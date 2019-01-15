@@ -1,11 +1,13 @@
 client_config_backend: settings
-client_config:
-  client_id: jibberjabber
-  client_secret: yourmothersadirtywhore
+client_config_file: client_secret.json
+# client_config:
+  # client_id: jibberjabber
+  # client_secret: yourmothersadirtywhore
 
 save_credentials: True
 save_credentials_backend: file
-save_credentials_file: credentials.json
+save_credentials_file: google_creds.json
+save_credentials_file: google_creds.json
 
 get_refresh_token: True
 
