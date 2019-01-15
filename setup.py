@@ -8,7 +8,7 @@ setuptools.setup(
     version="0.0.1",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
-    description="Only Snarf Automation library",
+    description="Only Snarf Automation",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/skeetzo/onlysnarf",
