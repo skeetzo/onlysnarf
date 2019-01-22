@@ -53,6 +53,8 @@ GALLERY_FOLDER = False
 IMAGE_FILE = False
 # Twitter hashtags
 HASHTAGGING = False
+# -f -> force / ignore upload max wait
+FORCE_UPLOAD = False
 ########################################################################################################
 ##### Args #############################################################################################
 ########################################################################################################
@@ -68,9 +70,14 @@ while i < len(sys.argv):
         DEBUG = True
     if '-h' in str(sys.argv[i]):
         HASHTAGGING = True
+    if '-f' in str(sys.argv[i]):
+        FORCE_UPLOAD = True
     i += 1
 print('DEBUG='+str(DEBUG))
 print('BACKING_UP='+str(BACKING_UP))
+print('HASHTAGGING='+str(HASHTAGGING))
+if FORCE_UPLOAD:
+    print('FORCE_UPLOAD='+str(FORCE_UPLOAD))
 # debugging
 def maybePrint(text):
     if DEBUG:
@@ -314,9 +321,6 @@ def upload_file_to_OnlyFans(fileName, path):
     maxUploadCount = 12 # 2 hours
     i = 0
     while True:
-        if i == maxUploadCount:
-            print('max upload reached, breaking..')
-            break
         try:
             WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]')))
             if DEBUG:
@@ -327,6 +331,9 @@ def upload_file_to_OnlyFans(fileName, path):
         except Exception as e:
             print('uploading...')
             i+=1
+            if i == maxUploadCount and FORCE_UPLOAD is not True:
+                print('max upload wait reached, breaking..')
+                break
     print('File Uploaded Successfully')
     return
 # Uploads a folder to OnlyFans
