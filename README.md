@@ -2,12 +2,8 @@
   
 `pip install git+git://github.com/skeetzo/onlysnarf.git`
 
-<<<<<<< HEAD
-`python3 onlysnarf.py (-d) -i|-g|-v|-h|-f`
-=======
 `python3 onlysnarf.py (-d) -i|-g|-v`
 `git clone git@github.com:skeetzo/onlysnarf`
->>>>>>> b28c096f5b638a5118c5c9323f3f71342a1b8bd3
 
 ## args
 
