@@ -2,7 +2,12 @@
   
 `pip install git+git://github.com/skeetzo/onlysnarf.git`
 
+<<<<<<< HEAD
 `python3 onlysnarf.py (-d) -i|-g|-v|-h|-f`
+=======
+`python3 onlysnarf.py (-d) -i|-g|-v`
+`git clone git@github.com:skeetzo/onlysnarf`
+>>>>>>> b28c096f5b638a5118c5c9323f3f71342a1b8bd3
 
 ## args
 
@@ -12,7 +17,7 @@ Tests configuration. Does not upload or remove from Google Drive.
 
 -i (mage)  
   `python3 onlysnarf.py -i`  
-Uploads an image labeled: 'imageName- %d%m%y'  
+Uploads an image labeled: 'imageName - %d%m%y'  
 
 -g (allery)  
   `python3 onlysnarf.py -g`  
@@ -20,7 +25,11 @@ Uploads a gallery labeled: 'folderName - %d%m%y'
 
 -v (ideo)  
   `python3 onlysnarf.py -v`  
-Uploads a video labeled: 'folderName- %d%m%y'  
+Uploads a video labeled: 'folderName - %d%m%y'  
+
+-t (ext)  
+  `python3 onlysnarf.py -v -t "your mom"`  
+Uploads a video labeled: 'your mom - %d%m%y'  
 
 -h (ashtag)  
   `python3 onlysnarf.py -h`  
