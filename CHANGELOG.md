@@ -9,6 +9,8 @@
 	- sync with DBot updates; while loop upload
 **0.0.4 : 1/21/2019**
 	- upload fix & hashtagging
+**0.0.5 : 1/29/2019**
+	- vid
 
 ## ToDo
 	- installation / setup scripts  
