@@ -2,7 +2,7 @@
   
 `pip install git+git://github.com/skeetzo/onlysnarf.git`
 
-`python3 onlysnarf.py (-d) -i|-g|-v`
+`python3 onlysnarf.py (-d) -i|-g|-v|-h|-f`
 
 ## args
 
@@ -21,6 +21,14 @@ Uploads a gallery labeled: 'folderName - %d%m%y'
 -v (ideo)  
   `python3 onlysnarf.py -v`  
 Uploads a video labeled: 'folderName- %d%m%y'  
+
+-h (ashtag)  
+  `python3 onlysnarf.py -h`  
+Uploads a video with the source folder split into hash tags: '#folderName'  
+
+-f (orce upload)  
+  `python3 onlysnarf.py -f`  
+Attempts to upload limit regardless of file size. 
 
 ## Description
 
