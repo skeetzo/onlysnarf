@@ -34,7 +34,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from pprint import pprint
-os.system('clear')
+# os.system('clear')
 ########################################################################################################
 ##### Globals ##########################################################################################
 ########################################################################################################
@@ -92,12 +92,17 @@ while i < len(sys.argv):
     if '-delete' in str(sys.argv[i]):
         DELETING = False
     i += 1
-print('DEBUG='+str(DEBUG))
-print('BACKING_UP='+str(BACKING_UP))
-print('HASHTAGGING='+str(HASHTAGGING))
-print('TWEETING='+str(TWEETING))
+print('OnlySnarf Settings:')
+if DEBUG:
+    print(' - DEBUG = '+str(DEBUG))
+if BACKING_UP:
+    print(' - BACKING_UP = '+str(BACKING_UP))
+if HASHTAGGING:
+    print(' - HASHTAGGING = '+str(HASHTAGGING))
+if TWEETING:
+    print(' - TWEETING = '+str(TWEETING))
 if FORCE_UPLOAD:
-    print('FORCE_UPLOAD='+str(FORCE_UPLOAD))
+    print(' - FORCE_UPLOAD = '+str(FORCE_UPLOAD))
 # debugging
 def maybePrint(text):
     if DEBUG:
@@ -107,12 +112,12 @@ def maybePrint(text):
 ########################################################################################################
 with open(CONFIG_FILE) as config_file:    
     config = json.load(config_file)
-maybePrint('Loaded: Config')
+# maybePrint('Loaded: Config')
 ########################################################################################################
 ##### Authenticate Google ##############################################################################
 ########################################################################################################
-print('Uploading Google Drive content to OnlyFans')
-print('Authenticating Google...')
+# print('Uploading Google Drive content to OnlyFans')
+# print('Authenticating Google...')
 try:
     # Google Drive folder ids and OnlyFans login
     OnlyFans_USERNAME = config['username']        
@@ -125,7 +130,7 @@ try:
     gauth = GoogleAuth()
     # Try to load saved client credentials
     gauth.LoadCredentialsFile(os.path.join(GOOGLE_CREDS))
-    maybePrint('Loaded: Google Credentials')
+    # maybePrint('Loaded: Google Credentials')
     if gauth.credentials is None:
         # Authenticate if they're not there
         gauth.LocalWebserverAuth()
@@ -143,12 +148,98 @@ except:
     print('exiting...')
     sys.stdout.flush()
     sys.exit()
-print('...Authentication Success!') 
+# print('...Authentication Success!') 
 sys.stdout.flush()
 ########################################################################################################
 ##### FUNCTIONS ########################################################################################
 ########################################################################################################
 FOLDER_NAME = None
+
+def download(fileChoice):
+    if fileChoice == 'image':
+        return download_image_()
+    elif fileChoice == 'gallery':
+        return download_gallery_()
+    elif fileChoice == 'video':
+        return download_video_()
+
+def download_image_():
+    if DEBUG:
+        print('Deleting Locals')
+        remove_local()
+    print('Fetching Content')
+    random_file = get_random_image()
+    file_name = random_file['title']
+    file_path = download_file(random_file)
+    if random_file == None:
+        print('Missing Random Image')
+        return
+    if file_path == None:
+        print('Missing Random Image: Empty Download')
+        return
+    return [file_name, file_path]
+
+def download_gallery_():
+    if DEBUG:
+        print('Deleting Locals')
+        remove_local()
+    print('Fetching Content')
+    random_file = get_random_gallery()
+    file_name = random_file['title']
+    file_path = download_gallery(random_file)
+    if random_file == None:
+        print('Missing Random Gallery')
+        return
+    if file_path == None:
+        print('Missing Random Gallery: Empty Download')
+        return
+    return [file_name, file_path]
+
+def download_video_():
+    if DEBUG:
+        print('Deleting Locals')
+        remove_local()
+    print('Fetching Content')
+    random_file = get_random_video()
+    file_name = random_file['title']
+    file_path = download_file(random_file)
+    if random_file == None:
+        print('Missing Random Video')
+        return
+    if file_path == None:
+        print('Missing Random Video: Empty Download')
+        return
+    return [file_name, file_path]
+
+def upload(fileChoice):
+    if fileChoice == 'image':
+        return upload_image_()
+    elif fileChoice == 'gallery':
+        return upload_gallery_()
+    elif fileChoice == 'video':
+        return upload_video_()
+
+def upload_image_(file_name, file_path):
+    print('Accessing OnlyFans')
+    log_into_OnlyFans()
+    upload_file_to_OnlyFans(file_name, file_path)
+    print('Upload Complete')
+    return
+
+def upload_gallery_(file_name, file_path):
+    print('Accessing OnlyFans')
+    log_into_OnlyFans()
+    upload_directory_to_OnlyFans(file_name, file_path)
+    print('Upload Complete')
+    return
+
+def upload_video_(file_name, file_path):
+    print('Accessing OnlyFans')
+    log_into_OnlyFans()
+    upload_file_to_OnlyFans(file_name, file_path)
+    print('Upload Complete')
+    return
+
 # Downloads random video from Google Drive
 def get_random_video():
     print('Downloading Random Video')
@@ -460,7 +551,7 @@ def main():
     if args.remove_local:
         print('3/4 : Cleaning Up Files')
         remove_local()
-    if args.backup
+    if args.backup:
         print('4/4 : Backing Up')
         move_file(random_file)
     if args.delete:

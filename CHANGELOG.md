@@ -10,8 +10,10 @@
 **0.0.4 : 1/21/2019**
 	- upload fix & hashtagging
 **0.0.5 : 1/29/2019**
-	- vid
-
+	- demo
+**0.0.6 : 2/3/2019**
+	- menu
+	
 ## ToDo
 	- installation / setup scripts  
 	- |_ configure settings.yaml -> client_id & client_secret

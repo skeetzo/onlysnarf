@@ -5,40 +5,11 @@ import datetime
 import json
 import sys
 import pathlib
-import OnlySnarf 
-import importlib.util
-spec = importlib.util.spec_from_file_location("module.name", "/path/to/file.py")
 
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
 
-header = "\
-_________               .__    __________                   __               __\n\
-\_   ___ \  ____   ____ |  |   \______   \_______  ____    |__| ____   _____/  |_\n\
-/    \  \/ /  _ \ /  _ \|  |    |     ___/\_  __ \/  _ \   |  |/ __ \_/ ___\   __\\\n\
-\     \___(  <_> |  <_> )  |__  |    |     |  | \(  <_> )  |  \  ___/\  \___|  |\n\
- \______  /\____/ \____/|____/  |____|     |__|   \____/\__|  |\___  >\___  >__|\n\
-        \/                                             \______|    \/     \/      \n"
- 
-colors = {
-        'blue': '\033[94m',
-        'pink': '\033[95m',
-        'green': '\033[92m',
-        }
- 
-def colorize(string, color):
-    if not color in colors: return string
-    return colors[color] + string + '\033[0m'
- 
-def foo():
-    print("You called foo()")
-    input("Press [Enter] to continue...")
- 
-def bar():
-    print("You called bar()")
-    input("Press [Enter] to continue...")
- 
-def exit():
-    sys.exit(0)
-
+with open(CONFIG_FILE) as config_file:    
+    config = json.load(config_file)
 
 # GIANT TO;DO
 # menu for updating and setting the config file
@@ -74,9 +45,50 @@ def exit():
 # - Show
 # - Update
 
+
+header = " ________         .__          _________                     _____ \n \
+\\_____  \\   ____ |  | ___.__./   _____/ ____ _____ ________/ ____\\\n \
+ /   |   \\ /    \\|  |<   |  |\\_____  \\ /    \\\\__  \\\\_   _ \\   __\\ \n \
+/    |    \\   |  \\  |_\\___  |/        \\   |  \\/ __ \\ |  |\\/| |   \n \
+\\_______  /___|  /____/ ____/_______  /___|  (____  \\\\__|  |_|   \n \
+        \\/     \\/     \\/            \\/     \\/     \\/              \n"
+ 
+colors = {
+        'blue': '\033[94m',
+        'teal': '\033[96m',
+        'pink': '\033[95m',
+        'green': '\033[92m',
+        'yellow': '\033[93m',
+        }
+
 menuItems = [
-    [ "Download, Upload, & Backup", "downloadUploadAndBackup"],
+    [ "Actions", "action"],
+    [ "Settings", "settings"],
     [ "Exit", "exit"]
+]
+
+actionItems = [
+    [ "Download", ["download"]],
+    [ "Upload", ["upload"]],
+    [ "Backup", ["backup"]],
+    [ "Download & Upload", ["download", "upload"]],
+    [ "Download, Upload, & Backup", ["download", "upload", "backup"]],
+    [ "Upload & Backup", ["upload", "backup"]]
+]
+
+fileItems = [
+    [ "Image", "image"],
+    [ "Gallery", "gallery"],
+    [ "Video", "video"],
+]
+
+locationItems = [
+    [ "Local", "local"],
+    [ "Google Drive", "google"]
+]
+
+settingItems = [
+    [ "Local", "local"],
 ]
 # menuItems = list(menuItems)
  
@@ -87,14 +99,67 @@ ARGS = {
     "delete": False
 }
 
-with open(CONFIG_FILE) as config_file:    
-    config = json.load(config_file)
+FILE_NAME = None
+FILE_PATH = None
 
+def settings():
+    for item in settingItems:
+        print(colorize("[" + str(settingItems.index(item)) + "] ", 'blue') + list(item)[0])
+    return
+
+def action():
+    ### File Menu
+    for item in actionItems:
+        print(colorize("[" + str(actionItems.index(item)) + "] ", 'teal') + list(item)[0])
+    while True:
+        actionChoice = input(">> ")
+        try:
+            if int(actionChoice) < 0 or int(actionChoice) >= len(actionItems): raise ValueError
+            # Call the matching function
+            actionChoice = list(actionItems[int(actionChoice)])[1]
+            return finalizeAction(actionChoice)
+        except (ValueError, IndexError):
+            print("Incorrect Index")
+            pass
+
+def finalizeAction(choice):
+    ### File Menu
+    for item in fileItems:
+        print(colorize("[" + str(fileItems.index(item)) + "] ", 'teal') + list(item)[0])
+    while True:
+        fileChoice = input(">> ")
+        try:
+            if int(fileChoice) < 0 or int(fileChoice) >= len(fileItems): raise ValueError
+            # Call the matching function
+            fileChoice = list(fileItems[int(fileChoice)])[1]
+            return performAction(choice, fileChoice)
+        except (ValueError, IndexError):
+            print("Incorrect Index")
+            pass
+
+def performAction(actionChoice, fileChoice):
+    import onlysnarf
+    for action in actionChoice:
+        try:
+            method = getattr(onlysnarf, str(action))
+            output = method(fileChoice)
+        except (AttributeError):
+            print("Missing Method") 
+
+def colorize(string, color):
+    if not color in colors: return string
+    return colors[color] + string + '\033[0m'
+  
+def exit():
+    sys.exit(0)
 
 def main():
+    os.system('clear')
     # Print some badass ascii art header here !
     print(colorize(header, 'pink'))
-    print(colorize('version 0.1\n', 'green'))
+    print(colorize('version 1.0.0\n', 'green'))
+    import onlysnarf
+    ### Main Menu
     for item in menuItems:
         print(colorize("[" + str(menuItems.index(item)) + "] ", 'blue') + list(item)[0])
     while True:
@@ -107,13 +172,12 @@ def main():
             possibles.update(locals())
             method = possibles.get(method_name)
             if method is not None:
-                method(ARGS)
+                return method()
             else:
                 print("Missing Option")    
         except (ValueError, IndexError):
             print("Incorrect Index")
             pass
-
 
 if __name__ == "__main__":
     main()
