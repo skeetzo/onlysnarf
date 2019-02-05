@@ -1,9 +1,8 @@
 #!/usr/bin/python
 # 2/3/2019 - Skeetzo
-# onlysnarf.py menu system
+# script.py menu system
 
 # GIANT TO;DO
-# menu for updating and setting the config file
 # uploads files via download or local to onlyfans location
 # can set whether to backup or delete
 # can do each thing separately
@@ -18,7 +17,6 @@
 # upload & backup (requires upload via local added to main script)
 # settings menu -> "Incorrect Index"
 
-
 import random
 import os
 import shutil
@@ -26,8 +24,9 @@ import datetime
 import json
 import sys
 import pathlib
+import OnlySnarf.onlysnarf as onlysnarf
 ###########################
-header = " ________         .__          _________                     _____ \n \
+header = "\n ________         .__          _________                     _____ \n \
 \\_____  \\   ____ |  | ___.__./   _____/ ____ _____ ________/ ____\\\n \
  /   |   \\ /    \\|  |<   |  |\\_____  \\ /    \\\\__  \\\\_   _ \\   __\\ \n \
 /    |    \\   |  \\  |_\\___  |/        \\   |  \\/ __ \\ |  |\\/| |   \n \
@@ -54,11 +53,13 @@ FORCE_UPLOAD = False
 # -show -> shows window
 SHOW_WINDOW = False
 # -t -> text
-TEXT = None
+TEXT = "Default"
 # -q -> quiet / no tweet
 TWEETING = True
 FILE_NAME = None
 FILE_PATH = None
+UPDATED = False
+UPDATED_TO = False
 i = 0
 while i < len(sys.argv):
     if '-t' in str(sys.argv[i]):
@@ -80,10 +81,12 @@ while i < len(sys.argv):
 ###########################
 colors = {
         'blue': '\033[94m',
+        'header': '\033[48;1;34m',
         'teal': '\033[96m',
         'pink': '\033[95m',
         'green': '\033[92m',
         'yellow': '\033[93m',
+        'menu': '\033[48;1;44m'
         }
 
 menuItems = [
@@ -92,7 +95,7 @@ menuItems = [
     [ "Exit", "exit"]
 ]
 
-actionItems = [
+actionItems = sorted([
     [ "All", ["all"]],
     [ "Download", ["download"]],
     # [ "Upload", ["upload"]],
@@ -100,54 +103,43 @@ actionItems = [
     # [ "Download & Upload", ["download", "upload"]],
     # [ "Download, Upload, & Backup", ["download", "upload", "backup"]],
     # [ "Upload & Backup", ["upload", "backup"]],
-    [ "Back", ["main"]]
-]
+    [ "Reset", ["reset"]]
+])
+actionItems.append([ "Back", ["main"]])
 
-fileItems = [
+fileItems = sorted([
     [ "Image", "image"],
     [ "Gallery", "gallery"],
     [ "Video", "video"],
-]
+])
 
-locationItems = [
+locationItems = sorted([
     [ "Local", "local"],
     [ "Google Drive", "google"]
-]
+])
 
-settingItems = [
+settingItems = sorted([
     [ "File Name", FILE_NAME],
     [ "File Path", FILE_PATH],
-    [ "Location", LOCATION],
-    [ "Backup", BACKING_UP],
-    [ "Delete Google", DELETING],
-    [ "Delete Local", REMOVE_LOCAL],
-    [ "Hashtag", HASHTAGGING],
-    [ "Force Upload", FORCE_UPLOAD],
-    [ "Show Window", SHOW_WINDOW],
+    [ "Location", LOCATION, ["Local","Google"]],
+    [ "Backup", BACKING_UP, ["True","False"]],
+    [ "Delete Google", DELETING, ["True","False"]],
+    [ "Delete Local", REMOVE_LOCAL, ["True","False"]],
+    [ "Hashtag", HASHTAGGING, ["True","False"]],
+    [ "Force Upload", FORCE_UPLOAD, ["True","False"]],
+    [ "Show Window", SHOW_WINDOW, ["True","False"]],
     [ "Text", TEXT],
-    [ "Tweeting", TWEETING],
-    [ "Debug", DEBUG],
-    [ "Debug Skip Download", DEBUG_SKIP_DOWNLOAD],
-    [ "Back", "main"]
-]
-
-runtimeItems = [
-    [ "Debug", DEBUG],
-    [ "Delete Google", DELETING],
-    [ "Delete Local", REMOVE_LOCAL],
-    [ "Force Upload", FORCE_UPLOAD],
-    [ "Hashtag", HASHTAGGING],
-    [ "Location", LOCATION],
-    [ "Show Window", SHOW_WINDOW],
-    [ "Text", TEXT],
-    [ "Tweeting", TWEETING]
-]
+    [ "Tweeting", TWEETING, ["True","False"]],
+    [ "Debug", DEBUG, ["True","False"]],
+    [ "Debug Skip Download", DEBUG_SKIP_DOWNLOAD, ["True","False"]]    
+])
+settingItems.append([ "Back", "main"])
 
 ###########################
-# import atexit
-# def exit_handler():
-#     print('')
-# atexit.register(exit_handler)
+import atexit
+def exit_handler():
+    print('Shnnarrrff!')
+atexit.register(exit_handler)
 ###########################
 
 ### Action Menu - file type
@@ -155,19 +147,22 @@ def action():
     for item in actionItems:
         print(colorize("[" + str(actionItems.index(item)) + "] ", 'teal') + list(item)[0])
     while True:
-        actionChoice = input(">> ")
+        choice = input(">> ")
         try:
-            if int(actionChoice) < 0 or int(actionChoice) >= len(actionItems): raise ValueError
-            if actionItems[int(actionChoice)] == "Back":
+            if int(choice) < 0 or int(choice) >= len(actionItems): raise ValueError
+            if str(actionItems[int(choice)][0]) == "Back":
                 return main()
-            actionChoice = list(actionItems[int(actionChoice)])[1]
-            return finalizeAction(actionChoice)
+            elif str(actionItems[int(choice)][0]) == "Reset":
+                onlysnarf.remove_local()
+            else:
+                actionChoice = list(actionItems[int(choice)])[1]
+                return finalizeAction(actionChoice)
         except (ValueError, IndexError, KeyboardInterrupt):
             print("Incorrect Index")
             pass
 
 ### Action Menu - finalize
-def finalizeAction(choice):
+def finalizeAction(actionChoice):
     for item in fileItems:
         print(colorize("[" + str(fileItems.index(item)) + "] ", 'teal') + list(item)[0])
     while True:
@@ -176,14 +171,13 @@ def finalizeAction(choice):
             if int(fileChoice) < 0 or int(fileChoice) >= len(fileItems): raise ValueError
             # Call the matching function
             fileChoice = list(fileItems[int(fileChoice)])[1]
-            return performAction(choice, fileChoice)
+            return performAction(actionChoice, fileChoice)
         except (ValueError, IndexError, KeyboardInterrupt):
             print("Incorrect Index")
             pass
 
 ### Action Menu - perform
 def performAction(actionChoice, fileChoice):
-    import onlysnarf
     for action in actionChoice:
         try:
             method = getattr(onlysnarf, str(action))
@@ -199,30 +193,55 @@ def performAction(actionChoice, fileChoice):
 
 ### Settings Menu
 def settings():
+    showHeader()
+    print(colorize("Set:",'menu'))
+    global settingItems
     for item in settingItems:
         print(colorize("[" + str(settingItems.index(item)) + "] ", 'blue') + list(item)[0])
     while True:
-        settingChoice = input(">> ")
+        choice = input(">> ")
         try:
-            if int(settingChoice) < 0 or int(settingChoice) >= len(settingItems): raise ValueError
-            settingChoice = list(settingItems[int(settingChoice)])[0]
-            settingValue = list(settingItems[int(settingChoice)])[1]
-            if settingChoice == "Back":
+            if int(choice) < 0 or int(choice) >= len(settingItems): raise ValueError
+            settingChoice = list(settingItems[int(choice)])[0]
+            settingValue = list(settingItems[int(choice)])[1]
+            if str(settingChoice) == "Back":
                 return main()
-            if settingChoice == "Location":
-                if settingValue == "Google":
-                    settingValue = "Local"
-                elif settingValue == "Local":
-                    settingValue = "Google"
-            elif settingValue:
-                settingValue = False
-            elif settingValue == False:
-                settingValue = True
-            list(settingItems[int(settingChoice)])[1] = settingValue
-            print("Updated: "+settingChoice)
-            return main()
-        except (ValueError, IndexError, KeyboardInterrupt):
+            elif str(settingChoice) == "File Name":
+                settingValue = input("Enter the file name: ")
+            elif str(settingChoice) == "File Path":
+                settingValue = input("Enter the file path: ")
+            elif str(settingChoice) == "Text":
+                settingValue = input("Enter the upload text: ")
+            else:
+                list_ = list(settingItems[int(choice)][2])
+                print(colorize(str(settingChoice)+" =", 'blue'))
+                for item in list_:
+                    print(colorize("[" + str(list_.index(item)) + "] ", 'pink') + str(item))
+                while True:
+                    updateChoice = input(">> ")
+                    try:
+                        if int(updateChoice) < 0 or int(updateChoice) >= len(list(settingItems[int(choice)][2])): raise ValueError
+                        settingValue = list_[int(updateChoice)]
+                        break
+                    except (IndexError, ValueError, KeyboardInterrupt):
+                        print("Incorrect Index")
+                        pass
+                    except:
+                        print('What did shnnarf break?')
+                        print(sys.exc_info()[0])
+                        break
+            global UPDATED
+            UPDATED = settingChoice
+            global UPDATED_TO
+            UPDATED_TO = settingValue
+            settingItems[int(choice)][1] = settingValue
+            return settings()
+        except (IndexError, ValueError, KeyboardInterrupt):
             print("Incorrect Index")
+            pass
+        except:
+            print(sys.exc_info()[0])
+            return main()
             pass
 
 ###########################
@@ -232,19 +251,23 @@ def colorize(string, color):
     return colors[color] + string + '\033[0m'
   
 def exit():
+    print("Shnarrf?")
     sys.exit(0)
 
 def main():
+    showHeader()
+    mainMenu()
+
+def showHeader():
     os.system('clear')
     # Print some badass ascii art header here !
-    print(colorize(header, 'pink'))
+    print(colorize(header, 'header'))
     print(colorize('version 0.0.6\n', 'green'))
-    import onlysnarf
     showSettings()
-    mainMenu()
 
 def mainMenu():
     ### Main Menu
+    print(colorize("Select an option:", 'menu'))
     for item in menuItems:
         print(colorize("[" + str(menuItems.index(item)) + "] ", 'blue') + list(item)[0])
     while True:
@@ -265,9 +288,24 @@ def mainMenu():
             pass
 
 def showSettings():
-    print('OnlySnarf Settings:')
-    for setting in runtimeItems:
-        print(' - '+setting[0]+' = '+str(setting[1]))
+    print('Settings:')
+    for setting in settingItems:
+        if str(setting[0]) != "Back":
+            print(' - '+setting[0]+' = '+str(setting[1]))
+    global UPDATED
+    global UPDATED_TO
+    if UPDATED:
+        print('\nUpdated: '+str(UPDATED)+' -> '+str(UPDATED_TO))
+    else:
+        print('\n'+str(UPDATED))
+    UPDATED = False
+    print('\r')
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except:
+        # print(sys.exc_info()[0])
+        print("Shhhhhnnnnnarf!")
+    finally:
+        sys.exit(0)

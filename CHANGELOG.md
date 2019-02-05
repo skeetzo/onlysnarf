@@ -13,6 +13,7 @@
 	- demo
 **0.0.6 : 2/3/2019**
 	- menu
+	- package & setup.py
 	
 ## ToDo
 	- installation / setup scripts  
@@ -20,3 +21,5 @@
 	- |_ configure config.json -> OnlySnarf login & Google Drive folder ids
 
 	- add arg: -t '[upload text]'
+
+sudo python3 setup.py install

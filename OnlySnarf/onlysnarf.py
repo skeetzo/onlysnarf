@@ -17,7 +17,6 @@
 
 ########################################################################################################
 ##### Dependencies #####################################################################################
-# pip install selenium 
 ########################################################################################################
 import random
 import os
@@ -26,6 +25,7 @@ import datetime
 import json
 import sys
 import pathlib
+import chromedriver_binary
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -39,7 +39,8 @@ from pprint import pprint
 ########################################################################################################
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
 GOOGLE_CREDS = os.path.join(os.path.dirname(os.path.realpath(__file__)),'google_creds.txt')
-CHROMEDRIVER_PATH = "/usr/local/bin/chromedriver"
+CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
+# print(CHROMEDRIVER_PATH)
 DEBUG = False
 DEBUG_SKIP_DOWNLOAD = True
 IMAGE_UPLOAD_LIMIT = 6
@@ -135,39 +136,47 @@ with open(CONFIG_FILE) as config_file:
 ##### Authenticate Google ##############################################################################
 ########################################################################################################
 # print('Uploading Google Drive content to OnlyFans')
-# print('Authenticating Google...')
-try:
-    # Google Drive folder ids and OnlyFans login
-    OnlyFans_USERNAME = config['username']        
-    OnlyFans_PASSWORD = config['password']   
-    OnlyFans_VIDEOS_FOLDER = config['videos_folder']
-    OnlyFans_IMAGES_FOLDER = config['images_folder']
-    OnlyFans_GALLERIES_FOLDER = config['galleries_folder']
-    OnlyFans_POSTED_FOLDER = config['posted_folder']
-    # Google Auth
-    gauth = GoogleAuth()
-    # Try to load saved client credentials
-    gauth.LoadCredentialsFile(os.path.join(GOOGLE_CREDS))
-    # maybePrint('Loaded: Google Credentials')
-    if gauth.credentials is None:
-        # Authenticate if they're not there
-        gauth.LocalWebserverAuth()
-    elif gauth.access_token_expired:
-        # Refresh them if expired
-        gauth.Refresh()
-    else:
-        # Initialize the saved creds
-        gauth.Authorize()
-    # Save the current credentials to a file
-    gauth.SaveCredentialsFile(os.path.join(GOOGLE_CREDS))
-    drive = GoogleDrive(gauth)
-except:
-    print('...Authentication Failure!')
-    print('exiting...')
+def authGoogle():
+    print('Authenticating Google...')
+    try:
+        # Google Drive folder ids and OnlyFans login
+        global OnlyFans_USERNAME
+        global OnlyFans_PASSWORD
+        global OnlyFans_VIDEOS_FOLDER
+        global OnlyFans_IMAGES_FOLDER
+        global OnlyFans_GALLERIES_FOLDER
+        global OnlyFans_POSTED_FOLDER
+        OnlyFans_USERNAME = config['username']        
+        OnlyFans_PASSWORD = config['password']   
+        OnlyFans_VIDEOS_FOLDER = config['videos_folder']
+        OnlyFans_IMAGES_FOLDER = config['images_folder']
+        OnlyFans_GALLERIES_FOLDER = config['galleries_folder']
+        OnlyFans_POSTED_FOLDER = config['posted_folder']
+        # Google Auth
+        gauth = GoogleAuth()
+        # Try to load saved client credentials
+        gauth.LoadCredentialsFile(GOOGLE_CREDS)
+        # maybePrint('Loaded: Google Credentials')
+        if gauth.credentials is None:
+            # Authenticate if they're not there
+            gauth.LocalWebserverAuth()
+        elif gauth.access_token_expired:
+            # Refresh them if expired
+            gauth.Refresh()
+        else:
+            # Initialize the saved creds
+            gauth.Authorize()
+        # Save the current credentials to a file
+        gauth.SaveCredentialsFile(GOOGLE_CREDS)
+        global drive
+        drive = GoogleDrive(gauth)
+    except:
+        print('...Authentication Failure!')
+        print('exiting...')
+        sys.stdout.flush()
+        sys.exit()
+    print('...Authentication Success!') 
     sys.stdout.flush()
-    sys.exit()
-# print('...Authentication Success!') 
-sys.stdout.flush()
 ########################################################################################################
 ##### MENU FUNCTIONS ###################################################################################
 ########################################################################################################
@@ -191,6 +200,7 @@ def all(fileChoice, args):
 
 def download(fileChoice, args):
     updateDefaults(args)
+    authGoogle()
     if fileChoice == 'image':
         return download_image_()
     elif fileChoice == 'gallery':
@@ -266,46 +276,30 @@ def upload(fileChoice, args):
         return upload_gallery_(file_name, file_path)
     elif fileChoice == 'video':
         return upload_video_(file_name, file_path)
-    print('Upload Complete')
-    sys.stdout.flush()
-    #################################################
-    if REMOVE_LOCAL:
-        print('Cleaning Up Files')
-        remove_local()
-    if BACKING_UP:
-        print('Backing Up')
-        move_file(random_file)
-    if DELETING:
-        print('Deleting')
-        delete_file(random_file)
-    sys.stdout.flush()
+    else:
+        print("Missing Upload Choice")
 
 def upload_image_(file_name, file_path):
     print('Accessing OnlyFans')
     log_into_OnlyFans()
     upload_file_to_OnlyFans(file_name, file_path)
     print('Upload Complete')
-    return
 
 def upload_gallery_(file_name, file_path):
     print('Accessing OnlyFans')
     log_into_OnlyFans()
     upload_directory_to_OnlyFans(file_name, file_path)
     print('Upload Complete')
-    return
 
 def upload_video_(file_name, file_path):
     print('Accessing OnlyFans')
     log_into_OnlyFans()
     upload_file_to_OnlyFans(file_name, file_path)
     print('Upload Complete')
-    return
 
 def backup(fileChoice, args):
     updateDefaults(args)
     print("Missing Feature: Backup")
-    return
-
 
 ########################################################################################################
 ##### FUNCTIONS ########################################################################################
@@ -314,22 +308,19 @@ def backup(fileChoice, args):
 def get_random_video():
     print('Downloading Random Video')
     random_folders = drive.ListFile({'q': "'"+OnlyFans_VIDEOS_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-    video_list = [];
-    random_video = None;
-    # print('random folders: '+str(random_folders))
-    print('randomizing folder...')
+    video_list = []
+    random_video = None
     for folder in random_folders:
-        random_folder_folder = random.choice(random_folders)
+        print('checking folder: '+folder['title'],end="")
         video_list_tmp = drive.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
-        if len(video_list_tmp)==0:
-           maybePrint('skipping empty folder: '+folder['title'])
-        else:
-            maybePrint('folder found: '+folder['title'])
+        if len(video_list_tmp)>0:
             video_list.append(folder)
+            print(" -> added")
+        else:
+            print(" -> empty")
     if len(video_list)==0:
         print('No video file found!')
         return
-    # print('video list: '+str(video_list))
     random_video = random.choice(video_list)
     global FOLDER_NAME
     FOLDER_NAME = random_video['title'];
@@ -343,25 +334,26 @@ def get_random_video():
 def get_random_image():
     print('Downloading Random Image')
     random_folders = drive.ListFile({'q': "'"+OnlyFans_IMAGES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-    images_list = [];
-    random_image = None;
+    images_list = []
+    random_image = None
     for folder in random_folders:
-        random_folder_folder = random.choice(random_folders)
-        images_list = drive.ListFile({'q': "'"+random_folder_folder['id']+"' in parents and trashed=false and mimeType contains 'image/jpeg'"}).GetList()      
-        if len(images_list)==0:
-            maybePrint('skipping empty folder: '+random_folder_folder['title'])
-        elif len(images_list)>0:
-            # print('- folder found: '+images_list['title'])
-            global FOLDER_NAME
-            FOLDER_NAME = random_folder_folder['title']
-            maybePrint('folder name: '+FOLDER_NAME)
-            random_image = random.choice(images_list)
-            maybePrint('random image: '+random_image['title'])
-            return random_image
+        if DEBUG:
+            print('checking folder: '+folder['title'],end="")
+        images_list_tmp = drive.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
+        if len(images_list_tmp)>0:
+            video_list.append(folder)
+            maybePrint(" -> added")
+        else:
+            maybePrint(" -> empty")
     if len(images_list)==0:
         print('No image file found!')
         return
     random_image = random.choice(images_list)
+    global FOLDER_NAME
+    FOLDER_NAME = random_image['title'];
+    print('Random Folder: '+random_image['title'])
+    random_image = drive.ListFile({'q': "'"+random_image['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
+    random_image = random.choice(random_image)
     print('Random Image: '+random_image['title'])
     return random_image
 
@@ -369,24 +361,34 @@ def get_random_image():
 def get_random_gallery():
     print('Downloading Random Gallery')
     random_folders = drive.ListFile({'q': "'"+OnlyFans_GALLERIES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-    gallery_list = [];
-    random_gallery = None;
+    folder_list = []
+    gallery_list = []
+    random_gallery = None
     for folder in random_folders:
-        random_folder_folder = random.choice(random_folders)
-        gallery_list = drive.ListFile({'q': "'"+random_folder_folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        if len(gallery_list)==0:
-            maybePrint('- skipping empty folder: '+random_folder_folder['title'])
-        elif len(gallery_list)>0:
-            global FOLDER_NAME
-            FOLDER_NAME = random_folder_folder['title']
-            maybePrint('folder name: '+FOLDER_NAME)
-            random_gallery = random.choice(gallery_list)
-            maybePrint('random gallery: '+random_gallery['title'])
-            return random_gallery
+        if DEBUG:
+            print('checking folders: '+folder['title'],end="")
+        gallery_list_tmp = drive.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+        if len(gallery_list_tmp)>0:
+            folder_list.append(folder)
+            maybePrint(" -> added")
+        else:
+            maybePrint(" -> empty")
+
+    for folder in folder_list:
+        if DEBUG:
+            print('checking gallery: '+folder['title'],end="")
+        gallery_list_tmp = drive.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
+        if len(gallery_list_tmp)>0:
+            gallery_list.append(folder)
+            maybePrint(" -> added")
+        else:
+            maybePrint(" -> empty")
     if len(gallery_list)==0:
         print('No gallery folders found!')
         return
     random_gallery = random.choice(gallery_list)
+    global FOLDER_NAME
+    FOLDER_NAME = random_gallery['title'];
     print('Random Gallery: '+random_gallery['title'])
     return random_gallery
 
@@ -426,7 +428,7 @@ def download_gallery(folder):
     if not os.path.exists(path):
         os.makedirs(path)
     # download folder
-    file_list = drive.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'image/jpeg'"}).GetList()
+    file_list = drive.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
     folder_size = len(file_list)
     maybePrint('Folder size: '+str(folder_size))
     maybePrint('Upload limit: '+str(IMAGE_UPLOAD_LIMIT))
@@ -467,7 +469,6 @@ def log_into_OnlyFans():
     password.send_keys(OnlyFans_PASSWORD)
     password.send_keys(Keys.ENTER)
     print('Login Success')
-    return
 
 # Uploads a file to OnlyFans
 def upload_file_to_OnlyFans(fileName, path):
@@ -502,7 +503,6 @@ def upload_file_to_OnlyFans(fileName, path):
                 print('max upload wait reached, breaking..')
                 break
     print('File Uploaded Successfully')
-    return
 
 # Uploads a folder to OnlyFans
 def upload_directory_to_OnlyFans(dirName, path):
@@ -530,21 +530,18 @@ def upload_directory_to_OnlyFans(dirName, path):
         return
     send = WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]'))).click()
     print('Directory Uploaded Successfully')
-    return
 
 # Deletes local file
 def remove_local():
-    print('Deleting Local File(s)')
+    # print('Deleting Local File(s)')
     # delete /tmp
     tmp = os.getcwd()
     tmp += '/tmp'
     if os.path.exists(tmp):
         shutil.rmtree(tmp)
         print('Local File(s) Removed')
-        return
     else:
         print('Local Files Not Found')
-        return
 
 # Deletes online file
 def delete_file(file):
@@ -554,7 +551,6 @@ def delete_file(file):
         return
     file.Trash()
     print('Google Video Trashed')
-    return
 
 # Archives posted file
 def move_file(file):
@@ -565,7 +561,6 @@ def move_file(file):
     file['parents'] = [{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}]
     file.Upload()
     print('Google Video Archived')
-    return
 ########################################################################################################
 ###### START ###########################################################################################
 ########################################################################################################
@@ -573,6 +568,7 @@ def move_file(file):
     # return print('- Skipping Download -')
 ########################################################################################################
 def main():
+    authGoogle()
     if DEBUG:
         print('0/3 : Deleting Locals')
         remove_local()
@@ -580,14 +576,20 @@ def main():
     RANDOM_FILE = None
     if GALLERY_FOLDER:
         RANDOM_FILE = get_random_gallery()
+        if RANDOM_FILE == None:
+            return
         FILE_NAME = RANDOM_FILE['title']
         FILE_PATH = download_gallery(RANDOM_FILE)
     elif VIDEO_FILE:
         RANDOM_FILE = get_random_video()
+        if RANDOM_FILE == None:
+            return
         FILE_NAME = RANDOM_FILE['title']
         FILE_PATH = download_file(RANDOM_FILE)
     elif IMAGE_FILE:
         RANDOM_FILE = get_random_image()
+        if RANDOM_FILE == None:
+            return
         FILE_NAME = RANDOM_FILE['title']
         FILE_PATH = download_file(RANDOM_FILE)
     else:
@@ -629,14 +631,19 @@ def main():
     #################################################
     print('Google Drive to OnlyFans Upload Complete!')
     sys.stdout.flush()
-    return
 
 if __name__ == "__main__":
-    os.system('clear')
-    print('OnlySnarf Settings:')
-    print(' - DEBUG = '+str(DEBUG))
-    print(' - BACKING_UP = '+str(BACKING_UP))
-    print(' - HASHTAGGING = '+str(HASHTAGGING))
-    print(' - TWEETING = '+str(TWEETING))
-    print(' - FORCE_UPLOAD = '+str(FORCE_UPLOAD))
-    main()
+    try:
+        # os.system('clear')
+        print('OnlySnarf Settings:')
+        print(' - DEBUG = '+str(DEBUG))
+        print(' - BACKING_UP = '+str(BACKING_UP))
+        print(' - HASHTAGGING = '+str(HASHTAGGING))
+        print(' - TWEETING = '+str(TWEETING))
+        print(' - FORCE_UPLOAD = '+str(FORCE_UPLOAD))
+        main()
+    except:
+        print(sys.exc_info()[0])
+        print("Shnarf!")
+    finally:
+        sys.exit(0)
