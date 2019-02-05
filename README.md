@@ -5,6 +5,12 @@
 `python3 onlysnarf.py (-d) -i|-g|-v`
 `git clone git@github.com:skeetzo/onlysnarf`
 
+(sudo) python3 setup.py install
+
+## Scripts
+  * `(sudo) main [args]`
+  * `(sudo) menu [args]`
+
 ## args
 
 -d (ebug)  

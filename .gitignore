@@ -1,6 +1,19 @@
+# Config
 config.json
 google_creds.txt
 settings.yaml
 node_modules/
 client_secret.json
-OnlySnarf/tmp/
+
+# Temporary downloads
+/tmp/
+
+# Compiled python modules.
+*.pyc
+
+# Setuptools distribution folder.
+/dist/
+/build/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
