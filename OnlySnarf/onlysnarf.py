@@ -3,7 +3,7 @@
 # 10/10/2018: args overhaul
 # 10/20/2018: usability overhaul
 # 1/21/2019: upload fix & hashtagging
-# 2/23/2019: upload ext fix & tweeting
+# 2/3/2019: upload ext fix & tweeting
 
 ###### Process ################################
 # download mp4 from Google Drive folder @ id  #
@@ -34,7 +34,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from pprint import pprint
-# os.system('clear')
 ########################################################################################################
 ##### Globals ##########################################################################################
 ########################################################################################################
@@ -44,6 +43,7 @@ CHROMEDRIVER_PATH = "/usr/local/bin/chromedriver"
 DEBUG = False
 DEBUG_SKIP_DOWNLOAD = True
 IMAGE_UPLOAD_LIMIT = 6
+REMOVE_LOCAL = True
 # selenium web browser
 BROWSER = None
 # backup uploaded content
@@ -66,6 +66,34 @@ SHOW_WINDOW = False
 TEXT = None
 # -q -> quiet / no tweet
 TWEETING = True
+def updateDefaults(args):
+    for arg in args:
+        if arg[0] == "Debug":
+            DEBUG = arg[1]
+        if arg[0] == "DEBUG_SKIP_DOWNLOAD":
+            DEBUG_SKIP_DOWNLOAD = arg[1]
+        if arg[0] == "IMAGE_UPLOAD_LIMIT":
+            IMAGE_UPLOAD_LIMIT = arg[1]
+        if arg[0] == "BACKING_UP":
+            BACKING_UP = arg[1]
+        if arg[0] == "DELETING":
+            DELETING = arg[1]
+        if arg[0] == "VIDEO_FILE":
+            VIDEO_FILE = arg[1]
+        if arg[0] == "GALLERY_FOLDER":
+            GALLERY_FOLDER = arg[1]
+        if arg[0] == "IMAGE_FILE":
+            IMAGE_FILE = arg[1]
+        if arg[0] == "HASHTAGGING":
+            HASHTAGGING = arg[1]
+        if arg[0] == "FORCE_UPLOAD":
+            FORCE_UPLOAD = arg[1]
+        if arg[0] == "SHOW_WINDOW":
+            SHOW_WINDOW = arg[1]
+        if arg[0] == "TEXT":
+            TEXT = arg[1]
+        if arg[0] == "TWEETING":        
+            TWEETING = arg[1]
 ########################################################################################################
 ##### Args #############################################################################################
 ########################################################################################################
@@ -92,17 +120,7 @@ while i < len(sys.argv):
     if '-delete' in str(sys.argv[i]):
         DELETING = False
     i += 1
-print('OnlySnarf Settings:')
-if DEBUG:
-    print(' - DEBUG = '+str(DEBUG))
-if BACKING_UP:
-    print(' - BACKING_UP = '+str(BACKING_UP))
-if HASHTAGGING:
-    print(' - HASHTAGGING = '+str(HASHTAGGING))
-if TWEETING:
-    print(' - TWEETING = '+str(TWEETING))
-if FORCE_UPLOAD:
-    print(' - FORCE_UPLOAD = '+str(FORCE_UPLOAD))
+
 # debugging
 def maybePrint(text):
     if DEBUG:
@@ -151,11 +169,28 @@ except:
 # print('...Authentication Success!') 
 sys.stdout.flush()
 ########################################################################################################
-##### FUNCTIONS ########################################################################################
+##### MENU FUNCTIONS ###################################################################################
 ########################################################################################################
 FOLDER_NAME = None
 
-def download(fileChoice):
+def all(fileChoice, args):
+    updateDefaults(args)
+    global GALLERY_FOLDER
+    GALLERY_FOLDER = False
+    global IMAGE_FILE
+    IMAGE_FILE = False
+    global VIDEO_FILE
+    VIDEO_FILE = False
+    if fileChoice == 'image':
+        IMAGE_FILE = True
+    elif fileChoice == 'gallery':
+        GALLERY_FOLDER = True
+    elif fileChoice == 'video':
+        VIDEO_FILE = True
+    main()
+
+def download(fileChoice, args):
+    updateDefaults(args)
     if fileChoice == 'image':
         return download_image_()
     elif fileChoice == 'gallery':
@@ -169,6 +204,9 @@ def download_image_():
         remove_local()
     print('Fetching Content')
     random_file = get_random_image()
+    if random_file == None:
+        print('Missing Random Image')
+        return
     file_name = random_file['title']
     file_path = download_file(random_file)
     if random_file == None:
@@ -211,13 +249,36 @@ def download_video_():
         return
     return [file_name, file_path]
 
-def upload(fileChoice):
+def upload(fileChoice, args):
+    updateDefaults(args)
+    file_name = None
+    file_path = None
+    for arg in args:
+        if arg[0] == "file_name":
+            file_name = arg[1]
+        if arg[0] == "file_path":
+            file_path = arg[1]
+    print('file name: '+str(file_name))
+    print('file path: '+str(file_path))
     if fileChoice == 'image':
-        return upload_image_()
+        return upload_image_(file_name, file_path)
     elif fileChoice == 'gallery':
-        return upload_gallery_()
+        return upload_gallery_(file_name, file_path)
     elif fileChoice == 'video':
-        return upload_video_()
+        return upload_video_(file_name, file_path)
+    print('Upload Complete')
+    sys.stdout.flush()
+    #################################################
+    if REMOVE_LOCAL:
+        print('Cleaning Up Files')
+        remove_local()
+    if BACKING_UP:
+        print('Backing Up')
+        move_file(random_file)
+    if DELETING:
+        print('Deleting')
+        delete_file(random_file)
+    sys.stdout.flush()
 
 def upload_image_(file_name, file_path):
     print('Accessing OnlyFans')
@@ -240,6 +301,15 @@ def upload_video_(file_name, file_path):
     print('Upload Complete')
     return
 
+def backup(fileChoice, args):
+    updateDefaults(args)
+    print("Missing Feature: Backup")
+    return
+
+
+########################################################################################################
+##### FUNCTIONS ########################################################################################
+########################################################################################################
 # Downloads random video from Google Drive
 def get_random_video():
     print('Downloading Random Video')
@@ -258,8 +328,7 @@ def get_random_video():
             video_list.append(folder)
     if len(video_list)==0:
         print('No video file found!')
-        sys.stdout.flush()
-        return sys.exit(0)
+        return
     # print('video list: '+str(video_list))
     random_video = random.choice(video_list)
     global FOLDER_NAME
@@ -291,8 +360,7 @@ def get_random_image():
             return random_image
     if len(images_list)==0:
         print('No image file found!')
-        sys.stdout.flush()
-        return sys.exit(0)
+        return
     random_image = random.choice(images_list)
     print('Random Image: '+random_image['title'])
     return random_image
@@ -317,8 +385,7 @@ def get_random_gallery():
             return random_gallery
     if len(gallery_list)==0:
         print('No gallery folders found!')
-        sys.stdout.flush()
-        return sys.exit(0)
+        return
     random_gallery = random.choice(gallery_list)
     print('Random Gallery: '+random_gallery['title'])
     return random_gallery
@@ -507,56 +574,57 @@ def move_file(file):
 ########################################################################################################
 def main():
     if DEBUG:
-        print('0/4 : Deleting Locals')
+        print('0/3 : Deleting Locals')
         remove_local()
-    print('1/4 : Fetching Content')
-    random_file = None
-    file_name = None
-    file_path = None
-    if args.content_type == 'gallery':
-        random_file = get_random_gallery()
-        file_name = random_file['title']
-        file_path = download_gallery(random_file)
-    elif args.content_type == 'video':
-        random_file = get_random_video()
-        file_name = random_file['title']
-        file_path = download_file(random_file)
-    elif args.content_type == 'image':
-        random_file = get_random_image()
-        file_name = random_file['title']
-        file_path = download_file(random_file)
+    print('1/3 : Fetching Content')
+    RANDOM_FILE = None
+    if GALLERY_FOLDER:
+        RANDOM_FILE = get_random_gallery()
+        FILE_NAME = RANDOM_FILE['title']
+        FILE_PATH = download_gallery(RANDOM_FILE)
+    elif VIDEO_FILE:
+        RANDOM_FILE = get_random_video()
+        FILE_NAME = RANDOM_FILE['title']
+        FILE_PATH = download_file(RANDOM_FILE)
+    elif IMAGE_FILE:
+        RANDOM_FILE = get_random_image()
+        FILE_NAME = RANDOM_FILE['title']
+        FILE_PATH = download_file(RANDOM_FILE)
     else:
         print('Missing Args!')
-        return
-    if random_file == None:
+        sys.stdout.flush()
+        sys.exit()
+    if RANDOM_FILE == None:
         print('Missing Random File / Directory!')
-        return
-    if file_path == None:
+        sys.stdout.flush()
+        sys.exit()
+    if FILE_PATH == None:
         print('Missing Random Video: Empty Download')
-        return
+        sys.stdout.flush()
+        sys.exit()
     sys.stdout.flush()
     #################################################
-    print('2/4 : Accessing OnlyFans')
+    print('2/3 : Accessing OnlyFans')
     log_into_OnlyFans()
-    if args.content_type == 'gallery':
-        upload_directory_to_OnlyFans(file_name, file_path)
-    elif args.content_type == 'video' or args.content_type == 'image':
-        upload_file_to_OnlyFans(file_name, file_path)
+    sys.stdout.flush()
+    if GALLERY_FOLDER:
+        upload_directory_to_OnlyFans(FILE_NAME, FILE_PATH)
+    elif VIDEO_FILE or IMAGE_FILE:
+        upload_file_to_OnlyFans(FILE_NAME, FILE_PATH)
     else:
         print('Missing OnlyFans Instructions!')
-        return
+        sys.stdout.flush()
+        sys.exit()
     print('Upload Complete')
     sys.stdout.flush()
     #################################################
-    if args.remove_local:
-        print('3/4 : Cleaning Up Files')
-        remove_local()
-    if args.backup:
-        print('4/4 : Backing Up')
-        move_file(random_file)
-    if args.delete:
-        print('5/4 : Deleting')
-        delete_file(random_file)
+    print('3/3 : Cleaning Up Files')
+    remove_local()
+    if BACKING_UP:
+        move_file(RANDOM_FILE)
+    else:
+        delete_file(RANDOM_FILE)
+    print('Files Cleaned ')
     sys.stdout.flush()
     #################################################
     print('Google Drive to OnlyFans Upload Complete!')
@@ -564,4 +632,11 @@ def main():
     return
 
 if __name__ == "__main__":
+    os.system('clear')
+    print('OnlySnarf Settings:')
+    print(' - DEBUG = '+str(DEBUG))
+    print(' - BACKING_UP = '+str(BACKING_UP))
+    print(' - HASHTAGGING = '+str(HASHTAGGING))
+    print(' - TWEETING = '+str(TWEETING))
+    print(' - FORCE_UPLOAD = '+str(FORCE_UPLOAD))
     main()
