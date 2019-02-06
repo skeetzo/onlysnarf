@@ -368,25 +368,23 @@ def get_random_gallery():
             maybePrint(" -> added")
         else:
             maybePrint(" -> empty")
-
+    random.shuffle(folder_list)
     for folder in folder_list:
-        maybePrint('checking gallery: '+folder['title'])
+        if DEBUG:
+            print('checking gallery: '+folder['title'],end="")
         gallery_list_tmp = drive.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        for gallery in gallery_list_tmp:
-            if DEBUG:
-                print('checking folder: '+gallery['title'],end="")
-            gallery_list_tmp_tmp = drive.ListFile({'q': "'"+gallery['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
-            if len(gallery_list_tmp_tmp)>0:
-                gallery_list.append(gallery)
-                maybePrint(" -> added")
-            else:
-                maybePrint(" -> empty")
-    if len(gallery_list)==0:
+        random_gallery_tmp = random.choice(gallery_list_tmp)
+        gallery_list_tmp_tmp = drive.ListFile({'q': "'"+random_gallery_tmp['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
+        if len(gallery_list_tmp_tmp)>0:
+            global FOLDER_NAME
+            FOLDER_NAME = folder['title']
+            random_gallery = random_gallery_tmp
+            maybePrint(" -> found")
+        else:
+            maybePrint(" -> empty")
+    if not random_gallery:
         print('No gallery folders found!')
         return
-    random_gallery = random.choice(gallery_list)
-    global FOLDER_NAME
-    FOLDER_NAME = random_gallery['title'];
     print('Random Gallery: '+random_gallery['title'])
     return random_gallery
 
@@ -446,7 +444,7 @@ def download_gallery(folder):
         file.GetContentFile(path+"/"+str(file['title']))
         i+=1
     print('Download Complete')
-    return path
+    return [file_list_random, path]
 
 # Upload to OnlyFans
 def log_into_OnlyFans():
@@ -550,7 +548,7 @@ def remove_local():
 
 # Deletes online file
 def delete_file(file):
-    if DELETE == False:
+    if DELETING == False:
         print("Skipping Delete")
         return
     print('Trashing Google Video')
@@ -560,18 +558,28 @@ def delete_file(file):
     file.Trash()
     print('Google Video Trashed')
 
-# Archives posted file
+# Archives posted file / folder
 def move_file(file):
-    if BACKING_UP == False:
-        print("Skipping Backup")
-        return
-    print('Archiving Google Video')
-    if DEBUG:
-        print('skipping Google archive')
+    if DEBUG or BACKING_UP == False:
+        print('Skipping Google Backup: '+file['title'])
         return
     file['parents'] = [{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}]
     file.Upload()
-    print('Google Video Archived')
+    print('Google File Backed Up: '+file['title'])
+
+def move_files(folderName, files):
+    if DEBUG or BACKING_UP == False:
+        print('Skipping Google Backup: '+folderName)
+        return
+    title = folderName+" - "+datetime.datetime.now().strftime("%d-%m-%I-%M")
+    print('title: '+title)
+    global drive
+    tmp_folder = drive.CreateFile({'title':title, 'parents':[{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}],'mimeType':'application/vnd.google-apps.folder'})
+    tmp_folder.Upload()
+    for file in files:
+        file['parents'] = [{"kind": "drive#fileLink", "id": tmp_folder['id']}]
+        file.Upload()
+    print('Google Files Backed Up')
 ########################################################################################################
 ###### START ###########################################################################################
 ########################################################################################################
@@ -594,7 +602,9 @@ def main():
         if random_file == None:
             return
         file_name = random_file['title']
-        file_path = download_gallery(random_file)
+        results = download_gallery(random_file)
+        gallery_files = results[0]
+        file_path = results[1]
     elif TYPE == "video":
         random_file = get_random_video()
         if random_file == None:
@@ -632,7 +642,10 @@ def main():
     #################################################
     print('3/3 : Cleaning Up Files')
     remove_local()
-    move_file(random_file)
+    if TYPE == "gallery":
+        move_files(file_name, gallery_files)
+    else:
+        move_file(random_file)
     delete_file(random_file)
     print('Files Cleaned ')
     #################################################
