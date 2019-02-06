@@ -11,9 +11,11 @@
 	- upload fix & hashtagging
 **0.0.5 : 1/29/2019**
 	- demo
-**0.0.6 : 2/3/2019**
+**0.1.0 : 2/3/2019**
 	- menu
 	- package & setup.py
+**0.1.1 : 2/4/2019**
+	- menu fixes
 	
 ## ToDo
 	- installation / setup scripts  
