@@ -64,6 +64,7 @@ SHOW_WINDOW = False
 TEXT = None
 # -q -> quiet / no tweet
 TWEETING = True
+drive = None
 def updateDefaults(args):
     for arg in args:
         if arg[0] == "Debug":
@@ -102,6 +103,7 @@ def updateDefaults(args):
         if arg[0] == "Type":
             global TYPE        
             TYPE = arg[1]
+
 ########################################################################################################
 ##### Args #############################################################################################
 ########################################################################################################
@@ -138,6 +140,12 @@ def maybePrint(text):
 ########################################################################################################
 with open(CONFIG_FILE) as config_file:    
     config = json.load(config_file)
+OnlyFans_USERNAME = config['username']        
+OnlyFans_PASSWORD = config['password']   
+OnlyFans_VIDEOS_FOLDER = config['videos_folder']
+OnlyFans_IMAGES_FOLDER = config['images_folder']
+OnlyFans_GALLERIES_FOLDER = config['galleries_folder']
+OnlyFans_POSTED_FOLDER = config['posted_folder']
 # maybePrint('Loaded: Config')
 ########################################################################################################
 ##### Authenticate Google ##############################################################################
@@ -146,19 +154,6 @@ with open(CONFIG_FILE) as config_file:
 def authGoogle():
     print('Authenticating Google...')
     try:
-        # Google Drive folder ids and OnlyFans login
-        global OnlyFans_USERNAME
-        global OnlyFans_PASSWORD
-        global OnlyFans_VIDEOS_FOLDER
-        global OnlyFans_IMAGES_FOLDER
-        global OnlyFans_GALLERIES_FOLDER
-        global OnlyFans_POSTED_FOLDER
-        OnlyFans_USERNAME = config['username']        
-        OnlyFans_PASSWORD = config['password']   
-        OnlyFans_VIDEOS_FOLDER = config['videos_folder']
-        OnlyFans_IMAGES_FOLDER = config['images_folder']
-        OnlyFans_GALLERIES_FOLDER = config['galleries_folder']
-        OnlyFans_POSTED_FOLDER = config['posted_folder']
         # Google Auth
         gauth = GoogleAuth()
         # Try to load saved client credentials
@@ -179,11 +174,9 @@ def authGoogle():
         drive = GoogleDrive(gauth)
     except:
         print('...Authentication Failure!')
-        print('exiting...')
-        sys.stdout.flush()
-        sys.exit()
+        return False
     print('...Authentication Success!') 
-    sys.stdout.flush()
+    return True
 ########################################################################################################
 ##### MENU FUNCTIONS ###################################################################################
 ########################################################################################################
@@ -197,7 +190,9 @@ def all(fileChoice, args):
 
 def download(fileChoice, args):
     updateDefaults(args)
-    authGoogle()
+    auth = authGoogle()
+    if not auth:
+        return
     if fileChoice == 'image':
         return download_image_()
     elif fileChoice == 'gallery':
@@ -304,6 +299,7 @@ def backup(fileChoice, args):
 # Downloads random video from Google Drive
 def get_random_video():
     print('Getting Random Video...')
+    global drive
     random_folders = drive.ListFile({'q': "'"+OnlyFans_VIDEOS_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     video_list = []
     random_video = None
@@ -330,6 +326,7 @@ def get_random_video():
 # Downloads random image from Google Drive
 def get_random_image():
     print('Getting Random Image...')
+    global drive
     random_folders = drive.ListFile({'q': "'"+OnlyFans_IMAGES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     images_list = []
     random_image = None
@@ -357,6 +354,7 @@ def get_random_image():
 # Downloads random gallery from Google Drive
 def get_random_gallery():
     print('Getting Random Gallery...')
+    global drive
     random_folders = drive.ListFile({'q': "'"+OnlyFans_GALLERIES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     folder_list = []
     gallery_list = []
@@ -428,6 +426,7 @@ def download_gallery(folder):
     if not os.path.exists(path):
         os.makedirs(path)
     # download folder
+    global drive
     file_list = drive.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
     folder_size = len(file_list)
     maybePrint('Folder size: '+str(folder_size))
@@ -580,7 +579,9 @@ def move_file(file):
     # return print('- Skipping Download -')
 ########################################################################################################
 def main():
-    authGoogle()
+    auth = authGoogle()
+    if not auth:
+        return
     if DEBUG:
         print('0/3 : Deleting Locals')
         remove_local()
