@@ -60,6 +60,7 @@ FILE_NAME = None
 FILE_PATH = None
 UPDATED = False
 UPDATED_TO = False
+TYPE = None
 i = 0
 while i < len(sys.argv):
     if '-t' in str(sys.argv[i]):
@@ -105,18 +106,20 @@ actionItems = sorted([
     # [ "Upload & Backup", ["upload", "backup"]],
     [ "Reset", ["reset"]]
 ])
-actionItems.append([ "Back", ["main"]])
+actionItems.insert(0,[ "Back", ["main"]])
 
 fileItems = sorted([
     [ "Image", "image"],
     [ "Gallery", "gallery"],
     [ "Video", "video"],
 ])
+fileItems.insert(0,[ "Back", "main"])
 
 locationItems = sorted([
     [ "Local", "local"],
     [ "Google Drive", "google"]
 ])
+locationItems.insert(0,[ "Back", "main"])
 
 settingItems = sorted([
     [ "File Name", FILE_NAME],
@@ -129,11 +132,12 @@ settingItems = sorted([
     [ "Force Upload", FORCE_UPLOAD, ["True","False"]],
     [ "Show Window", SHOW_WINDOW, ["True","False"]],
     [ "Text", TEXT],
+    [ "Type", TYPE],
     [ "Tweeting", TWEETING, ["True","False"]],
     [ "Debug", DEBUG, ["True","False"]],
     [ "Debug Skip Download", DEBUG_SKIP_DOWNLOAD, ["True","False"]]    
 ])
-settingItems.append([ "Back", "main"])
+settingItems.insert(0,[ "Back", "main"])
 
 ###########################
 import atexit
@@ -169,6 +173,8 @@ def finalizeAction(actionChoice):
         fileChoice = input(">> ")
         try:
             if int(fileChoice) < 0 or int(fileChoice) >= len(fileItems): raise ValueError
+            if str(fileItems[int(fileChoice)][0]) == "Back":
+                return action()
             # Call the matching function
             fileChoice = list(fileItems[int(fileChoice)])[1]
             return performAction(actionChoice, fileChoice)
@@ -181,10 +187,14 @@ def performAction(actionChoice, fileChoice):
     for action in actionChoice:
         try:
             method = getattr(onlysnarf, str(action))
-            response = method(fileChoice, json.dumps(settingItems))
-            if str(action) == "download":
-                settingItems[0][1] = response[0]
-                settingItems[1][1] = response[1]
+            response = method(fileChoice, settingItems)
+            if response:
+                if str(action) == "download":
+                    for setting in settingItems:
+                        if setting[0] == "File Name":
+                            setting[1] = response[0]
+                        elif setting[0] == "File Path":
+                            setting[1] = response[1]
         except (AttributeError, KeyboardInterrupt):
             print("Missing Method") 
     mainMenu()
@@ -294,10 +304,8 @@ def showSettings():
             print(' - '+setting[0]+' = '+str(setting[1]))
     global UPDATED
     global UPDATED_TO
-    if UPDATED:
+    if str(UPDATED) != "False":
         print('\nUpdated: '+str(UPDATED)+' -> '+str(UPDATED_TO))
-    else:
-        print('\n'+str(UPDATED))
     UPDATED = False
     print('\r')
 
