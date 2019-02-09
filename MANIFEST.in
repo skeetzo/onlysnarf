@@ -1,10 +1,6 @@
 # Config
-include OnlySnarf/client_secret.json
-include OnlySnarf/config.json
 include OnlySnarf/config_example.json
-include OnlySnarf/google_creds.txt
 include OnlySnarf/google_creds_example.txt
-include OnlySnarf/settings.yaml
 include OnlySnarf/settings_example.yaml
 
 # Include the README

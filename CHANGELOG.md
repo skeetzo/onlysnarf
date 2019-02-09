@@ -16,12 +16,14 @@
 	- package & setup.py
 **0.1.1 : 2/4/2019**
 	- menu fixes
-	
+**0.1.2 : 2/7/2019**
+	- config.py
+	- script names updated
+	- readme updated
+**2/9/2019**
+	- fuck you PyDrive
+
 ## ToDo
-	- installation / setup scripts  
-	- |_ configure settings.yaml -> client_id & client_secret
-	- |_ configure config.json -> OnlySnarf login & Google Drive folder ids
 
-	- add arg: -t '[upload text]'
-
+## Install
 sudo python3 setup.py install

@@ -6,13 +6,13 @@ def main(args=None):
     if args is None:
         args = sys.argv[1:]
 
-    os.system("python3 OnlySnarf/onlysnarf.py "+" ".join(args))
+    os.system("python3 "+os.path.join(os.path.dirname(os.path.realpath(__file__)),'onlysnarf.py')+" "+" ".join(args))
 
 if __name__ == "__main__":
     try:
         main()
     except:
-        # print(sys.exc_info()[0])
+        print(sys.exc_info()[0])
         print("Shnarf!")
     finally:
         sys.exit(0)

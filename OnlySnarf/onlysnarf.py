@@ -39,6 +39,7 @@ from pprint import pprint
 ########################################################################################################
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
 GOOGLE_CREDS = os.path.join(os.path.dirname(os.path.realpath(__file__)),'google_creds.txt')
+GOOGLE_CREDS_JSON = os.path.join(os.path.dirname(os.path.realpath(__file__)),'client_secret.json')
 # CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
 DEBUG = False
 DEBUG_SKIP_DOWNLOAD = True
@@ -138,8 +139,12 @@ def maybePrint(text):
 ########################################################################################################
 ##### Config ###########################################################################################
 ########################################################################################################
-with open(CONFIG_FILE) as config_file:    
-    config = json.load(config_file)
+try:
+    with open(CONFIG_FILE) as config_file:    
+        config = json.load(config_file)
+except FileNotFoundError:
+    print('Missing Config, run `onlysnarf-config`')
+    sys.exit(0)
 OnlyFans_USERNAME = config['username']        
 OnlyFans_PASSWORD = config['password']   
 OnlyFans_VIDEOS_FOLDER = config['videos_folder']
@@ -173,6 +178,7 @@ def authGoogle():
         global drive
         drive = GoogleDrive(gauth)
     except:
+        # print(sys.exc_info()[0])
         print('...Authentication Failure!')
         return False
     print('...Authentication Success!') 
