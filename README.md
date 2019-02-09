@@ -1,15 +1,16 @@
 # OnlySnarf
   
-`pip install git+git://github.com/skeetzo/onlysnarf.git`
-
-`python3 onlysnarf.py (-d) -i|-g|-v`
 `git clone git@github.com:skeetzo/onlysnarf`
+or
+`pip install git+git://github.com/skeetzo/onlysnarf.git`
 
 (sudo) python3 setup.py install
 
 ## Scripts
-  * `(sudo) main [args]`
-  * `(sudo) menu [args]`
+  * `(sudo) onlysnarf [args]`
+  * `(sudo) onlysnarf-menu [args]`
+  * `(sudo) onlysnarf-config [args]`
+  * OR directly via `python3 onlysnarf.py (-d) -i|-g|-v`
 
 ## args
 
@@ -45,6 +46,8 @@ Attempts to upload limit regardless of file size.
 
 Downloads a random file or gallery of files from a random Google Drive folder as specified by run time arguments and then uploads the image, video, or gallery to an OnlyFans account.
 
+`onlysnarf-menu` is used to easily perform basic sets of operations that would usually be time consuming for a long video upload ie waiting an hour until completion and then clicking send.
+
 ## Config
 ##### config.json  
 Create a "config.json" file with the following values:
@@ -76,4 +79,4 @@ Upload a random video every Friday in the month of June at 6:00pm:
   `00 18 * 6 5 python3 onlysnarf.py -v`
 
 ## Dependencies
-  * Chromedriver: install binary to '/usr/local/bin/chromedriver'
+  * Chromedriver: binary installed via package
