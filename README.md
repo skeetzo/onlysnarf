@@ -47,9 +47,9 @@ Downloads a random file or gallery of files from a random Google Drive folder as
 
 `onlysnarf-menu` is used to easily perform basic sets of operations that would usually be time consuming for a long video upload ie waiting an hour until completion and then clicking send.
 
-## Authentication
-from [Auth Quickstart](https://raw.githubusercontent.com/gsuitedevs/PyDrive/master/docs/quickstart.rst)
+## Authentication  
 --------------
+###### from [Auth Quickstart](https://raw.githubusercontent.com/gsuitedevs/PyDrive/master/docs/quickstart.rst)
 Drive API requires OAuth2.0 for authentication. *PyDrive* makes handles complex authentication steps that need to be personally authorized for your Drive account.
 
 1. Go to `APIs Console`_ and make your own project.
