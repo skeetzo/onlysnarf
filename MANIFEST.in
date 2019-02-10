@@ -1,5 +1,7 @@
 # Config
+include OnlySnarf/config.json
 include OnlySnarf/config_example.json
+include OnlySnarf/google_creds.txt
 include OnlySnarf/google_creds_example.txt
 include OnlySnarf/settings_example.yaml
 

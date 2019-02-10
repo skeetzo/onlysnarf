@@ -40,14 +40,14 @@ def updateConfig(config):
 	with open('config.json', 'w') as outfile:
 	    json.dump(config, outfile, indent=4, sort_keys=True)
 
-if __name__ == "__main__":
+def main():
 	CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
 	GOOGLE_CREDS = os.path.join(os.path.dirname(os.path.realpath(__file__)),'google_creds.txt')
-	try:
-		with open(GOOGLE_CREDS) as google_creds:    
-			google = json.load(google_creds)
-	except FileNotFoundError:
-		createGoogle()
+	# try:
+	# 	with open(GOOGLE_CREDS) as google_creds:    
+	# 		google = json.load(google_creds)
+	# except FileNotFoundError:
+	# 	createGoogle()
 	try:
 		with open(CONFIG_FILE) as config_file:    
 			config = json.load(config_file)
@@ -57,3 +57,6 @@ if __name__ == "__main__":
 	finally:
 		print('Config Updated')
 		sys.exit(0)
+
+if __name__ == "__main__":
+	main()
