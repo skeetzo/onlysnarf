@@ -1,12 +1,11 @@
 # OnlySnarf
   
 `git clone git@github.com:skeetzo/onlysnarf`
-or
-`pip install git+git://github.com/skeetzo/onlysnarf.git`
-
-(sudo) python3 setup.py install
 
 ## Scripts
+First run:  
+  * `(sudo) python3 setup.py install`  
+Then from within project directory either:  
   * `(sudo) onlysnarf [args]`
   * `(sudo) onlysnarf-menu [args]`
   * `(sudo) onlysnarf-config [args]`
