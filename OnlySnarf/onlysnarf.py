@@ -145,6 +145,12 @@ try:
 except FileNotFoundError:
     print('Missing Config, run `onlysnarf-config`')
     sys.exit(0)
+    # from . import config as CONFIG
+    # CONFIG.main()
+    # with open(CONFIG_FILE) as config_file:    
+        # config = json.load(config_file)
+
+
 OnlyFans_USERNAME = config['username']        
 OnlyFans_PASSWORD = config['password']   
 OnlyFans_VIDEOS_FOLDER = config['videos_folder']
