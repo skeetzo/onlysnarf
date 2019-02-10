@@ -1,7 +1,6 @@
 # Config
 config.json
 google_creds.txt
-settings.yaml
 client_secrets.json
 
 # Temporary downloads
