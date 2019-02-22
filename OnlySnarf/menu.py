@@ -24,7 +24,7 @@ import datetime
 import json
 import sys
 import pathlib
-import OnlySnarf.onlysnarf as onlysnarf
+from . import onlysnarf
 ###########################
 header = "\n ________         .__          _________                     _____ \n \
 \\_____  \\   ____ |  | ___.__./   _____/ ____ _____ ________/ ____\\\n \

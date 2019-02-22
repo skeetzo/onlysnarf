@@ -5,20 +5,21 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="0.1.1",
+    version="0.1.2",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     description="Only Snarf Automation",
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    # long_description_content_type="text/markdown",
     url="https://github.com/skeetzo/onlysnarf",
     packages=setuptools.find_packages(),
     include_package_data=True,
     install_requires=['selenium','pydrive','pathlib','chromedriver-binary'],
     entry_points={
         'console_scripts' : [
-            'main = OnlySnarf.__main__:main',
-            'menu = OnlySnarf.menu:main'
+            'onlysnarf = OnlySnarf.__main__:main',
+            'onlysnarf-menu = OnlySnarf.menu:main',
+            'onlysnarf-config = OnlySnarf.config:main'
         ]
     },
     classifiers=[
