@@ -2,6 +2,9 @@
   
 `git clone git@github.com:skeetzo/onlysnarf`
 
+## Preview
+![preview](https://github.com/skeetzo/onlysnarf/blob/master/preview.jpeg)
+
 ## Scripts
 First run:  
   * `(sudo) python3 setup.py install`  
