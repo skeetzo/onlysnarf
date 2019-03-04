@@ -1,8 +1,8 @@
 # Config
 config.json
 google_creds.txt
-settings.yaml
 client_secrets.json
+settings.yaml
 
 # Temporary downloads
 /tmp/
@@ -16,3 +16,5 @@ client_secrets.json
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
+
+/tmp/
