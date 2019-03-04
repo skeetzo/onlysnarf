@@ -2,10 +2,13 @@
   
 `git clone git@github.com:skeetzo/onlysnarf`
 
+## Preview
+![preview](https://github.com/skeetzo/onlysnarf/blob/master/preview.jpeg)
+
 ## Scripts
 First run:  
   * `(sudo) python3 setup.py install`  
-Then from within project directory either:  
+Then from within project's OnlySnarf directory either:  
   * `(sudo) onlysnarf [args]`
   * `(sudo) onlysnarf-menu [args]`
   * `(sudo) onlysnarf-config [args]`

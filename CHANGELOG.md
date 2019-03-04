@@ -22,6 +22,8 @@
 	- readme updated
 **2/9/2019**
 	- fuck you PyDrive
+**0.1.3 : 2/24/2019**
+	- jpeg
 
 ## ToDo
 

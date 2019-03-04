@@ -1,0 +1,14 @@
+{
+	"// Your OnlyFans username //":"",
+	"username":"",
+	"// Your OnlyFans password //":"",
+	"password":"",
+	"// The ID of the Google Drive folder with your images //":"",
+	"images_folder":"",
+	"// The ID of the Google Drive folder with your galleries //":"",
+	"galleries_folder":"",
+	"// The ID of the Google Drive folder to backup to //":"",
+	"posted_folder": "",
+	"// The ID of the Google Drive folder with your videos //":"",
+	"videos_folder":""
+}

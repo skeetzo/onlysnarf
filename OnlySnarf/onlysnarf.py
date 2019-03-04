@@ -4,6 +4,7 @@
 # 10/20/2018: usability overhaul
 # 1/21/2019: upload fix & hashtagging
 # 2/3/2019: upload ext fix & tweeting
+# 2/6/2019: menu
 
 ###### Process ################################
 # download mp4 from Google Drive folder @ id  #
