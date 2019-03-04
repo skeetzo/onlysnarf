@@ -6,7 +6,7 @@ client_config:
 
 save_credentials: True
 save_credentials_backend: file
-save_credentials_file: google_creds.txt
+save_credentials_file: google_creds.json
 
 get_refresh_token: True
 
