@@ -42,6 +42,7 @@ CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.j
 GOOGLE_CREDS = os.path.join(os.path.dirname(os.path.realpath(__file__)),'google_creds.txt')
 GOOGLE_CREDS_JSON = os.path.join(os.path.dirname(os.path.realpath(__file__)),'client_secret.json')
 # CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
+MOUNT_PATH = "/var/mnt"
 DEBUG = False
 DEBUG_SKIP_DOWNLOAD = True
 IMAGE_UPLOAD_LIMIT = 6
@@ -406,6 +407,8 @@ def download_file(file):
     print('Downloading Video...')
     # mkdir /tmp
     path = os.getcwd()
+    if MOUNT_PATH:
+        path = MOUNT_PATH
     path += '/tmp'
     tmp = path
     if not os.path.exists(path):
@@ -432,6 +435,8 @@ def download_gallery(folder):
     print('Downloading Gallery...')
     # mkdir /tmp
     path = os.getcwd()
+    if MOUNT_PATH:
+        path = MOUNT_PATH
     path += '/tmp'+"/"+str(folder['title'])
     maybePrint('path: '+path)
     if not os.path.exists(path):
@@ -552,6 +557,8 @@ def remove_local():
     # print('Deleting Local File(s)')
     # delete /tmp
     tmp = os.getcwd()
+    if MOUNT_PATH:
+        tmp = MOUNT_PATH
     tmp += '/tmp'
     if os.path.exists(tmp):
         shutil.rmtree(tmp)
