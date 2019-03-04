@@ -1,8 +1,8 @@
 client_config_backend: settings
-client_config_file: client_secrets.json
-client_config:
-  client_id: blablabla.apps.googleusercontent.com
-  client_secret: blablabla
+client_config_file: client_secret.json
+# client_config:
+  # client_id: jibberjabber
+  # client_secret: yourmothersadirtywhore
 
 save_credentials: True
 save_credentials_backend: file
