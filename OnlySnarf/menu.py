@@ -272,7 +272,7 @@ def showHeader():
     os.system('clear')
     # Print some badass ascii art header here !
     print(colorize(header, 'header'))
-    print(colorize('version 0.1.3\n', 'green'))
+    print(colorize('version 0.1.4\n', 'green'))
     showSettings()
 
 def mainMenu():
