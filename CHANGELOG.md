@@ -24,6 +24,10 @@
 	- fuck you PyDrive
 **0.1.3 : 2/24/2019**
 	- jpeg
+**0.1.4 : 3/19/2019**
+	- module separation
+	- User.py
+	- send User message w/ image for $
 
 ## ToDo
 
