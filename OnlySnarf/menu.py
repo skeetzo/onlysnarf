@@ -16,7 +16,7 @@
 ### doesn't work:
 # upload & backup (requires upload via local added to main script)
 # settings menu -> "Incorrect Index"
-
+version = "0.1.6"
 import random
 import os
 import shutil
@@ -196,6 +196,7 @@ def performAction(actionChoice, fileChoice):
                         elif setting[0] == "File Path":
                             setting[1] = response[1]
         except (AttributeError, KeyboardInterrupt):
+            # print(sys.exc_info()[0])
             print("Missing Method") 
     mainMenu()
 
@@ -272,7 +273,7 @@ def showHeader():
     os.system('clear')
     # Print some badass ascii art header here !
     print(colorize(header, 'header'))
-    print(colorize('version 0.1.4\n', 'green'))
+    print(colorize('version '+version+'\n', 'green'))
     showSettings()
 
 def mainMenu():
@@ -308,6 +309,22 @@ def showSettings():
         print('\nUpdated: '+str(UPDATED)+' -> '+str(UPDATED_TO))
     UPDATED = False
     print('\r')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     try:

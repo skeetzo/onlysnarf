@@ -20,14 +20,20 @@
 	- config.py
 	- script names updated
 	- readme updated
-**2/9/2019**
+		**2/9/2019**
 	- fuck you PyDrive
 **0.1.3 : 2/24/2019**
 	- jpeg
 **0.1.4 : 3/4/2019**
 	- mount path
+**0.1.5 : 3/7/2019**
+	- updated send_post_button refs
+**0.1.6 : 3/19/2019**
+	- module separation
 
 ## ToDo
+	- User.py
+	- send User message w/ image for $
 
 ## Install
 sudo python3 setup.py install

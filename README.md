@@ -3,7 +3,7 @@
 `git clone git@github.com:skeetzo/onlysnarf`
 
 ## Preview
-![preview](https://github.com/skeetzo/onlysnarf/blob/master/preview.jpeg)
+![preview](https://github.com/skeetzo/onlysnarf/blob/master/OnlySnarf/images/preview.jpeg)
 
 ## Scripts
 First run:  
