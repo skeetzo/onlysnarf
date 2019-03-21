@@ -246,7 +246,7 @@ def download_gallery(args, folder):
 # Deletes online file
 def delete_file(args, file):
     updateDefaults(args)
-    if DELETING == False:
+    if DELETING == "False":
         print("Skipping Delete")
         return
     print('Trashing Google Video')
@@ -259,7 +259,7 @@ def delete_file(args, file):
 # Archives posted file / folder
 def move_file(args, file):
     updateDefaults(args)
-    if DEBUG or BACKING_UP == False:
+    if DEBUG or BACKING_UP == "False":
         print('Skipping Google Backup: '+file['title'])
         return
     file['parents'] = [{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}]
@@ -268,7 +268,7 @@ def move_file(args, file):
 
 def move_files(args, folderName, files):
     updateDefaults(args)
-    if DEBUG or BACKING_UP == False:
+    if DEBUG or BACKING_UP == "False":
         print('Skipping Google Backup: '+folderName)
         return
     title = folderName+" - "+datetime.datetime.now().strftime("%d-%m-%I-%M")

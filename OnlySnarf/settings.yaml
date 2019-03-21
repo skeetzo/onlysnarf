@@ -1,8 +1,8 @@
-client_config_backend: settings
+client_config_backend: file
 client_config_file: client_secrets.json
-client_config:
-  client_id: 33099781715-iepijvbd7va9gabssubbmk2aeb3qenjk.apps.googleusercontent.com
-  client_secret: Jb8Iis46H52GsupmFQ50j7Tl
+# client_config:
+#   client_id: blabla.apps.googleusercontent.com
+#   client_secret: blabla
 
 save_credentials: True
 save_credentials_backend: file

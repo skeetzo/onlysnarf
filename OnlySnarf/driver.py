@@ -127,10 +127,12 @@ def upload_file_to_OnlyFans(args, fileName, path, folderName):
     while True:
         try:
             WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]')))
+            # WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
             if DEBUG:
                 print('skipping OnlyFans upload')
                 return
             send = WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]'))).click()
+            # send = WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
             break
         except Exception as e:
             print('uploading...')
@@ -158,21 +160,22 @@ def upload_directory_to_OnlyFans(args, dirName, path, folderName):
     if not TWEETING:
         WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
     
+    ############
     # files_path = "[\""+"\",\"".join(files_path)+"\"]"
     # print("files_path: "+files_path)
-    
-    files_path = "home/skeetzo/Projects/onlysnarf/OnlySnarf/tmp"
-    BROWSER.find_element_by_id("fileupload_photo").send_keys(files_path)
-    WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]')))
-
-    # for file in files_path:
-        # maybePrint('uploading: '+str(file))
-        # BROWSER.find_element_by_id("fileupload_photo").send_keys(file)
-        # WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]')))
+    # files_path = "home/skeetzo/Projects/onlysnarf/OnlySnarf/tmp"
+    # BROWSER.find_element_by_id("fileupload_photo").send_keys(files_path)
+    # WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]')))
+    ############
+    for file in files_path:
+        maybePrint('uploading: '+str(file))
+        BROWSER.find_element_by_id("fileupload_photo").send_keys(file)
+        WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
+    send = WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
     if DEBUG:
         print('skipping OnlyFans upload')
         return
-    send = WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]'))).click()
+    send.click()
     print('Directory Uploaded Successfully')
 
 
@@ -181,7 +184,7 @@ def upload_directory_to_OnlyFans(args, dirName, path, folderName):
 ####################################################################################################################
 
 def uploadPerformer(args, dirName, path, folderName):
-	pass
+    pass
 
 
 #################
@@ -192,13 +195,56 @@ def uploadPerformer(args, dirName, path, folderName):
 
 # gets a list of all user_ids subscribed to profile
 def get_users():
-	pass
+    # gets users from cache or refreshes from onlyfans.com
+    global USER_CACHE
+    if USER_CACHE:
+        return USER_CACHE
+    else:
+        USER_CACHE = []
+    global BROWSER
+    if not BROWSER:
+        log_into_OnlyFans()
+    # go to onlyfans.com/my/subscribers/active
+    BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
+    # scrape all  <span class="g-user-username">@u6279283</span>
+    users = BROWSER.find_elements_by_class_name('//span[@class="g-user-username"]')
+    maybePrint(users)
+    return []
+    # add to list of users
+    active_users = []
+    for user in users:
+        active_users.append("") # update this with correct values
+    for user in active_users:
+        existing = False
+        for user_ in USER_CACHE:
+            if user == user_:
+                existing = True
+        if not existing:
+            USER_CACHE.append(user)
+    # start cache timeout
+    start_user_cache()
+    # save users locally
+    write_users_local(USER_CACHE)
+    return USER_CACHE
+
+from threading import Thread
+
+def reset_user_cache():
+    global USER_CACHE
+    USER_CACHE = False
+    print("User Cache Reset")
+
+def start_user_cache():
+    t = Timer(600.0, reset_user_cache)
+    t.start() # after 10 minutes
+
+
 # gets a list of all subscribed user_ids from local txt
 def get_users_local():
-	pass
+    pass
 # writes user list to local txt
-def write_users_local():
-	pass
+def write_users_local(users):
+    pass
 
 ####################
 ##### Messages #####
@@ -206,11 +252,11 @@ def write_users_local():
 
 # sends message to all users
 def mass_message_all(message, image, price):
-	pass
+    pass
 
 # sends an image at price to user_id recipient
 def send_priced_image(message, image, price, recipient):
-	pass
+    pass
 
 #################
 ##### Crons ##### -> move to onlysnarf.py
@@ -218,7 +264,7 @@ def send_priced_image(message, image, price, recipient):
 
 # sends a message to all recent subscribers
 def greet_new_subscribers():
-	pass
+    pass
 
 
 
@@ -245,7 +291,7 @@ def greet_new_subscribers():
 
 # message recent messages
 def message_recent():
-	pass
+    pass
 # go to /my/chats
 
 # click on last message
