@@ -358,7 +358,7 @@ def main():
         Google.move_files(ARGS, file_name, gallery_files)
     else:
         Google.move_file(ARGS, random_file)
-    delete_file(random_file)
+    Google.delete_file(ARGS, random_file)
     print('Files Cleaned ')
     #################################################
     print('Google Drive to OnlyFans Upload Complete!')
