@@ -90,12 +90,14 @@ colors = {
         'menu': '\033[48;1;44m'
         }
 
+# Main Menu
 menuItems = [
     [ "Actions", "action"],
     [ "Settings", "settings"],
     [ "Exit", "exit"]
 ]
 
+# Actions Menu
 actionItems = sorted([
     [ "All", ["all"]],
     [ "Download", ["download"]],
@@ -104,10 +106,21 @@ actionItems = sorted([
     # [ "Download & Upload", ["download", "upload"]],
     # [ "Download, Upload, & Backup", ["download", "upload", "backup"]],
     # [ "Upload & Backup", ["upload", "backup"]],
+    [ "Message", ["message"]],
     [ "Reset", ["reset"]]
 ])
 actionItems.insert(0,[ "Back", ["main"]])
 
+# Message Menu
+messageItems = sorted([
+    [ "All", ["message_all"]],
+    [ "Recent", ["message_recent"]],
+    [ "User by Username", ["message_by_username"]],
+    [ "User by ID", ["message_by_id"]]
+])
+messageItems.insert(0,[ "Back", ["main"]])
+
+# File Type Menu
 fileItems = sorted([
     [ "Image", "image"],
     [ "Gallery", "gallery"],
@@ -115,12 +128,14 @@ fileItems = sorted([
 ])
 fileItems.insert(0,[ "Back", "main"])
 
+# File Location Menu
 locationItems = sorted([
     [ "Local", "local"],
     [ "Google Drive", "google"]
 ])
 locationItems.insert(0,[ "Back", "main"])
 
+# Settings Menu
 settingItems = sorted([
     [ "File Name", FILE_NAME],
     [ "File Path", FILE_PATH],
@@ -158,6 +173,9 @@ def action():
                 return main()
             elif str(actionItems[int(choice)][0]) == "Reset":
                 onlysnarf.remove_local()
+            elif str(actionItems[int(choice)][0]) == "Message":
+                actionChoice = list(actionItems[int(choice)])[1]
+                return finalizeMessage(actionChoice)
             else:
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeAction(actionChoice)
@@ -199,6 +217,34 @@ def performAction(actionChoice, fileChoice):
             # print(sys.exc_info()[0])
             print("Missing Method") 
     mainMenu()
+
+# Message Menu - finalize
+def finalizeMessage(actionChoice):
+    for item in messageItems:
+        print(colorize("[" + str(messageItems.index(item)) + "] ", 'teal') + list(item)[0])
+    while True:
+        choice = input(">> ")
+        try:
+            if int(choice) < 0 or int(choice) >= len(messageItems): raise ValueError
+            if str(messageItems[int(choice)][0]) == "Back":
+                return action()
+            # Call the matching function
+            choice = list(messageItems[int(choice)])[1]
+            return performMessage(actionChoice, choice)
+        except (ValueError, IndexError, KeyboardInterrupt):
+            print("Incorrect Index")
+            pass
+
+# Message Menu - perform
+def performMessage(actionChoice, messageChoice):
+    for action in actionChoice:
+        try:
+            method = getattr(onlysnarf, str(action))
+            response = method(messageChoice, settingItems)    
+        except (AttributeError, KeyboardInterrupt):
+            # print(sys.exc_info()[0])
+            print("Missing Method") 
+    mainMenu()    
 
 ###########################
 
