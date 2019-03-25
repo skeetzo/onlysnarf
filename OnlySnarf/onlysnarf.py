@@ -269,6 +269,22 @@ def backup(fileChoice, args):
     updateDefaults(args)
     print("Missing Feature: Backup")
 
+def message_all():
+    pass
+
+def message_recent():
+    pass
+
+def message_by_user_id():
+    pass
+
+def message_by_username();
+    pass
+
+def message_with_pic_for_price():
+    pass
+
+
 #####################
 ##### FUNCTIONS #####
 #####################
