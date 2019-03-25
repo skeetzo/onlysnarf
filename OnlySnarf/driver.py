@@ -15,6 +15,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from threading import Thread
 
 ###################
 ##### Globals #####
@@ -191,7 +192,7 @@ def uploadPerformer(args, dirName, path, folderName):
 ##### Users #####
 #################
 # code User.py
-# from . import User
+from . import user as User
 
 # gets a list of all user_ids subscribed to profile
 def get_users():
@@ -199,8 +200,7 @@ def get_users():
     global USER_CACHE
     if USER_CACHE:
         return USER_CACHE
-    else:
-        USER_CACHE = []
+    USER_CACHE = get_users_local()
     global BROWSER
     if not BROWSER:
         log_into_OnlyFans()
@@ -227,7 +227,6 @@ def get_users():
     write_users_local(USER_CACHE)
     return USER_CACHE
 
-from threading import Thread
 
 def reset_user_cache():
     global USER_CACHE
@@ -238,13 +237,29 @@ def start_user_cache():
     t = Timer(600.0, reset_user_cache)
     t.start() # after 10 minutes
 
-
 # gets a list of all subscribed user_ids from local txt
 def get_users_local():
-    pass
+    print("Getting Local Users")
+    with open(LOCAL_DATA) as json_file:  
+    users = json.load(json_file)
+    for p in users['users']:
+        print('Name: ' + p['name'])
+        print('Username: ' + p['username'])
+        print('')
+    return users
+
 # writes user list to local txt
 def write_users_local(users):
-    pass
+    print("Writing Local Users")
+    data = {}
+    data['users'] = []
+    for user in users:
+        data['users'].append({  
+            'name': user['name'],
+            'username': user['username']
+        })
+    with open(LOCAL_DATA, 'w') as outfile:  
+        json.dump(data, outfile)
 
 ####################
 ##### Messages #####
@@ -252,11 +267,16 @@ def write_users_local(users):
 
 # sends message to all users
 def mass_message_all(message, image, price):
-    pass
+    print("Sending Mass Message")
+    users = get_users()
+    for user in users:
+        user.sendMessage(message, image, price)
 
+#### NEEDED?
 # sends an image at price to user_id recipient
-def send_priced_image(message, image, price, recipient):
-    pass
+def send_message(message, image, price, recipient):
+    print("Sending Message to User: "+recipient)
+    recipient.sendMessage(message, image, price)
 
 #################
 ##### Crons ##### -> move to onlysnarf.py
@@ -284,14 +304,28 @@ def greet_new_subscribers():
 # wait until button is available and then send
 # class="g-btn m-rounded b-chat__btn-submit"
 
+# handles the price modal that pops up
+def enterPrice(price):
+    pass
+    # driver.click on price entry and enter the price amount
+    # driver.click on confirm
 
-
-
+def enterMessage(text, image, price):
+    pass
+    # doesn't check for login or if on correct page, just searches for generic stuff
+    # search for driver.text and enter text
+    # search for driver.image and click on upload and upload image file location
+    # search for driver.price and click on price then call setPrice(price) which handles the generic price modal
 
 
 # message recent messages
 def message_recent():
     pass
+    # login if not
+    # open url for /my/chats
+    # driver.click on last message by class search
+    # call function enterMessage(message, image, price)
+    # driver.click on send button
 # go to /my/chats
 
 # click on last message
