@@ -142,6 +142,18 @@ def maybePrint(text):
     if DEBUG:
         print(text);
 
+def getTmp():
+    # mkdir /tmp
+    tmp = os.getcwd()
+    global MOUNT_PATH
+    if MOUNT_PATH:
+        tmp = os.path.join(MOUNT_PATH, "/tmp")
+    else:
+        tmp = os.path.join(tmp, "/tmp")
+    if not os.path.exists(str(tmp)):
+        os.mkdir(str(tmp))
+    return tmp
+
 ##################
 ##### Config #####
 ##################
@@ -292,11 +304,7 @@ def remove_local():
         return
     # print('Deleting Local File(s)')
     # delete /tmp
-    tmp = os.getcwd()
-    global MOUNT_PATH
-    if MOUNT_PATH:
-        tmp = os.path.join(MOUNT_PATH, "/tmp")
-    tmp += '/tmp'
+    tmp = getTmp()
     if os.path.exists(tmp):
         shutil.rmtree(tmp)
         print('Local File(s) Removed')
