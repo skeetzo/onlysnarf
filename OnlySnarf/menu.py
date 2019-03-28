@@ -163,6 +163,14 @@ import atexit
 def exit_handler():
     print('Shnnarrrff!')
 atexit.register(exit_handler)
+
+import signal
+def signal_handler(sig, frame):
+    print('You pressed Ctrl+C!')
+    sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
+# print('Press Ctrl+C')
+# signal.pause()
 ###########################
 
 ### Action Menu - file type

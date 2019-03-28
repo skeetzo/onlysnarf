@@ -44,6 +44,18 @@ def maybePrint(text):
     if DEBUG:
         print(text);
 
+def getTmp():
+    # mkdir /tmp
+    tmp = os.getcwd()
+    global MOUNT_PATH
+    if MOUNT_PATH:
+        tmp = os.path.join(MOUNT_PATH, "/tmp")
+    else:
+        tmp = os.path.join(tmp, "/tmp")
+    if not os.path.exists(str(tmp)):
+        os.mkdir(str(tmp))
+    return tmp
+
 def updateDefaults(args):
     for arg in args:
         if arg[0] == "Debug":
@@ -190,15 +202,7 @@ def get_random_gallery(args):
 def download_file(args, file):
     updateDefaults(args)
     print('Downloading Video...')
-    # mkdir /tmp
-    tmp = os.getcwd()
-    global MOUNT_PATH
-    if MOUNT_PATH:
-        tmp = MOUNT_PATH
-    else:
-        tmp = os.path.join(tmp, "/tmp")
-    if not os.path.exists(str(tmp)):
-        os.mkdir(str(tmp))
+    tmp = getTmp()
     # download file
     ext = os.path.splitext(file['title'])[1]
     if not ext:
@@ -220,15 +224,7 @@ def download_file(args, file):
 def download_gallery(args, folder):
     updateDefaults(args)
     print('Downloading Gallery...')
-    # mkdir /tmp
-    tmp = os.getcwd()
-    global MOUNT_PATH
-    if MOUNT_PATH:
-        tmp = os.path.join(MOUNT_PATH, "/tmp")
-    else:
-        tmp = os.path.join(tmp, "/tmp")
-    if not os.path.exists(str(tmp)):
-        os.mkdir(str(tmp))
+    tmp = getTmp()
     # download folder
     global DRIVE
     file_list = DRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
@@ -289,5 +285,4 @@ def move_files(args, folderName, files):
         file['parents'] = [{"kind": "drive#fileLink", "id": tmp_folder['id']}]
         file.Upload()
     print('Google Files Backed Up')
-
 
