@@ -20,7 +20,6 @@ from . import driver as OnlySnarf
 # from pprint import pprint
 
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
-# MOUNT_PATH = "/var/mnt"
 MOUNT_PATH = None
 DEBUG = False
 DEBUG_SKIP_DOWNLOAD = True
@@ -73,6 +72,8 @@ while i < len(sys.argv):
         TWEETING = False
     if '-delete' in str(sys.argv[i]):
         DELETING = False
+    if '-mount' in str(sys.argv[i]):
+        MOUNT_PATH = str(sys.argv[i+1])
     i += 1
 
 def updateDefaults(args):
@@ -113,7 +114,7 @@ def updateDefaults(args):
         if arg[0] == "Type":
             global TYPE        
             TYPE = arg[1]
-        if arg[0] == "Mount":
+        if arg[0] == "Mount Path":
             global MOUNT_PATH        
             MOUNT_PATH = arg[1]
 
@@ -127,6 +128,7 @@ def argsToArray():
         [ "Delete Local", REMOVE_LOCAL, ["True","False"]],
         [ "Hashtag", HASHTAGGING, ["True","False"]],
         [ "Force Upload", FORCE_UPLOAD, ["True","False"]],
+        [ "Mount Path", MOUNT_PATH],
         [ "Show Window", SHOW_WINDOW, ["True","False"]],
         [ "Text", TEXT],
         [ "Type", TYPE],
@@ -177,9 +179,7 @@ def download(fileChoice, args):
         return download_video_()
 
 def download_image_():
-    if DEBUG:
-        print('Deleting Locals')
-        remove_local()
+    remove_local()
     print('Fetching Content')
     random_file = Google.get_random_image(argsToArray())
     if random_file == None:
@@ -196,9 +196,7 @@ def download_image_():
     return [file_name, file_path]
 
 def download_gallery_():
-    if DEBUG:
-        print('Deleting Locals')
-        remove_local()
+    remove_local()
     print('Fetching Content')
     random_file = Google.get_random_gallery(argsToArray())
     if random_file == None:
@@ -212,9 +210,7 @@ def download_gallery_():
     return [file_name, file_path]
 
 def download_video_():
-    if DEBUG:
-        print('Deleting Locals')
-        remove_local()
+    remove_local()
     print('Fetching Content')
     random_file = Google.get_random_video()
     file_name = random_file['title']
@@ -278,7 +274,7 @@ def message_recent():
 def message_by_user_id():
     pass
 
-def message_by_username();
+def message_by_username():
     pass
 
 def message_with_pic_for_price():
@@ -297,8 +293,9 @@ def remove_local():
     # print('Deleting Local File(s)')
     # delete /tmp
     tmp = os.getcwd()
+    global MOUNT_PATH
     if MOUNT_PATH:
-        tmp = MOUNT_PATH
+        tmp = os.path.join(MOUNT_PATH, "/tmp")
     tmp += '/tmp'
     if os.path.exists(tmp):
         shutil.rmtree(tmp)

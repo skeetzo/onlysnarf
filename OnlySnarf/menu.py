@@ -61,6 +61,7 @@ FILE_PATH = None
 UPDATED = False
 UPDATED_TO = False
 TYPE = None
+MOUNT_PATH = None
 i = 0
 while i < len(sys.argv):
     if '-t' in str(sys.argv[i]):
@@ -77,6 +78,8 @@ while i < len(sys.argv):
         TWEETING = False
     if '-delete' in str(sys.argv[i]):
         DELETING = False
+    if '-mount' in str(sys.argv[i]):
+        MOUNT_PATH = str(sys.argv[i+1])
     i += 1
 
 ###########################
@@ -145,6 +148,7 @@ settingItems = sorted([
     [ "Delete Local", REMOVE_LOCAL, ["True","False"]],
     [ "Hashtag", HASHTAGGING, ["True","False"]],
     [ "Force Upload", FORCE_UPLOAD, ["True","False"]],
+    [ "Mount Path", MOUNT_PATH],
     [ "Show Window", SHOW_WINDOW, ["True","False"]],
     [ "Text", TEXT],
     [ "Type", TYPE],
@@ -269,6 +273,8 @@ def settings():
                 settingValue = input("Enter the file path: ")
             elif str(settingChoice) == "Text":
                 settingValue = input("Enter the upload text: ")
+            elif str(settingChoice) == "Mount Path":
+                settingValue = input("Enter the mount path: ")
             else:
                 list_ = list(settingItems[int(choice)][2])
                 print(colorize(str(settingChoice)+" =", 'blue'))

@@ -23,7 +23,7 @@ IMAGE_UPLOAD_LIMIT = 6
 BACKING_UP = True
 # delete uploaded content
 DELETING = False
-
+MOUNT_PATH = None
 ##################
 ##### Config #####
 ##################
@@ -58,6 +58,9 @@ def updateDefaults(args):
         if arg[0] == "Delete Google":
             global DELETING
             DELETING = arg[1]
+        if arg[0] == "Mount Path":
+            global MOUNT_PATH        
+            MOUNT_PATH = arg[1]
 
 def authGoogle(args):
     updateDefaults(args)
@@ -188,38 +191,44 @@ def download_file(args, file):
     updateDefaults(args)
     print('Downloading Video...')
     # mkdir /tmp
-    path = os.getcwd()
-    path += '/tmp'
-    tmp = path
-    if not os.path.exists(path):
-        os.mkdir(path)
+    tmp = os.getcwd()
+    global MOUNT_PATH
+    if MOUNT_PATH:
+        tmp = MOUNT_PATH
+    else:
+        tmp = os.path.join(tmp, "/tmp")
+    if not os.path.exists(str(tmp)):
+        os.mkdir(str(tmp))
     # download file
     ext = os.path.splitext(file['title'])[1]
     if not ext:
         ext = '.mp4'
-        maybePrint('ext (default): '+ext)
+        maybePrint('ext (default): '+str(ext))
     else:
-        maybePrint('ext: '+ext)
-    path += "/uploadMe"+ext
-    maybePrint('path: '+path)
-    file.GetContentFile(path)
-    if os.path.getsize(path) == 0:
-        maybePrint('size: '+str(os.path.getsize(path)))
+        maybePrint('ext: '+str(ext))
+    tmp += "/uploadMe"+str(ext)
+    maybePrint('path: '+str(tmp))
+    file.GetContentFile(tmp)
+    if os.path.getsize(tmp) == 0:
+        maybePrint('size: '+str(os.path.getsize(tmp)))
         print('Download Failure')
         return
     print('Download Complete')
-    return path
+    return tmp
 
 # Download Gallery
 def download_gallery(args, folder):
     updateDefaults(args)
     print('Downloading Gallery...')
     # mkdir /tmp
-    path = os.getcwd()
-    path += '/tmp'+"/"+str(folder['title'])
-    maybePrint('path: '+path)
-    if not os.path.exists(path):
-        os.makedirs(path)
+    tmp = os.getcwd()
+    global MOUNT_PATH
+    if MOUNT_PATH:
+        tmp = os.path.join(MOUNT_PATH, "/tmp")
+    else:
+        tmp = os.path.join(tmp, "/tmp")
+    if not os.path.exists(str(tmp)):
+        os.mkdir(str(tmp))
     # download folder
     global DRIVE
     file_list = DRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
@@ -237,16 +246,16 @@ def download_gallery(args, folder):
     i = 1
     for file in sorted(file_list_random, key = lambda x: x['title']):
         print('Downloading {} from GDrive ({}/{})'.format(file['title'], i, folder_size))
-        maybePrint('filePath: '+path+"/"+str(file['title']))
-        file.GetContentFile(path+"/"+str(file['title']))
+        maybePrint('filePath: '+tmp+"/"+str(file['title']))
+        file.GetContentFile(tmp+"/"+str(file['title']))
         i+=1
     print('Download Complete')
-    return [file_list_random, path]
+    return [file_list_random, tmp]
 
 # Deletes online file
 def delete_file(args, file):
     updateDefaults(args)
-    if DELETING == "False":
+    if not DELETING or DELETING == "False":
         print("Skipping Delete")
         return
     print('Trashing Google Video')
@@ -259,7 +268,7 @@ def delete_file(args, file):
 # Archives posted file / folder
 def move_file(args, file):
     updateDefaults(args)
-    if DEBUG or BACKING_UP == "False":
+    if DEBUG or not BACKING_UP or BACKING_UP == "False":
         print('Skipping Google Backup: '+file['title'])
         return
     file['parents'] = [{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}]
@@ -268,7 +277,7 @@ def move_file(args, file):
 
 def move_files(args, folderName, files):
     updateDefaults(args)
-    if DEBUG or BACKING_UP == "False":
+    if DEBUG or not BACKING_UP or BACKING_UP == "False":
         print('Skipping Google Backup: '+folderName)
         return
     title = folderName+" - "+datetime.datetime.now().strftime("%d-%m-%I-%M")

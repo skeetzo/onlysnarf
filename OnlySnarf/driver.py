@@ -96,10 +96,10 @@ def log_into_OnlyFans(SHOW_WINDOW):
     # login via Twitter
     twitter = BROWSER.find_element_by_xpath('//a[@class="btn btn-default btn-block btn-lg btn-twitter"]').click()
     # fill in username
-    username = BROWSER.find_element_by_xpath('//input[@id="username_or_email"]').send_keys(OnlyFans_USERNAME)
+    username = BROWSER.find_element_by_xpath('//input[@id="username_or_email"]').send_keys(str(OnlyFans_USERNAME))
     # fill in password and hit the login button 
     password = BROWSER.find_element_by_xpath('//input[@id="password"]')
-    password.send_keys(OnlyFans_PASSWORD)
+    password.send_keys(str(OnlyFans_PASSWORD))
     password.send_keys(Keys.ENTER)
     print('Login Success')
 
@@ -110,17 +110,17 @@ def log_into_OnlyFans(SHOW_WINDOW):
 # Uploads a file to OnlyFans
 def upload_file_to_OnlyFans(args, fileName, path, folderName):
     updateDefaults(args)
-    fileName = os.path.splitext(fileName)[0]
-    print('Uploading: '+fileName)
+    fileName = os.path.splitext(str(fileName))[0]
+    print('Uploading: '+str(fileName))
     # maybePrint('path: '+path)
     if HASHTAGGING:
-        postText = str(fileName)+" #"+" #".join(folderName.split(' '))
+        postText = str(fileName)+" #"+" #".join(str(folderName).split(' '))
     else:
-        postText = folderName+" "+fileName
-    maybePrint('text: '+postText)
+        postText = str(folderName)+" "+str(fileName)
+    maybePrint('text: '+str(postText))
     global BROWSER
-    BROWSER.find_element_by_id("new_post_text_input").send_keys(postText)
-    BROWSER.find_element_by_id("fileupload_photo").send_keys(path)
+    BROWSER.find_element_by_id("new_post_text_input").send_keys(str(postText))
+    BROWSER.find_element_by_id("fileupload_photo").send_keys(str(path))
     if not TWEETING:
         WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
     maxUploadCount = 12 # 2 hours max attempt time
@@ -147,17 +147,17 @@ def upload_file_to_OnlyFans(args, fileName, path, folderName):
 def upload_directory_to_OnlyFans(args, dirName, path, folderName):
     updateDefaults(args)
     if HASHTAGGING:
-        postText = str(dirName)+" #"+" #".join(folderName.split(' '))
+        postText = str(dirName)+" #"+" #".join(str(folderName).split(' '))
     else:    
         postText = str(folderName)+" "+str(dirName)
-    print('Uploading: '+postText)
-    maybePrint('path: '+path)
+    print('Uploading: '+str(postText))
+    maybePrint('path: '+str(path))
     files_path = []
-    for file in pathlib.Path(path).iterdir():  
+    for file in pathlib.Path(str(path)).iterdir():  
         files_path.append(str(file))
     maybePrint('files: '+str(files_path))
     global BROWSER
-    BROWSER.find_element_by_id("new_post_text_input").send_keys(postText)
+    BROWSER.find_element_by_id("new_post_text_input").send_keys(str(postText))
     if not TWEETING:
         WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
     
@@ -170,7 +170,7 @@ def upload_directory_to_OnlyFans(args, dirName, path, folderName):
     ############
     for file in files_path:
         maybePrint('uploading: '+str(file))
-        BROWSER.find_element_by_id("fileupload_photo").send_keys(file)
+        BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
         WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
     send = WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
     if DEBUG:
@@ -241,7 +241,7 @@ def start_user_cache():
 def get_users_local():
     print("Getting Local Users")
     with open(LOCAL_DATA) as json_file:  
-    users = json.load(json_file)
+        users = json.load(json_file)
     for p in users['users']:
         print('Name: ' + p['name'])
         print('Username: ' + p['username'])
