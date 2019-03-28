@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# 3/18/2019: Skeetzo
+# 3/28/2019: Skeetzo
 
 import random
 import os
@@ -17,27 +17,21 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from threading import Thread
 
+from . import settings
+
 ###################
 ##### Globals #####
 ###################
 
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
-CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
 BROWSER = None
-DEBUG = False
-# Twitter hashtags
-HASHTAGGING = False
-# -f -> force / ignore upload max wait
-FORCE_UPLOAD = False
-# -show -> shows window
-SHOW_WINDOW = False
-# -q -> quiet / no tweet
-TWEETING = True
+USER_CACHE = None
+LOCAL_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)),'users.json')
 
 ##################
 ##### Config #####
 ##################
 
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
 try:
     with open(CONFIG_FILE) as config_file:    
         config = json.load(config_file)
@@ -48,30 +42,9 @@ except FileNotFoundError:
 OnlyFans_USERNAME = config['username']        
 OnlyFans_PASSWORD = config['password']   
 
-def updateDefaults(args):
-    for arg in args:
-        if arg[0] == "Debug":
-            global DEBUG
-            DEBUG = arg[1]
-        if arg[0] == "Debug Skip Download":
-            global DEBUG_SKIP_DOWNLOAD
-            DEBUG_SKIP_DOWNLOAD = arg[1]
-        if arg[0] == "Hashtag":
-            global HASHTAGGING
-            HASHTAGGING = arg[1]
-        if arg[0] == "Force Upload":
-            global FORCE_UPLOAD
-            FORCE_UPLOAD = arg[1]
-        if arg[0] == "Show Window":
-            global SHOW_WINDOW
-            SHOW_WINDOW = arg[1]
-        if arg[0] == "Tweeting":
-            global TWEETING        
-            TWEETING = arg[1]
-
 # debugging
 def maybePrint(text):
-    if DEBUG:
+    if settings.DEBUG:
         print(text);
 
 #####################
@@ -79,15 +52,16 @@ def maybePrint(text):
 #####################
 
 # Upload to OnlyFans
-def log_into_OnlyFans(SHOW_WINDOW):
+def log_into_OnlyFans():
     print('Logging into OnlyFans...')
     options = webdriver.ChromeOptions()
-    if not SHOW_WINDOW:
+    if not settings.SHOW_WINDOW:
         options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     # options.setExperimentalOption('useAutomationExtension', false);
     options.add_argument('--disable-gpu')  # Last I checked this was necessary.
     global BROWSER
+    # CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
     # BROWSER = webdriver.Chrome(binary=CHROMEDRIVER_PATH, chrome_options=options)
     BROWSER = webdriver.Chrome(chrome_options=options)
     BROWSER.implicitly_wait(10) # seconds
@@ -108,12 +82,11 @@ def log_into_OnlyFans(SHOW_WINDOW):
 ##################
 
 # Uploads a file to OnlyFans
-def upload_file_to_OnlyFans(args, fileName, path, folderName):
-    updateDefaults(args)
+def upload_file_to_OnlyFans(fileName, path, folderName):
     fileName = os.path.splitext(str(fileName))[0]
     print('Uploading: '+str(fileName))
     # maybePrint('path: '+path)
-    if HASHTAGGING:
+    if settings.HASHTAGGING:
         postText = str(fileName)+" #"+" #".join(str(folderName).split(' '))
     else:
         postText = str(folderName)+" "+str(fileName)
@@ -121,7 +94,7 @@ def upload_file_to_OnlyFans(args, fileName, path, folderName):
     global BROWSER
     BROWSER.find_element_by_id("new_post_text_input").send_keys(str(postText))
     BROWSER.find_element_by_id("fileupload_photo").send_keys(str(path))
-    if not TWEETING:
+    if not settings.TWEETING:
         WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
     maxUploadCount = 12 # 2 hours max attempt time
     i = 0
@@ -129,7 +102,7 @@ def upload_file_to_OnlyFans(args, fileName, path, folderName):
         try:
             WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]')))
             # WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
-            if DEBUG:
+            if settings.DEBUG:
                 print('skipping OnlyFans upload')
                 return
             send = WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]'))).click()
@@ -138,15 +111,14 @@ def upload_file_to_OnlyFans(args, fileName, path, folderName):
         except Exception as e:
             print('uploading...')
             i+=1
-            if i == maxUploadCount and FORCE_UPLOAD is not True:
+            if i == maxUploadCount and settings.FORCE_UPLOAD is not True:
                 print('max upload wait reached, breaking..')
                 break
     print('File Uploaded Successfully')
 
 # Uploads a folder to OnlyFans
-def upload_directory_to_OnlyFans(args, dirName, path, folderName):
-    updateDefaults(args)
-    if HASHTAGGING:
+def upload_directory_to_OnlyFans(dirName, path, folderName):
+    if settings.HASHTAGGING:
         postText = str(dirName)+" #"+" #".join(str(folderName).split(' '))
     else:    
         postText = str(folderName)+" "+str(dirName)
@@ -158,7 +130,7 @@ def upload_directory_to_OnlyFans(args, dirName, path, folderName):
     maybePrint('files: '+str(files_path))
     global BROWSER
     BROWSER.find_element_by_id("new_post_text_input").send_keys(str(postText))
-    if not TWEETING:
+    if not settings.TWEETING:
         WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
     
     ############
@@ -168,19 +140,17 @@ def upload_directory_to_OnlyFans(args, dirName, path, folderName):
     # BROWSER.find_element_by_id("fileupload_photo").send_keys(files_path)
     # WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]')))
     ############
+
     for file in files_path:
         maybePrint('uploading: '+str(file))
         BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
         WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
     send = WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
-    if DEBUG:
+    if settings.DEBUG:
         print('skipping OnlyFans upload')
         return
     send.click()
     print('Directory Uploaded Successfully')
-
-
-
 
 ####################################################################################################################
 
@@ -206,21 +176,28 @@ def get_users():
         log_into_OnlyFans()
     # go to onlyfans.com/my/subscribers/active
     BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
+    print("goto -> /my/subscribers/active")
     # scrape all  <span class="g-user-username">@u6279283</span>
-    users = BROWSER.find_elements_by_class_name('//span[@class="g-user-username"]')
-    maybePrint(users)
-    return []
+    # users = BROWSER.find_elements_by_xpath(By.XPATH, '//span[@class="g-user-username"]')
+    users = BROWSER.find_elements_by_class_name('g-user-username')
+    # maybePrint(users)
+    # return []
     # add to list of users
     active_users = []
+    global OnlyFans_USERNAME
     for user in users:
-        active_users.append("") # update this with correct values
+        name = str(user.get_attribute("innerHTML")).strip()
+        if str(name) == "@"+str(OnlyFans_USERNAME):
+            continue
+        print("username: "+str(name))
+        active_users.append(str(name)) # update this with correct values
     for user in active_users:
         existing = False
         for user_ in USER_CACHE:
-            if user == user_:
+            if str(user) == str(user_):
                 existing = True
         if not existing:
-            USER_CACHE.append(user)
+            USER_CACHE.append(str(user))
     # start cache timeout
     start_user_cache()
     # save users locally
@@ -231,22 +208,28 @@ def get_users():
 def reset_user_cache():
     global USER_CACHE
     USER_CACHE = False
-    print("User Cache Reset")
+    print("User Cache: reset")
 
 def start_user_cache():
-    t = Timer(600.0, reset_user_cache)
+    t = Thread.Timer(600.0, reset_user_cache)
     t.start() # after 10 minutes
+    print("User Cache: started")
 
 # gets a list of all subscribed user_ids from local txt
 def get_users_local():
     print("Getting Local Users")
-    with open(LOCAL_DATA) as json_file:  
-        users = json.load(json_file)
-    for p in users['users']:
-        print('Name: ' + p['name'])
-        print('Username: ' + p['username'])
-        print('')
-    return users
+    users = []
+    try:
+        with open(LOCAL_DATA) as json_file:  
+            users = json.load(json_file)
+        for p in users['users']:
+            print('Name: ' + p['name'])
+            print('Username: ' + p['username'])
+            print('')
+    except FileNotFoundError:
+        print("Missing File: Local Users")
+    finally:
+        return users
 
 # writes user list to local txt
 def write_users_local(users):

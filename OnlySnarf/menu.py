@@ -1,22 +1,11 @@
 #!/usr/bin/python
-# 2/3/2019 - Skeetzo
-# script.py menu system
-
-# GIANT TO;DO
-# uploads files via download or local to onlyfans location
-# can set whether to backup or delete
-# can do each thing separately
-# can do groups of things
-## can be installed easily via pip
-## is the main run script when installed
-## includes instructions in the ascii menu etc for setup
-### can run locally with a filePath of a video, image, or gallery (USB, mounted, etc)
-### link to author, etc
+# 3/28/2019 Skeetzo
+# onlysnarf.py menu system
 
 ### doesn't work:
 # upload & backup (requires upload via local added to main script)
 # settings menu -> "Incorrect Index"
-version = "0.1.6"
+
 import random
 import os
 import shutil
@@ -24,65 +13,24 @@ import datetime
 import json
 import sys
 import pathlib
+from . import settings
 from . import onlysnarf
-###########################
+ 
+###################
+##### Globals #####
+###################
+
+version = "0.1.7"
 header = "\n ________         .__          _________                     _____ \n \
 \\_____  \\   ____ |  | ___.__./   _____/ ____ _____ ________/ ____\\\n \
  /   |   \\ /    \\|  |<   |  |\\_____  \\ /    \\\\__  \\\\_   _ \\   __\\ \n \
 /    |    \\   |  \\  |_\\___  |/        \\   |  \\/ __ \\ |  |\\/| |   \n \
 \\_______  /___|  /____/ ____/_______  /___|  (____  \\\\__|  |_|   \n \
         \\/     \\/     \\/            \\/     \\/     \\/              \n"
- 
-###########################
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
-with open(CONFIG_FILE) as config_file:    
-    config = json.load(config_file)
-DEBUG = False
-DEBUG_SKIP_DOWNLOAD = True
-IMAGE_UPLOAD_LIMIT = 6
-REMOVE_LOCAL = True
-LOCATION = "google"
-# backup uploaded content
-BACKING_UP = True
-# delete uploaded content
-DELETING = False
-# Twitter hashtags
-HASHTAGGING = False
-# -f -> force / ignore upload max wait
-FORCE_UPLOAD = False
-# -show -> shows window
-SHOW_WINDOW = False
-# -t -> text
-TEXT = "Default"
-# -q -> quiet / no tweet
-TWEETING = True
-FILE_NAME = None
-FILE_PATH = None
+
 UPDATED = False
 UPDATED_TO = False
-TYPE = None
-MOUNT_PATH = None
-i = 0
-while i < len(sys.argv):
-    if '-t' in str(sys.argv[i]):
-        TEXT = str(sys.argv[i+1])
-    if '-d' in str(sys.argv[i]):
-        DEBUG = True
-    if '-h' in str(sys.argv[i]):
-        HASHTAGGING = True
-    if '-f' in str(sys.argv[i]):
-        FORCE_UPLOAD = True
-    if '-show' in str(sys.argv[i]):
-        SHOW_WINDOW = True
-    if '-q' in str(sys.argv[i]):
-        TWEETING = False
-    if '-delete' in str(sys.argv[i]):
-        DELETING = False
-    if '-mount' in str(sys.argv[i]):
-        MOUNT_PATH = str(sys.argv[i+1])
-    i += 1
 
-###########################
 colors = {
         'blue': '\033[94m',
         'header': '\033[48;1;34m',
@@ -102,6 +50,7 @@ menuItems = [
 
 # Actions Menu
 actionItems = sorted([
+    [ "Test", ["test"]],
     [ "All", ["all"]],
     [ "Download", ["download"]],
     # [ "Upload", ["upload"]],
@@ -140,21 +89,21 @@ locationItems.insert(0,[ "Back", "main"])
 
 # Settings Menu
 settingItems = sorted([
-    [ "File Name", FILE_NAME],
-    [ "File Path", FILE_PATH],
-    [ "Location", LOCATION, ["Local","Google"]],
-    [ "Backup", BACKING_UP, ["True","False"]],
-    [ "Delete Google", DELETING, ["True","False"]],
-    [ "Delete Local", REMOVE_LOCAL, ["True","False"]],
-    [ "Hashtag", HASHTAGGING, ["True","False"]],
-    [ "Force Upload", FORCE_UPLOAD, ["True","False"]],
-    [ "Mount Path", MOUNT_PATH],
-    [ "Show Window", SHOW_WINDOW, ["True","False"]],
-    [ "Text", TEXT],
-    [ "Type", TYPE],
-    [ "Tweeting", TWEETING, ["True","False"]],
-    [ "Debug", DEBUG, ["True","False"]],
-    [ "Debug Skip Download", DEBUG_SKIP_DOWNLOAD, ["True","False"]]    
+    [ "File Name", settings.FILE_NAME],
+    [ "File Path", settings.FILE_PATH],
+    [ "Location", settings.LOCATION, ["Local","Google"]],
+    [ "Backup", settings.BACKING_UP, ["True","False"]],
+    [ "Delete Google", settings.DELETING, ["True","False"]],
+    [ "Delete Local", settings.REMOVE_LOCAL, ["True","False"]],
+    [ "Hashtag", settings.HASHTAGGING, ["True","False"]],
+    [ "Force Upload", settings.FORCE_UPLOAD, ["True","False"]],
+    [ "Mount Path", settings.MOUNT_PATH],
+    [ "Show Window", settings.SHOW_WINDOW, ["True","False"]],
+    [ "Text", settings.TEXT],
+    [ "Type", settings.TYPE],
+    [ "Tweeting", settings.TWEETING, ["True","False"]],
+    [ "Debug", settings.DEBUG, ["True","False"]],
+    [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"]]    
 ])
 settingItems.insert(0,[ "Back", "main"])
 
@@ -172,6 +121,10 @@ signal.signal(signal.SIGINT, signal_handler)
 # print('Press Ctrl+C')
 # signal.pause()
 ###########################
+
+#####################
+##### Functions #####
+#####################
 
 ### Action Menu - file type
 def action():
@@ -207,17 +160,18 @@ def finalizeAction(actionChoice):
                 return action()
             # Call the matching function
             fileChoice = list(fileItems[int(fileChoice)])[1]
-            return performAction(actionChoice, fileChoice)
+            settings.TYPE = fileChoice
+            return performAction(actionChoice)
         except (ValueError, IndexError, KeyboardInterrupt):
             print("Incorrect Index")
             pass
 
 ### Action Menu - perform
-def performAction(actionChoice, fileChoice):
+def performAction(actionChoice):
     for action in actionChoice:
         try:
             method = getattr(onlysnarf, str(action))
-            response = method(fileChoice, settingItems)
+            response = method(settings.TYPE)
             if response:
                 if str(action) == "download":
                     for setting in settingItems:
@@ -252,7 +206,7 @@ def performMessage(actionChoice, messageChoice):
     for action in actionChoice:
         try:
             method = getattr(onlysnarf, str(action))
-            response = method(messageChoice, settingItems)    
+            response = method(messageChoice)    
         except (AttributeError, KeyboardInterrupt):
             # print(sys.exc_info()[0])
             print("Missing Method") 
@@ -370,21 +324,7 @@ def showSettings():
     UPDATED = False
     print('\r')
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+###########################
 
 if __name__ == "__main__":
     try:
