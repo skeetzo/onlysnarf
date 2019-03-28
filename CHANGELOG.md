@@ -30,6 +30,9 @@
 	- updated send_post_button refs
 **0.1.6 : 3/19/2019**
 	- module separation
+**0.1.7 : 3/28/2019**
+	- settings.py
+	- user.py
 
 ## ToDo
 	- User.py

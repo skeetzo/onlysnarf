@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# 3/18/2019: Skeetzo
+# 3/28/2019: Skeetzo
 
 import random
 import os
@@ -8,25 +8,21 @@ import datetime
 import json
 import sys
 import pathlib
-
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
+from . import settings
 
 ###################
 ##### Globals #####
 ###################
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
+
 DRIVE = None
-DEBUG = False
-IMAGE_UPLOAD_LIMIT = 6
-# backup uploaded content
-BACKING_UP = True
-# delete uploaded content
-DELETING = False
-MOUNT_PATH = None
+
 ##################
 ##### Config #####
 ##################
+
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
 try:
     with open(CONFIG_FILE) as config_file:    
         config = json.load(config_file)
@@ -39,48 +35,31 @@ OnlyFans_IMAGES_FOLDER = config['images_folder']
 OnlyFans_GALLERIES_FOLDER = config['galleries_folder']
 OnlyFans_POSTED_FOLDER = config['posted_folder']
 
+###################
+##### Helpers #####
+###################
+
 # debugging
 def maybePrint(text):
-    if DEBUG:
+    if settings.DEBUG:
         print(text);
 
+# mkdir /tmp
 def getTmp():
-    # mkdir /tmp
     tmp = os.getcwd()
     global MOUNT_PATH
-    if MOUNT_PATH:
-        tmp = os.path.join(MOUNT_PATH, "/tmp")
+    if settings.MOUNT_PATH:
+        tmp = os.path.join(settings.MOUNT_PATH, "tmp")
     else:
-        tmp = os.path.join(tmp, "/tmp")
+        tmp = os.path.join(tmp, "tmp")
     if not os.path.exists(str(tmp)):
         os.mkdir(str(tmp))
     return tmp
 
-def updateDefaults(args):
-    for arg in args:
-        if arg[0] == "Debug":
-            global DEBUG
-            DEBUG = arg[1]
-        if arg[0] == "Image Upload Limit":
-            global IMAGE_UPLOAD_LIMIT
-            IMAGE_UPLOAD_LIMIT = arg[1]
-        if arg[0] == "Backup":
-            global BACKING_UP
-            BACKING_UP = arg[1]
-        if arg[0] == "Delete Google":
-            global DELETING
-            DELETING = arg[1]
-        if arg[0] == "Mount Path":
-            global MOUNT_PATH        
-            MOUNT_PATH = arg[1]
-
-def authGoogle(args):
-    updateDefaults(args)
+def authGoogle():
     print('Authenticating Google...')
     try:
         GOOGLE_CREDS = os.path.join(os.path.dirname(os.path.realpath(__file__)),'google_creds.txt')
-        # GOOGLE_CREDS_JSON = os.path.join(os.path.dirname(os.path.realpath(__file__)),'client_secret.json')
-
         # Google Auth
         gauth = GoogleAuth()
         # Try to load saved client credentials
@@ -107,8 +86,7 @@ def authGoogle(args):
     return True
 
 # Downloads random video from Google Drive
-def get_random_video(args):
-    updateDefaults(args)
+def get_random_video():
     print('Getting Random Video...')
     global DRIVE
     random_folders = DRIVE.ListFile({'q': "'"+OnlyFans_VIDEOS_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
@@ -134,15 +112,14 @@ def get_random_video(args):
     return [random_video, folder_name]
 
 # Downloads random image from Google Drive
-def get_random_image(args):
-    updateDefaults(args)
+def get_random_image():
     print('Getting Random Image...')
     global DRIVE
     random_folders = DRIVE.ListFile({'q': "'"+OnlyFans_IMAGES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     images_list = []
     random_image = None
     for folder in random_folders:
-        if DEBUG:
+        if settings.DEBUG:
             print('checking folder: '+folder['title'],end="")
         images_list_tmp = DRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
         if len(images_list_tmp)>0:
@@ -162,8 +139,7 @@ def get_random_image(args):
     return [random_image, folder_name]
 
 # Downloads random gallery from Google Drive
-def get_random_gallery(args):
-    updateDefaults(args)
+def get_random_gallery():
     print('Getting Random Gallery...')
     global DRIVE
     random_folders = DRIVE.ListFile({'q': "'"+OnlyFans_GALLERIES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
@@ -171,7 +147,7 @@ def get_random_gallery(args):
     gallery_list = []
     random_gallery = None
     for folder in random_folders:
-        if DEBUG:
+        if settings.DEBUG:
             print('checking galleries: '+folder['title'],end="")
         gallery_list_tmp = DRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         if len(gallery_list_tmp)>0:
@@ -181,7 +157,7 @@ def get_random_gallery(args):
             maybePrint(" -> empty")
     random.shuffle(folder_list)
     for folder in folder_list:
-        if DEBUG:
+        if settings.DEBUG:
             print('checking gallery: '+folder['title'],end="")
         gallery_list_tmp = DRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         random_gallery_tmp = random.choice(gallery_list_tmp)
@@ -199,8 +175,7 @@ def get_random_gallery(args):
     return [random_gallery, folder_name]
 
 # Download File
-def download_file(args, file):
-    updateDefaults(args)
+def download_file(file):
     print('Downloading Video...')
     tmp = getTmp()
     # download file
@@ -221,8 +196,7 @@ def download_file(args, file):
     return tmp
 
 # Download Gallery
-def download_gallery(args, folder):
-    updateDefaults(args)
+def download_gallery(folder):
     print('Downloading Gallery...')
     tmp = getTmp()
     # download folder
@@ -230,12 +204,12 @@ def download_gallery(args, folder):
     file_list = DRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
     folder_size = len(file_list)
     maybePrint('Folder size: '+str(folder_size))
-    maybePrint('Upload limit: '+str(IMAGE_UPLOAD_LIMIT))
+    maybePrint('Upload limit: '+str(settings.IMAGE_UPLOAD_LIMIT))
     if int(folder_size) == 0:
         print('Error: Empty Folder')
         return
     file_list_random = []
-    for x in range(IMAGE_UPLOAD_LIMIT):
+    for x in range(settings.IMAGE_UPLOAD_LIMIT):
         random_file = random.choice(file_list)
         file_list.remove(random_file)
         file_list_random.append(random_file)
@@ -249,31 +223,28 @@ def download_gallery(args, folder):
     return [file_list_random, tmp]
 
 # Deletes online file
-def delete_file(args, file):
-    updateDefaults(args)
-    if not DELETING or DELETING == "False":
+def delete_file(file):
+    if not settings.DELETING or settings.DELETING == "False":
         print("Skipping Delete")
         return
     print('Trashing Google Video')
-    if DEBUG:
+    if settings.DEBUG:
         print('skipping Google delete')
         return
     file.Trash()
     print('Google Video Trashed')
 
 # Archives posted file / folder
-def move_file(args, file):
-    updateDefaults(args)
-    if DEBUG or not BACKING_UP or BACKING_UP == "False":
+def move_file(file):
+    if settings.DEBUG or not settings.BACKING_UP or settings.BACKING_UP == "False":
         print('Skipping Google Backup: '+file['title'])
         return
     file['parents'] = [{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}]
     file.Upload()
     print('Google File Backed Up: '+file['title'])
 
-def move_files(args, folderName, files):
-    updateDefaults(args)
-    if DEBUG or not BACKING_UP or BACKING_UP == "False":
+def move_files(folderName, files):
+    if settings.DEBUG or not settings.BACKING_UP or settings.BACKING_UP == "False":
         print('Skipping Google Backup: '+folderName)
         return
     title = folderName+" - "+datetime.datetime.now().strftime("%d-%m-%I-%M")
@@ -285,4 +256,3 @@ def move_files(args, folderName, files):
         file['parents'] = [{"kind": "drive#fileLink", "id": tmp_folder['id']}]
         file.Upload()
     print('Google Files Backed Up')
-
