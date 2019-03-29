@@ -46,7 +46,7 @@ def test(TYPE):
     remove_local()
     print('1/3 : Testing')
     # users = OnlySnarf.get_users()
-    message_all(image=settings.IMAGE)
+    message_recent(image=settings.IMAGE)
 
 def all(TYPE):
     settings.TYPE = TYPE

@@ -160,7 +160,65 @@ def uploadPerformer(args, dirName, path, folderName):
 #################
 ##### Users #####
 #################
-# code User.py
+
+def goto_user(username):
+    print("Goto user: %s" % username)
+    global BROWSER
+    if not BROWSER:
+        log_into_OnlyFans()
+    username = str(username).replace("@u","").replace("@","")
+    BROWSER.get(('https://onlyfans.com/my/chats/chat/'+str(username)))
+    print("goto -> /my/chats/chat/$%s" % username)
+
+def enter_message(text):
+    try:
+        print("Enter text: %s" % text)
+        if not text or text == None:
+            print("Missing Text")
+            return
+        global BROWSER
+        message = BROWSER.find_element_by_class("form-control unlimsize b-chat__message-input").sendKeys(Keys.TAB);
+        message.clear();
+        message.send_keys(str(text))
+        print("Message Entered")
+    except:
+        print(sys.exc_info()[0])
+
+def enter_image(image):
+    try:
+        print("Enter image: %s" % image)
+        if not image or image == None:
+            print("Missing Image")
+            return
+        global BROWSER
+        BROWSER.find_element_by_id("cm_fileupload_photo").send_keys(str(image))
+        print("Image Entered")
+    except:
+        print(sys.exc_info()[0])
+
+def enter_price(price):
+    try:
+        print("Enter price: %s" % price)
+        if not price or price == None:
+            print("Missing Price")
+            return
+        global BROWSER
+        BROWSER.find_element_by_class("b-chat__btn-set-price js-chat__btn-set-price").click()
+        BROWSER.find_element_by_class("form-control js-chat__price-input b-chat__panel__input js-input").send_keys(str(price))
+        BROWSER.find_element_by_class("g-btn m-rounded js-panel__btn-save js-chat__price-btn-save").click()
+        print("Price Entered")
+    except:
+        print(sys.exc_info()[0])
+
+def confirm_message():
+    try:
+        if settings.DEBUG:
+            print('skipping OnlyFans message')
+            return
+        global BROWSER
+        BROWSER.find_element_by_class("g-btn m-rounded b-chat__btn-submit").click()
+    except:
+        print(sys.exc_info()[0])
 
 # gets a list of all user_ids subscribed to profile
 def get_users():
@@ -203,6 +261,23 @@ def get_users():
     write_users_local(USER_CACHE)
     return USER_CACHE
 
+def get_user_by_username(username):
+    users = get_users()
+    for user in users:
+        if str(user.username) == str(username):
+            return user
+    return None
+
+def get_recent_users():
+    users = get_users()
+    i = 0
+    users_ = []
+    for user in users:
+        users_.append(user)
+        i += 1
+        if i == 10:
+            return users_
+    return users_
 
 def reset_user_cache():
     global USER_CACHE
