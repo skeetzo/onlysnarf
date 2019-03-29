@@ -8,15 +8,14 @@ import datetime
 import json
 import sys
 import pathlib
-
+import threading
 import chromedriver_binary
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from threading import Thread
-
+from .user import User
 from . import settings
 
 ###################
@@ -25,13 +24,13 @@ from . import settings
 
 BROWSER = None
 USER_CACHE = None
-LOCAL_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)),'users.json')
+LOCAL_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'users.json')
 
 ##################
 ##### Config #####
 ##################
 
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')
 try:
     with open(CONFIG_FILE) as config_file:    
         config = json.load(config_file)
@@ -162,7 +161,6 @@ def uploadPerformer(args, dirName, path, folderName):
 ##### Users #####
 #################
 # code User.py
-from . import user as User
 
 # gets a list of all user_ids subscribed to profile
 def get_users():
@@ -197,7 +195,8 @@ def get_users():
             if str(user) == str(user_):
                 existing = True
         if not existing:
-            USER_CACHE.append(str(user))
+            USER_CACHE.append(User(str(user)))
+        user = User(user)
     # start cache timeout
     start_user_cache()
     # save users locally
@@ -208,66 +207,47 @@ def get_users():
 def reset_user_cache():
     global USER_CACHE
     USER_CACHE = False
-    print("User Cache: reset")
+    maybePrint("User Cache: reset")
 
 def start_user_cache():
-    t = Thread.Timer(600.0, reset_user_cache)
-    t.start() # after 10 minutes
-    print("User Cache: started")
+    maybePrint("User Cache: starting")
+    try:
+        threading.Timer(600.0, reset_user_cache).start() # after 10 minutes
+        maybePrint("User Cache: started")
+    except:
+        maybePrint("User Cache: error starting")
+        print(sys.exc_info()[0])
 
 # gets a list of all subscribed user_ids from local txt
 def get_users_local():
     print("Getting Local Users")
     users = []
+    users_ = []
     try:
         with open(LOCAL_DATA) as json_file:  
             users = json.load(json_file)
         for p in users['users']:
-            print('Name: ' + p['name'])
-            print('Username: ' + p['username'])
-            print('')
+            maybePrint('Username: ' + str(p))
+            maybePrint('')
+            users_.append(User(str(p)))
     except FileNotFoundError:
         print("Missing File: Local Users")
     finally:
-        return users
+        return users_
 
 # writes user list to local txt
 def write_users_local(users):
     print("Writing Local Users")
+    maybePrint("local data path: "+str(LOCAL_DATA))
     data = {}
     data['users'] = []
     for user in users:
+        maybePrint("saving: "+str(user.username))
         data['users'].append({  
-            'name': user['name'],
-            'username': user['username']
+            'username': str(user.username),
         })
     with open(LOCAL_DATA, 'w') as outfile:  
         json.dump(data, outfile)
-
-####################
-##### Messages #####
-####################
-
-# sends message to all users
-def mass_message_all(message, image, price):
-    print("Sending Mass Message")
-    users = get_users()
-    for user in users:
-        user.sendMessage(message, image, price)
-
-#### NEEDED?
-# sends an image at price to user_id recipient
-def send_message(message, image, price, recipient):
-    print("Sending Message to User: "+recipient)
-    recipient.sendMessage(message, image, price)
-
-#################
-##### Crons ##### -> move to onlysnarf.py
-#################
-
-# sends a message to all recent subscribers
-def greet_new_subscribers():
-    pass
 
 
 
