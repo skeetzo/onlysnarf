@@ -46,6 +46,8 @@ global FILE_NAME
 FILE_NAME = None
 global FILE_PATH
 FILE_PATH = None
+global IMAGE
+IMAGE = None
 
 i = 0
 while i < len(sys.argv):
@@ -65,6 +67,8 @@ while i < len(sys.argv):
         DELETING = False
     if '-mount' in str(sys.argv[i]):
         MOUNT_PATH = str(sys.argv[i+1])
+    if '-i' in str(sys.argv[i]):
+        IMAGE = str(sys.argv[i+1])
     i += 1
 
 # global initialized

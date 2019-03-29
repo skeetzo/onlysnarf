@@ -101,6 +101,7 @@ settingItems = sorted([
     [ "Show Window", settings.SHOW_WINDOW, ["True","False"]],
     [ "Text", settings.TEXT],
     [ "Type", settings.TYPE],
+    [ "Image", settings.IMAGE],
     [ "Tweeting", settings.TWEETING, ["True","False"]],
     [ "Debug", settings.DEBUG, ["True","False"]],
     [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"]]    
@@ -237,6 +238,8 @@ def settings():
                 settingValue = input("Enter the upload text: ")
             elif str(settingChoice) == "Mount Path":
                 settingValue = input("Enter the mount path: ")
+            elif str(settingChoice) == "Image":
+                settingValue = input("Enter the image path: ")
             else:
                 list_ = list(settingItems[int(choice)][2])
                 print(colorize(str(settingChoice)+" =", 'blue'))

@@ -3,9 +3,8 @@
 # User Class
 
 class User:
-    def __init__(self, name, username):
-        self.name = name
+    def __init__(self, username):
         self.username = username
 
-    def sendMessage(message, image, price):
-        pass
+    def sendMessage(self, message=None, image=None, price=None):
+    	print("Sending Message: %s - %s - %s" % (message, image, price))

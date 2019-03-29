@@ -45,9 +45,8 @@ def test(TYPE):
     print('0/3 : Deleting Locals')
     remove_local()
     print('1/3 : Testing')
-    OnlySnarf.get_users()
-
-
+    # users = OnlySnarf.get_users()
+    message_all(image=settings.IMAGE)
 
 def all(TYPE):
     settings.TYPE = TYPE
@@ -140,21 +139,33 @@ def upload_video_():
 def backup(fileChoice, args):
     print("Missing Feature: Backup")
 
-def message_all():
-    pass
+####################
+##### Messages #####
+####################
 
-def message_recent():
-    pass
+def message_all(message=":)", image=None, price="10.00"):
+    print("Messaging: All")
+    users = OnlySnarf.get_users()
+    for user in users:
+        user.sendMessage(message, image, price)
 
-def message_by_user_id():
-    pass
+def message_recent(message=":)", image=None, price="10.00"):
+    print("Messaging: Recent")
+    users = OnlySnarf.get_recent_users()
+    for user in users:
+        user.sendMessage(message, image, price)
 
-def message_by_username():
-    pass
+def message_by_username(username=None, message=":)", image=None, price="10.00"):
+    print("Messaging: User - %s" % username)
+    OnlySnarf.get_user_by_username(str(username)).sendMessage(message, image, price)
 
-def message_with_pic_for_price():
-    pass
+#################
+##### Crons ##### -> move to onlysnarf.py
+#################
 
+# sends a message to all recent subscribers
+def greet_new_subscribers():
+    pass # needs to add OnlySnarf.searchNotificationsForNewSubscribers
 
 #####################
 ##### FUNCTIONS #####
