@@ -48,12 +48,13 @@ def test(TYPE):
     remove_local()
     print('1/3 : Testing')
     # users = OnlySnarf.get_users()
+    # return
     response = download_random_image()
     if not response or response == None:
         print("Error: Missing Image")
         return
-    # message_all(image=response[1])
-    message_recent(image=response[1])
+    message_all(image=response[1])
+    # message_recent(image=response[1])
 
 def all(TYPE):
     settings.TYPE = TYPE
