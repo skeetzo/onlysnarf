@@ -10,6 +10,7 @@ import sys
 import pathlib
 import threading
 import chromedriver_binary
+import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -39,7 +40,8 @@ except FileNotFoundError:
     sys.exit(0)
 
 OnlyFans_USERNAME = config['username']        
-OnlyFans_PASSWORD = config['password']   
+OnlyFans_PASSWORD = config['password']
+OnlyFans_USER_ID = "409408"
 
 # debugging
 def maybePrint(text):
@@ -233,24 +235,35 @@ def get_users():
     if not BROWSER or BROWSER == None:
         log_into_OnlyFans()
     # go to onlyfans.com/my/subscribers/active
-    BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
     print("goto -> /my/subscribers/active")
-    users = BROWSER.find_elements_by_class_name('g-user-username')
+    BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
+    num = BROWSER.find_element_by_class_name("b-tabs__nav__item__count").get_attribute("innerHTML")
+    maybePrint("User count: %s" % num)
+    for n in range(int(int(int(num)/10)+1)):
+        maybePrint("scrolling...")
+        BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(1)
+    user_ids = BROWSER.find_elements_by_class_name('b-avatar')
+    # users = BROWSER.find_elements_by_class_name('g-user-name')
+    # usernames = BROWSER.find_elements_by_class_name('g-user-username')
     # maybePrint(users)
     # return []
     # add to list of users
     active_users = []
     global OnlyFans_USERNAME
     maybePrint("Found: ")
-    for user in users:
-        name = str(user.get_attribute("innerHTML")).strip()
-        maybePrint("username: %s" % name)
-        if str(OnlyFans_USERNAME).lower() in str(name).lower():
+    for user in user_ids:
+        # name = str(user.get_attribute("innerHTML")).strip()
+        user_id = str(user.get_attribute("user_id")).strip()
+        maybePrint("username: %s" % user_id)
+        if str(OnlyFans_USERNAME).lower() in str(user_id).lower():
             continue
-        if str(name).lower() in settings.SKIP_USERS:
-            maybePrint("skipping: %s" % name)
+        if str(OnlyFans_USER_ID).lower() in str(user_id).lower():
             continue
-        active_users.append(str(name)) # update this with correct values
+        if str(user_id).lower() in settings.SKIP_USERS:
+            maybePrint("skipping: %s" % user_id)
+            continue
+        active_users.append(str(user_id)) # update this with correct values
     for user in active_users:
         existing = False
         for user_ in USER_CACHE:
@@ -338,3 +351,14 @@ def write_users_local(users):
         })
     with open(LOCAL_DATA, 'w') as outfile:  
         json.dump(data, outfile)
+
+
+
+
+
+
+
+
+# add a write to users to save users that have been sent an image to
+# add a check for the Oops page when sending a message to just move on
+# close when done sending messages
