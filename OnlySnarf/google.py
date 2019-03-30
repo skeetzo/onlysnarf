@@ -123,7 +123,7 @@ def get_random_image():
             print('checking folder: '+folder['title'],end="")
         images_list_tmp = DRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
         if len(images_list_tmp)>0:
-            video_list.append(folder)
+            images_list.append(folder)
             maybePrint(" -> added")
         else:
             maybePrint(" -> empty")
@@ -176,7 +176,7 @@ def get_random_gallery():
 
 # Download File
 def download_file(file):
-    print('Downloading Video...')
+    print('Downloading File...')
     tmp = getTmp()
     # download file
     ext = os.path.splitext(file['title'])[1]

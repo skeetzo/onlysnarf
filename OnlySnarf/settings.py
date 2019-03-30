@@ -47,7 +47,20 @@ FILE_NAME = None
 global FILE_PATH
 FILE_PATH = None
 global IMAGE
+# IMAGE = "/home/skeetzo/Projects/onlysnarf/OnlySnarf/images/snarf.jpg"
 IMAGE = None
+global RECENT_USER_COUNT
+RECENT_USER_COUNT = 10
+global DEFAULT_PRICE
+DEFAULT_PRICE = "10.00"
+global DEFAULT_MESSAGE
+DEFAULT_MESSAGE = ":)"
+
+global SKIP_USERS
+SKIP_USERS = [
+    "@u1823577",
+    "@u4242416"
+]
 
 i = 0
 while i < len(sys.argv):
