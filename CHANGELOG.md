@@ -33,7 +33,9 @@
 **0.1.7 : 3/28/2019**
 	- settings.py
 	- user.py
-
+**0.1.8 : 3/31/2019**
+	- debugging
+	
 ## ToDo
 	- User.py
 	- send User message w/ image for $

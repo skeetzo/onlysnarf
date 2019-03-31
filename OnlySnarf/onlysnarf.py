@@ -55,6 +55,7 @@ def test(TYPE):
         return
     message_all(image=response[1])
     # message_recent(image=response[1])
+    OnlySnarf.exit()
 
 def all(TYPE):
     settings.TYPE = TYPE
@@ -276,6 +277,7 @@ def main():
     #################################################
     print('Google Drive to OnlyFans Upload Complete!')
     sys.stdout.flush()
+    OnlySnarf.exit()
 
 ################################################################################################################################################
 

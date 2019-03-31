@@ -244,38 +244,42 @@ def get_users():
         BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(1)
     user_ids = BROWSER.find_elements_by_class_name('b-avatar')
-    # users = BROWSER.find_elements_by_class_name('g-user-name')
-    # usernames = BROWSER.find_elements_by_class_name('g-user-username')
+    users = BROWSER.find_elements_by_class_name('g-user-name')
+    usernames = BROWSER.find_elements_by_class_name('g-user-username')
     # maybePrint(users)
     # return []
     # add to list of users
     active_users = []
     global OnlyFans_USERNAME
     maybePrint("Found: ")
-    for user in user_ids:
-        # name = str(user.get_attribute("innerHTML")).strip()
-        user_id = str(user.get_attribute("user_id")).strip()
-        maybePrint("username: %s" % user_id)
-        if str(OnlyFans_USERNAME).lower() in str(user_id).lower():
+    for i in range(len(user_ids))
+        user_id = user_ids[i]
+        name = users[i]
+        username = usernames[i]
+        user_id = str(user_id.get_attribute("user_id")).strip()
+        name = str(name.get_attribute("innerHTML")).strip()
+        username = str(username.get_attribute("innerHTML")).strip()
+        if str(OnlyFans_USERNAME).lower() in str(username).lower():
+            maybePrint("skipping self: %s = %s" % (OnlyFans_USERNAME, username)
             continue
         if str(OnlyFans_USER_ID).lower() in str(user_id).lower():
+            maybePrint("skipping self: %s" % (OnlyFans_USER_ID, user_id))
             continue
         if str(user_id).lower() in settings.SKIP_USERS:
             maybePrint("skipping: %s" % user_id)
             continue
-        active_users.append(str(user_id)) # update this with correct values
+        active_users.append(User(name=name, username=username, id=user_id)) # update this with correct values
     for user in active_users:
         existing = False
         for user_ in USER_CACHE:
-            if str(user) == str(user_):
+            if user.equals(user_):
                 existing = True
         if not existing:
-            USER_CACHE.append(User(str(user)))
-        user = User(user)
+            USER_CACHE.append(user)
     # start cache timeout
     start_user_cache()
     # save users locally
-    write_users_local(USER_CACHE)
+    write_users_local()
     return USER_CACHE
 
 def get_user_by_username(username):
@@ -339,7 +343,8 @@ def get_users_local():
         return users_
 
 # writes user list to local txt
-def write_users_local(users):
+def write_users_local():
+    users = get_users()
     print("Writing Local Users")
     maybePrint("local data path: "+str(LOCAL_DATA))
     data = {}
@@ -352,13 +357,8 @@ def write_users_local(users):
     with open(LOCAL_DATA, 'w') as outfile:  
         json.dump(data, outfile)
 
-
-
-
-
-
-
-
-# add a write to users to save users that have been sent an image to
-# add a check for the Oops page when sending a message to just move on
-# close when done sending messages
+def exit():
+    print("Closing OnlyFans...")
+    write_users_local()
+    global BROWSER
+    BROWSER.quit()
