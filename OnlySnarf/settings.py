@@ -15,6 +15,8 @@ REMOVE_LOCAL = True
 global BACKING_UP
 # backup uploaded content
 BACKING_UP = True
+global BACKING_UP_FORCE
+BACKING_UP_FORCE = True
 global DELETING
 # delete uploaded content
 DELETING = False
@@ -91,7 +93,18 @@ while i < len(sys.argv):
         MOUNT_PATH = str(sys.argv[i+1])
     if '-i' in str(sys.argv[i]):
         IMAGE = str(sys.argv[i+1])
+    if '-force' in str(sys.argv[i]):
+        FORCE_UPLOAD = True
     i += 1
 
 # global initialized
 # initialized = True
+
+
+
+
+
+def maybePrint(text):
+    global DEBUG
+    if DEBUG:
+        print(text);
