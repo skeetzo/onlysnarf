@@ -116,6 +116,9 @@ def upload_file_to_OnlyFans(fileName, path, folderName):
                 break
     print('File Uploaded Successfully')
 
+# Failed to resize image (thumb) ????????????
+# check / add / fix thumbnail for mp4
+
 # Uploads a folder to OnlyFans
 def upload_directory_to_OnlyFans(dirName, path, folderName):
     if settings.HASHTAGGING:
