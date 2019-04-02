@@ -2,6 +2,7 @@
 include OnlySnarf/config.json
 include OnlySnarf/google_creds.txt
 include OnlySnarf/settings.yaml
+include OnlySnarf/video.mp4
 
 # Include the README
 include *.md

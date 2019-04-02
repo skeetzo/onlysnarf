@@ -19,11 +19,6 @@ AUTH = False
 ##### Helpers #####
 ###################
 
-# debugging
-def maybePrint(text):
-    if settings.DEBUG:
-        print(text);
-
 def getTmp():
     # mkdir /tmp
     tmp = os.getcwd()
@@ -47,19 +42,32 @@ def test(TYPE):
     print('0/3 : Deleting Locals')
     remove_local()
     print('1/3 : Testing')
-    # users = OnlySnarf.get_users()
-    # return
+    users = OnlySnarf.get_users()
+    return
     response = download_random_image()
     if not response or response == None:
         print("Error: Missing Image")
         return
-    message_all(image=response[1])
-    # message_recent(image=response[1])
+    # message_all(image=response[1])
+    message_recent(image=response[1])
+    Google.move_file(response[2])
     OnlySnarf.exit()
 
 def all(TYPE):
     settings.TYPE = TYPE
     main()
+
+# upload a file or gallery
+# send a message to [recent, all, user] w/ a preview image
+def upload_and_announce(fileChoice):
+    settings.TYPE = fileChoice
+    response = download_random_image()
+    upload(fileChoice, filename=response[0], filepath=response[1])
+    # uploads a file or gallery
+    # sends a message to all users w/ a preview image
+    
+
+# 
 
 def download(fileChoice):
     if fileChoice == 'image':
@@ -88,7 +96,7 @@ def download_random_image():
     if file_path == None:
         print('Missing Random Image: Empty Download')
         return
-    return [file_name, file_path]
+    return [file_name, file_path, random_file]
 
 def download_random_gallery():
     global AUTH
@@ -108,7 +116,7 @@ def download_random_gallery():
     if file_path == None:
         print('Missing Random Gallery: Empty Download')
         return
-    return [file_name, file_path]
+    return [file_name, file_path, random_file]
 
 def download_random_video():
     global AUTH
@@ -129,7 +137,7 @@ def download_random_video():
     if file_path == None:
         print('Missing Random Video: Empty Download')
         return
-    return [file_name, file_path]
+    return [file_name, file_path, random_file]
 
 def upload(fileChoice, filename=settings.FILE_NAME, filepath=settings.FILE_PATH):
     if fileChoice == 'image':
@@ -209,9 +217,8 @@ def main():
     global AUTH
     if not AUTH:
         AUTH = Google.authGoogle()
-    if settings.DEBUG:
-        print('0/3 : Deleting Locals')
-        remove_local()
+    print('0/3 : Deleting Locals')
+    remove_local()
     print('1/3 : Fetching Content')
     random_file = None
     file_name = None
@@ -255,7 +262,7 @@ def main():
     sys.stdout.flush()
     #################################################
     print('2/3 : Accessing OnlyFans')
-    OnlySnarf.log_into_OnlyFans(settings.SHOW_WINDOW)
+    OnlySnarf.log_into_OnlyFans()
     if settings.TYPE == "gallery":
         OnlySnarf.upload_directory_to_OnlyFans(file_name, file_path, folder_name)
     elif settings.TYPE == "video" or settings.TYPE == "image":
@@ -275,7 +282,7 @@ def main():
     Google.delete_file(random_file)
     print('Files Cleaned ')
     #################################################
-    print('Google Drive to OnlyFans Upload Complete!')
+    print('Google Drive to OnlyFans Upload Complete')
     sys.stdout.flush()
     OnlySnarf.exit()
 

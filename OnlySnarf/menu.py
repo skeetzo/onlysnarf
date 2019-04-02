@@ -98,6 +98,7 @@ settingItems = sorted([
     [ "Hashtag", settings.HASHTAGGING, ["True","False"]],
     [ "Force Upload", settings.FORCE_UPLOAD, ["True","False"]],
     [ "Mount Path", settings.MOUNT_PATH],
+    [ "Users Path", settings.USERS_PATH],
     [ "Show Window", settings.SHOW_WINDOW, ["True","False"]],
     [ "Text", settings.TEXT],
     [ "Type", settings.TYPE],
@@ -147,7 +148,9 @@ def action():
                 return finalizeAction(actionChoice)
         except (ValueError, IndexError, KeyboardInterrupt):
             print("Incorrect Index")
-            pass
+        except:
+            print(sys.exc_info()[0])
+            print("Missing Method") 
 
 ### Action Menu - finalize
 def finalizeAction(actionChoice):
@@ -165,7 +168,9 @@ def finalizeAction(actionChoice):
             return performAction(actionChoice)
         except (ValueError, IndexError, KeyboardInterrupt):
             print("Incorrect Index")
-            pass
+        except:
+            print(sys.exc_info()[0])
+            print("Missing Method") 
 
 ### Action Menu - perform
 def performAction(actionChoice):
@@ -180,8 +185,10 @@ def performAction(actionChoice):
                             setting[1] = response[0]
                         elif setting[0] == "File Path":
                             setting[1] = response[1]
-        except (AttributeError, KeyboardInterrupt):
-            # print(sys.exc_info()[0])
+        except (ValueError, IndexError, KeyboardInterrupt):
+            print("Incorrect Index")
+        except:
+            print(sys.exc_info()[0])
             print("Missing Method") 
     mainMenu()
 
@@ -199,8 +206,8 @@ def finalizeMessage(actionChoice):
             choice = list(messageItems[int(choice)])[1]
             return performMessage(actionChoice, choice)
         except (ValueError, IndexError, KeyboardInterrupt):
+            print(sys.exc_info()[0])
             print("Incorrect Index")
-            pass
 
 # Message Menu - perform
 def performMessage(actionChoice, messageChoice):
@@ -208,8 +215,10 @@ def performMessage(actionChoice, messageChoice):
         try:
             method = getattr(onlysnarf, str(action))
             response = method(messageChoice)    
-        except (AttributeError, KeyboardInterrupt):
-            # print(sys.exc_info()[0])
+        except (ValueError, IndexError, KeyboardInterrupt):
+            print("Incorrect Index")
+        except:
+            print(sys.exc_info()[0])
             print("Missing Method") 
     mainMenu()    
 
@@ -251,9 +260,8 @@ def settings():
                         if int(updateChoice) < 0 or int(updateChoice) >= len(list(settingItems[int(choice)][2])): raise ValueError
                         settingValue = list_[int(updateChoice)]
                         break
-                    except (IndexError, ValueError, KeyboardInterrupt):
+                    except (ValueError, IndexError, KeyboardInterrupt):
                         print("Incorrect Index")
-                        pass
                     except:
                         print('What did shnnarf break?')
                         print(sys.exc_info()[0])
@@ -264,13 +272,11 @@ def settings():
             UPDATED_TO = settingValue
             settingItems[int(choice)][1] = settingValue
             return settings()
-        except (IndexError, ValueError, KeyboardInterrupt):
+        except (ValueError, IndexError, KeyboardInterrupt):
             print("Incorrect Index")
-            pass
         except:
             print(sys.exc_info()[0])
             return main()
-            pass
 
 ###########################
 

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="0.1.5",
+    version="0.1.8",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     description="Only Snarf Automation",
