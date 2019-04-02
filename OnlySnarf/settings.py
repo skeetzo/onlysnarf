@@ -4,6 +4,8 @@ import sys
 # def init(sys.argv):
 global MOUNT_PATH
 MOUNT_PATH = None
+global USERS_PATH
+USERS_PATH = None
 global DEBUG
 DEBUG = False
 global SKIP_DOWNLOAD
@@ -15,6 +17,8 @@ REMOVE_LOCAL = True
 global BACKING_UP
 # backup uploaded content
 BACKING_UP = True
+global BACKING_UP_FORCE
+BACKING_UP_FORCE = True
 global DELETING
 # delete uploaded content
 DELETING = False
@@ -56,6 +60,9 @@ DEFAULT_PRICE = "10.00"
 global DEFAULT_MESSAGE
 DEFAULT_MESSAGE = ":)"
 
+global FORCE_REDUCTION
+FORCE_REDUCTION = False
+
 global SKIP_USERS
 SKIP_USERS = [
     "1823577",
@@ -89,9 +96,24 @@ while i < len(sys.argv):
         DELETING = False
     if '-mount' in str(sys.argv[i]):
         MOUNT_PATH = str(sys.argv[i+1])
+    if '-users' in str(sys.argv[i]):
+        USERS_PATH = str(sys.argv[i+1])
     if '-i' in str(sys.argv[i]):
         IMAGE = str(sys.argv[i+1])
+    if '-force-upload' in str(sys.argv[i]):
+        FORCE_UPLOAD = True
+    if '-force-reduc' in str(sys.argv[i]):
+        FORCE_REDUCTION = True
     i += 1
 
 # global initialized
 # initialized = True
+
+
+
+
+
+def maybePrint(text):
+    global DEBUG
+    if DEBUG:
+        print(text);

@@ -3,6 +3,7 @@ config.json
 google_creds.txt
 client_secrets.json
 settings.yaml
+users.json
 
 # Temporary downloads
 /tmp/

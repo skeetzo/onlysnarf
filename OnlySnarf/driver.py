@@ -25,7 +25,11 @@ from . import settings
 
 BROWSER = None
 USER_CACHE = None
-LOCAL_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'users.json')
+LOCAL_DATA = None
+if settings.USERS_PATH is not None:
+    LOCAL_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)), settings.USERS_PATH)
+else:
+    LOCAL_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'users.json')
 
 ##################
 ##### Config #####
@@ -42,11 +46,6 @@ except FileNotFoundError:
 OnlyFans_USERNAME = config['username']        
 OnlyFans_PASSWORD = config['password']
 OnlyFans_USER_ID = "409408"
-
-# debugging
-def maybePrint(text):
-    if settings.DEBUG:
-        print(text);
 
 #####################
 ##### Functions #####
@@ -86,31 +85,31 @@ def log_into_OnlyFans():
 def upload_file_to_OnlyFans(fileName, path, folderName):
     fileName = os.path.splitext(str(fileName))[0]
     print('Uploading: '+str(fileName))
-    # maybePrint('path: '+path)
+    print('path: '+path)
     if settings.HASHTAGGING:
         postText = str(fileName)+" #"+" #".join(str(folderName).split(' '))
     else:
         postText = str(folderName)+" "+str(fileName)
-    maybePrint('text: '+str(postText))
+    settings.maybePrint('text: '+str(postText))
     global BROWSER
+    if not settings.TWEETING:
+        WebDriverWait(BROWSER, 10, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
     BROWSER.find_element_by_id("new_post_text_input").send_keys(str(postText))
     BROWSER.find_element_by_id("fileupload_photo").send_keys(str(path))
-    if not settings.TWEETING:
-        WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
     maxUploadCount = 12 # 2 hours max attempt time
     i = 0
     while True:
         try:
-            WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]')))
-            # WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
+            WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
             if settings.DEBUG:
                 print('skipping OnlyFans upload')
                 return
-            send = WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]'))).click()
-            # send = WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
+            # send.click()
+            send = WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
             break
-        except Exception as e:
+        except:
             print('uploading...')
+            settings.maybePrint(sys.exc_info()[0])
             i+=1
             if i == maxUploadCount and settings.FORCE_UPLOAD is not True:
                 print('max upload wait reached, breaking..')
@@ -124,33 +123,34 @@ def upload_directory_to_OnlyFans(dirName, path, folderName):
     else:    
         postText = str(folderName)+" "+str(dirName)
     print('Uploading: '+str(postText))
-    maybePrint('path: '+str(path))
+    settings.maybePrint('path: '+str(path))
     files_path = []
     for file in pathlib.Path(str(path)).iterdir():  
         files_path.append(str(file))
-    maybePrint('files: '+str(files_path))
+    settings.maybePrint('files: '+str(files_path))
     global BROWSER
     BROWSER.find_element_by_id("new_post_text_input").send_keys(str(postText))
+    WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
     if not settings.TWEETING:
-        WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
+        WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
     
     ############
     # files_path = "[\""+"\",\"".join(files_path)+"\"]"
     # print("files_path: "+files_path)
     # files_path = "home/skeetzo/Projects/onlysnarf/OnlySnarf/tmp"
     # BROWSER.find_element_by_id("fileupload_photo").send_keys(files_path)
-    # WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="btn btn-xs btn-default send_post_button"]')))
+    # WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="send_post_button"]')))
     ############
 
     for file in files_path:
-        maybePrint('uploading: '+str(file))
+        settings.maybePrint('uploading: '+str(file))
         BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
-        WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
-    send = WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
+        send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
+    send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
     if settings.DEBUG:
         print('skipping OnlyFans upload')
         return
-    send.click()
+    send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
     print('Directory Uploaded Successfully')
 
 ####################################################################################################################
@@ -158,9 +158,9 @@ def upload_directory_to_OnlyFans(dirName, path, folderName):
 def uploadPerformer(args, dirName, path, folderName):
     pass
 
-#################
-##### Users #####
-#################
+####################
+##### Messages #####
+####################
 
 def goto_user(username):
     try:
@@ -171,7 +171,7 @@ def goto_user(username):
         print("goto -> /my/chats/chat/%s" % username)
         BROWSER.get(('https://onlyfans.com/my/chats/chat/'+str(username)))
     except:
-        maybePrint(sys.exc_info()[0])
+        settings.maybePrint(sys.exc_info()[0])
 
 def enter_message(text):
     try:
@@ -184,7 +184,7 @@ def enter_message(text):
         message.send_keys(str(text))
         print("Message Entered")
     except:
-        maybePrint(sys.exc_info()[0])
+        settings.maybePrint(sys.exc_info()[0])
 
 def enter_image(image):
     try:
@@ -196,7 +196,7 @@ def enter_image(image):
         BROWSER.find_element_by_id("cm_fileupload_photo").send_keys(str(image))
         print("Image Entered")
     except:
-        maybePrint(sys.exc_info()[0])
+        settings.maybePrint(sys.exc_info()[0])
 
 def enter_price(price):
     try:
@@ -210,7 +210,7 @@ def enter_price(price):
         BROWSER.find_element_by_css_selector(".g-btn.m-rounded.js-panel__btn-save.js-chat__price-btn-save").click()
         print("Price Entered")
     except:
-        maybePrint(sys.exc_info()[0])
+        settings.maybePrint(sys.exc_info()[0])
 
 def confirm_message():
     try:
@@ -222,7 +222,17 @@ def confirm_message():
         send.click()
         print('OnlyFans Message: Sent')
     except:
-        maybePrint(sys.exc_info()[0])
+        settings.maybePrint(sys.exc_info()[0])
+
+# update chat logs for all users
+def update_chat_logs():
+    pass
+def update_chat_log(user):
+    pass
+
+#################
+##### Users #####
+#################
 
 # gets a list of all user_ids subscribed to profile
 def get_users():
@@ -238,21 +248,21 @@ def get_users():
     print("goto -> /my/subscribers/active")
     BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
     num = BROWSER.find_element_by_class_name("b-tabs__nav__item__count").get_attribute("innerHTML")
-    maybePrint("User count: %s" % num)
+    settings.maybePrint("User count: %s" % num)
     for n in range(int(int(int(num)/10)+1)):
-        maybePrint("scrolling...")
+        settings.maybePrint("scrolling...")
         BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(1)
     user_ids = BROWSER.find_elements_by_class_name('b-avatar')
     users = BROWSER.find_elements_by_class_name('g-user-name')
     usernames = BROWSER.find_elements_by_class_name('g-user-username')
-    # maybePrint(users)
+    # settings.maybePrint(users)
     # return []
     # add to list of users
     active_users = []
     global OnlyFans_USERNAME
-    maybePrint("Found: ")
-    for i in range(len(user_ids))
+    settings.maybePrint("Found: ")
+    for i in range(len(user_ids)):
         user_id = user_ids[i]
         name = users[i]
         username = usernames[i]
@@ -260,13 +270,13 @@ def get_users():
         name = str(name.get_attribute("innerHTML")).strip()
         username = str(username.get_attribute("innerHTML")).strip()
         if str(OnlyFans_USERNAME).lower() in str(username).lower():
-            maybePrint("skipping self: %s = %s" % (OnlyFans_USERNAME, username)
+            settings.maybePrint("skipping self: %s = %s" % (OnlyFans_USERNAME, username))
             continue
         if str(OnlyFans_USER_ID).lower() in str(user_id).lower():
-            maybePrint("skipping self: %s" % (OnlyFans_USER_ID, user_id))
+            settings.maybePrint("skipping self: %s" % (OnlyFans_USER_ID, user_id))
             continue
         if str(user_id).lower() in settings.SKIP_USERS:
-            maybePrint("skipping: %s" % user_id)
+            settings.maybePrint("skipping: %s" % user_id)
             continue
         active_users.append(User(name=name, username=username, id=user_id)) # update this with correct values
     for user in active_users:
@@ -301,9 +311,9 @@ def get_recent_users():
     i = 0
     users_ = []
     for user in users:
-        # maybePrint("user: %s" % user.username)
+        # settings.maybePrint("user: %s" % user.username)
         if str(user.username).lower() in settings.SKIP_USERS:
-            maybePrint("skipping: %s" % user.username)
+            settings.maybePrint("skipping: %s" % user.username)
             continue
         users_.append(user)
         i += 1
@@ -314,16 +324,16 @@ def get_recent_users():
 def reset_user_cache():
     global USER_CACHE
     USER_CACHE = False
-    maybePrint("User Cache: reset")
+    settings.maybePrint("User Cache: reset")
 
 def start_user_cache():
-    maybePrint("User Cache: starting")
+    settings.maybePrint("User Cache: starting")
     try:
         threading.Timer(600.0, reset_user_cache).start() # after 10 minutes
-        maybePrint("User Cache: started")
+        settings.maybePrint("User Cache: started")
     except:
-        maybePrint("User Cache: error starting")
-        maybePrint(sys.exc_info()[0])
+        settings.maybePrint("User Cache: error starting")
+        settings.maybePrint(sys.exc_info()[0])
 
 # gets a list of all subscribed user_ids from local txt
 def get_users_local():
@@ -333,10 +343,11 @@ def get_users_local():
     try:
         with open(LOCAL_DATA) as json_file:  
             users = json.load(json_file)
-        for p in users['users']:
-            maybePrint('Username: ' + str(p))
-            maybePrint('')
-            users_.append(User(str(p)))
+        for user in users['users']:
+            user = User(name=user['name'], username=user['username'], id=user['id'])
+            settings.maybePrint('Loaded: %s' % user.username)
+            settings.maybePrint('')
+            users_.append(user)
     except FileNotFoundError:
         print("Error: Missing Local Users")
     finally:
@@ -346,19 +357,18 @@ def get_users_local():
 def write_users_local():
     users = get_users()
     print("Writing Local Users")
-    maybePrint("local data path: "+str(LOCAL_DATA))
+    settings.maybePrint("local data path: "+str(LOCAL_DATA))
     data = {}
     data['users'] = []
     for user in users:
-        maybePrint("saving: "+str(user.username))
-        data['users'].append({  
-            'username': str(user.username),
-        })
+        settings.maybePrint("Saving: "+str(user.username))
+        data['users'].append(user.toJSON())
     with open(LOCAL_DATA, 'w') as outfile:  
-        json.dump(data, outfile)
+        json.dump(data, outfile, indent=4, sort_keys=True)
 
 def exit():
-    print("Closing OnlyFans...")
+    print("Saving and Exiting OnlyFans")
     write_users_local()
     global BROWSER
     BROWSER.quit()
+    print("Browser Closed")
