@@ -2,33 +2,63 @@
 # 3/25/2019: Skeetzo
 # User Class
 
+import json
 from . import driver as OnlySnarf
+from . import settings
 
 class User:
-    def __init__(self, name=None, username=None, id_=None):
-    	self.name = name
+    def __init__(self, name=None, username=None, id=None):
+        self.name = name
         self.username = username
-        self.id = id_
+        self.id = id
         self.messages = []
         self.sent_images = []
-        print("User: %s - %s - %s" % (self.name, self.username, self.id))
+
+        self.preferences = []
+        self.last_messaged_on = None
+        self.subscribed_on = None
+
+        settings.maybePrint("User: %s - %s - %s" % (self.name, self.username, self.id))
 
     def sendMessage(self, message=None, image=None, price=None):
-    	print("Sending Message: %s - %s - %s" % (message, image, price))
-    	OnlySnarf.goto_user(self.id)
-    	OnlySnarf.enter_message(message)
-    	if image in self.sent_images:
-    		print("Image Already Sent: %s -> %s" % (image, self.id))
-    		return
-    	OnlySnarf.enter_image(image)
-    	if not settings.DEBUG:
-	    	self.sent_images.append(str(image))
-	    else
-	    	sent.sent_images.append("DEBUG")
-    	OnlySnarf.enter_price(price)
-    	OnlySnarf.confirm_message()
+        print("Sending Message: %s - %s - %s" % (message, image, price))
+        OnlySnarf.goto_user(self.id)
+        OnlySnarf.enter_message(message)
+        if image in self.sent_images:
+            print("Image Already Sent: %s -> %s" % (image, self.id))
+            return
+        OnlySnarf.enter_image(image)
+        if not settings.DEBUG:
+            self.sent_images.append(str(image))
+        else:
+            self.sent_images.append("DEBUG")
+        OnlySnarf.enter_price(price)
+        OnlySnarf.confirm_message()
 
-    def equals(user):
-    	if user.id == self.id:
-    		return True
-    	return False
+    def equals(self, user):
+        if user.id == self.id:
+            return True
+        return False
+
+    def toJSON(self):
+        return json.dumps({
+            "name":self.name,
+            "username":self.username,
+            "id":self.id
+        })
+
+    # greet user if new
+    def greet(self):
+        pass
+
+    # send refresher message to user
+    def refresh(self):
+        pass
+
+    # saves chat log to user
+    def readChat(self):
+        pass
+
+    # saves statement / payment history
+    def statement_history(self):
+        pass
