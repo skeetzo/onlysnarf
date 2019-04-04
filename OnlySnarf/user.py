@@ -18,6 +18,8 @@ class User:
         self.last_messaged_on = None
         self.subscribed_on = None
 
+        self.isFavorite = False
+
         settings.maybePrint("User: %s - %s - %s" % (self.name, self.username, self.id))
 
     def sendMessage(self, message=None, image=None, price=None):
@@ -49,16 +51,29 @@ class User:
 
     # greet user if new
     def greet(self):
+        if self.last_messaged_on != None:
+            print("Error: User Not New")
+            return
         pass
 
     # send refresher message to user
     def refresh(self):
+        if self.last_messaged_on == None:
+            return self.greet()
         pass
 
     # saves chat log to user
-    def readChat(self):
+    def readChat(self, chat):
         pass
 
     # saves statement / payment history
-    def statement_history(self):
+    def statement_history(self, history):
         pass
+
+    # sets as favorite
+    def favor(self):
+        self.isFavorite = True
+
+    # unsets as favorite
+    def unfavor(self):
+        self.isFavorite = False

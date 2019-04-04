@@ -26,6 +26,9 @@ import io
 
 DRIVE = None
 PYDRIVE = None
+ONE_GIGABYTE = 1000000000
+ONE_MEGABYTE = 1000000
+FIFTY_MEGABYTES = 50000000
 
 ##################
 ##### Config #####
@@ -162,7 +165,6 @@ def get_random_gallery():
     global PYDRIVE
     random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_GALLERIES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     folder_list = []
-    gallery_list = []
     random_gallery = None
     for folder in random_folders:
         if settings.DEBUG:
@@ -192,6 +194,41 @@ def get_random_gallery():
     print('Random Gallery: '+random_gallery['title'])
     return [random_gallery, folder_name]
 
+# Downloads random scene from Google Drive
+def get_random_scene():
+    print('Getting Random Scene...')
+    global PYDRIVE
+    random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_SCENES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+    folder_list = []
+    random_scene = None
+    for folder in random_folders:
+        if settings.DEBUG:
+            print('checking scenes: '+folder['title'],end="")
+        scene_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+        if len(scene_list_tmp)>0:
+            folder_list.append(folder)
+            settings.maybePrint(" -> added")
+        else:
+            settings.maybePrint(" -> empty")
+    random.shuffle(folder_list)
+    for folder in folder_list:
+        if settings.DEBUG:
+            print('checking scene: '+folder['title'],end="")
+        scene_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+        random_scene_tmp = random.choice(scene_list_tmp)
+        gallery_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+random_scene_tmp['id']+"' in parents and trashed=false and mimeType contains 'text/txt')"}).GetList()
+        if len(gallery_list_tmp_tmp)>0:
+            folder_name = folder['title']
+            random_scene = random_scene_tmp
+            settings.maybePrint(" -> found")
+        else:
+            settings.maybePrint(" -> empty")
+    if not random_scene:
+        print('No scene folders found!')
+        return
+    print('Random Scene: '+random_scene['title'])
+    return [random_scene, folder_name]
+
 def upload_file(filename=None, mimetype="video/mp4"):
     if filename == None:
         print("Error: Missing Filename")
@@ -204,8 +241,36 @@ def upload_file(filename=None, mimetype="video/mp4"):
     file = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
     print('File ID: %s' % file.get('id'))
 
+# Downloads Content from a Folder
+def download_content(folder):
+    print("Downloading Content: {}".format(folder['title']))
+    tmp = getTmp()
+    # download folder with preview in it
+    file_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or mimeType contains 'video/mp4')"}).GetList()
+    folder_size = len(file_list)
+    settings.maybePrint('Folder size: '+str(folder_size))
+    settings.maybePrint('Upload max: '+str(settings.IMAGE_UPLOAD_MAX))
+    if int(folder_size) == 0:
+        print('Error: Empty Folder')
+        return
+    elif int(folder_size) > int(settings.IMAGE_UPLOAD_MAX):
+        file_list_random = []
+        for x in range(settings.IMAGE_UPLOAD_MAX):
+            random_file = random.choice(file_list)
+            file_list.remove(random_file)
+            file_list_random.append(random_file)
+        file_list = file_list_random
+    i = 1
+    for file in sorted(file_list, key = lambda x: x['title']):
+        print('Downloading {} from GDrive ({}/{})'.format(file['title'], i, folder_size))
+        settings.maybePrint('filePath: '+tmp+"/"+str(file['title']))
+        file.GetContentFile(tmp+"/"+str(file['title']))
+        i+=1
+    print('Download Complete: {}'.format(folder['title']))
+    return [file_list, tmp]
+
 # Download File
-def download_file(file):
+def download_file(file, REPAIR=False):
     print('Downloading File...')
     tmp = getTmp()
     # download file
@@ -235,29 +300,35 @@ def download_file(file):
         # length = getLength(str(tmp))
         
         def repair(path):
+            repairedPath = str(path).replace(".mp4", "_fixed.mp4")
             try:
-                print("Repairing: {}".format(tmp))
                 global WORKING_VIDEO
-                if settings.DEBUG:
-                    fixed = subprocess.call(['untrunc', str(WORKING_VIDEO), str(path)])
-                else:
-                    fixed = subprocess.call(['untrunc', str(WORKING_VIDEO), str(path)], stdout=open(os.devnull, 'wb'))
+                print("Repairing: {} <-> {}".format(path, WORKING_VIDEO))
+                fixed = subprocess.call(['untrunc', str(WORKING_VIDEO), str(path)])
                 fixed.communicate()
+            except AttributeError:
+                if os.path.isfile(str(path)+"_fixed.mp4"):
+                    shutil.move(str(path)+"_fixed.mp4", repairedPath)
+                    print("Repair Successful")
             except:
                 settings.maybePrint(sys.exc_info()[0])
-            finally:
-                shutil.move(str(path)+"_fixed.mp4", str(path).replace(".mp4", "_fixed.mp4"))
-                print("Repair Complete")
-                return str(path)
-        
+                print("Warning: Skipping Repair")
+                return path
+            print("Repair Complete")
+            return str(repairedPath)
+    
         def reduce(path):
             reducedPath = str(path).replace(".mp4", "_reduced.mp4")
             try:
                 print("Reducing: {}".format(path))
-                clip = VideoFileClip(str(path))
-                print("Length: {}".format(clip.duration))
-                bitrate = 1000000000 / int(clip.duration)
-                print("Bitrate: {}".format(bitrate))
+                try:
+                    clip = VideoFileClip(str(path))
+                    print("Length: {}".format(clip.duration))
+                    bitrate = 1000000000 / int(clip.duration)
+                    print("Bitrate: {}".format(bitrate))
+                except FileNotFoundError:
+                    print("Error: Missing File to Reduce")
+                    return path
                 loglevel = "quiet"
                 if settings.DEBUG:
                     loglevel = "debug"
@@ -266,8 +337,10 @@ def download_file(file):
             except FileNotFoundError:
                 print("Warning: Ignoring Fixed Video")
                 return reduce(str(path).replace(".mp4", "_fixed.mp4"))
+            except AttributeError:
+                pass
             except:
-                print(sys.exc_info()[0])
+                settings.maybePrint(sys.exc_info()[0])
             finally:
                 print("Reduction Complete")
                 originalSize = os.path.getsize(str(path))
@@ -278,15 +351,50 @@ def download_file(file):
                     print("Warning: Original Size Smaller")
                     return path
                 return reducedPath
-        tmp = repair(tmp)
-        if int(os.stat(str(tmp)).st_size) >= 1000000000 or settings.FORCE_REDUCTION: # greater than 1GB
+
+        def fixThumbnail(path):
+            try:
+                print("Thumbnailing: {}".format(path))
+                loglevel = "quiet"
+                if settings.DEBUG:
+                    loglevel = "debug"
+                thumbnail_path = os.path.join(os.path.dirname(str(path)), 'thumbnail.png')
+                settings.maybePrint("thumbnail path: {}".format(thumbnail_path))
+                p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-i', str(path),'-ss', '00:00:00.000', '-vframes', '1', str(thumbnail_path)])
+                p.communicate()
+            except FileNotFoundError:
+                print("Warning: Ignoring Thumbnail")
+            except AttributeError:
+                pass
+            except:
+                settings.maybePrint(sys.exc_info()[0])
+            finally:
+                try:
+                    p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-y', '-i', str(path), '-i', str(thumbnail_path), '-pix_fmt', 'yuv420p', '-c', 'copy', '-acodec', 'copy', '-vcodec', 'copy', '-map', '0', '-map', '1', '-c:v:1', 'png', '-disposition:v:1', 'attached_pic', str(path)])
+                    p.communicate()
+                except:
+                    pass
+                    # print(sys.exc_info()[0])
+                finally:
+                    print("Thumbnailing Complete")              
+                    return
+        if REPAIR:
+            tmp = repair(tmp)
+            fixThumbnail(tmp)
+        global FIFTY_MEGABYTES
+        if int(os.stat(str(tmp)).st_size) >= FIFTY_MEGABYTES or settings.FORCE_REDUCTION: # greater than 1GB
             tmp = reduce(tmp)
     else:
         file.GetContentFile(tmp)
     ### Finish ###
-    if os.path.getsize(tmp) == 0:
-        settings.maybePrint('size: '+str(os.path.getsize(tmp)))
-        print('Download Failure')
+    if not os.path.isfile(str(tmp)):
+        print("Error: Missing Downloaded File")
+        return
+    print('File Size: '+str(os.path.getsize(tmp)))
+    global ONE_MEGABYTE
+    if os.path.getsize(tmp) <= ONE_MEGABYTE:
+        settings.maybePrint("Error: File Size Too Small")
+        print("Download Failure")
         return
     print('Download Complete')
     return tmp
@@ -317,6 +425,42 @@ def download_gallery(folder):
         i+=1
     print('Download Complete')
     return [file_list_random, tmp]
+
+# Download Scene
+def download_scene(sceneFolder):
+    print('Downloading Scene...')
+    tmp = getTmp()
+    global PYDRIVE
+    # get folders with content in it
+    contentFolder = None
+    previewFolder = None
+    folder_list = PYDRIVE.ListFile({'q': "'"+sceneFolder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+    for folder in folder_list
+        if folder['title'] == "content":
+            contentFolder = folder
+        elif folder['title'] == "preview":
+            previewFolder = folder
+    data = PYDRIVE.ListFile({'q': "'"+sceneFolder['id']+"' in parents and trashed=false and mimeType contains 'text/txt'"}).GetList()[0]
+    if data is not None:
+        print("Error: Missing Scene Data")
+        return
+    if contentFolder is not None:
+        print("Error: Missing Scene Content Folder")
+        return
+    if previewFolder is not None:
+        print("Error: Missing Scene Preview Folder")
+        return
+    content = download_content(contentFolder)
+    preview = download_file(previewFolder)
+    if content is not None:
+        print("Error: Missing Scene Content")
+        return
+    if preview is not None:
+        print("Error: Missing Scene Preview")
+        return
+    scene = [content, preview, data]
+    print('Download Complete: Scene')
+    return [scene, tmp]
 
 # Deletes online file
 def delete_file(file):
