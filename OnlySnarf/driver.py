@@ -108,6 +108,14 @@ def upload_file_to_OnlyFans(fileName, path, folderName):
             send = WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
             break
         except:
+            try: 
+                # check for existence of "thumbnail is fucked up" modal and hit ok button
+                BROWSER.switchTo().frame("iframe");
+                BROWSER.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
+                print("Error: Thumbnail Missing")
+                break
+            except:
+                settings.maybePrint(sys.exc_info()[0])
             print('uploading...')
             settings.maybePrint(sys.exc_info()[0])
             i+=1
@@ -304,6 +312,9 @@ def get_user_by_username(username):
         if str(user.username) == str(username):
             return user
     return None
+
+def get_favorite_users():
+    return []
 
 def get_recent_user():
     users = get_users()
