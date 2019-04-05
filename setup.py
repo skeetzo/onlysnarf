@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://github.com/skeetzo/onlysnarf",
     packages=setuptools.find_packages(),
     include_package_data=True,
-    install_requires=['selenium','pydrive','pathlib','chromedriver-binary'],
+    install_requires=['selenium','pydrive','pathlib','chromedriver-binary','moviepy'],
     entry_points={
         'console_scripts' : [
             'onlysnarf = OnlySnarf.__main__:main',

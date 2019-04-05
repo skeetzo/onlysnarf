@@ -45,9 +45,9 @@ def download(fileChoice):
         return download_random_gallery()
     elif fileChoice == 'video':
         return download_random_video()
-    elif fileChoice == 'scene'
+    elif fileChoice == 'scene':
         return download_random_scene()
-    else
+    else:
         return print("Error: Missing File Choice")
 
 def download_random_image():
@@ -175,16 +175,16 @@ def test(TYPE):
     print('0/3 : Deleting Locals')
     remove_local()
     print('1/3 : Testing')
-    release_
+    
 
     # users = OnlySnarf.get_users()
     # return
-    # response = download_random_image()
-    # if not response or response == None:
-        # print("Error: Missing Image")
-        # return
+    response = download_random_image()
+    if not response or response == None:
+        print("Error: Missing Image")
+        return
     # message_all(image=response[1])
-    # message_recent(image=response[1])
+    message_recent(message=":)", image=response[1], price="50.00")
     # Google.move_file(response[2])
     OnlySnarf.exit()
 
