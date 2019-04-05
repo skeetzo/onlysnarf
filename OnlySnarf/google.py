@@ -435,7 +435,7 @@ def download_scene(sceneFolder):
     contentFolder = None
     previewFolder = None
     folder_list = PYDRIVE.ListFile({'q': "'"+sceneFolder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-    for folder in folder_list
+    for folder in folder_list:
         if folder['title'] == "content":
             contentFolder = folder
         elif folder['title'] == "preview":
