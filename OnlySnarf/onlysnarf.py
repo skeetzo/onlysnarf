@@ -15,20 +15,17 @@ from . import driver as OnlySnarf
 
 AUTH = False
 
-###################
-##### Helpers #####
-###################
+#################
+##### Crons #####
+#################
 
-def getTmp():
-    # mkdir /tmp
-    tmp = os.getcwd()
-    if settings.MOUNT_PATH:
-        tmp = os.path.join(settings.MOUNT_PATH, "tmp")
-    else:
-        tmp = os.path.join(tmp, "tmp")
-    if not os.path.exists(str(tmp)):
-        os.mkdir(str(tmp))
-    return tmp
+# sends a message to all recent subscribers
+def greet_new_subscribers():
+    pass # needs to add OnlySnarf.searchNotificationsForNewSubscribers
+
+# sends the image / message prepared for all users
+def send_user_messages():
+    pass
 
 ##########################
 ##### MENU FUNCTIONS #####
@@ -37,6 +34,10 @@ def getTmp():
 def all(TYPE):
     settings.TYPE = TYPE
     main()
+
+####################
+##### Download #####
+####################
 
 def download(fileChoice):
     if fileChoice == 'image':
@@ -57,19 +58,19 @@ def download_random_image():
     remove_local()
     print('Fetching Content')
     response = Google.get_random_image()
-    random_file = response[0]
+    google_file = response[0]
     folder_name = response[1]
-    if random_file == None:
+    if google_file == None:
         return
-    file_name = random_file['title']
-    file_path = Google.download_file(random_file)
-    if random_file == None:
+    file_name = google_file['title']
+    file_path = Google.download_file(google_file)
+    if google_file == None:
         print('Missing Random Image')
         return
     if file_path == None:
         print('Missing Random Image: Empty Download')
         return
-    return [file_name, file_path, random_file]
+    return [file_name, file_path, google_file]
 
 def download_random_gallery():
     global AUTH
@@ -78,18 +79,18 @@ def download_random_gallery():
     remove_local()
     print('Fetching Content')
     response = Google.get_random_gallery()
-    random_file = response[0]
+    google_file = response[0]
     folder_name = response[1]
-    if random_file == None:
+    if google_file == None:
         return
-    file_name = random_file['title']
-    results = Google.download_gallery(random_file)
+    file_name = google_file['title']
+    results = Google.download_gallery(google_file)
     gallery_files = results[0]
     file_path = results[1]
     if file_path == None:
         print('Missing Random Gallery: Empty Download')
         return
-    return [file_name, file_path, random_file]
+    return [file_name, file_path, google_file]
 
 def download_random_video():
     global AUTH
@@ -98,22 +99,22 @@ def download_random_video():
     remove_local()
     print('Fetching Content')
     response = Google.get_random_video()
-    random_file = response[0]
+    google_file = response[0]
     folder_name = response[1]
-    if random_file == None:
+    if google_file == None:
         return
-    file_name = random_file['title']
+    file_name = google_file['title']
     repair = False
     if str(folder_name) == "gopro":
         repair = True
-    file_path = Google.download_file(random_file, REPAIR=repair)
-    if random_file == None:
+    file_path = Google.download_file(google_file, REPAIR=repair)
+    if google_file == None:
         print('Missing Random Video')
         return
     if file_path == None:
         print('Missing Random Video: Empty Download')
         return
-    return [file_name, file_path, random_file]
+    return [file_name, file_path, google_file]
 
 def download_random_scene():
     global AUTH
@@ -122,72 +123,16 @@ def download_random_scene():
     remove_local()
     print('Fetching Content')
     response = Google.get_random_scene()
-    random_file = response[0]
+    google_file = response[0]
     folder_name = response[1]
-    if random_file == None:
+    if google_file == None:
         return
-    file_name = random_file['title']
-    results = Google.download_scene(random_file)
-    scene_files = results[0]
-    file_path = results[1]
-    preview_path = results[2]
-    if file_path == None:
+    file_name = google_file['title']
+    results = Google.download_scene(google_file)
+    if results == None:
         print('Missing Random Scene: Empty Download')
         return
-    return [file_name, file_path, random_file, preview_path]
-
-def upload(fileChoice, filename=None, filepath=None):
-    settings.TYPE = fileChoice
-    if fileChoice == 'image':
-        OnlySnarf.upload_file_to_OnlyFans(filename, filepath)
-    elif fileChoice == 'gallery':
-        OnlySnarf.upload_directory_to_OnlyFans(filename, filepath)
-    elif fileChoice == 'video':
-        OnlySnarf.upload_file_to_OnlyFans(filename, filepath)
-    elif fileChoice == 'scene':
-        OnlySnarf.upload_scene_to_OnlyFans(filename, filepath)
-    else:
-        print("Missing Upload Choice")
-    print('Upload Complete')
-
-# upload a file or gallery
-# send a message to [recent, all, user] w/ a preview image
-def release_scene(userChoice="all"):
-    response = download("scene")
-    upload("scene", filename=response[0], filepath=response[1])
-    message = response[2]
-    image = response[3]
-    price = response[4]
-    if str(userChoice) == "all":
-        message_all(message=response[2], image=response[3], price=response[4])
-    elif str(userChoice) == "recent":
-        message_recent(message=response[2], image=response[3], price=response[4])
-    elif str(userChoice) == "favorite":
-        message_favorites(message=response[2], image=response[3], price=response[4])
-    else:
-        message_by_username(message=response[2], image=response[3], price=response[4], username=userChoice)
-
-def test(TYPE):
-    settings.TYPE = TYPE
-    # auth = Google.authGoogle()
-    # if not auth:
-        # return
-    print('0/3 : Deleting Locals')
-    remove_local()
-    print('1/3 : Testing')
-    
-
-    # users = OnlySnarf.get_users()
-    # return
-    response = download_random_image()
-    if not response or response == None:
-        print("Error: Missing Image")
-        return
-    # message_all(image=response[1])
-    message_recent(message=":)", image=response[1], price="50.00")
-    # Google.move_file(response[2])
-    OnlySnarf.exit()
-
+    return results
 
 ####################
 ##### Messages #####
@@ -216,22 +161,8 @@ def message_by_username(username=None, message=None, image=None, price=None):
     OnlySnarf.get_user_by_username(str(username)).sendMessage(message, image, price)
 
 #################
-##### Crons ##### -> move to onlysnarf.py
+##### Reset #####
 #################
-
-# sends a message to all recent subscribers
-def greet_new_subscribers():
-    pass # needs to add OnlySnarf.searchNotificationsForNewSubscribers
-
-# sends the image / message prepared for all users
-def send_user_messages():
-    pass
-
-# def 
-
-#####################
-##### FUNCTIONS #####
-#####################
 
 # Deletes local file
 def remove_local():
@@ -240,12 +171,111 @@ def remove_local():
         return
     # print('Deleting Local File(s)')
     # delete /tmp
-    tmp = getTmp()
+    tmp = settings.getTmp()
     if os.path.exists(tmp):
         shutil.rmtree(tmp)
         print('Local File(s) Removed')
     else:
         print('Local Files Not Found')
+
+#################
+##### Scene #####
+#################
+
+# upload a file or gallery
+# send a message to [recent, all, user] w/ a preview image
+def release_scene(userChoice="all"):
+    response = download("scene")
+    print("Scene: {}".format(response))
+    content = response[0]
+    preview = response[1]
+    data = response[2]
+    # print("Data:\n{}".format(json.dumps(data, sort_keys=True, indent=4)))
+    data = json.loads(data)
+    # print("Data: {}".format(data))
+    title = None
+    message = None
+    price = None
+    try:
+        title = data["title"]
+        message = data["message"]
+        price = data["price"]
+    except:
+        print(sys.exc_info()[0])
+    # title = data.title
+    # message = data.message
+    # price = data.price
+    print("Title: {}".format(title))
+    print("Message: {}".format(message))
+    print("Price: {}".format(price))
+    upload("scene", filename=title, filepath=content)
+    if str(userChoice) == "all":
+        message_all(message=message, image=preview, price=price)
+    elif str(userChoice) == "recent":
+        message_recent(message=message, image=preview, price=price)
+    elif str(userChoice) == "favorite":
+        message_favorites(message=message, image=preview, price=price)
+    else:
+        message_by_username(message=message, image=preview, price=price, username=userChoice)
+
+##################
+##### Upload #####
+##################
+
+def upload(fileChoice, filename=None, filepath=None):
+    settings.TYPE = fileChoice
+    if fileChoice == 'image':
+        OnlySnarf.upload_file_to_OnlyFans(filename, filepath)
+    elif fileChoice == 'gallery':
+        OnlySnarf.upload_directory_to_OnlyFans(filename, filepath)
+    elif fileChoice == 'video':
+        OnlySnarf.upload_file_to_OnlyFans(filename, filepath)
+    elif fileChoice == 'scene':
+        OnlySnarf.upload_scene_to_OnlyFans(filename, filepath)
+    else:
+        print("Missing Upload Choice")
+    print('Upload Complete')
+
+
+def test(TYPE):
+    settings.TYPE = TYPE
+    # auth = Google.authGoogle()
+    # if not auth:
+        # return
+    print('0/3 : Deleting Locals')
+    remove_local()
+    print('1/3 : Testing')
+
+    ### Users ###
+    # users = OnlySnarf.get_users()
+    # return
+    #####################
+    
+    ### Scene ###
+    release_scene(userChoice="all")
+    return
+    #############
+
+    ### Message ###
+    # response = download_random_image()
+    # if not response or response == None:
+        # print("Error: Missing Image")
+        # return
+    # message_all(image=response[1])
+    # message_recent(message=":)", image=response[1], price="50.00")
+    # Google.move_file(response[2])
+    ###############
+
+    ### Exit Gracefully ###
+    OnlySnarf.exit()
+    #######################
+
+
+#####################
+##### FUNCTIONS #####
+#####################
+
+
 
 def main():
     global AUTH
@@ -254,53 +284,53 @@ def main():
     print('0/3 : Deleting Locals')
     remove_local()
     print('1/3 : Fetching Content')
-    random_file = None
+    google_file = None
     file_name = None
     file_path = None
     folder_name = None
     if settings.TYPE == "gallery":
         response = Google.get_random_gallery()
-        random_file = response[0]
+        google_file = response[0]
         folder_name = response[1]
-        if random_file == None:
+        if google_file == None:
             return
-        file_name = random_file['title']
-        results = Google.download_gallery(random_file)
+        file_name = google_file['title']
+        results = Google.download_gallery(google_file)
         # gallery_files = results[0]
         file_path = results[1]
     elif settings.TYPE == "video":
         response = Google.get_random_video()
-        random_file = response[0]
+        google_file = response[0]
         folder_name = response[1]
-        if random_file == None:
+        if google_file == None:
             return
-        file_name = random_file['title']
+        file_name = google_file['title']
         repair = False
         if str(folder_name) == "gopro":
             repair = True
-        file_path = Google.download_file(random_file, REPAIR=repair)
+        file_path = Google.download_file(google_file, REPAIR=repair)
     elif settings.TYPE == "image":
         response = Google.get_random_image()
-        random_file = response[0]
+        google_file = response[0]
         folder_name = response[1]
-        if random_file == None:
+        if google_file == None:
             return
-        file_name = random_file['title']
-        file_path = Google.download_file(random_file)
+        file_name = google_file['title']
+        file_path = Google.download_file(google_file)
     elif settings.TYPE == "scene":
         response = Google.get_random_scene()
-        random_file = response[0]
+        google_file = response[0]
         folder_name = response[1]
-        if random_file == None:
+        if google_file == None:
             return
-        file_name = random_file['title']
-        results = Google.download_scene(random_file)
+        file_name = google_file['title']
+        results = Google.download_scene(google_file)
         # scene_files = results[0]
         file_path = results[1]
     else:
         print('Missing Args!')
         return
-    if random_file == None:
+    if google_file == None:
         print('Missing Random File / Directory!')
         return
     if file_path == None:
@@ -325,8 +355,8 @@ def main():
     if settings.TYPE == "gallery":
         Google.move_files(file_name, gallery_files)
     else:
-        Google.move_file(random_file)
-    Google.delete_file(random_file)
+        Google.move_file(google_file)
+    Google.delete_file(google_file)
     print('Files Cleaned ')
     #################################################
     print('Google Drive to OnlyFans Upload Complete')

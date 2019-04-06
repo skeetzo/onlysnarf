@@ -48,22 +48,11 @@ OnlyFans_VIDEOS_FOLDER = config['videos_folder']
 OnlyFans_IMAGES_FOLDER = config['images_folder']
 OnlyFans_GALLERIES_FOLDER = config['galleries_folder']
 OnlyFans_POSTED_FOLDER = config['posted_folder']
+OnlyFans_SCENES_FOLDER = config['scenes_folder']
 
-###################
-##### Helpers #####
-###################
-
-# mkdir /tmp
-def getTmp():
-    tmp = os.getcwd()
-    global MOUNT_PATH
-    if settings.MOUNT_PATH:
-        tmp = os.path.join(settings.MOUNT_PATH, "tmp")
-    else:
-        tmp = os.path.join(tmp, "tmp")
-    if not os.path.exists(str(tmp)):
-        os.mkdir(str(tmp))
-    return tmp
+################
+##### Auth #####
+################
 
 def authGoogle():
     print('Authenticating Google...')
@@ -106,173 +95,53 @@ def authGoogle():
     print('...Authentication Success!') 
     return True
 
-# Downloads random video from Google Drive
-def get_random_video():
-    print('Getting Random Video...')
+################################
+##### Archiving / Deleting #####
+################################
+
+# Deletes online file
+def delete_file(file):
+    if not settings.DELETING or settings.DELETING == "False":
+        print("Skipping Delete")
+        return
+    print('Trashing Google Video')
+    if settings.DEBUG:
+        print('skipping Google delete')
+        return
+    file.Trash()
+    print('Google Video Trashed')
+
+# Archives posted file / folder
+def move_file(file):
+    if settings.DEBUG or not settings.BACKING_UP or settings.BACKING_UP == "False":
+        print('Skipping Google Backup: '+file['title'])
+        return
+    file['parents'] = [{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}]
+    file.Upload()
+    print('Google File Backed Up: '+file['title'])
+
+def move_files(folderName, files):
+    if settings.DEBUG or not settings.BACKING_UP or settings.BACKING_UP == "False" and not settings.BACKING_UP_FORCE:
+        print('Skipping Google Backup: '+folderName)
+        return
+    title = folderName+" - "+datetime.datetime.now().strftime("%d-%m-%I-%M")
+    print('title: '+title)
     global PYDRIVE
-    random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_VIDEOS_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-    video_list = []
-    random_video = None
-    for folder in random_folders:
-        print('checking folder: '+folder['title'],end="")
-        video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
-        if len(video_list_tmp)>0:
-            video_list.append(folder)
-            print(" -> added")
-        else:
-            print(" -> empty")
-    if len(video_list)==0:
-        print('No video file found!')
-        return
-    random_video = random.choice(video_list)
-    folder_name = random_video['title'];
-    print('Random Folder: '+random_video['title'])
-    random_video = PYDRIVE.ListFile({'q': "'"+random_video['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
-    random_video = random.choice(random_video)
-    print('Random Video: '+random_video['title'])
-    return [random_video, folder_name]
+    tmp_folder = PYDRIVE.CreateFile({'title':title, 'parents':[{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}],'mimeType':'application/vnd.google-apps.folder'})
+    tmp_folder.Upload()
+    for file in files:
+        file['parents'] = [{"kind": "drive#fileLink", "id": tmp_folder['id']}]
+        file.Upload()
+    print('Google Files Backed Up')
 
-# Downloads random image from Google Drive
-def get_random_image():
-    print('Getting Random Image...')
-    global PYDRIVE
-    random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_IMAGES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-    images_list = []
-    random_image = None
-    for folder in random_folders:
-        if settings.DEBUG:
-            print('checking folder: '+folder['title'],end="")
-        images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
-        if len(images_list_tmp)>0:
-            images_list.append(folder)
-            settings.maybePrint(" -> added")
-        else:
-            settings.maybePrint(" -> empty")
-    if len(images_list)==0:
-        print('No image file found!')
-        return
-    random_image = random.choice(images_list)
-    folder_name = random_image['title'];
-    print('Random Folder: '+random_image['title'])
-    random_image = PYDRIVE.ListFile({'q': "'"+random_image['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
-    random_image = random.choice(random_image)
-    print('Random Image: '+random_image['title'])
-    return [random_image, folder_name]
-
-# Downloads random gallery from Google Drive
-def get_random_gallery():
-    print('Getting Random Gallery...')
-    global PYDRIVE
-    random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_GALLERIES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-    folder_list = []
-    random_gallery = None
-    for folder in random_folders:
-        if settings.DEBUG:
-            print('checking galleries: '+folder['title'],end="")
-        gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        if len(gallery_list_tmp)>0:
-            folder_list.append(folder)
-            settings.maybePrint(" -> added")
-        else:
-            settings.maybePrint(" -> empty")
-    random.shuffle(folder_list)
-    for folder in folder_list:
-        if settings.DEBUG:
-            print('checking gallery: '+folder['title'],end="")
-        gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        random_gallery_tmp = random.choice(gallery_list_tmp)
-        gallery_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+random_gallery_tmp['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
-        if len(gallery_list_tmp_tmp)>0:
-            folder_name = folder['title']
-            random_gallery = random_gallery_tmp
-            settings.maybePrint(" -> found")
-        else:
-            settings.maybePrint(" -> empty")
-    if not random_gallery:
-        print('No gallery folders found!')
-        return
-    print('Random Gallery: '+random_gallery['title'])
-    return [random_gallery, folder_name]
-
-# Downloads random scene from Google Drive
-def get_random_scene():
-    print('Getting Random Scene...')
-    global PYDRIVE
-    random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_SCENES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-    folder_list = []
-    random_scene = None
-    for folder in random_folders:
-        if settings.DEBUG:
-            print('checking scenes: '+folder['title'],end="")
-        scene_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        if len(scene_list_tmp)>0:
-            folder_list.append(folder)
-            settings.maybePrint(" -> added")
-        else:
-            settings.maybePrint(" -> empty")
-    random.shuffle(folder_list)
-    for folder in folder_list:
-        if settings.DEBUG:
-            print('checking scene: '+folder['title'],end="")
-        scene_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        random_scene_tmp = random.choice(scene_list_tmp)
-        gallery_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+random_scene_tmp['id']+"' in parents and trashed=false and mimeType contains 'text/txt')"}).GetList()
-        if len(gallery_list_tmp_tmp)>0:
-            folder_name = folder['title']
-            random_scene = random_scene_tmp
-            settings.maybePrint(" -> found")
-        else:
-            settings.maybePrint(" -> empty")
-    if not random_scene:
-        print('No scene folders found!')
-        return
-    print('Random Scene: '+random_scene['title'])
-    return [random_scene, folder_name]
-
-def upload_file(filename=None, mimetype="video/mp4"):
-    if filename == None:
-        print("Error: Missing Filename")
-        return
-    file_metadata = {
-        'name': str(filename),
-        'mimeType': str(mimetype)
-    }
-    media = MediaFileUpload(str(filename), mimetype=str(mimetype), resumable=True)
-    file = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
-    print('File ID: %s' % file.get('id'))
-
-# Downloads Content from a Folder
-def download_content(folder):
-    print("Downloading Content: {}".format(folder['title']))
-    tmp = getTmp()
-    # download folder with preview in it
-    file_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or mimeType contains 'video/mp4')"}).GetList()
-    folder_size = len(file_list)
-    settings.maybePrint('Folder size: '+str(folder_size))
-    settings.maybePrint('Upload max: '+str(settings.IMAGE_UPLOAD_MAX))
-    if int(folder_size) == 0:
-        print('Error: Empty Folder')
-        return
-    elif int(folder_size) > int(settings.IMAGE_UPLOAD_MAX):
-        file_list_random = []
-        for x in range(settings.IMAGE_UPLOAD_MAX):
-            random_file = random.choice(file_list)
-            file_list.remove(random_file)
-            file_list_random.append(random_file)
-        file_list = file_list_random
-    i = 1
-    for file in sorted(file_list, key = lambda x: x['title']):
-        print('Downloading {} from GDrive ({}/{})'.format(file['title'], i, folder_size))
-        settings.maybePrint('filePath: '+tmp+"/"+str(file['title']))
-        file.GetContentFile(tmp+"/"+str(file['title']))
-        i+=1
-    print('Download Complete: {}'.format(folder['title']))
-    return [file_list, tmp]
+####################
+##### Download #####
+####################
 
 # Download File
 def download_file(file, REPAIR=False):
     print('Downloading File...')
-    tmp = getTmp()
+    tmp = settings.getTmp()
     # download file
     ext = os.path.splitext(file['title'])[1].lower()
     if not ext:
@@ -290,7 +159,7 @@ def download_file(file, REPAIR=False):
             done = False
             while done is False:
                 status, done = downloader.next_chunk()
-                print("Downloading: %d%%" % int(status.progress() * 100))
+                print("Downloading: %d%%\r".format(status.progress() * 100))
 
         # ffmpeg -i <inputfilename> -s 640x480 -b:v 512k -vcodec mpeg1video -acodec copy <outputfilename>
         # def getLength(filename):
@@ -365,25 +234,26 @@ def download_file(file, REPAIR=False):
             except FileNotFoundError:
                 print("Warning: Ignoring Thumbnail")
             except AttributeError:
-                pass
+                print("Thumbnailing: Captured PNG")
             except:
                 settings.maybePrint(sys.exc_info()[0])
             finally:
                 try:
                     p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-y', '-i', str(path), '-i', str(thumbnail_path), '-pix_fmt', 'yuv420p', '-c', 'copy', '-acodec', 'copy', '-vcodec', 'copy', '-map', '0', '-map', '1', '-c:v:1', 'png', '-disposition:v:1', 'attached_pic', str(path)])
                     p.communicate()
+                except AttributeError:
+                    print("Thumbnailing: Added PNG")
                 except:
-                    pass
-                    # print(sys.exc_info()[0])
+                    settings.maybePrint(sys.exc_info()[0])
                 finally:
                     print("Thumbnailing Complete")              
                     return
         if REPAIR:
             tmp = repair(tmp)
-            fixThumbnail(tmp)
         global FIFTY_MEGABYTES
         if int(os.stat(str(tmp)).st_size) >= FIFTY_MEGABYTES or settings.FORCE_REDUCTION: # greater than 1GB
             tmp = reduce(tmp)
+        fixThumbnail(tmp)
     else:
         file.GetContentFile(tmp)
     ### Finish ###
@@ -396,13 +266,13 @@ def download_file(file, REPAIR=False):
         settings.maybePrint("Error: File Size Too Small")
         print("Download Failure")
         return
-    print('Download Complete')
+    print('Download Complete: File')
     return tmp
 
 # Download Gallery
 def download_gallery(folder):
     print('Downloading Gallery...')
-    tmp = getTmp()
+    tmp = settings.getTmp()
     # download folder
     global PYDRIVE
     file_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
@@ -420,79 +290,229 @@ def download_gallery(folder):
     i = 1
     for file in sorted(file_list_random, key = lambda x: x['title']):
         print('Downloading {} from GDrive ({}/{})'.format(file['title'], i, folder_size))
-        settings.maybePrint('filePath: '+tmp+"/"+str(file['title']))
-        file.GetContentFile(tmp+"/"+str(file['title']))
+        settings.maybePrint('filePath: '+os.path.join(tmp, str(file['title'])))
+        file.GetContentFile(os.path.join(tmp, str(file['title'])))
         i+=1
-    print('Download Complete')
+    print('Download Complete: Gallery')
     return [file_list_random, tmp]
 
 # Download Scene
 def download_scene(sceneFolder):
     print('Downloading Scene...')
-    tmp = getTmp()
+    tmp = settings.getTmp()
     global PYDRIVE
-    # get folders with content in it
-    contentFolder = None
-    previewFolder = None
+    content = None
+    preview = None
     folder_list = PYDRIVE.ListFile({'q': "'"+sceneFolder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     for folder in folder_list:
         if folder['title'] == "content":
-            contentFolder = folder
+            content = folder
+            settings.maybePrint("Content Folder: "+folder['id'])
         elif folder['title'] == "preview":
-            previewFolder = folder
-    data = PYDRIVE.ListFile({'q': "'"+sceneFolder['id']+"' in parents and trashed=false and mimeType contains 'text/txt'"}).GetList()[0]
-    if data is not None:
+            preview = folder
+            settings.maybePrint("Preview Folder: "+folder['id'])
+    data = PYDRIVE.ListFile({'q': "'"+sceneFolder['id']+"' in parents and trashed=false and mimeType contains 'text/plain'"}).GetList()
+    if len(data) == 0:
         print("Error: Missing Scene Data")
         return
-    if contentFolder is not None:
+    data = data[0]
+    if data is None:
+        print("Error: Missing Scene Data")
+        return
+    if content is None:
         print("Error: Missing Scene Content Folder")
         return
-    if previewFolder is not None:
+    if preview is None:
         print("Error: Missing Scene Preview Folder")
         return
-    content = download_content(contentFolder)
-    preview = download_file(previewFolder)
-    if content is not None:
-        print("Error: Missing Scene Content")
-        return
-    if preview is not None:
+
+    def read_data(d):
+        json_data = None
+        with open(d, 'r') as f:
+            words = json.dumps(f.read())
+            return words
+
+    #####
+    content = download_gallery(content)
+    # move content to tmp/content
+    tmp_content = os.path.join(content[1], "content")
+    settings.maybePrint("Old Content Path: {}".format(content[1]))
+    settings.maybePrint("New Content Path: {}".format(tmp_content))
+    os.mkdir(tmp_content)
+    for file in os.listdir(content[1]):
+        file = os.path.join(content[1], file) 
+        settings.maybePrint("Moving: {}".format(file))
+        shutil.move(file, tmp_content)
+    data.GetContentFile(os.path.join(tmp, "data.json"))
+    data = read_data(os.path.join(tmp, "data.json"))
+    preview = PYDRIVE.ListFile({'q': "'"+preview['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
+    if len(preview) == 0:
         print("Error: Missing Scene Preview")
         return
-    scene = [content, preview, data]
+    preview = preview[0]
+    preview = download_file(preview)
+    #####
+
+    if data is None:
+        print("Error: Missing Scene Data")
+        return
+    if content is None:
+        print("Error: Missing Scene Content")
+        return
+    if preview is None:
+        print("Error: Missing Scene Preview")
+        return
     print('Download Complete: Scene')
-    return [scene, tmp]
+    return [tmp_content, preview, data]
+    # return json.dumps({
+    #     "content": content[0],
+    #     "content_path": tmp_content,
+    #     "preview": preview,
+    #     "data": data
+    # })
 
-# Deletes online file
-def delete_file(file):
-    if not settings.DELETING or settings.DELETING == "False":
-        print("Skipping Delete")
-        return
-    print('Trashing Google Video')
-    if settings.DEBUG:
-        print('skipping Google delete')
-        return
-    file.Trash()
-    print('Google Video Trashed')
+###############
+##### Get #####
+###############
 
-# Archives posted file / folder
-def move_file(file):
-    if settings.DEBUG or not settings.BACKING_UP or settings.BACKING_UP == "False":
-        print('Skipping Google Backup: '+file['title'])
-        return
-    file['parents'] = [{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}]
-    file.Upload()
-    print('Google File Backed Up: '+file['title'])
-
-def move_files(folderName, files):
-    if settings.DEBUG or not settings.BACKING_UP or settings.BACKING_UP == "False" and not settings.BACKING_UP_FORCE:
-        print('Skipping Google Backup: '+folderName)
-        return
-    title = folderName+" - "+datetime.datetime.now().strftime("%d-%m-%I-%M")
-    print('title: '+title)
+# Downloads random video from Google Drive
+def get_random_video():
+    print('Getting Random Video...')
     global PYDRIVE
-    tmp_folder = PYDRIVE.CreateFile({'title':title, 'parents':[{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}],'mimeType':'application/vnd.google-apps.folder'})
-    tmp_folder.Upload()
-    for file in files:
-        file['parents'] = [{"kind": "drive#fileLink", "id": tmp_folder['id']}]
-        file.Upload()
-    print('Google Files Backed Up')
+    random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_VIDEOS_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+    video_list = []
+    random_video = None
+    folder_name = None
+    for folder in random_folders:
+        print('checking folder: '+folder['title'],end="")
+        video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
+        if len(video_list_tmp)>0:
+            video_list.append(folder)
+            print(" -> added")
+        else:
+            print(" -> empty")
+    if len(video_list)==0:
+        print('No video file found!')
+        return
+    random_video = random.choice(video_list)
+    folder_name = random_video['title'];
+    print('Random Folder: '+random_video['title'])
+    random_video = PYDRIVE.ListFile({'q': "'"+random_video['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
+    random_video = random.choice(random_video)
+    print('Random Video: '+random_video['title'])
+    return [random_video, folder_name]
+
+# Downloads random image from Google Drive
+def get_random_image():
+    print('Getting Random Image...')
+    global PYDRIVE
+    random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_IMAGES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+    images_list = []
+    random_image = None
+    folder_name = None
+    for folder in random_folders:
+        if settings.DEBUG:
+            print('checking folder: '+folder['title'],end="")
+        images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
+        if len(images_list_tmp)>0:
+            images_list.append(folder)
+            settings.maybePrint(" -> added")
+        else:
+            settings.maybePrint(" -> empty")
+    if len(images_list)==0:
+        print('No image file found!')
+        return
+    random_image = random.choice(images_list)
+    folder_name = random_image['title'];
+    print('Random Folder: '+random_image['title'])
+    random_image = PYDRIVE.ListFile({'q': "'"+random_image['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
+    random_image = random.choice(random_image)
+    print('Random Image: '+random_image['title'])
+    return [random_image, folder_name]
+
+# Downloads random gallery from Google Drive
+def get_random_gallery():
+    print('Getting Random Gallery...')
+    global PYDRIVE
+    random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_GALLERIES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+    folder_list = []
+    random_gallery = None
+    folder_name = None
+    for folder in random_folders:
+        if settings.DEBUG:
+            print('checking galleries: '+folder['title'])
+        gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+        if len(gallery_list_tmp)>0:
+            folder_list.append(folder)
+            settings.maybePrint(" -> added")
+        else:
+            settings.maybePrint(" -> empty")
+    random.shuffle(folder_list)
+    for folder in folder_list:
+        if settings.DEBUG:
+            print('checking gallery: '+folder['title'])
+        gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+        random_gallery_tmp = random.choice(gallery_list_tmp)
+        gallery_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+random_gallery_tmp['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
+        if len(gallery_list_tmp_tmp)>0:
+            folder_name = folder['title']
+            random_gallery = random_gallery_tmp
+            settings.maybePrint(" -> found")
+        else:
+            settings.maybePrint(" -> empty")
+    if not random_gallery:
+        print('No gallery folders found!')
+        return
+    print('Random Gallery: '+random_gallery['title'])
+    return [random_gallery, folder_name]
+
+# Downloads random scene from Google Drive
+def get_random_scene():
+    print('Getting Random Scene...')
+    global PYDRIVE
+    random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_SCENES_FOLDER+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+    folder_list = []
+    random_scene = None
+    folder_name = None
+    for folder in random_folders:
+        if settings.DEBUG:
+            print('checking scenes: '+folder['title'],end="")
+        scene_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+        if len(scene_list_tmp)>0:
+            folder_list.append(folder)
+            settings.maybePrint(" -> added")
+        else:
+            settings.maybePrint(" -> empty")
+    random.shuffle(folder_list)
+    for folder in folder_list:
+        if settings.DEBUG:
+            print('checking scene: '+folder['title'],end="")
+        scene_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'text/plain'"}).GetList()
+        if len(scene_list_tmp_tmp)>0:
+            folder_name = folder['title']
+            random_scene = folder
+            settings.maybePrint(" -> found")
+        else:
+            settings.maybePrint(" -> empty")
+    if not random_scene:
+        print('No scene folders found!')
+        return
+    print('Random Scene: '+random_scene['title'])
+    return [random_scene, folder_name]
+
+##################
+##### Upload #####
+##################
+
+def upload_file(filename=None, mimetype="video/mp4"):
+    if filename == None:
+        print("Error: Missing Filename")
+        return
+    file_metadata = {
+        'name': str(filename),
+        'mimeType': str(mimetype)
+    }
+    media = MediaFileUpload(str(filename), mimetype=str(mimetype), resumable=True)
+    file = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
+    print('File ID: %s' % file.get('id'))
+
