@@ -1,5 +1,6 @@
 # Global Settings
 import sys
+import os
 
 # def init(sys.argv):
 global MOUNT_PATH
@@ -56,7 +57,7 @@ global IMAGE
 # IMAGE = "/home/skeetzo/Projects/onlysnarf/OnlySnarf/images/snarf.jpg"
 IMAGE = None
 global RECENT_USER_COUNT
-RECENT_USER_COUNT = 10
+RECENT_USER_COUNT = 3
 global DEFAULT_PRICE
 DEFAULT_PRICE = "10.00"
 global DEFAULT_MESSAGE
@@ -111,9 +112,21 @@ while i < len(sys.argv):
 # global initialized
 # initialized = True
 
+#####################
+##### Functions #####
+#####################
 
-
-
+def getTmp():
+    # mkdir /tmp
+    tmp = os.getcwd()
+    global MOUNT_PATH
+    if MOUNT_PATH:
+        tmp = os.path.join(MOUNT_PATH, "tmp")
+    else:
+        tmp = os.path.join(tmp, "tmp")
+    if not os.path.exists(str(tmp)):
+        os.mkdir(str(tmp))
+    return tmp
 
 def maybePrint(text):
     global DEBUG
