@@ -3,6 +3,9 @@
 # User Class
 
 import json
+import time
+from re import sub
+from decimal import Decimal
 from . import driver as OnlySnarf
 from . import settings
 
@@ -30,11 +33,27 @@ class User:
             print("Image Already Sent: %s -> %s" % (image, self.id))
             return
         OnlySnarf.enter_image(image)
+        OnlySnarf.enter_price(price)
         if not settings.DEBUG:
             self.sent_images.append(str(image))
         else:
             self.sent_images.append("DEBUG")
-        OnlySnarf.enter_price(price)
+        if Decimal(sub(r'[^\d.]', '', price)) < 5:
+            print("Warning: Price Too Low, Skipping")
+            return
+        if settings.DEBUG:
+	        settings.maybePrint("30...")
+	        time.sleep(10)
+	        settings.maybePrint("20...")
+	        time.sleep(10)
+	        settings.maybePrint("10...")
+	        time.sleep(7)
+	        settings.maybePrint("3...")
+	        time.sleep(1)
+	        settings.maybePrint("2...")
+	        time.sleep(1)
+	        settings.maybePrint("1...")
+	        time.sleep(1)
         OnlySnarf.confirm_message()
 
     def equals(self, user):

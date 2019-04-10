@@ -252,18 +252,18 @@ def test(TYPE):
     #####################
     
     ### Scene ###
-    release_scene(userChoice="all")
-    return
+    # release_scene(userChoice="all")
+    # return
     #############
 
     ### Message ###
-    # response = download_random_image()
-    # if not response or response == None:
-        # print("Error: Missing Image")
-        # return
-    # message_all(image=response[1])
+    response = download_random_image()
+    if not response or response == None:
+        print("Error: Missing Image")
+        return
+    message_all(message="Creampie Clue :D", image=response[1], price="10.00")
     # message_recent(message=":)", image=response[1], price="50.00")
-    # Google.move_file(response[2])
+    Google.move_file(response[2])
     ###############
 
     ### Exit Gracefully ###
