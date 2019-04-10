@@ -9,7 +9,7 @@ from . import settings
 class User:
     def __init__(self, name=None, username=None, id=None):
         self.name = name
-        self.username = username
+        self.username = username.encode("utf-8")
         self.id = id
         self.messages = []
         self.sent_images = []
