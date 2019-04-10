@@ -48,7 +48,8 @@ OnlyFans_VIDEOS_FOLDER = config['videos_folder']
 OnlyFans_IMAGES_FOLDER = config['images_folder']
 OnlyFans_GALLERIES_FOLDER = config['galleries_folder']
 OnlyFans_POSTED_FOLDER = config['posted_folder']
-OnlyFans_SCENES_FOLDER = config['scenes_folder']
+# OnlyFans_SCENES_FOLDER = config['scenes_folder']
+OnlyFans_SCENES_FOLDER = None
 
 ################
 ##### Auth #####
