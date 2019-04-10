@@ -216,7 +216,7 @@ def enter_price(price):
     try:
         print("Enter price: %s" % price)
         if not price or price == None:
-            print("Missing Price")
+            print("Error: Missing Price")
             return
         global BROWSER
         BROWSER.find_element_by_css_selector(".b-chat__btn-set-price.js-chat__btn-set-price").click()
