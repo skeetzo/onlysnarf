@@ -13,7 +13,6 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from . import settings
 from moviepy.editor import VideoFileClip
-
 from apiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file, client, tools
@@ -55,12 +54,11 @@ OnlyFans_SCENES_FOLDER = None
 ##### Auth #####
 ################
 
+# Google Auth
 def authGoogle():
     print('Authenticating Google...')
     try:
         GOOGLE_CREDS = os.path.join(os.path.dirname(os.path.realpath(__file__)),'google_creds.txt')
-        # Google Auth
-        
         # PyDrive
         gauth = GoogleAuth()
         # Try to load saved client credentials

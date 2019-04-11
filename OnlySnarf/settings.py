@@ -68,18 +68,15 @@ FORCE_REDUCTION = False
 
 global SKIP_USERS
 SKIP_USERS = [
-    "1823577",
-    "4242416",
-    "681565",
-    "3971049",
-    "7386155",
-    "6274419",
-    "4743044",
-    "7248614",
-    "7528282",
-    "1823577",
-    "527995"
+    "6710870"
 ]
+
+global user_DEFAULT_GREETING
+user_DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
+
+global user_DEFAULT_REFRESHER
+user_DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
+
 
 i = 0
 while i < len(sys.argv):

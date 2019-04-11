@@ -36,10 +36,11 @@
 **0.1.8 : 3/31/2019**
 	- debugging
 	- Drive API for mp4 downloads
+**0.2.0 : 4/10/2019**
+	- User: read_chat
 	
 ## ToDo
-	- User.py
-	- send User message w/ image for $
+	- read messages html for emojis
 
 ## Install
 sudo python3 setup.py install
