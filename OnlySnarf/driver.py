@@ -11,6 +11,7 @@ import pathlib
 import threading
 import chromedriver_binary
 import time
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -406,26 +407,56 @@ def read_chat(user):
         messages_all = []
         messages_to = []
         messages_from = []
+        # timestamps_ = BROWSER.find_elements_by_class_name("b-chat__message__time")
+        # timestamps = []
+        # for timestamp in timestamps_:
+            # settings.maybePrint("timestamp1: {}".format(timestamp))
+            # timestamp = timestamp["data-timestamp"]
+            # timestamp = timestamp.get_attribute("innerHTML")
+            # settings.maybePrint("timestamp: {}".format(timestamp))
+            # timestamps.append(timestamp)
         for message in messages_all_:
             settings.maybePrint("all: {}".format(message.get_attribute("innerHTML")))
             messages_all.append(message.get_attribute("innerHTML"))
+        messages_and_timestamps = []
+        # messages_and_timestamps = [j for i in zip(timestamps,messages_all) for j in i]
+        # settings.maybePrint("Chat Log:")
+        # for f in messages_and_timestamps:
+            # settings.maybePrint(": {}".format(f))
         for message in messages_from_:
             # settings.maybePrint("from1: {}".format(message.get_attribute("innerHTML")))
             message = message.find_element_by_class_name("b-chat__message__text")
             settings.maybePrint("from: {}".format(message.get_attribute("innerHTML")))
             messages_from.append(message.get_attribute("innerHTML"))
+
+        i = 0
         for message in messages_all:
-            addMe = True
+            from_ = False
+            to_ = False
             for mess in messages_from:
                 if str(message) == str(mess):
-                    addMe = False
-            if addMe:
-                settings.maybePrint("to: {}".format(message))
+                    from_ = True
+            for mess in messages_to:
+                if str(message) == str(mess):
+                    to_ = True
+            if not from_:
+                # settings.maybePrint("to_: {}".format(message))
+                # messages_to[i] = [timestamps[i], message]
+                # messages_to[i] = message
                 messages_to.append(message)
+                # settings.maybePrint("to_: {}".format(messages_to[i]))
+            # elif from_:
+                # settings.maybePrint("from_: {}".format(message))
+                # messages_from[i] = [timestamps[i], message]
+                # messages_from[i] = message
+                # settings.maybePrint("from_: {}".format(messages_from[i]))
+            i += 1
+        settings.maybePrint("to: {}".format(messages_to))
+        settings.maybePrint("from: {}".format(messages_from))
         settings.maybePrint("Messages From: {}".format(len(messages_from)))
         settings.maybePrint("Messages To: {}".format(len(messages_to)))
         settings.maybePrint("Messages All: {}".format(len(messages_all)))
-        return [messages_all, messages_to, messages_from]
+        return [messages_all, messages_and_timestamps, messages_to, messages_from]
     except Exception as e:
         print(e)
 
@@ -463,6 +494,8 @@ def get_users_local():
             users_.append(user)
     except FileNotFoundError:
         print("Error: Missing Local Users")
+    except OSError:
+        print("Error: Missing Local Path")
     finally:
         return users_
 
@@ -476,8 +509,13 @@ def write_users_local():
     for user in users:
         settings.maybePrint("Saving: "+str(user.username))
         data['users'].append(user.toJSON())
-    with open(LOCAL_DATA, 'w') as outfile:  
-        json.dump(data, outfile, indent=4, sort_keys=True)
+    try:
+        with open(LOCAL_DATA, 'w') as outfile:  
+            json.dump(data, outfile, indent=4, sort_keys=True)
+    except FileNotFoundError:
+        print("Error: Missing Local Users")
+    except OSError:
+        print("Error: Missing Local Path")
 
 def exit(force=False):
     if not force:

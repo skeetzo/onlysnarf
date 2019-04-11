@@ -166,17 +166,20 @@ def message_by_username(username=None, message=None, image=None, price=None):
 
 # Deletes local file
 def remove_local():
-    if settings.REMOVE_LOCAL == False:
-        print("Skipping Local Remove")
-        return
-    # print('Deleting Local File(s)')
-    # delete /tmp
-    tmp = settings.getTmp()
-    if os.path.exists(tmp):
-        shutil.rmtree(tmp)
-        print('Local File(s) Removed')
-    else:
-        print('Local Files Not Found')
+    try:
+        if settings.REMOVE_LOCAL == False:
+            print("Skipping Local Remove")
+            return
+        # print('Deleting Local File(s)')
+        # delete /tmp
+        tmp = settings.getTmp()
+        if os.path.exists(tmp):
+            shutil.rmtree(tmp)
+            print('Local File(s) Removed')
+        else:
+            print('Local Files Not Found')
+    except OSError as e:
+        print("Error: Missing Local Path")
 
 #################
 ##### Scene #####
