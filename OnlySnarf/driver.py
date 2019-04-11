@@ -29,10 +29,15 @@ from . import settings
 BROWSER = None
 USER_CACHE = None
 LOCAL_DATA = None
-if settings.USERS_PATH is not None:
-    LOCAL_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)), settings.USERS_PATH)
+if settings.USERS_PATH is not None and settings.MOUNT_PATH is not None:
+    LOCAL_DATA = os.path.join(settings.MOUNT_PATH, settings.USERS_PATH)
+elif settings.USERS_PATH is not None:
+    LOCAL_DATA = settings.USERS_PATH
+elif settings.MOUNT_PATH is not None:
+    LOCAL_DATA = os.path.join(settings.MOUNT_PATH, "users.json")
 else:
     LOCAL_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'users.json')
+settings.maybePrint("Users Path: {}".format(LOCAL_DATA))
 
 ##################
 ##### Config #####
@@ -61,24 +66,44 @@ def log_into_OnlyFans():
     if not settings.SHOW_WINDOW:
         options.add_argument('--headless')
     options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
     # options.setExperimentalOption('useAutomationExtension', false);
     options.add_argument('--disable-gpu')  # Last I checked this was necessary.
-    global BROWSER
     # CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
     # BROWSER = webdriver.Chrome(binary=CHROMEDRIVER_PATH, chrome_options=options)
-    BROWSER = webdriver.Chrome(chrome_options=options)
-    BROWSER.implicitly_wait(10) # seconds
-    BROWSER.set_page_load_timeout(1200)
-    BROWSER.get(('https://onlyfans.com'))
-    # login via Twitter
-    twitter = BROWSER.find_element_by_xpath('//a[@class="btn btn-default btn-block btn-lg btn-twitter"]').click()
-    # fill in username
-    username = BROWSER.find_element_by_xpath('//input[@id="username_or_email"]').send_keys(str(OnlyFans_USERNAME))
-    # fill in password and hit the login button 
-    password = BROWSER.find_element_by_xpath('//input[@id="password"]')
-    password.send_keys(str(OnlyFans_PASSWORD))
-    password.send_keys(Keys.ENTER)
-    print('Login Success')
+    CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
+    os.environ["webdriver.chrome.driver"] = CHROMEDRIVER_PATH
+    global BROWSER
+    try:
+        BROWSER = webdriver.Chrome(CHROMEDRIVER_PATH, chrome_options=options)
+    except WebDriverException as e:
+        settings.maybePrint(e)
+        settings.maybePrint("Warning: Missing chromedriver_path, retrying")
+        try:
+            BROWSER = webdriver.Chrome(chrome_options=options)
+        except Exception as e:
+            settings.maybePrint(e)
+            print("Error: Missing chromedriver_path, exiting")
+            return False
+    try:
+        BROWSER.implicitly_wait(10) # seconds
+        BROWSER.set_page_load_timeout(1200)
+        BROWSER.get(('https://onlyfans.com'))
+        # login via Twitter
+        twitter = BROWSER.find_element_by_xpath('//a[@class="btn btn-default btn-block btn-lg btn-twitter"]').click()
+        # fill in username
+        username = BROWSER.find_element_by_xpath('//input[@id="username_or_email"]').send_keys(str(OnlyFans_USERNAME))
+        # fill in password and hit the login button 
+        password = BROWSER.find_element_by_xpath('//input[@id="password"]')
+        password.send_keys(str(OnlyFans_PASSWORD))
+        password.send_keys(Keys.ENTER)
+        print('Login Success')
+        return True
+    except Exception as e:
+        settings.maybePrint(e)
+        print('Login Failure')
+        return False
+
 
 ##################
 ##### Upload #####
@@ -86,6 +111,12 @@ def log_into_OnlyFans():
 
 # Uploads a file to OnlyFans
 def upload_file_to_OnlyFans(fileName, path, folderName):
+    logged_in = False
+    global BROWSER
+    if not BROWSER or BROWSER == None:
+        logged_in = log_into_OnlyFans()
+    else:
+        logged_in = True
     fileName = os.path.splitext(str(fileName))[0]
     print('Uploading: '+str(fileName))
     print('path: '+path)
@@ -94,7 +125,6 @@ def upload_file_to_OnlyFans(fileName, path, folderName):
     else:
         postText = str(folderName)+" "+str(fileName)
     settings.maybePrint('text: '+str(postText))
-    global BROWSER
     if not settings.TWEETING:
         WebDriverWait(BROWSER, 10, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
     BROWSER.find_element_by_id("new_post_text_input").send_keys(str(postText))
@@ -132,6 +162,12 @@ def upload_file_to_OnlyFans(fileName, path, folderName):
 
 # Uploads a folder to OnlyFans
 def upload_directory_to_OnlyFans(dirName, path, folderName):
+    logged_in = False
+    global BROWSER
+    if not BROWSER or BROWSER == None:
+        logged_in = log_into_OnlyFans()
+    else:
+        logged_in = True
     if settings.HASHTAGGING:
         postText = str(dirName)+" #"+" #".join(str(folderName).split(' '))
     else:    
@@ -142,7 +178,6 @@ def upload_directory_to_OnlyFans(dirName, path, folderName):
     for file in pathlib.Path(str(path)).iterdir():  
         files_path.append(str(file))
     settings.maybePrint('files: '+str(files_path))
-    global BROWSER
     BROWSER.find_element_by_id("new_post_text_input").send_keys(str(postText))
     WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
     if not settings.TWEETING:
@@ -240,9 +275,16 @@ def confirm_message():
 
 # update chat logs for all users
 def update_chat_logs():
-    pass
+    print("Updating User Chats")
+    users = get_users()
+    for user in users:
+        update_chat_log(user)
+
 def update_chat_log(user):
-    pass
+    print("Updating Chat: {} - {}".format(user.username, user.id))
+    if not user:
+        return print("Error: Missing User")
+    user.readChat()
 
 #################
 ##### Users #####
@@ -255,9 +297,15 @@ def get_users():
     if USER_CACHE:
         return USER_CACHE
     USER_CACHE = get_users_local()
+    logged_in = False
     global BROWSER
     if not BROWSER or BROWSER == None:
-        log_into_OnlyFans()
+        logged_in = log_into_OnlyFans()
+    else:
+        logged_in = True
+    if logged_in == False:
+        print("Error: Login Failure")
+        return USER_CACHE
     # go to onlyfans.com/my/subscribers/active
     print("goto -> /my/subscribers/active")
     BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
@@ -338,6 +386,54 @@ def get_recent_users():
             return users_
     return users_
 
+def read_chat(user):
+    try:
+        logged_in = False
+        global BROWSER
+        if not BROWSER or BROWSER == None:
+            logged_in = log_into_OnlyFans()
+        else:
+            logged_in = True
+        if logged_in == False:
+            print("Error: Login Failure")
+            return [[],[],[]]
+        # go to onlyfans.com/my/subscribers/active
+        goto_user(user)
+        messages_from_ = BROWSER.find_elements_by_class_name("m-from-me")
+        # print("first message: {}".format(messages_to_[0].get_attribute("innerHTML")))
+        # messages_to_.pop(0) # drop self user at top of page
+        messages_all_ = BROWSER.find_elements_by_class_name("b-chat__message__text")
+        messages_all = []
+        messages_to = []
+        messages_from = []
+        for message in messages_all_:
+            settings.maybePrint("all: {}".format(message.get_attribute("innerHTML")))
+            messages_all.append(message.get_attribute("innerHTML"))
+        for message in messages_from_:
+            # settings.maybePrint("from1: {}".format(message.get_attribute("innerHTML")))
+            message = message.find_element_by_class_name("b-chat__message__text")
+            settings.maybePrint("from: {}".format(message.get_attribute("innerHTML")))
+            messages_from.append(message.get_attribute("innerHTML"))
+        for message in messages_all:
+            addMe = True
+            for mess in messages_from:
+                if str(message) == str(mess):
+                    addMe = False
+            if addMe:
+                settings.maybePrint("to: {}".format(message))
+                messages_to.append(message)
+        settings.maybePrint("Messages From: {}".format(len(messages_from)))
+        settings.maybePrint("Messages To: {}".format(len(messages_to)))
+        settings.maybePrint("Messages All: {}".format(len(messages_all)))
+        return [messages_all, messages_to, messages_from]
+    except Exception as e:
+        print(e)
+
+# "b-chat__message__text"
+# b-chat__message__body
+# b-chat__message m-from-me
+
+
 def reset_user_cache():
     global USER_CACHE
     USER_CACHE = False
@@ -361,7 +457,7 @@ def get_users_local():
         with open(LOCAL_DATA) as json_file:  
             users = json.load(json_file)
         for user in users['users']:
-            user = User(name=user['name'], username=user['username'], id=user['id'])
+            user = User(name=user['name'], username=user['username'], id=user['id'], messages_from=user['messages_from'], messages_to=user['messages_to'], messages=user['messages'], preferences=user['preferences'], last_messaged_on=user['last_messaged_on'], sent_images=user['sent_images'], subscribed_on=user['subscribed_on'], isFavorite=user['isFavorite'], statement_history=user['statement_history'])
             settings.maybePrint('Loaded: %s' % user.username)
             settings.maybePrint('')
             users_.append(user)
@@ -383,9 +479,10 @@ def write_users_local():
     with open(LOCAL_DATA, 'w') as outfile:  
         json.dump(data, outfile, indent=4, sort_keys=True)
 
-def exit():
-    print("Saving and Exiting OnlyFans")
-    write_users_local()
+def exit(force=False):
+    if not force:
+        print("Saving and Exiting OnlyFans")
+        write_users_local()
     global BROWSER
     BROWSER.quit()
     print("Browser Closed")

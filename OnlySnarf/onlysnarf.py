@@ -200,14 +200,14 @@ def release_scene(userChoice="all"):
         title = data["title"]
         message = data["message"]
         price = data["price"]
-    except:
-        print(sys.exc_info()[0])
-    # title = data.title
-    # message = data.message
-    # price = data.price
-    print("Title: {}".format(title))
-    print("Message: {}".format(message))
-    print("Price: {}".format(price))
+    except Exception as e:
+        settings.maybePrint(e)
+    if title == None or message == None or price == None:
+        return print("Error: Missing Scene Data")
+    print("Scene:")
+    print("- Title: {}".format(title))
+    print("- Message: {}".format(message))
+    print("- Price: {}".format(price))
     upload("scene", filename=title, filepath=content)
     if str(userChoice) == "all":
         message_all(message=message, image=preview, price=price)
@@ -250,6 +250,7 @@ def test(TYPE):
     # users = OnlySnarf.get_users()
     # return
     #####################
+    OnlySnarf.update_chat_logs()
     
     ### Scene ###
     # release_scene(userChoice="all")
@@ -257,13 +258,13 @@ def test(TYPE):
     #############
 
     ### Message ###
-    response = download_random_image()
-    if not response or response == None:
-        print("Error: Missing Image")
-        return
-    message_all(message="Creampie Clue :D", image=response[1], price="10.00")
+    # response = download_random_image()
+    # if not response or response == None:
+        # print("Error: Missing Image")
+        # return
+    # message_all(message="Creampie Clue :D", image=response[1], price="10.00")
     # message_recent(message=":)", image=response[1], price="50.00")
-    Google.move_file(response[2])
+    # Google.move_file(response[2])
     ###############
 
     ### Exit Gracefully ###
@@ -339,7 +340,10 @@ def main():
     sys.stdout.flush()
     #################################################
     print('2/3 : Accessing OnlyFans')
-    OnlySnarf.log_into_OnlyFans()
+    logged_in = OnlySnarf.log_into_OnlyFans()
+    if logged_in == False:
+        print("Error: Login Failure")
+        return
     if settings.TYPE == "gallery":
         OnlySnarf.upload_directory_to_OnlyFans(file_name, file_path, folder_name)
     elif settings.TYPE == "video" or settings.TYPE == "image":
