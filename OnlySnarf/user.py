@@ -20,7 +20,8 @@ class User:
         # messages sent to the user
         self.messages_to = messages_to
         # combined chatlog
-        self.messages = messages
+        self.messages = messages 
+        # self.messages_and_timestamps = [] # message = [timestamp, message]
         # anal, cock, etc
         self.preferences = preferences
         # date and time last messaged on
@@ -110,8 +111,9 @@ class User:
         print("Reading Chat: {} - {}".format(self.username, self.id))
         messages = OnlySnarf.read_chat(self.id)
         self.messages = messages[0]
-        self.messages_to = messages[1]
-        self.messages_from = messages[2]
+        # self.messages_and_timestamps = messages[1]
+        self.messages_to = messages[2]
+        self.messages_from = messages[3]
         settings.maybePrint("Chat Read: {} - {}".format(self.username, self.id))
 
     # saves statement / payment history
