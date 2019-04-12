@@ -20,7 +20,7 @@ from . import onlysnarf
 ##### Globals #####
 ###################
 
-version = "0.1.7"
+version = "0.2.1"
 header = "\n ________         .__          _________                     _____ \n \
 \\_____  \\   ____ |  | ___.__./   _____/ ____ _____ ________/ ____\\\n \
  /   |   \\ /    \\|  |<   |  |\\_____  \\ /    \\\\__  \\\\_   _ \\   __\\ \n \
@@ -44,7 +44,7 @@ colors = {
 # Main Menu
 menuItems = [
     [ "Actions", "action"],
-    [ "Settings", "settings"],
+    [ "Settings", "set_settings"],
     [ "Exit", "exit"]
 ]
 
@@ -76,6 +76,8 @@ messageItems.insert(0,[ "Back", ["main"]])
 fileItems = sorted([
     [ "Image", "image"],
     [ "Gallery", "gallery"],
+    [ "Performer", "performer"],
+    [ "Scene", "scene"],
     [ "Video", "video"],
 ])
 fileItems.insert(0,[ "Back", "main"])
@@ -225,7 +227,7 @@ def performMessage(actionChoice, messageChoice):
 ###########################
 
 ### Settings Menu
-def settings():
+def set_settings():
     showHeader()
     print(colorize("Set:",'menu'))
     global settingItems
@@ -262,16 +264,16 @@ def settings():
                         break
                     except (ValueError, IndexError, KeyboardInterrupt):
                         print("Incorrect Index")
-                    except:
+                    except Exception as e:
                         print('What did shnnarf break?')
-                        print(sys.exc_info()[0])
+                        print(e)
                         break
             global UPDATED
             UPDATED = settingChoice
             global UPDATED_TO
             UPDATED_TO = settingValue
             settingItems[int(choice)][1] = settingValue
-            return settings()
+            return set_settings()
         except (ValueError, IndexError, KeyboardInterrupt):
             print("Incorrect Index")
         except:

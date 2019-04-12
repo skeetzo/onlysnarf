@@ -7,12 +7,13 @@ import time
 from datetime import datetime
 from re import sub
 from decimal import Decimal
+
 from . import driver as OnlySnarf
 from . import settings
 
 class User:
     def __init__(self, name=None, username=None, id=None, messages_from=[], messages_to=[], messages=[], preferences=[], last_messaged_on=None, sent_images=[], subscribed_on=None, isFavorite=False, statement_history=[]):
-        self.name = name
+        self.name = name.encode("utf-8")
         self.username = username.encode("utf-8")
         self.id = id
         # messages receieved from the user
@@ -34,7 +35,11 @@ class User:
         self.isFavorite = isFavorite
         # statement history
         self.statement_history = statement_history
-        settings.maybePrint("User: {} - {} - {}".format(self.name, self.username, self.id))
+        try:
+            settings.maybePrint("User: {} - {} - {}".format(self.name, self.username.encode("utf-8"), self.id))
+        except UnicodeEncodeError as e:
+            settings.maybePrint(e)
+            settings.maybePrint("User: {}".format(self.id))
 
     def sendMessage(self, message=None, image=None, price=None):
         print("Sending Message: {} - {} - {}".format(message, image, price))
