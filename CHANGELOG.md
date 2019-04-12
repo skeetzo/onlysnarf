@@ -20,7 +20,7 @@
 	- config.py
 	- script names updated
 	- readme updated
-		**2/9/2019**
+	**2/9/2019**
 	- fuck you PyDrive
 **0.1.3 : 2/24/2019**
 	- jpeg
@@ -38,6 +38,9 @@
 	- Drive API for mp4 downloads
 **0.2.0 : 4/10/2019**
 	- User: read_chat
+**0.2.1 : 4/12/2019**
+	- upload performer
+	- upload scene
 	
 ## ToDo
 	- read messages html for emojis

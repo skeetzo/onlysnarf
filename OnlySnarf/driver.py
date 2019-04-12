@@ -38,23 +38,26 @@ elif settings.MOUNT_PATH is not None:
     LOCAL_DATA = os.path.join(settings.MOUNT_PATH, "users.json")
 else:
     LOCAL_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'users.json')
-settings.maybePrint("Users Path: {}".format(LOCAL_DATA))
 
 ##################
 ##### Config #####
 ##################
 
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')
+
+OnlyFans_USERNAME = None        
+OnlyFans_PASSWORD = None
+OnlyFans_USER_ID = None
+
 try:
     with open(CONFIG_FILE) as config_file:    
         config = json.load(config_file)
+    OnlyFans_USERNAME = config['username']        
+    OnlyFans_PASSWORD = config['password']
+    OnlyFans_USER_ID = "409408"
 except FileNotFoundError:
     print('Missing Config, run `onlysnarf-config`')
     sys.exit(0)
-
-OnlyFans_USERNAME = config['username']        
-OnlyFans_PASSWORD = config['password']
-OnlyFans_USER_ID = "409408"
 
 #####################
 ##### Functions #####
@@ -105,103 +108,132 @@ def log_into_OnlyFans():
         print('Login Failure')
         return False
 
+# Reset to home
+def reset():
+    global BROWSER
+    if not BROWSER or BROWSER == None:
+        print('OnlyFans Not Open, Skipping Reset')
+        return True
+    try:
+        BROWSER.get(('https://onlyfans.com'))
+        print('OnlyFans Reset')
+        return True
+    except Exception as e:
+        settings.maybePrint(e)
+        print('Error: Failure Resetting OnlyFans')
+        return False
 
 ##################
 ##### Upload #####
 ##################
 
 # Uploads a file to OnlyFans
-def upload_file_to_OnlyFans(fileName, path, folderName):
-    logged_in = False
-    global BROWSER
-    if not BROWSER or BROWSER == None:
-        logged_in = log_into_OnlyFans()
-    else:
-        logged_in = True
-    fileName = os.path.splitext(str(fileName))[0]
-    print('Uploading: '+str(fileName))
-    print('path: '+path)
-    if settings.HASHTAGGING:
-        postText = str(fileName)+" #"+" #".join(str(folderName).split(' '))
-    else:
-        postText = str(folderName)+" "+str(fileName)
-    settings.maybePrint('text: '+str(postText))
-    if not settings.TWEETING:
-        WebDriverWait(BROWSER, 10, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
-    BROWSER.find_element_by_id("new_post_text_input").send_keys(str(postText))
-    BROWSER.find_element_by_id("fileupload_photo").send_keys(str(path))
-    maxUploadCount = 12 # 2 hours max attempt time
-    i = 0
-    while True:
-        try:
-            WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
-            if settings.DEBUG:
-                print('skipping OnlyFans upload')
-                return
-            # send.click()
-            send = WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
-            break
-        except:
-            try: 
-                # check for existence of "thumbnail is fucked up" modal and hit ok button
-                BROWSER.switchTo().frame("iframe");
-                BROWSER.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
-                print("Error: Thumbnail Missing")
+def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None, tweeting=True):
+    try:
+        logged_in = False
+        global BROWSER
+        if not BROWSER or BROWSER == None:
+            logged_in = log_into_OnlyFans()
+        if not path:
+            print("Error: Missing Upload Path")
+            return
+        if not text:
+            print("Error: Missing Upload Text")
+            return
+        text = text.replace(".mp4","")
+        text = text.replace(".MP4","")
+        text = text.replace(".jpg","")
+        text = text.replace(".jpeg","")
+        if performers:
+            text += " w/ @"+" @".join(performers)
+        if keywords:
+            text += " #"+" #".join(keywords)
+        settings.maybePrint("Uploading:")
+        settings.maybePrint("Path: {}".format(path))
+        settings.maybePrint("Keywords: {}".format(keywords))
+        settings.maybePrint("Performers: {}".format(performers))
+        settings.maybePrint("Text: {}".format(text))
+        WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
+        if not tweeting:
+            WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
+        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
+        BROWSER.find_element_by_id("fileupload_photo").send_keys(str(path))
+        maxUploadCount = 12 # 2 hours max attempt time
+        i = 0
+        while True:
+            try:
+                WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
+                if settings.DEBUG:
+                    print('skipping OnlyFans upload')
+                    return
+                # send.click()
+                send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
                 break
             except:
+                try: 
+                    # check for existence of "thumbnail is fucked up" modal and hit ok button
+                    BROWSER.switchTo().frame("iframe");
+                    BROWSER.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
+                    print("Error: Thumbnail Missing")
+                    break
+                except:
+                    settings.maybePrint(sys.exc_info()[0])
+                print('uploading...')
                 settings.maybePrint(sys.exc_info()[0])
-            print('uploading...')
-            settings.maybePrint(sys.exc_info()[0])
-            i+=1
-            if i == maxUploadCount and settings.FORCE_UPLOAD is not True:
-                print('max upload wait reached, breaking..')
-                break
-    print('File Uploaded Successfully')
-
-# Failed to resize image (thumb) ????????????
-# check / add / fix thumbnail for mp4
+                i+=1
+                if i == maxUploadCount and settings.FORCE_UPLOAD is not True:
+                    print('max upload wait reached, breaking..')
+                    break
+        print('File Uploaded Successfully')
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: File Upload Failure")
 
 # Uploads a folder to OnlyFans
-def upload_directory_to_OnlyFans(dirName, path, folderName):
-    logged_in = False
-    global BROWSER
-    if not BROWSER or BROWSER == None:
-        logged_in = log_into_OnlyFans()
-    else:
-        logged_in = True
-    if settings.HASHTAGGING:
-        postText = str(dirName)+" #"+" #".join(str(folderName).split(' '))
-    else:    
-        postText = str(folderName)+" "+str(dirName)
-    print('Uploading: '+str(postText))
-    settings.maybePrint('path: '+str(path))
-    files_path = []
-    for file in pathlib.Path(str(path)).iterdir():  
-        files_path.append(str(file))
-    settings.maybePrint('files: '+str(files_path))
-    BROWSER.find_element_by_id("new_post_text_input").send_keys(str(postText))
-    WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
-    if not settings.TWEETING:
-        WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
-    
-    ############
-    # files_path = "[\""+"\",\"".join(files_path)+"\"]"
-    # print("files_path: "+files_path)
-    # files_path = "home/skeetzo/Projects/onlysnarf/OnlySnarf/tmp"
-    # BROWSER.find_element_by_id("fileupload_photo").send_keys(files_path)
-    # WebDriverWait(BROWSER, 600).until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="send_post_button"]')))
-    ############
-
-    for file in files_path:
-        settings.maybePrint('uploading: '+str(file))
-        BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
+def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers=None, tweeting=True):
+    try:
+        logged_in = False
+        global BROWSER
+        if not BROWSER or BROWSER == None:
+            logged_in = log_into_OnlyFans()
+        if not path:
+            print("Error: Missing Upload Path")
+            return
+        if not text:
+            print("Error: Missing Upload Text")
+            return
+        if performers and len(performers) > 1:
+            text += " w/ @"+" @".join(performers)
+        elif performers and len(performers) == 1:
+            text += " w/ @{}".format(performers[0])
+        if keywords:
+            text += " #"+" #".join(keywords)
+        settings.maybePrint("Uploading:")
+        settings.maybePrint("Path: {}".format(path))
+        settings.maybePrint("Keywords: {}".format(keywords))
+        settings.maybePrint("Performers: {}".format(performers))
+        settings.maybePrint("Text: {}".format(text))
+        files_path = []
+        for file in pathlib.Path(str(path)).iterdir():  
+            files_path.append(str(file))
+        settings.maybePrint('Files: '+str(files_path))
+        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
+        WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
+        if not tweeting:
+            WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
+        for file in files_path:
+            settings.maybePrint('uploading: '+str(file))
+            BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
+            send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
         send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
-    send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
-    if settings.DEBUG:
-        print('skipping OnlyFans upload')
-        return
-    send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
-    print('Directory Uploaded Successfully')
+        if settings.DEBUG:
+            print('skipping OnlyFans upload')
+            return
+        send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
+        print('Directory Uploaded Successfully')
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Directory Upload Failure")
 
 ####################################################################################################################
 
@@ -308,14 +340,19 @@ def get_users():
         print("Error: Login Failure")
         return USER_CACHE
     # go to onlyfans.com/my/subscribers/active
-    print("goto -> /my/subscribers/active")
-    BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
-    num = BROWSER.find_element_by_class_name("b-tabs__nav__item__count").get_attribute("innerHTML")
-    settings.maybePrint("User count: %s" % num)
-    for n in range(int(int(int(num)/10)+1)):
-        settings.maybePrint("scrolling...")
-        BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(1)
+    try:
+        print("goto -> /my/subscribers/active")
+        BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
+        num = BROWSER.find_element_by_class_name("b-tabs__nav__item__count").get_attribute("innerHTML")
+        settings.maybePrint("User count: %s" % num)
+        for n in range(int(int(int(num)/10)+1)):
+            settings.maybePrint("scrolling...")
+            BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(1)
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failed to Count Users")
+        return []
     user_ids = BROWSER.find_elements_by_class_name('b-avatar')
     users = BROWSER.find_elements_by_class_name('g-user-name')
     usernames = BROWSER.find_elements_by_class_name('g-user-username')
