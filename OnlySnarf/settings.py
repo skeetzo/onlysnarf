@@ -2,154 +2,162 @@
 import sys
 import os
 
-global DEFAULT_MESSAGE
-DEFAULT_MESSAGE = ":)"
+class Settings:
+    def __init__(self):
+        pass
 
-global DEBUG
-DEBUG = False
+    def initialize(self):
+        # print("Initializing Settings...")
+        try:
+            if self.INITIALIZED:
+                # print("Already Initialized, Skipping")
+                return
+        except:
+            self.INITIALIZED = False
 
-global SKIP_DOWNLOAD
-SKIP_DOWNLOAD = True
+        self.DEFAULT_MESSAGE = ":)"
 
-global IMAGE_UPLOAD_LIMIT
-IMAGE_UPLOAD_LIMIT = 6
+        self.DEBUG = False
 
-global IMAGE_UPLOAD_MAX
-IMAGE_UPLOAD_MAX = 15
+        self.SKIP_DOWNLOAD = True
 
-global REMOVE_LOCAL
-REMOVE_LOCAL = True
+        self.IMAGE_UPLOAD_LIMIT = 6
 
-# backup uploaded content
-global BACKING_UP
-BACKING_UP = True
+        self.IMAGE_UPLOAD_MAX = 15
 
-global BACKING_UP_FORCE
-BACKING_UP_FORCE = True
+        self.REMOVE_LOCAL = True
 
-# delete uploaded content
-global DELETING
-DELETING = False
+        # backup uploaded content
+        self.BACKING_UP = True
 
-# -video
-# -gallery
-# -image
-global TYPE
-TYPE = None
+        self.BACKING_UP_FORCE = True
 
-# Twitter hashtags
-global HASHTAGGING
-HASHTAGGING = False
+        # delete uploaded content
+        self.DELETING = False
 
-# -force / ignore upload max wait
-global FORCE_UPLOAD
-FORCE_UPLOAD = False
+        # -video
+        # -gallery
+        # -image
+        self.TYPE = None
 
-# -show -> shows window
-global SHOW_WINDOW
-SHOW_WINDOW = False
+        # Twitter hashtags
+        self.HASHTAGGING = False
 
-# -text
-global TEXT
-TEXT = None
+        # -force / ignore upload max wait
+        self.FORCE_UPLOAD = False
 
-# -quiet
-global TWEETING
-TWEETING = True
+        # -show -> shows window
+        self.SHOW_WINDOW = False
 
-global LOCATION
-LOCATION = "google"
+        # -text
+        self.TEXT = None
 
-# def init(sys.argv):
-global MOUNT_PATH
-MOUNT_PATH = None
-global USERS_PATH
-USERS_PATH = None
+        # -quiet
+        self.TWEETING = True
 
-global FILE_NAME
-FILE_NAME = None
-global FILE_PATH
-FILE_PATH = None
+        self.LOCATION = "google"
 
-global IMAGE
-# IMAGE = "/home/skeetzo/Projects/onlysnarf/OnlySnarf/images/snarf.jpg"
-IMAGE = None
+        # def init(sys.argv):
+        self.MOUNT_PATH = None
+        self.USERS_PATH = None
 
-global RECENT_USER_COUNT
-RECENT_USER_COUNT = 3
+        self.FILE_NAME = None
+        self.FILE_PATH = None
 
-global DEFAULT_PRICE
-DEFAULT_PRICE = "10.00"
+        self.IMAGE = None
+
+        self.RECENT_USER_COUNT = 3
+
+        self.DEFAULT_PRICE = "10.00"
 
 
-global FORCE_REDUCTION
-FORCE_REDUCTION = False
+        self.FORCE_REDUCTION = False
 
-global SKIP_USERS
-SKIP_USERS = [
-    "6710870"
-]
+        self.SKIP_USERS = [
+            "6710870",
+            "7248614",
+            "5451153",
+            "1771880",
+            "5057708",
+            "7825384",
+            "4883991"
+        ]
 
-global user_DEFAULT_GREETING
-user_DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
+        self.user_DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
 
-global user_DEFAULT_REFRESHER
-user_DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
+        self.user_DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
 
+        # user message delay
+        self.DELAY = False
 
-i = 0
-while i < len(sys.argv):
-    if '-image' in str(sys.argv[i]):
-        TYPE = "image"
-    if '-gallery' in str(sys.argv[i]):
-        TYPE = "gallery"
-    if '-video' in str(sys.argv[i]):
-        TYPE = "video"
-    if '-scene' in str(sys.argv[i]):
-        TYPE = "scene"
-    if '-text' in str(sys.argv[i]):
-        TEXT = str(sys.argv[i+1])
-    if '-debug' in str(sys.argv[i]):
-        DEBUG = True
-    if '-hash' in str(sys.argv[i]):
-        HASHTAGGING = True
-    if '-force' in str(sys.argv[i]):
-        FORCE_UPLOAD = True
-    if '-show' in str(sys.argv[i]):
-        SHOW_WINDOW = True
-    if '-quiet' in str(sys.argv[i]):
-        TWEETING = False
-    if '-delete' in str(sys.argv[i]):
-        DELETING = False
-    if '-mount' in str(sys.argv[i]):
-        MOUNT_PATH = str(sys.argv[i+1])
-    if '-users' in str(sys.argv[i]):
-        USERS_PATH = str(sys.argv[i+1])
-    if '-image' in str(sys.argv[i]):
-        IMAGE = str(sys.argv[i+1])
-    if '-force-upload' in str(sys.argv[i]):
-        FORCE_UPLOAD = True
-    if '-force-reduc' in str(sys.argv[i]):
-        FORCE_REDUCTION = True
-    i += 1
+        i = 0
+        while i < len(sys.argv):
+            if '-image' in str(sys.argv[i]):
+                self.TYPE = "image"
+            if '-gallery' in str(sys.argv[i]):
+                self.TYPE = "gallery"
+            if '-video' in str(sys.argv[i]):
+                self.TYPE = "video"
+            if '-scene' in str(sys.argv[i]):
+                self.TYPE = "scene"
+            if '-text' in str(sys.argv[i]):
+                self.TEXT = str(sys.argv[i+1])
+            if '-debug' in str(sys.argv[i]):
+                self.DEBUG = True
+            if '-hash' in str(sys.argv[i]):
+                self.HASHTAGGING = True
+            if '-force' in str(sys.argv[i]):
+                self.FORCE_UPLOAD = True
+            if '-show' in str(sys.argv[i]):
+                self.SHOW_WINDOW = True
+            if '-quiet' in str(sys.argv[i]):
+                self.TWEETING = False
+            if '-delete' in str(sys.argv[i]):
+                self.DELETING = False
+            if '-mount' in str(sys.argv[i]):
+                self.MOUNT_PATH = str(sys.argv[i+1])
+            if '-users' in str(sys.argv[i]):
+                self.USERS_PATH = str(sys.argv[i+1])
+            if '-image' in str(sys.argv[i]):
+                self.IMAGE = str(sys.argv[i+1])
+            if '-force-upload' in str(sys.argv[i]):
+                self.FORCE_UPLOAD = True
+            if '-force-reduc' in str(sys.argv[i]):
+                self.FORCE_REDUCTION = True
+            if '-delay' in str(sys.argv[i]):
+                self.DELAY = True
+            i += 1
 
-#####################
-##### Functions #####
-#####################
+        self.INITIALIZED = True
+        # print("Settings Initialized")
+    ###################################################
 
-def getTmp():
-    # mkdir /tmp
-    tmp = os.getcwd()
-    global MOUNT_PATH
-    if MOUNT_PATH:
-        tmp = os.path.join(MOUNT_PATH, "tmp")
-    else:
-        tmp = os.path.join(tmp, "tmp")
-    if not os.path.exists(str(tmp)):
-        os.mkdir(str(tmp))
-    return tmp
+    #####################
+    ##### Functions #####
+    #####################
 
-def maybePrint(text):
-    global DEBUG
-    if DEBUG:
-        print(text);
+    def getTmp(self):
+        # mkdir /tmp
+        tmp = os.getcwd()
+        if self.MOUNT_PATH != None:
+            tmp = os.path.join(self.MOUNT_PATH, "tmp")
+        else:
+            tmp = os.path.join(tmp, "tmp")
+        if not os.path.exists(str(tmp)):
+            os.mkdir(str(tmp))
+        return tmp
+
+    def maybePrint(self, text):
+        if str(self.DEBUG) == "True":
+            print(text);
+
+    def update_value(self, variable, newValue):
+        variable = str(variable).upper().replace(" ","_")
+        try:
+            # print("Updating: {} = {}".format(variable, newValue))
+            setattr(self, variable, newValue)
+            # print("Updated: {} = {}".format(variable, getattr(self, variable)))
+        except Exception as e:
+            print(e)
+
+SETTINGS = Settings()

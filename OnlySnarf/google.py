@@ -18,8 +18,7 @@ from apiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file, client, tools
 from apiclient.http import MediaFileUpload,MediaIoBaseDownload
-
-from . import settings
+from .settings import SETTINGS as settings
 
 ###################
 ##### Globals #####
@@ -117,7 +116,7 @@ def delete_file(file):
         print("Skipping Delete")
         return
     print('Trashing Google Video')
-    if settings.DEBUG:
+    if str(settings.DEBUG) == "True":
         print('skipping Google delete')
         return
     file.Trash()
@@ -128,7 +127,7 @@ def move_file(file):
     global AUTH
     if not AUTH:
         AUTH = authGoogle()
-    if settings.DEBUG or not settings.BACKING_UP or settings.BACKING_UP == "False":
+    if str(settings.DEBUG) == "True" or not settings.BACKING_UP or settings.BACKING_UP == "False":
         print('Skipping Google Backup: '+file['title'])
         return
     file['parents'] = [{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}]
@@ -139,7 +138,7 @@ def move_files(fileName, files):
     global AUTH
     if not AUTH:
         AUTH = authGoogle()
-    if settings.DEBUG or not settings.BACKING_UP or settings.BACKING_UP == "False" and not settings.BACKING_UP_FORCE:
+    if str(settings.DEBUG) == "True" or not settings.BACKING_UP or settings.BACKING_UP == "False" and not settings.BACKING_UP_FORCE:
         print('Skipping Google Backup: '+fileName)
         return
     title = fileName+" - "+datetime.datetime.now().strftime("%d-%m-%I-%M")
@@ -166,13 +165,15 @@ def download_file(file, REPAIR=False):
     print('Downloading File')
     tmp = settings.getTmp()
     # download file
+    name = os.path.splitext(file['title'])[0]
     ext = os.path.splitext(file['title'])[1].lower()
     if not ext:
         ext = '.mp4'
         settings.maybePrint('ext (default): '+str(ext))
     else:
         settings.maybePrint('ext: '+str(ext))
-    tmp += "/uploadMe"+str(ext)
+    name = "{}{}".format(name, ext)
+    tmp = os.path.join(tmp, name)
     settings.maybePrint('path: '+str(tmp))
     if str(ext).lower() == ".mp4":
         with open(tmp, 'w+b') as output:
@@ -380,7 +381,7 @@ def get_random_image():
     random_image = None
     folder_name = None
     for folder in random_folders:
-        if settings.DEBUG:
+        if str(settings.DEBUG) == "True":
             print('checking folder: '+folder['title'],end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
         if len(images_list_tmp)>0:
@@ -412,7 +413,7 @@ def get_random_gallery():
     random_gallery = None
     folder_name = None
     for folder in random_folders:
-        if settings.DEBUG:
+        if str(settings.DEBUG) == "True":
             print('checking galleries: {}'.format(folder['title']),end="")
         gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         if len(gallery_list_tmp)>0:
@@ -422,7 +423,7 @@ def get_random_gallery():
             settings.maybePrint(" -> empty")
     random.shuffle(folder_list)
     for folder in folder_list:
-        if settings.DEBUG:
+        if str(settings.DEBUG) == "True":
             print('checking gallery: {}'.format(folder['title']),end="")
         gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         random_gallery_tmp = random.choice(gallery_list_tmp)
@@ -511,7 +512,7 @@ def get_random_scene():
     random_scene = None
     folder_name = None
     for folder in random_folders:
-        if settings.DEBUG:
+        if str(settings.DEBUG) == "True":
             print('checking scenes: '+folder['title'],end="")
         scene_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         if len(scene_list_tmp)>0:
@@ -521,7 +522,7 @@ def get_random_scene():
             settings.maybePrint(" -> empty")
     random.shuffle(folder_list)
     for folder in folder_list:
-        if settings.DEBUG:
+        if str(settings.DEBUG) == "True":
             print('checking scene: '+folder['title'],end="")
         scene_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'text/plain'"}).GetList()
         if len(scene_list_tmp_tmp)>0:
@@ -567,7 +568,7 @@ def repair(path):
     try:
         global WORKING_VIDEO
         print("Repairing: {} <-> {}".format(path, WORKING_VIDEO))
-        if settings.DEBUG:
+        if str(settings.DEBUG) == "True":
             fixed = subprocess.call(['untrunc', str(WORKING_VIDEO), str(path)])
         else:
             subprocess.Popen(['untrunc', str(WORKING_VIDEO), str(path)],stdin=FNULL,stdout=FNULL)
@@ -596,7 +597,7 @@ def reduce(path):
             print("Error: Missing File to Reduce")
             return path
         loglevel = "quiet"
-        if settings.DEBUG:
+        if str(settings.DEBUG) == "True":
             loglevel = "debug"
         p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-err_detect', 'ignore_err', '-y', '-i', str(path), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', '-crf', '26', '-b:v', str(bitrate), str(reducedPath)])
         p.communicate()
@@ -626,7 +627,7 @@ def fixThumbnail(path):
     try:
         print("Thumbnailing: {}".format(path))
         loglevel = "quiet"
-        if settings.DEBUG:
+        if str(settings.DEBUG) == "True":
             loglevel = "debug"
         thumbnail_path = os.path.join(os.path.dirname(str(path)), 'thumbnail.png')
         settings.maybePrint("thumbnail path: {}".format(thumbnail_path))

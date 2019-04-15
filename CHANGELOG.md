@@ -41,6 +41,9 @@
 **0.2.1 : 4/12/2019**
 	- upload performer
 	- upload scene
+**0.2.2 : 4/15/2019**
+	- settings now actually updates
+	- settings globals -> class
 	
 ## ToDo
 	- read messages html for emojis
