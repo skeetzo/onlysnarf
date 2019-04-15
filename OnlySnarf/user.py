@@ -9,9 +9,22 @@ from re import sub
 from decimal import Decimal
 
 from . import driver as OnlySnarf
-from . import settings
+from .settings import SETTINGS as settings
 
 class User:
+    # name = None
+    # username = None
+    # id = None
+    # messages_from = []
+    # messages_to = []
+    # messages = []
+    # preferences = []
+    # last_messaged_on = []
+    # sent_images = []
+    # subscribed_on = None
+    # isFavorite = False
+    # statement_history = []
+
     def __init__(self, name=None, username=None, id=None, messages_from=[], messages_to=[], messages=[], preferences=[], last_messaged_on=None, sent_images=[], subscribed_on=None, isFavorite=False, statement_history=[]):
         self.name = name.encode("utf-8")
         self.username = username.encode("utf-8")
@@ -36,8 +49,8 @@ class User:
         # statement history
         self.statement_history = statement_history
         try:
-            settings.maybePrint("User: {} - {} - {}".format(self.name, self.username.encode("utf-8"), self.id))
-        except UnicodeEncodeError as e:
+            settings.maybePrint("User: {} - {} - {}".format(self.name, self.username, self.id))
+        except Exception as e:
             settings.maybePrint(e)
             settings.maybePrint("User: {}".format(self.id))
 
@@ -45,19 +58,19 @@ class User:
         print("Sending Message: {} - {} - {}".format(message, image, price))
         OnlySnarf.goto_user(self.id)
         OnlySnarf.enter_message(message)
-        if image in self.sent_images:
-            print("Image Already Sent: {} -> {}".format(image, self.id))
-            return
+        # if image in self.sent_images:
+            # print("Error: Image Already Sent: {} -> {}".format(image, self.id))
+            # return
         OnlySnarf.enter_image(image)
-        OnlySnarf.enter_price(price)
-        if not settings.DEBUG:
-            self.sent_images.append(str(image))
-        else:
+        if price != None:
+            if image != None and Decimal(sub(r'[^\d.]', '', price)) < 5:
+                print("Warning: Price Too Low")
+            OnlySnarf.enter_price(price)
+        if str(settings.DEBUG) == "True":
             self.sent_images.append("DEBUG")
-        if Decimal(sub(r'[^\d.]', '', price)) < 5:
-            print("Warning: Price Too Low, Skipping")
-            return
-        if settings.DEBUG:
+        else:
+            self.sent_images.append(str(image))
+        if str(settings.DEBUG) == "True" and str(settings.DELAY) == "True":
 	        settings.maybePrint("30...")
 	        time.sleep(10)
 	        settings.maybePrint("20...")
@@ -71,8 +84,9 @@ class User:
 	        settings.maybePrint("1...")
 	        time.sleep(1)
         OnlySnarf.confirm_message()
-        if not settings.DEBUG:
-            self.last_messaged_on = datetime()
+        if str(settings.DEBUG) == "False":
+            self.last_messaged_on = datetime.now()
+            
 
     def equals(self, user):
         if user.id == self.id:

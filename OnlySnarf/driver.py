@@ -21,7 +21,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 from .user import User
-from . import settings
+from .settings import SETTINGS as settings
 
 ###################
 ##### Globals #####
@@ -30,15 +30,28 @@ from . import settings
 BROWSER = None
 USER_CACHE = None
 LOCAL_DATA = None
-if settings.USERS_PATH is not None and settings.MOUNT_PATH is not None:
-    LOCAL_DATA = os.path.join(settings.MOUNT_PATH, settings.USERS_PATH)
-elif settings.USERS_PATH is not None:
-    LOCAL_DATA = settings.USERS_PATH
-elif settings.MOUNT_PATH is not None:
-    LOCAL_DATA = os.path.join(settings.MOUNT_PATH, "users.json")
-else:
-    LOCAL_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'users.json')
+INITIALIZED = False
 
+def initialize():
+    try:
+        # print("Initializing OnlySnarf")
+        global INITIALIZED
+        if INITIALIZED:
+            # print("Already Initialized, Skipping")
+            return
+        global LOCAL_DATA
+        if settings.USERS_PATH is not None and settings.MOUNT_PATH is not None:
+            LOCAL_DATA = os.path.join(settings.MOUNT_PATH, settings.USERS_PATH)
+        elif settings.USERS_PATH is not None:
+            LOCAL_DATA = settings.USERS_PATH
+        elif settings.MOUNT_PATH is not None:
+            LOCAL_DATA = os.path.join(settings.MOUNT_PATH, "users.json")
+        else:
+            LOCAL_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'users.json')
+        # print("Initialized OnlySnarf")
+        INITIALIZED = True
+    except Exception as e:
+        print(e)
 ##################
 ##### Config #####
 ##################
@@ -67,7 +80,7 @@ except FileNotFoundError:
 def log_into_OnlyFans():
     print('Logging into OnlyFans...')
     options = webdriver.ChromeOptions()
-    if not settings.SHOW_WINDOW:
+    if str(settings.SHOW_WINDOW) != "True":
         options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
@@ -163,7 +176,7 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
         while True:
             try:
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
-                if settings.DEBUG:
+                if str(settings.DEBUG) == "True":
                     print('skipping OnlyFans upload')
                     return
                 # send.click()
@@ -226,7 +239,7 @@ def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers
             BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
             send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
         send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
-        if settings.DEBUG:
+        if str(settings.DEBUG) == "True":
             print('skipping OnlyFans upload')
             return
         send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
@@ -298,7 +311,7 @@ def confirm_message():
     try:
         global BROWSER
         send = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".g-btn.m-rounded.b-chat__btn-submit")))
-        if settings.DEBUG:
+        if str(settings.DEBUG) == "True":
             print('OnlyFans Message: Skipped')
             return
         send.click()
