@@ -13,7 +13,7 @@ import datetime
 import json
 import sys
 import pathlib
-from . import settings
+from .settings import SETTINGS as settings
 from . import onlysnarf
  
 ###################
@@ -30,6 +30,7 @@ header = "\n ________         .__          _________                     _____ \
 
 UPDATED = False
 UPDATED_TO = False
+INITIALIZED = False
 
 colors = {
         'blue': '\033[94m',
@@ -89,42 +90,38 @@ locationItems = sorted([
 ])
 locationItems.insert(0,[ "Back", "main"])
 
-# Settings Menu
-settingItems = sorted([
-    [ "File Name", settings.FILE_NAME],
-    [ "File Path", settings.FILE_PATH],
-    [ "Location", settings.LOCATION, ["Local","Google"]],
-    [ "Backup", settings.BACKING_UP, ["True","False"]],
-    [ "Delete Google", settings.DELETING, ["True","False"]],
-    [ "Delete Local", settings.REMOVE_LOCAL, ["True","False"]],
-    [ "Hashtag", settings.HASHTAGGING, ["True","False"]],
-    [ "Force Upload", settings.FORCE_UPLOAD, ["True","False"]],
-    [ "Mount Path", settings.MOUNT_PATH],
-    [ "Users Path", settings.USERS_PATH],
-    [ "Show Window", settings.SHOW_WINDOW, ["True","False"]],
-    [ "Text", settings.TEXT],
-    [ "Type", settings.TYPE],
-    [ "Image", settings.IMAGE],
-    [ "Tweeting", settings.TWEETING, ["True","False"]],
-    [ "Debug", settings.DEBUG, ["True","False"]],
-    [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"]]    
-])
-settingItems.insert(0,[ "Back", "main"])
+settingItems = []
 
-###########################
-import atexit
-def exit_handler():
-    print('Shnnarrrff!')
-atexit.register(exit_handler)
-
-import signal
-def signal_handler(sig, frame):
-    print('Shnnnarf?')
-    sys.exit(0)
-signal.signal(signal.SIGINT, signal_handler)
-# print('Press Ctrl+C')
-# signal.pause()
-###########################
+def initialize():
+    # print("Initializing Menu")
+    global INITIALIZED
+    if INITIALIZED:
+        # print("Already Initialized, Skipping")
+        return
+    global settingItems
+    # Settings Menu
+    settingItems = sorted([
+        [ "File Name", settings.FILE_NAME],
+        [ "File Path", settings.FILE_PATH],
+        [ "Location", settings.LOCATION, ["Local","Google"]],
+        [ "Backup", settings.BACKING_UP, ["True","False"]],
+        [ "Delete Google", settings.DELETING, ["True","False"]],
+        [ "Delete Local", settings.REMOVE_LOCAL, ["True","False"]],
+        [ "Hashtag", settings.HASHTAGGING, ["True","False"]],
+        [ "Force Upload", settings.FORCE_UPLOAD, ["True","False"]],
+        [ "Mount Path", settings.MOUNT_PATH],
+        [ "Users Path", settings.USERS_PATH],
+        [ "Show Window", settings.SHOW_WINDOW, ["True","False"]],
+        [ "Text", settings.TEXT],
+        [ "Type", settings.TYPE],
+        [ "Image", settings.IMAGE],
+        [ "Tweeting", settings.TWEETING, ["True","False"]],
+        [ "Debug", settings.DEBUG, ["True","False"]],
+        [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"]]    
+    ])
+    settingItems.insert(0,[ "Back", "main"])
+    # print("Initialized Menu")
+    INITIALIZED = True
 
 #####################
 ##### Functions #####
@@ -273,6 +270,7 @@ def set_settings():
             global UPDATED_TO
             UPDATED_TO = settingValue
             settingItems[int(choice)][1] = settingValue
+            settings.update_value(settingChoice, settingValue)
             return set_settings()
         except (ValueError, IndexError, KeyboardInterrupt):
             print("Incorrect Index")
@@ -290,16 +288,23 @@ def exit():
     print("Shnarrf?")
     sys.exit(0)
 
+###########################
+import atexit
+def exit_handler():
+    print('Shnnarrrff!')
+    exit()
+atexit.register(exit_handler)
+
+import signal
+def signal_handler(sig, frame):
+    print('Shnnnarf?')
+    exit()
+signal.signal(signal.SIGINT, signal_handler)
+###########################
+
 def main():
     showHeader()
     mainMenu()
-
-def showHeader():
-    os.system('clear')
-    # Print some badass ascii art header here !
-    print(colorize(header, 'header'))
-    print(colorize('version '+version+'\n', 'green'))
-    showSettings()
 
 def mainMenu():
     ### Main Menu
@@ -323,6 +328,13 @@ def mainMenu():
             print("Incorrect Index")
             pass
 
+def showHeader():
+    os.system('clear')
+    # Print some badass ascii art header here !
+    print(colorize(header, 'header'))
+    print(colorize('version '+version+'\n', 'green'))
+    showSettings()
+
 def showSettings():
     print('Settings:')
     for setting in settingItems:
@@ -339,9 +351,14 @@ def showSettings():
 
 if __name__ == "__main__":
     try:
-        main()
+        main_other()
     except:
         # print(sys.exc_info()[0])
         print("Shhhhhnnnnnarf!")
     finally:
         sys.exit(0)
+
+def main_other():
+    settings.initialize()
+    initialize()
+    main()
