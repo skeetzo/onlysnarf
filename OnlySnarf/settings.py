@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # Global Settings
 import sys
 import os
@@ -69,7 +70,6 @@ class Settings:
         self.RECENT_USER_COUNT = 3
 
         self.DEFAULT_PRICE = "10.00"
-
 
         self.FORCE_REDUCTION = False
 
