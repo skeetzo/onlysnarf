@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # 3/28/2019: Skeetzo
 
 import random
@@ -86,7 +86,6 @@ def log_into_OnlyFans():
     options.add_argument('--disable-dev-shm-usage')
     # options.setExperimentalOption('useAutomationExtension', false);
     options.add_argument('--disable-gpu')  # Last I checked this was necessary.
-    # CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
     # BROWSER = webdriver.Chrome(binary=CHROMEDRIVER_PATH, chrome_options=options)
     CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
     os.environ["webdriver.chrome.driver"] = CHROMEDRIVER_PATH
@@ -257,6 +256,24 @@ def uploadPerformer(args, dirName, path, folderName):
 ##### Messages #####
 ####################
 
+def message(choice=None, message=None, image=None, price=None):
+    if str(choice) == "all":
+        users = get_users()
+    elif str(choice) == "recent":
+        print("Messaging: Recent")
+        users = get_recent_users()
+    elif str(choice) == "favorites":
+        print("Messaging: Recent")
+        users = get_favorite_users()
+    elif str(choice) != "None":
+        print("Messaging: User - %s" % username)
+        users = [get_user_by_username(str(username))]
+    else:
+        print("Error: Missing Message Choice")
+        return
+    for user in users:
+        user.sendMessage(message, image, price)
+
 def goto_user(username):
     try:
         if not username or username == None:
@@ -318,6 +335,79 @@ def confirm_message():
         print('OnlyFans Message: Sent')
     except:
         settings.maybePrint(sys.exc_info()[0])
+
+def read_chat(user):
+    try:
+        logged_in = False
+        global BROWSER
+        if not BROWSER or BROWSER == None:
+            logged_in = log_into_OnlyFans()
+        else:
+            logged_in = True
+        if logged_in == False:
+            print("Error: Login Failure")
+            return [[],[],[]]
+        # go to onlyfans.com/my/subscribers/active
+        goto_user(user)
+        messages_from_ = BROWSER.find_elements_by_class_name("m-from-me")
+        # print("first message: {}".format(messages_to_[0].get_attribute("innerHTML")))
+        # messages_to_.pop(0) # drop self user at top of page
+        messages_all_ = BROWSER.find_elements_by_class_name("b-chat__message__text")
+        messages_all = []
+        messages_to = []
+        messages_from = []
+        # timestamps_ = BROWSER.find_elements_by_class_name("b-chat__message__time")
+        # timestamps = []
+        # for timestamp in timestamps_:
+            # settings.maybePrint("timestamp1: {}".format(timestamp))
+            # timestamp = timestamp["data-timestamp"]
+            # timestamp = timestamp.get_attribute("innerHTML")
+            # settings.maybePrint("timestamp: {}".format(timestamp))
+            # timestamps.append(timestamp)
+        for message in messages_all_:
+            settings.maybePrint("all: {}".format(message.get_attribute("innerHTML")))
+            messages_all.append(message.get_attribute("innerHTML"))
+        messages_and_timestamps = []
+        # messages_and_timestamps = [j for i in zip(timestamps,messages_all) for j in i]
+        # settings.maybePrint("Chat Log:")
+        # for f in messages_and_timestamps:
+            # settings.maybePrint(": {}".format(f))
+        for message in messages_from_:
+            # settings.maybePrint("from1: {}".format(message.get_attribute("innerHTML")))
+            message = message.find_element_by_class_name("b-chat__message__text")
+            settings.maybePrint("from: {}".format(message.get_attribute("innerHTML")))
+            messages_from.append(message.get_attribute("innerHTML"))
+
+        i = 0
+        for message in messages_all:
+            from_ = False
+            to_ = False
+            for mess in messages_from:
+                if str(message) == str(mess):
+                    from_ = True
+            for mess in messages_to:
+                if str(message) == str(mess):
+                    to_ = True
+            if not from_:
+                # settings.maybePrint("to_: {}".format(message))
+                # messages_to[i] = [timestamps[i], message]
+                # messages_to[i] = message
+                messages_to.append(message)
+                # settings.maybePrint("to_: {}".format(messages_to[i]))
+            # elif from_:
+                # settings.maybePrint("from_: {}".format(message))
+                # messages_from[i] = [timestamps[i], message]
+                # messages_from[i] = message
+                # settings.maybePrint("from_: {}".format(messages_from[i]))
+            i += 1
+        settings.maybePrint("to: {}".format(messages_to))
+        settings.maybePrint("from: {}".format(messages_from))
+        settings.maybePrint("Messages From: {}".format(len(messages_from)))
+        settings.maybePrint("Messages To: {}".format(len(messages_to)))
+        settings.maybePrint("Messages All: {}".format(len(messages_all)))
+        return [messages_all, messages_and_timestamps, messages_to, messages_from]
+    except Exception as e:
+        print(e)
 
 # update chat logs for all users
 def update_chat_logs():
@@ -401,9 +491,27 @@ def get_users():
             USER_CACHE.append(user)
     # start cache timeout
     start_user_cache()
-    # save users locally
-    write_users_local()
     return USER_CACHE
+
+# gets a list of all subscribed user_ids from local txt
+def get_users_local():
+    print("Getting Local Users")
+    users = []
+    users_ = []
+    try:
+        with open(LOCAL_DATA) as json_file:  
+            users = json.load(json_file)
+        for user in users['users']:
+            user = User(name=user['name'], username=user['username'], id=user['id'], messages_from=user['messages_from'], messages_to=user['messages_to'], messages=user['messages'], preferences=user['preferences'], last_messaged_on=user['last_messaged_on'], sent_images=user['sent_images'], subscribed_on=user['subscribed_on'], isFavorite=user['isFavorite'], statement_history=user['statement_history'])
+            settings.maybePrint('Loaded: %s' % user.username)
+            settings.maybePrint('')
+            users_.append(user)
+    except FileNotFoundError:
+        print("Error: Missing Local Users")
+    except OSError:
+        print("Error: Missing Local Path")
+    finally:
+        return users_
 
 def get_user_by_username(username):
     if not username or username == None:
@@ -437,84 +545,6 @@ def get_recent_users():
             return users_
     return users_
 
-def read_chat(user):
-    try:
-        logged_in = False
-        global BROWSER
-        if not BROWSER or BROWSER == None:
-            logged_in = log_into_OnlyFans()
-        else:
-            logged_in = True
-        if logged_in == False:
-            print("Error: Login Failure")
-            return [[],[],[]]
-        # go to onlyfans.com/my/subscribers/active
-        goto_user(user)
-        messages_from_ = BROWSER.find_elements_by_class_name("m-from-me")
-        # print("first message: {}".format(messages_to_[0].get_attribute("innerHTML")))
-        # messages_to_.pop(0) # drop self user at top of page
-        messages_all_ = BROWSER.find_elements_by_class_name("b-chat__message__text")
-        messages_all = []
-        messages_to = []
-        messages_from = []
-        # timestamps_ = BROWSER.find_elements_by_class_name("b-chat__message__time")
-        # timestamps = []
-        # for timestamp in timestamps_:
-            # settings.maybePrint("timestamp1: {}".format(timestamp))
-            # timestamp = timestamp["data-timestamp"]
-            # timestamp = timestamp.get_attribute("innerHTML")
-            # settings.maybePrint("timestamp: {}".format(timestamp))
-            # timestamps.append(timestamp)
-        for message in messages_all_:
-            settings.maybePrint("all: {}".format(message.get_attribute("innerHTML")))
-            messages_all.append(message.get_attribute("innerHTML"))
-        messages_and_timestamps = []
-        # messages_and_timestamps = [j for i in zip(timestamps,messages_all) for j in i]
-        # settings.maybePrint("Chat Log:")
-        # for f in messages_and_timestamps:
-            # settings.maybePrint(": {}".format(f))
-        for message in messages_from_:
-            # settings.maybePrint("from1: {}".format(message.get_attribute("innerHTML")))
-            message = message.find_element_by_class_name("b-chat__message__text")
-            settings.maybePrint("from: {}".format(message.get_attribute("innerHTML")))
-            messages_from.append(message.get_attribute("innerHTML"))
-
-        i = 0
-        for message in messages_all:
-            from_ = False
-            to_ = False
-            for mess in messages_from:
-                if str(message) == str(mess):
-                    from_ = True
-            for mess in messages_to:
-                if str(message) == str(mess):
-                    to_ = True
-            if not from_:
-                # settings.maybePrint("to_: {}".format(message))
-                # messages_to[i] = [timestamps[i], message]
-                # messages_to[i] = message
-                messages_to.append(message)
-                # settings.maybePrint("to_: {}".format(messages_to[i]))
-            # elif from_:
-                # settings.maybePrint("from_: {}".format(message))
-                # messages_from[i] = [timestamps[i], message]
-                # messages_from[i] = message
-                # settings.maybePrint("from_: {}".format(messages_from[i]))
-            i += 1
-        settings.maybePrint("to: {}".format(messages_to))
-        settings.maybePrint("from: {}".format(messages_from))
-        settings.maybePrint("Messages From: {}".format(len(messages_from)))
-        settings.maybePrint("Messages To: {}".format(len(messages_to)))
-        settings.maybePrint("Messages All: {}".format(len(messages_all)))
-        return [messages_all, messages_and_timestamps, messages_to, messages_from]
-    except Exception as e:
-        print(e)
-
-# "b-chat__message__text"
-# b-chat__message__body
-# b-chat__message m-from-me
-
-
 def reset_user_cache():
     global USER_CACHE
     USER_CACHE = False
@@ -528,26 +558,6 @@ def start_user_cache():
     except:
         settings.maybePrint("User Cache: error starting")
         settings.maybePrint(sys.exc_info()[0])
-
-# gets a list of all subscribed user_ids from local txt
-def get_users_local():
-    print("Getting Local Users")
-    users = []
-    users_ = []
-    try:
-        with open(LOCAL_DATA) as json_file:  
-            users = json.load(json_file)
-        for user in users['users']:
-            user = User(name=user['name'], username=user['username'], id=user['id'], messages_from=user['messages_from'], messages_to=user['messages_to'], messages=user['messages'], preferences=user['preferences'], last_messaged_on=user['last_messaged_on'], sent_images=user['sent_images'], subscribed_on=user['subscribed_on'], isFavorite=user['isFavorite'], statement_history=user['statement_history'])
-            settings.maybePrint('Loaded: %s' % user.username)
-            settings.maybePrint('')
-            users_.append(user)
-    except FileNotFoundError:
-        print("Error: Missing Local Users")
-    except OSError:
-        print("Error: Missing Local Path")
-    finally:
-        return users_
 
 # writes user list to local txt
 def write_users_local():
@@ -566,6 +576,10 @@ def write_users_local():
         print("Error: Missing Local Users")
     except OSError:
         print("Error: Missing Local Path")
+
+################
+##### Exit #####
+################
 
 def exit(force=False):
     if not force:

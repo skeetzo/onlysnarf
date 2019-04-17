@@ -44,6 +44,8 @@
 **0.2.2 : 4/15/2019**
 	- settings now actually updates
 	- settings globals -> class
+	**4/16/2019**
+	- fucking default variables
 	
 ## ToDo
 	- read messages html for emojis
