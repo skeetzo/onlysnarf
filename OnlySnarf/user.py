@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # 3/25/2019: Skeetzo
 # User Class
 
@@ -12,41 +12,41 @@ from . import driver as OnlySnarf
 from .settings import SETTINGS as settings
 
 class User:
-    # name = None
-    # username = None
-    # id = None
-    # messages_from = []
-    # messages_to = []
-    # messages = []
-    # preferences = []
-    # last_messaged_on = []
-    # sent_images = []
-    # subscribed_on = None
-    # isFavorite = False
-    # statement_history = []
 
-    def __init__(self, name=None, username=None, id=None, messages_from=[], messages_to=[], messages=[], preferences=[], last_messaged_on=None, sent_images=[], subscribed_on=None, isFavorite=False, statement_history=[]):
+    def __init__(self, name=None, username=None, id=None, messages_from=None, messages_to=None, messages=None, preferences=None, last_messaged_on=None, sent_images=None, subscribed_on=None, isFavorite=False, statement_history=None):
         self.name = name.encode("utf-8")
         self.username = username.encode("utf-8")
         self.id = id
         # messages receieved from the user
+        if messages_from is None:
+            messages_from = []
         self.messages_from = messages_from
         # messages sent to the user
+        if messages_to is None:
+            messages_to = []
         self.messages_to = messages_to
         # combined chatlog
+        if messages is None:
+            messages = []
         self.messages = messages 
         # self.messages_and_timestamps = [] # message = [timestamp, message]
         # anal, cock, etc
+        if preferences is None:
+            preferences = []
         self.preferences = preferences
         # date and time last messaged on
         self.last_messaged_on = last_messaged_on
         # images already sent to the user
+        if sent_images is None:
+            sent_images = []
         self.sent_images = sent_images
         # date subscription began
         self.subscribed_on = subscribed_on
         # if user is a favorite
         self.isFavorite = isFavorite
         # statement history
+        if statement_history is None:
+            statement_history = []
         self.statement_history = statement_history
         try:
             settings.maybePrint("User: {} - {} - {}".format(self.name, self.username, self.id))
@@ -54,17 +54,19 @@ class User:
             settings.maybePrint(e)
             settings.maybePrint("User: {}".format(self.id))
 
-    def sendMessage(self, message=None, image=None, price=None):
+    def sendMessage(self, message, image, price):
         print("Sending Message: {} - {} - {}".format(message, image, price))
+        print("id: {}".format(self.id))
         OnlySnarf.goto_user(self.id)
         OnlySnarf.enter_message(message)
-        # if image in self.sent_images:
-            # print("Error: Image Already Sent: {} -> {}".format(image, self.id))
-            # return
+        print("images: {}".format(self.sent_images))
+        if image in self.sent_images:
+            print("Error: Image Already Sent: {} -> {}".format(image, self.id))
+            return
         OnlySnarf.enter_image(image)
         if price != None:
             if image != None and Decimal(sub(r'[^\d.]', '', price)) < 5:
-                print("Warning: Price Too Low")
+                print("Warning: Price Too Low, Free Image")
             OnlySnarf.enter_price(price)
         if str(settings.DEBUG) == "True":
             self.sent_images.append("DEBUG")
@@ -86,7 +88,6 @@ class User:
         OnlySnarf.confirm_message()
         if str(settings.DEBUG) == "False":
             self.last_messaged_on = datetime.now()
-            
 
     def equals(self, user):
         if user.id == self.id:

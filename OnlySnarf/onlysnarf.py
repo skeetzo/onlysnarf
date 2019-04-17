@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # 3/28/2019 Skeetzo
 
 import random
@@ -167,27 +167,9 @@ def download_random_scene():
 ##### Messages #####
 ####################
 
-def message_all(message=None, image=None, price=None):
-    print("Messaging: All")
-    users = OnlySnarf.get_users()
-    for user in users:
-        user.sendMessage(message, image, price)
-
-def message_recent(message=None, image=None, price=None):
-    print("Messaging: Recent")
-    users = OnlySnarf.get_recent_users()
-    for user in users:
-        user.sendMessage(message, image, price)
-
-def message_favorites(message=None, image=None, price=None):
-    print("Messaging: Recent")
-    users = OnlySnarf.get_favorite_users()
-    for user in users:
-        user.sendMessage(message, image, price)
-
-def message_by_username(username=None, message=None, image=None, price=None):
-    print("Messaging: User - %s" % username)
-    OnlySnarf.get_user_by_username(str(username)).sendMessage(message, image, price)
+def message(choice=None, message=None, image=None, price=None):
+    print("Messaging: {}".format(choice))
+    OnlySnarf.message(choice, message, image, price)
 
 #################
 ##### Reset #####
@@ -485,6 +467,7 @@ def release_video():
     except Exception as e:
         settings.maybePrint(e)
         return False
+
 ##################
 ##### Upload #####
 ##################
@@ -507,36 +490,71 @@ def upload(fileChoice, path=None, text=None, keywords=None, performers=None):
         return
     print('Upload Complete')
 
+#####################
+##### FUNCTIONS #####
+#####################
+
+def main():
+    print("0/3 : Deleting Locals")
+    remove_local()
+    sys.stdout.flush()
+    #################################################
+    print("1/3 : Running - {}".format(settings.TYPE))
+    if str(settings.TYPE) == "image":
+        released = release_image()
+    elif str(settings.TYPE) == "video":
+        released = release_video()
+    elif str(settings.TYPE) == "gallery":
+        released = release_gallery()
+    elif str(settings.TYPE) == "performer":
+        released = release_performer()
+    elif str(settings.TYPE) == "scene":
+        released = release_scene()
+    else:
+        print('Missing Args!')
+        return
+    sys.stdout.flush()
+    if released == False:
+        print("Error: Missing Released Files")
+        return
+    #################################################
+    print('2/3 : Cleaning Up Files')
+    remove_local()
+    print('Files Cleaned ')
+    #################################################
+    print('3/3 : Google Drive to OnlyFans Upload Complete')
+    sys.stdout.flush()
+    OnlySnarf.exit()
+
 
 def test(TYPE):
     print('0/3 : Deleting Locals')
     remove_local()
     print('1/3 : Testing')
 
-
     ### Message ###
     response = download_random_image()
     if not response or response == None:
         print("Error: Missing Image")
         return
-    message_all(message="8=======D", image=response[1], price="0.00")
-    # message_recent(message=":)", image=response[1], price="50.00")
+    # message(choice="all", message="8=======D", image=response[1], price="0.00")
+    message(choice="recent", message="8=======D", image=response[1], price="50.00")
     # Google.move_file(response[2])
     ##############
 
     #######################
     ### Exit Gracefully ###
-    OnlySnarf.exit()
-    return
+    # OnlySnarf.exit()
+    # return
     #######################
 
     ### Users ###
-    print('TESTING: Users')
-    users = OnlySnarf.get_users()
-    time.sleep(30)
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
+    # print('TESTING: Users')
+    # users = OnlySnarf.get_users()
+    # time.sleep(30)
+    # reset = OnlySnarf.reset()
+    # if not reset:
+        # return print("Error: Failed to Reset")
     # return
     #####################
     print('TESTING: Chat Logs')
@@ -545,6 +563,13 @@ def test(TYPE):
     reset = OnlySnarf.reset()
     if not reset:
         return print("Error: Failed to Reset")
+    
+    #######################
+    ### Exit Gracefully ###
+    OnlySnarf.exit()
+    return
+    #######################
+    
     ### Image ###
     print('TESTING: Image')
     release_image()
@@ -587,44 +612,6 @@ def test(TYPE):
     OnlySnarf.exit()
     #######################
 
-
-#####################
-##### FUNCTIONS #####
-#####################
-
-
-
-def main():
-    print("0/3 : Deleting Locals")
-    remove_local()
-    sys.stdout.flush()
-    #################################################
-    print("1/3 : Running - {}".format(settings.TYPE))
-    if str(settings.TYPE) == "image":
-        released = release_image()
-    elif str(settings.TYPE) == "video":
-        released = release_video()
-    elif str(settings.TYPE) == "gallery":
-        released = release_gallery()
-    elif str(settings.TYPE) == "performer":
-        released = release_performer()
-    elif str(settings.TYPE) == "scene":
-        released = release_scene()
-    else:
-        print('Missing Args!')
-        return
-    sys.stdout.flush()
-    if released == False:
-        print("Error: Missing Released Files")
-        return
-    #################################################
-    print('2/3 : Cleaning Up Files')
-    remove_local()
-    print('Files Cleaned ')
-    #################################################
-    print('3/3 : Google Drive to OnlyFans Upload Complete')
-    sys.stdout.flush()
-    OnlySnarf.exit()
 
 ################################################################################################################################################
 

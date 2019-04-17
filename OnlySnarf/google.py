@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # 3/28/2019: Skeetzo
 
 import random
