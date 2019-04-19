@@ -446,6 +446,11 @@ def release_video():
             settings.maybePrint(e)
         if str(keywords) == " " or str(keywords[0]) == " ":
             keywords = []
+        ext = str(os.path.splitext(text)[1].lower())
+        settings.maybePrint('ext: '+str(ext))
+        if ext == '.mp4':
+            settings.maybePrint("pruning extension")
+            text = os.path.splitext(text)[0]
         if text == None:
             print("Error: Missing Video Title")
             return False
