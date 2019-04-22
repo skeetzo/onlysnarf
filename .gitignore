@@ -6,7 +6,7 @@ settings.yaml
 users.json
 
 # Temporary downloads
-/tmp/
+OnlySnarf/tmp
 
 # Compiled python modules.
 *.pyc
@@ -18,4 +18,3 @@ users.json
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
 
-OnlySnarf/tmp

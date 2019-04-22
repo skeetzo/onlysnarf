@@ -46,9 +46,14 @@
 	- settings globals -> class
 	**4/16/2019**
 	- fucking default variables
+**1.0.0 : Release : 4/22/2019**
+	- save image_name instead of path
+	- uploaded to pip
 	
 ## ToDo
 	- read messages html for emojis
+	- add login prompt for saving Twitter password -> base64 hash instead of in config.json
+	- finalize / fix script exit
 
 ## Install
 sudo python3 setup.py install
