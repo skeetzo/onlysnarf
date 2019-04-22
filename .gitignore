@@ -4,6 +4,7 @@ google_creds.txt
 client_secrets.json
 settings.yaml
 users.json
+video.mp4
 
 # Temporary downloads
 OnlySnarf/tmp
