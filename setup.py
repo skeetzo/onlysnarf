@@ -8,13 +8,12 @@ setuptools.setup(
     version="1.0.0",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
-    url = 'https://github.com/skeetzo/onlysnarf',   # Provide either the link to your github or to your website
-    download_url = 'https://github.com/skeetzo/onlysnarf/archive/v1.0.0.tar.gz',    # I explain this later on
-    keywords = ['OnlyFans', 'Content', 'OnlySnarf'],   # Keywords that define your package best
+    url = 'https://github.com/skeetzo/onlysnarf',
+    download_url = 'https://github.com/skeetzo/onlysnarf/archive/v1.0.0.tar.gz',
+    keywords = ['OnlyFans', 'Content', 'OnlySnarf'],
     description="OnlyFans Content Distribution Tool",
     long_description=long_description,
     # long_description_content_type="text/markdown",
-    url="https://github.com/skeetzo/onlysnarf",
     packages=setuptools.find_packages(),
     include_package_data=True,
     install_requires=[
