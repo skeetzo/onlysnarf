@@ -9,7 +9,7 @@ setuptools.setup(
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',   # Provide either the link to your github or to your website
-    download_url = 'https://github.com/skeetzo/onlysnarf/archive/v_01.tar.gz',    # I explain this later on
+    download_url = 'https://github.com/skeetzo/onlysnarf/archive/v1.0.0.tar.gz',    # I explain this later on
     keywords = ['OnlyFans', 'Content', 'OnlySnarf'],   # Keywords that define your package best
     description="OnlyFans Content Distribution Tool",
     long_description=long_description,
