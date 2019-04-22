@@ -75,12 +75,15 @@ class Settings:
 
         self.SKIP_USERS = [
             "6710870",
-            "7248614",
+            
             "5451153",
             "1771880",
             "5057708",
             "7825384",
-            "4883991"
+            "4883991",
+
+            "1633091",
+            "3055233"
         ]
 
         self.user_DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"

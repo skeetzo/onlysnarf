@@ -101,5 +101,6 @@ Upload a random video every Friday in the month of June at 6:00pm:
   `00 18 * 6 5 python3 onlysnarf.py -video`
 
 ## Dependencies
-  * Chromedriver: binary installed via package
+  * Chromium / Google Chrome -> `sudo apt install -y chromium-browser`
+  * Chromedriver: binary installed via chromedriver-binary
 

@@ -55,12 +55,11 @@ class User:
             settings.maybePrint("User: {}".format(self.id))
 
     def sendMessage(self, message, image, price):
-        print("Sending Message: {} - {} - {}".format(message, image, price))
-        print("id: {}".format(self.id))
+        print("Sending Message: {} <- {} - {} - {}".format(self.id, message, image, price))
         OnlySnarf.goto_user(self.id)
         OnlySnarf.enter_message(message)
-        print("images: {}".format(self.sent_images))
-        if image in self.sent_images:
+        image_name = os.path.basename(image)
+        if str(image_name) in self.sent_images:
             print("Error: Image Already Sent: {} -> {}".format(image, self.id))
             return
         OnlySnarf.enter_image(image)
@@ -71,20 +70,9 @@ class User:
         if str(settings.DEBUG) == "True":
             self.sent_images.append("DEBUG")
         else:
-            self.sent_images.append(str(image))
+            self.sent_images.append(str(image_name))
         if str(settings.DEBUG) == "True" and str(settings.DELAY) == "True":
-	        settings.maybePrint("30...")
-	        time.sleep(10)
-	        settings.maybePrint("20...")
-	        time.sleep(10)
-	        settings.maybePrint("10...")
-	        time.sleep(7)
-	        settings.maybePrint("3...")
-	        time.sleep(1)
-	        settings.maybePrint("2...")
-	        time.sleep(1)
-	        settings.maybePrint("1...")
-	        time.sleep(1)
+	        delayForThirty()
         OnlySnarf.confirm_message()
         if str(settings.DEBUG) == "False":
             self.last_messaged_on = datetime.now()
@@ -150,3 +138,18 @@ class User:
     def unfavor(self):
         print("Unfavoring: {}".format(self.username))
         self.isFavorite = False
+
+
+def delayForThirty():
+    settings.maybePrint("30...")
+    time.sleep(10)
+    settings.maybePrint("20...")
+    time.sleep(10)
+    settings.maybePrint("10...")
+    time.sleep(7)
+    settings.maybePrint("3...")
+    time.sleep(1)
+    settings.maybePrint("2...")
+    time.sleep(1)
+    settings.maybePrint("1...")
+    time.sleep(1)

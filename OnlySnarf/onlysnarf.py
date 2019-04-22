@@ -542,15 +542,15 @@ def test(TYPE):
     if not response or response == None:
         print("Error: Missing Image")
         return
-    # message(choice="all", message="8=======D", image=response[1], price="0.00")
-    message(choice="recent", message="8=======D", image=response[1], price="50.00")
-    # Google.move_file(response[2])
+    message(choice="all", message="8=======D", image=response[1], price="0.00")
+    # message(choice="recent", message="8=======D", image=response[1], price="50.00")
+    Google.move_file(response[2])
     ##############
 
     #######################
     ### Exit Gracefully ###
-    # OnlySnarf.exit()
-    # return
+    OnlySnarf.exit()
+    return
     #######################
 
     ### Users ###
