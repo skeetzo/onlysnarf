@@ -537,33 +537,33 @@ def test(TYPE):
     remove_local()
     print('1/3 : Testing')
 
-     ### Gallery ###
-    print('TESTING: Gallery x 10')
-    for i in range(10):
-        release_gallery()
-        time.sleep(10)
-        reset = OnlySnarf.reset()
-        if not reset:
-            return print("Error: Failed to Reset")
-    return sys.exit(0)
+    #  ### Gallery ###
+    # print('TESTING: Gallery x 10')
+    # for i in range(10):
+    #     release_gallery()
+    #     time.sleep(10)
+    #     reset = OnlySnarf.reset()
+    #     if not reset:
+    #         return print("Error: Failed to Reset")
+    # return sys.exit(0)
 
 
 
-    ### Message ###
-    # response = download_random_image()
-    # if not response or response == None:
-    #     print("Error: Missing Image")
-    #     return
-    # message(choice="all", message="8=======D", image=response[1], price="0.00")
-    # # message(choice="recent", message="8=======D", image=response[1], price="50.00")
-    # Google.move_file(response[2])
-    # ##############
+    ## Message ###
+    response = download_random_image()
+    if not response or response == None:
+        print("Error: Missing Image")
+        return
+    message(choice="all", message="ass ass ass ass", image=response[1], price="10.00")
+    # message(choice="recent", message="8=======D", image=response[1], price="50.00")
+    Google.move_file(response[2])
+    ##############
 
-    # #######################
-    # ### Exit Gracefully ###
-    # OnlySnarf.exit()
-    # return
-    # #######################
+    #######################
+    ### Exit Gracefully ###
+    OnlySnarf.exit()
+    return
+    #######################
 
     ### Users ###
     # print('TESTING: Users')
