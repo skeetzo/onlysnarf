@@ -23,6 +23,7 @@ setuptools.setup(
         'chromedriver-binary',
         'moviepy',
         'apiclient',
+        'google-api-python-client',
         'httplib2',
         # 'oauth2client'
         ],

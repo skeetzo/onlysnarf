@@ -8,7 +8,7 @@ class Settings:
         pass
 
     def initialize(self):
-        # print("Initializing Settings...")
+        # print("Initializing self...")
         try:
             if self.INITIALIZED:
                 # print("Already Initialized, Skipping")
@@ -29,9 +29,9 @@ class Settings:
         self.REMOVE_LOCAL = True
 
         # backup uploaded content
-        self.BACKING_UP = True
+        self.BACKING_UP = False
 
-        self.BACKING_UP_FORCE = True
+        self.BACKING_UP_FORCE = False
 
         # delete uploaded content
         self.DELETING = False
@@ -60,7 +60,11 @@ class Settings:
 
         # def init(sys.argv):
         self.MOUNT_PATH = None
-        self.USERS_PATH = None
+        self.USERS_PATH = "users.json"
+        self.CONFIG_PATH = "config.json"
+        self.GOOGLE_CREDS_PATH = "google_creds.txt"
+        self.SECRET_PATH = "client_secret.json"
+        self.WORKING_VIDEO = "video.mp4"
 
         self.FILE_NAME = None
         self.FILE_PATH = None
@@ -127,9 +131,28 @@ class Settings:
                 self.FORCE_UPLOAD = True
             if '-force-reduc' in str(sys.argv[i]):
                 self.FORCE_REDUCTION = True
+            if '-force-backup' in str(sys.argv[i]):
+                self.BACKING_UP_FORCE = True
             if '-delay' in str(sys.argv[i]):
                 self.DELAY = True
+            if '-image-limit' in str(sys.argv[i]):
+                self.IMAGE_UPLOAD_LIMIT = str(sys.argv[i+1])
+            if '-image-max' in str(sys.argv[i]):
+                self.IMAGE_UPLOAD_MAX = str(sys.argv[i+1])
             i += 1
+        
+        if self.MOUNT_PATH is not None:
+            self.CONFIG_PATH = os.path.join(self.MOUNT_PATH, self.CONFIG_PATH)
+            self.SECRET_PATH = os.path.join(self.MOUNT_PATH, self.SECRET_PATH)
+            self.GOOGLE_CREDS_PATH = os.path.join(self.MOUNT_PATH, self.GOOGLE_CREDS_PATH)
+            self.USERS_PATH = os.path.join(self.MOUNT_PATH, self.USERS_PATH)
+            self.WORKING_VIDEO = os.path.join(self.MOUNT_PATH, self.WORKING_VIDEO)
+        else:
+            self.CONFIG_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.CONFIG_PATH)
+            self.SECRET_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.SECRET_PATH)
+            self.GOOGLE_CREDS_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.GOOGLE_CREDS_PATH)
+            self.USERS_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.USERS_PATH)
+            self.WORKING_VIDEO = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.WORKING_VIDEO)
 
         self.INITIALIZED = True
         # print("Settings Initialized")

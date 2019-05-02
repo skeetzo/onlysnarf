@@ -29,48 +29,34 @@ from .settings import SETTINGS as settings
 
 BROWSER = None
 USER_CACHE = None
-LOCAL_DATA = None
+settings.USERS_PATH = None
 INITIALIZED = False
-
-def initialize():
-    try:
-        # print("Initializing OnlySnarf")
-        global INITIALIZED
-        if INITIALIZED:
-            # print("Already Initialized, Skipping")
-            return
-        global LOCAL_DATA
-        if settings.USERS_PATH is not None and settings.MOUNT_PATH is not None:
-            LOCAL_DATA = os.path.join(settings.MOUNT_PATH, settings.USERS_PATH)
-        elif settings.USERS_PATH is not None:
-            LOCAL_DATA = settings.USERS_PATH
-        elif settings.MOUNT_PATH is not None:
-            LOCAL_DATA = os.path.join(settings.MOUNT_PATH, "users.json")
-        else:
-            LOCAL_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'users.json')
-        # print("Initialized OnlySnarf")
-        INITIALIZED = True
-    except Exception as e:
-        print(e)
-##################
-##### Config #####
-##################
-
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config.json')
-
 OnlyFans_USERNAME = None        
 OnlyFans_PASSWORD = None
 OnlyFans_USER_ID = None
 
-try:
-    with open(CONFIG_FILE) as config_file:    
-        config = json.load(config_file)
-    OnlyFans_USERNAME = config['username']        
-    OnlyFans_PASSWORD = config['password']
-    OnlyFans_USER_ID = "409408"
-except FileNotFoundError:
-    print('Missing Config, run `onlysnarf-config`')
-    sys.exit(0)
+def initialize():
+    try:
+        # settings.maybePrint("Initializing OnlySnarf")
+        global INITIALIZED
+        if INITIALIZED:
+            # settings.maybePrint("Already Initialized, Skipping")
+            return
+        with open(settings.CONFIG_PATH) as config_file:    
+            config = json.load(config_file)
+        global OnlyFans_USERNAME
+        global OnlyFans_PASSWORD
+        OnlyFans_USERNAME = config['username']        
+        OnlyFans_PASSWORD = config['password']
+        # settings.maybePrint("Initialized OnlySnarf: Driver")
+        INITIALIZED = True
+    except Exception as e:
+        print('Error Initializing, run `onlysnarf-config`')
+        print(e)
+        sys.exit(0)
+    except FileNotFoundError:
+        print('Missing Config, run `onlysnarf-config`')
+        sys.exit(0)
 
 #####################
 ##### Functions #####
@@ -91,22 +77,31 @@ def log_into_OnlyFans():
     os.environ["webdriver.chrome.driver"] = CHROMEDRIVER_PATH
     global BROWSER
     try:
-        BROWSER = webdriver.Chrome(CHROMEDRIVER_PATH, chrome_options=options)
+        BROWSER = webdriver.Chrome(chrome_options=options)
     except WebDriverException as e:
         settings.maybePrint(e)
         settings.maybePrint("Warning: Missing chromedriver_path, retrying")
         try:
-            BROWSER = webdriver.Chrome(chrome_options=options)
+            BROWSER = webdriver.Chrome(CHROMEDRIVER_PATH, chrome_options=options)
         except Exception as e:
             settings.maybePrint(e)
             print("Error: Missing chromedriver_path, exiting")
             return False
+    BROWSER.implicitly_wait(10) # seconds
+    BROWSER.set_page_load_timeout(1200)    
+    def login(opt):
+        try:
+            BROWSER.get(('https://onlyfans.com'))
+            # login via Twitter
+            if int(opt)==0:
+                twitter = BROWSER.find_element_by_xpath('//a[@class="g-btn m-rounded m-flex m-lg btn-twitter"]').click()
+            elif int(opt)==1:
+                twitter = BROWSER.find_element_by_xpath('//a[@class="btn btn-default btn-block btn-lg btn-twitter"]').click()
+        except NoSuchElementException as e:
+            print("Warning: Login Failure, Retrying")
+            login(opt+1)
     try:
-        BROWSER.implicitly_wait(10) # seconds
-        BROWSER.set_page_load_timeout(1200)
-        BROWSER.get(('https://onlyfans.com'))
-        # login via Twitter
-        twitter = BROWSER.find_element_by_xpath('//a[@class="btn btn-default btn-block btn-lg btn-twitter"]').click()
+        login(0)
         # fill in username
         username = BROWSER.find_element_by_xpath('//input[@id="username_or_email"]').send_keys(str(OnlyFans_USERNAME))
         # fill in password and hit the login button 
@@ -117,7 +112,7 @@ def log_into_OnlyFans():
         return True
     except Exception as e:
         settings.maybePrint(e)
-        print('Login Failure')
+        print('Error: Login Failure')
         return False
 
 # Reset to home
@@ -473,13 +468,16 @@ def get_users():
         name = str(name.get_attribute("innerHTML")).strip()
         username = str(username.get_attribute("innerHTML")).strip()
         if str(OnlyFans_USERNAME).lower() in str(username).lower():
-            settings.maybePrint("skipping self: %s = %s" % (OnlyFans_USERNAME, username))
+            settings.maybePrint("(self): %s = %s" % (OnlyFans_USERNAME, username))
+            # first user is always active user but just in case find it in list of users
+            global OnlyFans_USER_ID
+            OnlyFans_USER_ID = user_id
             continue
         if str(OnlyFans_USER_ID).lower() in str(user_id).lower():
-            settings.maybePrint("skipping self: %s" % (OnlyFans_USER_ID, user_id))
+            settings.maybePrint("(self): %s" % (OnlyFans_USER_ID, user_id))
             continue
         if str(user_id).lower() in settings.SKIP_USERS:
-            settings.maybePrint("skipping: %s" % user_id)
+            settings.maybePrint("(skipping): %s" % user_id)
             continue
         active_users.append(User(name=name, username=username, id=user_id)) # update this with correct values
     for user in active_users:
@@ -499,7 +497,7 @@ def get_users_local():
     users = []
     users_ = []
     try:
-        with open(LOCAL_DATA) as json_file:  
+        with open(settings.USERS_PATH) as json_file:  
             users = json.load(json_file)
         for user in users['users']:
             user = User(name=user['name'], username=user['username'], id=user['id'], messages_from=user['messages_from'], messages_to=user['messages_to'], messages=user['messages'], preferences=user['preferences'], last_messaged_on=user['last_messaged_on'], sent_images=user['sent_images'], subscribed_on=user['subscribed_on'], isFavorite=user['isFavorite'], statement_history=user['statement_history'])
@@ -563,14 +561,14 @@ def start_user_cache():
 def write_users_local():
     users = get_users()
     print("Writing Local Users")
-    settings.maybePrint("local data path: "+str(LOCAL_DATA))
+    settings.maybePrint("local data path: "+str(settings.USERS_PATH))
     data = {}
     data['users'] = []
     for user in users:
         settings.maybePrint("Saving: "+str(user.username))
         data['users'].append(user.toJSON())
     try:
-        with open(LOCAL_DATA, 'w') as outfile:  
+        with open(settings.USERS_PATH, 'w') as outfile:  
             json.dump(data, outfile, indent=4, sort_keys=True)
     except FileNotFoundError:
         print("Error: Missing Local Users")
