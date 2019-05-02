@@ -147,7 +147,7 @@ def move_file(file):
     elif str(settings.BACKING_UP) == "False":
         print('Skipping Backup (Disabled): {}'.format(fileName))
         return
-    else
+    else:
         print('Backing Up: {}'.format(fileName))
     file['parents'] = [{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}]
     file.Upload()
@@ -165,7 +165,7 @@ def move_files(fileName, files):
     elif str(settings.BACKING_UP) == "False":
         print('Skipping Backup (Disabled): {}'.format(fileName))
         return
-    else
+    else:
         print('Backing Up: {}'.format(fileName))
     title = fileName+" - "+datetime.datetime.now().strftime("%d-%m-%I-%M")
     settings.maybePrint('Moving To: '+title)
