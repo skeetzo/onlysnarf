@@ -49,10 +49,13 @@
 **1.0.0 : Release : 4/22/2019**
 	- save image_name instead of path
 	- uploaded to pip
-	
+**1.0.1 : 5/3/2019**
+	- minor bug fixes
+
 ## ToDo
 	- read messages html for emojis
 	- add login prompt for saving Twitter password -> base64 hash instead of in config.json
+	|_ add `Auth` option to settings?
 	- finalize / fix script exit
 
 ## Install
