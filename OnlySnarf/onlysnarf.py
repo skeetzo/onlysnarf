@@ -531,7 +531,6 @@ def main():
     sys.stdout.flush()
     OnlySnarf.exit()
 
-
 def test(TYPE):
     print('0/3 : Deleting Locals')
     remove_local()

@@ -1,6 +1,8 @@
 # OnlySnarf
   
 `git clone git@github.com:skeetzo/onlysnarf`
+OR
+`pip3 install OnlySnarf`
 
 ## Preview
 ![preview](https://github.com/skeetzo/onlysnarf/blob/master/OnlySnarf/images/preview.jpeg)
