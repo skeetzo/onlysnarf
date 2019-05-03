@@ -49,11 +49,16 @@
 **1.0.0 : Release : 4/22/2019**
 	- save image_name instead of path
 	- uploaded to pip
+	**1.0.1**
+	- removed video.mp4
+	**1.0.2**
+	- minor adjustments
 	
 ## ToDo
 	- read messages html for emojis
 	- add login prompt for saving Twitter password -> base64 hash instead of in config.json
 	- finalize / fix script exit
+	- add Twitter
 
 ## Install
 sudo python3 setup.py install

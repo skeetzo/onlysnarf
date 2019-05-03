@@ -5,7 +5,6 @@ def main(args=None):
     """The main routine."""
     if args is None:
         args = sys.argv[1:]
-
     os.system("python3 "+os.path.join(os.path.dirname(os.path.realpath(__file__)),'onlysnarf.py')+" "+" ".join(args))
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="1.0.1",
+    version="1.0.2",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
@@ -23,19 +23,20 @@ setuptools.setup(
         'chromedriver-binary',
         'moviepy',
         'apiclient',
-        'httplib2',
-        # 'oauth2client'
+        'httplib2'
         ],
     entry_points={
         'console_scripts' : [
-            'onlysnarf = OnlySnarf.__main__:main',
-            'onlysnarf-menu = OnlySnarf.menu:main_other',
+            'onlysnarf = OnlySnarf.menu:main_other',
             'onlysnarf-config = OnlySnarf.config:main'
         ]
     },
     classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ],
+    'Development Status :: 5 - Production/Stable',
+    'Intended Audience :: Hobbyists',
+    'Topic :: Content Delivery :: Automation Tools',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3.4',
+    "Operating System :: OS Independent :: Linux",
+  ]
 )
