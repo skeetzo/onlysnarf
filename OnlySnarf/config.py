@@ -6,27 +6,33 @@ import os
 import sys
 import json
 
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
+GOOGLE_CREDS = os.path.join(os.path.dirname(os.path.realpath(__file__)),'google_creds.txt')
+
 def createGoogle():
 	print("Setting Up Google Creds")
 	data = {}
-	with open('google_creds.txt', 'w') as outfile:
+	global GOOGLE_CREDS
+	with open(GOOGLE_CREDS, 'w') as outfile:
 	    json.dump(data, outfile, indent=4, sort_keys=True)
 
 def createConfig():
 	print("Setting up Config")
 	data = receiveInputs()
-	with open('config.json', 'w') as outfile:
+	global CONFIG_FILE
+	with open(CONFIG_FILE, 'w') as outfile:
 	    json.dump(data, outfile, indent=4, sort_keys=True)
 
 def updateConfig(config):
 	print("Updating Config")
 	print("(k to keep same)")
+	global CONFIG_FILE
 	data = receiveInputs()
 	for key, value in data.items():
 		if value.lower() == "k":
 			continue
 		config[key] = value
-	with open('config.json', 'w') as outfile:
+	with open(CONFIG_FILE, 'w') as outfile:
 	    json.dump(config, outfile, indent=4, sort_keys=True)
 
 def receiveInputs():
@@ -42,8 +48,7 @@ def receiveInputs():
 	return data
 
 def main():
-	CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
-	GOOGLE_CREDS = os.path.join(os.path.dirname(os.path.realpath(__file__)),'google_creds.txt')
+	global CONFIG_FILE
 	try:
 		with open(CONFIG_FILE) as config_file:    
 			config = json.load(config_file)
