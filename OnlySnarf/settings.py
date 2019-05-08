@@ -111,8 +111,8 @@ class Settings:
                 self.TEXT = str(sys.argv[i+1])
             if '-debug' in str(sys.argv[i]):
                 self.DEBUG = True
-            if '-hash' in str(sys.argv[i]):
-                self.HASHTAGGING = True
+            if '-backup' in str(sys.argv[i]):
+                self.BACKING_UP = True
             if '-force' in str(sys.argv[i]):
                 self.FORCE_UPLOAD = True
             if '-show' in str(sys.argv[i]):

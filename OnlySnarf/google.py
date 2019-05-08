@@ -167,7 +167,7 @@ def move_files(fileName, files):
         return
     else:
         print('Backing Up: {}'.format(fileName))
-    title = fileName+" - "+datetime.datetime.now().strftime("%d-%m-%I-%M")
+    title = fileName+" - "+datetime.datetime.now().strftime("%d-%m@%I-%M")
     settings.maybePrint('Moving To: '+title)
     global PYDRIVE
     tmp_folder = PYDRIVE.CreateFile({'title':title, 'parents':[{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}],'mimeType':'application/vnd.google-apps.folder'})
@@ -200,6 +200,7 @@ def download_file(file, REPAIR=False):
         settings.maybePrint('ext: '+str(ext))
     name = "{}{}".format(name, ext)
     tmp = os.path.join(tmp, name)
+    print("Downloading: {}".format(name))
     settings.maybePrint('path: '+str(tmp))
     if str(ext).lower() == ".mp4":
         with open(tmp, 'w+b') as output:
@@ -209,7 +210,7 @@ def download_file(file, REPAIR=False):
             done = False
             while done is False:
                 status, done = downloader.next_chunk()
-                print("Downloading: %d%%\r" % (status.progress() * 100),end="")
+                print("<-- %d%%\r" % (status.progress() * 100),end="")
             print("Download Complete")
         if REPAIR:
             tmp = repair(tmp)
@@ -255,7 +256,7 @@ def download_gallery(folder):
     file_list = file_list[:int(settings.IMAGE_UPLOAD_LIMIT)]
     i = 1
     for file in sorted(file_list, key = lambda x: x['title']):
-        print('Downloading {} from GDrive ({}/{})'.format(file['title'], i, folder_size))
+        print('Downloading: {} ({}/{})'.format(file['title'], i, folder_size))
         settings.maybePrint('filePath: '+os.path.join(tmp, str(file['title'])))
         file.GetContentFile(os.path.join(tmp, str(file['title'])))
         i+=1
