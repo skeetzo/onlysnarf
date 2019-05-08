@@ -35,7 +35,7 @@ class Settings:
 
         # delete uploaded content
         self.DELETING = False
-
+        self.DELETING_FORCED = False
         # -video
         # -gallery
         # -image
@@ -77,6 +77,8 @@ class Settings:
 
         self.FORCE_REDUCTION = False
 
+        self.VERBAL = False
+
         self.SKIP_USERS = [
             "6710870",
             
@@ -111,10 +113,12 @@ class Settings:
                 self.TEXT = str(sys.argv[i+1])
             if '-debug' in str(sys.argv[i]):
                 self.DEBUG = True
+            if '-verbal' in str(sys.argv[i]):
+                self.VERBAL = True
             if '-backup' in str(sys.argv[i]):
                 self.BACKING_UP = True
-            if '-force' in str(sys.argv[i]):
-                self.FORCE_UPLOAD = True
+            if '-force-delete' in str(sys.argv[i]):
+                self.DELETING_FORCED = True
             if '-show' in str(sys.argv[i]):
                 self.SHOW_WINDOW = True
             if '-quiet' in str(sys.argv[i]):
@@ -174,7 +178,7 @@ class Settings:
         return tmp
 
     def maybePrint(self, text):
-        if str(self.DEBUG) == "True":
+        if str(self.VERBAL) == "True":
             print(text);
 
     def update_value(self, variable, newValue):
