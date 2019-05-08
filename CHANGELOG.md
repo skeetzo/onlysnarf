@@ -55,6 +55,8 @@
 	- minor adjustments
 	**1.0.3 : 5/3/2019**
 	- minor bug fixes
+	**1.0.4 : 5/8/2019**
+	- more minor bug fixes
 
 ## ToDo
 	- read messages html for emojis
