@@ -31,34 +31,47 @@ ONE_GIGABYTE = 1000000000
 ONE_MEGABYTE = 1000000
 FIFTY_MEGABYTES = 50000000
 ONE_HUNDRED_KILOBYTES = 100000
-
+INITIALIZED = False
 ##################
 ##### Config #####
 ##################
-GOOGLE_CREDS_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'google_creds.txt')
-SECRET_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'client_secret.json')
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.json')
-WORKING_VIDEO = os.path.join(os.path.dirname(os.path.realpath(__file__)),'video.mp4')
 
-OnlyFans_VIDEOS_FOLDER = None
-OnlyFans_IMAGES_FOLDER = None
-OnlyFans_GALLERIES_FOLDER = None
-OnlyFans_POSTED_FOLDER = None
-OnlyFans_SCENES_FOLDER = None
-OnlyFans_PERFORMERS_FOLDER = None
-
-try:
-    with open(CONFIG_FILE) as config_file:    
-        config = json.load(config_file)
-    OnlyFans_VIDEOS_FOLDER = config['videos_folder']
-    OnlyFans_IMAGES_FOLDER = config['images_folder']
-    OnlyFans_GALLERIES_FOLDER = config['galleries_folder']
-    OnlyFans_POSTED_FOLDER = config['posted_folder']
-    OnlyFans_SCENES_FOLDER = config['scenes_folder']
-    OnlyFans_PERFORMERS_FOLDER = config['performers_folder']
-except FileNotFoundError:
-    print('Missing Config, run `onlysnarf-config`')
-    sys.exit(0)
+def initialize():
+    try:
+        # settings.maybePrint("Initializing OnlySnarf")
+        global INITIALIZED
+        if INITIALIZED:
+            # settings.maybePrint("Already Initialized, Skipping")
+            return
+        global OnlyFans_VIDEOS_FOLDER
+        global OnlyFans_IMAGES_FOLDER
+        global OnlyFans_GALLERIES_FOLDER
+        global OnlyFans_POSTED_FOLDER
+        global OnlyFans_SCENES_FOLDER
+        global OnlyFans_PERFORMERS_FOLDER
+        OnlyFans_VIDEOS_FOLDER = None
+        OnlyFans_IMAGES_FOLDER = None
+        OnlyFans_GALLERIES_FOLDER = None
+        OnlyFans_POSTED_FOLDER = None
+        OnlyFans_SCENES_FOLDER = None
+        OnlyFans_PERFORMERS_FOLDER = None
+        with open(settings.CONFIG_PATH) as config_file:    
+            config = json.load(config_file)
+        OnlyFans_VIDEOS_FOLDER = config['videos_folder']
+        OnlyFans_IMAGES_FOLDER = config['images_folder']
+        OnlyFans_GALLERIES_FOLDER = config['galleries_folder']
+        OnlyFans_POSTED_FOLDER = config['posted_folder']
+        OnlyFans_SCENES_FOLDER = config['scenes_folder']
+        OnlyFans_PERFORMERS_FOLDER = config['performers_folder']
+        # settings.maybePrint("Initialized OnlySnarf: Google")
+        INITIALIZED = True
+    except Exception as e:
+        print('Error Initializing, run `onlysnarf-config`')
+        print(e)
+        sys.exit(0)
+    except FileNotFoundError:
+        print('Missing Config, run `onlysnarf-config`')
+        sys.exit(0)
 
 ################
 ##### Auth #####
@@ -68,11 +81,10 @@ except FileNotFoundError:
 def authGoogle():
     print('Authenticating Google...')
     try:
-        global GOOGLE_CREDS_FILE
         # PyDrive
         gauth = GoogleAuth()
         # Try to load saved client credentials
-        gauth.LoadCredentialsFile(GOOGLE_CREDS_FILE)
+        gauth.LoadCredentialsFile(settings.GOOGLE_CREDS_PATH)
         settings.maybePrint('Loaded: Google Credentials')
         if gauth.credentials is None:
             # Authenticate if they're not there
@@ -84,15 +96,15 @@ def authGoogle():
             # Initialize the saved creds
             gauth.Authorize()
         # Save the current credentials to a file
-        gauth.SaveCredentialsFile(GOOGLE_CREDS_FILE)
+        gauth.SaveCredentialsFile(settings.GOOGLE_CREDS_PATH)
         global PYDRIVE
         PYDRIVE = GoogleDrive(gauth)
         # Drive v3 API
         SCOPES = 'https://www.googleapis.com/auth/drive'
-        store = file.Storage(GOOGLE_CREDS_FILE)
+        store = file.Storage(settings.GOOGLE_CREDS_PATH)
         creds = store.get()
         if not creds or creds.invalid:
-            flow = client.flow_from_clientsecrets(SECRET_FILE, SCOPES)
+            flow = client.flow_from_clientsecrets(settings.SECRET_PATH, SCOPES)
             creds = tools.run_flow(flow, store)
         global DRIVE
         DRIVE = build('drive', 'v3', http=creds.authorize(Http()))
@@ -127,31 +139,45 @@ def move_file(file):
     global AUTH
     if not AUTH:
         AUTH = authGoogle()
-    if str(settings.DEBUG) == "True" or not settings.BACKING_UP or settings.BACKING_UP == "False":
-        print('Skipping Google Backup: '+file['title'])
+    if str(settings.BACKING_UP_FORCE) == "True":
+        print("Backing Up (Forced): {}".format(fileName))
+    elif str(settings.DEBUG) == "True":
+        print("Skipping Backup (Debug): {}".format(fileName))
         return
+    elif str(settings.BACKING_UP) == "False":
+        print('Skipping Backup (Disabled): {}'.format(fileName))
+        return
+    else:
+        print('Backing Up: {}'.format(fileName))
     file['parents'] = [{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}]
     file.Upload()
-    print('Google File Backed Up: '+file['title'])
+    print('Google File Backed Up: {}'.format(file['title']))
 
 def move_files(fileName, files):
     global AUTH
     if not AUTH:
         AUTH = authGoogle()
-    if str(settings.DEBUG) == "True" or not settings.BACKING_UP or settings.BACKING_UP == "False" and not settings.BACKING_UP_FORCE:
-        print('Skipping Google Backup: '+fileName)
+    if str(settings.BACKING_UP_FORCE) == "True":
+        print("Backing Up (Forced): {}".format(fileName))
+    elif str(settings.DEBUG) == "True":
+        print("Skipping Backup (Debug): {}".format(fileName))
         return
+    elif str(settings.BACKING_UP) == "False":
+        print('Skipping Backup (Disabled): {}'.format(fileName))
+        return
+    else:
+        print('Backing Up: {}'.format(fileName))
     title = fileName+" - "+datetime.datetime.now().strftime("%d-%m-%I-%M")
     settings.maybePrint('Moving To: '+title)
     global PYDRIVE
     tmp_folder = PYDRIVE.CreateFile({'title':title, 'parents':[{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}],'mimeType':'application/vnd.google-apps.folder'})
     tmp_folder.Upload()
-    settings.maybePrint("moving",end="")
+    settings.maybePrint("Backing Up:")
     for file in files:
-        settings.maybePrint(".",end="")
+        settings.maybePrint(" - {}".format(file['title']))
         file['parents'] = [{"kind": "drive#fileLink", "id": tmp_folder['id']}]
         file.Upload()
-    print('Google Files Backed Up')
+    print('Google Files Backed Up: {}'.format(title))
 
 ####################
 ##### Download #####
@@ -225,19 +251,16 @@ def download_gallery(folder):
     if int(folder_size) == 0:
         print('Error: Empty Folder')
         return
-    file_list_random = []
-    for x in range(settings.IMAGE_UPLOAD_LIMIT):
-        random_file = random.choice(file_list)
-        file_list.remove(random_file)
-        file_list_random.append(random_file)
+    random.shuffle(file_list)
+    file_list = file_list[:int(settings.IMAGE_UPLOAD_LIMIT)]
     i = 1
-    for file in sorted(file_list_random, key = lambda x: x['title']):
+    for file in sorted(file_list, key = lambda x: x['title']):
         print('Downloading {} from GDrive ({}/{})'.format(file['title'], i, folder_size))
         settings.maybePrint('filePath: '+os.path.join(tmp, str(file['title'])))
         file.GetContentFile(os.path.join(tmp, str(file['title'])))
         i+=1
     print('Download Complete: Gallery')
-    return [file_list_random, tmp]
+    return [file_list, tmp]
 
 # Download Performer
 def download_performer(folder):
@@ -563,12 +586,11 @@ def upload_file(filename=None, mimetype="video/mp4"):
 def repair(path):
     repairedPath = str(path).replace(".mp4", "_fixed.mp4")
     try:
-        global WORKING_VIDEO
-        print("Repairing: {} <-> {}".format(path, WORKING_VIDEO))
+        print("Repairing: {} <-> {}".format(path, settings.WORKING_VIDEO))
         if str(settings.DEBUG) == "True":
-            fixed = subprocess.call(['untrunc', str(WORKING_VIDEO), str(path)])
+            fixed = subprocess.call(['untrunc', str(settings.WORKING_VIDEO), str(path)])
         else:
-            subprocess.Popen(['untrunc', str(WORKING_VIDEO), str(path)],stdin=FNULL,stdout=FNULL)
+            subprocess.Popen(['untrunc', str(settings.WORKING_VIDEO), str(path)],stdin=FNULL,stdout=FNULL)
         fixed.communicate()
     except AttributeError:
         if os.path.isfile(str(path)+"_fixed.mp4"):

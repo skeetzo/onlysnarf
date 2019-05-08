@@ -108,6 +108,7 @@ def initialize():
         [ "Delete Google", settings.DELETING, ["True","False"]],
         [ "Delete Local", settings.REMOVE_LOCAL, ["True","False"]],
         [ "Hashtag", settings.HASHTAGGING, ["True","False"]],
+        [ "Force Backup", settings.BACKING_UP_FORCE, ["True","False"]],
         [ "Force Upload", settings.FORCE_UPLOAD, ["True","False"]],
         [ "Mount Path", settings.MOUNT_PATH],
         [ "Users Path", settings.USERS_PATH],
@@ -115,6 +116,8 @@ def initialize():
         [ "Text", settings.TEXT],
         [ "Type", settings.TYPE],
         [ "Image", settings.IMAGE],
+        [ "Image Limit", settings.IMAGE_UPLOAD_LIMIT],
+        [ "Image Max", settings.IMAGE_UPLOAD_MAX],
         [ "Tweeting", settings.TWEETING, ["True","False"]],
         [ "Debug", settings.DEBUG, ["True","False"]],
         [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"]]    

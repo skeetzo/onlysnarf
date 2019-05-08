@@ -4,6 +4,7 @@
 
 import json
 import time
+import os
 from datetime import datetime
 from re import sub
 from decimal import Decimal
@@ -55,27 +56,31 @@ class User:
             settings.maybePrint("User: {}".format(self.id))
 
     def sendMessage(self, message, image, price):
-        print("Sending Message: {} <- {} - {} - {}".format(self.id, message, image, price))
-        OnlySnarf.goto_user(self.id)
-        OnlySnarf.enter_message(message)
-        image_name = os.path.basename(image)
-        if str(image_name) in self.sent_images:
-            print("Error: Image Already Sent: {} -> {}".format(image, self.id))
-            return
-        OnlySnarf.enter_image(image)
-        if price != None:
-            if image != None and Decimal(sub(r'[^\d.]', '', price)) < 5:
-                print("Warning: Price Too Low, Free Image")
-            OnlySnarf.enter_price(price)
-        if str(settings.DEBUG) == "True":
-            self.sent_images.append("DEBUG")
-        else:
-            self.sent_images.append(str(image_name))
-        if str(settings.DEBUG) == "True" and str(settings.DELAY) == "True":
-	        delayForThirty()
-        OnlySnarf.confirm_message()
-        if str(settings.DEBUG) == "False":
-            self.last_messaged_on = datetime.now()
+        try:
+            print("Sending Message: {} <- {} - {} - {}".format(self.id, message, image, price))
+            OnlySnarf.goto_user(self.id)
+            OnlySnarf.enter_message(message)
+            image_name = os.path.basename(image)
+            if str(image_name) in self.sent_images:
+                print("Error: Image Already Sent: {} -> {}".format(image, self.id))
+                return
+            OnlySnarf.enter_image(image)
+            if price != None:
+                if image != None and Decimal(sub(r'[^\d.]', '', price)) < 5:
+                    print("Warning: Price Too Low, Free Image")
+                OnlySnarf.enter_price(price)
+            if str(settings.DEBUG) == "True":
+                self.sent_images.append("DEBUG")
+            else:
+                self.sent_images.append(str(image_name))
+            if str(settings.DEBUG) == "True" and str(settings.DELAY) == "True":
+    	        delayForThirty()
+            OnlySnarf.confirm_message()
+            if str(settings.DEBUG) == "False":
+                self.last_messaged_on = datetime.now()
+        except Exception as e:
+            print("Error: There was an error messaging - {}".format(self.id))
+            settings.maybePrint(e)
 
     def equals(self, user):
         if user.id == self.id:

@@ -53,10 +53,13 @@
 	- removed video.mp4
 	**1.0.2**
 	- minor adjustments
-	
+	**1.0.3 : 5/3/2019**
+	- minor bug fixes
+
 ## ToDo
 	- read messages html for emojis
 	- add login prompt for saving Twitter password -> base64 hash instead of in config.json
+	|_ add `Auth` option to settings?
 	- finalize / fix script exit
 	- add Twitter
 
