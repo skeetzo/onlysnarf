@@ -78,9 +78,9 @@ def log_into_OnlyFans():
     global BROWSER
     try:
         BROWSER = webdriver.Chrome(chrome_options=options)
-    except WebDriverException as e:
+    except Exception as e:
         settings.maybePrint(e)
-        settings.maybePrint("Warning: Missing chromedriver_path, retrying")
+        print("Warning: Missing chromedriver_path, retrying")
         try:
             BROWSER = webdriver.Chrome(CHROMEDRIVER_PATH, chrome_options=options)
         except Exception as e:
@@ -141,12 +141,17 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
         global BROWSER
         if not BROWSER or BROWSER == None:
             logged_in = log_into_OnlyFans()
+        else:
+            logged_in = True
+        if logged_in == False:
+            print("Error: Not Logged In")
+            return False
         if not path:
             print("Error: Missing Upload Path")
-            return
+            return False
         if not text:
             print("Error: Missing Upload Text")
-            return
+            return False
         text = text.replace(".mp4","")
         text = text.replace(".MP4","")
         text = text.replace(".jpg","")
@@ -155,11 +160,11 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
             text += " w/ @"+" @".join(performers)
         if keywords:
             text += " #"+" #".join(keywords)
-        settings.maybePrint("Uploading:")
+        print("Uploading:")
         settings.maybePrint("Path: {}".format(path))
-        settings.maybePrint("Keywords: {}".format(keywords))
-        settings.maybePrint("Performers: {}".format(performers))
-        settings.maybePrint("Text: {}".format(text))
+        print("Keywords: {}".format(keywords))
+        print("Performers: {}".format(performers))
+        print("Text: {}".format(text))
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
         if not tweeting:
             WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
@@ -172,29 +177,31 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
                 if str(settings.DEBUG) == "True":
                     print('skipping OnlyFans upload')
-                    return
+                    return True
                 # send.click()
                 send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
                 break
-            except:
+            except Exception as e:
                 try: 
                     # check for existence of "thumbnail is fucked up" modal and hit ok button
                     BROWSER.switchTo().frame("iframe");
                     BROWSER.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
                     print("Error: Thumbnail Missing")
                     break
-                except:
-                    settings.maybePrint(sys.exc_info()[0])
+                except Exception as ef:
+                    settings.maybePrint(ef)
                 print('uploading...')
-                settings.maybePrint(sys.exc_info()[0])
+                settings.maybePrint(e)
                 i+=1
                 if i == maxUploadCount and settings.FORCE_UPLOAD is not True:
                     print('max upload wait reached, breaking..')
                     break
         print('File Uploaded Successfully')
+        return True
     except Exception as e:
         settings.maybePrint(e)
         print("Error: File Upload Failure")
+        return False
 
 # Uploads a folder to OnlyFans
 def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers=None, tweeting=True):
@@ -203,23 +210,28 @@ def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers
         global BROWSER
         if not BROWSER or BROWSER == None:
             logged_in = log_into_OnlyFans()
+        else:
+            logged_in = True
+        if logged_in == False:
+            print("Error: Not Logged In")
+            return False
         if not path:
             print("Error: Missing Upload Path")
-            return
+            return False
         if not text:
             print("Error: Missing Upload Text")
-            return
+            return False
         if performers and len(performers) > 1:
             text += " w/ @"+" @".join(performers)
         elif performers and len(performers) == 1:
             text += " w/ @{}".format(performers[0])
         if keywords:
             text += " #"+" #".join(keywords)
-        settings.maybePrint("Uploading:")
+        print("Uploading:")
         settings.maybePrint("Path: {}".format(path))
-        settings.maybePrint("Keywords: {}".format(keywords))
-        settings.maybePrint("Performers: {}".format(performers))
-        settings.maybePrint("Text: {}".format(text))
+        print("Keywords: {}".format(keywords))
+        print("Performers: {}".format(performers))
+        print("Text: {}".format(text))
         files_path = []
         for file in pathlib.Path(str(path)).iterdir():  
             files_path.append(str(file))
@@ -229,23 +241,20 @@ def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers
         if not tweeting:
             WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
         for file in files_path:
-            settings.maybePrint('uploading: '+str(file))
+            print('Uploading: '+str(file))
             BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
             send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
         send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
         if str(settings.DEBUG) == "True":
             print('skipping OnlyFans upload')
-            return
+            return True
         send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
         print('Directory Uploaded Successfully')
+        return True
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Directory Upload Failure")
-
-####################################################################################################################
-
-def uploadPerformer(args, dirName, path, folderName):
-    pass
+        return False
 
 ####################
 ##### Messages #####
@@ -277,8 +286,9 @@ def goto_user(username):
         username = str(username).replace("@u","").replace("@","")
         print("goto -> /my/chats/chat/%s" % username)
         BROWSER.get(('https://onlyfans.com/my/chats/chat/'+str(username)))
-    except:
-        settings.maybePrint(sys.exc_info()[0])
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failure to Goto User - {}".format(username))
 
 def enter_message(text):
     try:
@@ -290,8 +300,9 @@ def enter_message(text):
         message = BROWSER.find_element_by_css_selector(".form-control.unlimsize.b-chat__message-input")        
         message.send_keys(str(text))
         print("Message Entered")
-    except:
-        settings.maybePrint(sys.exc_info()[0])
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failure to Enter Message")
 
 def enter_image(image):
     try:
@@ -302,8 +313,9 @@ def enter_image(image):
         global BROWSER
         BROWSER.find_element_by_id("cm_fileupload_photo").send_keys(str(image))
         print("Image Entered")
-    except:
-        settings.maybePrint(sys.exc_info()[0])
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failure to Enter Image")
 
 def enter_price(price):
     try:
@@ -316,8 +328,9 @@ def enter_price(price):
         BROWSER.find_element_by_css_selector(".form-control.js-chat__price-input.b-chat__panel__input.js-input").send_keys(str(price))
         BROWSER.find_element_by_css_selector(".g-btn.m-rounded.js-panel__btn-save.js-chat__price-btn-save").click()
         print("Price Entered")
-    except:
-        settings.maybePrint(sys.exc_info()[0])
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failure to Enter Price")
 
 def confirm_message():
     try:
@@ -328,8 +341,9 @@ def confirm_message():
             return
         send.click()
         print('OnlyFans Message: Sent')
-    except:
-        settings.maybePrint(sys.exc_info()[0])
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failure to Confirm Message")
 
 def read_chat(user):
     try:
@@ -402,7 +416,9 @@ def read_chat(user):
         settings.maybePrint("Messages All: {}".format(len(messages_all)))
         return [messages_all, messages_and_timestamps, messages_to, messages_from]
     except Exception as e:
-        print(e)
+        settings.maybePrint(e)
+        print("Error: Failure to Read Chat - {}".format(user.username))
+        return [[],[],[]]
 
 # update chat logs for all users
 def update_chat_logs():
@@ -586,3 +602,4 @@ def exit(force=False):
     global BROWSER
     BROWSER.quit()
     print("Browser Closed")
+    global logged_in

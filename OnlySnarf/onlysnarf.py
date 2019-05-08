@@ -234,8 +234,11 @@ def release_image():
         print("- Title: {}".format(text)) # name of scene
         print("- Keywords: {}".format(keywords)) # text sent in messages
         print("- Content: {}".format(content)) # the file(s) to upload
-        upload("image", path=content, text=text, keywords=keywords)
-        Google.move_file(file)
+        successful = upload("image", path=content, text=text, keywords=keywords)
+        if successful:
+            Google.move_file(file)
+        else:
+            return False
         return True
     except Exception as e:
         settings.maybePrint(e)
@@ -286,8 +289,11 @@ def release_gallery():
         file = files[0]
         ext = str(os.path.splitext(file)[1].lower())
         settings.maybePrint('ext: '+str(ext))
-        upload("gallery", path=content, text=text, keywords=keywords)
-        Google.move_files(google_file['title'], google_files)
+        successful = upload("gallery", path=content, text=text, keywords=keywords)
+        if successful:
+            Google.move_files(google_file['title'], google_files)
+        else:
+            return False
         return True
     except Exception as e:
         settings.maybePrint(e)
@@ -332,8 +338,11 @@ def release_performer():
         file = files[0]
         ext = str(os.path.splitext(file)[1].lower())
         settings.maybePrint('ext: '+str(ext))
-        upload("gallery", path=content, text=text)
-        Google.move_file(google_file)
+        successful = upload("gallery", path=content, text=text)
+        if successful:
+            Google.move_file(google_file)
+        else:
+            return False
         return True
     except Exception as e:
         settings.maybePrint(e)
@@ -398,28 +407,37 @@ def release_scene():
         file = files[0]
         ext = str(os.path.splitext(file)[1].lower())
         settings.maybePrint('ext: '+str(ext))
+        successful_upload = False
         if not ext or ext == '.mp4':
-            upload("video", path=content, text=text, keywords=keywords, performers=performers)
+            successful_upload = upload("video", path=content, text=text, keywords=keywords, performers=performers)
         elif ext == '.jpg' or ext == '.jpeg' and len(files) > 1:
-            upload("gallery", path=content, text=text, keywords=keywords, performers=performers)
+            successful_upload = upload("gallery", path=content, text=text, keywords=keywords, performers=performers)
         elif ext == '.jpg' or ext == '.jpeg' and len(files) == 1:
-            upload("image", path=content, text=text, keywords=keywords, performers=performers) 
+            successful_upload = upload("image", path=content, text=text, keywords=keywords, performers=performers) 
         else:
             print("Error: Missing Scene Type")
-        if str(users[0]) == "all" or str(users[0]) == str("recent") or str(users[0]) == str("favorites"):
-            users = users[0]
-        if not users or str(users).lower() == "none":
-            print("Warning: Missing User Choice")
-        elif str(users) == "all":
-            message_all(message=message, image=preview, price=price)
-        elif str(users) == "recent":
-            message_recent(message=message, image=preview, price=price)
-        elif str(users) == "favorites":
-            message_favorites(message=message, image=preview, price=price)
+        if successful_upload:
+            if str(users[0]) == "all" or str(users[0]) == str("recent") or str(users[0]) == str("favorites"):
+                users = users[0]
+            if not users or str(users).lower() == "none":
+                print("Warning: Missing User Choice")
+            elif str(users) == "all":
+                successful_message = message_all(message=message, image=preview, price=price)
+            elif str(users) == "recent":
+                successful_message = message_recent(message=message, image=preview, price=price)
+            elif str(users) == "favorites":
+                successful_message = message_favorites(message=message, image=preview, price=price)
+            else:
+                for user in users:
+                    successful_message = message_by_username(message=message, image=preview, price=price, username=user)
+            if successful_message:
+                Google.move_file(google_folder)
+            else:
+                print("Error: Failure Messaging")
+                return False
         else:
-            for user in users:
-                message_by_username(message=message, image=preview, price=price, username=user)
-        Google.move_file(google_folder)
+            print("Error: Failure Uploading")
+            return False
         return True
     except Exception as e:
         settings.maybePrint(e)
@@ -466,8 +484,11 @@ def release_video():
         print("- Title: {}".format(text)) # name of scene
         print("- Keywords: {}".format(keywords)) # text sent in messages
         print("- Content: {}".format(content)) # the file(s) to upload
-        upload("video", path=content, text=text, keywords=keywords)
-        Google.move_file(file)
+        successful = upload("video", path=content, text=text, keywords=keywords)
+        if successful:
+            Google.move_file(file)
+        else:
+            return False
         return True
     except Exception as e:
         settings.maybePrint(e)
@@ -479,21 +500,26 @@ def release_video():
 
 def upload(fileChoice, path=None, text=None, keywords=None, performers=None):
     settings.maybePrint("Uploading: {} - {} - {}".format(fileChoice, path, text))
+    successful = False
     try:
         settings.TYPE = fileChoice
         if fileChoice == 'image':
-            OnlySnarf.upload_file_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
+            successful = OnlySnarf.upload_file_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
         elif fileChoice == 'gallery':
-            OnlySnarf.upload_directory_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
+            successful = OnlySnarf.upload_directory_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
         elif fileChoice == 'video':
-            OnlySnarf.upload_file_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
+            successful = OnlySnarf.upload_file_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
         else:
             print("Missing Upload Choice")
-    except TypeError as e:
+    except Exception as e:
         settings.maybePrint(e)
-        print("Error: Upload Failure")
+        print("Error: Unable to Upload")
         return
-    print('Upload Complete')
+    if successful:
+        print("Upload Complete")
+    else:
+        print("Upload Failure")
+    return successful
 
 #####################
 ##### FUNCTIONS #####
@@ -520,7 +546,7 @@ def main():
         return
     sys.stdout.flush()
     if released == False:
-        print("Error: Missing Released Files")
+        print("Error: Failed to release - {}".format(settings.TYPE))
         return
     #################################################
     print('2/3 : Cleaning Up Files')
