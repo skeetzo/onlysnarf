@@ -1,8 +1,5 @@
 client_config_backend: file
 client_config_file: client_secrets.json
-# client_config:
-#   client_id: blabla.apps.googleusercontent.com
-#   client_secret: blabla
 
 save_credentials: True
 save_credentials_backend: file
@@ -12,3 +9,8 @@ get_refresh_token: True
 
 oauth_scope:
   - https://www.googleapis.com/auth/drive
+
+# unused
+# client_config:
+#   client_id: blabla.apps.googleusercontent.com
+#   client_secret: blabla
