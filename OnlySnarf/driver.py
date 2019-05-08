@@ -161,10 +161,10 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
         if keywords:
             text += " #"+" #".join(keywords)
         print("Uploading:")
-        settings.maybePrint("Path: {}".format(path))
-        print("Keywords: {}".format(keywords))
-        print("Performers: {}".format(performers))
-        print("Text: {}".format(text))
+        settings.maybePrint("- Path: {}".format(path))
+        print("- Keywords: {}".format(keywords))
+        print("- Performers: {}".format(performers))
+        print("- Text: {}".format(text))
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
         if not tweeting:
             WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
@@ -228,10 +228,10 @@ def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers
         if keywords:
             text += " #"+" #".join(keywords)
         print("Uploading:")
-        settings.maybePrint("Path: {}".format(path))
-        print("Keywords: {}".format(keywords))
-        print("Performers: {}".format(performers))
-        print("Text: {}".format(text))
+        settings.maybePrint("- Path: {}".format(path))
+        print("- Keywords: {}".format(keywords))
+        print("- Performers: {}".format(performers))
+        print("- Text: {}".format(text))
         files_path = []
         for file in pathlib.Path(str(path)).iterdir():  
             files_path.append(str(file))
@@ -601,5 +601,6 @@ def exit(force=False):
         write_users_local()
     global BROWSER
     BROWSER.quit()
+    BROWSER = None
     print("Browser Closed")
     global logged_in

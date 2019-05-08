@@ -124,15 +124,17 @@ def delete_file(file):
     global AUTH
     if not AUTH:
         AUTH = authGoogle()
-    if not settings.DELETING or settings.DELETING == "False":
-        print("Skipping Delete")
+    if str(settings.DELETING_FORCED) == "True":
+        print("Deleting (Forced): {}".format(fileName))
+    elif str(settings.DEBUG) == "True":
+        print("Skipping Delete (Debug): {}".format(fileName))
         return
-    print('Trashing Google Video')
-    if str(settings.DEBUG) == "True":
-        print('skipping Google delete')
+    elif str(settings.DELETING) == "False":
+        print('Skipping Delete (Disabled): {}'.format(fileName))
         return
+    else:
+        print('Deleting: {}'.format(fileName))
     file.Trash()
-    print('Google Video Trashed')
 
 # Archives posted file / folder
 def move_file(file):
@@ -149,7 +151,8 @@ def move_file(file):
         return
     else:
         print('Backing Up: {}'.format(fileName))
-    file['parents'] = [{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}]
+    global OnlyFans_POSTED_FOLDER
+    file['parents'] = [{"kind": "drive#fileLink", "id": str(OnlyFans_POSTED_FOLDER)}]
     file.Upload()
     print('Google File Backed Up: {}'.format(file['title']))
 
@@ -170,7 +173,8 @@ def move_files(fileName, files):
     title = fileName+" - "+datetime.datetime.now().strftime("%d-%m@%I-%M")
     settings.maybePrint('Moving To: '+title)
     global PYDRIVE
-    tmp_folder = PYDRIVE.CreateFile({'title':title, 'parents':[{"kind": "drive#fileLink", "id": OnlyFans_POSTED_FOLDER}],'mimeType':'application/vnd.google-apps.folder'})
+    global OnlyFans_POSTED_FOLDER
+    tmp_folder = PYDRIVE.CreateFile({'title':str(title), 'parents':[{"kind": "drive#fileLink", "id": str(OnlyFans_POSTED_FOLDER)}],'mimeType':'application/vnd.google-apps.folder'})
     tmp_folder.Upload()
     settings.maybePrint("Backing Up:")
     for file in files:
@@ -405,7 +409,7 @@ def get_random_image():
     random_image = None
     folder_name = None
     for folder in random_folders:
-        if str(settings.DEBUG) == "True":
+        if str(settings.VERBAL) == "True":
             print('checking folder: '+folder['title'],end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
         if len(images_list_tmp)>0:
@@ -437,7 +441,7 @@ def get_random_gallery():
     random_gallery = None
     folder_name = None
     for folder in random_folders:
-        if str(settings.DEBUG) == "True":
+        if str(settings.VERBAL) == "True":
             print('checking galleries: {}'.format(folder['title']),end="")
         gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         if len(gallery_list_tmp)>0:
@@ -447,7 +451,7 @@ def get_random_gallery():
             settings.maybePrint(" -> empty")
     random.shuffle(folder_list)
     for folder in folder_list:
-        if str(settings.DEBUG) == "True":
+        if str(settings.VERBAL) == "True":
             print('checking gallery: {}'.format(folder['title']),end="")
         gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         random_gallery_tmp = random.choice(gallery_list_tmp)
@@ -505,13 +509,14 @@ def get_random_video():
     random_video = None
     folder_name = None
     for folder in random_folders:
-        print('checking folder: '+folder['title'],end="")
+        if str(settings.VERBAL) == "True":
+            print('checking folder: '+folder['title'],end="")
         video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
         if len(video_list_tmp)>0:
             video_list.append(folder)
-            print(" -> added")
+            settings.maybePrint(" -> added")
         else:
-            print(" -> empty")
+            settings.maybePrint(" -> empty")
     if len(video_list)==0:
         print('No video file found!')
         return
@@ -536,7 +541,7 @@ def get_random_scene():
     random_scene = None
     folder_name = None
     for folder in random_folders:
-        if str(settings.DEBUG) == "True":
+        if str(settings.VERBAL) == "True":
             print('checking scenes: '+folder['title'],end="")
         scene_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         if len(scene_list_tmp)>0:
@@ -546,7 +551,7 @@ def get_random_scene():
             settings.maybePrint(" -> empty")
     random.shuffle(folder_list)
     for folder in folder_list:
-        if str(settings.DEBUG) == "True":
+        if str(settings.VERBAL) == "True":
             print('checking scene: '+folder['title'],end="")
         scene_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'text/plain'"}).GetList()
         if len(scene_list_tmp_tmp)>0:

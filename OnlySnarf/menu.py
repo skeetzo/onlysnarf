@@ -120,7 +120,8 @@ def initialize():
         [ "Image Max", settings.IMAGE_UPLOAD_MAX],
         [ "Tweeting", settings.TWEETING, ["True","False"]],
         [ "Debug", settings.DEBUG, ["True","False"]],
-        [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"]]    
+        [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"]],    
+        [ "Verbal", settings.VERBAL, ["True","False"]]    
     ])
     settingItems.insert(0,[ "Back", "main"])
     # print("Initialized Menu")
