@@ -60,6 +60,7 @@ class Settings:
 
         # def init(sys.argv):
         self.MOUNT_PATH = None
+        self.MOUNT_DRIVE = None
         self.USERS_PATH = "users.json"
         self.CONFIG_PATH = "config.json"
         self.GOOGLE_CREDS_PATH = "google_creds.txt"
@@ -90,6 +91,14 @@ class Settings:
 
             "1633091",
             "3055233"
+        ]
+
+        self.DRIVE_FOLDERS = [
+            "images",
+            "galleries",
+            "performers",
+            "scenes",
+            "videos"
         ]
 
         self.user_DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
@@ -125,8 +134,10 @@ class Settings:
                 self.TWEETING = False
             if '-delete' in str(sys.argv[i]):
                 self.DELETING = False
-            if '-mount' in str(sys.argv[i]):
+            if '-mount-path' in str(sys.argv[i]):
                 self.MOUNT_PATH = str(sys.argv[i+1])
+            if '-mount-drive' in str(sys.argv[i]):
+                self.MOUNT_DRIVE = str(sys.argv[i+1])
             if '-users' in str(sys.argv[i]):
                 self.USERS_PATH = str(sys.argv[i+1])
             if '-image' in str(sys.argv[i]):

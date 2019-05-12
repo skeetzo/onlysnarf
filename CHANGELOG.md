@@ -57,6 +57,8 @@
 	- minor bug fixes
 	**1.0.4 : 5/8/2019**
 	- more minor bug fixes
+	**5/12/2019**
+	- create Google folder structure programmatically
 
 ## ToDo
 	- read messages html for emojis
@@ -64,6 +66,7 @@
 	|_ add `Auth` option to settings?
 	- finalize / fix script exit
 	- add Twitter
+
 
 ## Install
 sudo python3 setup.py install

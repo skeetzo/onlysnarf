@@ -183,6 +183,54 @@ def move_files(fileName, files):
         file.Upload()
     print('Google Files Backed Up: {}'.format(title))
 
+##################
+##### Folders #####
+##################
+
+# Creates the OnlyFans folder structure
+def create_folders():
+    global PYDRIVE
+    file_list = PYDRIVE.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+    global OnlyFansFolder
+    OnlyFansFolder = None
+    if settings.MOUNT_DRIVE is not None:
+        mount_root = None
+        for file in file_list:
+            if file['title'] == str(settings.MOUNT_DRIVE):
+                print("Found Root (alt): {}".format(settings.MOUNT_DRIVE))
+                mount_root = file
+        if mount_root is None:
+            print("Error: Drive Mount Folder Not Found")
+            return
+        file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(mount_root['id'])}).GetList()
+    for file in file_list:
+        if file['title'] == "OnlyFans":
+            print("Found Root OnlyFans")
+            OnlyFansFolder = file
+    if OnlyFansFolder is None:
+        print("Creating Root OnlyFans")
+        OnlyFansFolder = PYDRIVE.CreateFile({"title": "OnlyFans", "mimeType": "application/vnd.google-apps.folder"})
+        OnlyFansFolder.Upload()
+    print("Creating OnlyFans Folders")
+    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(OnlyFansFolder)}).GetList()
+    for folder in settings.DRIVE_FOLDERS:
+        found = False
+        for folder_ in file_list:
+            if str(folder) == folder_['title']
+                print("found: {}".format(folder))
+                found = True
+        if not found:
+            print("created")
+            contentFolder = PYDRIVE.CreateFile({"title": str(folder), "parents": [{"id": OnlyFansFolder['id']}], "mimeType": "application/vnd.google-apps.folder"})
+            contentFolder.Upload()
+
+def get_folder_by_name(folderName):
+    # global PYDRIVE
+    # file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false"}.format(OnlyFansFolder['id'])).GetList()
+    # for folder in file_list:
+
+    pass
+
 ####################
 ##### Download #####
 ####################
