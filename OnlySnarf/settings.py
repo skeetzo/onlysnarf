@@ -82,6 +82,8 @@ class Settings:
 
         self.VERBAL = False
 
+        self.ROOT_FOLDER = "OnlySnarf"
+
         self.SKIP_USERS = [
             "6710870",
             

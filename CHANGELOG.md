@@ -57,8 +57,9 @@
 	- minor bug fixes
 	**1.0.4 : 5/8/2019**
 	- more minor bug fixes
-	**5/12/2019**
+**1.1.0 : 5/12/2019**
 	- create Google folder structure programmatically
+	- predefine Google root
 
 ## ToDo
 	- read messages html for emojis
@@ -66,6 +67,8 @@
 	|_ add `Auth` option to settings?
 	- finalize / fix script exit
 	- add Twitter
+	- prepare a scene for release
+	- update backup function to include original folder name -> posted/galleries/$file
 
 
 ## Install
