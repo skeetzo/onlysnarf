@@ -163,14 +163,6 @@ def download_random_scene():
         return
     return results
 
-####################
-##### Messages #####
-####################
-
-def message(choice=None, message=None, image=None, price=None):
-    print("Messaging: {}".format(choice))
-    OnlySnarf.message(choice, message, image, price)
-
 #################
 ##### Reset #####
 #################
@@ -572,14 +564,16 @@ def test(TYPE):
     #         return print("Error: Failed to Reset")
     # return sys.exit(0)
 
+    Google.get_random_test()
 
+    return
 
     ## Message ###
     response = download_random_image()
     if not response or response == None:
         print("Error: Missing Image")
         return
-    message(choice="all", message="ass ass ass ass", image=response[1], price="10.00")
+    OnlySnarf.message(choice="all", message="ass ass ass ass", image=response[1], price="10.00")
     # message(choice="recent", message="8=======D", image=response[1], price="50.00")
     Google.move_file(response[2])
     ##############
