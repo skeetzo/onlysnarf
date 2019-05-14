@@ -78,6 +78,8 @@ class Settings:
 
         self.FORCE_REDUCTION = False
 
+        self.CREATE_MISSING_FOLDERS = False
+
         self.VERBAL = False
 
         self.SKIP_USERS = [
@@ -154,6 +156,8 @@ class Settings:
                 self.IMAGE_UPLOAD_LIMIT = str(sys.argv[i+1])
             if '-image-max' in str(sys.argv[i]):
                 self.IMAGE_UPLOAD_MAX = str(sys.argv[i+1])
+            if '-create-folders' in str(sys.argv[i]):
+                self.CREATE_MISSING_FOLDERS = True
             i += 1
         
         if self.MOUNT_PATH is not None:

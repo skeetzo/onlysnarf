@@ -121,6 +121,7 @@ def initialize():
         [ "Tweeting", settings.TWEETING, ["True","False"]],
         [ "Debug", settings.DEBUG, ["True","False"]],
         [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"]],    
+        [ "Create Missing Google Folders", settings.CREATE_MISSING_FOLDERS, ["True","False"]],    
         [ "Verbal", settings.VERBAL, ["True","False"]]    
     ])
     settingItems.insert(0,[ "Back", "main"])
