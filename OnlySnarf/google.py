@@ -144,15 +144,15 @@ def move_file(file):
     if not AUTH:
         AUTH = authGoogle()
     if str(settings.BACKING_UP_FORCE) == "True":
-        print("Backing Up (Forced): {}".format(fileName))
+        print("Backing Up (Forced): {}".format(file['title']))
     elif str(settings.DEBUG) == "True":
-        print("Skipping Backup (Debug): {}".format(fileName))
+        print("Skipping Backup (Debug): {}".format(file['title']))
         return
     elif str(settings.BACKING_UP) == "False":
-        print('Skipping Backup (Disabled): {}'.format(fileName))
+        print('Skipping Backup (Disabled): {}'.format(file['title']))
         return
     else:
-        print('Backing Up: {}'.format(fileName))
+        print('Backing Up: {}'.format(file['title']))
     global OnlyFans_POSTED_FOLDER
     file['parents'] = [{"kind": "drive#fileLink", "id": str(OnlyFans_POSTED_FOLDER)}]
     file.Upload()
@@ -192,73 +192,89 @@ def move_files(fileName, files):
 # Creates the OnlyFans folder structure
 def get_folder_OnlyFans():
     global PYDRIVE
-    file_list = PYDRIVE.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
     global OnlyFansFolder_
     if OnlyFansFolder_ is not None:
         return OnlyFansFolder_
     OnlyFansFolder = None
     if settings.MOUNT_DRIVE is not None:
-        mount_root = None
-        for file in file_list:
-            if file['title'] == str(settings.MOUNT_DRIVE):
-                print("Found Root (alt): {}".format(settings.MOUNT_DRIVE))
-                mount_root = file
-        if mount_root is None:
-            print("Error: Drive Mount Folder Not Found")
-            return
-        file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(mount_root['id'])}).GetList()
-    for file in file_list:
-        if file['title'] == "OnlyFans":
-            print("Found Root OnlyFans")
-            OnlyFansFolder = file
+        mount_root = "root"
+        root_folders = settings.MOUNT_DRIVE.split("/")
+        settings.maybePrint("Mount Folders: {}".format(root_folders))
+        def findRoot(parent, folderName):    
+            file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent)}).GetList()
+            for folder in file_list:
+                if str(folder['title']) == str(folderName):
+                    return folder['id']
+            print("Error: Unable to Find Drive Mount")
+            return None    
+        for folder in root_folders:
+            mount_root = findRoot(mount_root, folder)
+            if mount_root is None:
+                mount_root = "root"
+                print("Warning: Drive Mount Folder Not Found")
+                break
+        print("Found Root (alt): {}".format(settings.MOUNT_DRIVE))
+        OnlyFansFolder = mount_root
+    else:
+        file_list = PYDRIVE.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+        for folder in file_list:
+            if str(folder['title']) == str(settings.ROOT_FOLDER):
+                OnlyFansFolder = folder['id']
+                print("Found Root: {}".format(settings.ROOT_FOLDER))
     if OnlyFansFolder is None:
-        print("Creating Root OnlyFans")
-        OnlyFansFolder = PYDRIVE.CreateFile({"title": "OnlyFans", "mimeType": "application/vnd.google-apps.folder"})
+        print("Creating Root: {}".format(settings.ROOT_FOLDER))
+        OnlyFansFolder = PYDRIVE.CreateFile({"title": str(settings.ROOT_FOLDER), "mimeType": "application/vnd.google-apps.folder"})
         OnlyFansFolder.Upload()
+        OnlyFansFolder = OnlyFansFolder['id']
     OnlyFansFolder_ = OnlyFansFolder
     return OnlyFansFolder_
 
 def create_folders():
-    print("Creating OnlyFans Folders")
+    print("Creating Folders: {}".format(settings.ROOT_FOLDER))
     OnlyFansFolder = get_folder_OnlyFans()
+    if OnlyFansFolder is None:
+        print("Error: Unable To Create Folders")
+        return
     file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(OnlyFansFolder)}).GetList()
     for folder in settings.DRIVE_FOLDERS:
         found = False
         for folder_ in file_list:
             if str(folder) == folder_['title']:
-                print("found: {}".format(folder))
+                settings.maybePrint("found: {}".format(folder))
                 found = True
         if not found:
-            print("created")
-            contentFolder = PYDRIVE.CreateFile({"title": str(folder), "parents": [{"id": OnlyFansFolder['id']}], "mimeType": "application/vnd.google-apps.folder"})
+            settings.maybePrint("created: {}".format(folder))
+            contentFolder = PYDRIVE.CreateFile({"title": str(folder), "parents": [{"id": OnlyFansFolder}], "mimeType": "application/vnd.google-apps.folder"})
             contentFolder.Upload()
 
 def get_folder_by_name(folderName):
     settings.maybePrint("Getting Folder: {}".format(folderName))
-    try:
-        global PYDRIVE
-        global FOLDERS
-        if FOLDERS is not None:
-            if FOLDERS.get(str(folderName)) is not None:
-                return FOLDERS.get(str(folderName))
-        else:
-            FOLDERS = {}
-        OnlyFansFolder = get_folder_OnlyFans()
-        file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false"}.format(OnlyFansFolder['id'])).GetList()
-        for folder in file_list:
-            if str(folder['title']==str(folderName)):
-                FOLDERS.set(str(folderName),folder)
-                return folder
-        if str(settings.CREATE_MISSING_FOLDERS) == "False":
-            settings.maybePrint("Skipping: Create Missing Folder - "+str(folderName))
-            return
-        # create if missing
-        folder = PYDRIVE.CreateFile({"title": str(folderName), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": OnlyFansFolder}]})
-        folder.Upload()
-        FOLDERS.set(str(folderName),folder)
+    global PYDRIVE
+    global FOLDERS
+    if FOLDERS is not None:
+        if FOLDERS.get(str(folderName)) is not None:
+            return FOLDERS.get(str(folderName))
+    else:
+        FOLDERS = {}
+    OnlyFansFolder = get_folder_OnlyFans()
+    if OnlyFansFolder is None:
+        print("Error: Unable To Get Folder - {}".format(folderName))
         return None
-    except Exception as e:
-        print(e)
+    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(OnlyFansFolder)}).GetList()
+    for folder in file_list:
+        if str(folder['title'])==str(folderName):
+            FOLDERS[str(folderName)] = folder['id']
+            settings.maybePrint("Found Folder: {}".format(folderName))
+            return folder['id']
+    if str(settings.CREATE_MISSING_FOLDERS) == "False":
+        settings.maybePrint("Skipping: Create Missing Folder - {}".format(folderName))
+        return None
+    # create if missing
+    folder = PYDRIVE.CreateFile({"title": str(folderName), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": OnlyFansFolder}]})
+    folder.Upload()
+    FOLDERS[str(folderName)] = folder['id']
+    settings.maybePrint("Created Folder: {}".format(folderName))
+    return folder['id']
 
 ####################
 ##### Download #####
@@ -481,6 +497,9 @@ def get_random_image():
     print('Getting Random Image')
     global PYDRIVE
     OnlyFans_Images_Folder = get_folder_by_name("images")
+    if OnlyFans_Images_Folder is None:
+        print("Error: Unable to get Images Folder")
+        return None
     random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_Images_Folder+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     images_list = []
     random_image = None
@@ -513,6 +532,9 @@ def get_random_gallery():
     print('Getting Random Gallery')
     global PYDRIVE
     OnlyFans_Galleries_Folder = get_folder_by_name("galleries")
+    if OnlyFans_Galleries_Folder is None:
+        print("Error: Unable to get Galleries Folder")
+        return None
     random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_Galleries_Folder+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     folder_list = []
     random_gallery = None
@@ -553,6 +575,9 @@ def get_random_performer():
     print('Getting Random Performer')
     global PYDRIVE
     OnlyFans_Performers_Folder = get_folder_by_name("performers")
+    if OnlyFans_Performers_Folder is None:
+        print("Error: Unable to get Performers Folder")
+        return None
     random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_Performers_Folder+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     performer_list = []
     random_performer = None
@@ -582,6 +607,9 @@ def get_random_video():
     print('Getting Random Video')
     global PYDRIVE
     OnlyFans_Videos_Folder = get_folder_by_name("videos")
+    if OnlyFans_Videos_Folder is None:
+        print("Error: Unable to get Videos Folder")
+        return None
     random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_Videos_Folder+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     video_list = []
     random_video = None
@@ -614,6 +642,9 @@ def get_random_scene():
     print('Getting Random Scene')
     global PYDRIVE
     OnlyFans_Scenes_Folder = get_folder_by_name("scenes")
+    if OnlyFans_Scenes_Folder is None:
+        print("Error: Unable to get Scenes Folder")
+        return None
     random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_Scenes_Folder+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     folder_list = []
     random_scene = None
@@ -643,14 +674,6 @@ def get_random_scene():
         return
     print('Random Scene: '+random_scene['title'])
     return [random_scene, folder_name]
-
-def get_random_test():
-    global AUTH
-    if not AUTH:
-        AUTH = authGoogle()
-    print('Getting Random: Test')
-    global PYDRIVE
-    OnlyFans_Scenes_Folder = get_folder_by_name("test")
 
 ##################
 ##### Upload #####
@@ -723,8 +746,8 @@ def reduce(path):
     print("Reduction Complete")
     originalSize = os.path.getsize(str(path))
     newSize = os.path.getsize(str(reducedPath))
-    print("Original Size: {}".format(originalSize))
-    print("Reduced Size: {}".format(newSize))
+    print("Original Size: {}kb - {}mb".format(originalSize/1000, originalSize/1000000))
+    print("Reduced Size: {}kb - {}mb".format(newSize/1000, newSize/1000000))
     if int(originalSize) < int(newSize):
         print("Warning: Original Size Smaller")
         return path
@@ -765,8 +788,8 @@ def fixThumbnail(path):
     print("Thumbnailing Complete")
     originalSize = os.path.getsize(str(path))
     newSize = os.path.getsize(str(thumbedPath))
-    print("Original Size: {}".format(originalSize))
-    print("Thumbed Size: {}".format(newSize))
+    print("Original Size: {}kb - {}mb".format(originalSize/1000, originalSize/1000000))
+    print("Thumbed Size: {}kb - {}mb".format(newSize/1000, newSize/1000000))
     if int(originalSize) < int(newSize):
         print("Warning: Original Size Smaller")
         return path
