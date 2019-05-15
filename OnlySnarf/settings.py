@@ -107,21 +107,20 @@ class Settings:
 
         self.user_DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
 
-        self.user_DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
 
         # user message delay
         self.DELAY = False
 
         i = 0
         while i < len(sys.argv):
-            if '-image' in str(sys.argv[i]):
-                self.TYPE = "image"
-            if '-gallery' in str(sys.argv[i]):
-                self.TYPE = "gallery"
-            if '-video' in str(sys.argv[i]):
-                self.TYPE = "video"
-            if '-scene' in str(sys.argv[i]):
-                self.TYPE = "scene"
+            # if '-image' in str(sys.argv[i]):
+            #     self.TYPE = "image"
+            # if '-gallery' in str(sys.argv[i]):
+            #     self.TYPE = "gallery"
+            # if '-video' in str(sys.argv[i]):
+            #     self.TYPE = "video"
+            # if '-scene' in str(sys.argv[i]):
+            #     self.TYPE = "scene"
             if '-text' in str(sys.argv[i]):
                 self.TEXT = str(sys.argv[i+1])
             if '-debug' in str(sys.argv[i]):
@@ -160,6 +159,13 @@ class Settings:
                 self.IMAGE_UPLOAD_MAX = str(sys.argv[i+1])
             if '-create-folders' in str(sys.argv[i]):
                 self.CREATE_MISSING_FOLDERS = True
+            # skeetzo profile
+            if '-skeetzo' in str(sys.argv[i]):
+                self.VERBAL = True
+                self.BACKING_UP = True
+                self.TWEETING = False
+                self.MOUNT_PATH = "/mnt/onlysnarf"
+                self.MOUNT_DRIVE = "Pron/dbot"
             i += 1
         
         if self.MOUNT_PATH is not None:

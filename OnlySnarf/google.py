@@ -189,49 +189,9 @@ def move_files(fileName, files):
 ##### Folders #####
 ###################
 
-# Creates the OnlyFans folder structure
-def get_folder_OnlyFans():
-    global PYDRIVE
-    global OnlyFansFolder_
-    if OnlyFansFolder_ is not None:
-        return OnlyFansFolder_
-    OnlyFansFolder = None
-    if settings.MOUNT_DRIVE is not None:
-        mount_root = "root"
-        root_folders = settings.MOUNT_DRIVE.split("/")
-        settings.maybePrint("Mount Folders: {}".format(root_folders))
-        def findRoot(parent, folderName):    
-            file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent)}).GetList()
-            for folder in file_list:
-                if str(folder['title']) == str(folderName):
-                    return folder['id']
-            print("Error: Unable to Find Drive Mount")
-            return None    
-        for folder in root_folders:
-            mount_root = findRoot(mount_root, folder)
-            if mount_root is None:
-                mount_root = "root"
-                print("Warning: Drive Mount Folder Not Found")
-                break
-        print("Found Root (alt): {}".format(settings.MOUNT_DRIVE))
-        OnlyFansFolder = mount_root
-    else:
-        file_list = PYDRIVE.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
-        for folder in file_list:
-            if str(folder['title']) == str(settings.ROOT_FOLDER):
-                OnlyFansFolder = folder['id']
-                print("Found Root: {}".format(settings.ROOT_FOLDER))
-    if OnlyFansFolder is None:
-        print("Creating Root: {}".format(settings.ROOT_FOLDER))
-        OnlyFansFolder = PYDRIVE.CreateFile({"title": str(settings.ROOT_FOLDER), "mimeType": "application/vnd.google-apps.folder"})
-        OnlyFansFolder.Upload()
-        OnlyFansFolder = OnlyFansFolder['id']
-    OnlyFansFolder_ = OnlyFansFolder
-    return OnlyFansFolder_
-
 def create_folders():
     print("Creating Folders: {}".format(settings.ROOT_FOLDER))
-    OnlyFansFolder = get_folder_OnlyFans()
+    OnlyFansFolder = get_folder_root()
     if OnlyFansFolder is None:
         print("Error: Unable To Create Folders")
         return
@@ -247,6 +207,15 @@ def create_folders():
             contentFolder = PYDRIVE.CreateFile({"title": str(folder), "parents": [{"id": OnlyFansFolder}], "mimeType": "application/vnd.google-apps.folder"})
             contentFolder.Upload()
 
+def find_folder(parent, folderName):
+    global PYDRIVE
+    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent)}).GetList()
+    for folder in file_list:
+        if str(folder['title']) == str(folderName):
+            return folder['id']
+    print("Error: Unable to Find Folder - {}".format(folderName))
+    return None
+
 def get_folder_by_name(folderName):
     settings.maybePrint("Getting Folder: {}".format(folderName))
     global PYDRIVE
@@ -256,7 +225,7 @@ def get_folder_by_name(folderName):
             return FOLDERS.get(str(folderName))
     else:
         FOLDERS = {}
-    OnlyFansFolder = get_folder_OnlyFans()
+    OnlyFansFolder = get_folder_root()
     if OnlyFansFolder is None:
         print("Error: Unable To Get Folder - {}".format(folderName))
         return None
@@ -275,6 +244,44 @@ def get_folder_by_name(folderName):
     FOLDERS[str(folderName)] = folder['id']
     settings.maybePrint("Created Folder: {}".format(folderName))
     return folder['id']
+
+# Creates the OnlyFans folder structure
+def get_folder_root():
+    global PYDRIVE
+    global OnlyFansFolder_
+    if OnlyFansFolder_ is not None:
+        return OnlyFansFolder_
+    OnlyFansFolder = None
+    if settings.MOUNT_DRIVE is not None:
+        mount_root = "root"
+        root_folders = settings.MOUNT_DRIVE.split("/")
+        settings.maybePrint("Mount Folders: {}".format(root_folders))    
+        for folder in root_folders:
+            mount_root = find_folder(mount_root, folder)
+            if mount_root is None:
+                mount_root = "root"
+                print("Warning: Drive Mount Folder Not Found")
+                break
+        mount_root = find_folder(mount_root, settings.ROOT_FOLDER)
+        if mount_root is None:
+            mount_root = "root"
+            print("Warning: Drive Mount Folder Not Found")
+        else:
+            print("Found Root (alt): {}/{}".format(settings.MOUNT_DRIVE, settings.ROOT_FOLDER))
+        OnlyFansFolder = mount_root
+    else:
+        file_list = PYDRIVE.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+        for folder in file_list:
+            if str(folder['title']) == str(settings.ROOT_FOLDER):
+                OnlyFansFolder = folder['id']
+                print("Found Root: {}".format(settings.ROOT_FOLDER))
+    if OnlyFansFolder is None:
+        print("Creating Root: {}".format(settings.ROOT_FOLDER))
+        OnlyFansFolder = PYDRIVE.CreateFile({"title": str(settings.ROOT_FOLDER), "mimeType": "application/vnd.google-apps.folder"})
+        OnlyFansFolder.Upload()
+        OnlyFansFolder = OnlyFansFolder['id']
+    OnlyFansFolder_ = OnlyFansFolder
+    return OnlyFansFolder_
 
 ####################
 ##### Download #####
@@ -305,9 +312,13 @@ def download_file(file, REPAIR=False):
             request = DRIVE.files().get_media(fileId=file['id'])
             downloader = MediaIoBaseDownload(output, request)
             done = False
+            print("8",end="")
             while done is False:
                 status, done = downloader.next_chunk()
-                print("<-- %d%%\r" % (status.progress() * 100),end="")
+                print("=",end="")
+                # print("<-- %d%%\r" % (status.progress() * 100),end="")
+                
+            print("D")
             print("Download Complete")
         if REPAIR:
             tmp = repair(tmp)
