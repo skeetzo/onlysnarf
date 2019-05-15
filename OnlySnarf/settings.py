@@ -84,6 +84,10 @@ class Settings:
 
         self.ROOT_FOLDER = "OnlySnarf"
 
+        self.SKIP_REPAIR = False
+        self.SKIP_REDUCE = False
+        self.SKIP_THUMBNAIL = False
+
         self.SKIP_USERS = [
             "6710870",
             
@@ -159,12 +163,27 @@ class Settings:
                 self.IMAGE_UPLOAD_MAX = str(sys.argv[i+1])
             if '-create-folders' in str(sys.argv[i]):
                 self.CREATE_MISSING_FOLDERS = True
+            if '-skip-reduce' in str(sys.argv[i]):
+                self.SKIP_REDUCE = True
+            if '-skip-repair' in str(sys.argv[i]):
+                self.SKIP_REPAIR = True
+            if '-skip-thumb' in str(sys.argv[i]):
+                self.SKIP_THUMBNAIL = True
             # skeetzo profile
             if '-skeetzo' in str(sys.argv[i]):
                 self.VERBAL = True
                 self.BACKING_UP = True
                 self.TWEETING = False
                 self.MOUNT_PATH = "/mnt/onlysnarf"
+                self.MOUNT_DRIVE = "Pron/dbot"
+            if '-schizo' in str(sys.argv[i]):
+                self.SKIP_THUMBNAIL = True
+                self.SKIP_REPAIR = True
+                self.SKIP_REDUCE = True
+                self.VERBAL = True
+                self.BACKING_UP = True
+                self.TWEETING = False
+                self.MOUNT_PATH = "/opt/projects/onlysnarf"
                 self.MOUNT_DRIVE = "Pron/dbot"
             i += 1
         
