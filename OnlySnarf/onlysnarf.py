@@ -30,9 +30,8 @@ def send_user_messages():
 ##### MENU FUNCTIONS #####
 ##########################
 
-def all(TYPE):
-    settings.TYPE = TYPE
-    main()
+def all(opt):
+    main(opt)
 
 ####################
 ##### Download #####
@@ -494,7 +493,6 @@ def upload(fileChoice, path=None, text=None, keywords=None, performers=None):
     settings.maybePrint("Uploading: {} - {} - {}".format(fileChoice, path, text))
     successful = False
     try:
-        settings.TYPE = fileChoice
         if fileChoice == 'image':
             successful = OnlySnarf.upload_file_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
         elif fileChoice == 'gallery':
@@ -517,28 +515,28 @@ def upload(fileChoice, path=None, text=None, keywords=None, performers=None):
 ##### FUNCTIONS #####
 #####################
 
-def main():
+def main(opt):
     print("0/3 : Deleting Locals")
     remove_local()
     sys.stdout.flush()
     #################################################
-    print("1/3 : Running - {}".format(settings.TYPE))
-    if str(settings.TYPE) == "image":
+    print("1/3 : Running - {}".format(opt))
+    if str(opt) == "image":
         released = release_image()
-    elif str(settings.TYPE) == "video":
+    elif str(opt) == "video":
         released = release_video()
-    elif str(settings.TYPE) == "gallery":
+    elif str(opt) == "gallery":
         released = release_gallery()
-    elif str(settings.TYPE) == "performer":
+    elif str(opt) == "performer":
         released = release_performer()
-    elif str(settings.TYPE) == "scene":
+    elif str(opt) == "scene":
         released = release_scene()
     else:
         print('Missing Args!')
         return
     sys.stdout.flush()
     if released == False:
-        print("Error: Failed to release - {}".format(settings.TYPE))
+        print("Error: Failed to release - {}".format(opt))
         return
     #################################################
     print('2/3 : Cleaning Up Files')

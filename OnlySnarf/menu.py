@@ -111,11 +111,13 @@ def initialize():
         [ "Force Backup", settings.BACKING_UP_FORCE, ["True","False"]],
         [ "Force Upload", settings.FORCE_UPLOAD, ["True","False"]],
         [ "Mount Path", settings.MOUNT_PATH],
+        [ "Google: Root Folder Path", settings.MOUNT_DRIVE],
         [ "Users Path", settings.USERS_PATH],
         [ "Show Window", settings.SHOW_WINDOW, ["True","False"]],
         [ "Text", settings.TEXT],
-        [ "Type", settings.TYPE],
         [ "Image", settings.IMAGE],
+        [ "Google: Root Folder Name", settings.ROOT_FOLDER],
+        [ "Google: Drive Folders", settings.DRIVE_FOLDERS],
         [ "Image Limit", settings.IMAGE_UPLOAD_LIMIT],
         [ "Image Max", settings.IMAGE_UPLOAD_MAX],
         [ "Tweeting", settings.TWEETING, ["True","False"]],
@@ -168,8 +170,7 @@ def finalizeAction(actionChoice):
                 return action()
             # Call the matching function
             fileChoice = list(fileItems[int(fileChoice)])[1]
-            settings.TYPE = fileChoice
-            return performAction(actionChoice)
+            return performAction(actionChoice, fileChoice)
         except (ValueError, IndexError, KeyboardInterrupt):
             print("Incorrect Index")
         except:
@@ -177,11 +178,11 @@ def finalizeAction(actionChoice):
             print("Missing Method") 
 
 ### Action Menu - perform
-def performAction(actionChoice):
+def performAction(actionChoice, fileChoice):
     for action in actionChoice:
         try:
             method = getattr(onlysnarf, str(action))
-            response = method(settings.TYPE)
+            response = method(fileChoice)
             if response:
                 if str(action) == "download":
                     for setting in settingItems:
@@ -251,8 +252,19 @@ def set_settings():
                 settingValue = input("Enter the upload text: ")
             elif str(settingChoice) == "Mount Path":
                 settingValue = input("Enter the mount path: ")
+            elif str(settingChoice) == "Google: Root Folder Path":
+                settingValue = input("Enter the drive path (folderName/folderName/...): ")
             elif str(settingChoice) == "Image":
                 settingValue = input("Enter the image path: ")
+            elif str(settingChoice) == "Google: Root Folder Name":
+                settingValue = input("Enter the Google root folder name: ")
+            elif str(settingChoice) == "Google: Drive Folders":
+                settingValue = input("Enter the Google drive folders (separated by ',', no spaces): ")
+                settingValue = settingValue.split(",")
+            elif str(settingChoice) == "Image Limit":
+                settingValue = input("Enter the image upload limit: ")
+            elif str(settingChoice) == "Image Max":
+                settingValue = input("Enter the image upload max: ")
             else:
                 list_ = list(settingItems[int(choice)][2])
                 print(colorize(str(settingChoice)+" =", 'blue'))
