@@ -308,17 +308,17 @@ def download_file(file, REPAIR=False):
     settings.maybePrint('path: '+str(tmp))
     if str(ext).lower() == ".mp4":
         with open(tmp, 'w+b') as output:
+            # print("8",end="",flush=True)
             file_id = file['id']
             request = DRIVE.files().get_media(fileId=file['id'])
             downloader = MediaIoBaseDownload(output, request)
+            # print("=",end="",flush=True)
             done = False
-            print("8",end="")
             while done is False:
+                # print("=",end="",flush=True)
                 status, done = downloader.next_chunk()
-                print("=",end="")
-                # print("<-- %d%%\r" % (status.progress() * 100),end="")
-                
-            print("D")
+                print("<-- %d%%\r" % (status.progress() * 100),end="")
+            # print("D")
             print("Download Complete")
         if REPAIR:
             tmp = repair(tmp)
@@ -332,12 +332,13 @@ def download_file(file, REPAIR=False):
     if not os.path.isfile(str(tmp)):
         print("Error: Missing Downloaded File")
         return
-    print('File Size: '+str(os.path.getsize(tmp)))
+    size = os.path.getsize(tmp)
+    print("File Size: {}kb - {}mb".format(size/1000, size/1000000))
     global ONE_MEGABYTE
-    if os.path.getsize(tmp) <= ONE_MEGABYTE:
+    if size <= ONE_MEGABYTE:
         settings.maybePrint("Warning: Small File Size")
     global ONE_HUNDRED_KILOBYTES
-    if os.path.getsize(tmp) <= ONE_HUNDRED_KILOBYTES:
+    if size <= ONE_HUNDRED_KILOBYTES:
         settings.maybePrint("Error: File Size Too Small")
         print("Download Failure")
         return
@@ -710,6 +711,9 @@ def upload_file(filename=None, mimetype="video/mp4"):
 ##################
 
 def repair(path):
+    if (settings.SKIP_REPAIR):
+        print("Warning: Skipping Repair")
+        return path
     repairedPath = str(path).replace(".mp4", "_fixed.mp4")
     try:
         print("Repairing: {} <-> {}".format(path, settings.WORKING_VIDEO))
@@ -730,6 +734,9 @@ def repair(path):
     return str(repairedPath)
 
 def reduce(path):
+    if (settings.SKIP_REDUCE):
+        print("Warning: Skipping Reduction")
+        return path
     reducedPath = str(path).replace(".mp4", "_reduced.mp4")
     try:
         print("Reducing: {}".format(path))
@@ -768,6 +775,9 @@ def reduce(path):
     return reducedPath
 
 def fixThumbnail(path):
+    if (settings.SKIP_THUMBNAIL):
+        print("Warning: Skipping Thumbnail")
+        return path
     thumbedPath = str(path).replace(".mp4", "_thumbed.mp4")
     try:
         print("Thumbnailing: {}".format(path))

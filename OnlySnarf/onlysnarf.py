@@ -413,14 +413,14 @@ def release_scene():
             if not users or str(users).lower() == "none":
                 print("Warning: Missing User Choice")
             elif str(users) == "all":
-                successful_message = message_all(message=message, image=preview, price=price)
+                successful_message = OnlySnarf.message(choice="all", message=message, image=preview, price=price)
             elif str(users) == "recent":
-                successful_message = message_recent(message=message, image=preview, price=price)
+                successful_message = OnlySnarf.message(choice="all", message=message, image=preview, price=price)
             elif str(users) == "favorites":
-                successful_message = message_favorites(message=message, image=preview, price=price)
+                successful_message = OnlySnarf.message(choice="all", message=message, image=preview, price=price)
             else:
                 for user in users:
-                    successful_message = message_by_username(message=message, image=preview, price=price, username=user)
+                    successful_message = OnlySnarf.message(choice="user", message=message, image=preview, price=price, username=user)
             if successful_message:
                 Google.move_file(google_folder)
             else:
@@ -552,7 +552,7 @@ def test(TYPE):
     remove_local()
     print('1/3 : Testing')
 
-    #  ### Gallery ###
+    # ### Gallery ###
     # print('TESTING: Gallery x 10')
     # for i in range(10):
     #     release_gallery()
@@ -561,28 +561,23 @@ def test(TYPE):
     #     if not reset:
     #         return print("Error: Failed to Reset")
     # return sys.exit(0)
+    # #######################
 
-    Google.get_random_test()
+    # ### Message ###
+    # response = download_random_image()
+    # if not response or response == None:
+    #     print("Error: Missing Image")
+    #     return
+    # OnlySnarf.message(choice="all", message="ass ass ass ass", image=response[1], price="10.00")
+    # # message(choice="recent", message="8=======D", image=response[1], price="50.00")
+    # Google.move_file(response[2])
+    # #######################
+    # ### Exit Gracefully ###
+    # OnlySnarf.exit()
+    # return
+    # #######################
 
-    return
-
-    ## Message ###
-    response = download_random_image()
-    if not response or response == None:
-        print("Error: Missing Image")
-        return
-    OnlySnarf.message(choice="all", message="ass ass ass ass", image=response[1], price="10.00")
-    # message(choice="recent", message="8=======D", image=response[1], price="50.00")
-    Google.move_file(response[2])
-    ##############
-
-    #######################
-    ### Exit Gracefully ###
-    OnlySnarf.exit()
-    return
-    #######################
-
-    ### Users ###
+    # ### Users ###
     # print('TESTING: Users')
     # users = OnlySnarf.get_users()
     # time.sleep(30)
@@ -590,41 +585,42 @@ def test(TYPE):
     # if not reset:
         # return print("Error: Failed to Reset")
     # return
-    #####################
-    print('TESTING: Chat Logs')
-    OnlySnarf.update_chat_logs()
-    time.sleep(30)
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
-    
     #######################
-    ### Exit Gracefully ###
-    OnlySnarf.exit()
-    return
-    #######################
+
+    # ### Chat Logs ###
+    # print('TESTING: Chat Logs')
+    # OnlySnarf.update_chat_logs()
+    # time.sleep(30)
+    # reset = OnlySnarf.reset()
+    # if not reset:
+    #     return print("Error: Failed to Reset")
+    # #######################
+    # ### Exit Gracefully ###
+    # OnlySnarf.exit()
+    # return
+    # #######################
     
-    ### Image ###
-    print('TESTING: Image')
-    release_image()
-    time.sleep(30)
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
-    ### Gallery ###
-    print('TESTING: Gallery')
-    release_gallery()
-    time.sleep(30)
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
-    ### Performer ###
-    print('TESTING: Performer')
-    release_performer()
-    time.sleep(30)
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
+    # ### Image ###
+    # print('TESTING: Image')
+    # release_image()
+    # time.sleep(30)
+    # reset = OnlySnarf.reset()
+    # if not reset:
+    #     return print("Error: Failed to Reset")
+    # ### Gallery ###
+    # print('TESTING: Gallery')
+    # release_gallery()
+    # time.sleep(30)
+    # reset = OnlySnarf.reset()
+    # if not reset:
+    #     return print("Error: Failed to Reset")
+    # ### Performer ###
+    # print('TESTING: Performer')
+    # release_performer()
+    # time.sleep(30)
+    # reset = OnlySnarf.reset()
+    # if not reset:
+    #     return print("Error: Failed to Reset")
     ### Scene ###
     print('TESTING: Scene')
     release_scene()
@@ -632,15 +628,14 @@ def test(TYPE):
     reset = OnlySnarf.reset()
     if not reset:
         return print("Error: Failed to Reset")
-    ### Video ###
-    print('TESTING: Video')
-    release_video()
-    time.sleep(30)
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
-    # return
-
+    # ### Video ###
+    # print('TESTING: Video')
+    # release_video()
+    # time.sleep(30)
+    # reset = OnlySnarf.reset()
+    # if not reset:
+    #     return print("Error: Failed to Reset")
+    
     #######################
     ### Exit Gracefully ###
     OnlySnarf.exit()
