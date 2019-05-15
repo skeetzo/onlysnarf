@@ -58,8 +58,12 @@
 	**1.0.4 : 5/8/2019**
 	- more minor bug fixes
 **1.1.0 : 5/12/2019**
+	- added: (settings).MOUNT_DRIVE, ROOT_FOLDER, DRIVE_FOLDERS, CREATE_MISSING_FOLDERS
 	- create Google folder structure programmatically
 	- predefine Google root
+	**5/14/2019**
+	- removed: settings.TYPE
+	- added: settings profile -> skeetzo
 
 ## ToDo
 	- read messages html for emojis
@@ -69,7 +73,8 @@
 	- add Twitter
 	- prepare a scene for release
 	- update backup function to include original folder name -> posted/galleries/$file
-
+	- add `local` setting
 
 ## Install
 sudo python3 setup.py install
+`onlysnarf -verbal -debug`
