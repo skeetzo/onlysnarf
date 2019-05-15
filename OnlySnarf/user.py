@@ -57,7 +57,7 @@ class User:
 
     def sendMessage(self, message, image, price):
         try:
-            print("Sending Message: {} <- {} - {} - {}".format(self.id, message, image, price))
+            print("Sending Message: {} <- {} - {} - ${}".format(self.id, message, image, price))
             OnlySnarf.goto_user(self.id)
             OnlySnarf.enter_message(message)
             image_name = os.path.basename(image)

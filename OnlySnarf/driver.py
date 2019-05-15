@@ -165,6 +165,7 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
         print("- Keywords: {}".format(keywords))
         print("- Performers: {}".format(performers))
         print("- Text: {}".format(text))
+        print("- Tweeting: {}".format(settings.TWEETING))
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
         if not tweeting:
             WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
@@ -232,6 +233,7 @@ def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers
         print("- Keywords: {}".format(keywords))
         print("- Performers: {}".format(performers))
         print("- Text: {}".format(text))
+        print("- Tweeting: {}".format(settings.TWEETING))
         files_path = []
         for file in pathlib.Path(str(path)).iterdir():  
             files_path.append(str(file))
@@ -260,7 +262,7 @@ def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers
 ##### Messages #####
 ####################
 
-def message(choice=None, message=None, image=None, price=None):
+def message(choice=None, message=None, image=None, price=None, username=None):
     if str(choice) == "all":
         users = get_users()
     elif str(choice) == "recent":
@@ -269,8 +271,11 @@ def message(choice=None, message=None, image=None, price=None):
     elif str(choice) == "favorites":
         print("Messaging: Recent")
         users = get_favorite_users()
-    elif str(choice) != "None":
-        print("Messaging: User - %s" % username)
+    elif str(choice) == "user":
+        print("Messaging: User - {}".format(username))
+        if username is None:
+            print("Error: Missing Username")
+            return
         users = [get_user_by_username(str(username))]
     else:
         print("Error: Missing Message Choice")
