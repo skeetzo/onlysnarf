@@ -65,15 +65,26 @@
 	- removed: settings.TYPE
 	- added: settings profile -> skeetzo
 
+	- updated: scenes to include trailer addition
+
 ## ToDo
-	- read messages html for emojis
-	- add login prompt for saving Twitter password -> base64 hash instead of in config.json
-	|_ add `Auth` option to settings?
-	- finalize / fix script exit
-	- add Twitter
-	- prepare a scene for release
-	- update backup function to include original folder name -> posted/galleries/$file
-	- add `local` setting
+	- add: read messages html for emojis
+	- add: login prompt for saving Twitter password -> base64 hash instead of in config.json
+	|_ add: `Auth` option to settings?
+	- finalize / fix: script exit
+	- add: Twitter
+	- prepare: a scene for release
+	- update: backup function to include original folder name -> posted/galleries/$file
+	- add: `local` setting
+	- add: feature for if missing scene previews to capture thumbnail from content/trailer
+	- test: performers upload w/ change to images/videos preferences
+	- add: same change to other folder download preferences
+	- update: data.txt for scenes with trailer
+	- update: scene to include trailer
+	- update: upload trailer same time as previews instead of content
+	- add: cron feature for installing crons
+	- add: scene feature to check data.txts for content to release n days after trailer/preview
+	- add: way to select google drive file to download
 
 ## Install
 sudo python3 setup.py install
