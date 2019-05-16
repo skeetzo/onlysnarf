@@ -70,6 +70,8 @@ class Settings:
         self.FILE_NAME = None
         self.FILE_PATH = None
 
+        self.THUMBNAILING_PREVIEW = True
+
         self.IMAGE = None
 
         self.RECENT_USER_COUNT = 3
@@ -178,8 +180,8 @@ class Settings:
                 self.MOUNT_DRIVE = "Pron/dbot"
             if '-schizo' in str(sys.argv[i]):
                 self.SKIP_THUMBNAIL = True
-                self.SKIP_REPAIR = True
-                self.SKIP_REDUCE = True
+                # self.SKIP_REPAIR = True
+                # self.SKIP_REDUCE = True
                 self.VERBAL = True
                 self.BACKING_UP = True
                 self.TWEETING = False

@@ -325,7 +325,7 @@ def download_file(file, REPAIR=False):
         global FIFTY_MEGABYTES
         if int(os.stat(str(tmp)).st_size) >= FIFTY_MEGABYTES or settings.FORCE_REDUCTION: # greater than 1GB
             tmp = reduce(tmp)
-        tmp = fixThumbnail(tmp)
+        tmp = thumbnail_fix(tmp)
     else:
         file.GetContentFile(tmp)
     ### Finish ###
@@ -403,7 +403,7 @@ def download_performer(folder):
     content_title = random_content['title']
     settings.maybePrint("Folder: {}".format(content_title))
     # download folder
-    file_list = PYDRIVE.ListFile({'q': "'"+random_content['id']+"' in parents and trashed=false and mimeType contains 'image/jpeg'"}).GetList()
+    file_list = PYDRIVE.ListFile({'q': "'"+random_content['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\' or mimeType contains \'video/mp4\')"}).GetList()
     folder_size = len(file_list)
     settings.maybePrint('Folder size: {}'.format(folder_size))
     settings.maybePrint('Upload limit: {}'.format(settings.IMAGE_UPLOAD_LIMIT))
@@ -411,20 +411,35 @@ def download_performer(folder):
     if folder_size == 0:
         print("Error: Missing Files")
         return
-    file_list_random = []
-    for x in range(folder_size):
-        random_file = random.choice(file_list)
-        file_list.remove(random_file)
-        file_list_random.append(random_file)
-    file_list_random = file_list_random[:settings.IMAGE_UPLOAD_LIMIT]
+    # get all images first then videos 1 at a time from folder
+    videos = []
+    images = []
+
+    for file in file_list:
+        if "mp4" in str(file['title']):
+            videos.add(file)
+        else:
+            images.add(file)
+    if len(images) > len(videos):
+        print("Found: Images")
+        file_list_random = []
+        for x in range(folder_size):
+            random_file = random.choice(file_list)
+            file_list.remove(random_file)
+            file_list_random.append(random_file)
+        file_list = file_list_random[:settings.IMAGE_UPLOAD_LIMIT]
+    else:
+        print("Found: Videos")
+        file_list = [random.choice(videos)]
+
     i = 1
-    for file in sorted(file_list_random, key = lambda x: x['title']):
-        print('Downloading {} from GDrive ({}/{})'.format(file['title'], i, folder_size))
+    for file in sorted(file_list, key = lambda x: x['title']):
+        print('Downloading: {} ({}/{})'.format(file['title'], i, folder_size))
         settings.maybePrint('filePath: '+tmp+"/"+str(file['title']))
         file.GetContentFile(tmp+"/"+str(file['title']))
         i+=1
     print('Download Complete')
-    return [file_list_random, tmp, content_title]
+    return [file_list, tmp, content_title]
 
 # Download Scene
 def download_scene(sceneFolder):
@@ -473,12 +488,17 @@ def download_scene(sceneFolder):
     with open(os.path.join(tmp, "data.json"), 'r', encoding='utf-8') as f:
         data = json.load(f)
     settings.maybePrint("data.json: {}".format(data))
-    preview = PYDRIVE.ListFile({'q': "'"+preview['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
+    preview = PYDRIVE.ListFile({'q': "'"+preview['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\' or mimeType contains \'video/mp4\')"}).GetList()
     if len(preview) == 0:
         print("Error: Missing Scene Preview")
         return
     preview = preview[0]
     preview = download_file(preview)
+    if "mp4" in preview:
+        if str(settings.THUMBNAILING_PREVIEW) == "False":
+            print("Error: Preview Thumbnailing Disabled")
+            return
+        preview = thumbnail_preview_fix(preview)
     if data is None:
         print("Error: Missing Scene Data")
         return
@@ -774,7 +794,7 @@ def reduce(path):
         return path
     return reducedPath
 
-def fixThumbnail(path):
+def thumbnail_fix(path):
     if (settings.SKIP_THUMBNAIL):
         print("Warning: Skipping Thumbnail")
         return path
@@ -818,3 +838,26 @@ def fixThumbnail(path):
         print("Error: Missing Thumbnailed File")
         return path
     return thumbedPath
+
+def thumbnail_preview_fix(path):
+    # if (settings.SKIP_THUMBNAIL):
+        # print("Warning: Skipping Thumbnail")
+        # return
+    try:
+        print("Thumbnailing: {}".format(path))
+        loglevel = "quiet"
+        if str(settings.DEBUG) == "True":
+            loglevel = "debug"
+        thumbnail_path = os.path.join(os.path.dirname(str(path)), 'thumbnail.png')
+        settings.maybePrint("thumbnail path: {}".format(thumbnail_path))
+        p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-i', str(path),'-ss', '00:00:00.000', '-vframes', '1', str(thumbnail_path)])
+        p.communicate()
+        print("Thumbnailing Complete")
+        return thumbedPath
+    except FileNotFoundError:
+        print("Warning: Ignoring Thumbnail")
+    except AttributeError:
+        print("Thumbnailing: Captured PNG")
+    except:
+        settings.maybePrint(sys.exc_info()[0])
+        print("Error: Thumbnailing Fuckup")    
