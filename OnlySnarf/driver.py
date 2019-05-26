@@ -135,7 +135,7 @@ def reset():
 ##################
 
 # Uploads a file to OnlyFans
-def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None, tweeting=True):
+def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
     try:
         logged_in = False
         global BROWSER
@@ -167,7 +167,7 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
         print("- Text: {}".format(text))
         print("- Tweeting: {}".format(settings.TWEETING))
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
-        if not tweeting:
+        if str(settings.TWEETING) == "False":
             WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
         BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
         BROWSER.find_element_by_id("fileupload_photo").send_keys(str(path))
@@ -205,7 +205,7 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
         return False
 
 # Uploads a folder to OnlyFans
-def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers=None, tweeting=True):
+def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
     try:
         logged_in = False
         global BROWSER
@@ -240,7 +240,7 @@ def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers
         settings.maybePrint('Files: '+str(files_path))
         BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
-        if not tweeting:
+        if str(settings.TWEETING) == "False":
             WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
         for file in files_path:
             print('Uploading: '+str(file))

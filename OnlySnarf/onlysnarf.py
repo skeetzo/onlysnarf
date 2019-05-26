@@ -14,18 +14,6 @@ from . import google as Google
 from . import driver as OnlySnarf
 # from pprint import pprint
 
-#################
-##### Crons #####
-#################
-
-# sends a message to all recent subscribers
-def greet_new_subscribers():
-    pass # needs to add OnlySnarf.searchNotificationsForNewSubscribers
-
-# sends the image / message prepared for all users
-def send_user_messages():
-    pass
-
 ##########################
 ##### MENU FUNCTIONS #####
 ##########################
@@ -647,9 +635,10 @@ def test(TYPE):
 if __name__ == "__main__":
     try:
         # os.system('clear')
+        settings.initialize()
         OnlySnarf.initialize()
         Google.initialize()
-        main()
+        main(settings.TYPE)
     except:
         print(sys.exc_info()[0])
         print("Shnarf!")

@@ -36,9 +36,11 @@ class Settings:
         # delete uploaded content
         self.DELETING = False
         self.DELETING_FORCED = False
+        
         # -video
         # -gallery
         # -image
+        # -scene
         self.TYPE = None
 
         # Twitter hashtags
@@ -49,6 +51,11 @@ class Settings:
 
         # -show -> shows window
         self.SHOW_WINDOW = False
+
+        self.SPECIAL_CRONS = [
+            "queuedMessages",
+            "greetNew"
+        ]
 
         # -text
         self.TEXT = None
@@ -119,14 +126,14 @@ class Settings:
 
         i = 0
         while i < len(sys.argv):
-            # if '-image' in str(sys.argv[i]):
-            #     self.TYPE = "image"
-            # if '-gallery' in str(sys.argv[i]):
-            #     self.TYPE = "gallery"
-            # if '-video' in str(sys.argv[i]):
-            #     self.TYPE = "video"
-            # if '-scene' in str(sys.argv[i]):
-            #     self.TYPE = "scene"
+            if '-image' in str(sys.argv[i]):
+                self.TYPE = "image"
+            if '-gallery' in str(sys.argv[i]):
+                self.TYPE = "gallery"
+            if '-video' in str(sys.argv[i]):
+                self.TYPE = "video"
+            if '-scene' in str(sys.argv[i]):
+                self.TYPE = "scene"
             if '-text' in str(sys.argv[i]):
                 self.TEXT = str(sys.argv[i+1])
             if '-debug' in str(sys.argv[i]):

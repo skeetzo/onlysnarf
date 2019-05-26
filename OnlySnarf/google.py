@@ -304,7 +304,7 @@ def download_file(file, REPAIR=False):
         settings.maybePrint('ext: '+str(ext))
     name = "{}{}".format(name, ext)
     tmp = os.path.join(tmp, name)
-    print("Downloading: {}".format(name))
+    print("name: {}".format(name))
     settings.maybePrint('path: '+str(tmp))
     if str(ext).lower() == ".mp4":
         with open(tmp, 'w+b') as output:
@@ -317,7 +317,7 @@ def download_file(file, REPAIR=False):
             while done is False:
                 # print("=",end="",flush=True)
                 status, done = downloader.next_chunk()
-                print("<-- %d%%\r" % (status.progress() * 100),end="")
+                print("Downloading: %d%%\r" % (status.progress() * 100),end="")
             # print("D")
             print("Download Complete")
         if REPAIR:
