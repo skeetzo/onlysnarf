@@ -97,6 +97,9 @@ def log_into_OnlyFans():
                 twitter = BROWSER.find_element_by_xpath('//a[@class="g-btn m-rounded m-flex m-lg btn-twitter"]').click()
             elif int(opt)==1:
                 twitter = BROWSER.find_element_by_xpath('//a[@class="btn btn-default btn-block btn-lg btn-twitter"]').click()
+            elif int(opt)==2:
+                twitter = BROWSER.find_element_by_xpath('//a[@class="g-btn m-rounded m-flex m-lg"]').click()
+
         except NoSuchElementException as e:
             print("Warning: Login Failure, Retrying")
             login(opt+1)
