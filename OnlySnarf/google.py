@@ -521,6 +521,42 @@ def download_scene(sceneFolder):
 ##### Get #####
 ###############
 
+def get_message_image(folderName):
+    global AUTH
+    if not AUTH:
+        AUTH = authGoogle()
+    print('Getting Message Image: {}'.format(folderName))
+    global PYDRIVE
+    OnlyFans_Images_Folder = get_folder_by_name("messages")
+    if OnlyFans_Images_Folder is None:
+        print("Error: Unable to get Images Folder")
+        return None
+    random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_Images_Folder+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+    images_list = []
+    random_image = None
+    folder_name = None
+    for folder in random_folders:
+        if folder['title'] != str(folderName):
+            continue
+        if str(settings.VERBAL) == "True":
+            print('checking folder: '+folder['title'],end="")
+        images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
+        if len(images_list_tmp)>0:
+            images_list.append(folder)
+            settings.maybePrint(" -> added")
+        else:
+            settings.maybePrint(" -> empty")
+    if len(images_list)==0:
+        print('No image file found!')
+        return
+    random_image = random.choice(images_list)
+    folder_name = random_image['title'];
+    print('Messages Folder: '+random_image['title'])
+    random_image = PYDRIVE.ListFile({'q': "'"+random_image['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
+    random_image = random.choice(random_image)
+    print('Messages Image: '+random_image['title'])
+    return [random_image, folder_name]
+
 # Downloads random image from Google Drive
 def get_random_image():
     global AUTH

@@ -29,6 +29,8 @@ from .settings import SETTINGS as settings
 
 BROWSER = None
 USER_CACHE = None
+USER_CACHE_TIMEOUT = 600 # ten minutes
+USER_CACHE_LOCKED = False
 settings.USERS_PATH = None
 INITIALIZED = False
 OnlyFans_USERNAME = None        
@@ -274,6 +276,9 @@ def message(choice=None, message=None, image=None, price=None, username=None):
     elif str(choice) == "favorites":
         print("Messaging: Recent")
         users = get_favorite_users()
+    elif str(choice) == "new":
+        print("Messaging: New")
+        users = get_new_users()
     elif str(choice) == "user":
         print("Messaging: User - {}".format(username))
         if username is None:
@@ -430,10 +435,14 @@ def read_chat(user):
 
 # update chat logs for all users
 def update_chat_logs():
+    global USER_CACHE_LOCKED
+    USER_CACHE_LOCKED = True
     print("Updating User Chats")
     users = get_users()
     for user in users:
         update_chat_log(user)
+    USER_CACHE_LOCKED = False
+
 
 def update_chat_log(user):
     print("Updating Chat: {} - {}".format(user.username, user.id))
@@ -548,9 +557,15 @@ def get_user_by_username(username):
 def get_favorite_users():
     return []
 
-def get_recent_user():
+# returns users that have no messages sent to them
+def get_new_users():
+    update_chat_logs()
     users = get_users()
-    return users[0]
+    newUsers = []
+    for user in users:
+        if len(user.messages_to) == 0:
+            newUsers.append(user)
+    return newUsers
 
 def get_recent_users():
     users = get_users()
@@ -568,14 +583,19 @@ def get_recent_users():
     return users_
 
 def reset_user_cache():
+    global USER_CACHE_LOCKED
+    if USER_CACHE_LOCKED:
+        settings.maybePrint("User Cache: locked, skipping reset")
+        return
     global USER_CACHE
     USER_CACHE = False
     settings.maybePrint("User Cache: reset")
 
 def start_user_cache():
     settings.maybePrint("User Cache: starting")
+    global USER_CACHE_TIMEOUT
     try:
-        threading.Timer(600.0, reset_user_cache).start() # after 10 minutes
+        threading.Timer(USER_CACHE_TIMEOUT, reset_user_cache).start() # after 10 minutes
         settings.maybePrint("User Cache: started")
     except:
         settings.maybePrint("User Cache: error starting")

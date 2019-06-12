@@ -52,7 +52,7 @@ menuItems = [
 # Actions Menu
 actionItems = sorted([
     [ "Test", ["test"]],
-    [ "All", ["all"]],
+    [ "Release", ["release"]],
     [ "Download", ["download"]],
     # [ "Upload", ["upload"]],
     # [ "Backup", ["backup"]],
@@ -66,12 +66,13 @@ actionItems.insert(0,[ "Back", ["main"]])
 
 # Message Menu
 messageItems = sorted([
-    [ "All", ["message_all"]],
-    [ "Recent", ["message_recent"]],
-    [ "User by Username", ["message_by_username"]],
-    [ "User by ID", ["message_by_id"]]
+    [ "All", "all"],
+    [ "New", "new"],
+    [ "Recent", "recent"],
+    [ "User by Username", "username"],
+    [ "User by ID", "id"]
 ])
-messageItems.insert(0,[ "Back", ["main"]])
+messageItems.insert(0,[ "Back", "main"])
 
 # File Type Menu
 fileItems = sorted([
