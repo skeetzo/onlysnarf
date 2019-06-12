@@ -183,7 +183,7 @@ class Settings:
                 self.VERBAL = True
                 self.BACKING_UP = True
                 self.TWEETING = False
-                self.MOUNT_PATH = "/mnt/onlysnarf"
+                self.MOUNT_PATH = "/mnt/apps/onlysnarf"
                 self.MOUNT_DRIVE = "Pron/dbot"
             if '-schizo' in str(sys.argv[i]):
                 self.SKIP_THUMBNAIL = True
