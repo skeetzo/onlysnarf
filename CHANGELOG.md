@@ -80,6 +80,13 @@
   - update: backup function to include original folder name -> posted/galleries/$file
   - add: feature for if missing scene previews to capture thumbnail from content/trailer
   - add: way to select google drive file to download
+    Upload
+    Message
+    -> Random
+    -> Select
+    --> Select Folder
+    ---> repeat until image
+
 
 ### Medium Priority
   - add: login prompt for saving Twitter password -> base64 hash instead of in config.json

@@ -39,6 +39,27 @@ def download(fileChoice):
     else:
         return print("Error: Missing File Choice")
 
+def download_message_image(folderName="random"):
+    remove_local()
+    print('Fetching Image')
+    response = Google.get_message_image(folderName)
+    if response == None:
+        print("Error: Missing Image Download")
+        return
+    google_file = response[0]
+    folder_name = response[1]
+    if google_file == None:
+        return
+    file_name = google_file['title']
+    file_path = Google.download_file(google_file)
+    if google_file == None:
+        print('Error: Missing Random Image')
+        return
+    if file_path == None:
+        print('Error: Empty Download')
+        return
+    return [file_name, file_path, google_file, folder_name]
+
 def download_random_image():
     remove_local()
     print('Fetching Image')
@@ -150,6 +171,31 @@ def download_random_scene():
         return
     return results
 
+###################
+##### Message #####
+###################
+
+def message(opt):
+    message = input("Message: ")
+    waiting = True
+    while waiting:
+        try:
+            price = input("Price: ")
+            "{:.2f}".format(float(price))
+            waiting = False
+        except ValueError:
+            print("Enter a currency amount!")
+    response = Google.get_message_image(opt)
+    if not response or response == None:
+        print("Error: Missing Image")
+        return
+    successful_message = OnlySnarf.message(choice=opt, message=message, image=response[1], price=price)
+    if successful_message and str(opt) != "new":
+        Google.move_file(response[2])
+    else:
+        print("Error: Failure Messaging")
+        return False
+
 #################
 ##### Reset #####
 #################
@@ -176,6 +222,38 @@ def remove_local():
 ###################
 ##### Release #####
 ###################
+
+def release(opt):
+    print("0/3 : Deleting Locals")
+    remove_local()
+    sys.stdout.flush()
+    #################################################
+    print("1/3 : Running - {}".format(opt))
+    if str(opt) == "image":
+        released = release_image()
+    elif str(opt) == "video":
+        released = release_video()
+    elif str(opt) == "gallery":
+        released = release_gallery()
+    elif str(opt) == "performer":
+        released = release_performer()
+    elif str(opt) == "scene":
+        released = release_scene()
+    else:
+        print('Missing Args!')
+        return
+    sys.stdout.flush()
+    if released == False:
+        print("Error: Failed to release - {}".format(opt))
+        return
+    #################################################
+    print('2/3 : Cleaning Up Files')
+    remove_local()
+    print('Files Cleaned ')
+    #################################################
+    print('3/3 : Google Drive to OnlyFans Upload Complete')
+    sys.stdout.flush()
+    OnlySnarf.exit()
 
 def release_image():
     try:
