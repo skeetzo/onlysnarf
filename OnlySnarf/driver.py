@@ -239,14 +239,14 @@ def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers
         print("- Performers: {}".format(performers))
         print("- Text: {}".format(text))
         print("- Tweeting: {}".format(settings.TWEETING))
+        WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
+        if str(settings.TWEETING) == "False":
+            WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
+        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
         files_path = []
         for file in pathlib.Path(str(path)).iterdir():  
             files_path.append(str(file))
         settings.maybePrint('Files: '+str(files_path))
-        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
-        WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
-        if str(settings.TWEETING) == "False":
-            WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
         for file in files_path:
             print('Uploading: '+str(file))
             BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
