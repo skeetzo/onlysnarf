@@ -71,6 +71,8 @@
   **1.1.2 : 5/25/2019**
   - added: cron.py
   - |_ needs a menu system to be added
+  **1.1.3 : 6/26/2019**
+  - fixed file & directory uploads
 
 ## ToDo
 ### Low Priority

@@ -73,7 +73,7 @@ def log_into_OnlyFans():
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     # options.setExperimentalOption('useAutomationExtension', false);
-    options.add_argument('--disable-gpu')  # Last I checked this was necessary.
+    options.add_argument('--disable-gpu')
     # BROWSER = webdriver.Chrome(binary=CHROMEDRIVER_PATH, chrome_options=options)
     CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
     os.environ["webdriver.chrome.driver"] = CHROMEDRIVER_PATH
@@ -96,11 +96,11 @@ def log_into_OnlyFans():
             BROWSER.get(('https://onlyfans.com'))
             # login via Twitter
             if int(opt)==0:
-                twitter = BROWSER.find_element_by_xpath('//a[@class="g-btn m-rounded m-flex m-lg btn-twitter"]').click()
-            elif int(opt)==1:
-                twitter = BROWSER.find_element_by_xpath('//a[@class="btn btn-default btn-block btn-lg btn-twitter"]').click()
-            elif int(opt)==2:
                 twitter = BROWSER.find_element_by_xpath('//a[@class="g-btn m-rounded m-flex m-lg"]').click()
+            elif int(opt)==1:
+                twitter = BROWSER.find_element_by_xpath('//a[@class="g-btn m-rounded m-flex m-lg btn-twitter"]').click()
+            elif int(opt)==2:
+                twitter = BROWSER.find_element_by_xpath('//a[@class="btn btn-default btn-block btn-lg btn-twitter"]').click()
         except NoSuchElementException as e:
             print("Warning: Login Failure, Retrying")
             login(opt+1)
@@ -171,20 +171,14 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
         print("- Text: {}".format(text))
         print("- Tweeting: {}".format(settings.TWEETING))
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
-        if str(settings.TWEETING) == "False":
+        if str(settings.TWEETING) == "True":
             WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
-        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
         BROWSER.find_element_by_id("fileupload_photo").send_keys(str(path))
         maxUploadCount = 12 # 2 hours max attempt time
         i = 0
         while True:
-            try:
+            try:                
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
-                if str(settings.DEBUG) == "True":
-                    print('skipping OnlyFans upload')
-                    return True
-                # send.click()
-                send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
                 break
             except Exception as e:
                 try: 
@@ -201,6 +195,16 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
                 if i == maxUploadCount and settings.FORCE_UPLOAD is not True:
                     print('max upload wait reached, breaking..')
                     break
+        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
+        time.sleep(10)
+        if str(settings.DEBUG) == "True":
+            print('skipping OnlyFans upload')
+            return True
+        send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
+        if str(settings.DEBUG) == "True":
+            print('skipping OnlyFans upload')
+            return True
+        send.click()
         print('File Uploaded Successfully')
         return True
     except Exception as e:
@@ -239,9 +243,8 @@ def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers
         print("- Text: {}".format(text))
         print("- Tweeting: {}".format(settings.TWEETING))
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
-        if str(settings.TWEETING) == "False":
+        if str(settings.TWEETING) == "True":
             WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
-        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
         files_path = []
         for file in pathlib.Path(str(path)).iterdir():  
             files_path.append(str(file))
@@ -249,12 +252,12 @@ def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers
         for file in files_path:
             print('Uploading: '+str(file))
             BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
-            send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
         send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
+        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
         if str(settings.DEBUG) == "True":
             print('skipping OnlyFans upload')
             return True
-        send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]'))).click()
+        send.click()
         print('Directory Uploaded Successfully')
         return True
     except Exception as e:
