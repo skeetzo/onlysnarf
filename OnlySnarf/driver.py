@@ -173,6 +173,7 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
         if str(settings.TWEETING) == "True":
             WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
+        WAIT.until(EC.element_to_be_clickable((By.XPATH, '//input[@class="fileupload_photo"]')))
         BROWSER.find_element_by_id("fileupload_photo").send_keys(str(path))
         maxUploadCount = 12 # 2 hours max attempt time
         i = 0
@@ -249,6 +250,7 @@ def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers
         for file in pathlib.Path(str(path)).iterdir():  
             files_path.append(str(file))
         settings.maybePrint('Files: '+str(files_path))
+        WAIT.until(EC.element_to_be_clickable((By.XPATH, '//input[@class="fileupload_photo"]')))
         for file in files_path:
             print('Uploading: '+str(file))
             BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
