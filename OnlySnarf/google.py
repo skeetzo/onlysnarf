@@ -31,49 +31,8 @@ ONE_GIGABYTE = 1000000000
 ONE_MEGABYTE = 1000000
 FIFTY_MEGABYTES = 50000000
 ONE_HUNDRED_KILOBYTES = 100000
-INITIALIZED = False
 FOLDERS = None
 OnlyFansFolder_ = None
-##################
-##### Config #####
-##################
-
-def initialize():
-    try:
-        # settings.maybePrint("Initializing OnlySnarf")
-        global INITIALIZED
-        if INITIALIZED:
-            # settings.maybePrint("Already Initialized, Skipping")
-            return
-        global OnlyFans_VIDEOS_FOLDER
-        global OnlyFans_IMAGES_FOLDER
-        global OnlyFans_GALLERIES_FOLDER
-        global OnlyFans_POSTED_FOLDER
-        global OnlyFans_SCENES_FOLDER
-        global OnlyFans_PERFORMERS_FOLDER
-        OnlyFans_VIDEOS_FOLDER = None
-        OnlyFans_IMAGES_FOLDER = None
-        OnlyFans_GALLERIES_FOLDER = None
-        OnlyFans_POSTED_FOLDER = None
-        OnlyFans_SCENES_FOLDER = None
-        OnlyFans_PERFORMERS_FOLDER = None
-        with open(settings.CONFIG_PATH) as config_file:    
-            config = json.load(config_file)
-        OnlyFans_VIDEOS_FOLDER = config['videos_folder']
-        OnlyFans_IMAGES_FOLDER = config['images_folder']
-        OnlyFans_GALLERIES_FOLDER = config['galleries_folder']
-        OnlyFans_POSTED_FOLDER = config['posted_folder']
-        OnlyFans_SCENES_FOLDER = config['scenes_folder']
-        OnlyFans_PERFORMERS_FOLDER = config['performers_folder']
-        # settings.maybePrint("Initialized OnlySnarf: Google")
-        INITIALIZED = True
-    except Exception as e:
-        print('Error Initializing, run `onlysnarf-config`')
-        print(e)
-        sys.exit(0)
-    except FileNotFoundError:
-        print('Missing Config, run `onlysnarf-config`')
-        sys.exit(0)
 
 ################
 ##### Auth #####
@@ -153,7 +112,7 @@ def move_file(file):
         return
     else:
         print('Backing Up: {}'.format(file['title']))
-    global OnlyFans_POSTED_FOLDER
+    OnlyFans_POSTED_FOLDER = get_folder_by_name("posted")
     file['parents'] = [{"kind": "drive#fileLink", "id": str(OnlyFans_POSTED_FOLDER)}]
     file.Upload()
     print('Google File Backed Up: {}'.format(file['title']))
@@ -175,7 +134,7 @@ def move_files(fileName, files):
     title = fileName+" - "+datetime.datetime.now().strftime("%d-%m@%I-%M")
     settings.maybePrint('Moving To: '+title)
     global PYDRIVE
-    global OnlyFans_POSTED_FOLDER
+    OnlyFans_POSTED_FOLDER = get_folder_by_name("posted")
     tmp_folder = PYDRIVE.CreateFile({'title':str(title), 'parents':[{"kind": "drive#fileLink", "id": str(OnlyFans_POSTED_FOLDER)}],'mimeType':'application/vnd.google-apps.folder'})
     tmp_folder.Upload()
     settings.maybePrint("Backing Up:")
