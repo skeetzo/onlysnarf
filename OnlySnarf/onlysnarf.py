@@ -715,7 +715,6 @@ if __name__ == "__main__":
         # os.system('clear')
         settings.initialize()
         OnlySnarf.initialize()
-        Google.initialize()
         main(settings.TYPE)
     except:
         print(sys.exc_info()[0])
@@ -726,7 +725,6 @@ else:
     try:
         settings.initialize()
         OnlySnarf.initialize()
-        Google.initialize()
     except Exception as e:
         print(e)
         print("Shnnarf?")

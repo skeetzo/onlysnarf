@@ -73,6 +73,8 @@
   - |_ needs a menu system to be added
   **1.1.3 : 6/26/2019**
   - fixed file & directory uploads
+  - removed config initialization from google.py
+  - updated ReadMe
 
 ## ToDo
 ### Low Priority

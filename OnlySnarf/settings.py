@@ -194,6 +194,15 @@ class Settings:
                 self.TWEETING = False
                 self.MOUNT_PATH = "/opt/projects/onlysnarf"
                 self.MOUNT_DRIVE = "Pron/dbot"
+            if '-dbot' in str(sys.argv[i]):
+                self.SKIP_THUMBNAIL = True
+                # self.SKIP_REPAIR = True
+                # self.SKIP_REDUCE = True
+                self.VERBAL = True
+                self.BACKING_UP = True
+                self.TWEETING = False
+                self.MOUNT_PATH = "/mnt/dbot/dev/onlysnarf"
+                self.MOUNT_DRIVE = "Pron/dbot"
             i += 1
         
         if self.MOUNT_PATH is not None:
