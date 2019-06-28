@@ -75,8 +75,17 @@
   - fixed file & directory uploads
   - removed config initialization from google.py
   - updated ReadMe
+  **1.1.4**
+  - fixed MANIFEST and credentials
+  **1.1.5**
+  - removed credentials
+
+
+----------------------------------------
+
 
 ## ToDo
+
 ### Low Priority
   - add: read messages html for emojis
   - finalize / fix: script exit
@@ -90,7 +99,6 @@
     -> Select
     --> Select Folder
     ---> repeat until image
-
 
 ### Medium Priority
   - add: login prompt for saving Twitter password -> base64 hash instead of in config.json
@@ -110,14 +118,6 @@
   |_ requires: cron feature
   - add: cron feature for installing crons
   |_ all it has to do is write to the crontab file
-
-
-## Install
-sudo python3 setup.py install
-`onlysnarf -verbal -debug`
-
-
-
 
 
 
