@@ -79,7 +79,8 @@
   - fixed MANIFEST and credentials
   **1.1.5**
   - removed credentials
-
+  **1.1.6**
+  - relative imports -> absolute
 
 ----------------------------------------
 

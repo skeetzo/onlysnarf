@@ -20,8 +20,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
-from .user import User
-from .settings import SETTINGS as settings
+from OnlySnarf.user import User
+from OnlySnarf.settings import SETTINGS as settings
 
 ###################
 ##### Globals #####
