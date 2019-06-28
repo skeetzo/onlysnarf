@@ -185,14 +185,14 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
                 break
             except Exception as e:
-                try: 
-                    # check for existence of "thumbnail is fucked up" modal and hit ok button
-                    BROWSER.switchTo().frame("iframe");
-                    BROWSER.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
-                    print("Error: Thumbnail Missing")
-                    break
-                except Exception as ef:
-                    settings.maybePrint(ef)
+                # try: 
+                #     # check for existence of "thumbnail is fucked up" modal and hit ok button
+                #     BROWSER.switchTo().frame("iframe");
+                #     BROWSER.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
+                #     print("Error: Thumbnail Missing")
+                #     break
+                # except Exception as ef:
+                #     settings.maybePrint(ef)
                 print('uploading...')
                 settings.maybePrint(e)
                 i+=1
