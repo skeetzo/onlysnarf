@@ -20,7 +20,7 @@ class Settings:
 
         self.DEBUG = False
 
-        self.SKIP_DOWNLOAD = True
+        self.SKIP_DOWNLOAD = False
 
         self.IMAGE_UPLOAD_LIMIT = 6
 
