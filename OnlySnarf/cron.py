@@ -1,5 +1,5 @@
 from crontab import CronTab
-from .settings import SETTINGS as settings
+from OnlySnarf.settings import SETTINGS as settings
 	
 def deleteCron(comment):
 	cron = findCron(comment)

@@ -9,9 +9,9 @@ import json
 import sys
 import pathlib
 import time
-from .settings import SETTINGS as settings
-from . import google as Google
-from . import driver as OnlySnarf
+from OnlySnarf.settings import SETTINGS as settings
+from OnlySnarf import google as Google
+from OnlySnarf import driver as OnlySnarf
 # from pprint import pprint
 
 ##########################

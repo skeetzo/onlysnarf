@@ -9,8 +9,8 @@ from datetime import datetime
 from re import sub
 from decimal import Decimal
 
-from . import driver as OnlySnarf
-from .settings import SETTINGS as settings
+from OnlySnarf import driver as OnlySnarf
+from OnlySnarf.settings import SETTINGS as settings
 
 class User:
 
