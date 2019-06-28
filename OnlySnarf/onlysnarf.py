@@ -395,7 +395,10 @@ def release_performer():
         file = files[0]
         ext = str(os.path.splitext(file)[1].lower())
         settings.maybePrint('ext: '+str(ext))
-        successful = upload("gallery", path=content, text=text)
+        if ext == ".mp4":
+            successful = upload("video", path=content, text=text) 
+        else:
+            successful = upload("gallery", path=content, text=text)
         if successful:
             Google.move_file(google_file)
         else:
