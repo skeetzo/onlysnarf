@@ -1,0 +1,10 @@
+{
+    "images": [
+        "shower"
+    ],
+    "message": "shower tease",
+    "prices": [
+        "5.00"
+    ],
+    "users": "favorite"
+}

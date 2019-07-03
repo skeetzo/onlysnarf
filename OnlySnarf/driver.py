@@ -138,8 +138,8 @@ def reset():
 ##### Upload #####
 ##################
 
-# Uploads a file to OnlyFans
-def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
+# Uploads a directory with a video file or image files to OnlyFans
+def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
     try:
         logged_in = False
         global BROWSER
@@ -173,11 +173,19 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
         if str(settings.TWEETING) == "True":
             WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
-        files_path = []
-        for file in pathlib.Path(str(path)).iterdir():  
+        files = []
+        if os.path.isfile(str(path)):
+            files = [str(path)]
+        elif os.path.isdir(str(path)):
+            # files = os.listdir(str(path))
+            for file in os.listdir(str(path)):
+                files.append(os.path.join(os.path.abspath(str(path)),file))
+        else:
+            print("Error: Unable to parse path")
+            return False
+        for file in files:  
             print('Uploading: '+str(file))
             BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
-            break
         maxUploadCount = 12 # 2 hours max attempt time
         i = 0
         while True:
@@ -210,56 +218,6 @@ def upload_file_to_OnlyFans(path=None, text=None, keywords=None, performers=None
     except Exception as e:
         settings.maybePrint(e)
         print("Error: File Upload Failure")
-        return False
-
-# Uploads a folder to OnlyFans
-def upload_directory_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
-    try:
-        logged_in = False
-        global BROWSER
-        if not BROWSER or BROWSER == None:
-            logged_in = log_into_OnlyFans()
-        else:
-            logged_in = True
-        if logged_in == False:
-            print("Error: Not Logged In")
-            return False
-        if not path:
-            print("Error: Missing Upload Path")
-            return False
-        if not text:
-            print("Error: Missing Upload Text")
-            return False
-        if performers and len(performers) > 1:
-            text += " w/ @"+" @".join(performers)
-        elif performers and len(performers) == 1:
-            text += " w/ @{}".format(performers[0])
-        if keywords:
-            text += " #"+" #".join(keywords)
-        print("Uploading:")
-        settings.maybePrint("- Path: {}".format(path))
-        print("- Keywords: {}".format(keywords))
-        print("- Performers: {}".format(performers))
-        print("- Text: {}".format(text))
-        print("- Tweeting: {}".format(settings.TWEETING))
-        WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
-        if str(settings.TWEETING) == "True":
-            WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
-        files_path = []
-        for file in pathlib.Path(str(path)).iterdir():  
-            print('Uploading: '+str(file))
-            BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
-        send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
-        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
-        if str(settings.DEBUG) == "True":
-            print('skipping OnlyFans upload')
-            return True
-        send.click()
-        print('Directory Uploaded Successfully')
-        return True
-    except Exception as e:
-        settings.maybePrint(e)
-        print("Error: Directory Upload Failure")
         return False
 
 ####################
@@ -335,10 +293,11 @@ def enter_price(price):
         if not price or price == None:
             print("Error: Missing Price")
             return
-        global BROWSER
+        global BROWSER 
         BROWSER.find_element_by_css_selector(".b-chat__btn-set-price.js-chat__btn-set-price").click()
         BROWSER.find_element_by_css_selector(".form-control.js-chat__price-input.b-chat__panel__input.js-input").send_keys(str(price))
-        BROWSER.find_element_by_css_selector(".g-btn.m-rounded.js-panel__btn-save.js-chat__price-btn-save").click()
+        WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".g-btn.m-rounded.js-panel__btn-save.js-chat__price-btn-save"))).click()
+        # BROWSER.find_element_by_css_selector(".g-btn.m-rounded.js-panel__btn-save.js-chat__price-btn-save").click()
         print("Price Entered")
     except Exception as e:
         settings.maybePrint(e)

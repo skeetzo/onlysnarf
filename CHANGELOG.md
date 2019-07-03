@@ -81,6 +81,9 @@
   - removed credentials
   **1.1.6**
   - relative imports -> absolute
+  - fixed messaging: input price
+  **1.1.7 : 7/3/2019**
+  - collapsed upload_file & upload_directory into upload_to
 
 ----------------------------------------
 

@@ -563,11 +563,11 @@ def upload(fileChoice, path=None, text=None, keywords=None, performers=None):
     successful = False
     try:
         if fileChoice == 'image':
-            successful = OnlySnarf.upload_file_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
+            successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
         elif fileChoice == 'gallery':
-            successful = OnlySnarf.upload_directory_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
+            successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
         elif fileChoice == 'video':
-            successful = OnlySnarf.upload_file_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
+            successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
         else:
             print("Missing Upload Choice")
     except Exception as e:
@@ -633,17 +633,20 @@ def test(TYPE):
     # #######################
 
     # ### Message ###
-    # response = download_random_image()
-    # if not response or response == None:
-    #     print("Error: Missing Image")
-    #     return
-    # OnlySnarf.message(choice="all", message="ass ass ass ass", image=response[1], price="10.00")
-    # # message(choice="recent", message="8=======D", image=response[1], price="50.00")
-    # Google.move_file(response[2])
+    response = download_random_image()
+    if not response or response == None:
+        print("Error: Missing Image")
+        return
+    successful_message = OnlySnarf.message(choice="all", message="random tease :P", image=response[1], price="5.00")
+    # message(choice="recent", message="8=======D", image=response[1], price="50.00")
+    if successful_message:
+        Google.move_file(response[2])
+    else:
+        print("Error: Failed to Send Message")
     # #######################
     # ### Exit Gracefully ###
-    # OnlySnarf.exit()
-    # return
+    OnlySnarf.exit()
+    return
     # #######################
 
     # ### Users ###
@@ -691,12 +694,12 @@ def test(TYPE):
     # if not reset:
     #     return print("Error: Failed to Reset")
     ### Scene ###
-    print('TESTING: Scene')
-    release_scene()
-    time.sleep(30)
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
+    # print('TESTING: Scene')
+    # release_scene()
+    # time.sleep(30)
+    # reset = OnlySnarf.reset()
+    # if not reset:
+    #     return print("Error: Failed to Reset")
     # ### Video ###
     # print('TESTING: Video')
     # release_video()
@@ -707,7 +710,7 @@ def test(TYPE):
     
     #######################
     ### Exit Gracefully ###
-    OnlySnarf.exit()
+    # OnlySnarf.exit()
     #######################
 
 
