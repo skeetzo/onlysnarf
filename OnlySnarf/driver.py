@@ -48,7 +48,7 @@ def initialize():
             config = json.load(config_file)
         global OnlyFans_USERNAME
         global OnlyFans_PASSWORD
-        OnlyFans_USERNAME = config['username']        
+        OnlyFans_USERNAME = config['username']
         OnlyFans_PASSWORD = config['password']
         # settings.maybePrint("Initialized OnlySnarf: Driver")
         INITIALIZED = True
@@ -432,7 +432,8 @@ def get_users():
     try:
         print("goto -> /my/subscribers/active")
         BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
-        num = BROWSER.find_element_by_class_name("b-tabs__nav__item__count").get_attribute("innerHTML")
+        # num = BROWSER.find_element_by_class_name("b-tabs__nav__item__count").get_attribute("innerHTML")
+        num = BROWSER.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML")
         settings.maybePrint("User count: %s" % num)
         for n in range(int(int(int(num)/10)+1)):
             settings.maybePrint("scrolling...")
@@ -451,33 +452,38 @@ def get_users():
     active_users = []
     global OnlyFans_USERNAME
     settings.maybePrint("Found: ")
-    for i in range(len(user_ids)):
-        user_id = user_ids[i]
-        name = users[i]
-        username = usernames[i]
-        user_id = str(user_id.get_attribute("user_id")).strip()
-        name = str(name.get_attribute("innerHTML")).strip()
-        username = str(username.get_attribute("innerHTML")).strip()
-        if str(OnlyFans_USERNAME).lower() in str(username).lower():
-            settings.maybePrint("(self): %s = %s" % (OnlyFans_USERNAME, username))
-            # first user is always active user but just in case find it in list of users
-            global OnlyFans_USER_ID
-            OnlyFans_USER_ID = user_id
-            continue
-        if str(OnlyFans_USER_ID).lower() in str(user_id).lower():
-            settings.maybePrint("(self): %s" % (OnlyFans_USER_ID, user_id))
-            continue
-        if str(user_id).lower() in settings.SKIP_USERS:
-            settings.maybePrint("(skipping): %s" % user_id)
-            continue
-        active_users.append(User(name=name, username=username, id=user_id)) # update this with correct values
-    for user in active_users:
-        existing = False
-        for user_ in USER_CACHE:
-            if user.equals(user_):
-                existing = True
-        if not existing:
-            USER_CACHE.append(user)
+    try:
+        for i in range(len(user_ids)):
+            user_id = user_ids[i]
+            name = users[i]
+            username = usernames[i]
+            # i don't think user_ids are working or are necessary
+            # user_id = str(user_id.get_attribute("user_id")).strip()
+            name = str(name.get_attribute("innerHTML")).strip()
+            username = str(username.get_attribute("innerHTML")).strip()
+            if str(OnlyFans_USERNAME).lower() in str(username).lower():
+                settings.maybePrint("(self): %s = %s" % (OnlyFans_USERNAME, username))
+                # first user is always active user but just in case find it in list of users
+                global OnlyFans_USER_ID
+                OnlyFans_USER_ID = user_id
+                continue
+            # if str(OnlyFans_USER_ID).lower() in str(user_id).lower():
+                # settings.maybePrint("(self): %s" % user_id)
+                # continue
+            if str(user_id).lower() in settings.SKIP_USERS or str(username).lower() in settings.SKIP_USERS:
+                settings.maybePrint("(skipping): %s\%s" % (user_id, username))
+                continue
+            # active_users.append(User(name=name, username=username, id=user_id)) # user_id not working
+            active_users.append(User(name=name, username=username))
+        for user in active_users:
+            existing = False
+            for user_ in USER_CACHE:
+                if user.equals(user_):
+                    existing = True
+            if not existing:
+                USER_CACHE.append(user)
+    except Exception as e:
+        print(e)
     # start cache timeout
     start_user_cache()
     return USER_CACHE
