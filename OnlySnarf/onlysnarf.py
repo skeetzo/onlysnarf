@@ -633,30 +633,30 @@ def test(TYPE):
     # #######################
 
     # ### Message ###
-    response = download_random_image()
-    if not response or response == None:
-        print("Error: Missing Image")
-        return
-    successful_message = OnlySnarf.message(choice="all", message="random tease :P", image=response[1], price="5.00")
+    # response = download_random_image()
+    # if not response or response == None:
+        # print("Error: Missing Image")
+        # return
+    # successful_message = OnlySnarf.message(choice="all", message="random tease :P", image=response[1], price="5.00")
     # message(choice="recent", message="8=======D", image=response[1], price="50.00")
-    if successful_message:
-        Google.move_file(response[2])
-    else:
-        print("Error: Failed to Send Message")
+    # if successful_message:
+        # Google.move_file(response[2])
+    # else:
+        # print("Error: Failed to Send Message")
     # #######################
     # ### Exit Gracefully ###
-    OnlySnarf.exit()
-    return
+    # OnlySnarf.exit()
+    # return
     # #######################
 
     # ### Users ###
-    # print('TESTING: Users')
-    # users = OnlySnarf.get_users()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-        # return print("Error: Failed to Reset")
-    # return
+    print('TESTING: Users')
+    users = OnlySnarf.get_users()
+    time.sleep(30)
+    reset = OnlySnarf.reset()
+    if not reset:
+        return print("Error: Failed to Reset")
+    return
     #######################
 
     # ### Chat Logs ###

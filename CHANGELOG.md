@@ -84,7 +84,9 @@
   - fixed messaging: input price
   **1.1.7 : 7/3/2019**
   - collapsed upload_file & upload_directory into upload_to
-
+  **1.1.8 : 7/19/2019**
+  - fixed user scrape css
+  
 ----------------------------------------
 
 
