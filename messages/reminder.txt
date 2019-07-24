@@ -1,0 +1,10 @@
+{
+    "images": [
+        "balls"
+    ],
+    "message": "hey!",
+    "prices": [
+        "0.00"
+    ],
+    "users": "inactive"
+}

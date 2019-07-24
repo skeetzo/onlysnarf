@@ -13,14 +13,14 @@ import datetime
 import json
 import sys
 import pathlib
-from .settings import SETTINGS as settings
-from . import onlysnarf
+from OnlySnarf.settings import SETTINGS as settings
+from OnlySnarf import onlysnarf
  
 ###################
 ##### Globals #####
 ###################
 
-version = "1.2.0"
+version = "1.1.8"
 header = "\n ________         .__          _________                     _____ \n \
 \\_____  \\   ____ |  | ___.__./   _____/ ____ _____ ________/ ____\\\n \
  /   |   \\ /    \\|  |<   |  |\\_____  \\ /    \\\\__  \\\\_   _ \\   __\\ \n \

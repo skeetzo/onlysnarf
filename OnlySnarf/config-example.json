@@ -1,18 +1,6 @@
 {
-	"// Your Twitter username //":"",
+	"// The Twitter username connected with your OnlyFans //":"",
 	"username":"",
-	"// Your Twitter password //":"",
+	"// The Twitter password connected with your OnlyFans //":"",
 	"password":"",
-	"// The ID of the Google Drive folder with your images //":"",
-	"images_folder":"",
-	"// The ID of the Google Drive folder with your galleries //":"",
-	"galleries_folder":"",
-	"// The ID of the Google Drive folder with your performers //":"",
-	"performers_folder":"",
-	"// The ID of the Google Drive folder with your scenes //":"",
-	"scenes_folder":"",
-	"// The ID of the Google Drive folder with your videos //":"",
-	"videos_folder":"",
-	"// The ID of the Google Drive folder to backup to //":"",
-	"posted_folder": ""
 }
