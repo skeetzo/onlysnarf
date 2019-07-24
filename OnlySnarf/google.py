@@ -349,7 +349,7 @@ def download_performer(folder):
         elif len(content_list)>0:
             settings.maybePrint('- content galleries found: '+folder['title'])
             for content in content_list:
-                content_list_galleries = PYDRIVE.ListFile({'q': "'"+content['id']+"' in parents and trashed=false and mimeType contains 'image/jpeg'"}).GetList()
+                content_list_galleries = PYDRIVE.ListFile({'q': "'"+content['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\' or mimeType contains \'video/mp4\')"}).GetList()
                 if len(content_list_galleries)==0:
                     settings.maybePrint('- skipping empty content gallery: '+content['title'])
                 elif len(content_list_galleries)>0 and len(content_list_galleries):
@@ -376,9 +376,9 @@ def download_performer(folder):
 
     for file in file_list:
         if "mp4" in str(file['title']):
-            videos.add(file)
+            videos.append(file)
         else:
-            images.add(file)
+            images.append(file)
     if len(images) > len(videos):
         print("Found: Images")
         file_list_random = []

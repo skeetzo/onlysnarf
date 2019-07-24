@@ -9,9 +9,9 @@ import json
 import sys
 import pathlib
 import time
-from .settings import SETTINGS as settings
-from . import google as Google
-from . import driver as OnlySnarf
+from OnlySnarf.settings import SETTINGS as settings
+from OnlySnarf import google as Google
+from OnlySnarf import driver as OnlySnarf
 # from pprint import pprint
 
 ##########################
@@ -395,7 +395,10 @@ def release_performer():
         file = files[0]
         ext = str(os.path.splitext(file)[1].lower())
         settings.maybePrint('ext: '+str(ext))
-        successful = upload("gallery", path=content, text=text)
+        if ext == ".mp4":
+            successful = upload("video", path=content, text=text) 
+        else:
+            successful = upload("gallery", path=content, text=text)
         if successful:
             Google.move_file(google_file)
         else:
@@ -560,11 +563,11 @@ def upload(fileChoice, path=None, text=None, keywords=None, performers=None):
     successful = False
     try:
         if fileChoice == 'image':
-            successful = OnlySnarf.upload_file_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
+            successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
         elif fileChoice == 'gallery':
-            successful = OnlySnarf.upload_directory_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
+            successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
         elif fileChoice == 'video':
-            successful = OnlySnarf.upload_file_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
+            successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
         else:
             print("Missing Upload Choice")
     except Exception as e:
@@ -632,11 +635,14 @@ def test(TYPE):
     # ### Message ###
     # response = download_random_image()
     # if not response or response == None:
-    #     print("Error: Missing Image")
-    #     return
-    # OnlySnarf.message(choice="all", message="ass ass ass ass", image=response[1], price="10.00")
-    # # message(choice="recent", message="8=======D", image=response[1], price="50.00")
-    # Google.move_file(response[2])
+        # print("Error: Missing Image")
+        # return
+    # successful_message = OnlySnarf.message(choice="all", message="random tease :P", image=response[1], price="5.00")
+    # message(choice="recent", message="8=======D", image=response[1], price="50.00")
+    # if successful_message:
+        # Google.move_file(response[2])
+    # else:
+        # print("Error: Failed to Send Message")
     # #######################
     # ### Exit Gracefully ###
     # OnlySnarf.exit()
@@ -644,13 +650,13 @@ def test(TYPE):
     # #######################
 
     # ### Users ###
-    # print('TESTING: Users')
-    # users = OnlySnarf.get_users()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-        # return print("Error: Failed to Reset")
-    # return
+    print('TESTING: Users')
+    users = OnlySnarf.get_users()
+    time.sleep(30)
+    reset = OnlySnarf.reset()
+    if not reset:
+        return print("Error: Failed to Reset")
+    return
     #######################
 
     # ### Chat Logs ###
@@ -688,12 +694,12 @@ def test(TYPE):
     # if not reset:
     #     return print("Error: Failed to Reset")
     ### Scene ###
-    print('TESTING: Scene')
-    release_scene()
-    time.sleep(30)
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
+    # print('TESTING: Scene')
+    # release_scene()
+    # time.sleep(30)
+    # reset = OnlySnarf.reset()
+    # if not reset:
+    #     return print("Error: Failed to Reset")
     # ### Video ###
     # print('TESTING: Video')
     # release_video()
@@ -704,7 +710,7 @@ def test(TYPE):
     
     #######################
     ### Exit Gracefully ###
-    OnlySnarf.exit()
+    # OnlySnarf.exit()
     #######################
 
 

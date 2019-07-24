@@ -10,7 +10,6 @@ get_refresh_token: True
 oauth_scope:
   - https://www.googleapis.com/auth/drive
 
-# unused
 # client_config:
-#   client_id: blabla.apps.googleusercontent.com
-#   client_secret: blabla
+#   client_id: 
+#   client_secret: 
