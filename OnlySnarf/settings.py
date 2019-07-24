@@ -20,7 +20,7 @@ class Settings:
 
         self.DEBUG = False
 
-        self.SKIP_DOWNLOAD = True
+        self.SKIP_DOWNLOAD = False
 
         self.IMAGE_UPLOAD_LIMIT = 6
 
@@ -192,7 +192,7 @@ class Settings:
                 self.VERBAL = True
                 self.BACKING_UP = True
                 self.TWEETING = False
-                self.MOUNT_PATH = "/opt/projects/onlysnarf"
+                self.MOUNT_PATH = "/opt/apps/onlysnarf"
                 self.MOUNT_DRIVE = "Pron/dbot"
             if '-dbot' in str(sys.argv[i]):
                 self.SKIP_THUMBNAIL = True

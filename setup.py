@@ -5,15 +5,15 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="1.2.0",
+    version="1.1.8",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
-    download_url = 'https://github.com/skeetzo/onlysnarf/archive/v1.2.0.tar.gz',
+    download_url = 'https://github.com/skeetzo/onlysnarf/archive/v1.1.8.tar.gz',
     keywords = ['OnlyFans', 'Content', 'OnlySnarf'],
     description="OnlyFans Content Distribution Tool",
     long_description=long_description,
-    # long_description_content_type="text/markdown",
+    long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
     include_package_data=True,
     install_requires=[
@@ -25,8 +25,7 @@ setuptools.setup(
         'apiclient',
         'google-api-python-client',
         'httplib2',
-        'python-crontab',
-        # 'oauth2client'
+        'python-crontab'
         ],
     entry_points={
         'console_scripts' : [
@@ -36,10 +35,10 @@ setuptools.setup(
     },
     classifiers=[
     'Development Status :: 5 - Production/Stable',
-    'Intended Audience :: Hobbyists',
-    'Topic :: Content Delivery :: Automation Tools',
+    'Intended Audience :: Developers',
+    'Topic :: System :: Shells',
     'License :: OSI Approved :: MIT License',
     'Programming Language :: Python :: 3.4',
-    "Operating System :: OS Independent :: Linux",
+    "Operating System :: OS Independent",
   ]
 )
