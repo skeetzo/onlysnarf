@@ -86,7 +86,9 @@
   - collapsed upload_file & upload_directory into upload_to
   **1.1.8 : 7/19/2019**
   - fixed user scrape css
-  
+  **1.1.9 : 8/14/2019**
+  - fixed user scrape css again
+
 ----------------------------------------
 
 
