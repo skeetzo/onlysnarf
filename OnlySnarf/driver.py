@@ -445,8 +445,18 @@ def get_users():
         return []
     user_ids = BROWSER.find_elements_by_class_name('b-avatar')
     users = BROWSER.find_elements_by_class_name('g-user-name')
+    
+    #
+    #   Testing
+    #
+    #################
     # usernames = BROWSER.find_elements_by_class_name('g-user-username')
     usernames = BROWSER.find_elements_by_class_name('g-user-name__wrapper')
+    #################
+    #
+    #   Should get userid from the wrapper isntead of getting the wrapper itself
+    #
+
     # settings.maybePrint(users)
     # return []
     # add to list of users
