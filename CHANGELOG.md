@@ -91,8 +91,12 @@
 
 ----------------------------------------
 
-
 ## ToDo
+ - test user scrape css
+ - decidedly fix chromedriver-binary & chromium browser issues, install chromedriver w/ binary? add script to fix PATH?
+ - add script / workaround constant fix for the "pip install --upgrade google-api-python-client" to the "No module named 'apiclient.discovery'" bug
+
+ - then deploy 1.1.9 to pip
 
 ### Low Priority
   - add: read messages html for emojis
