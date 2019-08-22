@@ -444,22 +444,9 @@ def get_users():
         print("Error: Failed to Count Users")
         return []
     user_ids = BROWSER.find_elements_by_class_name('b-avatar')
-    users = BROWSER.find_elements_by_class_name('g-user-name')
-    
-    #
-    #   Testing
-    #
-    #################
-    # usernames = BROWSER.find_elements_by_class_name('g-user-username')
-    usernames = BROWSER.find_elements_by_class_name('g-user-name__wrapper')
-    #################
-    #
-    #   Should get userid from the wrapper isntead of getting the wrapper itself
-    #
-
-    # settings.maybePrint(users)
-    # return []
-    # add to list of users
+    # users = BROWSER.find_elements_by_class_name('g-user-name')
+    users = BROWSER.find_elements_by_class_name('g-user-name__wrapper')
+    usernames = BROWSER.find_elements_by_class_name('g-user-username')
     active_users = []
     global OnlyFans_USERNAME
     settings.maybePrint("Found: ")
@@ -471,6 +458,7 @@ def get_users():
             # i don't think user_ids are working or are necessary
             # user_id = str(user_id.get_attribute("user_id")).strip()
             name = str(name.get_attribute("innerHTML")).strip()
+            print("name: "+str(name))
             username = str(username.get_attribute("innerHTML")).strip()
             if str(OnlyFans_USERNAME).lower() in str(username).lower():
                 settings.maybePrint("(self): %s = %s" % (OnlyFans_USERNAME, username))

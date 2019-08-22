@@ -178,14 +178,8 @@ class Settings:
                 self.SKIP_REPAIR = True
             if '-skip-thumb' in str(sys.argv[i]):
                 self.SKIP_THUMBNAIL = True
-            # skeetzo profile
-            if '-skeetzo' in str(sys.argv[i]):
-                self.VERBAL = True
-                self.BACKING_UP = True
-                self.TWEETING = False
-                self.MOUNT_PATH = "/mnt/apps/onlysnarf"
-                self.MOUNT_DRIVE = "Pron/dbot"
-            if '-schizo' in str(sys.argv[i]):
+            # profile
+            if '-schizo' in str(sys.argv[i]) or '-skeetzo' in str(sys.argv[i]):
                 self.SKIP_THUMBNAIL = True
                 # self.SKIP_REPAIR = True
                 # self.SKIP_REDUCE = True
