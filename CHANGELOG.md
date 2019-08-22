@@ -88,6 +88,9 @@
   - fixed user scrape css
   **1.1.9 : 8/14/2019**
   - fixed user scrape css again
+  **1.1.10 : 8/21/2019**
+  - really really fixed user scrape css
+  - removed apiclient from setup.py
 
 ----------------------------------------
 
