@@ -196,6 +196,16 @@ def message(opt):
         print("Error: Failure Messaging")
         return False
 
+#####################
+##### Promotion #####
+#####################
+
+def give_trial(user):
+    print("Giving Trial: "+user)
+    # call driver.send_trial_to_user(theUser)
+    pass
+
+
 #################
 ##### Reset #####
 #################
@@ -580,6 +590,26 @@ def upload(fileChoice, path=None, text=None, keywords=None, performers=None):
         print("Upload Failure")
     return successful
 
+#################
+##### Users #####
+#################
+
+def get_users():
+    settings.maybePrint("Getting Users")
+    successful = False
+    try:
+        successful = OnlySnarf.get_users()
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Unable to get users");
+        return
+    if successful:
+        settings.maybePrint("Users Found")
+    else:
+        print("Warning: users not found")
+        return []
+    return successful
+
 #####################
 ##### FUNCTIONS #####
 #####################
@@ -620,6 +650,16 @@ def test(TYPE):
     print('0/3 : Deleting Locals')
     remove_local()
     print('1/3 : Testing')
+
+    # ### Promotion ###
+    print('TESTING: Promotion')
+    response = apply_promotion()
+    if not repsonse or response == None:
+        print("Error: Failed to apply promotion")
+    reset = OnlySnarf.reset()
+    if not reset:
+        return print("Error: Failed to Reset")
+    return
 
     # ### Gallery ###
     # print('TESTING: Gallery x 10')

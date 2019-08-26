@@ -95,11 +95,7 @@
 ----------------------------------------
 
 ## ToDo
- - test user scrape css
- - decidedly fix chromedriver-binary & chromium browser issues, install chromedriver w/ binary? add script to fix PATH?
- - add script / workaround constant fix for the "pip install --upgrade google-api-python-client" to the "No module named 'apiclient.discovery'" bug
-
- - then deploy 1.1.9 to pip
+ 
 
 ### Low Priority
   - add: read messages html for emojis
@@ -155,3 +151,11 @@ General Solutions:
 - it should ask users what they like and then build its own profile and then message that user approrpiately -> "here's a dick pic just for you ;)"
 
 
+-> Cron that checks user messages for [picture] commands
+- post: "OnlySnarf Bot commands: !pic | !pic dick | !pic ass"
+-- sends [pic] to [user]
+
+
+-> i need an easy way for patreon followers to automatically be invited to a free trial
+-> i need a way to send a free trial for x days to a person
+-> 
