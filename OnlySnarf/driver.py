@@ -408,6 +408,19 @@ def update_chat_log(user):
         return print("Error: Missing User")
     user.readChat()
 
+
+######################
+##### Promotions #####
+######################
+
+# or email
+def send_trial_to_user(user):
+    # go to the promotions page
+    # find the css for the trial day #
+    # find the css for the email / user
+    # send it
+    pass
+
 #################
 ##### Users #####
 #################
@@ -418,7 +431,7 @@ def get_users():
     global USER_CACHE
     if USER_CACHE:
         return USER_CACHE
-    USER_CACHE = get_users_local()
+    USER_CACHE = read_users_local()
     logged_in = False
     global BROWSER
     if not BROWSER or BROWSER == None:
@@ -487,26 +500,6 @@ def get_users():
     start_user_cache()
     return USER_CACHE
 
-# gets a list of all subscribed user_ids from local txt
-def get_users_local():
-    print("Getting Local Users")
-    users = []
-    users_ = []
-    try:
-        with open(settings.USERS_PATH) as json_file:  
-            users = json.load(json_file)
-        for user in users['users']:
-            user = User(name=user['name'], username=user['username'], id=user['id'], messages_from=user['messages_from'], messages_to=user['messages_to'], messages=user['messages'], preferences=user['preferences'], last_messaged_on=user['last_messaged_on'], sent_images=user['sent_images'], subscribed_on=user['subscribed_on'], isFavorite=user['isFavorite'], statement_history=user['statement_history'])
-            settings.maybePrint('Loaded: %s' % user.username)
-            settings.maybePrint('')
-            users_.append(user)
-    except FileNotFoundError:
-        print("Error: Missing Local Users")
-    except OSError:
-        print("Error: Missing Local Path")
-    finally:
-        return users_
-
 def get_user_by_username(username):
     if not username or username == None:
         print("Error: Missing Username")
@@ -545,6 +538,26 @@ def get_recent_users():
             return users_
     return users_
 
+# gets a list of all subscribed user_ids from local txt
+def read_users_local():
+    print("Getting Local Users")
+    users = []
+    users_ = []
+    try:
+        with open(settings.USERS_PATH) as json_file:  
+            users = json.load(json_file)
+        for user in users['users']:
+            user = User(name=user['name'], username=user['username'], id=user['id'], messages_from=user['messages_from'], messages_to=user['messages_to'], messages=user['messages'], preferences=user['preferences'], last_messaged_on=user['last_messaged_on'], sent_images=user['sent_images'], subscribed_on=user['subscribed_on'], isFavorite=user['isFavorite'], statement_history=user['statement_history'])
+            settings.maybePrint('Loaded: %s' % user.username)
+            settings.maybePrint('')
+            users_.append(user)
+    except FileNotFoundError:
+        print("Error: Missing Local Users")
+    except OSError:
+        print("Error: Missing Local Path")
+    finally:
+        return users_
+
 def reset_user_cache():
     global USER_CACHE_LOCKED
     if USER_CACHE_LOCKED:
@@ -556,6 +569,7 @@ def reset_user_cache():
 
 def start_user_cache():
     settings.maybePrint("User Cache: starting")
+    write_users_local()
     global USER_CACHE_TIMEOUT
     try:
         threading.Timer(USER_CACHE_TIMEOUT, reset_user_cache).start() # after 10 minutes
