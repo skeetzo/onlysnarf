@@ -51,18 +51,14 @@ menuItems = [
 
 # Actions Menu
 actionItems = sorted([
-    [ "Test", ["test"]],
-    [ "Release", ["release"]],
-    [ "Download", ["download"]],
-    # [ "Upload", ["upload"]],
-    # [ "Backup", ["backup"]],
-    # [ "Download & Upload", ["download", "upload"]],
-    # [ "Download, Upload, & Backup", ["download", "upload", "backup"]],
-    # [ "Upload & Backup", ["upload", "backup"]],
-    [ "Message", ["message"]],
-    [ "Reset", ["reset"]]
+    [ "Test", "test" ],
+    [ "Release", "release" ],
+    [ "Download", "download" ],
+    [ "Promotion", "promotion" ],
+    [ "Message", "message" ],
+    [ "Reset", "reset" ]
 ])
-actionItems.insert(0,[ "Back", ["main"]])
+actionItems.insert(0,[ "Back", "main"])
 
 # Message Menu
 messageItems = sorted([
@@ -90,6 +86,12 @@ locationItems = sorted([
     [ "Google Drive", "google"]
 ])
 locationItems.insert(0,[ "Back", "main"])
+
+promotionItems = sorted([
+    [ "Enter Email", "email" ],
+    [ "Select User", "select" ]
+])
+promotionItems.insert(0,[ "Back", "main"])
 
 settingItems = []
 
@@ -150,6 +152,9 @@ def action():
             elif str(actionItems[int(choice)][0]) == "Message":
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeMessage(actionChoice)
+            elif str(actionItems[int(choice)][0]) == "Promotion":
+                actionChoice = list(actionItems[int(choice)])[1]
+                return finalizePromotion(actionChoice)
             else:
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeAction(actionChoice)
@@ -180,22 +185,21 @@ def finalizeAction(actionChoice):
 
 ### Action Menu - perform
 def performAction(actionChoice, fileChoice):
-    for action in actionChoice:
-        try:
-            method = getattr(onlysnarf, str(action))
-            response = method(fileChoice)
-            if response:
-                if str(action) == "download":
-                    for setting in settingItems:
-                        if setting[0] == "File Name":
-                            setting[1] = response[0]
-                        elif setting[0] == "File Path":
-                            setting[1] = response[1]
-        except (ValueError, IndexError, KeyboardInterrupt):
-            print("Incorrect Index")
-        except:
-            print(sys.exc_info()[0])
-            print("Missing Method") 
+    try:
+        method = getattr(onlysnarf, str(action))
+        response = method(fileChoice)
+        if response:
+            if str(action) == "download":
+                for setting in settingItems:
+                    if setting[0] == "File Name":
+                        setting[1] = response[0]
+                    elif setting[0] == "File Path":
+                        setting[1] = response[1]
+    except (ValueError, IndexError, KeyboardInterrupt):
+        print("Incorrect Index")
+    except:
+        print(sys.exc_info()[0])
+        print("Missing Method") 
     mainMenu()
 
 # Message Menu - finalize
@@ -208,7 +212,6 @@ def finalizeMessage(actionChoice):
             if int(choice) < 0 or int(choice) >= len(messageItems): raise ValueError
             if str(messageItems[int(choice)][0]) == "Back":
                 return action()
-            # Call the matching function
             choice = list(messageItems[int(choice)])[1]
             return performMessage(actionChoice, choice)
         except (ValueError, IndexError, KeyboardInterrupt):
@@ -217,15 +220,60 @@ def finalizeMessage(actionChoice):
 
 # Message Menu - perform
 def performMessage(actionChoice, messageChoice):
-    for action in actionChoice:
+    try:
+        method = getattr(onlysnarf, str(action))
+        response = method(messageChoice)    
+    except (ValueError, IndexError, KeyboardInterrupt):
+        print("Incorrect Index")
+    except:
+        print(sys.exc_info()[0])
+        print("Missing Method") 
+    mainMenu()    
+
+# Promotion Menu - finalize
+def finalizePromotion(actionChoice):
+    for item in promotionItems:
+        print(colorize("[" + str(promotionItems.index(item)) + "] ", 'teal') + list(item)[0])
+    while True:
+        choice = input(">> ")
         try:
-            method = getattr(onlysnarf, str(action))
-            response = method(messageChoice)    
+            if int(choice) < 0 or int(choice) >= len(promotionItems): raise ValueError
+            if str(promotionItems[int(choice)][0]) == "Back":
+                return action()
+            choice = list(promotionItems[int(choice)])[1]
+            return performPromotion(actionChoice, choice)
         except (ValueError, IndexError, KeyboardInterrupt):
-            print("Incorrect Index")
-        except:
             print(sys.exc_info()[0])
-            print("Missing Method") 
+            print("Incorrect Index")
+
+def performPromotion(actionChoice, promotionChoice):
+    username = None
+    if actionChoice == "email":
+        # prompt
+        choice = input("Email: ")
+        username = str(choice)
+        return promote(username)
+    elif actionChoice == "select":
+        users = onlysnarf.get_users()
+        # show list
+        for user in users:
+            print(colorize("[" + str(settingItems.index(user)) + "] ", 'blue') + str(user.username))    
+        while True:
+            choice = input(">> ")
+            try:
+                username = str(choice)
+                return promote(username)
+            except (ValueError, IndexError, KeyboardInterrupt):
+                print("Incorrect Index")
+            except Exception as e:
+                print(e)
+                return main()
+    
+def promote(username):
+    if username == None:
+        print("Warning: No user found")
+    else:
+        onlysnarf.give_trial(username)
     mainMenu()    
 
 ###########################
