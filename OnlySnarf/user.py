@@ -83,7 +83,8 @@ class User:
             settings.maybePrint(e)
 
     def equals(self, user):
-        if user.id == self.id:
+        # print(str(user.username)+" == "+str(self.username))
+        if user.username == self.username:
             return True
         return False
 

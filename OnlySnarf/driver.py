@@ -464,14 +464,15 @@ def get_users():
     global OnlyFans_USERNAME
     settings.maybePrint("Found: ")
     try:
-        for i in range(len(user_ids)):
+        # print(len(user_ids))
+        for i in range(len(user_ids)-1):
             user_id = user_ids[i]
             name = users[i]
             username = usernames[i]
             # i don't think user_ids are working or are necessary
             # user_id = str(user_id.get_attribute("user_id")).strip()
             name = str(name.get_attribute("innerHTML")).strip()
-            print("name: "+str(name))
+            # print("name: "+str(name))
             username = str(username.get_attribute("innerHTML")).strip()
             if str(OnlyFans_USERNAME).lower() in str(username).lower():
                 settings.maybePrint("(self): %s = %s" % (OnlyFans_USERNAME, username))
@@ -487,6 +488,7 @@ def get_users():
                 continue
             # active_users.append(User(name=name, username=username, id=user_id)) # user_id not working
             active_users.append(User(name=name, username=username))
+        # print("users: "+active_users)
         for user in active_users:
             existing = False
             for user_ in USER_CACHE:
@@ -540,7 +542,7 @@ def get_recent_users():
 
 # gets a list of all subscribed user_ids from local txt
 def read_users_local():
-    print("Getting Local Users")
+    settings.maybePrint("Getting Local Users")
     users = []
     users_ = []
     try:
@@ -569,7 +571,7 @@ def reset_user_cache():
 
 def start_user_cache():
     settings.maybePrint("User Cache: starting")
-    write_users_local()
+    # write_users_local()
     global USER_CACHE_TIMEOUT
     try:
         threading.Timer(USER_CACHE_TIMEOUT, reset_user_cache).start() # after 10 minutes

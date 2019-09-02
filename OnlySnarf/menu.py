@@ -159,10 +159,10 @@ def action():
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeAction(actionChoice)
         except (ValueError, IndexError, KeyboardInterrupt):
-            print("Incorrect Index")
-        except:
-            print(sys.exc_info()[0])
-            print("Missing Method") 
+            print("Error: Incorrect Index")
+        except Exception as e:
+            print(e)
+            print("Error: Missing Method") 
 
 ### Action Menu - finalize
 def finalizeAction(actionChoice):
@@ -178,28 +178,28 @@ def finalizeAction(actionChoice):
             fileChoice = list(fileItems[int(fileChoice)])[1]
             return performAction(actionChoice, fileChoice)
         except (ValueError, IndexError, KeyboardInterrupt):
-            print("Incorrect Index")
-        except:
-            print(sys.exc_info()[0])
-            print("Missing Method") 
+            print("Error: Incorrect Index")
+        except Exception as e:
+            print(e)
+            print("Error: Missing Method") 
 
 ### Action Menu - perform
 def performAction(actionChoice, fileChoice):
     try:
-        method = getattr(onlysnarf, str(action))
+        method = getattr(onlysnarf, str(actionChoice))
         response = method(fileChoice)
         if response:
-            if str(action) == "download":
+            if str(actionChoice) == "download":
                 for setting in settingItems:
                     if setting[0] == "File Name":
                         setting[1] = response[0]
                     elif setting[0] == "File Path":
                         setting[1] = response[1]
     except (ValueError, IndexError, KeyboardInterrupt):
-        print("Incorrect Index")
-    except:
-        print(sys.exc_info()[0])
-        print("Missing Method") 
+        print("Error: Incorrect Index")
+    except Exception as e:
+        print(e)
+        print("Error: Missing Method") 
     mainMenu()
 
 # Message Menu - finalize
@@ -216,7 +216,7 @@ def finalizeMessage(actionChoice):
             return performMessage(actionChoice, choice)
         except (ValueError, IndexError, KeyboardInterrupt):
             print(sys.exc_info()[0])
-            print("Incorrect Index")
+            print("Error: Incorrect Index")
 
 # Message Menu - perform
 def performMessage(actionChoice, messageChoice):
@@ -224,10 +224,10 @@ def performMessage(actionChoice, messageChoice):
         method = getattr(onlysnarf, str(action))
         response = method(messageChoice)    
     except (ValueError, IndexError, KeyboardInterrupt):
-        print("Incorrect Index")
-    except:
-        print(sys.exc_info()[0])
-        print("Missing Method") 
+        print("Error: Incorrect Index")
+    except Exception as e:
+        print(e)
+        print("Error: Missing Method") 
     mainMenu()    
 
 # Promotion Menu - finalize
@@ -244,37 +244,49 @@ def finalizePromotion(actionChoice):
             return performPromotion(actionChoice, choice)
         except (ValueError, IndexError, KeyboardInterrupt):
             print(sys.exc_info()[0])
-            print("Incorrect Index")
+            print("Error: Incorrect Index")
 
 def performPromotion(actionChoice, promotionChoice):
-    username = None
-    if actionChoice == "email":
-        # prompt
-        choice = input("Email: ")
-        username = str(choice)
-        return promote(username)
-    elif actionChoice == "select":
-        users = onlysnarf.get_users()
-        # show list
-        for user in users:
-            print(colorize("[" + str(settingItems.index(user)) + "] ", 'blue') + str(user.username))    
-        while True:
-            choice = input(">> ")
-            try:
-                username = str(choice)
-                return promote(username)
-            except (ValueError, IndexError, KeyboardInterrupt):
-                print("Incorrect Index")
-            except Exception as e:
-                print(e)
-                return main()
-    
-def promote(username):
-    if username == None:
-        print("Warning: No user found")
-    else:
-        onlysnarf.give_trial(username)
-    mainMenu()    
+    def promote(username):
+        print("promote")
+        if username == None:
+            print("Warning: No user found")
+        else:
+            onlysnarf.give_trial(username)
+        mainMenu()    
+    try:
+        username = None
+        print("performPromotion: "+actionChoice+"/"+promotionChoice)
+        if str(promotionChoice) == "email":
+            # prompt
+            choice = input("Email: ")
+            username = str(choice)
+            return promote(username)
+        elif str(promotionChoice) == "select":
+            users = onlysnarf.get_users()
+            print(colorize("[0] ", 'blue') + "Back")
+            # show list
+            i = 0
+            for user in users:
+                print(colorize("[" + str(i) + "] ", 'blue') + str(user.username))
+                i = i+1    
+            while True:
+                choice = input(">> ")
+                try:
+                    if int(choice) < 0 or int(choice) >= len(users): raise ValueError
+                    if int(choice) == 0:
+                        return finalizePromotion(actionChoice)
+                    return promote(str(users[int(choice)].username))
+
+                except (ValueError, IndexError, KeyboardInterrupt):
+                    print(sys.exc_info()[0])
+                    print("Error: Incorrect Index")            
+    except (ValueError, IndexError, KeyboardInterrupt):
+        print("Error: Incorrect Index")
+    except Exception as e:
+        print(e)
+        print("Error: Missing Method") 
+    mainMenu()
 
 ###########################
 
