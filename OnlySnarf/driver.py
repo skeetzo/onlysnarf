@@ -483,9 +483,8 @@ def get_users():
             # if str(OnlyFans_USER_ID).lower() in str(user_id).lower():
                 # settings.maybePrint("(self): %s" % user_id)
                 # continue
-            if str(user_id).lower() in settings.SKIP_USERS or str(username).lower() in settings.SKIP_USERS:
-                settings.maybePrint("(skipping): %s\%s" % (user_id, username))
-                continue
+            user = skipUserCheck(user)
+            if user is None: continue
             # active_users.append(User(name=name, username=username, id=user_id)) # user_id not working
             active_users.append(User(name=name, username=username))
         # print("users: "+active_users)
@@ -517,23 +516,27 @@ def get_favorite_users():
 
 # returns users that have no messages sent to them
 def get_new_users():
+    settings.maybePrint("Getting New Users")
     update_chat_logs()
     users = get_users()
     newUsers = []
     for user in users:
         if len(user.messages_to) == 0:
+            settings.maybePrint("New User: %s" % user.username)
+            user = skipUserCheck(user)
+            if user is None: continue
             newUsers.append(user)
     return newUsers
 
 def get_recent_users():
+    settings.maybePrint("Getting Recent Users")
     users = get_users()
     i = 0
     users_ = []
     for user in users:
-        # settings.maybePrint("user: %s" % user.username)
-        if str(user.username).lower() in settings.SKIP_USERS:
-            settings.maybePrint("skipping: %s" % user.username)
-            continue
+        settings.maybePrint("Recent User: %s" % user.username)
+        user = skipUserCheck(user)
+        if user is None: continue
         users_.append(user)
         i += 1
         if i == settings.RECENT_USER_COUNT:
@@ -559,6 +562,12 @@ def read_users_local():
         print("Error: Missing Local Path")
     finally:
         return users_
+
+def skipUserCheck(user):
+    if str(user_id).lower() in settings.SKIP_USERS or str(username).lower() in settings.SKIP_USERS:
+        settings.maybePrint("skipping: %s" % user.username)
+        return None
+    return user
 
 def reset_user_cache():
     global USER_CACHE_LOCKED

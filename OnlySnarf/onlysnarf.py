@@ -175,7 +175,7 @@ def download_random_scene():
 ##### Message #####
 ###################
 
-def message(opt):
+def message(opt, username=None):
     message = input("Message: ")
     waiting = True
     while waiting:
@@ -189,7 +189,7 @@ def message(opt):
     if not response or response == None:
         print("Error: Missing Image")
         return
-    successful_message = OnlySnarf.message(choice=opt, message=message, image=response[1], price=price)
+    successful_message = OnlySnarf.message(choice=opt, message=message, image=response[1], price=price, username=username)
     if successful_message and str(opt) != "new":
         Google.move_file(response[2])
     else:
