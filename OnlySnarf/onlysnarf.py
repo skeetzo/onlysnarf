@@ -201,10 +201,8 @@ def message(opt, username=None):
 #####################
 
 def give_trial(user):
-    print("Giving Trial: "+user)
-    # call driver.send_trial_to_user(theUser)
-    pass
-
+    print("Applying Promotion: "+user)
+    OnlySnarf.send_trial_to_user(user)
 
 #################
 ##### Reset #####
