@@ -248,7 +248,6 @@ def finalizePromotion(actionChoice):
 
 def performPromotion(actionChoice, promotionChoice):
     def promote(username):
-        print("promote")
         if username == None:
             print("Warning: No user found")
         else:
