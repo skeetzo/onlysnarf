@@ -20,6 +20,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.remote.webelement import WebElement
 from OnlySnarf.user import User
 from OnlySnarf.settings import SETTINGS as settings
 
@@ -415,11 +416,68 @@ def update_chat_log(user):
 
 # or email
 def send_trial_to_user(user):
-    # go to the promotions page
-    # find the css for the trial day #
-    # find the css for the email / user
-    # send it
-    pass
+    global BROWSER
+    if not BROWSER or BROWSER == None:
+        logged_in = log_into_OnlyFans()
+    else:
+        logged_in = True
+    if logged_in == False:
+        print("Error: Login Failure")
+        return USER_CACHE
+    # go to onlyfans.com/my/subscribers/active
+    try:
+        print("goto -> /my/promotions")
+        BROWSER.get(('https://onlyfans.com/my/promotions'))
+        # go to the promotions page
+        # find the css for the trial day #
+        print("trial")
+        # button class="g-btn m-rounded m-sm" Create trial link
+        trial = BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-sm")[0].click()
+        print("create")
+        # click create
+        # button class="g-btn m-rounded" Create
+
+        # modal = WebElement(webdriver.findElement(By.xpath("//div['g-ModalTrial___BV_modal_content_']")))
+        # btn = modal.findElement(By.xpath(".//buton['g-btn.m-rounded']")).click()
+
+        # switch to modal
+        # modal = BROWSER.find_element_by_class_name("g-ModalTrial___BV_modal_content_")
+        # modal = BROWSER.find_element_by_class_name("modal-content")
+        # print(modal)
+        # WAIT = WebDriverWait(BROWSER, 30, poll_frequency=3)
+        WebDriverWait(BROWSER, 60, poll_frequency=3).until(EC.element_to_be_clickable((By.XPATH, '//button[@class="g-btn.m-rounded"]'))).click()
+        # time.sleep(3)
+        # .click()
+        # trials = BROWSER.find_element_by_xpath('//class[@class=".modal.modal-footer.g-btn.m-rounded"]')
+
+        # BROWSER.switch_to_frame("ModalTrial___BV_modal_content_")
+        # BROWSER.switch_to_window().activeElement()
+        # WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@class="g-btn.m-rounded"]')))
+
+        # WebDriverWait(BROWSER, 60, poll_frequency=3).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".g-btn.m-rounded")))
+        # create = BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[0].click()
+        # create = BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[1].click()
+        # create = BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[2].click()
+        # create = BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[3].click()
+        # create = modal.find_element_by_class_name("g-btn.m-rounded").click()
+
+        # count number of links
+        # div class="b-users__item.m-fans"
+        trials = BROWSER.find_elements_by_class_name("b-users__item.m-fans")
+        print("trials")
+        # find last one in list of trial link buttons
+        # button class="g-btn m-sm m-rounded" Copy trial link
+        trials = BROWSER.find_elements_by_class_name("g-btn.m-sm.m-rounded")
+        print("trials: "+str(len(trials)))
+        trials[len(trials)-1].click()
+        # find the css for the email / user
+        # which there isn't, so, create a 1 person limited 7 day trial and send it to their email
+        # add a fucking emailing capacity
+        # send it
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failed to Apply Promotion")
+        return None
 
 #################
 ##### Users #####

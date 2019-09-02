@@ -93,12 +93,12 @@
   - removed apiclient from setup.py
   **1.2.0 : 9/2/2019**
   - fixed user scrape & cache
-  - added promotions
+  - added promotions (unfinished)
 
 ----------------------------------------
 
 ## ToDo
- 
+ - finish testing promotions
 
 ### Low Priority
   - add: read messages html for emojis
