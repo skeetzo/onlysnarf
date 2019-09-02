@@ -256,7 +256,6 @@ def performPromotion(actionChoice, promotionChoice):
         mainMenu()    
     try:
         username = None
-        print("performPromotion: "+actionChoice+"/"+promotionChoice)
         if str(promotionChoice) == "email":
             # prompt
             choice = input("Email: ")
