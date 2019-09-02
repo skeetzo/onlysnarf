@@ -91,6 +91,9 @@
   **1.1.10 : 8/21/2019**
   - really really fixed user scrape css
   - removed apiclient from setup.py
+  **1.2.0 : 9/2/2019**
+  - fixed user scrape & cache
+  - added promotions
 
 ----------------------------------------
 
