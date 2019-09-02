@@ -65,8 +65,7 @@ messageItems = sorted([
     [ "All", "all"],
     [ "New", "new"],
     [ "Recent", "recent"],
-    [ "User by Username", "username"],
-    [ "User by ID", "id"]
+    [ "User by Username", "username"]
 ])
 messageItems.insert(0,[ "Back", "main"])
 
@@ -145,14 +144,14 @@ def action():
         choice = input(">> ")
         try:
             if int(choice) < 0 or int(choice) >= len(actionItems): raise ValueError
-            if str(actionItems[int(choice)][0]) == "Back":
+            if str(actionItems[int(choice)][1]) == "main":
                 return main()
-            elif str(actionItems[int(choice)][0]) == "Reset":
+            elif str(actionItems[int(choice)][1]) == "reset":
                 onlysnarf.remove_local()
-            elif str(actionItems[int(choice)][0]) == "Message":
+            elif str(actionItems[int(choice)][1]) == "message":
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeMessage(actionChoice)
-            elif str(actionItems[int(choice)][0]) == "Promotion":
+            elif str(actionItems[int(choice)][1]) == "promotion":
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizePromotion(actionChoice)
             else:
@@ -172,7 +171,7 @@ def finalizeAction(actionChoice):
         fileChoice = input(">> ")
         try:
             if int(fileChoice) < 0 or int(fileChoice) >= len(fileItems): raise ValueError
-            if str(fileItems[int(fileChoice)][0]) == "Back":
+            if str(fileItems[int(fileChoice)][1]) == "main":
                 return action()
             # Call the matching function
             fileChoice = list(fileItems[int(fileChoice)])[1]
@@ -210,8 +209,20 @@ def finalizeMessage(actionChoice):
         choice = input(">> ")
         try:
             if int(choice) < 0 or int(choice) >= len(messageItems): raise ValueError
-            if str(messageItems[int(choice)][0]) == "Back":
+            if str(messageItems[int(choice)][1]) == "main":
                 return action()
+            if str(messageItems[int(choice)][1]) == "username":
+                users = displayUsers()    
+                while True:
+                    choice = input(">> ")
+                    try:
+                        if int(choice) < 0 or int(choice) >= len(users): raise ValueError
+                        if int(choice) == 0:
+                            return finalizeMessage(actionChoice)
+                        return onlysnarf.message("user", str(users[int(choice)].username))
+                    except (ValueError, IndexError, KeyboardInterrupt):
+                        print(sys.exc_info()[0])
+                        print("Error: Incorrect Index")
             choice = list(messageItems[int(choice)])[1]
             return performMessage(actionChoice, choice)
         except (ValueError, IndexError, KeyboardInterrupt):
@@ -238,7 +249,7 @@ def finalizePromotion(actionChoice):
         choice = input(">> ")
         try:
             if int(choice) < 0 or int(choice) >= len(promotionItems): raise ValueError
-            if str(promotionItems[int(choice)][0]) == "Back":
+            if str(promotionItems[int(choice)][1]) == "main":
                 return action()
             choice = list(promotionItems[int(choice)])[1]
             return performPromotion(actionChoice, choice)
@@ -255,20 +266,13 @@ def performPromotion(actionChoice, promotionChoice):
         mainMenu()    
     try:
         username = None
-        print("performPromotion: "+actionChoice+"/"+promotionChoice)
         if str(promotionChoice) == "email":
             # prompt
             choice = input("Email: ")
             username = str(choice)
             return promote(username)
         elif str(promotionChoice) == "select":
-            users = onlysnarf.get_users()
-            print(colorize("[0] ", 'blue') + "Back")
-            # show list
-            i = 0
-            for user in users:
-                print(colorize("[" + str(i) + "] ", 'blue') + str(user.username))
-                i = i+1    
+            users = displayUsers()    
             while True:
                 choice = input(">> ")
                 try:
@@ -286,6 +290,18 @@ def performPromotion(actionChoice, promotionChoice):
         print(e)
         print("Error: Missing Method") 
     mainMenu()
+
+# displays and returns users
+# logs into onlyfans
+def displayusers():
+    users = onlysnarf.get_users()
+    print(colorize("[0] ", 'blue') + "Back")
+    # show list
+    i = 0
+    for user in users:
+        print(colorize("[" + str(i) + "] ", 'blue') + str(user.username))
+        i = i+1
+    return users
 
 ###########################
 
