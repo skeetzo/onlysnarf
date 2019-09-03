@@ -453,7 +453,7 @@ def send_trial_to_user(user):
         # BROWSER.switch_to_frame("ModalTrial___BV_modal_content_")
         # BROWSER.switch_to_window().activeElement()
         # WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@class="g-btn.m-rounded"]')))
-
+        # WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@class="g-btn.m-rounded"]')))
         # WebDriverWait(BROWSER, 60, poll_frequency=3).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".g-btn.m-rounded")))
         # create = BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[0].click()
         # create = BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[1].click()
@@ -503,6 +503,8 @@ def get_users():
     try:
         print("goto -> /my/subscribers/active")
         BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
+       # WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@class="g-btn.m-rounded"]')))
+        # WebDriverWait(BROWSER, 30, poll_frequency=3).until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".l-sidebar__user-data__item__count")))
         # num = BROWSER.find_element_by_class_name("b-tabs__nav__item__count").get_attribute("innerHTML")
         num = BROWSER.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML")
         settings.maybePrint("User count: %s" % num)
@@ -541,10 +543,11 @@ def get_users():
             # if str(OnlyFans_USER_ID).lower() in str(user_id).lower():
                 # settings.maybePrint("(self): %s" % user_id)
                 # continue
+            user = User(name=name, username=username)
             user = skipUserCheck(user)
             if user is None: continue
             # active_users.append(User(name=name, username=username, id=user_id)) # user_id not working
-            active_users.append(User(name=name, username=username))
+            active_users.append(user)
         # print("users: "+active_users)
         for user in active_users:
             existing = False
@@ -622,7 +625,7 @@ def read_users_local():
         return users_
 
 def skipUserCheck(user):
-    if str(user_id).lower() in settings.SKIP_USERS or str(username).lower() in settings.SKIP_USERS:
+    if str(user.id).lower() in settings.SKIP_USERS or str(user.username).lower() in settings.SKIP_USERS:
         settings.maybePrint("skipping: %s" % user.username)
         return None
     return user
