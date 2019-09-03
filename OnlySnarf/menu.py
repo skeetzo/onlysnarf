@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # 3/28/2019 Skeetzo
-# onlysnarf.py menu system
+# OnlySnarf.py menu system
 
 ### doesn't work:
 # upload & backup (requires upload via local added to main script)
@@ -14,8 +14,9 @@ import json
 import sys
 import pathlib
 from OnlySnarf.settings import SETTINGS as settings
-from OnlySnarf import onlysnarf
- 
+from OnlySnarf import onlysnarf as OnlySnarf
+from OnlySnarf import google as Google
+
 ###################
 ##### Globals #####
 ###################
@@ -147,7 +148,7 @@ def action():
             if str(actionItems[int(choice)][1]) == "main":
                 return main()
             elif str(actionItems[int(choice)][1]) == "reset":
-                onlysnarf.remove_local()
+                OnlySnarf.remove_local()
             elif str(actionItems[int(choice)][1]) == "message":
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeMessage(actionChoice)
@@ -157,7 +158,7 @@ def action():
             else:
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeAction(actionChoice)
-        except (ValueError, IndexError, KeyboardInterrupt):
+        except (ValueError, IndexError):
             print("Error: Incorrect Index")
         except Exception as e:
             print(e)
@@ -176,7 +177,7 @@ def finalizeAction(actionChoice):
             # Call the matching function
             fileChoice = list(fileItems[int(fileChoice)])[1]
             return performAction(actionChoice, fileChoice)
-        except (ValueError, IndexError, KeyboardInterrupt):
+        except (ValueError, IndexError):
             print("Error: Incorrect Index")
         except Exception as e:
             print(e)
@@ -185,7 +186,7 @@ def finalizeAction(actionChoice):
 ### Action Menu - perform
 def performAction(actionChoice, fileChoice):
     try:
-        method = getattr(onlysnarf, str(actionChoice))
+        method = getattr(OnlySnarf, str(actionChoice))
         response = method(fileChoice)
         if response:
             if str(actionChoice) == "download":
@@ -194,12 +195,19 @@ def performAction(actionChoice, fileChoice):
                         setting[1] = response[0]
                     elif setting[0] == "File Path":
                         setting[1] = response[1]
-    except (ValueError, IndexError, KeyboardInterrupt):
+    except (ValueError, IndexError):
         print("Error: Incorrect Index")
     except Exception as e:
         print(e)
         print("Error: Missing Method") 
     mainMenu()
+
+
+# this needs to be cleaned up
+
+# pick message type: all, new, recent, username
+# pick an image to send
+
 
 # Message Menu - finalize
 def finalizeMessage(actionChoice):
@@ -208,37 +216,52 @@ def finalizeMessage(actionChoice):
     while True:
         choice = input(">> ")
         try:
+            choice = int(choice)-1
             if int(choice) < 0 or int(choice) >= len(messageItems): raise ValueError
             if str(messageItems[int(choice)][1]) == "main":
                 return action()
             if str(messageItems[int(choice)][1]) == "username":
-                users = displayUsers()    
+                users = displayUsers()
                 while True:
                     choice = input(">> ")
                     try:
                         if int(choice) < 0 or int(choice) >= len(users): raise ValueError
                         if int(choice) == 0:
                             return finalizeMessage(actionChoice)
-                        return onlysnarf.message("user", str(users[int(choice)].username))
-                    except (ValueError, IndexError, KeyboardInterrupt):
+                        return performMessage(actionChoice, ,list(messageItems[int(choice)])[1])
+                        return OnlySnarf.message("user", str(users[int(choice)].username))
+                    except (ValueError, IndexError):
                         print(sys.exc_info()[0])
                         print("Error: Incorrect Index")
             choice = list(messageItems[int(choice)])[1]
             return performMessage(actionChoice, choice)
-        except (ValueError, IndexError, KeyboardInterrupt):
+        except (ValueError, IndexError):
             print(sys.exc_info()[0])
             print("Error: Incorrect Index")
 
 # Message Menu - perform
-def performMessage(actionChoice, messageChoice):
-    try:
-        method = getattr(onlysnarf, str(action))
-        response = method(messageChoice)    
-    except (ValueError, IndexError, KeyboardInterrupt):
-        print("Error: Incorrect Index")
-    except Exception as e:
-        print(e)
-        print("Error: Missing Method") 
+def performMessage(actionChoice, messageChoice, username):
+    # select an image first
+    images = selectImage(messageChoice)
+    # [folder , image_file]
+    # print("len: " + str(len(images)))
+    while True:
+        choice = input(">> ")
+        try:
+            if int(choice) < 0 or int(choice) > len(images): raise ValueError
+            if int(choice) == 0:
+                return finalizeMessage(actionChoice)
+            try:
+                image = images[int(choice)-1]
+                print("image: "+str(image))
+                return OnlySnarf.message(messageChoice, {"image": image[1],"folder":image[0]}, username)
+            # except (ValueError, IndexError):
+                # print("Error: Incorrect Index")
+            except Exception as e:
+                print(e)
+                print("Error: Missing Method")
+        except (ValueError, IndexError):
+            print("Error: Incorrect Index")
     mainMenu()    
 
 # Promotion Menu - finalize
@@ -248,12 +271,13 @@ def finalizePromotion(actionChoice):
     while True:
         choice = input(">> ")
         try:
+            choice = int(choice)-1
             if int(choice) < 0 or int(choice) >= len(promotionItems): raise ValueError
             if str(promotionItems[int(choice)][1]) == "main":
                 return action()
             choice = list(promotionItems[int(choice)])[1]
             return performPromotion(actionChoice, choice)
-        except (ValueError, IndexError, KeyboardInterrupt):
+        except (ValueError, IndexError):
             print(sys.exc_info()[0])
             print("Error: Incorrect Index")
 
@@ -262,7 +286,7 @@ def performPromotion(actionChoice, promotionChoice):
         if username == None:
             print("Warning: No user found")
         else:
-            onlysnarf.give_trial(username)
+            OnlySnarf.give_trial(username)
         mainMenu()    
     try:
         username = None
@@ -281,10 +305,10 @@ def performPromotion(actionChoice, promotionChoice):
                         return finalizePromotion(actionChoice)
                     return promote(str(users[int(choice)].username))
 
-                except (ValueError, IndexError, KeyboardInterrupt):
+                except (ValueError, IndexError):
                     print(sys.exc_info()[0])
                     print("Error: Incorrect Index")            
-    except (ValueError, IndexError, KeyboardInterrupt):
+    except (ValueError, IndexError):
         print("Error: Incorrect Index")
     except Exception as e:
         print(e)
@@ -292,16 +316,26 @@ def performPromotion(actionChoice, promotionChoice):
     mainMenu()
 
 # displays and returns users
-# logs into onlyfans
-def displayusers():
-    users = onlysnarf.get_users()
+def displayUsers():
+    users = OnlySnarf.get_users()
     print(colorize("[0] ", 'blue') + "Back")
     # show list
-    i = 0
+    i = 1
     for user in users:
         print(colorize("[" + str(i) + "] ", 'blue') + str(user.username))
         i = i+1
     return users
+
+def selectImage(folderName):
+    images = Google.get_images(folderName)
+    print(colorize("[0] ", 'blue') + "Back")
+    i = 1
+    for image in images:
+        print(colorize("[" + str(i) + "] ", 'blue') + str(image[0]["title"]) + " - " + str(image[1]['title']))
+        i = i+1
+    return images
+    # performMessage -> [folder , image_file] -> performMessage
+
 
 ###########################
 
@@ -352,7 +386,7 @@ def set_settings():
                         if int(updateChoice) < 0 or int(updateChoice) >= len(list(settingItems[int(choice)][2])): raise ValueError
                         settingValue = list_[int(updateChoice)]
                         break
-                    except (ValueError, IndexError, KeyboardInterrupt):
+                    except (ValueError, IndexError):
                         print("Incorrect Index")
                     except Exception as e:
                         print('What did shnnarf break?')
@@ -365,7 +399,7 @@ def set_settings():
             settingItems[int(choice)][1] = settingValue
             settings.update_value(settingChoice, settingValue)
             return set_settings()
-        except (ValueError, IndexError, KeyboardInterrupt):
+        except (ValueError, IndexError):
             print("Incorrect Index")
         except:
             print(sys.exc_info()[0])

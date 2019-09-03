@@ -480,6 +480,37 @@ def download_scene(sceneFolder):
 ##### Get #####
 ###############
 
+# gets all the folders in the messages category
+# gets all the images in the folders
+# returns an array of json images w/ 
+# [ 'image.folder' - 'image.title']
+def get_images(folderName):
+    global AUTH
+    if not AUTH:
+        AUTH = authGoogle()
+    print('Getting Images: {}'.format(folderName))
+    global PYDRIVE
+    OnlyFans_Images_Folder = get_folder_by_name("messages")
+    if OnlyFans_Images_Folder is None:
+        print("Error: Unable to get Images Folder")
+        return None
+    random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_Images_Folder+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+    images_list = []
+    for folder in random_folders:
+        if folder['title'] != str(folderName):
+            continue
+        if str(settings.VERBAL) == "True":
+            print('checking folder: '+folder['title'])
+        images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
+        for image_file in images_list_tmp:
+            # images_list.append({"folder":folder['title'],"folder_id":folder['id'],"id":image_file['id'],"image":image_file['title']})
+            images_list.append([folder, image_file])
+    if len(images_list)==0:
+        print('Warning: No message files found!')
+        return
+    return images_list
+    # menu.selectImage -> [] -> menu.selectImage
+
 def get_message_image(folderName):
     global AUTH
     if not AUTH:
