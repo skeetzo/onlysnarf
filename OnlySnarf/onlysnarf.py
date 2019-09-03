@@ -175,7 +175,11 @@ def download_random_scene():
 ##### Message #####
 ###################
 
-def message(opt, username=None):
+# {
+#   image: file
+#   folder: folder
+# }
+def message(choice, image=None, username=None):
     message = input("Message: ")
     waiting = True
     while waiting:
@@ -185,13 +189,18 @@ def message(opt, username=None):
             waiting = False
         except ValueError:
             print("Enter a currency amount!")
-    response = Google.get_message_image(opt)
-    if not response or response == None:
+    
+
+    if not image.image or image.image == None:
         print("Error: Missing Image")
         return
-    successful_message = OnlySnarf.message(choice=opt, message=message, image=response[1], price=price, username=username)
-    if successful_message and str(opt) != "new":
-        Google.move_file(response[2])
+
+    file_path = Google.download_file(image.image)
+
+
+    successful_message = OnlySnarf.message(choice=choice, message=message, image=file_path, price=price, username=username)
+    if successful_message and str(choice) != "new":
+        Google.move_file(image.image)
     else:
         print("Error: Failure Messaging")
         return False
