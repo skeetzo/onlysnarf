@@ -1,18 +1,21 @@
 # OnlySnarf
   
-`git clone git@github.com:skeetzo/onlysnarf`
+`git clone git@github.com:skeetzo/onlysnarf && sudo python3 setup.py install`
 OR
 `pip3 install OnlySnarf`
+
+## Description
+
+OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans. OnlySnarf is capable of downloading and uploading a file (image or video) or gallery of files (images) from a Google Drive folder as specified by run time arguments to an OnlyFans account. OnlySnarf can mass messages fans with priced images.
 
 ## Preview
 ![preview](https://github.com/skeetzo/onlysnarf/blob/master/OnlySnarf/images/preview.jpeg)
 
 ## Scripts
 First run:  
-  * `(sudo) python3 setup.py install`  
+  * `(sudo) onlysnarf-config`
 Then from within project's OnlySnarf directory either:  
   * `(sudo) onlysnarf [args]`
-  * `(sudo) onlysnarf-config [args]`
   * or directly via `python3 onlysnarf.py (-debug) -image|-gallery|-video`
 
 ## args
@@ -49,15 +52,14 @@ Attempts to upload limit regardless of file size.
   `python3 onlysnarf.py -show`
 Shows the Chromium browser
 
-## Description
+**more available in menu**
 
-Downloads a random file or gallery of files from a random Google Drive folder as specified by run time arguments and then uploads the image, video, or gallery to an OnlyFans account.
+Or include a 'profile.conf' file located at '/etc/onlysnarf/profile.conf' to set variables at runtime without using arguments. An example file has been provided. Please be sure to follow the key:value pattern. A starting # denotes a comment.
 
 ## Authentication  
 --------------
+The use of this package requires configuring a Google App with *PyDrive* for access to your Google Drive. The Drive API requires OAuth2.0 for authentication.
 ###### from [Auth Quickstart](https://raw.githubusercontent.com/gsuitedevs/PyDrive/master/docs/quickstart.rst)
-Drive API requires OAuth2.0 for authentication. *PyDrive* handles complex authentication steps that need to be personally authorized for your Drive account.
-
 1. Go to `APIs Console`_ and make your own project.
 2. Search for 'Google Drive API', select the entry, and click 'Enable'.
 3. Select 'Credentials' from the left menu, click 'Create Credentials', select 'OAuth client ID'.
@@ -71,8 +73,8 @@ Drive API requires OAuth2.0 for authentication. *PyDrive* handles complex authen
 
 5. Click 'Download JSON' on the right side of Client ID to download **client_secret_<really long ID>.json**.
 
-The downloaded file has all authentication information of your application.
-**Rename the file to "client_secrets.json" and place it in the OnlySnarf folder.**
+**Rename the file to "client_secrets.json" and place it into your installed OnlySnarf directory.**
+To update your installation with the new file, run `onlysnarf-config`, select 'Update Google Creds', and enter the location of your "client_secret.json" file.
 
 ## Config
 ##### config.json  
@@ -91,10 +93,10 @@ Used to facilitate Google Drive's python authentication. Requires generating an 
 
 ## Example Crons  
 
-Upload an image once a day at noon:  
+Upload a random image once a day at noon:  
   `* 12 * * * python3 onlysnarf.py -image`
 
-Upload a gallery of images every Wednesday at 2:30pm:  
+Upload a random gallery of images every Wednesday at 2:30pm:  
   `30 14 * * 3 python3 onlysnarf.py -gallery`
 
 Upload a random video every Friday in the month of June at 6:00pm:  
@@ -104,5 +106,4 @@ Text will be generated if not provided with `-text`
   `* 12 * * * python3 onlysnarf.py -image -text "Your mother is a dirty whore"`
 
 ## Dependencies
-  * Chromium / Google Chrome -> `sudo apt install -y chromium-browser`
-  * Chromedriver: binary installed via chromedriver-binary
+  ### Google Chrome -> `sudo apt install -y google-chrome-beta`
