@@ -15,8 +15,10 @@ from OnlySnarf.settings import SETTINGS as settings
 class User:
 
     def __init__(self, name=None, username=None, id=None, messages_from=None, messages_to=None, messages=None, preferences=None, last_messaged_on=None, sent_images=None, subscribed_on=None, isFavorite=False, statement_history=None):
-        self.name = name.encode("utf-8")
-        self.username = username.encode("utf-8")
+        # self.name = name.encode("utf-8")
+        # self.username = username.encode("utf-8")
+        self.name = name
+        self.username = username
         self.id = id
         # messages receieved from the user
         if messages_from is None:
