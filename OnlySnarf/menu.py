@@ -21,7 +21,7 @@ from OnlySnarf import google as Google
 ##### Globals #####
 ###################
 
-version = "1.1.10"
+version = "1.2.1"
 header = "\n ________         .__          _________                     _____ \n \
 \\_____  \\   ____ |  | ___.__./   _____/ ____ _____ ________/ ____\\\n \
  /   |   \\ /    \\|  |<   |  |\\_____  \\ /    \\\\__  \\\\_   _ \\   __\\ \n \
@@ -202,13 +202,6 @@ def performAction(actionChoice, fileChoice):
         print("Error: Missing Method") 
     mainMenu()
 
-
-# this needs to be cleaned up
-
-# pick message type: all, new, recent, username
-# pick an image to send
-
-
 # Message Menu - finalize
 def finalizeMessage(actionChoice):
     for item in messageItems:
@@ -216,32 +209,33 @@ def finalizeMessage(actionChoice):
     while True:
         choice = input(">> ")
         try:
-            choice = int(choice)-1
+            choice = int(choice)
             if int(choice) < 0 or int(choice) >= len(messageItems): raise ValueError
             if str(messageItems[int(choice)][1]) == "main":
                 return action()
-            if str(messageItems[int(choice)][1]) == "username":
-                users = displayUsers()
-                while True:
-                    choice = input(">> ")
-                    try:
-                        if int(choice) < 0 or int(choice) >= len(users): raise ValueError
-                        if int(choice) == 0:
-                            return finalizeMessage(actionChoice)
-                        return performMessage(actionChoice, ,list(messageItems[int(choice)])[1])
-                        return OnlySnarf.message("user", str(users[int(choice)].username))
-                    except (ValueError, IndexError):
-                        print(sys.exc_info()[0])
-                        print("Error: Incorrect Index")
-            choice = list(messageItems[int(choice)])[1]
-            return performMessage(actionChoice, choice)
+            return performMessage(actionChoice, messageItems[int(choice)][1])
         except (ValueError, IndexError):
             print(sys.exc_info()[0])
             print("Error: Incorrect Index")
 
 # Message Menu - perform
-def performMessage(actionChoice, messageChoice, username):
-    # select an image first
+def performMessage(actionChoice, messageChoice):
+    username = None
+    if str(messageChoice) == "username":
+        users = displayUsers()
+        seeking = True
+        while seeking:
+            choice = input(">> ")
+            try:
+                if int(choice) < 0 or int(choice) > len(users): raise ValueError
+                if int(choice) == 0:
+                    return finalizeMessage(actionChoice)
+                username = users[int(choice)-1][1]
+                seeking = False
+            except (ValueError, IndexError):
+                print(sys.exc_info()[0])
+                print("Error: Incorrect Index")
+                return mainMenu()
     images = selectImage(messageChoice)
     # [folder , image_file]
     # print("len: " + str(len(images)))
@@ -253,8 +247,8 @@ def performMessage(actionChoice, messageChoice, username):
                 return finalizeMessage(actionChoice)
             try:
                 image = images[int(choice)-1]
-                print("image: "+str(image))
-                return OnlySnarf.message(messageChoice, {"image": image[1],"folder":image[0]}, username)
+                message(messageChoice, [image[1],image[0]], username)
+                return mainMenu()
             # except (ValueError, IndexError):
                 # print("Error: Incorrect Index")
             except Exception as e:
@@ -262,7 +256,34 @@ def performMessage(actionChoice, messageChoice, username):
                 print("Error: Missing Method")
         except (ValueError, IndexError):
             print("Error: Incorrect Index")
-    mainMenu()    
+    # mainMenu()    
+
+# {
+#   image: file
+#   folder: folder
+# }
+def message(choice, image=None, username=None):
+    message = input("Message: ")
+    waiting = True
+    while waiting:
+        try:
+            price = input("Price: ")
+            "{:.2f}".format(float(price))
+            waiting = False
+        except ValueError:
+            print("Enter a currency amount!")
+    if not image or not image[0] or image[0] == None:
+        print("Error: Missing Image")
+        return
+
+    file_path = Google.download_file(image[0])
+
+    successful_message = OnlySnarf.message(choice=choice, message=message, image=file_path, price=price, username=username)
+    if successful_message and str(choice) != "new":
+        Google.move_file(image[0])
+    else:
+        print("Error: Failure Messaging")
+        return False
 
 # Promotion Menu - finalize
 def finalizePromotion(actionChoice):
@@ -271,8 +292,8 @@ def finalizePromotion(actionChoice):
     while True:
         choice = input(">> ")
         try:
-            choice = int(choice)-1
-            if int(choice) < 0 or int(choice) >= len(promotionItems): raise ValueError
+            choice = int(choice)
+            if int(choice) < 0 or int(choice) > len(promotionItems): raise ValueError
             if str(promotionItems[int(choice)][1]) == "main":
                 return action()
             choice = list(promotionItems[int(choice)])[1]
@@ -300,10 +321,10 @@ def performPromotion(actionChoice, promotionChoice):
             while True:
                 choice = input(">> ")
                 try:
-                    if int(choice) < 0 or int(choice) >= len(users): raise ValueError
+                    if int(choice) < 0 or int(choice) > len(users): raise ValueError
                     if int(choice) == 0:
                         return finalizePromotion(actionChoice)
-                    return promote(str(users[int(choice)].username))
+                    return promote(str(users[int(choice)-1].username))
 
                 except (ValueError, IndexError):
                     print(sys.exc_info()[0])

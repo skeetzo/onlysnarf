@@ -227,6 +227,7 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
 
 def message(choice=None, message=None, image=None, price=None, username=None):
     if str(choice) == "all":
+        print("Messaging: All")
         users = get_users()
     elif str(choice) == "recent":
         print("Messaging: Recent")
@@ -246,6 +247,7 @@ def message(choice=None, message=None, image=None, price=None, username=None):
     else:
         print("Error: Missing Message Choice")
         return
+    print(users)
     for user in users:
         user.sendMessage(message, image, price)
 
