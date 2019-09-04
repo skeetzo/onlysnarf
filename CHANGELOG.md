@@ -94,11 +94,15 @@
   **1.2.0 : 9/2/2019**
   - fixed user scrape & cache
   - added promotions (unfinished)
-
+  **1.2.1 : 9/4/2019**
+  - removed innate debug profiles and added profile.conf
+  - added google creds to onlysnarf-config
+  - updated readme to reflect creds process
 ----------------------------------------
 
 ## ToDo
  - finish testing promotions
+ - finish testing messages & user selection
 
 ### Low Priority
   - add: read messages html for emojis

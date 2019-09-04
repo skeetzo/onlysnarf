@@ -97,18 +97,7 @@ class Settings:
         self.SKIP_REDUCE = False
         self.SKIP_THUMBNAIL = False
 
-        self.SKIP_USERS = [
-            "6710870",
-            
-            "5451153",
-            "1771880",
-            "5057708",
-            "7825384",
-            "4883991",
-
-            "1633091",
-            "3055233"
-        ]
+        self.SKIP_USERS = []
 
         self.DRIVE_FOLDERS = [
             "images",
@@ -120,10 +109,16 @@ class Settings:
 
         self.user_DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
 
-
         # user message delay
         self.DELAY = False
 
+        # updates w/ values from profile.conf
+        profile = None
+        if os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf")):
+            readProfile(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf"))
+        if os.path.exists("/etc/onlysnarf/profile.conf"):
+            readProfile(self, "/etc/onlysnarf/profile.conf")
+                
         i = 0
         while i < len(sys.argv):
             if '-image' in str(sys.argv[i]):
@@ -178,25 +173,6 @@ class Settings:
                 self.SKIP_REPAIR = True
             if '-skip-thumb' in str(sys.argv[i]):
                 self.SKIP_THUMBNAIL = True
-            # profile
-            if '-schizo' in str(sys.argv[i]) or '-skeetzo' in str(sys.argv[i]):
-                self.SKIP_THUMBNAIL = True
-                # self.SKIP_REPAIR = True
-                # self.SKIP_REDUCE = True
-                self.VERBAL = True
-                self.BACKING_UP = True
-                self.TWEETING = False
-                self.MOUNT_PATH = "/opt/apps/onlysnarf"
-                self.MOUNT_DRIVE = "Pron/dbot"
-            if '-dbot' in str(sys.argv[i]):
-                self.SKIP_THUMBNAIL = True
-                # self.SKIP_REPAIR = True
-                # self.SKIP_REDUCE = True
-                self.VERBAL = True
-                self.BACKING_UP = True
-                self.TWEETING = False
-                self.MOUNT_PATH = "/mnt/dbot/dev/onlysnarf"
-                self.MOUNT_DRIVE = "Pron/dbot"
             i += 1
         
         if self.MOUNT_PATH is not None:
@@ -245,3 +221,11 @@ class Settings:
             print(e)
 
 SETTINGS = Settings()
+
+
+def readProfile(self, profile):
+    with open(profile) as f:
+        for line in f:
+            (key, val) = line.split()
+            if str(key[0]) == "#": continue
+            setattr(self, key, val)
