@@ -603,7 +603,7 @@ def get_new_users():
     for user in users:
         if len(user.messages_to) == 0:
             settings.maybePrint("New User: %s" % user.username)
-            started = datetime.strptime(user.started,'%Y-%m-%d')
+            # started = datetime.strptime(user.started,'%Y-%m-%d')
             settings.maybePrint("started: "+str(started))
             if started < date: continue
             user = skipUserCheck(user)
