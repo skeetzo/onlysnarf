@@ -538,7 +538,6 @@ def get_users():
         user_ids_ = []
         starteds_ = []
         for i in range(len(user_ids)):
-            print("user_id: "+user_ids[i].get_attribute("href"))
             if user_ids[i].get_attribute("href"):
                 user_ids_.append(user_ids[i].get_attribute("href"))
         for i in range(len(starteds)):
