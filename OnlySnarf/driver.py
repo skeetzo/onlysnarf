@@ -542,9 +542,7 @@ def get_users():
                 user_ids_.append(user_ids[i].get_attribute("href"))
         for i in range(len(starteds)):
             text = starteds[i].get_attribute("innerHTML")
-            # print("text: "+str(text))
             match = re.findall("Started.*([A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4})", text)
-            # print("match: "+str(match))
             if len(match) > 0:
                 starteds_.append(match[0])
             
@@ -598,12 +596,29 @@ def get_favorite_users():
 # returns users that have no messages sent to them
 def get_new_users():
     settings.maybePrint("Getting New Users")
+    users = get_users()
+    newUsers = []
+    date = datetime.today().strftime('%Y-%m-%d') - datetime.timedelta(days=10)
+    settings.maybePrint("date: "+str(date))
+    for user in users:
+        if len(user.messages_to) == 0:
+            settings.maybePrint("New User: %s" % user.username)
+            started = datetime.strptime(user.started,'%Y-%m-%d')
+            settings.maybePrint("started: "+str(started))
+            if started < date: continue
+            user = skipUserCheck(user)
+            if user is None: continue
+            newUsers.append(user)
+    return newUsers
+
+def get_never_messaged_users():
+    settings.maybePrint("Getting New Users")
     update_chat_logs()
     users = get_users()
     newUsers = []
     for user in users:
         if len(user.messages_to) == 0:
-            settings.maybePrint("New User: %s" % user.username)
+            settings.maybePrint("Never Messaged User: %s" % user.username)
             user = skipUserCheck(user)
             if user is None: continue
             newUsers.append(user)
