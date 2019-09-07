@@ -105,5 +105,9 @@ Upload a random video every Friday in the month of June at 6:00pm:
 Text will be generated if not provided with `-text`
   `* 12 * * * python3 onlysnarf.py -image -text "Your mother is a dirty whore"`
 
+## Profiles
+
+A profile of preset variables can be used by modifying the 'profile.conf' file. A config file located at `/etc/onlysnarf/profile.conf` will be prioritized.
+
 ## Dependencies
   ### Google Chrome -> `sudo apt install -y google-chrome-beta`
