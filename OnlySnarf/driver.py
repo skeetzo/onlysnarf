@@ -11,7 +11,7 @@ import pathlib
 import threading
 import chromedriver_binary
 import time
-from datetime import date, time, datetime, timedelta
+from datetime import date, datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
