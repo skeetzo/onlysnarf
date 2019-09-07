@@ -11,7 +11,7 @@ import pathlib
 import threading
 import chromedriver_binary
 import time
-from datetime import datetime
+from datetime import date, time, datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -598,7 +598,7 @@ def get_new_users():
     settings.maybePrint("Getting New Users")
     users = get_users()
     newUsers = []
-    date = datetime.today().strftime('%Y-%m-%d') - datetime.timedelta(days=10)
+    date = datetime.today().strftime('%Y-%m-%d') - timedelta(days=10)
     settings.maybePrint("date: "+str(date))
     for user in users:
         if len(user.messages_to) == 0:
