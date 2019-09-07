@@ -106,10 +106,13 @@ def download_random_performer():
     remove_local()
     print('Fetching Performer')
     google_file = Google.get_random_performer()
+    if google_file == None:
+        print("Error: Missing Performer")
+        return
     performer = google_file['title']
     results = Google.download_performer(google_file)
     if results == None:
-        print("Error: Missing Performer Download")
+        print("Error: Missing Performer Folders")
         return
     gallery_files = results[0]
     file_path = results[1]

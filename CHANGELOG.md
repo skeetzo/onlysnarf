@@ -98,6 +98,8 @@
   - removed innate debug profiles and added profile.conf
   - added google creds to onlysnarf-config
   - updated readme to reflect creds process
+  **1.2.2 : 9/5/2019**
+  - fixed user scrape & messaging
 ----------------------------------------
 
 ## ToDo

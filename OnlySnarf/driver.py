@@ -247,7 +247,6 @@ def message(choice=None, message=None, image=None, price=None, username=None):
     else:
         print("Error: Missing Message Choice")
         return
-    print(users)
     for user in users:
         user.sendMessage(message, image, price)
 
@@ -270,12 +269,14 @@ def enter_message(text):
             print("Missing Text")
             return
         global BROWSER
-        message = BROWSER.find_element_by_css_selector(".form-control.unlimsize.b-chat__message-input")        
+        message = BROWSER.find_element_by_css_selector(".form-control.b-chat__message-input")        
         message.send_keys(str(text))
         print("Message Entered")
+        return True
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Failure to Enter Message")
+        return False
 
 def enter_image(image):
     try:
@@ -296,11 +297,10 @@ def enter_price(price):
         if not price or price == None:
             print("Error: Missing Price")
             return
-        global BROWSER 
-        BROWSER.find_element_by_css_selector(".b-chat__btn-set-price.js-chat__btn-set-price").click()
-        BROWSER.find_element_by_css_selector(".form-control.js-chat__price-input.b-chat__panel__input.js-input").send_keys(str(price))
-        WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".g-btn.m-rounded.js-panel__btn-save.js-chat__price-btn-save"))).click()
-        # BROWSER.find_element_by_css_selector(".g-btn.m-rounded.js-panel__btn-save.js-chat__price-btn-save").click()
+        global BROWSER
+        BROWSER.find_element_by_css_selector(".b-chat__btn-set-price").click()
+        BROWSER.find_elements_by_css_selector(".form-control.b-chat__panel__input")[1].send_keys(str(price))
+        BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[4].click()
         print("Price Entered")
     except Exception as e:
         settings.maybePrint(e)
@@ -518,39 +518,56 @@ def get_users():
         settings.maybePrint(e)
         print("Error: Failed to Count Users")
         return []
-    user_ids = BROWSER.find_elements_by_class_name('b-avatar')
+    avatars = BROWSER.find_elements_by_class_name('b-avatar')
+    user_ids = BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-border.m-sm")
+    starteds = BROWSER.find_elements_by_class_name("b-fans__item__list__item")
     # users = BROWSER.find_elements_by_class_name('g-user-name')
     users = BROWSER.find_elements_by_class_name('g-user-name__wrapper')
     usernames = BROWSER.find_elements_by_class_name('g-user-username')
     active_users = []
     global OnlyFans_USERNAME
+
+    # class="b-fans__item__list"
+    # class="b-fans__item__list__item"
+
+    print("starteds: "+str(len(starteds)))
+
     settings.maybePrint("Found: ")
+    import re
     try:
-        # print(len(user_ids))
-        for i in range(len(user_ids)-1):
-            user_id = user_ids[i]
+        user_ids_ = []
+        starteds_ = []
+        for i in range(len(user_ids)):
+            if user_ids[i].get_attribute("href"):
+                user_ids_.append(user_ids[i].get_attribute("href"))
+        for i in range(len(starteds)):
+            text = starteds[i].get_attribute("innerHTML")
+            match = re.findall("[A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4}", text)
+            # print("match: "+str(match))
+            if len(match) > 0:
+                starteds_.append(match[0])
+            
+        print("ids vs starteds: "+str(len(user_ids_))+" - "+str(len(starteds_)))
+        for i in range(len(avatars)-1):
+            start = starteds_[i]
+            user_id = user_ids_[i][35:]
             name = users[i]
             username = usernames[i]
-            # i don't think user_ids are working or are necessary
-            # user_id = str(user_id.get_attribute("user_id")).strip()
             name = str(name.get_attribute("innerHTML")).strip()
-            # print("name: "+str(name))
             username = str(username.get_attribute("innerHTML")).strip()
+            # settings.maybePrint("name: "+str(name))
+            # settings.maybePrint("username: "+str(username))
+            # settings.maybePrint("user_id: "+str(user_id))
             if str(OnlyFans_USERNAME).lower() in str(username).lower():
                 settings.maybePrint("(self): %s = %s" % (OnlyFans_USERNAME, username))
                 # first user is always active user but just in case find it in list of users
                 global OnlyFans_USER_ID
-                OnlyFans_USER_ID = user_id
+                OnlyFans_USER_ID = username
                 continue
-            # if str(OnlyFans_USER_ID).lower() in str(user_id).lower():
-                # settings.maybePrint("(self): %s" % user_id)
-                # continue
-            user = User(name=name, username=username)
+            user = User(name=name, username=username, id=user_id, started=start)
             user = skipUserCheck(user)
             if user is None: continue
-            # active_users.append(User(name=name, username=username, id=user_id)) # user_id not working
             active_users.append(user)
-        # print("users: "+active_users)
         for user in active_users:
             existing = False
             for user_ in USER_CACHE:

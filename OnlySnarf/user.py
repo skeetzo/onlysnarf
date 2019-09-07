@@ -14,7 +14,7 @@ from OnlySnarf.settings import SETTINGS as settings
 
 class User:
 
-    def __init__(self, name=None, username=None, id=None, messages_from=None, messages_to=None, messages=None, preferences=None, last_messaged_on=None, sent_images=None, subscribed_on=None, isFavorite=False, statement_history=None):
+    def __init__(self, name=None, username=None, id=None, messages_from=None, messages_to=None, messages=None, preferences=None, last_messaged_on=None, sent_images=None, subscribed_on=None, isFavorite=False, statement_history=None, started=None):
         # self.name = name.encode("utf-8")
         # self.username = username.encode("utf-8")
         self.name = name
@@ -51,6 +51,7 @@ class User:
         if statement_history is None:
             statement_history = []
         self.statement_history = statement_history
+        self.started = started
         try:
             settings.maybePrint("User: {} - {} - {}".format(self.name, self.username, self.id))
         except Exception as e:
@@ -61,7 +62,9 @@ class User:
         try:
             print("Sending Message: {} <- {} - {} - ${}".format(self.id, message, image, price))
             OnlySnarf.goto_user(self.id)
-            OnlySnarf.enter_message(message)
+            success = OnlySnarf.enter_message(message)
+            if not success:
+                return
             image_name = os.path.basename(image)
             if str(image_name) in self.sent_images:
                 print("Error: Image Already Sent: {} -> {}".format(image, self.id))
