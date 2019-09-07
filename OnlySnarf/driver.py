@@ -598,7 +598,7 @@ def get_new_users():
     settings.maybePrint("Getting New Users")
     users = get_users()
     newUsers = []
-    date = (datetime.today() - timedelta(days=10)).strftime('%Y-%m-%d')
+    date = datetime.today() - timedelta(days=10)
     settings.maybePrint("date: "+str(date))
     for user in users:
         if len(user.messages_to) == 0:
