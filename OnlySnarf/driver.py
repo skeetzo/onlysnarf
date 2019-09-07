@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # 3/28/2019: Skeetzo
-
+import re
 import random
 import os
 import shutil
@@ -530,19 +530,21 @@ def get_users():
     # class="b-fans__item__list"
     # class="b-fans__item__list__item"
 
+    print("user_ids: "+str(len(user_ids)))
     print("starteds: "+str(len(starteds)))
 
     settings.maybePrint("Found: ")
-    import re
     try:
         user_ids_ = []
         starteds_ = []
         for i in range(len(user_ids)):
+            print("user_id: "+user_ids[i].get_attribute("href"))
             if user_ids[i].get_attribute("href"):
                 user_ids_.append(user_ids[i].get_attribute("href"))
         for i in range(len(starteds)):
             text = starteds[i].get_attribute("innerHTML")
-            match = re.findall("[A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4}", text)
+            # print("text: "+str(text))
+            match = re.findall("Started.*([A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4})", text)
             # print("match: "+str(match))
             if len(match) > 0:
                 starteds_.append(match[0])
