@@ -601,7 +601,7 @@ def get_new_users():
     date_ = datetime.today() - timedelta(days=10)
     settings.maybePrint("date: "+str(date_))
     for user in users:
-        started = date(datetime.strptime(user.started))
+        started = date(datetime.strptime(user.started,'%Y-%m-%d'))
         settings.maybePrint("started: "+str(started))
         if started < date_: continue
         settings.maybePrint("New User: %s" % user.username)
