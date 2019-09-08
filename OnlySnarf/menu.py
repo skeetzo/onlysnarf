@@ -21,7 +21,7 @@ from OnlySnarf import google as Google
 ##### Globals #####
 ###################
 
-version = "1.2.1"
+version = "1.3.0"
 header = "\n ________         .__          _________                     _____ \n \
 \\_____  \\   ____ |  | ___.__./   _____/ ____ _____ ________/ ____\\\n \
  /   |   \\ /    \\|  |<   |  |\\_____  \\ /    \\\\__  \\\\_   _ \\   __\\ \n \
@@ -43,56 +43,12 @@ colors = {
         'menu': '\033[48;1;44m'
         }
 
-# Main Menu
-menuItems = [
-    [ "Actions", "action"],
-    [ "Settings", "set_settings"],
-    [ "Exit", "exit"]
-]
-
-# Actions Menu
-actionItems = sorted([
-    [ "Test", "test" ],
-    [ "Release", "release" ],
-    [ "Download", "download" ],
-    [ "Promotion", "promotion" ],
-    [ "Message", "message" ],
-    [ "Reset", "reset" ]
-])
-actionItems.insert(0,[ "Back", "main"])
-
-# Message Menu
-messageItems = sorted([
-    [ "All", "all"],
-    [ "New", "new"],
-    [ "Recent", "recent"],
-    [ "User by Username", "username"]
-])
-messageItems.insert(0,[ "Back", "main"])
-
-# File Type Menu
-fileItems = sorted([
-    [ "Image", "image"],
-    [ "Gallery", "gallery"],
-    [ "Performer", "performer"],
-    [ "Scene", "scene"],
-    [ "Video", "video"],
-])
-fileItems.insert(0,[ "Back", "main"])
-
-# File Location Menu
-locationItems = sorted([
-    [ "Local", "local"],
-    [ "Google Drive", "google"]
-])
-locationItems.insert(0,[ "Back", "main"])
-
-promotionItems = sorted([
-    [ "Enter Email", "email" ],
-    [ "Select User", "select" ]
-])
-promotionItems.insert(0,[ "Back", "main"])
-
+menuItems = []
+actionItems = []
+messageItems = []
+fileItems = []
+locationItems = []
+promotionItems = []
 settingItems = []
 
 def initialize():
@@ -104,9 +60,6 @@ def initialize():
     global settingItems
     # Settings Menu
     settingItems = sorted([
-        [ "File Name", settings.FILE_NAME],
-        [ "File Path", settings.FILE_PATH],
-        [ "Location", settings.LOCATION, ["Local","Google"]],
         [ "Backup", settings.BACKING_UP, ["True","False"]],
         [ "Delete Google", settings.DELETING, ["True","False"]],
         [ "Delete Local", settings.REMOVE_LOCAL, ["True","False"]],
@@ -117,8 +70,6 @@ def initialize():
         [ "Google: Root Folder Path", settings.MOUNT_DRIVE],
         [ "Users Path", settings.USERS_PATH],
         [ "Show Window", settings.SHOW_WINDOW, ["True","False"]],
-        [ "Text", settings.TEXT],
-        [ "Image", settings.IMAGE],
         [ "Google: Root Folder Name", settings.ROOT_FOLDER],
         [ "Google: Drive Folders", settings.DRIVE_FOLDERS],
         [ "Image Limit", settings.IMAGE_UPLOAD_LIMIT],
@@ -129,7 +80,72 @@ def initialize():
         [ "Create Missing Google Folders", settings.CREATE_MISSING_FOLDERS, ["True","False"]],    
         [ "Verbal", settings.VERBAL, ["True","False"]]    
     ])
+    if str(settings.DEBUG) == "True":
+        settingItems.append([ "File Name", settings.FILE_NAME])
+        settingItems.append([ "File Path", settings.FILE_PATH])
+        settingItems.append([ "Location", settings.LOCATION, ["Local","Google"]])
+        settingItems.append([ "Text", settings.TEXT])
+        settingItems.append([ "Image", settings.IMAGE])
     settingItems.insert(0,[ "Back", "main"])
+
+    global menuItems
+    # Main Menu
+    menuItems = [
+        [ "Actions", "action"],
+        [ "Settings", "set_settings"],
+        [ "Exit", "exit"]
+    ]
+
+    global actionItems
+    # Actions Menu
+    actionItems = sorted([
+        [ "Release", "release" ],
+        [ "Download", "download" ],
+        [ "Promotion", "promotion" ],
+        [ "Message", "message" ],
+        [ "Reset", "reset" ]
+    ])
+    if str(settings.DEBUG) == "True":
+        actionItems.append([ "Test", "test"])
+    actionItems.insert(0,[ "Back", "main"])
+
+    global messageItems
+    # Message Menu
+    messageItems = sorted([
+        [ "All", "all"],
+        [ "New", "new"],
+        [ "Recent", "recent"],
+        [ "User by Username", "user"]
+    ])
+    messageItems.insert(0,[ "Back", "main"])
+
+    global fileItems
+    # File Type Menu
+    fileItems = sorted([
+        [ "Image", "image"],
+        [ "Gallery", "gallery"],
+        [ "Performer", "performer"],
+        [ "Scene", "scene"],
+        [ "Video", "video"],
+    ])
+    fileItems.insert(0,[ "Back", "main"])
+
+    global locationItems
+    # File Location Menu
+    locationItems = sorted([
+        [ "Local", "local"],
+        [ "Google Drive", "google"]
+    ])
+    locationItems.insert(0,[ "Back", "main"])
+
+    global promotionItems
+    if str(settings.DEBUG) == "True":
+        promotionItems = sorted([
+            [ "Enter Email", "email" ],
+            # [ "Select User", "select" ]
+        ])
+    promotionItems.insert(0,[ "Back", "main"])
+
     # print("Initialized Menu")
     INITIALIZED = True
 
@@ -221,7 +237,7 @@ def finalizeMessage(actionChoice):
 # Message Menu - perform
 def performMessage(actionChoice, messageChoice):
     username = None
-    if str(messageChoice) == "username":
+    if str(messageChoice) == "user":
         users = displayUsers()
         seeking = True
         while seeking:
@@ -230,7 +246,7 @@ def performMessage(actionChoice, messageChoice):
                 if int(choice) < 0 or int(choice) > len(users): raise ValueError
                 if int(choice) == 0:
                     return finalizeMessage(actionChoice)
-                username = users[int(choice)-1][1]
+                username = users[int(choice)-1].username
                 seeking = False
             except (ValueError, IndexError):
                 print(sys.exc_info()[0])
@@ -275,9 +291,7 @@ def message(choice, image=None, username=None):
     if not image or not image[0] or image[0] == None:
         print("Error: Missing Image")
         return
-
     file_path = Google.download_file(image[0])
-
     successful_message = OnlySnarf.message(choice=choice, message=message, image=file_path, price=price, username=username)
     if successful_message and str(choice) != "new":
         Google.move_file(image[0])
@@ -348,7 +362,7 @@ def displayUsers():
     return users
 
 def selectImage(folderName):
-    images = Google.get_images(folderName)
+    images = Google.get_images()
     print(colorize("[0] ", 'blue') + "Back")
     i = 1
     for image in images:

@@ -417,7 +417,7 @@ def update_chat_log(user):
 ######################
 
 # or email
-def send_trial_to_user(user):
+def get_new_trial_link():
     global BROWSER
     if not BROWSER or BROWSER == None:
         logged_in = log_into_OnlyFans()
@@ -430,52 +430,32 @@ def send_trial_to_user(user):
     try:
         print("goto -> /my/promotions")
         BROWSER.get(('https://onlyfans.com/my/promotions'))
-        # go to the promotions page
-        # find the css for the trial day #
-        print("trial")
-        # button class="g-btn m-rounded m-sm" Create trial link
         trial = BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-sm")[0].click()
-        print("create")
-        # click create
-        # button class="g-btn m-rounded" Create
+        create = BROWSER.find_elements_by_class_name("g-btn.m-rounded")
+        for i in range(len(create)):
+            if create[i].get_attribute("innerHTML").strip() == "Create":
+                create[i].click()
+                break
 
-        # modal = WebElement(webdriver.findElement(By.xpath("//div['g-ModalTrial___BV_modal_content_']")))
-        # btn = modal.findElement(By.xpath(".//buton['g-btn.m-rounded']")).click()
-
-        # switch to modal
-        # modal = BROWSER.find_element_by_class_name("g-ModalTrial___BV_modal_content_")
-        # modal = BROWSER.find_element_by_class_name("modal-content")
-        # print(modal)
-        # WAIT = WebDriverWait(BROWSER, 30, poll_frequency=3)
-        WebDriverWait(BROWSER, 60, poll_frequency=3).until(EC.element_to_be_clickable((By.XPATH, '//button[@class="g-btn.m-rounded"]'))).click()
-        # time.sleep(3)
-        # .click()
-        # trials = BROWSER.find_element_by_xpath('//class[@class=".modal.modal-footer.g-btn.m-rounded"]')
-
-        # BROWSER.switch_to_frame("ModalTrial___BV_modal_content_")
-        # BROWSER.switch_to_window().activeElement()
-        # WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@class="g-btn.m-rounded"]')))
-        # WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@class="g-btn.m-rounded"]')))
-        # WebDriverWait(BROWSER, 60, poll_frequency=3).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".g-btn.m-rounded")))
-        # create = BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[0].click()
-        # create = BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[1].click()
-        # create = BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[2].click()
-        # create = BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[3].click()
-        # create = modal.find_element_by_class_name("g-btn.m-rounded").click()
-
+        # copy to clipboard? email to user by email?
         # count number of links
         # div class="b-users__item.m-fans"
         trials = BROWSER.find_elements_by_class_name("b-users__item.m-fans")
-        print("trials")
+        # print("trials")
         # find last one in list of trial link buttons
         # button class="g-btn m-sm m-rounded" Copy trial link
-        trials = BROWSER.find_elements_by_class_name("g-btn.m-sm.m-rounded")
-        print("trials: "+str(len(trials)))
-        trials[len(trials)-1].click()
+        # trials = BROWSER.find_elements_by_class_name("g-btn.m-sm.m-rounded")
+        # print("trials: "+str(len(trials)))
+        # trials[len(trials)-1].click()
+        # for i in range(len(create)):
+        #     print(create[i].get_attribute("innerHTML"))
+       
         # find the css for the email / user
         # which there isn't, so, create a 1 person limited 7 day trial and send it to their email
         # add a fucking emailing capacity
         # send it
+        link = "https://onlyfans.com/action/trial/$number"
+        return link
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Failed to Apply Promotion")
@@ -505,9 +485,6 @@ def get_users():
     try:
         print("goto -> /my/subscribers/active")
         BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
-       # WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@class="g-btn.m-rounded"]')))
-        # WebDriverWait(BROWSER, 30, poll_frequency=3).until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".l-sidebar__user-data__item__count")))
-        # num = BROWSER.find_element_by_class_name("b-tabs__nav__item__count").get_attribute("innerHTML")
         num = BROWSER.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML")
         settings.maybePrint("User count: %s" % num)
         for n in range(int(int(int(num)/10)+1)):
@@ -526,13 +503,8 @@ def get_users():
     usernames = BROWSER.find_elements_by_class_name('g-user-username')
     active_users = []
     global OnlyFans_USERNAME
-
-    # class="b-fans__item__list"
-    # class="b-fans__item__list__item"
-
-    print("user_ids: "+str(len(user_ids)))
-    print("starteds: "+str(len(starteds)))
-
+    # print("user_ids: "+str(len(user_ids)))
+    # print("starteds: "+str(len(starteds)))
     settings.maybePrint("Found: ")
     try:
         user_ids_ = []
@@ -545,8 +517,7 @@ def get_users():
             match = re.findall("Started.*([A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4})", text)
             if len(match) > 0:
                 starteds_.append(match[0])
-            
-        print("ids vs starteds: "+str(len(user_ids_))+" - "+str(len(starteds_)))
+        # print("ids vs starteds: "+str(len(user_ids_))+" - "+str(len(starteds_)))
         for i in range(len(avatars)-1):
             start = starteds_[i]
             user_id = user_ids_[i][35:]
@@ -599,10 +570,9 @@ def get_new_users():
     users = get_users()
     newUsers = []
     date_ = datetime.today() - timedelta(days=10)
-    settings.maybePrint("date: "+str(date_))
     for user in users:
-        started = date(datetime.strptime(user.started,'%Y-%m-%d'))
-        settings.maybePrint("started: "+str(started))
+        started = datetime.strptime(user.started,"%b %d, %Y")
+        # settings.maybePrint("date: "+str(date_)+" - "+str(started))
         if started < date_: continue
         settings.maybePrint("New User: %s" % user.username)
         user = skipUserCheck(user)

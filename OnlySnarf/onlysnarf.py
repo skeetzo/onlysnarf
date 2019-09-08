@@ -191,7 +191,14 @@ def message(choice, message=None, image=None, price=None, username=None):
 
 def give_trial(user):
     print("Applying Promotion: "+user)
-    OnlySnarf.send_trial_to_user(user)
+    link = OnlySnarf.get_new_trial_link()
+    text = "Here's your free trial link!\n"+link
+    settings.maybePrint("Link: "+str(text))
+    send_email(email, text)
+
+def send_email(email, text):
+    print("Sending Email: "+str(email))
+    pass
 
 #################
 ##### Reset #####
