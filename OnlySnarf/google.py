@@ -447,7 +447,7 @@ def download_scene(sceneFolder):
     with open(os.path.join(tmp, "data.json"), 'r', encoding='utf-8') as f:
         data = json.load(f)
     settings.maybePrint("data.json: {}".format(data))
-    preview = PYDRIVE.ListFile({'q': "'"+preview['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\' or mimeType contains \'video/mp4\')"}).GetList()
+    preview = PYDRIVE.ListFile({'q': "'"+preview['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
     if len(preview) == 0:
         print("Error: Missing Scene Preview")
         return
@@ -484,21 +484,19 @@ def download_scene(sceneFolder):
 # gets all the images in the folders
 # returns an array of json images w/ 
 # [ 'image.folder' - 'image.title']
-def get_images(folderName):
+def get_images():
     global AUTH
     if not AUTH:
         AUTH = authGoogle()
-    print('Getting Images: {}'.format(folderName))
+    print('Getting Images')
     global PYDRIVE
-    OnlyFans_Images_Folder = get_folder_by_name("messages")
+    OnlyFans_Images_Folder = get_folder_by_name("images")
     if OnlyFans_Images_Folder is None:
         print("Error: Unable to get Images Folder")
         return None
     random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_Images_Folder+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     images_list = []
     for folder in random_folders:
-        if folder['title'] != str(folderName):
-            continue
         if str(settings.VERBAL) == "True":
             print('checking folder: '+folder['title'])
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
