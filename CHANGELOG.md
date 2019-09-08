@@ -100,11 +100,15 @@
   - updated readme to reflect creds process
   **1.2.2 : 9/5/2019**
   - fixed user scrape & messaging
+  - fixed messaging by username
+  **1.3.0 : 9/8/2019**
+  - finished testing promotions- unworkable w/o email or clipboard utility
+  - finished testing messages & user selection
+  - hidden unworking functions in menu w/o debug
+
 ----------------------------------------
 
 ## ToDo
- - finish testing promotions
- - finish testing messages & user selection
 
 ### Low Priority
   - add: read messages html for emojis
@@ -127,6 +131,7 @@
   - update: data.txt for scenes with trailer
   - update: scene to include trailer
   - update: upload trailer same time as previews instead of content	
+  - add email functionality for sending trial link
 
 ### High Priority
   - prepare: a scene for release
@@ -139,8 +144,6 @@
   - add: cron feature for installing crons
   |_ all it has to do is write to the crontab file
 
-
-
 Performers mostly advertise on Twitter
 - so add a feature that routinely tweets defined reminders
 - text that is tweeted
@@ -150,7 +153,6 @@ Performers mostly advertise on Twitter
 - maybe delete previous tweets?
 - maybe tweet once and pin it?
 
-
 General Solutions:
 - needs to solve fanbase interaction for someone like me who really doesn't get it get it
 - it should ask fans individually what more of they want to see
@@ -159,12 +161,6 @@ General Solutions:
 - it should backup sent message/images differently than the current posted folder
 - it should ask users what they like and then build its own profile and then message that user approrpiately -> "here's a dick pic just for you ;)"
 
-
--> Cron that checks user messages for [picture] commands
+-> Cron that checks user messages for bot commands 
 - post: "OnlySnarf Bot commands: !pic | !pic dick | !pic ass"
 -- sends [pic] to [user]
-
-
--> i need an easy way for patreon followers to automatically be invited to a free trial
--> i need a way to send a free trial for x days to a person
--> 
