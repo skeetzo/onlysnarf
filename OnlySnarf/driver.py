@@ -598,14 +598,14 @@ def get_new_users():
     settings.maybePrint("Getting New Users")
     users = get_users()
     newUsers = []
-    date = datetime.today() - timedelta(days=10)
-    settings.maybePrint("date: "+str(date))
+    date_ = datetime.today() - timedelta(days=10)
+    settings.maybePrint("date: "+str(date_))
     for user in users:
         if len(user.messages_to) == 0:
             settings.maybePrint("New User: %s" % user.username)
-            # started = datetime.strptime(user.started,'%Y-%m-%d')
+            started = date(datetime.strptime(user.started,'%Y-%m-%d'))
             settings.maybePrint("started: "+str(started))
-            if started < date: continue
+            if started < date_: continue
             user = skipUserCheck(user)
             if user is None: continue
             newUsers.append(user)
