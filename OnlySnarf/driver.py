@@ -601,14 +601,13 @@ def get_new_users():
     date_ = datetime.today() - timedelta(days=10)
     settings.maybePrint("date: "+str(date_))
     for user in users:
-        if len(user.messages_to) == 0:
-            settings.maybePrint("New User: %s" % user.username)
-            started = date(datetime.strptime(user.started,'%Y-%m-%d'))
-            settings.maybePrint("started: "+str(started))
-            if started < date_: continue
-            user = skipUserCheck(user)
-            if user is None: continue
-            newUsers.append(user)
+        started = date(user.started)
+        settings.maybePrint("started: "+str(started))
+        if started < date_: continue
+        settings.maybePrint("New User: %s" % user.username)
+        user = skipUserCheck(user)
+        if user is None: continue
+        newUsers.append(user)
     return newUsers
 
 def get_never_messaged_users():
