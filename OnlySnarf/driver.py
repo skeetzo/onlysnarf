@@ -209,11 +209,22 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
                     print('max upload wait reached, breaking..')
                     break
         BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
-        send = WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
+        sends = BROWSER.find_elements_by_class_name("g-btn m-rounded send_post_button")
+        send = BROWSER.find_element_by_class_name("g-btn m-rounded send_post_button")
+        print("enabled: "+str(send.is_enabled()))
+        for i in range(sends):
+            print("sends: "+str(sends[i].is_enabled()))
+        
+        print("len: "+str(len(send)))
         if str(settings.DEBUG) == "True":
             print('skipping OnlyFans upload')
             return True
-        send.click()
+
+        time.sleep(3)
+        print("clicking send")
+        if send.is_enabled():
+            send.click()
+        # send[1].click() # the 0th one is disabled
         print('File Uploaded Successfully')
         return True
     except Exception as e:
@@ -310,11 +321,7 @@ def enter_price(price):
         print("Enter price: %s" % price)
         if not price or price == None:
             print("Error: Missing Price")
-<<<<<<< HEAD
             return False
-=======
-            return
->>>>>>> 9f1bd89f0b225860685d38f2f79faa2422619447
         global BROWSER
         BROWSER.find_element_by_css_selector(".b-chat__btn-set-price").click()
         BROWSER.find_elements_by_css_selector(".form-control.b-chat__panel__input")[1].send_keys(str(price))
@@ -525,13 +532,8 @@ def get_users():
     usernames = BROWSER.find_elements_by_class_name('g-user-username')
     active_users = []
     global OnlyFans_USERNAME
-<<<<<<< HEAD
-    settings.maybePrint("user_ids: "+str(len(user_ids)))
-    settings.maybePrint("starteds: "+str(len(starteds)))
-=======
-    # print("user_ids: "+str(len(user_ids)))
-    # print("starteds: "+str(len(starteds)))
->>>>>>> 9f1bd89f0b225860685d38f2f79faa2422619447
+    # settings.maybePrint("user_ids: "+str(len(user_ids)))
+    # settings.maybePrint("starteds: "+str(len(starteds)))
     settings.maybePrint("Found: ")
     useridsFailed = False
     startedsFailed = False
@@ -552,7 +554,6 @@ def get_users():
             match = re.findall("Started.*([A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4})", text)
             if len(match) > 0:
                 starteds_.append(match[0])
-<<<<<<< HEAD
         settings.maybePrint("ids vs starteds: "+str(len(user_ids_))+" - "+str(len(starteds_)))
         for i in range(len(avatars)-1):
             if not startedsFailed:
@@ -563,12 +564,6 @@ def get_users():
                 user_id = user_ids_[i][35:]
             else:
                 user_id = None
-=======
-        # print("ids vs starteds: "+str(len(user_ids_))+" - "+str(len(starteds_)))
-        for i in range(len(avatars)-1):
-            start = starteds_[i]
-            user_id = user_ids_[i][35:]
->>>>>>> 9f1bd89f0b225860685d38f2f79faa2422619447
             name = users[i]
             username = usernames[i]
             name = str(name.get_attribute("innerHTML")).strip()
