@@ -105,6 +105,8 @@
   - finished testing promotions- unworkable w/o email or clipboard utility
   - finished testing messages & user selection
   - hidden unworking functions in menu w/o debug
+  **1.3.1 : 9/9/2019**
+  - error messages cleanup in user messaging
 
 ----------------------------------------
 

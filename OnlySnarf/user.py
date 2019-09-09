@@ -12,6 +12,8 @@ from decimal import Decimal
 from OnlySnarf import driver as OnlySnarf
 from OnlySnarf.settings import SETTINGS as settings
 
+PRICE_MINIMUM = 3
+
 class User:
 
     def __init__(self, name=None, username=None, id=None, messages_from=None, messages_to=None, messages=None, preferences=None, last_messaged_on=None, sent_images=None, subscribed_on=None, isFavorite=False, statement_history=None, started=None):
@@ -61,31 +63,37 @@ class User:
     def sendMessage(self, message, image, price):
         try:
             print("Sending Message: {} <- {} - {} - ${}".format(self.id, message, image, price))
-            OnlySnarf.goto_user(self.id)
+            success = OnlySnarf.goto_user(self)
+            if not success: return False
             success = OnlySnarf.enter_message(message)
-            if not success:
-                return
+            if not success: return False
             image_name = os.path.basename(image)
             if str(image_name) in self.sent_images:
                 print("Error: Image Already Sent: {} -> {}".format(image, self.id))
-                return
-            OnlySnarf.enter_image(image)
+                return False
+            success = OnlySnarf.enter_image(image)
+            if not success: return False
             if price != None:
-                if image != None and Decimal(sub(r'[^\d.]', '', price)) < 5:
+                global PRICE_MINIMUM
+                if image != None and Decimal(sub(r'[^\d.]', '', price)) < PRICE_MINIMUM:
                     print("Warning: Price Too Low, Free Image")
-                OnlySnarf.enter_price(price)
+                    print("Price Minimum: ${}".format(PRICE_MINIMUM))
+                success = OnlySnarf.enter_price(price)
+                if not success: return False
             if str(settings.DEBUG) == "True":
                 self.sent_images.append("DEBUG")
             else:
                 self.sent_images.append(str(image_name))
             if str(settings.DEBUG) == "True" and str(settings.DELAY) == "True":
     	        delayForThirty()
-            OnlySnarf.confirm_message()
+            success = OnlySnarf.confirm_message()
+            if not success: return False
             if str(settings.DEBUG) == "False":
                 self.last_messaged_on = datetime.now()
+            return True
         except Exception as e:
-            print("Error: There was an error messaging - {}".format(self.id))
             settings.maybePrint(e)
+            return False
 
     def equals(self, user):
         # print(str(user.username)+" == "+str(self.username))
