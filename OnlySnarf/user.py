@@ -63,10 +63,10 @@ class User:
     def sendMessage(self, message, image, price):
         try:
             print("Sending Message: {} <- {} - {} - ${}".format(self.id, message, image, price))
-            success = OnlySnarf.goto_user(self)
-            if not success: return False
+            OnlySnarf.goto_user(self.id)
             success = OnlySnarf.enter_message(message)
-            if not success: return False
+            if not success:
+                return
             image_name = os.path.basename(image)
             if str(image_name) in self.sent_images:
                 print("Error: Image Already Sent: {} -> {}".format(image, self.id))
