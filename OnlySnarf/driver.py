@@ -310,7 +310,11 @@ def enter_price(price):
         print("Enter price: %s" % price)
         if not price or price == None:
             print("Error: Missing Price")
+<<<<<<< HEAD
             return False
+=======
+            return
+>>>>>>> 9f1bd89f0b225860685d38f2f79faa2422619447
         global BROWSER
         BROWSER.find_element_by_css_selector(".b-chat__btn-set-price").click()
         BROWSER.find_elements_by_css_selector(".form-control.b-chat__panel__input")[1].send_keys(str(price))
@@ -521,8 +525,13 @@ def get_users():
     usernames = BROWSER.find_elements_by_class_name('g-user-username')
     active_users = []
     global OnlyFans_USERNAME
+<<<<<<< HEAD
     settings.maybePrint("user_ids: "+str(len(user_ids)))
     settings.maybePrint("starteds: "+str(len(starteds)))
+=======
+    # print("user_ids: "+str(len(user_ids)))
+    # print("starteds: "+str(len(starteds)))
+>>>>>>> 9f1bd89f0b225860685d38f2f79faa2422619447
     settings.maybePrint("Found: ")
     useridsFailed = False
     startedsFailed = False
@@ -543,6 +552,7 @@ def get_users():
             match = re.findall("Started.*([A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4})", text)
             if len(match) > 0:
                 starteds_.append(match[0])
+<<<<<<< HEAD
         settings.maybePrint("ids vs starteds: "+str(len(user_ids_))+" - "+str(len(starteds_)))
         for i in range(len(avatars)-1):
             if not startedsFailed:
@@ -553,6 +563,12 @@ def get_users():
                 user_id = user_ids_[i][35:]
             else:
                 user_id = None
+=======
+        # print("ids vs starteds: "+str(len(user_ids_))+" - "+str(len(starteds_)))
+        for i in range(len(avatars)-1):
+            start = starteds_[i]
+            user_id = user_ids_[i][35:]
+>>>>>>> 9f1bd89f0b225860685d38f2f79faa2422619447
             name = users[i]
             username = usernames[i]
             name = str(name.get_attribute("innerHTML")).strip()
