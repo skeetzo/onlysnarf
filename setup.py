@@ -14,18 +14,18 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
-    package_data={'': ['/path/to/google']},
-    include_package_data=True,
-    install_requires=[
-        'selenium',
-        'pydrive',
-        'pathlib', 
-        'chromedriver-binary',
-        'moviepy',
-        'google-api-python-client',
-        'httplib2',
-        'python-crontab'
-        ],
+    # package_data={'': ['/path/to/google']},
+    # include_package_data=True,
+    # install_requires=[
+    #     'selenium',
+    #     'pydrive',
+    #     'pathlib', 
+    #     'chromedriver-binary',
+    #     'moviepy',
+    #     'google-api-python-client',
+    #     'httplib2',
+    #     'python-crontab'
+    #     ],
     entry_points={
         'console_scripts' : [
             'onlysnarf = OnlySnarf.menu:main_other',
