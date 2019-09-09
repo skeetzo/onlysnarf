@@ -114,10 +114,10 @@ class Settings:
 
         # updates w/ values from profile.conf
         profile = None
-        if os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf")):
-            readProfile(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf"))
         if os.path.exists("/etc/onlysnarf/profile.conf"):
             readProfile(self, "/etc/onlysnarf/profile.conf")
+        elif os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf")):
+            readProfile(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf"))
                 
         i = 0
         while i < len(sys.argv):
