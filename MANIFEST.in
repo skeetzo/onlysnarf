@@ -2,7 +2,7 @@
 include OnlySnarf/config-example.json
 include OnlySnarf/google_creds_example.txt
 include OnlySnarf/settings.yaml
-include OnlySnarf/profile.conf
+include OnlySnarf/profile-example.conf
 #include OnlySnarf/video.mp4
 
 exclude OnlySnarf/config.json

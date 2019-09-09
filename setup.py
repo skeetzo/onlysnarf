@@ -5,11 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="1.3.0",
+    version="1.3.1",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
-    download_url = 'https://github.com/skeetzo/onlysnarf/archive/v1.3.0.tar.gz',
     keywords = ['OnlyFans', 'Content', 'OnlySnarf'],
     description="OnlyFans Content Distribution Tool",
     long_description=long_description,

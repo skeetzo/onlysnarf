@@ -248,26 +248,38 @@ def message(choice=None, message=None, image=None, price=None, username=None):
         print("Error: Missing Message Choice")
         return
     for user in users:
-        user.sendMessage(message, image, price)
-
-def goto_user(username):
+        success = user.sendMessage(message, image, price)
+        if not success:
+            print("Error: There was an error messaging - {}/{}".format(user.id, user.username))
+                
+def goto_user(user):
     try:
-        if not username or username == None:
-            print("Missing Username")
-            return
-        username = str(username).replace("@u","").replace("@","")
-        print("goto -> /my/chats/chat/%s" % username)
-        BROWSER.get(('https://onlyfans.com/my/chats/chat/'+str(username)))
+        userid = user.id
+        if not userid or userid == None:
+            print("Warning: Missing User ID")
+            if not user.username or user.username == None:
+                print("Error: Missing User ID & Username")
+                return False
+            userid = str(user.username).replace("@u","").replace("@","")
+            if len(re.findall("[A-Za-z]", userid)) > 0:  
+                print("Warning: Invalid User ID")
+                if str(settings.DEBUG) == "False":
+                    return False
+        print("goto -> /my/chats/chat/%s" % userid)
+        global BROWSER
+        BROWSER.get(('https://onlyfans.com/my/chats/chat/'+str(userid)))
+        return True
     except Exception as e:
         settings.maybePrint(e)
-        print("Error: Failure to Goto User - {}".format(username))
+        print("Error: Failure to Goto User - {}/{}".format(user.id, user.username))
+        return False
 
 def enter_message(text):
     try:
         print("Enter text: %s" % text)
         if not text or text == None:
-            print("Missing Text")
-            return
+            print("Error: Missing Text")
+            return False
         global BROWSER
         message = BROWSER.find_element_by_css_selector(".form-control.b-chat__message-input")        
         message.send_keys(str(text))
@@ -282,29 +294,33 @@ def enter_image(image):
     try:
         print("Enter image: %s" % image)
         if not image or image == None:
-            print("Missing Image")
-            return
+            print("Error: Missing Image")
+            return False
         global BROWSER
         BROWSER.find_element_by_id("cm_fileupload_photo").send_keys(str(image))
         print("Image Entered")
+        return True
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Failure to Enter Image")
+        return False
 
 def enter_price(price):
     try:
         print("Enter price: %s" % price)
         if not price or price == None:
             print("Error: Missing Price")
-            return
+            return False
         global BROWSER
         BROWSER.find_element_by_css_selector(".b-chat__btn-set-price").click()
         BROWSER.find_elements_by_css_selector(".form-control.b-chat__panel__input")[1].send_keys(str(price))
         BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[4].click()
         print("Price Entered")
+        return True
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Failure to Enter Price")
+        return False
 
 def confirm_message():
     try:
@@ -312,12 +328,14 @@ def confirm_message():
         send = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".g-btn.m-rounded.b-chat__btn-submit")))
         if str(settings.DEBUG) == "True":
             print('OnlyFans Message: Skipped')
-            return
+            return True
         send.click()
         print('OnlyFans Message: Sent')
+        return True
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Failure to Confirm Message")
+        return False
 
 def read_chat(user):
     try:
@@ -503,9 +521,17 @@ def get_users():
     usernames = BROWSER.find_elements_by_class_name('g-user-username')
     active_users = []
     global OnlyFans_USERNAME
-    # print("user_ids: "+str(len(user_ids)))
-    # print("starteds: "+str(len(starteds)))
+    settings.maybePrint("user_ids: "+str(len(user_ids)))
+    settings.maybePrint("starteds: "+str(len(starteds)))
     settings.maybePrint("Found: ")
+    useridsFailed = False
+    startedsFailed = False
+    if len(user_ids) == 0:
+        print("Warning: Unable to find user ids")
+        useridsFailed = True
+    if len(starteds) == 0:
+        print("Warning: Unable to find starting dates")
+        startedsFailed = True
     try:
         user_ids_ = []
         starteds_ = []
@@ -517,10 +543,16 @@ def get_users():
             match = re.findall("Started.*([A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4})", text)
             if len(match) > 0:
                 starteds_.append(match[0])
-        # print("ids vs starteds: "+str(len(user_ids_))+" - "+str(len(starteds_)))
+        settings.maybePrint("ids vs starteds: "+str(len(user_ids_))+" - "+str(len(starteds_)))
         for i in range(len(avatars)-1):
-            start = starteds_[i]
-            user_id = user_ids_[i][35:]
+            if not startedsFailed:
+                start = starteds_[i]
+            else:
+                start = datetime.now().strftime("%b %d, %Y")
+            if not useridsFailed:
+                user_id = user_ids_[i][35:]
+            else:
+                user_id = None
             name = users[i]
             username = usernames[i]
             name = str(name.get_attribute("innerHTML")).strip()
