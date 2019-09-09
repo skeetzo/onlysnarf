@@ -5,6 +5,7 @@ client_secrets.json
 #settings.yaml
 users.json
 video.mp4
+profile.conf
 
 # Temporary downloads
 OnlySnarf/tmp
@@ -18,4 +19,3 @@ OnlySnarf/tmp
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
-
