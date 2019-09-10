@@ -107,6 +107,7 @@
   - hidden unworking functions in menu w/o debug
   **1.3.1 : 9/9/2019**
   - error messages cleanup in user messaging
+  **1.3.2 : 9/10/2019**
   - submit button works again
 
 ----------------------------------------
