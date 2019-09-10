@@ -209,21 +209,16 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
                     print('max upload wait reached, breaking..')
                     break
         BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
-        sends = BROWSER.find_elements_by_class_name("g-btn m-rounded send_post_button")
-        send = BROWSER.find_element_by_class_name("g-btn m-rounded send_post_button")
-        print("enabled: "+str(send.is_enabled()))
-        for i in range(sends):
-            print("sends: "+str(sends[i].is_enabled()))
-        
-        print("len: "+str(len(send)))
+        # first one is disabled
+        sends = BROWSER.find_elements_by_class_name("send_post_button")
+        # send = BROWSER.find_element_by_class_name("send_post_button")
+        for i in range(len(sends)):
+            if sends[i].is_enabled():
+                sends = sends[i]
         if str(settings.DEBUG) == "True":
             print('skipping OnlyFans upload')
             return True
-
-        time.sleep(3)
-        print("clicking send")
-        if send.is_enabled():
-            send.click()
+        sends.click()
         # send[1].click() # the 0th one is disabled
         print('File Uploaded Successfully')
         return True
