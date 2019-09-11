@@ -101,12 +101,13 @@ def initialize():
     actionItems = sorted([
         [ "Release", "release" ],
         [ "Download", "download" ],
-        [ "Promotion", "promotion" ],
+        # [ "Promotion", "promotion" ],
         [ "Message", "message" ],
         [ "Reset", "reset" ]
     ])
     if str(settings.DEBUG) == "True":
         actionItems.append([ "Test", "test"])
+        actionItems.append([ "Promotion", "promotion" ])
     actionItems.insert(0,[ "Back", "main"])
 
     global messageItems
@@ -125,9 +126,11 @@ def initialize():
         [ "Image", "image"],
         [ "Gallery", "gallery"],
         [ "Performer", "performer"],
-        [ "Scene", "scene"],
+        # [ "Scene", "scene"],
         [ "Video", "video"],
     ])
+    if str(settings.DEBUG) == "True":
+        fileItems.append([ "Scene", "scene"])
     fileItems.insert(0,[ "Back", "main"])
 
     global locationItems
