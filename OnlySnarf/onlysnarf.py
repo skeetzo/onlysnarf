@@ -485,12 +485,8 @@ def release_scene():
                 users = users[0]
             if not users or str(users).lower() == "none":
                 print("Warning: Missing User Choice")
-            elif str(users) == "all":
-                successful_message = OnlySnarf.message(choice="all", message=message, image=preview, price=price)
-            elif str(users) == "recent":
-                successful_message = OnlySnarf.message(choice="all", message=message, image=preview, price=price)
-            elif str(users) == "favorites":
-                successful_message = OnlySnarf.message(choice="all", message=message, image=preview, price=price)
+            elif str(users) == "all" or str(users) == "recent" or str(users) == "favorites":
+                successful_message = OnlySnarf.message(choice=str(users), message=message, image=preview, price=price)
             else:
                 for user in users:
                     successful_message = OnlySnarf.message(choice="user", message=message, image=preview, price=price, username=user)

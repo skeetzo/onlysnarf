@@ -108,7 +108,8 @@
   **1.3.1 : 9/9/2019**
   - error messages cleanup in user messaging
   - submit button works again
-
+  - added: way to select google drive file to message
+   
 ----------------------------------------
 
 ## ToDo
@@ -119,27 +120,28 @@
   - add: Twitter (social media reminders)
   - update: backup function to include original folder name -> posted/galleries/$file
   - add: feature for if missing scene previews to capture thumbnail from content/trailer
-  - add: way to select google drive file to download
-    Upload
-    Message
-    -> Random
-    -> Select
-    --> Select Folder
-    ---> repeat until image
+  - add: easier way to select local file to upload
 
 ### Medium Priority
   - add: login prompt for saving Twitter password -> base64 hash instead of in config.json
   |_ add: `Auth` option to settings?
   - add: `local` setting
+
   - update: data.txt for scenes with trailer
   - update: scene to include trailer
-  - update: upload trailer same time as previews instead of content	
-  - add email functionality for sending trial link
+  - update: upload trailer same time as previews instead of content
+
+  - add email functionality for sending trial link; add clipboard function to copy link
 
 ### High Priority
   - prepare: a scene for release
   |_ requires: scene cron feature
+
+  - rewrite scene release to NOT upload until releaseDate days after
+  -- requires daily check or cron job
+
   - test: performers upload w/ change to images/videos preferences
+
   - add: same change to other folder download preferences
   |_ ? which change
   - add: scene feature to check data.txts for content to release n days after trailer/preview
@@ -158,12 +160,13 @@ Performers mostly advertise on Twitter
 
 General Solutions:
 - needs to solve fanbase interaction for someone like me who really doesn't get it get it
-- it should ask fans individually what more of they want to see
-- it should message fans individually more of what they want to see
-- it should be able to make folders for individual users to save what has been sent
-- it should backup sent message/images differently than the current posted folder
-- it should ask users what they like and then build its own profile and then message that user approrpiately -> "here's a dick pic just for you ;)"
+  - it should ask fans what more of they want to see
+    - add: ability to post polls
+  - it should message fans individually more of what they want to see
+    - add: ask all new users their preferences; run once for existing users
+- it should backup sent message/images differently than the current posted folder -> why?
+- it should ask users what they like and then build its own profile and then message that user approrpiately -> "do you like dick pics or ass pics?" -> n days later -> here's a dick pic just for you ;)"
 
--> Cron that checks user messages for bot commands 
-- post: "OnlySnarf Bot commands: !pic | !pic dick | !pic ass"
+-> Cron that checks user messages for bot commands
+ - post: "OnlySnarf Bot commands: !pic | !pic dick | !pic ass"
 -- sends [pic] to [user]
