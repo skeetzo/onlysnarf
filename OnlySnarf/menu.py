@@ -13,6 +13,7 @@ import datetime
 import json
 import sys
 import pathlib
+import pkg_resources
 from OnlySnarf.settings import SETTINGS as settings
 from OnlySnarf import onlysnarf as OnlySnarf
 from OnlySnarf import google as Google
@@ -21,7 +22,7 @@ from OnlySnarf import google as Google
 ##### Globals #####
 ###################
 
-version = "1.3.2"
+version = str(pkg_resources.get_distribution("onlysnarf").version)
 header = "\n ________         .__          _________                     _____ \n \
 \\_____  \\   ____ |  | ___.__./   _____/ ____ _____ ________/ ____\\\n \
  /   |   \\ /    \\|  |<   |  |\\_____  \\ /    \\\\__  \\\\_   _ \\   __\\ \n \

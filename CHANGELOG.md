@@ -110,7 +110,8 @@
   **1.3.2 : 9/10/2019**
   - submit button works again
   - added: way to select google drive file to message
-   
+  **1.3.3 : 9/15/2019**
+  - package install fix & dynamic version in menu
 ----------------------------------------
 
 ## ToDo
