@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="1.3.2",
+    version="1.3.3",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
@@ -16,16 +16,16 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     # package_data={'': ['/path/to/google']},
     # include_package_data=True,
-    # install_requires=[
-    #     'selenium',
-    #     'pydrive',
-    #     'pathlib', 
-    #     'chromedriver-binary',
-    #     'moviepy',
-    #     'google-api-python-client',
-    #     'httplib2',
-    #     'python-crontab'
-    #     ],
+    install_requires=[
+        'selenium',
+        'pydrive',
+        'pathlib', 
+        'chromedriver-binary',
+        'moviepy',
+        'google-api-python-client',
+        'httplib2',
+        'python-crontab'
+        ],
     entry_points={
         'console_scripts' : [
             'onlysnarf = OnlySnarf.menu:main_other',
