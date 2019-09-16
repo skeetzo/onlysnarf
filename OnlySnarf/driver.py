@@ -208,7 +208,21 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
                 if i == maxUploadCount and settings.FORCE_UPLOAD is not True:
                     print('max upload wait reached, breaking..')
                     break
-        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
+        try:
+            BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
+        except:
+            settings.maybePrint("Warning: Upload Error Message, Closing")
+            try:
+                buttons = BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-border")
+                for butt in buttons:
+                    if butt.get_attribute("innerHTML").strip() == "Close":
+                        butt.click()
+                        settings.maybePrint("Success: Upload Error Message Closed")
+                        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
+            except Exception as e:
+                print("Error: Unable to Upload Images")
+                settings.maybePrint(e)
+                return False
         # first one is disabled
         sends = BROWSER.find_elements_by_class_name("send_post_button")
         # send = BROWSER.find_element_by_class_name("send_post_button")
