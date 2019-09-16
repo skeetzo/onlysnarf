@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="1.3.3",
+    version="1.4.0",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
@@ -20,7 +20,7 @@ setuptools.setup(
         'selenium',
         'pydrive',
         'pathlib', 
-        'chromedriver-binary',
+        'chromedriver-binary==77.0.3865.40',
         'moviepy',
         'google-api-python-client',
         'httplib2',

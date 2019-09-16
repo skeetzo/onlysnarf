@@ -61,32 +61,32 @@ def initialize():
     global settingItems
     # Settings Menu
     settingItems = sorted([
-        [ "Backup", settings.BACKING_UP, ["True","False"]],
-        [ "Delete Google", settings.DELETING, ["True","False"]],
-        [ "Delete Local", settings.REMOVE_LOCAL, ["True","False"]],
-        [ "Hashtag", settings.HASHTAGGING, ["True","False"]],
-        [ "Force Backup", settings.BACKING_UP_FORCE, ["True","False"]],
-        [ "Force Upload", settings.FORCE_UPLOAD, ["True","False"]],
-        [ "Mount Path", settings.MOUNT_PATH],
-        [ "Google: Root Folder Path", settings.MOUNT_DRIVE],
-        [ "Users Path", settings.USERS_PATH],
-        [ "Show Window", settings.SHOW_WINDOW, ["True","False"]],
-        [ "Google: Root Folder Name", settings.ROOT_FOLDER],
-        [ "Google: Drive Folders", settings.DRIVE_FOLDERS],
-        [ "Image Limit", settings.IMAGE_UPLOAD_LIMIT],
-        [ "Image Max", settings.IMAGE_UPLOAD_MAX],
-        [ "Tweeting", settings.TWEETING, ["True","False"]],
-        [ "Debug", settings.DEBUG, ["True","False"]],
-        [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"]],    
-        [ "Create Missing Google Folders", settings.CREATE_MISSING_FOLDERS, ["True","False"]],    
-        [ "Verbal", settings.VERBAL, ["True","False"]]    
+        [ "Backup", settings.BACKING_UP, ["True","False"],True],
+        [ "Delete Google", settings.DELETING, ["True","False"],False],
+        [ "Delete Local", settings.REMOVE_LOCAL, ["True","False"],False],
+        [ "Hashtag", settings.HASHTAGGING, ["True","False"], True],
+        [ "Force Backup", settings.BACKING_UP_FORCE, ["True","False"],False],
+        [ "Force Upload", settings.FORCE_UPLOAD, ["True","False"],False],
+        [ "Mount Path", settings.MOUNT_PATH,None,False],
+        [ "Google: Root Folder Path", settings.MOUNT_DRIVE,None,False],
+        [ "Users Path", settings.USERS_PATH,None,False],
+        [ "Show Window", settings.SHOW_WINDOW, ["True","False"],False],
+        [ "Google: Root Folder Name", settings.ROOT_FOLDER,None,False],
+        [ "Google: Drive Folders", settings.DRIVE_FOLDERS,None,False],
+        [ "Image Limit", settings.IMAGE_UPLOAD_LIMIT,None,True],
+        [ "Image Max", settings.IMAGE_UPLOAD_MAX,None,False],
+        [ "Tweeting", settings.TWEETING, ["True","False"],True],
+        [ "Debug", settings.DEBUG, ["True","False"],False],
+        [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"],False],    
+        [ "Create Missing Google Folders", settings.CREATE_MISSING_FOLDERS, ["True","False"],False],    
+        [ "Verbal", settings.VERBAL, ["True","False"],True]    
     ])
     if str(settings.DEBUG) == "True":
-        settingItems.append([ "File Name", settings.FILE_NAME])
-        settingItems.append([ "File Path", settings.FILE_PATH])
-        settingItems.append([ "Location", settings.LOCATION, ["Local","Google"]])
-        settingItems.append([ "Text", settings.TEXT])
-        settingItems.append([ "Image", settings.IMAGE])
+        settingItems.append([ "File Name", settings.FILE_NAME,None,False])
+        settingItems.append([ "File Path", settings.FILE_PATH,None,False])
+        settingItems.append([ "Location", settings.LOCATION, ["Local","Google"],False])
+        settingItems.append([ "Text", settings.TEXT,None,False])
+        settingItems.append([ "Image", settings.IMAGE,None,False])
     settingItems.insert(0,[ "Back", "main"])
 
     global menuItems
@@ -504,8 +504,13 @@ def showHeader():
 def showSettings():
     print('Settings:')
     for setting in settingItems:
-        if str(setting[0]) != "Back":
+        if str(setting[0]) == "Image Limit" and setting[3]:
+            print(' - '+setting[0]+' = '+str(setting[1])+"/"+str(settings.IMAGE_UPLOAD_MAX))
+        elif str(setting[0]) != "Back" and str(settings.DEBUG) == "True":
             print(' - '+setting[0]+' = '+str(setting[1]))
+        elif str(setting[0]) != "Back" and setting[3]:
+            print(' - '+setting[0]+' = '+str(setting[1]))
+        
     global UPDATED
     global UPDATED_TO
     if str(UPDATED) != "False":
