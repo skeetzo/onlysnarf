@@ -112,6 +112,12 @@
   - added: way to select google drive file to message
   **1.3.3 : 9/15/2019**
   - package install fix & dynamic version in menu
+  **1.3.4 : 9/15/2019**
+  - menu cleanup
+  **1.4.0 : 9/15/2019**
+  - chromedriver binary version set = 77.0.3865.40
+  - added catch for image upload error
+  
 ----------------------------------------
 
 ## ToDo
