@@ -19,7 +19,7 @@ CONFIG_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)),'config.j
 GOOGLE_CREDS = os.path.join(os.path.dirname(os.path.realpath(__file__)),'google_creds.txt')
 
 def createConfig():
-    print("Setting up Config")
+    print("Preparing Config")
     data = receiveInputs()
     global CONFIG_FILE
     with open(CONFIG_FILE, 'w') as outfile:
@@ -80,7 +80,7 @@ def main():
             elif int(choice) == 1:
                 updateConfig()
         except (ValueError, IndexError, KeyboardInterrupt):
-            print("Incorrect Index")
+            print("Error: Incorrect Index")
         finally:
             sys.exit(0)
 
