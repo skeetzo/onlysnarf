@@ -78,7 +78,7 @@ def initialize():
         [ "Debug", settings.DEBUG, ["True","False"],False],
         [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"],False],    
         [ "Create Missing Google Folders", settings.DRIVE_CREATE_MISSING, ["True","False"],False],    
-        [ "Verbal", settings.VERBOSE, ["True","False"],True]    
+        [ "Verbose", settings.VERBOSE, ["True","False"],True]    
     ])
     if str(settings.DEBUG) == "True":
         settingItems.append([ "Text", settings.TEXT,None,False])

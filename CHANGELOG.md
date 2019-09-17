@@ -121,7 +121,10 @@
   - cleaned print & maybePrint outputs
   - cleaned up settings.py
   - cron cleanup
-  
+  **1.4.2 : 9/17/2019**
+  - text fix
+  - fixed verbose output
+
 ----------------------------------------
 
 ## ToDo
