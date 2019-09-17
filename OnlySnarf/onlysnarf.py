@@ -12,6 +12,7 @@ import time
 from OnlySnarf.settings import SETTINGS as settings
 from OnlySnarf import google as Google
 from OnlySnarf import driver as OnlySnarf
+from OnlySnarf import cron as Cron
 # from pprint import pprint
 
 ##########################
@@ -207,7 +208,7 @@ def send_email(email, text):
 # Deletes local file
 def remove_local():
     try:
-        if str(settings.REMOVE_LOCAL) == "False":
+        if str(settings.SKIP_DELETE) == "False":
             print("Skipping Local Remove")
             return
         # print('Deleting Local File(s)')
@@ -641,10 +642,23 @@ def test(TYPE):
     remove_local()
     print('1/3 : Testing')
 
+
+
+    # ### Promotion ###
+    print('TESTING: Cron')
+    response = Cron.test()
+    if not response or response == None:
+        print("Error: Failed to test crons")
+    reset = OnlySnarf.reset()
+    if not reset:
+        return print("Error: Failed to Reset")
+    return
+
+
     # ### Promotion ###
     print('TESTING: Promotion')
     response = apply_promotion()
-    if not repsonse or response == None:
+    if not response or response == None:
         print("Error: Failed to apply promotion")
     reset = OnlySnarf.reset()
     if not reset:

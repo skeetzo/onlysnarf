@@ -63,7 +63,7 @@ class User:
     def sendMessage(self, message, image, price):
         try:
             print("Sending Message: {} <- {} - {} - ${}".format(self.id, message, image, price))
-            OnlySnarf.goto_user(self.id)
+            OnlySnarf.goto_user(self)
             success = OnlySnarf.enter_message(message)
             if not success:
                 return
@@ -84,7 +84,7 @@ class User:
                 self.sent_images.append("DEBUG")
             else:
                 self.sent_images.append(str(image_name))
-            if str(settings.DEBUG) == "True" and str(settings.DELAY) == "True":
+            if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
     	        delayForThirty()
             success = OnlySnarf.confirm_message()
             if not success: return False
@@ -121,7 +121,7 @@ class User:
         if self.last_messaged_on == None:
             return print("Error: User Not New")
         print("Sending User Greeting: {}".format(self.username))
-        self.sendMessage(message=settings.user_DEFAULT_GREETING)
+        self.sendMessage(message=settings.DEFAULT_GREETING)
 
     # send refresher message to user
     def refresh(self):

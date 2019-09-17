@@ -32,7 +32,7 @@ BROWSER = None
 USER_CACHE = None
 USER_CACHE_TIMEOUT = 600 # ten minutes
 USER_CACHE_LOCKED = False
-settings.USERS_PATH = None
+settings.PATH_USERS = None
 INITIALIZED = False
 OnlyFans_USERNAME = None        
 OnlyFans_PASSWORD = None
@@ -45,7 +45,7 @@ def initialize():
         if INITIALIZED:
             # settings.maybePrint("Already Initialized, Skipping")
             return
-        with open(settings.CONFIG_PATH) as config_file:    
+        with open(settings.PATH_CONFIG) as config_file:    
             config = json.load(config_file)
         global OnlyFans_USERNAME
         global OnlyFans_PASSWORD
@@ -54,11 +54,11 @@ def initialize():
         # settings.maybePrint("Initialized OnlySnarf: Driver")
         INITIALIZED = True
     except Exception as e:
-        print('Error Initializing, run `onlysnarf-config`')
-        print(e)
+        print('Error: Unable to Start, run `onlysnarf-config`')
+        settings.maybePrint(e)
         sys.exit(0)
     except FileNotFoundError:
-        print('Missing Config, run `onlysnarf-config`')
+        print('Error: Missing Config, run `onlysnarf-config`')
         sys.exit(0)
 
 #####################
@@ -67,7 +67,7 @@ def initialize():
 
 # Upload to OnlyFans
 def log_into_OnlyFans():
-    print('Logging into OnlyFans...')
+    print('Logging into OnlyFans')
     options = webdriver.ChromeOptions()
     if str(settings.SHOW_WINDOW) != "True":
         options.add_argument('--headless')
@@ -113,7 +113,7 @@ def log_into_OnlyFans():
         password = BROWSER.find_element_by_xpath('//input[@id="password"]')
         password.send_keys(str(OnlyFans_PASSWORD))
         password.send_keys(Keys.ENTER)
-        print('Login Success')
+        print('Login Successful')
         return True
     except Exception as e:
         settings.maybePrint(e)
@@ -206,8 +206,8 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
                 settings.maybePrint(e)
                 i+=1
                 if i == maxUploadCount and settings.FORCE_UPLOAD is not True:
-                    print('max upload wait reached, breaking..')
-                    break
+                    print('Error: Max Upload Time Reached')
+                    return False
         try:
             BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
         except:
@@ -230,7 +230,7 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
             if sends[i].is_enabled():
                 sends = sends[i]
         if str(settings.DEBUG) == "True":
-            print('skipping OnlyFans upload')
+            print('Skipped: OnlyFans upload')
             return True
         sends.click()
         # send[1].click() # the 0th one is disabled
@@ -285,7 +285,7 @@ def goto_user(user):
                 print("Warning: Invalid User ID")
                 if str(settings.DEBUG) == "False":
                     return False
-        print("goto -> /my/chats/chat/%s" % userid)
+        settings.maybePrint("goto -> /my/chats/chat/%s" % userid)
         global BROWSER
         BROWSER.get(('https://onlyfans.com/my/chats/chat/'+str(userid)))
         return True
@@ -347,7 +347,7 @@ def confirm_message():
         global BROWSER
         send = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".g-btn.m-rounded.b-chat__btn-submit")))
         if str(settings.DEBUG) == "True":
-            print('OnlyFans Message: Skipped')
+            print('OnlyFans Message: Skipped (debug)')
             return True
         send.click()
         print('OnlyFans Message: Sent')
@@ -466,7 +466,7 @@ def get_new_trial_link():
         return USER_CACHE
     # go to onlyfans.com/my/subscribers/active
     try:
-        print("goto -> /my/promotions")
+        settings.maybePrint("goto -> /my/promotions")
         BROWSER.get(('https://onlyfans.com/my/promotions'))
         trial = BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-sm")[0].click()
         create = BROWSER.find_elements_by_class_name("g-btn.m-rounded")
@@ -510,6 +510,8 @@ def get_users():
     if USER_CACHE:
         return USER_CACHE
     USER_CACHE = read_users_local()
+    if settings.PREFER_LOCAL == "True":
+        return USER_CACHE
     logged_in = False
     global BROWSER
     if not BROWSER or BROWSER == None:
@@ -521,7 +523,7 @@ def get_users():
         return USER_CACHE
     # go to onlyfans.com/my/subscribers/active
     try:
-        print("goto -> /my/subscribers/active")
+        settings.maybePrint("goto -> /my/subscribers/active")
         BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
         num = BROWSER.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML")
         settings.maybePrint("User count: %s" % num)
@@ -598,7 +600,7 @@ def get_users():
             if not existing:
                 USER_CACHE.append(user)
     except Exception as e:
-        print(e)
+        settings.maybePrint(e)
     # start cache timeout
     start_user_cache()
     return USER_CACHE
@@ -666,7 +668,7 @@ def read_users_local():
     users = []
     users_ = []
     try:
-        with open(settings.USERS_PATH) as json_file:  
+        with open(settings.PATH_USERS) as json_file:  
             users = json.load(json_file)
         for user in users['users']:
             user = User(name=user['name'], username=user['username'], id=user['id'], messages_from=user['messages_from'], messages_to=user['messages_to'], messages=user['messages'], preferences=user['preferences'], last_messaged_on=user['last_messaged_on'], sent_images=user['sent_images'], subscribed_on=user['subscribed_on'], isFavorite=user['isFavorite'], statement_history=user['statement_history'])
@@ -709,15 +711,15 @@ def start_user_cache():
 # writes user list to local txt
 def write_users_local():
     users = get_users()
-    print("Writing Local Users")
-    settings.maybePrint("local data path: "+str(settings.USERS_PATH))
+    print("Saving Users Locally")
+    settings.maybePrint("local data path: "+str(settings.PATH_USERS))
     data = {}
     data['users'] = []
     for user in users:
         settings.maybePrint("Saving: "+str(user.username))
         data['users'].append(user.toJSON())
     try:
-        with open(settings.USERS_PATH, 'w') as outfile:  
+        with open(settings.PATH_USERS, 'w') as outfile:  
             json.dump(data, outfile, indent=4, sort_keys=True)
     except FileNotFoundError:
         print("Error: Missing Local Users")

@@ -117,6 +117,10 @@
   **1.4.0 : 9/15/2019**
   - chromedriver binary version set = 77.0.3865.40
   - added catch for image upload error
+  **1.4.1 : 9/16/2019**
+  - cleaned print & maybePrint outputs
+  - cleaned up settings.py
+  - cron cleanup
   
 ----------------------------------------
 
