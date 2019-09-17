@@ -61,15 +61,14 @@ def initialize():
     global settingItems
     # Settings Menu
     settingItems = sorted([
-        [ "Backup", settings.BACKING_UP, ["True","False"],True],
-        [ "Delete Google", settings.DELETING, ["True","False"],False],
-        [ "Delete Local", settings.REMOVE_LOCAL, ["True","False"],False],
-        [ "Hashtag", settings.HASHTAGGING, ["True","False"], True],
-        [ "Force Backup", settings.BACKING_UP_FORCE, ["True","False"],False],
+        [ "Backup", settings.BACKUP, ["True","False"],True],
+        [ "Delete Google", settings.DELETE_GOOGLE, ["True","False"],False],
+        [ "Delete Local", settings.SKIP_DELETE, ["True","False"],False],
+        [ "Force Backup", settings.FORCE_BACKUP, ["True","False"],False],
         [ "Force Upload", settings.FORCE_UPLOAD, ["True","False"],False],
-        [ "Mount Path", settings.MOUNT_PATH,None,False],
-        [ "Google: Root Folder Path", settings.MOUNT_DRIVE,None,False],
-        [ "Users Path", settings.USERS_PATH,None,False],
+        [ "Mount Path", settings.PATH_MOUNT,None,False],
+        [ "Google: Root Folder Path", settings.PATH_DRIVE,None,False],
+        [ "Users Path", settings.PATH_USERS,None,False],
         [ "Show Window", settings.SHOW_WINDOW, ["True","False"],False],
         [ "Google: Root Folder Name", settings.ROOT_FOLDER,None,False],
         [ "Google: Drive Folders", settings.DRIVE_FOLDERS,None,False],
@@ -78,15 +77,13 @@ def initialize():
         [ "Tweeting", settings.TWEETING, ["True","False"],True],
         [ "Debug", settings.DEBUG, ["True","False"],False],
         [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"],False],    
-        [ "Create Missing Google Folders", settings.CREATE_MISSING_FOLDERS, ["True","False"],False],    
-        [ "Verbal", settings.VERBAL, ["True","False"],True]    
+        [ "Create Missing Google Folders", settings.DRIVE_CREATE_MISSING, ["True","False"],False],    
+        [ "Verbal", settings.VERBOSE, ["True","False"],True]    
     ])
     if str(settings.DEBUG) == "True":
-        settingItems.append([ "File Name", settings.FILE_NAME,None,False])
-        settingItems.append([ "File Path", settings.FILE_PATH,None,False])
-        settingItems.append([ "Location", settings.LOCATION, ["Local","Google"],False])
         settingItems.append([ "Text", settings.TEXT,None,False])
         settingItems.append([ "Image", settings.IMAGE,None,False])
+        settingItems.append([ "Prefer Local", settings.PREFER_LOCAL,["True","False"],True])
     settingItems.insert(0,[ "Back", "main"])
 
     global menuItems
@@ -181,7 +178,7 @@ def action():
         except (ValueError, IndexError):
             print("Error: Incorrect Index")
         except Exception as e:
-            print(e)
+            settings.maybePrint(e)
             print("Error: Missing Method") 
 
 ### Action Menu - finalize
@@ -200,7 +197,7 @@ def finalizeAction(actionChoice):
         except (ValueError, IndexError):
             print("Error: Incorrect Index")
         except Exception as e:
-            print(e)
+            settings.maybePrint(e)
             print("Error: Missing Method") 
 
 ### Action Menu - perform
@@ -218,7 +215,7 @@ def performAction(actionChoice, fileChoice):
     except (ValueError, IndexError):
         print("Error: Incorrect Index")
     except Exception as e:
-        print(e)
+        settings.maybePrint(e)
         print("Error: Missing Method") 
     mainMenu()
 
@@ -272,7 +269,7 @@ def performMessage(actionChoice, messageChoice):
             # except (ValueError, IndexError):
                 # print("Error: Incorrect Index")
             except Exception as e:
-                print(e)
+                settings.maybePrint(e)
                 print("Error: Missing Method")
         except (ValueError, IndexError):
             print("Error: Incorrect Index")
@@ -317,7 +314,7 @@ def finalizePromotion(actionChoice):
             choice = list(promotionItems[int(choice)])[1]
             return performPromotion(actionChoice, choice)
         except (ValueError, IndexError):
-            print(sys.exc_info()[0])
+            settings.maybePrint(sys.exc_info()[0])
             print("Error: Incorrect Index")
 
 def performPromotion(actionChoice, promotionChoice):
@@ -345,12 +342,12 @@ def performPromotion(actionChoice, promotionChoice):
                     return promote(str(users[int(choice)-1].username))
 
                 except (ValueError, IndexError):
-                    print(sys.exc_info()[0])
+                    settings.maybePrint(sys.exc_info()[0])
                     print("Error: Incorrect Index")            
     except (ValueError, IndexError):
         print("Error: Incorrect Index")
     except Exception as e:
-        print(e)
+        settings.maybePrint(e)
         print("Error: Missing Method") 
     mainMenu()
 
@@ -426,10 +423,9 @@ def set_settings():
                         settingValue = list_[int(updateChoice)]
                         break
                     except (ValueError, IndexError):
-                        print("Incorrect Index")
+                        print("Error: Incorrect Index")
                     except Exception as e:
-                        print('What did shnnarf break?')
-                        print(e)
+                        settings.maybePrint(e)
                         break
             global UPDATED
             UPDATED = settingChoice
@@ -439,9 +435,9 @@ def set_settings():
             settings.update_value(settingChoice, settingValue)
             return set_settings()
         except (ValueError, IndexError):
-            print("Incorrect Index")
-        except:
-            print(sys.exc_info()[0])
+            print("Error: Incorrect Index")
+        except Exception as e:
+            settings.maybePrint(e)
             return main()
 
 ###########################
@@ -489,9 +485,9 @@ def mainMenu():
             if method is not None:
                 return method()
             else:
-                print("Missing Option")    
+                print("Error: Missing Option")    
         except (ValueError, IndexError, KeyboardInterrupt):
-            print("Incorrect Index")
+            print("Error: Incorrect Index")
             pass
 
 def showHeader():

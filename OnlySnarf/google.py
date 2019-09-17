@@ -40,12 +40,12 @@ OnlyFansFolder_ = None
 
 # Google Auth
 def authGoogle():
-    print('Authenticating Google...')
+    print('Authenticating Google')
     try:
         # PyDrive
         gauth = GoogleAuth()
         # Try to load saved client credentials
-        gauth.LoadCredentialsFile(settings.GOOGLE_CREDS_PATH)
+        gauth.LoadCredentialsFile(settings.PATH_GOOGLE_CREDS)
         settings.maybePrint('Loaded: Google Credentials')
         if gauth.credentials is None:
             # Authenticate if they're not there
@@ -57,23 +57,23 @@ def authGoogle():
             # Initialize the saved creds
             gauth.Authorize()
         # Save the current credentials to a file
-        gauth.SaveCredentialsFile(settings.GOOGLE_CREDS_PATH)
+        gauth.SaveCredentialsFile(settings.PATH_GOOGLE_CREDS)
         global PYDRIVE
         PYDRIVE = GoogleDrive(gauth)
         # Drive v3 API
         SCOPES = 'https://www.googleapis.com/auth/drive'
-        store = file.Storage(settings.GOOGLE_CREDS_PATH)
+        store = file.Storage(settings.PATH_GOOGLE_CREDS)
         creds = store.get()
         if not creds or creds.invalid:
-            flow = client.flow_from_clientsecrets(settings.SECRET_PATH, SCOPES)
+            flow = client.flow_from_clientsecrets(settings.PATH_SECRET, SCOPES)
             creds = tools.run_flow(flow, store)
         global DRIVE
         DRIVE = build('drive', 'v3', http=creds.authorize(Http()))
     except:
         settings.maybePrint(sys.exc_info()[0])
-        print('...Authentication Failure!')
+        print('Error: Unable to Authenticate w/ Google')
         return False
-    print('...Authentication Success!') 
+    print('Authentication Success') 
     return True
 
 ################################
@@ -85,12 +85,12 @@ def delete_file(file):
     global AUTH
     if not AUTH:
         AUTH = authGoogle()
-    if str(settings.DELETING_FORCED) == "True":
+    if str(settings.FORCE_DELETE_GOOGLE) == "True":
         print("Deleting (Forced): {}".format(fileName))
     elif str(settings.DEBUG) == "True":
         print("Skipping Delete (Debug): {}".format(fileName))
         return
-    elif str(settings.DELETING) == "False":
+    elif str(settings.DELETE_GOOGLE) == "False":
         print('Skipping Delete (Disabled): {}'.format(fileName))
         return
     else:
@@ -102,12 +102,12 @@ def move_file(file):
     global AUTH
     if not AUTH:
         AUTH = authGoogle()
-    if str(settings.BACKING_UP_FORCE) == "True":
+    if str(settings.FORCE_BACKUP) == "True":
         print("Backing Up (Forced): {}".format(file['title']))
     elif str(settings.DEBUG) == "True":
         print("Skipping Backup (Debug): {}".format(file['title']))
         return
-    elif str(settings.BACKING_UP) == "False":
+    elif str(settings.BACKUP) == "False":
         print('Skipping Backup (Disabled): {}'.format(file['title']))
         return
     else:
@@ -121,12 +121,12 @@ def move_files(fileName, files):
     global AUTH
     if not AUTH:
         AUTH = authGoogle()
-    if str(settings.BACKING_UP_FORCE) == "True":
+    if str(settings.FORCE_BACKUP) == "True":
         print("Backing Up (Forced): {}".format(fileName))
     elif str(settings.DEBUG) == "True":
         print("Skipping Backup (Debug): {}".format(fileName))
         return
-    elif str(settings.BACKING_UP) == "False":
+    elif str(settings.BACKUP) == "False":
         print('Skipping Backup (Disabled): {}'.format(fileName))
         return
     else:
@@ -194,7 +194,7 @@ def get_folder_by_name(folderName):
             FOLDERS[str(folderName)] = folder['id']
             settings.maybePrint("Found Folder: {}".format(folderName))
             return folder['id']
-    if str(settings.CREATE_MISSING_FOLDERS) == "False":
+    if str(settings.DRIVE_CREATE_MISSING) == "False":
         settings.maybePrint("Skipping: Create Missing Folder - {}".format(folderName))
         return None
     # create if missing
@@ -211,9 +211,9 @@ def get_folder_root():
     if OnlyFansFolder_ is not None:
         return OnlyFansFolder_
     OnlyFansFolder = None
-    if settings.MOUNT_DRIVE is not None:
+    if settings.PATH_DRIVE is not None:
         mount_root = "root"
-        root_folders = settings.MOUNT_DRIVE.split("/")
+        root_folders = settings.PATH_DRIVE.split("/")
         settings.maybePrint("Mount Folders: {}".format(root_folders))    
         for folder in root_folders:
             mount_root = find_folder(mount_root, folder)
@@ -226,7 +226,7 @@ def get_folder_root():
             mount_root = "root"
             print("Warning: Drive Mount Folder Not Found")
         else:
-            print("Found Root (alt): {}/{}".format(settings.MOUNT_DRIVE, settings.ROOT_FOLDER))
+            print("Found Root (alt): {}/{}".format(settings.PATH_DRIVE, settings.ROOT_FOLDER))
         OnlyFansFolder = mount_root
     else:
         file_list = PYDRIVE.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
@@ -263,7 +263,7 @@ def download_file(file, REPAIR=False):
         settings.maybePrint('ext: '+str(ext))
     name = "{}{}".format(name, ext)
     tmp = os.path.join(tmp, name)
-    print("name: {}".format(name))
+    settings.maybePrint("name: {}".format(name))
     settings.maybePrint('path: '+str(tmp))
     if str(ext).lower() == ".mp4":
         with open(tmp, 'w+b') as output:
@@ -292,16 +292,16 @@ def download_file(file, REPAIR=False):
         print("Error: Missing Downloaded File")
         return
     size = os.path.getsize(tmp)
-    print("File Size: {}kb - {}mb".format(size/1000, size/1000000))
+    settings.maybePrint("File Size: {}kb - {}mb".format(size/1000, size/1000000))
     global ONE_MEGABYTE
     if size <= ONE_MEGABYTE:
         settings.maybePrint("Warning: Small File Size")
     global ONE_HUNDRED_KILOBYTES
     if size <= ONE_HUNDRED_KILOBYTES:
         settings.maybePrint("Error: File Size Too Small")
-        print("Download Failure")
+        print("Error: Download Failure")
         return
-    print('Download Complete: File')
+    print('Downloaded: File')
     return tmp
 
 # Download Gallery
@@ -328,7 +328,7 @@ def download_gallery(folder):
         settings.maybePrint('filePath: '+os.path.join(tmp, str(file['title'])))
         file.GetContentFile(os.path.join(tmp, str(file['title'])))
         i+=1
-    print('Download Complete: Gallery')
+    print('Downloaded: Gallery')
     return [file_list, tmp]
 
 # Download Performer
@@ -356,7 +356,7 @@ def download_performer(folder):
                     settings.maybePrint('- content gallery found: '+content['title'])
                     content_found.append(content)
     if len(content_found)==0:
-        print('No content folder found!')
+        print('Warning: Missing Content Folder')
         return
     random_content = random.choice(content_found)
     content_title = random_content['title']
@@ -373,14 +373,13 @@ def download_performer(folder):
     # get all images first then videos 1 at a time from folder
     videos = []
     images = []
-
     for file in file_list:
         if "mp4" in str(file['title']):
             videos.append(file)
         else:
             images.append(file)
     if len(images) > len(videos):
-        print("Found: Images")
+        settings.maybePrint("Found: Images")
         file_list_random = []
         for x in range(folder_size):
             random_file = random.choice(file_list)
@@ -388,7 +387,7 @@ def download_performer(folder):
             file_list_random.append(random_file)
         file_list = file_list_random[:settings.IMAGE_UPLOAD_LIMIT]
     else:
-        print("Found: Videos")
+        settings.maybePrint("Found: Videos")
         file_list = [random.choice(videos)]
 
     i = 1
@@ -397,7 +396,7 @@ def download_performer(folder):
         settings.maybePrint('filePath: '+tmp+"/"+str(file['title']))
         file.GetContentFile(tmp+"/"+str(file['title']))
         i+=1
-    print('Download Complete')
+    print('Downloaded: Performer')
     return [file_list, tmp, content_title]
 
 # Download Scene
@@ -467,7 +466,7 @@ def download_scene(sceneFolder):
     if preview is None:
         print("Error: Missing Scene Preview")
         return
-    print('Download Complete: Scene')
+    print('Downloaded: Scene')
     return [tmp_content, preview, data, content]
     # return json.dumps({
     #     "content": content[0],
@@ -497,14 +496,13 @@ def get_images():
     random_folders = PYDRIVE.ListFile({'q': "'"+OnlyFans_Images_Folder+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     images_list = []
     for folder in random_folders:
-        if str(settings.VERBAL) == "True":
-            print('checking folder: '+folder['title'])
+        settings.maybePrint('checking folder: '+folder['title'])
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
         for image_file in images_list_tmp:
             # images_list.append({"folder":folder['title'],"folder_id":folder['id'],"id":image_file['id'],"image":image_file['title']})
             images_list.append([folder, image_file])
     if len(images_list)==0:
-        print('Warning: No message files found!')
+        print('Warning: Missing Message Files')
         return
     return images_list
     # menu.selectImage -> [] -> menu.selectImage
@@ -526,8 +524,7 @@ def get_message_image(folderName):
     for folder in random_folders:
         if folder['title'] != str(folderName):
             continue
-        if str(settings.VERBAL) == "True":
-            print('checking folder: '+folder['title'],end="")
+        print('checking folder: '+folder['title'],end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
         if len(images_list_tmp)>0:
             images_list.append(folder)
@@ -535,7 +532,7 @@ def get_message_image(folderName):
         else:
             settings.maybePrint(" -> empty")
     if len(images_list)==0:
-        print('No image file found!')
+        print('Error: Missing Image File')
         return
     random_image = random.choice(images_list)
     folder_name = random_image['title'];
@@ -561,8 +558,7 @@ def get_random_image():
     random_image = None
     folder_name = None
     for folder in random_folders:
-        if str(settings.VERBAL) == "True":
-            print('checking folder: '+folder['title'],end="")
+        print('checking folder: '+folder['title'],end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
         if len(images_list_tmp)>0:
             images_list.append(folder)
@@ -570,7 +566,7 @@ def get_random_image():
         else:
             settings.maybePrint(" -> empty")
     if len(images_list)==0:
-        print('No image file found!')
+        print('Error: Missing Image File')
         return
     random_image = random.choice(images_list)
     folder_name = random_image['title'];
@@ -596,8 +592,7 @@ def get_random_gallery():
     random_gallery = None
     folder_name = None
     for folder in random_folders:
-        if str(settings.VERBAL) == "True":
-            print('checking galleries: {}'.format(folder['title']),end="")
+        print('checking galleries: {}'.format(folder['title']),end="")
         gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         if len(gallery_list_tmp)>0:
             folder_list.append(folder)
@@ -606,8 +601,7 @@ def get_random_gallery():
             settings.maybePrint(" -> empty")
     random.shuffle(folder_list)
     for folder in folder_list:
-        if str(settings.VERBAL) == "True":
-            print('checking gallery: {}'.format(folder['title']),end="")
+        print('checking gallery: {}'.format(folder['title']),end="")
         gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         random_gallery_tmp = random.choice(gallery_list_tmp)
         gallery_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+random_gallery_tmp['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
@@ -618,7 +612,7 @@ def get_random_gallery():
         else:
             settings.maybePrint(" -> empty")
     if not random_gallery:
-        print('No gallery folders found!')
+        print('Error: Missing Gallery Folder')
         return
     print('Random Gallery: '+random_gallery['title'])
     return [random_gallery, folder_name]
@@ -649,7 +643,7 @@ def get_random_performer():
             settings.maybePrint('- performer found: '+random_folder_folder['title'])
             performer_list.append(random_folder_folder)
     if len(performer_list)==0:
-        print('No performer folder found!')
+        print('Error: Missing Performer Folder')
         return
     random_performer = random.choice(performer_list)
     print('Random Performer: '+random_performer['title'])
@@ -671,8 +665,7 @@ def get_random_video():
     random_video = None
     folder_name = None
     for folder in random_folders:
-        if str(settings.VERBAL) == "True":
-            print('checking folder: '+folder['title'],end="")
+        print('checking folder: '+folder['title'],end="")
         video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
         if len(video_list_tmp)>0:
             video_list.append(folder)
@@ -680,7 +673,7 @@ def get_random_video():
         else:
             settings.maybePrint(" -> empty")
     if len(video_list)==0:
-        print('No video file found!')
+        print('Error: Missing Video File')
         return
     random_video = random.choice(video_list)
     folder_name = random_video['title'];
@@ -706,8 +699,7 @@ def get_random_scene():
     random_scene = None
     folder_name = None
     for folder in random_folders:
-        if str(settings.VERBAL) == "True":
-            print('checking scenes: '+folder['title'],end="")
+        print('checking scenes: '+folder['title'],end="")
         scene_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         if len(scene_list_tmp)>0:
             folder_list.append(folder)
@@ -716,8 +708,7 @@ def get_random_scene():
             settings.maybePrint(" -> empty")
     random.shuffle(folder_list)
     for folder in folder_list:
-        if str(settings.VERBAL) == "True":
-            print('checking scene: '+folder['title'],end="")
+        print('checking scene: '+folder['title'],end="")
         scene_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'text/plain'"}).GetList()
         if len(scene_list_tmp_tmp)>0:
             folder_name = folder['title']
@@ -726,7 +717,7 @@ def get_random_scene():
         else:
             settings.maybePrint(" -> empty")
     if not random_scene:
-        print('No scene folders found!')
+        print('Error: Missing Scene Folders')
         return
     print('Random Scene: '+random_scene['title'])
     return [random_scene, folder_name]
@@ -769,12 +760,12 @@ def repair(path):
     except AttributeError:
         if os.path.isfile(str(path)+"_fixed.mp4"):
             shutil.move(str(path)+"_fixed.mp4", repairedPath)
-            print("Repair Successful")
+            print("Repair Complete")
     except:
         settings.maybePrint(sys.exc_info()[0])
         print("Warning: Skipping Repair")
         return path
-    print("Repair Complete")
+    print("Repair Successful")
     return str(repairedPath)
 
 def reduce(path):
@@ -783,12 +774,12 @@ def reduce(path):
         return path
     reducedPath = str(path).replace(".mp4", "_reduced.mp4")
     try:
-        print("Reducing: {}".format(path))
+        settings.maybePrint("Reducing: {}".format(path))
         try:
             clip = VideoFileClip(str(path))
-            print("Length: {}".format(clip.duration))
+            settings.maybePrint("Length: {}".format(clip.duration))
             bitrate = 1000000000 / int(clip.duration)
-            print("Bitrate: {}".format(bitrate))
+            settings.maybePrint("Bitrate: {}".format(bitrate))
         except FileNotFoundError:
             print("Error: Missing File to Reduce")
             return path
