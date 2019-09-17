@@ -276,7 +276,8 @@ def download_file(file, REPAIR=False):
             while done is False:
                 # print("=",end="",flush=True)
                 status, done = downloader.next_chunk()
-                print("Downloading: %d%%\r" % (status.progress() * 100),end="")
+                if str(settings.VERBOSE) == "True":
+                    print("Downloading: %d%%\r" % (status.progress() * 100),end="")
             # print("D")
             print("Download Complete")
         if REPAIR:
@@ -524,7 +525,8 @@ def get_message_image(folderName):
     for folder in random_folders:
         if folder['title'] != str(folderName):
             continue
-        print('checking folder: '+folder['title'],end="")
+        if str(settings.VERBOSE) == "True":
+            print('checking folder: '+folder['title'],end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
         if len(images_list_tmp)>0:
             images_list.append(folder)
@@ -558,7 +560,8 @@ def get_random_image():
     random_image = None
     folder_name = None
     for folder in random_folders:
-        print('checking folder: '+folder['title'],end="")
+        if str(settings.VERBOSE) == "True":
+            print('checking folder: '+folder['title'],end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()      
         if len(images_list_tmp)>0:
             images_list.append(folder)
@@ -592,7 +595,8 @@ def get_random_gallery():
     random_gallery = None
     folder_name = None
     for folder in random_folders:
-        print('checking galleries: {}'.format(folder['title']),end="")
+        if str(settings.VERBOSE) == "True":
+            print('checking galleries: {}'.format(folder['title']),end="")
         gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         if len(gallery_list_tmp)>0:
             folder_list.append(folder)
@@ -601,7 +605,8 @@ def get_random_gallery():
             settings.maybePrint(" -> empty")
     random.shuffle(folder_list)
     for folder in folder_list:
-        print('checking gallery: {}'.format(folder['title']),end="")
+        if str(settings.VERBOSE) == "True":
+            print('checking gallery: {}'.format(folder['title']),end="")
         gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         random_gallery_tmp = random.choice(gallery_list_tmp)
         gallery_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+random_gallery_tmp['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
@@ -665,7 +670,8 @@ def get_random_video():
     random_video = None
     folder_name = None
     for folder in random_folders:
-        print('checking folder: '+folder['title'],end="")
+        if str(settings.VERBOSE) == "True":
+            print('checking folder: '+folder['title'],end="")
         video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
         if len(video_list_tmp)>0:
             video_list.append(folder)
@@ -699,7 +705,8 @@ def get_random_scene():
     random_scene = None
     folder_name = None
     for folder in random_folders:
-        print('checking scenes: '+folder['title'],end="")
+        if str(settings.VERBOSE) == "True":
+            print('checking scenes: '+folder['title'],end="")
         scene_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         if len(scene_list_tmp)>0:
             folder_list.append(folder)
@@ -708,7 +715,8 @@ def get_random_scene():
             settings.maybePrint(" -> empty")
     random.shuffle(folder_list)
     for folder in folder_list:
-        print('checking scene: '+folder['title'],end="")
+        if str(settings.VERBOSE) == "True":
+            print('checking scene: '+folder['title'],end="")
         scene_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'text/plain'"}).GetList()
         if len(scene_list_tmp_tmp)>0:
             folder_name = folder['title']
