@@ -229,6 +229,8 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
         for i in range(len(sends)):
             if sends[i].is_enabled():
                 sends = sends[i]
+        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
         if str(settings.DEBUG) == "True":
             print('Skipped: OnlyFans upload')
             return True
@@ -731,9 +733,11 @@ def write_users_local():
 ################
 
 def exit(force=False):
-    if not force:
+    if str(settings.SAVE_USERS) == "True":
         print("Saving and Exiting OnlyFans")
         write_users_local()
+    else:
+        print("Exiting OnlyFans")
     global BROWSER
     BROWSER.quit()
     BROWSER = None

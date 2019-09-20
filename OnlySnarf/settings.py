@@ -33,6 +33,7 @@ class Settings:
         # -debug-delay
         # user message delay
         self.DEBUG_DELAY = False
+        self.DEBUG_DELAY_AMOUNT = 10
         # -delete-google
         # delete uploaded content
         self.DELETE_GOOGLE = False
@@ -94,6 +95,9 @@ class Settings:
         # can be set in profile.conf
         # root Google drive folder
         self.ROOT_FOLDER = "OnlySnarf"
+        # -save-users
+        # saves OnlyFans users upon exit
+        self.SAVE_USERS = False
         # -skip-delete
         # skip local file deletion before and after upload
         self.SKIP_DELETE = False
@@ -169,6 +173,8 @@ class Settings:
                 self.IMAGE_UPLOAD_MAX = str(sys.argv[i+1])
             elif '-prefer-local' in str(sys.argv[i]):
                 self.PREFER_LOCAL = True
+            elif '-save-users' in str(sys.argv[i]):
+                self.SAVE_USERS = True
             elif '-show' in str(sys.argv[i]):
                 self.SHOW_WINDOW = True
             elif '-skip-delete' in str(sys.argv[i]):
