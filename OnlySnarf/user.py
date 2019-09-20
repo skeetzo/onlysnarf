@@ -85,7 +85,7 @@ class User:
             else:
                 self.sent_images.append(str(image_name))
             if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
-    	        delayForThirty()
+                time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
             success = OnlySnarf.confirm_message()
             if not success: return False
             if str(settings.DEBUG) == "False":

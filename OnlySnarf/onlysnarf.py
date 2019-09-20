@@ -208,7 +208,7 @@ def send_email(email, text):
 # Deletes local file
 def remove_local():
     try:
-        if str(settings.SKIP_DELETE) == "False":
+        if str(settings.SKIP_DELETE) == "True":
             print("Skipping Local Remove")
             return
         # print('Deleting Local File(s)')
