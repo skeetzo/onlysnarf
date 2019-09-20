@@ -760,11 +760,10 @@ def repair(path):
     repairedPath = str(path).replace(".mp4", "_fixed.mp4")
     try:
         print("Repairing: {} <-> {}".format(path, settings.WORKING_VIDEO))
-        if str(settings.DEBUG) == "True":
-            fixed = subprocess.call(['untrunc', str(settings.WORKING_VIDEO), str(path)])
+        if str(settings.VERBOSE) == "True":
+            subprocess.call(['untrunc', str(settings.WORKING_VIDEO), str(path)]).communicate()
         else:
             subprocess.Popen(['untrunc', str(settings.WORKING_VIDEO), str(path)],stdin=FNULL,stdout=FNULL)
-        fixed.communicate()
     except AttributeError:
         if os.path.isfile(str(path)+"_fixed.mp4"):
             shutil.move(str(path)+"_fixed.mp4", repairedPath)
@@ -792,7 +791,7 @@ def reduce(path):
             print("Error: Missing File to Reduce")
             return path
         loglevel = "quiet"
-        if str(settings.DEBUG) == "True":
+        if str(settings.VERBOSE) == "True":
             loglevel = "debug"
         p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-err_detect', 'ignore_err', '-y', '-i', str(path), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', '-crf', '26', '-b:v', str(bitrate), str(reducedPath)])
         p.communicate()
@@ -825,7 +824,7 @@ def thumbnail_fix(path):
     try:
         print("Thumbnailing: {}".format(path))
         loglevel = "quiet"
-        if str(settings.DEBUG) == "True":
+        if str(settings.VERBOSE) == "True":
             loglevel = "debug"
         thumbnail_path = os.path.join(os.path.dirname(str(path)), 'thumbnail.png')
         settings.maybePrint("thumbnail path: {}".format(thumbnail_path))
@@ -869,7 +868,7 @@ def thumbnail_preview_fix(path):
     try:
         print("Thumbnailing: {}".format(path))
         loglevel = "quiet"
-        if str(settings.DEBUG) == "True":
+        if str(settings.VERBOSE) == "True":
             loglevel = "debug"
         thumbnail_path = os.path.join(os.path.dirname(str(path)), 'thumbnail.png')
         settings.maybePrint("thumbnail path: {}".format(thumbnail_path))
