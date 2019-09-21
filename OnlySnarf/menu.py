@@ -63,7 +63,7 @@ def initialize():
     settingItems = sorted([
         [ "Backup", settings.BACKUP, ["True","False"],True],
         [ "Delete Google", settings.DELETE_GOOGLE, ["True","False"],False],
-        [ "Delete Local", settings.SKIP_DELETE, ["True","False"],False],
+        [ "Skip Delete Local", settings.SKIP_DELETE, ["True","False"],False],
         [ "Force Backup", settings.FORCE_BACKUP, ["True","False"],False],
         [ "Force Upload", settings.FORCE_UPLOAD, ["True","False"],False],
         [ "Mount Path", settings.PATH_MOUNT,None,False],
@@ -76,7 +76,7 @@ def initialize():
         [ "Image Max", settings.IMAGE_UPLOAD_MAX,None,False],
         [ "Tweeting", settings.TWEETING, ["True","False"],True],
         [ "Debug", settings.DEBUG, ["True","False"],False],
-        [ "Debug Skip Download", settings.SKIP_DOWNLOAD, ["True","False"],False],    
+        [ "Skip Download", settings.SKIP_DOWNLOAD, ["True","False"],False],    
         [ "Create Missing Google Folders", settings.DRIVE_CREATE_MISSING, ["True","False"],False],    
         [ "Verbose", settings.VERBOSE, ["True","False"],True]    
     ])
