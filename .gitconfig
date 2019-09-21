@@ -1,0 +1,2 @@
+[alias]
+	save = "bin/save.sh"
