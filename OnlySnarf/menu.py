@@ -147,6 +147,14 @@ def initialize():
         ])
     promotionItems.insert(0,[ "Back", "main"])
 
+    global methodItems
+    if str(settings.DEBUG) == "True":
+        methodItems = sorted([
+            [ "Choose", "choose" ],
+            [ "Random", "random" ]
+        ])
+    methodItems.insert(0,[ "Back", "main"])
+
     # print("Initialized Menu")
     INITIALIZED = True
 
@@ -193,7 +201,68 @@ def finalizeAction(actionChoice):
                 return action()
             # Call the matching function
             fileChoice = list(fileItems[int(fileChoice)])[1]
-            return performAction(actionChoice, fileChoice)
+            return selectMethod(actionChoice, fileChoice)
+        except (ValueError, IndexError):
+            print("Error: Incorrect Index")
+        except Exception as e:
+            settings.maybePrint(e)
+            print("Error: Missing Method") 
+
+def selectMethod(actionChoice, fileChoice):
+    for item in methodItems:
+        print(colorize("[" + str(methodItems.index(item)) + "] ", 'teal') + list(item)[0])
+    while True:
+        methodChoice = input(">> ")
+        try:
+            if int(methodChoice) < 0 or int(methodChoice) >= len(methodItems): raise ValueError
+            if str(methodItems[int(methodChoice)][1]) == "main":
+                return action()
+            elif str(methodItems[int(methodChoice)][1]) == "choose":
+                if str(fileChoice) == "gallery":
+                    choices = displayFolders("galleries")
+                elif str(fileChoice) == "video":
+                    choices = displayFiles("videos")
+                elif str(fileChoice) == "image":
+                    choices = displayFolders("images")
+                methodChoice = list(methodItems[int(methodChoice)])[1]
+                seeking = True
+                while seeking:
+                    choice = input(">> ")
+                    try:
+                        if int(choice) < 0 or int(choice) > len(choices): raise ValueError
+                        if int(choice) == 0:
+                            return selectMethod(actionChoice, fileChoice)
+                        file = choices[int(choice)-1]
+                        seeking = False
+                        if str(fileChoice) == "gallery" or str(fileChoice) == "image":
+                            if str(fileChoice) == "gallery":
+                                choices_ = displayFolders(file['title'], parent="galleries")
+                            elif str(fileChoice) == "image":
+                                choices_ = displayFiles(file['title'], parent="images")
+                            elif str(fileChoice) == "video":
+                                choices_ = displayFiles(file['title'], parent="videos")
+                            seeking_ = True
+                            while seeking_:
+                                choice_ = input(">> ")
+                                try:
+                                    if int(choice_) < 0 or int(choice_) > len(choices_): raise ValueError
+                                    if int(choice_) == 0:
+                                        return selectMethod(actionChoice, fileChoice)
+                                    file = choices_[int(choice_)-1]
+                                    seeking_ = False
+                                except (ValueError, IndexError):
+                                    print(sys.exc_info()[0])
+                                    print("Error: Incorrect Index")
+                                    return finalizeAction(actionChoice)
+                        return performAction(actionChoice, fileChoice, methodChoice, file=file)
+
+
+                    except (ValueError, IndexError):
+                        print(sys.exc_info()[0])
+                        print("Error: Incorrect Index")
+                        return finalizeAction(actionChoice)
+
+            return performAction(actionChoice, fileChoice, methodChoice)
         except (ValueError, IndexError):
             print("Error: Incorrect Index")
         except Exception as e:
@@ -201,10 +270,10 @@ def finalizeAction(actionChoice):
             print("Error: Missing Method") 
 
 ### Action Menu - perform
-def performAction(actionChoice, fileChoice):
+def performAction(actionChoice, fileChoice, methodChoice, file=None):
     try:
         method = getattr(OnlySnarf, str(actionChoice))
-        response = method(fileChoice)
+        response = method(fileChoice, methodChoice, file)
         if response:
             if str(actionChoice) == "download":
                 for setting in settingItems:
@@ -350,6 +419,24 @@ def performPromotion(actionChoice, promotionChoice):
         settings.maybePrint(e)
         print("Error: Missing Method") 
     mainMenu()
+
+def displayFiles(folderName, parent=None):
+    files = Google.get_files_of_folder(folderName, parent=parent)
+    print(colorize("[0] ", 'blue') + "Back")
+    i = 1
+    for file in files:
+        print(colorize("[" + str(i) + "] ", 'blue') + str(file['title']))
+        i = i+1
+    return files
+
+def displayFolders(folderName, parent=None):
+    folders = Google.get_folders_of_folder(folderName, parent=parent)
+    print(colorize("[0] ", 'blue') + "Back")
+    i = 1
+    for folder in folders:
+        print(colorize("[" + str(i) + "] ", 'blue') + str(folder['title']))
+        i = i+1
+    return folders
 
 # displays and returns users
 def displayUsers():
