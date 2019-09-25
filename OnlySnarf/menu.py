@@ -51,6 +51,7 @@ fileItems = []
 locationItems = []
 promotionItems = []
 settingItems = []
+methodItems = []
 
 def initialize():
     # print("Initializing Menu")
@@ -215,16 +216,20 @@ def selectMethod(actionChoice, fileChoice):
         methodChoice = input(">> ")
         try:
             if int(methodChoice) < 0 or int(methodChoice) >= len(methodItems): raise ValueError
+            methodChoice_ = list(methodItems[int(methodChoice)])[1]
             if str(methodItems[int(methodChoice)][1]) == "main":
                 return action()
             elif str(methodItems[int(methodChoice)][1]) == "choose":
                 if str(fileChoice) == "gallery":
                     choices = displayFolders("galleries")
                 elif str(fileChoice) == "video":
-                    choices = displayFiles("videos")
+                    choices = displayFolders("videos")
                 elif str(fileChoice) == "image":
                     choices = displayFolders("images")
-                methodChoice = list(methodItems[int(methodChoice)])[1]
+                elif str(fileChoice) == "performer":
+                    choices = displayFolders("performers")
+                elif str(fileChoice) == "scene":
+                    choices = displayFolders("scenes")
                 seeking = True
                 while seeking:
                     choice = input(">> ")
@@ -233,14 +238,18 @@ def selectMethod(actionChoice, fileChoice):
                         if int(choice) == 0:
                             return selectMethod(actionChoice, fileChoice)
                         file = choices[int(choice)-1]
+                        parent = file
+                        folderName = file['title']
                         seeking = False
-                        if str(fileChoice) == "gallery" or str(fileChoice) == "image":
+                        if str(fileChoice) == "gallery" or str(fileChoice) == "image"  or str(fileChoice) == "video" or str(fileChoice) == "performer":
                             if str(fileChoice) == "gallery":
                                 choices_ = displayFolders(file['title'], parent="galleries")
                             elif str(fileChoice) == "image":
                                 choices_ = displayFiles(file['title'], parent="images")
                             elif str(fileChoice) == "video":
                                 choices_ = displayFiles(file['title'], parent="videos")
+                            elif str(fileChoice) == "performer":
+                                choices_ = displayFolders(file['title'], parent="performers")
                             seeking_ = True
                             while seeking_:
                                 choice_ = input(">> ")
@@ -254,15 +263,14 @@ def selectMethod(actionChoice, fileChoice):
                                     print(sys.exc_info()[0])
                                     print("Error: Incorrect Index")
                                     return finalizeAction(actionChoice)
-                        return performAction(actionChoice, fileChoice, methodChoice, file=file)
+                        return performAction(actionChoice, fileChoice, methodChoice_, file=file, folderName=folderName, parent=parent)
 
 
                     except (ValueError, IndexError):
                         print(sys.exc_info()[0])
                         print("Error: Incorrect Index")
                         return finalizeAction(actionChoice)
-
-            return performAction(actionChoice, fileChoice, methodChoice)
+            return performAction(actionChoice, fileChoice, methodChoice_)
         except (ValueError, IndexError):
             print("Error: Incorrect Index")
         except Exception as e:
@@ -270,10 +278,10 @@ def selectMethod(actionChoice, fileChoice):
             print("Error: Missing Method") 
 
 ### Action Menu - perform
-def performAction(actionChoice, fileChoice, methodChoice, file=None):
+def performAction(actionChoice, fileChoice, methodChoice, file=None, folderName=None, parent=None):
     try:
         method = getattr(OnlySnarf, str(actionChoice))
-        response = method(fileChoice, methodChoice, file)
+        response = method(fileChoice, methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
         if response:
             if str(actionChoice) == "download":
                 for setting in settingItems:
