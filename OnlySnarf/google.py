@@ -179,7 +179,7 @@ def find_folder(parent, folderName):
 def get_folder_by_name(folderName, parent=None):
     checkAuth()
     if str(parent) == "galleries" or str(parent) == "images" or str(parent) == "videos":
-        parent = get_folder_by_name(folderName)
+        parent = get_folder_by_name(parent)
     settings.maybePrint("Getting Folder: {}".format(folderName))
     global PYDRIVE
     if parent is None:
@@ -273,20 +273,25 @@ def download_file(file, REPAIR=False):
     settings.maybePrint("name: {}".format(name))
     settings.maybePrint('path: '+str(tmp))
     if str(ext).lower() == ".mp4":
-        with open(tmp, 'w+b') as output:
-            # print("8",end="",flush=True)
-            file_id = file['id']
-            request = DRIVE.files().get_media(fileId=file['id'])
-            downloader = MediaIoBaseDownload(output, request)
-            # print("=",end="",flush=True)
-            done = False
-            while done is False:
+        try:
+            with open(tmp, 'w+b') as output:
+                # print("8",end="",flush=True)
+                file_id = file['id']
+                request = DRIVE.files().get_media(fileId=file['id'])
+                downloader = MediaIoBaseDownload(output, request)
                 # print("=",end="",flush=True)
-                status, done = downloader.next_chunk()
-                if str(settings.VERBOSE) == "True":
-                    print("Downloading: %d%%\r" % (status.progress() * 100),end="")
-            # print("D")
-            print("Download Complete")
+                done = False
+                while done is False:
+                    # print("=",end="",flush=True)
+                    status, done = downloader.next_chunk()
+                    if str(settings.VERBOSE) == "True":
+                        print("Downloading: %d%%\r" % (status.progress() * 100),end="")
+                # print("D")
+                print("Download Complete")
+        except Exception as e:
+            settings.maybePrint(e)
+            file.GetContentFile(tmp)
+
         if REPAIR:
             tmp = repair(tmp)
         global FIFTY_MEGABYTES
@@ -310,7 +315,7 @@ def download_file(file, REPAIR=False):
         print("Error: Download Failure")
         return
     print('Downloaded: File')
-    return True
+    return tmp
 
 # Download Gallery
 def download_gallery(folder):
@@ -335,7 +340,7 @@ def download_gallery(folder):
         file.GetContentFile(os.path.join(tmp, str(file['title'])))
         i+=1
     print('Downloaded: Gallery')
-    return True
+    return [tmp, file_list]
 
 # Download Performer
 def download_performer(folder):
@@ -436,7 +441,22 @@ def download_scene(sceneFolder):
     if preview is None:
         print("Error: Missing Scene Preview Folder")
         return
-    content = download_gallery(content)
+    # tries to download as gallery first, then finds first video file
+    content_ = None
+    try:
+        content_ = download_gallery(content)
+    except Exception as e:
+        print("1:" +str(e))
+    if content_ is None:
+        try:
+            content_ = PYDRIVE.ListFile({'q': "'"+content['id']+"' in parents and trashed=false and mimeType != 'application/vnd.google-apps.folder'"}).GetList()
+            content_ = download_file(content_[0])
+        except Exception as e:
+            print("2: "+str(e))
+    content = content_
+    if content is None:
+        print("Error: Unable to Find Content")
+        return
     # move content to tmp/content
     tmp_content = os.path.join(content[1], "content")
     settings.maybePrint("Old Content Path: {}".format(content[1]))
@@ -493,7 +513,7 @@ def download_scene(sceneFolder):
 def get_files_of_folder(folderName, parent=None):
     folder = get_folder_by_name(folderName, parent=parent)
     global PYDRIVE
-    files = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\' or mimeType contains \'video/mp4\')"}).GetList()      
+    files = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType != 'application/vnd.google-apps.folder'"}).GetList()      
     return files
 
 # gets all the folders in the messages category

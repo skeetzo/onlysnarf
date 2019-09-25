@@ -126,10 +126,14 @@
   - fixed verbose output
   **1.4.3 : 9/21/2019**
   - dbot issue
+  **2.0.0 : 9/25/2019**
+  - added functionality to choose instead of random
 
 ----------------------------------------
 
 ## ToDo
+
+  - update download_performers and seperate randomizing selection
 
 ### Low Priority
   - add: read messages html for emojis

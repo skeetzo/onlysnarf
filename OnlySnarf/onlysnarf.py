@@ -26,7 +26,7 @@ def all(opt):
 ##### Download #####
 ####################
 
-def download(fileChoice, methodChoice="random", file=None):
+def download(fileChoice, methodChoice="random", file=None, folderName=None, parent=None):
     if methodChoice == "random":
         if fileChoice == 'image':
             return download_random_image()
@@ -42,23 +42,40 @@ def download(fileChoice, methodChoice="random", file=None):
             return print("Error: Missing File Choice")
     elif methodChoice == "choose" and file is not None:
         if fileChoice == 'image':
-            response = Google.download_file(file)
+            file_path = Google.download_file(file)
+            if file_path == None:
+                print('Error: Empty Download')
+                return
+            return [file['title'], file_path, file, folderName]
         elif fileChoice == 'gallery':
             response = Google.download_gallery(file)
+            file_path = response[0]
+            gallery_files = response[1]
+            if file_path == None:
+                print('Error: Missing Random Gallery')
+                return
+            return [file['title'], file_path, file, gallery_files, folderName]
         elif fileChoice == 'video':
-            response = Google.download_file(file)
+            file_path = Google.download_file(file)
+            if file_path == None:
+                print('Error: Empty Download')
+                return
+            return [file['title'], file_path, file, folderName]
 
+#################################################################
+        elif fileChoice == 'performer':
 
-        google_file = response[0]
-        folder_name = response[1]
-    
-        file_name = response[0]['title']
-        file_path = Google.download_file(google_file)
+            file = Google.get_random_performer()
+            if file == None:
+                print("Error: Missing Performer")
+                return
+            results = Google.download_performer(file)
+            return [results[1], file, file['title'], results[2]]
 
-        return [file_name, file_path, response[0], folder_name]
+#################################################################
 
-
-
+        elif fileChoice == 'scene':
+            return Google.download_scene(file)
     else:
         print("Error: Unable to Download")
         return None
@@ -138,22 +155,22 @@ def download_random_performer():
     if results == None:
         print("Error: Missing Performer Folders")
         return
-    gallery_files = results[0]
+    # gallery_files = results[0]
     file_path = results[1]
     gallery_name = results[2]
     if file_path == None:
         print('Error: Missing Content')
         return
-    if gallery_files == None:
-        print('Error: Missing Gallery Content')
-        return
+    # if gallery_files == None:
+    #     print('Error: Missing Gallery Content')
+    #     return
     if performer == None:
         print('Error: Missing Performer Name')
         return
     if gallery_name == None:
         print('Error: Missing Gallery Name')
         return
-    return [file_path, google_file, performer, gallery_name, google_file]
+    return [file_path, google_file, performer, gallery_name]
 
 def download_random_video():
     remove_local()
@@ -251,22 +268,22 @@ def remove_local():
 ##### Release #####
 ###################
 
-def release(opt, methodChoice="random", file=None):
+def release(opt, methodChoice="random", file=None, folderName=None, parent=None):
     print("0/3 : Deleting Locals")
     remove_local()
     sys.stdout.flush()
     #################################################
     print("1/3 : Running - {}".format(opt))
     if str(opt) == "image":
-        released = release_image(methodChoice, file)
+        released = release_image(methodChoice, file=file, folderName=folderName, parent=None)
     elif str(opt) == "video":
-        released = release_video(methodChoice, file)
+        released = release_video(methodChoice, file=file, folderName=folderName, parent=None)
     elif str(opt) == "gallery":
-        released = release_gallery(methodChoice, file)
+        released = release_gallery(methodChoice, file=file, folderName=folderName, parent=None)
     elif str(opt) == "performer":
-        released = release_performer(methodChoice, file)
+        released = release_performer(methodChoice, file=file, folderName=folderName, parent=None)
     elif str(opt) == "scene":
-        released = release_scene(methodChoice, file)
+        released = release_scene(methodChoice, file=file, folderName=folderName, parent=None)
     else:
         print('Missing Args!')
         return
@@ -283,10 +300,10 @@ def release(opt, methodChoice="random", file=None):
     sys.stdout.flush()
     OnlySnarf.exit()
 
-def release_image(methodChoice="random", file=None):
+def release_image(methodChoice="random", file=None, folderName=None, parent=None):
     try:
         print("Releasing Image")
-        response = download("image", methodChoice=methodChoice, file=file)
+        response = download("image", methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
         if response == None:
             print("Error: Failure Releasing Image")
             return False
@@ -329,10 +346,10 @@ def release_image(methodChoice="random", file=None):
         settings.maybePrint(e)
         return False
 
-def release_gallery(methodChoice="random", file=None):
+def release_gallery(methodChoice="random", file=None, folderName=None, parent=None):
     try:
         print("Releasing Gallery")
-        response = download("gallery", methodChoice=methodChoice, file=file)
+        response = download("gallery", methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
         if response == None:
             print("Error: Failure Releasing Gallery")
             return False
@@ -384,10 +401,10 @@ def release_gallery(methodChoice="random", file=None):
         settings.maybePrint(e)
         return False
 
-def release_performer(methodChoice="random", file=None):
+def release_performer(methodChoice="random", file=None, folderName=None, parent=None):
     try:
         print("Releasing Performer")
-        response = download("performer", methodChoice=methodChoice, file=file)
+        response = download("performer", methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
         if response == None:
             print("Error: Failure Releasing Performer")
             return False
@@ -396,13 +413,11 @@ def release_performer(methodChoice="random", file=None):
         performer = None
         content = None
         google_file = None
-        folder_name = None
         try:
             content = response[0]
             google_file = response[1]
             performer = response[2]
             text = response[3]
-            folder_name = response[4]
         except Exception as e:
             settings.maybePrint(e)
         if text == None:
@@ -438,10 +453,10 @@ def release_performer(methodChoice="random", file=None):
     
 # upload a file or gallery
 # send a message to [recent, all, user] w/ a preview image
-def release_scene(methodChoice="random", file=None):
+def release_scene(methodChoice="random", file=None, folderName=None, parent=None):
     try:
         print("Releasing Scene")
-        response = download("scene", methodChoice=methodChoice, file=file)
+        response = download("scene", methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
         if response == None:
             print("Error: Failure Releasing Scene")
             return False
@@ -527,10 +542,10 @@ def release_scene(methodChoice="random", file=None):
         settings.maybePrint(e)
         return False
 
-def release_video(methodChoice="random", file=None):
+def release_video(methodChoice="random", file=None, folderName=None, parent=None):
     try:
         print("Releasing Video")
-        response = download("video", methodChoice=methodChoice, file=file)
+        response = download("video", methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
         if response == None:
             print("Error: Failure Releasing Video")
             return False
@@ -665,8 +680,6 @@ def test(TYPE):
     remove_local()
     print('1/3 : Testing')
 
-
-
     # ### Promotion ###
     print('TESTING: Cron')
     response = Cron.test()
@@ -677,7 +690,6 @@ def test(TYPE):
         return print("Error: Failed to Reset")
     return
 
-
     # ### Promotion ###
     print('TESTING: Promotion')
     response = apply_promotion()
@@ -687,98 +699,6 @@ def test(TYPE):
     if not reset:
         return print("Error: Failed to Reset")
     return
-
-    # ### Gallery ###
-    # print('TESTING: Gallery x 10')
-    # for i in range(10):
-    #     release_gallery()
-    #     time.sleep(10)
-    #     reset = OnlySnarf.reset()
-    #     if not reset:
-    #         return print("Error: Failed to Reset")
-    # return sys.exit(0)
-    # #######################
-
-    # ### Message ###
-    # response = download_random_image()
-    # if not response or response == None:
-        # print("Error: Missing Image")
-        # return
-    # successful_message = OnlySnarf.message(choice="all", message="random tease :P", image=response[1], price="5.00")
-    # message(choice="recent", message="8=======D", image=response[1], price="50.00")
-    # if successful_message:
-        # Google.move_file(response[2])
-    # else:
-        # print("Error: Failed to Send Message")
-    # #######################
-    # ### Exit Gracefully ###
-    # OnlySnarf.exit()
-    # return
-    # #######################
-
-    # ### Users ###
-    print('TESTING: Users')
-    users = OnlySnarf.get_users()
-    time.sleep(30)
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
-    return
-    #######################
-
-    # ### Chat Logs ###
-    # print('TESTING: Chat Logs')
-    # OnlySnarf.update_chat_logs()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-    #     return print("Error: Failed to Reset")
-    # #######################
-    # ### Exit Gracefully ###
-    # OnlySnarf.exit()
-    # return
-    # #######################
-    
-    # ### Image ###
-    # print('TESTING: Image')
-    # release_image()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-    #     return print("Error: Failed to Reset")
-    # ### Gallery ###
-    # print('TESTING: Gallery')
-    # release_gallery()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-    #     return print("Error: Failed to Reset")
-    # ### Performer ###
-    # print('TESTING: Performer')
-    # release_performer()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-    #     return print("Error: Failed to Reset")
-    ### Scene ###
-    # print('TESTING: Scene')
-    # release_scene()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-    #     return print("Error: Failed to Reset")
-    # ### Video ###
-    # print('TESTING: Video')
-    # release_video()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-    #     return print("Error: Failed to Reset")
-    
-    #######################
-    ### Exit Gracefully ###
-    # OnlySnarf.exit()
-    #######################
 
 
 ################################################################################################################################################
