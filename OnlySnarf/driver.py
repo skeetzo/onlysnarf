@@ -567,7 +567,13 @@ def get_users():
             match = re.findall("Started.*([A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4})", text)
             if len(match) > 0:
                 starteds_.append(match[0])
-        settings.maybePrint("ids vs starteds: "+str(len(user_ids_))+" - "+str(len(starteds_)))
+        if len(user_ids_) == 0:
+            print("Warning: Unable to find user ids")
+            useridsFailed = True
+        if len(starteds_) == 0:
+            print("Warning: Unable to find starting dates")
+            startedsFailed = True
+        settings.maybePrint("ids vs starteds vs avatars: "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(avatars)))
         for i in range(len(avatars)-1):
             if not startedsFailed:
                 start = starteds_[i]
