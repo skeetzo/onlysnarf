@@ -69,7 +69,7 @@ def download(fileChoice, methodChoice="random", file=None, folderName=None, pare
             if file == None:
                 print("Error: Missing Performer")
                 return
-            results = Google.download_performer(file)
+            results = Google.download_performer(file)            
             return [results[1], file, file['title'], results[2]]
 
 #################################################################
@@ -194,7 +194,6 @@ def download_random_video():
     if file_path == None:
         print('Error: Empty Download')
         return
-    return [file_name, file_path, google_file, folder_name]
 
 def download_random_scene():
     remove_local()
@@ -689,17 +688,6 @@ def test(TYPE):
     if not reset:
         return print("Error: Failed to Reset")
     return
-
-    # ### Promotion ###
-    print('TESTING: Promotion')
-    response = apply_promotion()
-    if not response or response == None:
-        print("Error: Failed to apply promotion")
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
-    return
-
 
 ################################################################################################################################################
 
