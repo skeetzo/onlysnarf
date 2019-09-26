@@ -128,7 +128,9 @@
   - dbot issue
   **2.0.0 : 9/25/2019**
   - added functionality to choose instead of random
-
+  **2.0.1**
+  - oops
+  
 ----------------------------------------
 
 ## ToDo

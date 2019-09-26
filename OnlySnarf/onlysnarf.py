@@ -333,7 +333,7 @@ def release_image(methodChoice="random", file=None, folderName=None, parent=None
             print("Warning: Missing Image Keywords")
         print("Image:")
         print("- Title: {}".format(text)) # name of scene
-        print("- Keywords: {}".format(keywords)) # text sent in messages
+        print("- Folder: {}".format(keywords)) # text sent in messages
         print("- Content: {}".format(content)) # the file(s) to upload
         successful = upload("image", path=content, text=text, keywords=keywords)
         if successful:
@@ -384,7 +384,7 @@ def release_gallery(methodChoice="random", file=None, folderName=None, parent=No
             print("Warning: Missing Gallery Keywords")
         print("Gallery:")
         print("- Title: {}".format(text)) # name of scene
-        print("- Keywords: {}".format(keywords)) # text sent in messages
+        print("- Folder: {}".format(keywords)) # text sent in messages
         print("- Content: {}".format(content)) # the file(s) to upload
         files = os.listdir(content)
         file = files[0]
@@ -580,7 +580,7 @@ def release_video(methodChoice="random", file=None, folderName=None, parent=None
             print("Warning: Missing Video Keywords")
         print("Video:")
         print("- Title: {}".format(text)) # name of scene
-        print("- Keywords: {}".format(keywords)) # text sent in messages
+        print("- Folder: {}".format(keywords)) # text sent in messages
         print("- Content: {}".format(content)) # the file(s) to upload
         successful = upload("video", path=content, text=text, keywords=keywords)
         if successful:

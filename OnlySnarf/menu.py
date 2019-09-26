@@ -149,11 +149,10 @@ def initialize():
     promotionItems.insert(0,[ "Back", "main"])
 
     global methodItems
-    if str(settings.DEBUG) == "True":
-        methodItems = sorted([
-            [ "Choose", "choose" ],
-            [ "Random", "random" ]
-        ])
+    methodItems = sorted([
+        [ "Choose", "choose" ],
+        [ "Random", "random" ]
+    ])
     methodItems.insert(0,[ "Back", "main"])
 
     # print("Initialized Menu")
