@@ -64,13 +64,8 @@ def download(fileChoice, methodChoice="random", file=None, folderName=None, pare
 
 #################################################################
         elif fileChoice == 'performer':
-
-            file = Google.get_random_performer()
-            if file == None:
-                print("Error: Missing Performer")
-                return
             results = Google.download_performer(file)            
-            return [results[1], file, file['title'], results[2]]
+            return [results[1], file]
 
 #################################################################
 
@@ -415,8 +410,8 @@ def release_performer(methodChoice="random", file=None, folderName=None, parent=
         try:
             content = response[0]
             google_file = response[1]
-            performer = response[2]
-            text = response[3]
+            performer = parent
+            text = folderName
         except Exception as e:
             settings.maybePrint(e)
         if text == None:
