@@ -258,6 +258,25 @@ def selectMethod(actionChoice, fileChoice):
                                         return selectMethod(actionChoice, fileChoice)
                                     file = choices_[int(choice_)-1]
                                     seeking_ = False
+
+                                    if str(fileChoice) == "performer":
+                                        # parent = file
+                                        choices_ = displayFiles(file['title'], parent=parent)
+                                        seeking__ = True
+                                        while seeking__:
+                                            choice_ = input(">> ")
+                                            try:
+                                                if int(choice_) < 0 or int(choice_) > len(choices_): raise ValueError
+                                                if int(choice_) == 0:
+                                                    return selectMethod(actionChoice, fileChoice)
+                                                file = choices_[int(choice_)-1]
+                                                seeking__ = False
+                                                return performAction(actionChoice, fileChoice, methodChoice_, file=file, folderName=folderName, parent=parent)
+                                            except (ValueError, IndexError):
+                                                print(sys.exc_info()[0])
+                                                print("Error: Incorrect Index")
+                                                return finalizeAction(actionChoice)
+
                                 except (ValueError, IndexError):
                                     print(sys.exc_info()[0])
                                     print("Error: Incorrect Index")
