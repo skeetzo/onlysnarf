@@ -178,7 +178,7 @@ def find_folder(parent, folderName):
 
 def get_folder_by_name(folderName, parent=None):
     checkAuth()
-    if str(parent) == "galleries" or str(parent) == "images" or str(parent) == "videos":
+    if str(parent) == "galleries" or str(parent) == "images" or str(parent) == "videos" or str(parent) == "performers":
         parent = get_folder_by_name(parent)
     settings.maybePrint("Getting Folder: {}".format(folderName))
     global PYDRIVE
@@ -349,33 +349,40 @@ def download_performer(folder):
     # mkdir /tmp
     tmp = settings.getTmp()
     global PYDRIVE
-    content_folders = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-    content_found = []
-    random_content = None
-    content_title = None
-    for folder in content_folders:
-        settings.maybePrint('content: '+folder['title'])
-        content_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        if len(content_list)==0:
-            settings.maybePrint('- skipping empty content: '+folder['title'])
-        elif len(content_list)>0:
-            settings.maybePrint('- content galleries found: '+folder['title'])
-            for content in content_list:
-                content_list_galleries = PYDRIVE.ListFile({'q': "'"+content['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\' or mimeType contains \'video/mp4\')"}).GetList()
-                if len(content_list_galleries)==0:
-                    settings.maybePrint('- skipping empty content gallery: '+content['title'])
-                elif len(content_list_galleries)>0 and len(content_list_galleries):
-                    settings.maybePrint('- content gallery found: '+content['title'])
-                    content_found.append(content)
-    if len(content_found)==0:
-        print('Warning: Missing Content Folder')
-        return
-    random_content = random.choice(content_found)
-    content_title = random_content['title']
-    settings.maybePrint("Folder: {}".format(content_title))
+    # content_folders = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+    # content_found = []
+    # random_content = None
+    # content_title = None
+    # for folder in content_folders:
+    #     settings.maybePrint('content: '+folder['title'])
+    #     content_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+    #     if len(content_list)==0:
+    #         settings.maybePrint('- skipping empty content: '+folder['title'])
+    #     elif len(content_list)>0:
+    #         settings.maybePrint('- content galleries found: '+folder['title'])
+    #         for content in content_list:
+    #             content_list_galleries = PYDRIVE.ListFile({'q': "'"+content['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\' or mimeType contains \'video/mp4\')"}).GetList()
+    #             if len(content_list_galleries)==0:
+    #                 settings.maybePrint('- skipping empty content gallery: '+content['title'])
+    #             elif len(content_list_galleries)>0 and len(content_list_galleries):
+    #                 settings.maybePrint('- content gallery found: '+content['title'])
+    #                 content_found.append(content)
+    # if len(content_found)==0:
+    #     print('Warning: Missing Content Folder')
+    #     return
+    # random_content = random.choice(content_found)
+    # content_title = random_content['title']
+    # settings.maybePrint("Folder: {}".format(content_title))
+
     # download folder
-    file_list = PYDRIVE.ListFile({'q': "'"+random_content['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\' or mimeType contains \'video/mp4\')"}).GetList()
-    folder_size = len(file_list)
+    # file_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\' or mimeType contains \'video/mp4\')"}).GetList()
+    video_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains \'image/jpeg\' or mimeType contains \'image/jpg\' or mimeType contains \'image/png\')"}).GetList()
+    image_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains \'video/mp4\'"}).GetList()
+    # file_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType != 'application/vnd.google-apps.folder'"}).GetList()
+    file_list = []
+    folder_size = len(image_list) + len(video_list)
+
+
     settings.maybePrint('Folder size: {}'.format(folder_size))
     settings.maybePrint('Upload limit: {}'.format(settings.IMAGE_UPLOAD_LIMIT))
     # settings.maybePrint("Files: {}".format(file_list))
@@ -385,22 +392,22 @@ def download_performer(folder):
     # get all images first then videos 1 at a time from folder
     videos = []
     images = []
-    for file in file_list:
-        if "mp4" in str(file['title']):
-            videos.append(file)
-        else:
-            images.append(file)
-    if len(images) > len(videos):
+    # for file in file_list:
+    #     if "mp4" in str(file['title']):
+    #         videos.append(file)
+    #     else:
+    #         images.append(file)
+    if len(image_list) > len(video_list):
         settings.maybePrint("Found: Images")
         file_list_random = []
         for x in range(folder_size):
-            random_file = random.choice(file_list)
-            file_list.remove(random_file)
+            random_file = random.choice(image_list)
+            image_list.remove(random_file)
             file_list_random.append(random_file)
         file_list = file_list_random[:settings.IMAGE_UPLOAD_LIMIT]
     else:
         settings.maybePrint("Found: Videos")
-        file_list = [random.choice(videos)]
+        file_list = [random.choice(video_list)]
 
     i = 1
     for file in sorted(file_list, key = lambda x: x['title']):
@@ -409,7 +416,7 @@ def download_performer(folder):
         file.GetContentFile(tmp+"/"+str(file['title']))
         i+=1
     print('Downloaded: Performer')
-    return [file_list, tmp, content_title]
+    return [tmp, file_list]
 
 # Download Scene
 def download_scene(sceneFolder):
