@@ -21,6 +21,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.common.action_chains import ActionChains
 from OnlySnarf.user import User
 from OnlySnarf.settings import SETTINGS as settings
 
@@ -151,8 +152,7 @@ def reset():
 ####################
 
 # maximum discount = 55%
-def discount_user(user, depth=0, discount=10, months=1):
-    print("Discounting User: {}".format(user))
+def discount_user(user, depth=0, discount=10, months=1, skip_reload=False):
     auth()
     if int(discount) > 55:
         print("Warning: Discount Too High, Max -> 55%")
@@ -161,20 +161,19 @@ def discount_user(user, depth=0, discount=10, months=1):
         print("Warning: Months Too High, Max -> 12")
         months = 12
     try:
-        settings.maybePrint("goto -> /my/subscribers/active")
-        BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
-        num = BROWSER.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML")
-        for n in range(int(int(depth)/10)):
-            settings.maybePrint("scrolling...")
-            BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(1)
-        time.sleep(2)
+        if skip_reload:
+            settings.maybePrint("at -> /my/subscribers/active")
+        else:
+            settings.maybePrint("goto -> /my/subscribers/active")
+            BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Failed to Find Users")
         return False
-    # get all the users
     users = BROWSER.find_elements_by_class_name('b-users__item.m-fans')
+    print("Discounting User: {} - {}/{}".format(user, depth, len(users)))
+    time.sleep(2)
+    # get all the users
     user__ = users[0]
     for user_ in users:
         text = user_.get_attribute("innerHTML")
@@ -182,24 +181,38 @@ def discount_user(user, depth=0, discount=10, months=1):
         if str(user) in text:
             user__ = user_
             break
+    ActionChains(BROWSER).move_to_element(user_).perform()
     buttons = user__.find_elements_by_class_name("g-btn.m-rounded.m-border.m-sm")
     for button in buttons:
-        # print(button.get_attribute("innerHTML"))
         if "Discount" in button.get_attribute("innerHTML"):
             button.click()
             break
     time.sleep(1)
-    BROWSER.find_elements_by_class_name("g-input.form-control")[0].send_keys(str(discount))
+    buttons_ = BROWSER.find_elements_by_class_name("g-btn.m-rounded")
+    try:
+        discountText = BROWSER.find_elements_by_class_name("g-input.form-control")[0]
+        if text.get_attribute("value") != "":
+            print("Warning: Existing Discount")
+        discountText.clear()
+        discountText.send_keys(str(discount))
+    except Exception as e:
+        settings.maybePrint(e)
+        for button in buttons_:
+            if "Cancel" in button.get_attribute("innerHTML"):
+                button.click()
+                print("Skipping: Save Discount")
+                return True
     months_ = BROWSER.find_elements_by_class_name("g-input.form-control")[1]
     for n in range(int(months)-1):
         months_.send_keys(Keys.DOWN)
-    buttons_ = BROWSER.find_elements_by_class_name("g-btn.m-rounded")
     for button in buttons_:
         if "Cancel" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "True":
+            button.click()
             print("Skipping: Save Discount (Debug)")
             return True
-        if "Save" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "False":
+        elif "Save" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "False":
             button.click()
+            print("Discounted User: {}".format(user))
             break
     return True
 

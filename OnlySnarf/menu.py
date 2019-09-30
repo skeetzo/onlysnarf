@@ -118,7 +118,8 @@ def initialize():
         [ "New", "new"],
         [ "Recent", "recent"],
         [ "Favorite", "favorite"],
-        [ "User by Username", "user"]
+        [ "User by Username", "user"],
+        [ "Select User", "select"]
     ])
     messageItems.insert(0,[ "Back", "main"])
 
@@ -466,11 +467,15 @@ def finalizeDiscount(actionChoice):
             print(sys.exc_info()[0])
             print("Error: Incorrect Index")
 
-def performDiscount(actionChoice, messageChoice):
+def performDiscount(actionChoice, discountChoice):
     username = None
     discount = input("Discount: ")
     months = input("Months: ")
-    if str(messageChoice) == "user":
+    if str(discountChoice) == "user":
+        user = input("Username: ")
+        OnlySnarf.discount(user, depth=int(choice), discount=discount, months=months)
+        mainMenu()
+    elif str(discountChoice) == "select":
         users = displayUsers()
         seeking = True
         while seeking:
@@ -485,7 +490,7 @@ def performDiscount(actionChoice, messageChoice):
                 print(sys.exc_info()[0])
                 print("Error: Incorrect Index")
                 return mainMenu()
-    OnlySnarf.discount(messageChoice, discount=discount, months=months)
+    OnlySnarf.discount(discountChoice, discount=discount, months=months)
     mainMenu()    
 
 def displayFiles(folderName, parent=None):

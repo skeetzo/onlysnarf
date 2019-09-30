@@ -26,21 +26,34 @@ def all(opt):
 ##### Discount #####
 ####################
 
-def discount(user, depth=0, discount=0, months=0):
+def discount(user, depth=1, discount=0, months=0):
     users = []
+    skip = False
     if str(user) == "all":
         users = OnlySnarf.get_users()
+        skip = True
     elif str(user) == "new":
         users = OnlySnarf.get_new_users()
+        skip = True
     elif str(user) == "favorite":
         users = OnlySnarf.get_favorite_users()
+        skip = True
     elif str(user) == "recent":
         users = OnlySnarf.get_recent_users()
+        skip = True
     else:
+        if isinstance(user, str):
+            user = OnlySnarf.get_user_by_username(user)
         users.append(user)
+    skip_ = False
     for user in users:
-        OnlySnarf.discount_user(user.id, depth=depth, discount=discount, months=months)
-        depth = depth + 1
+        try:
+            OnlySnarf.discount_user(user.id, depth=depth, discount=discount, months=months, skip_reload=skip_)
+        except Exception as e:
+            settings.maybePrint(e)
+        depth = int(depth) + 1
+        if skip: # skips first False
+            skip_ = skip
 
 ####################
 ##### Download #####
