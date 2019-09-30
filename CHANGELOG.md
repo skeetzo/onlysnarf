@@ -130,7 +130,11 @@
   - added functionality to choose instead of random
   **2.0.1**
   - oops
-  
+  **2.1.0 9/29/2019**
+  - discount: all or select users x% for n months
+  - fixed local user load
+  - updated User(mess=mess) -> User(data)
+
 ----------------------------------------
 
 ## ToDo

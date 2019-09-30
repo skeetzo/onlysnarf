@@ -85,6 +85,7 @@ def initialize():
         settingItems.append([ "Text", settings.TEXT,None,False])
         settingItems.append([ "Image", settings.IMAGE,None,False])
         settingItems.append([ "Prefer Local", settings.PREFER_LOCAL,["True","False"],True])
+        settingItems.append([ "Overwrite Local", settings.OVERWRITE_LOCAL,["True","False"],True])
     settingItems.insert(0,[ "Back", "main"])
 
     global menuItems
@@ -102,6 +103,7 @@ def initialize():
         [ "Download", "download" ],
         # [ "Promotion", "promotion" ],
         [ "Message", "message" ],
+        [ "Discount", "discount" ],
         [ "Reset", "reset" ]
     ])
     if str(settings.DEBUG) == "True":
@@ -115,6 +117,7 @@ def initialize():
         [ "All", "all"],
         [ "New", "new"],
         [ "Recent", "recent"],
+        [ "Favorite", "favorite"],
         [ "User by Username", "user"]
     ])
     messageItems.insert(0,[ "Back", "main"])
@@ -144,7 +147,7 @@ def initialize():
     if str(settings.DEBUG) == "True":
         promotionItems = sorted([
             [ "Enter Email", "email" ],
-            # [ "Select User", "select" ]
+            [ "Select User", "select" ]
         ])
     promotionItems.insert(0,[ "Back", "main"])
 
@@ -177,6 +180,9 @@ def action():
             elif str(actionItems[int(choice)][1]) == "message":
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeMessage(actionChoice)
+            elif str(actionItems[int(choice)][1]) == "discount":
+                actionChoice = list(actionItems[int(choice)])[1]
+                return finalizeDiscount(actionChoice)
             elif str(actionItems[int(choice)][1]) == "promotion":
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizePromotion(actionChoice)
@@ -435,7 +441,6 @@ def performPromotion(actionChoice, promotionChoice):
                     if int(choice) == 0:
                         return finalizePromotion(actionChoice)
                     return promote(str(users[int(choice)-1].username))
-
                 except (ValueError, IndexError):
                     settings.maybePrint(sys.exc_info()[0])
                     print("Error: Incorrect Index")            
@@ -445,6 +450,43 @@ def performPromotion(actionChoice, promotionChoice):
         settings.maybePrint(e)
         print("Error: Missing Method") 
     mainMenu()
+
+def finalizeDiscount(actionChoice):
+    for item in messageItems:
+        print(colorize("[" + str(messageItems.index(item)) + "] ", 'teal') + list(item)[0])
+    while True:
+        choice = input(">> ")
+        try:
+            choice = int(choice)
+            if int(choice) < 0 or int(choice) >= len(messageItems): raise ValueError
+            if str(messageItems[int(choice)][1]) == "main":
+                return action()
+            return performDiscount(actionChoice, messageItems[int(choice)][1])
+        except (ValueError, IndexError):
+            print(sys.exc_info()[0])
+            print("Error: Incorrect Index")
+
+def performDiscount(actionChoice, messageChoice):
+    username = None
+    discount = input("Discount: ")
+    months = input("Months: ")
+    if str(messageChoice) == "user":
+        users = displayUsers()
+        seeking = True
+        while seeking:
+            choice = input(">> ")
+            try:
+                if int(choice) < 0 or int(choice) > len(users): raise ValueError
+                if int(choice) == 0:
+                    return finalizeDiscount(actionChoice)
+                OnlySnarf.discount(users[int(choice)-1], depth=int(choice), discount=discount, months=months)
+                mainMenu()
+            except (ValueError, IndexError):
+                print(sys.exc_info()[0])
+                print("Error: Incorrect Index")
+                return mainMenu()
+    OnlySnarf.discount(messageChoice, discount=discount, months=months)
+    mainMenu()    
 
 def displayFiles(folderName, parent=None):
     files = Google.get_files_of_folder(folderName, parent=parent)
@@ -484,7 +526,6 @@ def selectImage(folderName):
         i = i+1
     return images
     # performMessage -> [folder , image_file] -> performMessage
-
 
 ###########################
 

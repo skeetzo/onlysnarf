@@ -16,44 +16,34 @@ PRICE_MINIMUM = 3
 
 class User:
 
-    def __init__(self, name=None, username=None, id=None, messages_from=None, messages_to=None, messages=None, preferences=None, last_messaged_on=None, sent_images=None, subscribed_on=None, isFavorite=False, statement_history=None, started=None):
-        # self.name = name.encode("utf-8")
-        # self.username = username.encode("utf-8")
-        self.name = name
-        self.username = username
-        self.id = id
-        # messages receieved from the user
-        if messages_from is None:
-            messages_from = []
-        self.messages_from = messages_from
-        # messages sent to the user
-        if messages_to is None:
-            messages_to = []
-        self.messages_to = messages_to
-        # combined chatlog
-        if messages is None:
-            messages = []
-        self.messages = messages 
-        # self.messages_and_timestamps = [] # message = [timestamp, message]
-        # anal, cock, etc
-        if preferences is None:
-            preferences = []
-        self.preferences = preferences
-        # date and time last messaged on
-        self.last_messaged_on = last_messaged_on
-        # images already sent to the user
-        if sent_images is None:
-            sent_images = []
-        self.sent_images = sent_images
-        # date subscription began
-        self.subscribed_on = subscribed_on
-        # if user is a favorite
-        self.isFavorite = isFavorite
-        # statement history
-        if statement_history is None:
-            statement_history = []
-        self.statement_history = statement_history
-        self.started = started
+    def __init__(self, data):
+        data = json.loads(json.dumps(data))
+        # print(data)
+        self.name = data.get('name')
+        self.username = data.get('username')
+        self.id = data.get('id')
+        self.messages_from = data.get('messages_from')
+        self.messages_to = data.get('messages_to')
+        self.messages = data.get('messages')
+        self.preferences = data.get('preferences')
+        self.last_messaged_on = data.get('last_messaged_on')
+        self.sent_images = data.get('sent_images')
+        self.subscribed_on = data.get('subscribed_on')
+        self.isFavorite = data.get('isFavorite')
+        self.statement_history = data.get('statement_history')
+        self.started = data.get('started')
+        if data.get('messages_to') is None:
+            self.messages_to = []
+        if data.get('messages') is None:
+            self.messages = []
+        if data.get('preferences') is None:
+            self.preferences = []
+        if data.get('sent_images') is None:
+            self.sent_images = []
+        if data.get('isFavorite') is None:
+            self.isFavorite = False
+        if data.get('statement_history') is None:
+            self.statement_history = []
         try:
             settings.maybePrint("User: {} - {} - {}".format(self.name, self.username, self.id))
         except Exception as e:

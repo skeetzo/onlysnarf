@@ -65,7 +65,18 @@ def initialize():
 ##### Functions #####
 #####################
 
-# Upload to OnlyFans
+def auth():
+    logged_in = False
+    global BROWSER
+    if not BROWSER or BROWSER == None:
+        logged_in = log_into_OnlyFans()
+    else:
+        logged_in = True
+    if logged_in == False:
+        print("Error: Failure to Login")
+        sys.exit(1)
+
+# Login to OnlyFans
 def log_into_OnlyFans():
     print('Logging into OnlyFans')
     options = webdriver.ChromeOptions()
@@ -135,6 +146,63 @@ def reset():
         print('Error: Failure Resetting OnlyFans')
         return False
 
+####################
+##### Discount #####
+####################
+
+# maximum discount = 55%
+def discount_user(user, depth=0, discount=10, months=1):
+    print("Discounting User: {}".format(user))
+    auth()
+    if int(discount) > 55:
+        print("Warning: Discount Too High, Max -> 55%")
+        discount = 55
+    if int(months) > 12:
+        print("Warning: Months Too High, Max -> 12")
+        months = 12
+    try:
+        settings.maybePrint("goto -> /my/subscribers/active")
+        BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
+        num = BROWSER.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML")
+        for n in range(int(int(depth)/10)):
+            settings.maybePrint("scrolling...")
+            BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(1)
+        time.sleep(2)
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failed to Find Users")
+        return False
+    # get all the users
+    users = BROWSER.find_elements_by_class_name('b-users__item.m-fans')
+    user__ = users[0]
+    for user_ in users:
+        text = user_.get_attribute("innerHTML")
+        buttons_ = user_.find_elements_by_class_name("g-btn.m-rounded.m-border.m-sm")
+        if str(user) in text:
+            user__ = user_
+            break
+    buttons = user__.find_elements_by_class_name("g-btn.m-rounded.m-border.m-sm")
+    for button in buttons:
+        # print(button.get_attribute("innerHTML"))
+        if "Discount" in button.get_attribute("innerHTML"):
+            button.click()
+            break
+    time.sleep(1)
+    BROWSER.find_elements_by_class_name("g-input.form-control")[0].send_keys(str(discount))
+    months_ = BROWSER.find_elements_by_class_name("g-input.form-control")[1]
+    for n in range(int(months)-1):
+        months_.send_keys(Keys.DOWN)
+    buttons_ = BROWSER.find_elements_by_class_name("g-btn.m-rounded")
+    for button in buttons_:
+        if "Cancel" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "True":
+            print("Skipping: Save Discount (Debug)")
+            return True
+        if "Save" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "False":
+            button.click()
+            break
+    return True
+
 ##################
 ##### Upload #####
 ##################
@@ -142,15 +210,7 @@ def reset():
 # Uploads a directory with a video file or image files to OnlyFans
 def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
     try:
-        logged_in = False
-        global BROWSER
-        if not BROWSER or BROWSER == None:
-            logged_in = log_into_OnlyFans()
-        else:
-            logged_in = True
-        if logged_in == False:
-            print("Error: Not Logged In")
-            return False
+        auth()
         if not path:
             print("Error: Missing Upload Path")
             return False
@@ -361,15 +421,7 @@ def confirm_message():
 
 def read_chat(user):
     try:
-        logged_in = False
-        global BROWSER
-        if not BROWSER or BROWSER == None:
-            logged_in = log_into_OnlyFans()
-        else:
-            logged_in = True
-        if logged_in == False:
-            print("Error: Login Failure")
-            return [[],[],[]]
+        auth()
         # go to onlyfans.com/my/subscribers/active
         goto_user(user)
         messages_from_ = BROWSER.find_elements_by_class_name("m-from-me")
@@ -458,14 +510,7 @@ def update_chat_log(user):
 
 # or email
 def get_new_trial_link():
-    global BROWSER
-    if not BROWSER or BROWSER == None:
-        logged_in = log_into_OnlyFans()
-    else:
-        logged_in = True
-    if logged_in == False:
-        print("Error: Login Failure")
-        return USER_CACHE
+    auth()
     # go to onlyfans.com/my/subscribers/active
     try:
         settings.maybePrint("goto -> /my/promotions")
@@ -511,18 +556,13 @@ def get_users():
     global USER_CACHE
     if USER_CACHE:
         return USER_CACHE
-    USER_CACHE = read_users_local()
-    if settings.PREFER_LOCAL == "True":
-        return USER_CACHE
-    logged_in = False
-    global BROWSER
-    if not BROWSER or BROWSER == None:
-        logged_in = log_into_OnlyFans()
+    if str(settings.OVERWRITE_LOCAL) == "False":
+        USER_CACHE = read_users_local()
     else:
-        logged_in = True
-    if logged_in == False:
-        print("Error: Login Failure")
+        USER_CACHE = []
+    if str(settings.PREFER_LOCAL) == "True":
         return USER_CACHE
+    auth()
     # go to onlyfans.com/my/subscribers/active
     try:
         settings.maybePrint("goto -> /my/subscribers/active")
@@ -537,17 +577,18 @@ def get_users():
         settings.maybePrint(e)
         print("Error: Failed to Count Users")
         return []
-    avatars = BROWSER.find_elements_by_class_name('b-avatar')
-    user_ids = BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-border.m-sm")
+    # avatars = BROWSER.find_elements_by_class_name('b-avatar')
+    # user_ids = BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-border.m-sm")
+    user_ids = BROWSER.find_elements_by_css_selector("a.g-btn.m-rounded.m-border.m-sm")
     starteds = BROWSER.find_elements_by_class_name("b-fans__item__list__item")
     # users = BROWSER.find_elements_by_class_name('g-user-name')
     users = BROWSER.find_elements_by_class_name('g-user-name__wrapper')
     usernames = BROWSER.find_elements_by_class_name('g-user-username')
+    usernames.pop(0)
     active_users = []
     global OnlyFans_USERNAME
     # settings.maybePrint("user_ids: "+str(len(user_ids)))
     # settings.maybePrint("starteds: "+str(len(starteds)))
-    settings.maybePrint("Found: ")
     useridsFailed = False
     startedsFailed = False
     if len(user_ids) == 0:
@@ -556,6 +597,7 @@ def get_users():
     if len(starteds) == 0:
         print("Warning: Unable to find starting dates")
         startedsFailed = True
+    settings.maybePrint("Found:")
     try:
         user_ids_ = []
         starteds_ = []
@@ -573,33 +615,39 @@ def get_users():
         if len(starteds_) == 0:
             print("Warning: Unable to find starting dates")
             startedsFailed = True
-        settings.maybePrint("ids vs starteds vs avatars: "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(avatars)))
-        for i in range(len(avatars)-1):
-            if not startedsFailed:
-                start = starteds_[i]
-            else:
-                start = datetime.now().strftime("%b %d, %Y")
-            if not useridsFailed:
-                user_id = user_ids_[i][35:]
-            else:
-                user_id = None
-            name = users[i]
-            username = usernames[i]
-            name = str(name.get_attribute("innerHTML")).strip()
-            username = str(username.get_attribute("innerHTML")).strip()
-            # settings.maybePrint("name: "+str(name))
-            # settings.maybePrint("username: "+str(username))
-            # settings.maybePrint("user_id: "+str(user_id))
-            if str(OnlyFans_USERNAME).lower() in str(username).lower():
-                settings.maybePrint("(self): %s = %s" % (OnlyFans_USERNAME, username))
-                # first user is always active user but just in case find it in list of users
-                global OnlyFans_USER_ID
-                OnlyFans_USER_ID = username
-                continue
-            user = User(name=name, username=username, id=user_id, started=start)
-            user = skipUserCheck(user)
-            if user is None: continue
-            active_users.append(user)
+        # settings.maybePrint("ids vs starteds vs avatars: "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(avatars)))
+        settings.maybePrint("ids vs starteds vs usernames:"+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(usernames)))
+        for i in range(len(users)): # the first is you and doesn't count towards total
+            try:
+                if not startedsFailed:
+                    start = starteds_[i]
+                else:
+                    start = datetime.now().strftime("%b %d, %Y")
+                if not useridsFailed:
+                    user_id = user_ids_[i][35:]
+                else:
+                    user_id = None
+                name = users[i]
+                username = usernames[i]
+                name = str(name.get_attribute("innerHTML")).strip()
+                username = str(username.get_attribute("innerHTML")).strip()
+                # settings.maybePrint("name: "+str(name))
+                # settings.maybePrint("username: "+str(username))
+                # settings.maybePrint("user_id: "+str(user_id))
+                if str(OnlyFans_USERNAME).lower() in str(username).lower():
+                    settings.maybePrint("(self): %s = %s" % (OnlyFans_USERNAME, username))
+                    # first user is always active user but just in case find it in list of users
+                    global OnlyFans_USER_ID
+                    OnlyFans_USER_ID = username
+                    continue
+                user = User({"name":name, "username":username, "id":user_id, "started":start})
+                user = skipUserCheck(user)
+                if user is None: continue
+                active_users.append(user)
+            except Exception as e:
+                settings.maybePrint(e)
+        settings.maybePrint("pruning memberlist")
+        settings.maybePrint("users: {} - {} :cache".format(len(active_users), len(USER_CACHE)))
         for user in active_users:
             existing = False
             for user_ in USER_CACHE:
@@ -611,6 +659,7 @@ def get_users():
         settings.maybePrint(e)
     # start cache timeout
     start_user_cache()
+    write_users_local(users=USER_CACHE)
     return USER_CACHE
 
 def get_user_by_username(username):
@@ -677,22 +726,25 @@ def read_users_local():
     users_ = []
     try:
         with open(settings.PATH_USERS) as json_file:  
-            users = json.load(json_file)
-        for user in users['users']:
-            user = User(name=user['name'], username=user['username'], id=user['id'], messages_from=user['messages_from'], messages_to=user['messages_to'], messages=user['messages'], preferences=user['preferences'], last_messaged_on=user['last_messaged_on'], sent_images=user['sent_images'], subscribed_on=user['subscribed_on'], isFavorite=user['isFavorite'], statement_history=user['statement_history'])
-            settings.maybePrint('Loaded: %s' % user.username)
-            settings.maybePrint('')
-            users_.append(user)
+            users = json.load(json_file)['users']
+        settings.maybePrint("Loaded:")
+        for user in users:
+            try:
+                users_.append(User(json.loads(user)))
+            except Exception as e:
+                settings.maybePrint(e)
+        return users_
     except FileNotFoundError:
         print("Error: Missing Local Users")
     except OSError:
         print("Error: Missing Local Path")
-    finally:
-        return users_
+    return users_
 
 def skipUserCheck(user):
+    if str(settings.SKIP_USERS) == "None":
+        settings.SKIP_USERS = []
     if str(user.id).lower() in settings.SKIP_USERS or str(user.username).lower() in settings.SKIP_USERS:
-        settings.maybePrint("skipping: %s" % user.username)
+        settings.maybePrint("skipping: {}".format(user.username))
         return None
     return user
 
@@ -717,8 +769,9 @@ def start_user_cache():
         settings.maybePrint(sys.exc_info()[0])
 
 # writes user list to local txt
-def write_users_local():
-    users = get_users()
+def write_users_local(users=None):
+    if users is None:
+        users = get_users()
     print("Saving Users Locally")
     settings.maybePrint("local data path: "+str(settings.PATH_USERS))
     data = {}
