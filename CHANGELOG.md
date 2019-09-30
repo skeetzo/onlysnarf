@@ -134,6 +134,8 @@
   - discount: all or select users x% for n months
   - fixed local user load
   - updated User(mess=mess) -> User(data)
+  **2.1.1**
+  - shameless 2.1.0 fix
 
 ----------------------------------------
 
