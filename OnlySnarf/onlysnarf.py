@@ -23,6 +23,26 @@ def all(opt):
     main(opt)
 
 ####################
+##### Discount #####
+####################
+
+def discount(user, depth=0, discount=0, months=0):
+    users = []
+    if str(user) == "all":
+        users = OnlySnarf.get_users()
+    elif str(user) == "new":
+        users = OnlySnarf.get_new_users()
+    elif str(user) == "favorite":
+        users = OnlySnarf.get_favorite_users()
+    elif str(user) == "recent":
+        users = OnlySnarf.get_recent_users()
+    else:
+        users.append(user)
+    for user in users:
+        OnlySnarf.discount_user(user.id, depth=depth, discount=discount, months=months)
+        depth = depth + 1
+
+####################
 ##### Download #####
 ####################
 
@@ -63,6 +83,7 @@ def download(fileChoice, methodChoice="random", file=None, folderName=None, pare
             return [file['title'], file_path, file, folderName]
 
 #################################################################
+
         elif fileChoice == 'performer':
             results = Google.download_performer(file)            
             return [results[1], file]
@@ -619,19 +640,12 @@ def upload(fileChoice, path=None, text=None, keywords=None, performers=None):
 
 def get_users():
     settings.maybePrint("Getting Users")
-    successful = False
     try:
-        successful = OnlySnarf.get_users()
+        return OnlySnarf.get_users()
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Unable to get users");
-        return
-    if successful:
-        settings.maybePrint("Users Found")
-    else:
-        print("Warning: users not found")
         return []
-    return successful
 
 #####################
 ##### FUNCTIONS #####
