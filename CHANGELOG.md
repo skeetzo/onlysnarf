@@ -142,6 +142,8 @@
   - nonrandom uploads now confirm entered information
   - cleaned out user methods from driver -> static
   - updated download_performers and seperated randomizing selection
+  **2.2.1**
+  - release: keywords and performers can be deleted
 
 ----------------------------------------
 

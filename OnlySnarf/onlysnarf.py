@@ -202,12 +202,28 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
                     text = text_
                 keywords_ = input("Keywords ({}): ".format(keywords))
                 if keywords_ != "":
-                    keywords = keywords_.split(",")
-                    keywords = [n.strip() for n in keywords]
+                    if str(keywords_) == "None":
+                        keywords = []
+                    elif str(keywords_) == "[]":
+                        keywords = []
+                    elif str(keywords_) == " ":
+                        keywords = []
+                    else:
+                        keywords = keywords_.split(",")
+                        keywords = [n.strip() for n in keywords]
                 performers_ = input("Performers ({}): ".format(performers))
                 if performers_ != "":
-                    performers = performers_.split(",")
-                    performers = [n.strip() for n in performers]
+                    if str(performers_) == "None":
+                        performers = []
+                    elif str(performers_) == "[]":
+                        performers = []
+                    elif str(performers_) == " ":
+                        performers = []
+                    else:
+                        performers = performers_.split(",")
+                        performers = [n.strip() for n in performers]
+                
+                
         except Exception as e:
             settings.maybePrint(e)
         if text == None: print("Warning: Missing Title")
