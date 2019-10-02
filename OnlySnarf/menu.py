@@ -245,7 +245,7 @@ def selectMethod(actionChoice, fileChoice):
                             return selectMethod(actionChoice, fileChoice)
                         file = choices[int(choice)-1]
                         parent = file
-                        folderName = file['title']
+                        
                         seeking = False
                         if str(fileChoice) == "gallery" or str(fileChoice) == "image"  or str(fileChoice) == "video" or str(fileChoice) == "performer":
                             if str(fileChoice) == "gallery":
@@ -265,10 +265,11 @@ def selectMethod(actionChoice, fileChoice):
                                         return selectMethod(actionChoice, fileChoice)
                                     file = choices_[int(choice_)-1]
                                     seeking_ = False
-
+                                    folderName = file['title']
                                     if str(fileChoice) == "performer":
                                         # parent = file
-                                        choices_ = displayFiles(file['title'], parent=parent)
+                                        # choices_ = displayFiles(file['title'], parent=parent)
+                                        choices_ = displayBoth(file['title'], parent=parent)
                                         seeking__ = True
                                         while seeking__:
                                             choice_ = input(">> ")
@@ -394,8 +395,8 @@ def message(choice, image=None, username=None):
     if not image or not image[0] or image[0] == None:
         print("Error: Missing Image")
         return
-    file_path = Google.download_file(image[0])
-    successful_message = OnlySnarf.message(choice=choice, message=message, image=file_path, price=price, username=username)
+    image = Google.download_file(image[0]).get("path")
+    successful_message = OnlySnarf.message(choice=choice, message=message, image=image, price=price, username=username)
     if successful_message and str(choice) != "new":
         Google.move_file(image[0])
     else:
@@ -492,6 +493,19 @@ def performDiscount(actionChoice, discountChoice):
                 return mainMenu()
     OnlySnarf.discount(discountChoice, discount=discount, months=months)
     mainMenu()    
+
+def displayBoth(folderName, parent=None):
+    files = Google.get_files_of_folder(folderName, parent=parent)
+    folders = Google.get_folders_of_folder(folderName, parent=parent)
+    files_both = []
+    for f in files: files_both.append(f)
+    for f in folders: files_both.append(f)
+    print(colorize("[0] ", 'blue') + "Back")
+    i = 1
+    for file in files_both:
+        print(colorize("[" + str(i) + "] ", 'blue') + str(file['title']))
+        i = i+1
+    return files_both
 
 def displayFiles(folderName, parent=None):
     files = Google.get_files_of_folder(folderName, parent=parent)
