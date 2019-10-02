@@ -25,8 +25,8 @@ def main(opt):
     remove_local()
     sys.stdout.flush()
     #################################################
-    print("1/3 : Running - {}".format(opt))
-    released = release(opt)
+    print("1/3 : Main - {}".format(opt))
+    released = release_(opt)
     if released == False: print("Error: Failed to release - {}".format(opt))
     sys.stdout.flush()
     #################################################
@@ -182,7 +182,7 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
         keywords = []
         performers = []
         files = None
-        parent = parent.get("title")
+        if parent: parent = parent.get("title")
         try:
             if file == None: file = data.get("file")
             text = file.get("title") or ""
@@ -222,8 +222,6 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
                     else:
                         performers = performers_.split(",")
                         performers = [n.strip() for n in performers]
-                
-                
         except Exception as e:
             settings.maybePrint(e)
         if text == None: print("Warning: Missing Title")
