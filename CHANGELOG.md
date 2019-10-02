@@ -144,7 +144,9 @@
   - updated download_performers and seperated randomizing selection
   **2.2.1**
   - release: keywords and performers can be deleted
-
+  **2.2.2**
+  - standalone script bug
+  
 ----------------------------------------
 
 ## ToDo
