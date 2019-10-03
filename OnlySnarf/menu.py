@@ -85,7 +85,7 @@ def initialize():
         settingItems.append([ "Text", settings.TEXT,None,False])
         settingItems.append([ "Image", settings.IMAGE,None,False])
         settingItems.append([ "Prefer Local", settings.PREFER_LOCAL,["True","False"],True])
-        settingItems.append([ "Overwrite Local", settings.OVERWRITE_LOCAL,["True","False"],True])
+        # settingItems.append([ "Overwrite Local", settings.OVERWRITE_LOCAL,["True","False"],True])
     settingItems.insert(0,[ "Back", "main"])
 
     global menuItems
@@ -470,11 +470,9 @@ def finalizeDiscount(actionChoice):
 
 def performDiscount(actionChoice, discountChoice):
     username = None
-    discount = input("Discount: ")
-    months = input("Months: ")
     if str(discountChoice) == "user":
         user = input("Username: ")
-        OnlySnarf.discount(user, depth=int(choice), discount=discount, months=months)
+        OnlySnarf.discount(user, depth=int(choice))
         mainMenu()
     elif str(discountChoice) == "select":
         users = displayUsers()
@@ -485,13 +483,13 @@ def performDiscount(actionChoice, discountChoice):
                 if int(choice) < 0 or int(choice) > len(users): raise ValueError
                 if int(choice) == 0:
                     return finalizeDiscount(actionChoice)
-                OnlySnarf.discount(users[int(choice)-1], depth=int(choice), discount=discount, months=months)
+                OnlySnarf.discount(users[int(choice)-1], depth=int(choice))
                 mainMenu()
             except (ValueError, IndexError):
                 print(sys.exc_info()[0])
                 print("Error: Incorrect Index")
                 return mainMenu()
-    OnlySnarf.discount(discountChoice, discount=discount, months=months)
+    OnlySnarf.discount(discountChoice)
     mainMenu()    
 
 def displayBoth(folderName, parent=None):
