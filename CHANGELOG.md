@@ -146,7 +146,11 @@
   - release: keywords and performers can be deleted
   **2.2.2**
   - standalone script bug
-  
+  **2.2.3**
+  - removed pointless User cache -> fixed User count bug
+  - removed overwrite-local
+  - added BROWSER.url checks
+
 ----------------------------------------
 
 ## ToDo
