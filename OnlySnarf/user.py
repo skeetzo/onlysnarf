@@ -5,6 +5,7 @@
 import json
 import time
 import os
+import threading
 from datetime import datetime
 from re import sub
 from decimal import Decimal
@@ -13,9 +14,6 @@ from OnlySnarf import driver as OnlySnarf
 from OnlySnarf.settings import SETTINGS as settings
 
 PRICE_MINIMUM = 3
-USER_CACHE = None
-USER_CACHE_TIMEOUT = 600 # ten minutes
-USER_CACHE_LOCKED = False
 
 class User:
 
@@ -149,18 +147,14 @@ class User:
 
     @staticmethod
     def get_all_users():
-        # gets users from cache or refreshes from onlyfans.com
-        global USER_CACHE
-        if USER_CACHE:
-            return USER_CACHE
-        if str(settings.OVERWRITE_LOCAL) == "False":
-            USER_CACHE = read_users_local()
-        else:
-            USER_CACHE = []
-        if str(settings.PREFER_LOCAL) == "True":
-            return USER_CACHE
-        users = OnlySnarf.get_users()
+        return User.get_active_users()
+
+    # gets users from local or refreshes from onlyfans.com
+    @staticmethod
+    def get_active_users():
+        if str(settings.PREFER_LOCAL) == "True": return read_users_local()
         active_users = []
+        users = OnlySnarf.get_users()
         for user in users:
             try:
                 user = User(user)
@@ -170,18 +164,9 @@ class User:
             except Exception as e:
                 settings.maybePrint(e)
         settings.maybePrint("pruning memberlist")
-        settings.maybePrint("users: {} - {} :cache".format(len(active_users), len(USER_CACHE)))
-        for user in active_users:
-            existing = False
-            for user_ in USER_CACHE:
-                if user.equals(user_):
-                    user_ = user
-            if not existing:
-                USER_CACHE.append(user)
-        # start cache timeout
-        start_user_cache()
-        write_users_local(users=USER_CACHE)
-        return USER_CACHE
+        settings.maybePrint("users: {}".format(len(active_users)))
+        write_users_local(users=active_users)
+        return active_users
 
     @staticmethod
     def get_user_by_username(username):
@@ -273,26 +258,6 @@ def skipUserCheck(user):
         settings.maybePrint("skipping: {}".format(user.username))
         return None
     return user
-
-def reset_user_cache():
-    global USER_CACHE_LOCKED
-    if USER_CACHE_LOCKED:
-        settings.maybePrint("User Cache: locked, skipping reset")
-        return
-    global USER_CACHE
-    USER_CACHE = False
-    settings.maybePrint("User Cache: reset")
-
-def start_user_cache():
-    settings.maybePrint("User Cache: starting")
-    # write_users_local()
-    global USER_CACHE_TIMEOUT
-    try:
-        threading.Timer(USER_CACHE_TIMEOUT, reset_user_cache).start() # after 10 minutes
-        settings.maybePrint("User Cache: started")
-    except Exception as e:
-        settings.maybePrint("User Cache: error starting")
-        settings.maybePrint(e)
 
 # writes user list to local txt
 def write_users_local(users=None):

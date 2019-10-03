@@ -8,7 +8,6 @@ import shutil
 import json
 import sys
 import pathlib
-import threading
 import chromedriver_binary
 import time
 from datetime import date, datetime, timedelta
@@ -148,7 +147,7 @@ def reset():
 ####################
 
 # maximum discount = 55%
-def discount_user(user, depth=0, discount=10, months=1, skip_reload=False):
+def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
     auth()
     if int(discount) > 55:
         print("Warning: Discount Too High, Max -> 55%")
@@ -156,12 +155,19 @@ def discount_user(user, depth=0, discount=10, months=1, skip_reload=False):
     if int(months) > 12:
         print("Warning: Months Too High, Max -> 12")
         months = 12
+    global BROWSER
     try:
-        if skip_reload:
+        if str(BROWSER.current_url) == "https://onlyfans.com/my/subscribers/active":
             settings.maybePrint("at -> /my/subscribers/active")
         else:
             settings.maybePrint("goto -> /my/subscribers/active")
             BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
+            if tryAll: depth = BROWSER.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML")
+            settings.maybePrint("Depth: {}".format(depth))
+            for n in range(int(int(int(depth)/10)+1)):
+                settings.maybePrint("scrolling...")
+                BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(1)
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Failed to Find Users")
@@ -181,16 +187,33 @@ def discount_user(user, depth=0, discount=10, months=1, skip_reload=False):
     buttons = user__.find_elements_by_class_name("g-btn.m-rounded.m-border.m-sm")
     for button in buttons:
         if "Discount" in button.get_attribute("innerHTML"):
-            button.click()
-            break
+            try:
+                button.click()
+                break
+            except Exception as e:
+                print("Warning: Unable To Find User, retrying")
+                settings.maybePrint(e)
+                return discount_user(user, depth=depth, discount=dicount, months=months, tryAll=True)
     time.sleep(1)
     buttons_ = BROWSER.find_elements_by_class_name("g-btn.m-rounded")
     try:
         discountText = BROWSER.find_elements_by_class_name("g-input.form-control")[0]
-        if text.get_attribute("value") != "":
+        if discountText.get_attribute("value") != "":
             print("Warning: Existing Discount")
         discountText.clear()
         discountText.send_keys(str(discount))
+        months_ = BROWSER.find_elements_by_class_name("g-input.form-control")[1]
+        for n in range(int(months)-1):
+            months_.send_keys(Keys.DOWN)
+        for button in buttons_:
+            if "Cancel" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "True":
+                button.click()
+                print("Skipping: Save Discount (Debug)")
+                return True
+            elif "Save" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "False":
+                button.click()
+                print("Discounted User: {}".format(user))
+                return True
     except Exception as e:
         settings.maybePrint(e)
         for button in buttons_:
@@ -198,18 +221,6 @@ def discount_user(user, depth=0, discount=10, months=1, skip_reload=False):
                 button.click()
                 print("Skipping: Save Discount")
                 return True
-    months_ = BROWSER.find_elements_by_class_name("g-input.form-control")[1]
-    for n in range(int(months)-1):
-        months_.send_keys(Keys.DOWN)
-    for button in buttons_:
-        if "Cancel" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "True":
-            button.click()
-            print("Skipping: Save Discount (Debug)")
-            return True
-        elif "Save" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "False":
-            button.click()
-            print("Discounted User: {}".format(user))
-            break
     return True
 
 ##################
@@ -220,6 +231,14 @@ def discount_user(user, depth=0, discount=10, months=1, skip_reload=False):
 def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
     try:
         auth()
+
+        global BROWSER
+        if str(BROWSER.current_url) == "https://onlyfans.com":
+            settings.maybePrint("at -> onlyfans.com")
+        else:
+            settings.maybePrint("goto -> onlyfans.com")
+            BROWSER.get(('https://onlyfans.com'))
+
         if not path:
             print("Error: Missing Upload Path")
             return False
@@ -564,19 +583,21 @@ def get_new_trial_link():
 
 def get_users():
     auth()
-    # go to onlyfans.com/my/subscribers/active
     try:
-        settings.maybePrint("goto -> /my/subscribers/active")
-        BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
-        num = BROWSER.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML")
-        settings.maybePrint("User count: %s" % num)
-        for n in range(int(int(int(num)/10)+1)):
-            settings.maybePrint("scrolling...")
-            BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(1)
+        if str(BROWSER.current_url) == "https://onlyfans.com/my/subscribers/active":
+            settings.maybePrint("at -> /my/subscribers/active")
+        else:
+            settings.maybePrint("goto -> /my/subscribers/active")
+            BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
+            num = BROWSER.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML")
+            settings.maybePrint("User count: {}".format(num))
+            for n in range(int(int(int(num)/10)+1)):
+                settings.maybePrint("scrolling...")
+                BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(1)
     except Exception as e:
         settings.maybePrint(e)
-        print("Error: Failed to Count Users")
+        print("Error: Failed to Find Users")
         return []
     # avatars = BROWSER.find_elements_by_class_name('b-avatar')
     # user_ids = BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-border.m-sm")

@@ -71,7 +71,7 @@ class Settings:
         # maximum number of images that can be uploaded
         self.IMAGE_UPLOAD_MAX = 15
         # -overwrite-local
-        self.OVERWRITE_LOCAL = False
+        # self.OVERWRITE_LOCAL = False
         # -mount-path
         # the mounth path for a local directory of OnlyFans config files
         self.PATH_MOUNT = None
@@ -174,8 +174,8 @@ class Settings:
                 self.IMAGE_UPLOAD_LIMIT = str(sys.argv[i+1])
             elif '-image-max' in str(sys.argv[i]):
                 self.IMAGE_UPLOAD_MAX = str(sys.argv[i+1])
-            elif '-overwrite-local' in str(sys.argv[i]):
-                self.OVERWRITE_LOCAL = True
+            # elif '-overwrite-local' in str(sys.argv[i]):
+                # self.OVERWRITE_LOCAL = True
             elif '-prefer-local' in str(sys.argv[i]):
                 self.PREFER_LOCAL = True
             elif '-save-users' in str(sys.argv[i]):
