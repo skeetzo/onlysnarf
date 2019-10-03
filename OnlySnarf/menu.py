@@ -115,12 +115,15 @@ def initialize():
     # Message Menu
     messageItems = sorted([
         [ "All", "all"],
-        [ "New", "new"],
+        # [ "New", "new"],
         [ "Recent", "recent"],
-        [ "Favorite", "favorite"],
+        # [ "Favorite", "favorite"],
         [ "User by Username", "user"],
         [ "Select User", "select"]
     ])
+    if str(settings.DEBUG) == "True":
+        messageItems.append([ "New", "new"])
+        messageItems.append([ "Favorite", "favorite"])
     messageItems.insert(0,[ "Back", "main"])
 
     global fileItems
