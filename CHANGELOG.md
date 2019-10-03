@@ -150,6 +150,8 @@
   - removed pointless User cache -> fixed User count bug
   - removed overwrite-local
   - added BROWSER.url checks
+  **2.2.4**
+  - user selections -> debug
 
 ----------------------------------------
 
