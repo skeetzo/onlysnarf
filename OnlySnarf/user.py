@@ -208,7 +208,7 @@ class User:
         newUsers = []
         for user in users:
             if len(user.messages_to) == 0:
-                settings.maybePrint("Never Messaged User: %s" % user.username)
+                settings.maybePrint("Never Messaged User: {}".format(user.username))
                 user = skipUserCheck(user)
                 if user is None: continue
                 newUsers.append(user)
@@ -221,7 +221,7 @@ class User:
         i = 0
         users_ = []
         for user in users:
-            settings.maybePrint("Recent User: %s" % user.username)
+            settings.maybePrint("Recent User: {}".format(user.username))
             user = skipUserCheck(user)
             if user is None: continue
             users_.append(user)
