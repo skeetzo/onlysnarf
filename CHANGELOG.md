@@ -130,6 +130,7 @@
 ----------------------------------------
 
 ## ToDo
+  - add check for failed internet connection - Google, OnlyFans
 
 ### Low Priority
   - add: read messages html for emojis
