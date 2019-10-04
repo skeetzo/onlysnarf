@@ -12,168 +12,84 @@ import time
 from OnlySnarf.settings import SETTINGS as settings
 from OnlySnarf import google as Google
 from OnlySnarf import driver as OnlySnarf
+from OnlySnarf.user import User
 from OnlySnarf import cron as Cron
+
 # from pprint import pprint
+#################################################################
+#################################################################
+#################################################################
 
-##########################
-##### MENU FUNCTIONS #####
-##########################
+def main(opt):
+    print("0/3 : Deleting Locals")
+    remove_local()
+    sys.stdout.flush()
+    #################################################
+    print("1/3 : Main - {}".format(opt))
+    released = release_(opt)
+    if released == False: print("Error: Failed to release - {}".format(opt))
+    sys.stdout.flush()
+    #################################################
+    print('2/3 : Cleaning Up Files')
+    remove_local()
+    print('Files Cleaned ')
+    #################################################
+    print('3/3 : Google Drive to OnlyFans Upload Complete')
+    OnlySnarf.exit()
+    sys.stdout.flush()
 
-def all(opt):
-    main(opt)
+####################
+##### Discount #####
+####################
+
+def discount(user, depth=1):
+    amount = input("Discount: ")
+    months = input("Months: ")
+    users = []
+    if str(user) == "all":
+        users = User.get_all_users()
+    elif str(user) == "new":
+        users = User.get_new_users()
+    elif str(user) == "favorite":
+        users = User.get_favorite_users()
+    elif str(user) == "recent":
+        users = User.get_recent_users()
+    else:
+        if isinstance(user, str):
+            user = User.get_user_by_username(user)
+        users.append(user)
+    for user in users:
+        try:
+            OnlySnarf.discount_user(user.id, depth=depth, discount=amount, months=months)
+        except Exception as e:
+            settings.maybePrint(e)
+        depth = int(depth) + 1
+    OnlySnarf.exit()
 
 ####################
 ##### Download #####
 ####################
 
-def download(fileChoice):
-    if fileChoice == 'image':
-        return download_random_image()
-    elif fileChoice == 'gallery':
-        return download_random_gallery()
-    elif fileChoice == 'performer':
-        return download_random_performer()
-    elif fileChoice == 'scene':
-        return download_random_scene()
-    elif fileChoice == 'video':
-        return download_random_video()
+def download(fileChoice, methodChoice="random", file=None):
+    if methodChoice == "random":
+        return Google.random_download(fileChoice)
+    elif methodChoice == "choose" and file is not None:
+        if fileChoice == 'image' or fileChoice == 'video':
+            return Google.download_file(file)
+        elif fileChoice == 'gallery':
+            return Google.download_gallery(file)
+        elif fileChoice == 'performer':
+            if "folder" in file.get("mimeType"):
+                return Google.download_content(file)
+            else:          
+                return Google.download_file(file)  
+#################################################################
+        elif fileChoice == 'scene':
+            return Google.download_scene(file)
+#################################################################
     else:
-        return print("Error: Missing File Choice")
-
-def download_message_image(folderName="random"):
-    remove_local()
-    print('Fetching Image')
-    response = Google.get_message_image(folderName)
-    if response == None:
-        print("Error: Missing Image Download")
-        return
-    google_file = response[0]
-    folder_name = response[1]
-    if google_file == None:
-        return
-    file_name = google_file['title']
-    file_path = Google.download_file(google_file)
-    if google_file == None:
-        print('Error: Missing Random Image')
-        return
-    if file_path == None:
-        print('Error: Empty Download')
-        return
-    return [file_name, file_path, google_file, folder_name]
-
-def download_random_image():
-    remove_local()
-    print('Fetching Image')
-    response = Google.get_random_image()
-    if response == None:
-        print("Error: Missing Image Download")
-        return
-    google_file = response[0]
-    folder_name = response[1]
-    if google_file == None:
-        return
-    file_name = google_file['title']
-    file_path = Google.download_file(google_file)
-    if google_file == None:
-        print('Error: Missing Random Image')
-        return
-    if file_path == None:
-        print('Error: Empty Download')
-        return
-    return [file_name, file_path, google_file, folder_name]
-
-def download_random_gallery():
-    remove_local()
-    print('Fetching Gallery')
-    response = Google.get_random_gallery()
-    if response == None:
-        print("Error: Missing Gallery Download")
-        return
-    google_file = response[0]
-    folder_name = response[1]
-    if google_file == None:
-        print("Error: Missing Google File")
-        return
-    file_name = google_file['title']
-    results = Google.download_gallery(google_file)
-    gallery_files = results[0]
-    file_path = results[1]
-    if file_path == None:
-        print('Error: Missing Random Gallery')
-        return
-    return [file_name, file_path, google_file, gallery_files, folder_name]
-
-def download_random_performer():
-    remove_local()
-    print('Fetching Performer')
-    google_file = Google.get_random_performer()
-    if google_file == None:
-        print("Error: Missing Performer")
-        return
-    performer = google_file['title']
-    results = Google.download_performer(google_file)
-    if results == None:
-        print("Error: Missing Performer Folders")
-        return
-    gallery_files = results[0]
-    file_path = results[1]
-    gallery_name = results[2]
-    if file_path == None:
-        print('Error: Missing Content')
-        return
-    if gallery_files == None:
-        print('Error: Missing Gallery Content')
-        return
-    if performer == None:
-        print('Error: Missing Performer Name')
-        return
-    if gallery_name == None:
-        print('Error: Missing Gallery Name')
-        return
-    return [file_path, google_file, performer, gallery_name, google_file]
-
-def download_random_video():
-    remove_local()
-    print('Fetching Video')
-    response = Google.get_random_video()
-    if response == None:
-        print("Error: Missing Video Download")
-        return
-    google_file = response[0]
-    folder_name = response[1]
-    if google_file == None:
-        return
-    file_name = google_file['title']
-    repair = False
-    if str(folder_name) == "gopro":
-        repair = True
-    file_path = Google.download_file(google_file, REPAIR=repair)
-    if google_file == None:
-        print('Error: Missing Random Video')
-        return
-    if file_path == None:
-        print('Error: Empty Download')
-        return
-    return [file_name, file_path, google_file, folder_name]
-
-def download_random_scene():
-    remove_local()
-    print('Fetching Scene')
-    response = Google.get_random_scene()
-    if response == None:
-        print("Error: Missing Scene Download")
-        return
-    google_file = response[0]
-    folder_name = response[1]
-    if google_file == None:
-        print("Error: Missing Google File")
-        return
-    file_name = google_file['title']
-    results = Google.download_scene(google_file)
-    if results == None:
-        print('Error: Empty Download')
-        return
-    return results
+        print("Error: Unable to Download")
+        return None
 
 ###################
 ##### Message #####
@@ -185,6 +101,16 @@ def message(choice, message=None, image=None, price=None, username=None):
         return False
     successful_message = OnlySnarf.message(choice=choice, message=message, image=image, price=price, username=username)
     return successful_message
+
+################
+##### Post #####
+################
+
+def post(text=None):
+    if not text:
+        text = input("Text: ".format(text))
+    OnlySnarf.post(text)
+    OnlySnarf.exit()
 
 #####################
 ##### Promotion #####
@@ -228,197 +154,107 @@ def remove_local():
 ##### Release #####
 ###################
 
-def release(opt):
+def release(opt, methodChoice="random", file=None, folderName=None, parent=None):
     print("0/3 : Deleting Locals")
     remove_local()
     sys.stdout.flush()
     #################################################
     print("1/3 : Running - {}".format(opt))
-    if str(opt) == "image":
-        released = release_image()
-    elif str(opt) == "video":
-        released = release_video()
-    elif str(opt) == "gallery":
-        released = release_gallery()
-    elif str(opt) == "performer":
-        released = release_performer()
-    elif str(opt) == "scene":
-        released = release_scene()
-    else:
-        print('Missing Args!')
-        return
+    released = release_(opt, methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
+    if released == False: print("Error: Failed to release - {}".format(opt))
     sys.stdout.flush()
-    if released == False:
-        print("Error: Failed to release - {}".format(opt))
-        return
     #################################################
     print('2/3 : Cleaning Up Files')
     remove_local()
     print('Files Cleaned ')
     #################################################
     print('3/3 : Google Drive to OnlyFans Upload Complete')
-    sys.stdout.flush()
     OnlySnarf.exit()
+    sys.stdout.flush()
 
-def release_image():
+def release_(opt, methodChoice="random", file=None, folderName=None, parent=None):
     try:
-        print("Releasing Image")
-        response = download("image")
-        if response == None:
-            print("Error: Failure Releasing Image")
+        if not opt:
+            print("Error: Missing Option")
             return False
-        # settings.maybePrint("Image: {}".format(response))
+        print("Releasing: {}".format(opt))
+        data = download(opt, methodChoice=methodChoice, file=file)
+        if data == None:
+            print("Error: Missing Data")
+            return False
         text = None
-        content = None
-        file = None
-        keywords = None
+        path = None
+        keywords = []
+        performers = []
+        files = None
+        if parent: parent = parent.get("title")
         try:
-            text = response[0]
-            content = response[1]
-            file = response[2]
-            keywords = response[3].split(" ")
+            if file == None: file = data.get("file")
+            text = file.get("title") or ""
+            path = data.get("path")
+            files = data.get("files")
+            keywords = data.get("keywords") or parent
+            performers = data.get("performers") or []
+            # if parent: keywords = parent.split(" ")
+            if isinstance(keywords, str): keywords = keywords.split(" ")
+            if str(opt) == "performer":
+                keywords = folderName or keywords
+                if parent: performers = parent.split(" ")
+            if isinstance(keywords, list): keywords = [n.strip() for n in keywords]
+            if str(methodChoice) == "choose":
+                text_ = input("Text ({}): ".format(text))
+                if text_ != "":
+                    text = text_
+                keywords_ = input("Keywords ({}): ".format(keywords))
+                if keywords_ != "":
+                    if str(keywords_) == "None":
+                        keywords = []
+                    elif str(keywords_) == "[]":
+                        keywords = []
+                    elif str(keywords_) == " ":
+                        keywords = []
+                    else:
+                        keywords = keywords_.split(",")
+                        keywords = [n.strip() for n in keywords]
+                performers_ = input("Performers ({}): ".format(performers))
+                if performers_ != "":
+                    if str(performers_) == "None":
+                        performers = []
+                    elif str(performers_) == "[]":
+                        performers = []
+                    elif str(performers_) == " ":
+                        performers = []
+                    else:
+                        performers = performers_.split(",")
+                        performers = [n.strip() for n in performers]
         except Exception as e:
             settings.maybePrint(e)
-        if str(keywords) == " " or str(keywords[0]) == " ":
-            keywords = []
-        if text == None:
-            print("Error: Missing Image Title")
-            return False
-        if content == None:
-            print("Error: Missing Image Content")
-            return False
-        if file == None:
-            print("Error: Missing Image File")
-            return False
-        if keywords == None:
-            print("Warning: Missing Image Keywords")
-        print("Image:")
-        print("- Title: {}".format(text)) # name of scene
-        print("- Keywords: {}".format(keywords)) # text sent in messages
-        print("- Content: {}".format(content)) # the file(s) to upload
-        successful = upload("image", path=content, text=text, keywords=keywords)
-        if successful:
-            Google.move_file(file)
-        else:
-            return False
-        return True
-    except Exception as e:
-        settings.maybePrint(e)
-        return False
-
-def release_gallery():
-    try:
-        print("Releasing Gallery")
-        response = download("gallery")
-        if response == None:
-            print("Error: Failure Releasing Gallery")
-            return False
-        # settings.maybePrint("Gallery: {}".format(response))
-        text = None
-        content = None
-        google_file = None
-        google_files = None
-        keywords = None
-        try:
-            text = response[0]
-            content = response[1]
-            google_file = response[2]
-            google_files = response[3]
-            keywords = response[4].split(" ")
-        except Exception as e:
-            settings.maybePrint(e)
-        if keywords == " " or str(keywords[0]) == " ":
-            keywords = []
-        if text == None:
-            print("Error: Missing Gallery Title")
-            return False
-        if content == None:
-            print("Error: Missing Gallery Content")
-            return False
-        if google_file == None:
-            print("Error: Missing Gallery File")
-            return False
-        if google_files == None or len(google_files) == 0:
-            print("Error: Missing Gallery Files")
-            return False
-        if str(keywords) == None:
-            print("Warning: Missing Gallery Keywords")
-        print("Gallery:")
-        print("- Title: {}".format(text)) # name of scene
-        print("- Keywords: {}".format(keywords)) # text sent in messages
-        print("- Content: {}".format(content)) # the file(s) to upload
-        files = os.listdir(content)
-        file = files[0]
-        ext = str(os.path.splitext(file)[1].lower())
-        settings.maybePrint('ext: '+str(ext))
-        successful = upload("gallery", path=content, text=text, keywords=keywords)
-        if successful:
-            Google.move_files(google_file['title'], google_files)
-        else:
-            return False
-        return True
-    except Exception as e:
-        settings.maybePrint(e)
-        return False
-
-def release_performer():
-    try:
-        print("Releasing Performer")
-        response = download("performer")
-        if response == None:
-            print("Error: Failure Releasing Performer")
-            return False
-        # settings.maybePrint("Performer: {}".format(response))
-        text = None
-        performer = None
-        content = None
-        google_file = None
-        folder_name = None
-        try:
-            content = response[0]
-            google_file = response[1]
-            performer = response[2]
-            text = response[3]
-            folder_name = response[4]
-        except Exception as e:
-            settings.maybePrint(e)
-        if text == None:
-            print("Error: Missing Performer Text")
-            return False
-        if performer == None:
-            print("Error: Missing Performer Name")
-            return False
-        if content == None:
-            print("Error: Missing Performer Content")
-            return False
-        text += " w/ @{}".format(performer)
-        print("Performer:")
-        print("- Performer: {}".format(performer)) # name of scene
+        if text == None: print("Warning: Missing Title")
+        if path == None: print("Warning: Missing Content")
+        if keywords == None or len(keywords) == 0: print("Warning: Missing Keywords")
+        if performers == None or len(performers) == 0: print("Warning: Missing Performers")
+        print("Data:")
         print("- Text: {}".format(text)) # name of scene
-        print("- Content: {}".format(content)) # the file(s) to upload
-        files = os.listdir(content)
-        file = files[0]
-        ext = str(os.path.splitext(file)[1].lower())
-        settings.maybePrint('ext: '+str(ext))
-        if ext == ".mp4":
-            successful = upload("video", path=content, text=text) 
+        print("- Keywords: {}".format(keywords)) # text sent in messages
+        print("- Content: {}".format(path)) # the file(s) to upload
+        print("- Performer(s): {}".format(performers)) # name of performers
+        successful_upload = upload(path, text, keywords, performers)
+        if not successful_upload:
+            print("Error: Missing Data Type")
+        elif files:
+            Google.move_files(text, files)
         else:
-            successful = upload("gallery", path=content, text=text)
-        if successful:
-            Google.move_file(google_file)
-        else:
-            return False
-        return True
+            Google.move_file(file)
     except Exception as e:
         settings.maybePrint(e)
         return False
     
 # upload a file or gallery
 # send a message to [recent, all, user] w/ a preview image
-def release_scene():
+def release_scene(methodChoice="random", file=None, folderName=None, parent=None):
     try:
         print("Releasing Scene")
-        response = download("scene")
+        response = download("scene", methodChoice=methodChoice, file=file)
         if response == None:
             print("Error: Failure Releasing Scene")
             return False
@@ -472,15 +308,7 @@ def release_scene():
         file = files[0]
         ext = str(os.path.splitext(file)[1].lower())
         settings.maybePrint('ext: '+str(ext))
-        successful_upload = False
-        if not ext or ext == '.mp4':
-            successful_upload = upload("video", path=content, text=text, keywords=keywords, performers=performers)
-        elif ext == '.jpg' or ext == '.jpeg' and len(files) > 1:
-            successful_upload = upload("gallery", path=content, text=text, keywords=keywords, performers=performers)
-        elif ext == '.jpg' or ext == '.jpeg' and len(files) == 1:
-            successful_upload = upload("image", path=content, text=text, keywords=keywords, performers=performers) 
-        else:
-            print("Error: Missing Scene Type")
+        successful_upload = upload(path, text, keywords, performers)
         if successful_upload:
             if str(users[0]) == "all" or str(users[0]) == str("recent") or str(users[0]) == str("favorites"):
                 users = users[0]
@@ -504,77 +332,19 @@ def release_scene():
         settings.maybePrint(e)
         return False
 
-def release_video():
-    try:
-        print("Releasing Video")
-        response = download("video")
-        if response == None:
-            print("Error: Failure Releasing Video")
-            return False
-        # settings.maybePrint("Video: {}".format(response))
-        text = None
-        content = None
-        file = None
-        keywords = None
-        try:
-            text = response[0]
-            content = response[1]
-            file = response[2]
-            keywords = response[3].split(" ")
-        except Exception as e:
-            settings.maybePrint(e)
-        if str(keywords) == " " or str(keywords[0]) == " ":
-            keywords = []
-        ext = str(os.path.splitext(text)[1].lower())
-        settings.maybePrint('ext: '+str(ext))
-        if ext == '.mp4':
-            settings.maybePrint("pruning extension")
-            text = os.path.splitext(text)[0]
-        if text == None:
-            print("Error: Missing Video Title")
-            return False
-        if content == None:
-            print("Error: Missing Video Content")
-            return False
-        if file == None:
-            print("Error: Missing Video File")
-            return False
-        if keywords == None:
-            print("Warning: Missing Video Keywords")
-        print("Video:")
-        print("- Title: {}".format(text)) # name of scene
-        print("- Keywords: {}".format(keywords)) # text sent in messages
-        print("- Content: {}".format(content)) # the file(s) to upload
-        successful = upload("video", path=content, text=text, keywords=keywords)
-        if successful:
-            Google.move_file(file)
-        else:
-            return False
-        return True
-    except Exception as e:
-        settings.maybePrint(e)
-        return False
-
 ##################
 ##### Upload #####
 ##################
 
-def upload(fileChoice, path=None, text=None, keywords=None, performers=None):
-    settings.maybePrint("Uploading: {} - {} - {}".format(fileChoice, path, text))
+def upload(path, text, keywords, performers):
+    settings.maybePrint("Uploading: {}".format(path))
     successful = False
     try:
-        if fileChoice == 'image':
-            successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
-        elif fileChoice == 'gallery':
-            successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
-        elif fileChoice == 'video':
-            successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
-        else:
-            print("Missing Upload Choice")
+        successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Unable to Upload")
-        return
+        return False
     if successful:
         print("Upload Complete")
     else:
@@ -587,62 +357,21 @@ def upload(fileChoice, path=None, text=None, keywords=None, performers=None):
 
 def get_users():
     settings.maybePrint("Getting Users")
-    successful = False
     try:
-        successful = OnlySnarf.get_users()
+        return User.get_all_users()
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Unable to get users");
-        return
-    if successful:
-        settings.maybePrint("Users Found")
-    else:
-        print("Warning: users not found")
         return []
-    return successful
 
-#####################
-##### FUNCTIONS #####
-#####################
-
-def main(opt):
-    print("0/3 : Deleting Locals")
-    remove_local()
-    sys.stdout.flush()
-    #################################################
-    print("1/3 : Running - {}".format(opt))
-    if str(opt) == "image":
-        released = release_image()
-    elif str(opt) == "video":
-        released = release_video()
-    elif str(opt) == "gallery":
-        released = release_gallery()
-    elif str(opt) == "performer":
-        released = release_performer()
-    elif str(opt) == "scene":
-        released = release_scene()
-    else:
-        print('Missing Args!')
-        return
-    sys.stdout.flush()
-    if released == False:
-        print("Error: Failed to release - {}".format(opt))
-        return
-    #################################################
-    print('2/3 : Cleaning Up Files')
-    remove_local()
-    print('Files Cleaned ')
-    #################################################
-    print('3/3 : Google Drive to OnlyFans Upload Complete')
-    sys.stdout.flush()
-    OnlySnarf.exit()
+###############
+##### Dev #####
+###############
 
 def test(TYPE):
     print('0/3 : Deleting Locals')
     remove_local()
     print('1/3 : Testing')
-
-
 
     # ### Promotion ###
     print('TESTING: Cron')
@@ -653,110 +382,6 @@ def test(TYPE):
     if not reset:
         return print("Error: Failed to Reset")
     return
-
-
-    # ### Promotion ###
-    print('TESTING: Promotion')
-    response = apply_promotion()
-    if not response or response == None:
-        print("Error: Failed to apply promotion")
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
-    return
-
-    # ### Gallery ###
-    # print('TESTING: Gallery x 10')
-    # for i in range(10):
-    #     release_gallery()
-    #     time.sleep(10)
-    #     reset = OnlySnarf.reset()
-    #     if not reset:
-    #         return print("Error: Failed to Reset")
-    # return sys.exit(0)
-    # #######################
-
-    # ### Message ###
-    # response = download_random_image()
-    # if not response or response == None:
-        # print("Error: Missing Image")
-        # return
-    # successful_message = OnlySnarf.message(choice="all", message="random tease :P", image=response[1], price="5.00")
-    # message(choice="recent", message="8=======D", image=response[1], price="50.00")
-    # if successful_message:
-        # Google.move_file(response[2])
-    # else:
-        # print("Error: Failed to Send Message")
-    # #######################
-    # ### Exit Gracefully ###
-    # OnlySnarf.exit()
-    # return
-    # #######################
-
-    # ### Users ###
-    print('TESTING: Users')
-    users = OnlySnarf.get_users()
-    time.sleep(30)
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
-    return
-    #######################
-
-    # ### Chat Logs ###
-    # print('TESTING: Chat Logs')
-    # OnlySnarf.update_chat_logs()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-    #     return print("Error: Failed to Reset")
-    # #######################
-    # ### Exit Gracefully ###
-    # OnlySnarf.exit()
-    # return
-    # #######################
-    
-    # ### Image ###
-    # print('TESTING: Image')
-    # release_image()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-    #     return print("Error: Failed to Reset")
-    # ### Gallery ###
-    # print('TESTING: Gallery')
-    # release_gallery()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-    #     return print("Error: Failed to Reset")
-    # ### Performer ###
-    # print('TESTING: Performer')
-    # release_performer()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-    #     return print("Error: Failed to Reset")
-    ### Scene ###
-    # print('TESTING: Scene')
-    # release_scene()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-    #     return print("Error: Failed to Reset")
-    # ### Video ###
-    # print('TESTING: Video')
-    # release_video()
-    # time.sleep(30)
-    # reset = OnlySnarf.reset()
-    # if not reset:
-    #     return print("Error: Failed to Reset")
-    
-    #######################
-    ### Exit Gracefully ###
-    # OnlySnarf.exit()
-    #######################
-
 
 ################################################################################################################################################
 
