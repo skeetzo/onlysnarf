@@ -102,6 +102,16 @@ def message(choice, message=None, image=None, price=None, username=None):
     successful_message = OnlySnarf.message(choice=choice, message=message, image=image, price=price, username=username)
     return successful_message
 
+################
+##### Post #####
+################
+
+def post(text=None):
+    if not text:
+        text = input("Text: ".format(text))
+    OnlySnarf.post(text)
+    OnlySnarf.exit()
+
 #####################
 ##### Promotion #####
 #####################
