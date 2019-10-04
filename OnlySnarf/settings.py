@@ -70,6 +70,8 @@ class Settings:
         # -image-max
         # maximum number of images that can be uploaded
         self.IMAGE_UPLOAD_MAX = 15
+        # -overwrite-local
+        # self.OVERWRITE_LOCAL = False
         # -mount-path
         # the mounth path for a local directory of OnlyFans config files
         self.PATH_MOUNT = None
@@ -102,8 +104,6 @@ class Settings:
         # skip local file deletion before and after upload
         self.SKIP_DELETE = False
         # -skip-download
-        # totally not implemented
-        # todo: this
         self.SKIP_DOWNLOAD = False
         # -skip-reduce
         # skip mp4 reducing
@@ -115,6 +115,9 @@ class Settings:
         # skip video thumbnailing when repairing
         self.SKIP_THUMBNAIL = False
         # can be set in profile.conf
+        # -skip-upload
+        # skips file upload
+        self.SKIP_UPLOAD = False
         # list of users to skip
         self.SKIP_USERS = []
         # -show 
@@ -171,6 +174,8 @@ class Settings:
                 self.IMAGE_UPLOAD_LIMIT = str(sys.argv[i+1])
             elif '-image-max' in str(sys.argv[i]):
                 self.IMAGE_UPLOAD_MAX = str(sys.argv[i+1])
+            # elif '-overwrite-local' in str(sys.argv[i]):
+                # self.OVERWRITE_LOCAL = True
             elif '-prefer-local' in str(sys.argv[i]):
                 self.PREFER_LOCAL = True
             elif '-save-users' in str(sys.argv[i]):
@@ -179,10 +184,14 @@ class Settings:
                 self.SHOW_WINDOW = True
             elif '-skip-delete' in str(sys.argv[i]):
                 self.SKIP_DELETE = True
+            elif '-skip-download' in str(sys.argv[i]):
+                self.SKIP_DOWNLOAD= True
             elif '-skip-reduce' in str(sys.argv[i]):
                 self.SKIP_REDUCE = True
             elif '-skip-repair' in str(sys.argv[i]):
                 self.SKIP_REPAIR = True
+            elif '-skip-upload' in str(sys.argv[i]):
+                self.SKIP_UPLOAD = True
             elif '-skip-thumb' in str(sys.argv[i]):
                 self.SKIP_THUMBNAIL = True
             elif '-type' in str(sys.argv[i]):

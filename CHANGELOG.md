@@ -126,6 +126,34 @@
   - fixed verbose output
   **1.4.3 : 9/21/2019**
   - dbot issue
+  **2.0.0 : 9/25/2019**
+  - added functionality to choose instead of random
+  **2.0.1**
+  - oops
+  **2.1.0 9/29/2019**
+  - discount: all or select users x% for n months
+  - fixed local user load
+  - updated User(mess=mess) -> User(data)
+  **2.1.1**
+  - shameless 2.1.0 fix
+  **2.2.0**
+  - cleaned up & mostly fixed release via selection
+  - cleaned up release via random
+  - nonrandom uploads now confirm entered information
+  - cleaned out user methods from driver -> static
+  - updated download_performers and seperated randomizing selection
+  **2.2.1**
+  - release: keywords and performers can be deleted
+  **2.2.2**
+  - standalone script bug
+  **2.2.3**
+  - removed pointless User cache -> fixed User count bug
+  - removed overwrite-local
+  - added BROWSER.url checks
+  **2.2.4**
+  - user selections -> debug
+  **2.3.0**
+  - added: post
 
 ----------------------------------------
 
@@ -135,21 +163,41 @@
 ### Low Priority
   - add: read messages html for emojis
   - finalize / fix: script exit
-  - add: Twitter (social media reminders)
   - update: backup function to include original folder name -> posted/galleries/$file
-  - add: feature for if missing scene previews to capture thumbnail from content/trailer
   - add: easier way to select local file to upload
+
+  - functionality to create a post w/ text
+  |_ create multiple basic posts such as "greetings" or "going on holiday" or a trip, or question of what to post more of?
+  |_ a menu of standardized posts like above
+  |_ a menu of questions|greetings to message to users
+  - functionality to create a quiz / poll
+  - bot functionality to check posts for quiz answers
 
 ### Medium Priority
   - add: login prompt for saving Twitter password -> base64 hash instead of in config.json
   |_ add: `Auth` option to settings?
   - add: `local` setting
 
+  -> Scenes - FIX
   - update: data.txt for scenes with trailer
   - update: scene to include trailer
   - update: upload trailer same time as previews instead of content
+  - add: feature for if missing scene previews to capture thumbnail from content/trailer
 
-  - add email functionality for sending trial link; add clipboard function to copy link
+  -> Promotions
+  - add email|Twitter functionality for sending trial link; add clipboard function to copy link
+
+  -> Cron & Bot functionality that checks user messages for bot commands
+  - post: "OnlySnarf Bot commands: !pic | !pic dick | !pic ass"
+  -- sends [pic] to [user]
+
+  -> Twitter
+  - tweet reminders
+  - can enter text that is tweeted
+  - any links to include (counts against text limit) of content or images
+  - must not spam, must follow a schedule. monthly, weekly on a day, daily at an hour
+  -- maybe delete previous tweets?
+  - maybe tweet once and pin it?
 
 ### High Priority
   - prepare: a scene for release
@@ -158,33 +206,7 @@
   - rewrite scene release to NOT upload until releaseDate days after
   -- requires daily check or cron job
 
-  - test: performers upload w/ change to images/videos preferences
-
-  - add: same change to other folder download preferences
-  |_ ? which change
   - add: scene feature to check data.txts for content to release n days after trailer/preview
   |_ requires: cron feature
   - add: cron feature for installing crons
   |_ all it has to do is write to the crontab file
-
-Performers mostly advertise on Twitter
-- so add a feature that routinely tweets defined reminders
-- text that is tweeted
-- any links to include (counts against text limit)
-- must support emojis
-- must not spam, must follow a schedule. monthly, weekly on a day, daily at an hour
-- maybe delete previous tweets?
-- maybe tweet once and pin it?
-
-General Solutions:
-- needs to solve fanbase interaction for someone like me who really doesn't get it get it
-  - it should ask fans what more of they want to see
-    - add: ability to post polls
-  - it should message fans individually more of what they want to see
-    - add: ask all new users their preferences; run once for existing users
-- it should backup sent message/images differently than the current posted folder -> why?
-- it should ask users what they like and then build its own profile and then message that user approrpiately -> "do you like dick pics or ass pics?" -> n days later -> here's a dick pic just for you ;)"
-
--> Cron that checks user messages for bot commands
- - post: "OnlySnarf Bot commands: !pic | !pic dick | !pic ass"
--- sends [pic] to [user]

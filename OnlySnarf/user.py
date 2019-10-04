@@ -5,6 +5,7 @@
 import json
 import time
 import os
+import threading
 from datetime import datetime
 from re import sub
 from decimal import Decimal
@@ -16,44 +17,30 @@ PRICE_MINIMUM = 3
 
 class User:
 
-    def __init__(self, name=None, username=None, id=None, messages_from=None, messages_to=None, messages=None, preferences=None, last_messaged_on=None, sent_images=None, subscribed_on=None, isFavorite=False, statement_history=None, started=None):
-        # self.name = name.encode("utf-8")
-        # self.username = username.encode("utf-8")
-        self.name = name
-        self.username = username
-        self.id = id
-        # messages receieved from the user
-        if messages_from is None:
-            messages_from = []
-        self.messages_from = messages_from
-        # messages sent to the user
-        if messages_to is None:
-            messages_to = []
-        self.messages_to = messages_to
-        # combined chatlog
-        if messages is None:
-            messages = []
-        self.messages = messages 
-        # self.messages_and_timestamps = [] # message = [timestamp, message]
-        # anal, cock, etc
-        if preferences is None:
-            preferences = []
-        self.preferences = preferences
-        # date and time last messaged on
-        self.last_messaged_on = last_messaged_on
-        # images already sent to the user
-        if sent_images is None:
-            sent_images = []
-        self.sent_images = sent_images
-        # date subscription began
-        self.subscribed_on = subscribed_on
-        # if user is a favorite
-        self.isFavorite = isFavorite
-        # statement history
-        if statement_history is None:
-            statement_history = []
-        self.statement_history = statement_history
-        self.started = started
+    def __init__(self, data):
+        data = json.loads(json.dumps(data))
+        # print(data)
+        self.name = data.get('name')
+        self.username = data.get('username')
+        self.id = data.get('id')
+        self.messages_from = data.get('messages_from') or []
+        self.messages_to = data.get('messages_to') or []
+        self.messages = data.get('messages') or []
+        self.preferences = data.get('preferences') or []
+        self.last_messaged_on = data.get('last_messaged_on')
+        self.sent_images = data.get('sent_images') or []
+        self.subscribed_on = data.get('subscribed_on')
+        self.isFavorite = data.get('isFavorite') or False
+        self.statement_history = data.get('statement_history') or []
+        self.started = data.get('started')
+        ###### fucking json #####
+        self.messages_from = ",".join(self.messages_from).split(",")
+        self.messages_to = ",".join(self.messages_from).split(",")
+        self.messages = ",".join(self.messages_from).split(",")
+        self.preferences = ",".join(self.messages_from).split(",")
+        self.sent_images = ",".join(self.messages_from).split(",")
+        self.statement_history = ",".join(self.messages_from).split(",")
+        #########################
         try:
             settings.maybePrint("User: {} - {} - {}".format(self.name, self.username, self.id))
         except Exception as e:
@@ -63,22 +50,22 @@ class User:
     def sendMessage(self, message, image, price):
         try:
             print("Sending Message: {} <- {} - {} - ${}".format(self.id, message, image, price))
-            OnlySnarf.goto_user(self)
-            success = OnlySnarf.enter_message(message)
+            OnlySnarf.message_user(self)
+            success = OnlySnarf.message_text(message)
             if not success:
                 return
             image_name = os.path.basename(image)
             if str(image_name) in self.sent_images:
                 print("Error: Image Already Sent: {} -> {}".format(image, self.id))
                 return False
-            success = OnlySnarf.enter_image(image)
+            success = OnlySnarf.message_image(image)
             if not success: return False
             if price != None:
                 global PRICE_MINIMUM
                 if image != None and Decimal(sub(r'[^\d.]', '', price)) < PRICE_MINIMUM:
                     print("Warning: Price Too Low, Free Image")
                     print("Price Minimum: ${}".format(PRICE_MINIMUM))
-                success = OnlySnarf.enter_price(price)
+                success = OnlySnarf.message_price(price)
                 if not success: return False
             if str(settings.DEBUG) == "True":
                 self.sent_images.append("DEBUG")
@@ -86,7 +73,7 @@ class User:
                 self.sent_images.append(str(image_name))
             if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
                 time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
-            success = OnlySnarf.confirm_message()
+            success = OnlySnarf.message_confirm()
             if not success: return False
             if str(settings.DEBUG) == "False":
                 self.last_messaged_on = datetime.now()
@@ -136,7 +123,7 @@ class User:
     # saves chat log to user
     def readChat(self):
         print("Reading Chat: {} - {}".format(self.username, self.id))
-        messages = OnlySnarf.read_chat(self.id)
+        messages = OnlySnarf.read_user_messages(self.id)
         self.messages = messages[0]
         # self.messages_and_timestamps = messages[1]
         self.messages_to = messages[2]
@@ -157,6 +144,139 @@ class User:
     def unfavor(self):
         print("Unfavoring: {}".format(self.username))
         self.isFavorite = False
+
+    @staticmethod
+    def get_all_users():
+        return User.get_active_users()
+
+    # gets users from local or refreshes from onlyfans.com
+    @staticmethod
+    def get_active_users():
+        if str(settings.PREFER_LOCAL) == "True": return read_users_local()
+        active_users = []
+        users = OnlySnarf.get_users()
+        for user in users:
+            try:
+                user = User(user)
+                user = skipUserCheck(user)
+                if user is None: continue
+                active_users.append(user)
+            except Exception as e:
+                settings.maybePrint(e)
+        settings.maybePrint("pruning memberlist")
+        settings.maybePrint("users: {}".format(len(active_users)))
+        write_users_local(users=active_users)
+        return active_users
+
+    @staticmethod
+    def get_user_by_username(username):
+        if not username or username == None:
+            print("Error: Missing Username")
+            return None
+        users = User.get_all_users()
+        for user in users:
+            if str(user.username) == str(username):
+                return user
+        return None
+
+    @staticmethod
+    def get_favorite_users():
+        return []
+
+    # returns users that have no messages sent to them
+    @staticmethod
+    def get_new_users():
+        settings.maybePrint("Getting New Users")
+        users = User.get_all_users()
+        newUsers = []
+        date_ = datetime.today() - timedelta(days=10)
+        for user in users:
+            started = datetime.strptime(user.started,"%b %d, %Y")
+            # settings.maybePrint("date: "+str(date_)+" - "+str(started))
+            if started < date_: continue
+            settings.maybePrint("New User: %s" % user.username)
+            user = skipUserCheck(user)
+            if user is None: continue
+            newUsers.append(user)
+        return newUsers
+
+    @staticmethod
+    def get_never_messaged_users():
+        settings.maybePrint("Getting New Users")
+        update_chat_logs()
+        users = User.get_all_users()
+        newUsers = []
+        for user in users:
+            if len(user.messages_to) == 0:
+                settings.maybePrint("Never Messaged User: {}".format(user.username))
+                user = skipUserCheck(user)
+                if user is None: continue
+                newUsers.append(user)
+        return newUsers
+
+    @staticmethod
+    def get_recent_users():
+        settings.maybePrint("Getting Recent Users")
+        users = User.get_all_users()
+        i = 0
+        users_ = []
+        for user in users:
+            settings.maybePrint("Recent User: {}".format(user.username))
+            user = skipUserCheck(user)
+            if user is None: continue
+            users_.append(user)
+            i += 1
+            if i == settings.RECENT_USER_COUNT:
+                return users_
+        return users_
+
+# gets a list of all subscribed user_ids from local txt
+def read_users_local():
+    settings.maybePrint("Getting Local Users")
+    users = []
+    users_ = []
+    try:
+        with open(settings.PATH_USERS) as json_file:  
+            users = json.load(json_file)['users']
+        settings.maybePrint("Loaded:")
+        for user in users:
+            try:
+                users_.append(User(json.loads(user)))
+            except Exception as e:
+                settings.maybePrint(e)
+        return users_
+    except FileNotFoundError:
+        print("Error: Missing Local Users")
+    except OSError:
+        print("Error: Missing Local Path")
+    return users_
+
+def skipUserCheck(user):
+    if str(settings.SKIP_USERS) == "None":
+        settings.SKIP_USERS = []
+    if str(user.id).lower() in settings.SKIP_USERS or str(user.username).lower() in settings.SKIP_USERS:
+        settings.maybePrint("skipping: {}".format(user.username))
+        return None
+    return user
+
+# writes user list to local txt
+def write_users_local(users=None):
+    if users is None:
+        users = User.get_all_users()
+    print("Saving Users Locally")
+    settings.maybePrint("local data path: "+str(settings.PATH_USERS))
+    data = {}
+    data['users'] = []
+    for user in users:
+        settings.maybePrint("Saving: "+str(user.username))
+        data['users'].append(user.toJSON())
+    try:
+        with open(settings.PATH_USERS, 'w') as outfile:  
+            json.dump(data, outfile, indent=4, sort_keys=True)
+    except FileNotFoundError:
+        print("Error: Missing Local Users")
+    except OSError:
+        print("Error: Missing Local Path")
 
 
 def delayForThirty():

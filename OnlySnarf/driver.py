@@ -8,7 +8,6 @@ import shutil
 import json
 import sys
 import pathlib
-import threading
 import chromedriver_binary
 import time
 from datetime import date, datetime, timedelta
@@ -21,6 +20,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.common.action_chains import ActionChains
 from OnlySnarf.user import User
 from OnlySnarf.settings import SETTINGS as settings
 
@@ -29,10 +29,6 @@ from OnlySnarf.settings import SETTINGS as settings
 ###################
 
 BROWSER = None
-USER_CACHE = None
-USER_CACHE_TIMEOUT = 600 # ten minutes
-USER_CACHE_LOCKED = False
-settings.PATH_USERS = None
 INITIALIZED = False
 OnlyFans_USERNAME = None        
 OnlyFans_PASSWORD = None
@@ -65,7 +61,18 @@ def initialize():
 ##### Functions #####
 #####################
 
-# Upload to OnlyFans
+def auth():
+    logged_in = False
+    global BROWSER
+    if not BROWSER or BROWSER == None:
+        logged_in = log_into_OnlyFans()
+    else:
+        logged_in = True
+    if logged_in == False:
+        print("Error: Failure to Login")
+        sys.exit(1)
+
+# Login to OnlyFans
 def log_into_OnlyFans():
     print('Logging into OnlyFans')
     options = webdriver.ChromeOptions()
@@ -135,113 +142,86 @@ def reset():
         print('Error: Failure Resetting OnlyFans')
         return False
 
-##################
-##### Upload #####
-##################
+####################
+##### Discount #####
+####################
 
-# Uploads a directory with a video file or image files to OnlyFans
-def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
+# maximum discount = 55%
+def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
+    auth()
+    if int(discount) > 55:
+        print("Warning: Discount Too High, Max -> 55%")
+        discount = 55
+    if int(months) > 12:
+        print("Warning: Months Too High, Max -> 12")
+        months = 12
+    global BROWSER
     try:
-        logged_in = False
-        global BROWSER
-        if not BROWSER or BROWSER == None:
-            logged_in = log_into_OnlyFans()
+        if str(BROWSER.current_url) == "https://onlyfans.com/my/subscribers/active":
+            settings.maybePrint("at -> /my/subscribers/active")
         else:
-            logged_in = True
-        if logged_in == False:
-            print("Error: Not Logged In")
-            return False
-        if not path:
-            print("Error: Missing Upload Path")
-            return False
-        if not text:
-            print("Error: Missing Upload Text")
-            return False
-        text = text.replace(".mp4","")
-        text = text.replace(".MP4","")
-        text = text.replace(".jpg","")
-        text = text.replace(".jpeg","")
-        if performers:
-            text += " w/ @"+" @".join(performers)
-        if keywords:
-            text += " #"+" #".join(keywords)
-        print("Uploading:")
-        settings.maybePrint("- Path: {}".format(path))
-        print("- Keywords: {}".format(keywords))
-        print("- Performers: {}".format(performers))
-        print("- Text: {}".format(text))
-        print("- Tweeting: {}".format(settings.TWEETING))
-        WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
-        if str(settings.TWEETING) == "True":
-            WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
-        files = []
-        if os.path.isfile(str(path)):
-            files = [str(path)]
-        elif os.path.isdir(str(path)):
-            # files = os.listdir(str(path))
-            for file in os.listdir(str(path)):
-                files.append(os.path.join(os.path.abspath(str(path)),file))
-        else:
-            print("Error: Unable to parse path")
-            return False
-        for file in files:  
-            print('Uploading: '+str(file))
-            BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
-        maxUploadCount = 12 # 2 hours max attempt time
-        i = 0
-        while True:
-            try:                
-                WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
-                break
-            except Exception as e:
-                # try: 
-                #     # check for existence of "thumbnail is fucked up" modal and hit ok button
-                #     BROWSER.switchTo().frame("iframe");
-                #     BROWSER.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
-                #     print("Error: Thumbnail Missing")
-                #     break
-                # except Exception as ef:
-                #     settings.maybePrint(ef)
-                print('uploading...')
-                settings.maybePrint(e)
-                i+=1
-                if i == maxUploadCount and settings.FORCE_UPLOAD is not True:
-                    print('Error: Max Upload Time Reached')
-                    return False
-        try:
-            BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
-        except:
-            settings.maybePrint("Warning: Upload Error Message, Closing")
-            try:
-                buttons = BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-border")
-                for butt in buttons:
-                    if butt.get_attribute("innerHTML").strip() == "Close":
-                        butt.click()
-                        settings.maybePrint("Success: Upload Error Message Closed")
-                        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
-            except Exception as e:
-                print("Error: Unable to Upload Images")
-                settings.maybePrint(e)
-                return False
-        # first one is disabled
-        sends = BROWSER.find_elements_by_class_name("send_post_button")
-        # send = BROWSER.find_element_by_class_name("send_post_button")
-        for i in range(len(sends)):
-            if sends[i].is_enabled():
-                sends = sends[i]
-        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
-            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
-        if str(settings.DEBUG) == "True":
-            print('Skipped: OnlyFans upload')
-            return True
-        sends.click()
-        # send[1].click() # the 0th one is disabled
-        print('File Uploaded Successfully')
-        return True
+            settings.maybePrint("goto -> /my/subscribers/active")
+            BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
+            if tryAll: depth = BROWSER.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML")
+            settings.maybePrint("Depth: {}".format(depth))
+            for n in range(int(int(int(depth)/10)+1)):
+                settings.maybePrint("scrolling...")
+                BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(1)
     except Exception as e:
         settings.maybePrint(e)
-        print("Error: File Upload Failure")
+        print("Error: Failed to Find Users")
         return False
+    users = BROWSER.find_elements_by_class_name('b-users__item.m-fans')
+    print("Discounting User: {} - {}/{}".format(user, depth, len(users)))
+    time.sleep(2)
+    # get all the users
+    user__ = users[0]
+    for user_ in users:
+        text = user_.get_attribute("innerHTML")
+        buttons_ = user_.find_elements_by_class_name("g-btn.m-rounded.m-border.m-sm")
+        if str(user) in text:
+            user__ = user_
+            break
+    ActionChains(BROWSER).move_to_element(user_).perform()
+    buttons = user__.find_elements_by_class_name("g-btn.m-rounded.m-border.m-sm")
+    for button in buttons:
+        if "Discount" in button.get_attribute("innerHTML"):
+            try:
+                button.click()
+                break
+            except Exception as e:
+                print("Warning: Unable To Find User, retrying")
+                settings.maybePrint(e)
+                return discount_user(user, depth=depth, discount=dicount, months=months, tryAll=True)
+    time.sleep(1)
+    buttons_ = BROWSER.find_elements_by_class_name("g-btn.m-rounded")
+    try:
+        discountText = BROWSER.find_elements_by_class_name("g-input.form-control")[0]
+        if discountText.get_attribute("value") != "":
+            print("Warning: Existing Discount")
+        discountText.clear()
+        discountText.send_keys(str(discount))
+        months_ = BROWSER.find_elements_by_class_name("g-input.form-control")[1]
+        for n in range(int(months)-1):
+            months_.send_keys(Keys.DOWN)
+        for button in buttons_:
+            if "Cancel" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "True":
+                button.click()
+                print("Skipping: Save Discount (Debug)")
+                return True
+            elif "Save" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "False":
+                button.click()
+                print("Discounted User: {}".format(user))
+                return True
+    except Exception as e:
+        settings.maybePrint(e)
+        for button in buttons_:
+            if "Cancel" in button.get_attribute("innerHTML"):
+                button.click()
+                print("Skipping: Save Discount")
+                return True
+    return True
 
 ####################
 ##### Messages #####
@@ -250,22 +230,22 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
 def message(choice=None, message=None, image=None, price=None, username=None):
     if str(choice) == "all":
         print("Messaging: All")
-        users = get_users()
+        users = User.get_all_users()
     elif str(choice) == "recent":
         print("Messaging: Recent")
-        users = get_recent_users()
+        users = User.get_recent_users()
     elif str(choice) == "favorites":
         print("Messaging: Recent")
-        users = get_favorite_users()
+        users = User.get_favorite_users()
     elif str(choice) == "new":
         print("Messaging: New")
-        users = get_new_users()
+        users = User.get_new_users()
     elif str(choice) == "user":
         print("Messaging: User - {}".format(username))
         if username is None:
             print("Error: Missing Username")
             return
-        users = [get_user_by_username(str(username))]
+        users = [User.get_user_by_username(str(username))]
     else:
         print("Error: Missing Message Choice")
         return
@@ -274,8 +254,72 @@ def message(choice=None, message=None, image=None, price=None, username=None):
         if not success:
             print("Error: There was an error messaging - {}/{}".format(user.id, user.username))
                 
-def goto_user(user):
+def message_confirm():
     try:
+        global BROWSER
+        send = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".g-btn.m-rounded.b-chat__btn-submit")))
+        if str(settings.DEBUG) == "True":
+            print('OnlyFans Message: Skipped (debug)')
+            return True
+        send.click()
+        print('OnlyFans Message: Sent')
+        return True
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failure to Confirm Message")
+        return False
+
+def message_text(text):
+    try:
+        print("Enter text: %s" % text)
+        if not text or text == None:
+            print("Error: Missing Text")
+            return False
+        global BROWSER
+        message = BROWSER.find_element_by_css_selector(".form-control.b-chat__message-input")        
+        message.send_keys(str(text))
+        settings.maybePrint("Text Entered")
+        return True
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failure to Enter Message")
+        return False
+
+def message_image(image):
+    try:
+        print("Enter image: %s" % image)
+        if not image or image == None:
+            print("Error: Missing Image")
+            return False
+        global BROWSER
+        BROWSER.find_element_by_id("cm_fileupload_photo").send_keys(str(image))
+        settings.maybePrint("Image Entered")
+        return True
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failure to Enter Image")
+        return False
+
+def message_price(price):
+    try:
+        print("Enter price: %s" % price)
+        if not price or price == None:
+            print("Error: Missing Price")
+            return False
+        global BROWSER
+        BROWSER.find_element_by_css_selector(".b-chat__btn-set-price").click()
+        BROWSER.find_elements_by_css_selector(".form-control.b-chat__panel__input")[1].send_keys(str(price))
+        BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[4].click()
+        settings.maybePrint("Price Entered")
+        return True
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failure to Enter Price")
+        return False
+
+def message_user(user):
+    try:
+        auth()
         userid = user.id
         if not userid or userid == None:
             print("Warning: Missing User ID")
@@ -296,82 +340,11 @@ def goto_user(user):
         print("Error: Failure to Goto User - {}/{}".format(user.id, user.username))
         return False
 
-def enter_message(text):
+def read_user_messages(user):
     try:
-        print("Enter text: %s" % text)
-        if not text or text == None:
-            print("Error: Missing Text")
-            return False
-        global BROWSER
-        message = BROWSER.find_element_by_css_selector(".form-control.b-chat__message-input")        
-        message.send_keys(str(text))
-        print("Message Entered")
-        return True
-    except Exception as e:
-        settings.maybePrint(e)
-        print("Error: Failure to Enter Message")
-        return False
-
-def enter_image(image):
-    try:
-        print("Enter image: %s" % image)
-        if not image or image == None:
-            print("Error: Missing Image")
-            return False
-        global BROWSER
-        BROWSER.find_element_by_id("cm_fileupload_photo").send_keys(str(image))
-        print("Image Entered")
-        return True
-    except Exception as e:
-        settings.maybePrint(e)
-        print("Error: Failure to Enter Image")
-        return False
-
-def enter_price(price):
-    try:
-        print("Enter price: %s" % price)
-        if not price or price == None:
-            print("Error: Missing Price")
-            return False
-        global BROWSER
-        BROWSER.find_element_by_css_selector(".b-chat__btn-set-price").click()
-        BROWSER.find_elements_by_css_selector(".form-control.b-chat__panel__input")[1].send_keys(str(price))
-        BROWSER.find_elements_by_css_selector(".g-btn.m-rounded")[4].click()
-        print("Price Entered")
-        return True
-    except Exception as e:
-        settings.maybePrint(e)
-        print("Error: Failure to Enter Price")
-        return False
-
-def confirm_message():
-    try:
-        global BROWSER
-        send = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".g-btn.m-rounded.b-chat__btn-submit")))
-        if str(settings.DEBUG) == "True":
-            print('OnlyFans Message: Skipped (debug)')
-            return True
-        send.click()
-        print('OnlyFans Message: Sent')
-        return True
-    except Exception as e:
-        settings.maybePrint(e)
-        print("Error: Failure to Confirm Message")
-        return False
-
-def read_chat(user):
-    try:
-        logged_in = False
-        global BROWSER
-        if not BROWSER or BROWSER == None:
-            logged_in = log_into_OnlyFans()
-        else:
-            logged_in = True
-        if logged_in == False:
-            print("Error: Login Failure")
-            return [[],[],[]]
+        auth()
         # go to onlyfans.com/my/subscribers/active
-        goto_user(user)
+        message_user(user)
         messages_from_ = BROWSER.find_elements_by_class_name("m-from-me")
         # print("first message: {}".format(messages_to_[0].get_attribute("innerHTML")))
         # messages_to_.pop(0) # drop self user at top of page
@@ -444,13 +417,45 @@ def update_chat_logs():
         update_chat_log(user)
     USER_CACHE_LOCKED = False
 
-
 def update_chat_log(user):
     print("Updating Chat: {} - {}".format(user.username, user.id))
     if not user:
         return print("Error: Missing User")
     user.readChat()
 
+################
+##### Post #####
+################
+
+def post(text):
+    try:
+        auth()
+        global BROWSER
+        if str(BROWSER.current_url) == "https://onlyfans.com":
+            settings.maybePrint("at -> onlyfans.com")
+        else:
+            settings.maybePrint("goto -> onlyfans.com")
+            BROWSER.get(('https://onlyfans.com'))
+        print("Posting:")
+        print("- Text: {}".format(text))
+        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
+        sends = BROWSER.find_elements_by_class_name("send_post_button")
+        for i in range(len(sends)):
+            if sends[i].is_enabled():
+                sends = sends[i]
+        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+        if str(settings.DEBUG) == "True":
+            print('Skipped: OnlyFans Post (debug)')
+            return True
+        sends.click()
+        # send[1].click() # the 0th one is disabled
+        print('OnlyFans Post Complete')
+        return True
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: OnlyFans Post Failure")
+        return False
 
 ######################
 ##### Promotions #####
@@ -458,14 +463,7 @@ def update_chat_log(user):
 
 # or email
 def get_new_trial_link():
-    global BROWSER
-    if not BROWSER or BROWSER == None:
-        logged_in = log_into_OnlyFans()
-    else:
-        logged_in = True
-    if logged_in == False:
-        print("Error: Login Failure")
-        return USER_CACHE
+    auth()
     # go to onlyfans.com/my/subscribers/active
     try:
         settings.maybePrint("goto -> /my/promotions")
@@ -501,53 +499,151 @@ def get_new_trial_link():
         print("Error: Failed to Apply Promotion")
         return None
 
+##################
+##### Upload #####
+##################
+
+# Uploads a directory with a video file or image files to OnlyFans
+def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
+    try:
+        auth()
+        global BROWSER
+        if str(BROWSER.current_url) == "https://onlyfans.com":
+            settings.maybePrint("at -> onlyfans.com")
+        else:
+            settings.maybePrint("goto -> onlyfans.com")
+            BROWSER.get(('https://onlyfans.com'))
+
+        if not path:
+            print("Error: Missing Upload Path")
+            return False
+        if not text:
+            print("Error: Missing Upload Text")
+            return False
+        text = text.replace(".mp4","")
+        text = text.replace(".MP4","")
+        text = text.replace(".jpg","")
+        text = text.replace(".jpeg","")
+        if isinstance(performers, list) and len(performers) > 0: text += " w/ @"+" @".join(performers)
+        if isinstance(keywords, list) and len(keywords) > 0: text += " #"+" #".join(keywords)
+        print("Uploading:")
+        settings.maybePrint("- Path: {}".format(path))
+        print("- Keywords: {}".format(keywords))
+        print("- Performers: {}".format(performers))
+        print("- Text: {}".format(text))
+        print("- Tweeting: {}".format(settings.TWEETING))
+        WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
+        if str(settings.TWEETING) == "True":
+            WAIT.until(EC.element_to_be_clickable((By.XPATH, '//label[@for="new_post_tweet_send"]'))).click()
+        files = []
+        if str(settings.SKIP_DOWNLOAD) == "True":
+            print("Warning: Unable to upload, skipped download")
+            return True
+        if os.path.isfile(str(path)):
+            files = [str(path)]
+        elif os.path.isdir(str(path)):
+            # files = os.listdir(str(path))
+            for file in os.listdir(str(path)):
+                files.append(os.path.join(os.path.abspath(str(path)),file))
+        else:
+            print("Error: Unable to parse path")
+            return False
+        if str(settings.SKIP_UPLOAD) == "True":
+            print("Skipping Upload")
+            return True
+        for file in files:  
+            print('Uploading: '+str(file))
+            BROWSER.find_element_by_id("fileupload_photo").send_keys(str(file))
+        maxUploadCount = 12 # 2 hours max attempt time
+        i = 0
+        while True:
+            try:                
+                WAIT.until(EC.element_to_be_clickable((By.XPATH, '//button[@type="submit" and @class="g-btn m-rounded send_post_button"]')))
+                break
+            except Exception as e:
+                # try: 
+                #     # check for existence of "thumbnail is fucked up" modal and hit ok button
+                #     BROWSER.switchTo().frame("iframe");
+                #     BROWSER.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
+                #     print("Error: Thumbnail Missing")
+                #     break
+                # except Exception as ef:
+                #     settings.maybePrint(ef)
+                print('uploading...')
+                settings.maybePrint(e)
+                i+=1
+                if i == maxUploadCount and settings.FORCE_UPLOAD is not True:
+                    print('Error: Max Upload Time Reached')
+                    return False
+        try:
+            BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
+        except:
+            settings.maybePrint("Warning: Upload Error Message, Closing")
+            try:
+                buttons = BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-border")
+                for butt in buttons:
+                    if butt.get_attribute("innerHTML").strip() == "Close":
+                        butt.click()
+                        settings.maybePrint("Success: Upload Error Message Closed")
+                        BROWSER.find_element_by_id("new_post_text_input").send_keys(str(text))
+            except Exception as e:
+                print("Error: Unable to Upload Images")
+                settings.maybePrint(e)
+                return False
+        # first one is disabled
+        sends = BROWSER.find_elements_by_class_name("send_post_button")
+        # send = BROWSER.find_element_by_class_name("send_post_button")
+        for i in range(len(sends)):
+            if sends[i].is_enabled():
+                sends = sends[i]
+        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+        if str(settings.DEBUG) == "True":
+            print('Skipped: OnlyFans Upload (debug)')
+            return True
+        sends.click()
+        # send[1].click() # the 0th one is disabled
+        print('OnlyFans Upload Complete')
+        return True
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: OnlyFans Upload Failure")
+        return False
+
 #################
 ##### Users #####
 #################
 
-# gets a list of all user_ids subscribed to profile
 def get_users():
-    # gets users from cache or refreshes from onlyfans.com
-    global USER_CACHE
-    if USER_CACHE:
-        return USER_CACHE
-    USER_CACHE = read_users_local()
-    if settings.PREFER_LOCAL == "True":
-        return USER_CACHE
-    logged_in = False
-    global BROWSER
-    if not BROWSER or BROWSER == None:
-        logged_in = log_into_OnlyFans()
-    else:
-        logged_in = True
-    if logged_in == False:
-        print("Error: Login Failure")
-        return USER_CACHE
-    # go to onlyfans.com/my/subscribers/active
+    auth()
     try:
-        settings.maybePrint("goto -> /my/subscribers/active")
-        BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
-        num = BROWSER.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML")
-        settings.maybePrint("User count: %s" % num)
-        for n in range(int(int(int(num)/10)+1)):
-            settings.maybePrint("scrolling...")
-            BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(1)
+        if str(BROWSER.current_url) == "https://onlyfans.com/my/subscribers/active":
+            settings.maybePrint("at -> /my/subscribers/active")
+        else:
+            settings.maybePrint("goto -> /my/subscribers/active")
+            BROWSER.get(('https://onlyfans.com/my/subscribers/active'))
+            num = BROWSER.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML")
+            settings.maybePrint("User count: {}".format(num))
+            for n in range(int(int(int(num)/10)+1)):
+                settings.maybePrint("scrolling...")
+                BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(1)
     except Exception as e:
         settings.maybePrint(e)
-        print("Error: Failed to Count Users")
+        print("Error: Failed to Find Users")
         return []
-    avatars = BROWSER.find_elements_by_class_name('b-avatar')
-    user_ids = BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-border.m-sm")
+    # avatars = BROWSER.find_elements_by_class_name('b-avatar')
+    # user_ids = BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-border.m-sm")
+    user_ids = BROWSER.find_elements_by_css_selector("a.g-btn.m-rounded.m-border.m-sm")
     starteds = BROWSER.find_elements_by_class_name("b-fans__item__list__item")
     # users = BROWSER.find_elements_by_class_name('g-user-name')
     users = BROWSER.find_elements_by_class_name('g-user-name__wrapper')
     usernames = BROWSER.find_elements_by_class_name('g-user-username')
+    usernames.pop(0)
     active_users = []
     global OnlyFans_USERNAME
     # settings.maybePrint("user_ids: "+str(len(user_ids)))
     # settings.maybePrint("starteds: "+str(len(starteds)))
-    settings.maybePrint("Found: ")
     useridsFailed = False
     startedsFailed = False
     if len(user_ids) == 0:
@@ -556,6 +652,7 @@ def get_users():
     if len(starteds) == 0:
         print("Warning: Unable to find starting dates")
         startedsFailed = True
+    users_ = []
     try:
         user_ids_ = []
         starteds_ = []
@@ -567,166 +664,44 @@ def get_users():
             match = re.findall("Started.*([A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4})", text)
             if len(match) > 0:
                 starteds_.append(match[0])
-        settings.maybePrint("ids vs starteds: "+str(len(user_ids_))+" - "+str(len(starteds_)))
-        for i in range(len(avatars)-1):
-            if not startedsFailed:
-                start = starteds_[i]
-            else:
-                start = datetime.now().strftime("%b %d, %Y")
-            if not useridsFailed:
-                user_id = user_ids_[i][35:]
-            else:
-                user_id = None
-            name = users[i]
-            username = usernames[i]
-            name = str(name.get_attribute("innerHTML")).strip()
-            username = str(username.get_attribute("innerHTML")).strip()
-            # settings.maybePrint("name: "+str(name))
-            # settings.maybePrint("username: "+str(username))
-            # settings.maybePrint("user_id: "+str(user_id))
-            if str(OnlyFans_USERNAME).lower() in str(username).lower():
-                settings.maybePrint("(self): %s = %s" % (OnlyFans_USERNAME, username))
-                # first user is always active user but just in case find it in list of users
-                global OnlyFans_USER_ID
-                OnlyFans_USER_ID = username
-                continue
-            user = User(name=name, username=username, id=user_id, started=start)
-            user = skipUserCheck(user)
-            if user is None: continue
-            active_users.append(user)
-        for user in active_users:
-            existing = False
-            for user_ in USER_CACHE:
-                if user.equals(user_):
-                    existing = True
-            if not existing:
-                USER_CACHE.append(user)
+        if len(user_ids_) == 0:
+            print("Warning: Unable to find user ids")
+            useridsFailed = True
+        if len(starteds_) == 0:
+            print("Warning: Unable to find starting dates")
+            startedsFailed = True
+        # settings.maybePrint("ids vs starteds vs avatars: "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(avatars)))
+        settings.maybePrint("ids vs starteds vs usernames:"+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(usernames)))
+        for i in range(len(users)): # the first is you and doesn't count towards total
+            try:
+                if not startedsFailed:
+                    start = starteds_[i]
+                else:
+                    start = datetime.now().strftime("%b %d, %Y")
+                if not useridsFailed:
+                    user_id = user_ids_[i][35:]
+                else:
+                    user_id = None
+                name = users[i]
+                username = usernames[i]
+                name = str(name.get_attribute("innerHTML")).strip()
+                username = str(username.get_attribute("innerHTML")).strip()
+                # settings.maybePrint("name: "+str(name))
+                # settings.maybePrint("username: "+str(username))
+                # settings.maybePrint("user_id: "+str(user_id))
+                if str(OnlyFans_USERNAME).lower() in str(username).lower():
+                    settings.maybePrint("(self): %s = %s" % (OnlyFans_USERNAME, username))
+                    # first user is always active user but just in case find it in list of users
+                    global OnlyFans_USER_ID
+                    OnlyFans_USER_ID = username
+                    continue
+                users_.append({"name":name, "username":username, "id":user_id, "started":start})
+            except Exception as e:
+                settings.maybePrint(e)
     except Exception as e:
         settings.maybePrint(e)
-    # start cache timeout
-    start_user_cache()
-    return USER_CACHE
-
-def get_user_by_username(username):
-    if not username or username == None:
-        print("Error: Missing Username")
-        return None
-    users = get_users()
-    for user in users:
-        if str(user.username) == str(username):
-            return user
-    return None
-
-def get_favorite_users():
-    return []
-
-# returns users that have no messages sent to them
-def get_new_users():
-    settings.maybePrint("Getting New Users")
-    users = get_users()
-    newUsers = []
-    date_ = datetime.today() - timedelta(days=10)
-    for user in users:
-        started = datetime.strptime(user.started,"%b %d, %Y")
-        # settings.maybePrint("date: "+str(date_)+" - "+str(started))
-        if started < date_: continue
-        settings.maybePrint("New User: %s" % user.username)
-        user = skipUserCheck(user)
-        if user is None: continue
-        newUsers.append(user)
-    return newUsers
-
-def get_never_messaged_users():
-    settings.maybePrint("Getting New Users")
-    update_chat_logs()
-    users = get_users()
-    newUsers = []
-    for user in users:
-        if len(user.messages_to) == 0:
-            settings.maybePrint("Never Messaged User: %s" % user.username)
-            user = skipUserCheck(user)
-            if user is None: continue
-            newUsers.append(user)
-    return newUsers
-
-def get_recent_users():
-    settings.maybePrint("Getting Recent Users")
-    users = get_users()
-    i = 0
-    users_ = []
-    for user in users:
-        settings.maybePrint("Recent User: %s" % user.username)
-        user = skipUserCheck(user)
-        if user is None: continue
-        users_.append(user)
-        i += 1
-        if i == settings.RECENT_USER_COUNT:
-            return users_
+    settings.maybePrint("Found: {}".format(len(users_)))
     return users_
-
-# gets a list of all subscribed user_ids from local txt
-def read_users_local():
-    settings.maybePrint("Getting Local Users")
-    users = []
-    users_ = []
-    try:
-        with open(settings.PATH_USERS) as json_file:  
-            users = json.load(json_file)
-        for user in users['users']:
-            user = User(name=user['name'], username=user['username'], id=user['id'], messages_from=user['messages_from'], messages_to=user['messages_to'], messages=user['messages'], preferences=user['preferences'], last_messaged_on=user['last_messaged_on'], sent_images=user['sent_images'], subscribed_on=user['subscribed_on'], isFavorite=user['isFavorite'], statement_history=user['statement_history'])
-            settings.maybePrint('Loaded: %s' % user.username)
-            settings.maybePrint('')
-            users_.append(user)
-    except FileNotFoundError:
-        print("Error: Missing Local Users")
-    except OSError:
-        print("Error: Missing Local Path")
-    finally:
-        return users_
-
-def skipUserCheck(user):
-    if str(user.id).lower() in settings.SKIP_USERS or str(user.username).lower() in settings.SKIP_USERS:
-        settings.maybePrint("skipping: %s" % user.username)
-        return None
-    return user
-
-def reset_user_cache():
-    global USER_CACHE_LOCKED
-    if USER_CACHE_LOCKED:
-        settings.maybePrint("User Cache: locked, skipping reset")
-        return
-    global USER_CACHE
-    USER_CACHE = False
-    settings.maybePrint("User Cache: reset")
-
-def start_user_cache():
-    settings.maybePrint("User Cache: starting")
-    # write_users_local()
-    global USER_CACHE_TIMEOUT
-    try:
-        threading.Timer(USER_CACHE_TIMEOUT, reset_user_cache).start() # after 10 minutes
-        settings.maybePrint("User Cache: started")
-    except:
-        settings.maybePrint("User Cache: error starting")
-        settings.maybePrint(sys.exc_info()[0])
-
-# writes user list to local txt
-def write_users_local():
-    users = get_users()
-    print("Saving Users Locally")
-    settings.maybePrint("local data path: "+str(settings.PATH_USERS))
-    data = {}
-    data['users'] = []
-    for user in users:
-        settings.maybePrint("Saving: "+str(user.username))
-        data['users'].append(user.toJSON())
-    try:
-        with open(settings.PATH_USERS, 'w') as outfile:  
-            json.dump(data, outfile, indent=4, sort_keys=True)
-    except FileNotFoundError:
-        print("Error: Missing Local Users")
-    except OSError:
-        print("Error: Missing Local Path")
 
 ################
 ##### Exit #####
@@ -739,7 +714,8 @@ def exit(force=False):
     else:
         print("Exiting OnlyFans")
     global BROWSER
-    BROWSER.quit()
+    if BROWSER:
+        BROWSER.quit()
     BROWSER = None
     print("Browser Closed")
     global logged_in

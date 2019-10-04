@@ -51,6 +51,7 @@ fileItems = []
 locationItems = []
 promotionItems = []
 settingItems = []
+methodItems = []
 
 def initialize():
     # print("Initializing Menu")
@@ -84,6 +85,7 @@ def initialize():
         settingItems.append([ "Text", settings.TEXT,None,False])
         settingItems.append([ "Image", settings.IMAGE,None,False])
         settingItems.append([ "Prefer Local", settings.PREFER_LOCAL,["True","False"],True])
+        # settingItems.append([ "Overwrite Local", settings.OVERWRITE_LOCAL,["True","False"],True])
     settingItems.insert(0,[ "Back", "main"])
 
     global menuItems
@@ -101,21 +103,28 @@ def initialize():
         [ "Download", "download" ],
         # [ "Promotion", "promotion" ],
         [ "Message", "message" ],
+        [ "Discount", "discount" ],
         [ "Reset", "reset" ]
     ])
     if str(settings.DEBUG) == "True":
         actionItems.append([ "Test", "test"])
         actionItems.append([ "Promotion", "promotion" ])
+        actionItems.append([ "Post", "post" ])
     actionItems.insert(0,[ "Back", "main"])
 
     global messageItems
     # Message Menu
     messageItems = sorted([
         [ "All", "all"],
-        [ "New", "new"],
+        # [ "New", "new"],
         [ "Recent", "recent"],
-        [ "User by Username", "user"]
+        # [ "Favorite", "favorite"],
+        [ "User by Username", "user"],
+        [ "Select User", "select"]
     ])
+    if str(settings.DEBUG) == "True":
+        messageItems.append([ "New", "new"])
+        messageItems.append([ "Favorite", "favorite"])
     messageItems.insert(0,[ "Back", "main"])
 
     global fileItems
@@ -143,9 +152,16 @@ def initialize():
     if str(settings.DEBUG) == "True":
         promotionItems = sorted([
             [ "Enter Email", "email" ],
-            # [ "Select User", "select" ]
+            [ "Select User", "select" ]
         ])
     promotionItems.insert(0,[ "Back", "main"])
+
+    global methodItems
+    methodItems = sorted([
+        [ "Choose", "choose" ],
+        [ "Random", "random" ]
+    ])
+    methodItems.insert(0,[ "Back", "main"])
 
     # print("Initialized Menu")
     INITIALIZED = True
@@ -169,9 +185,15 @@ def action():
             elif str(actionItems[int(choice)][1]) == "message":
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeMessage(actionChoice)
+            elif str(actionItems[int(choice)][1]) == "discount":
+                actionChoice = list(actionItems[int(choice)])[1]
+                return finalizeDiscount(actionChoice)
             elif str(actionItems[int(choice)][1]) == "promotion":
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizePromotion(actionChoice)
+            elif str(actionItems[int(choice)][1]) == "post":
+                actionChoice = list(actionItems[int(choice)])[1]
+                return finalizePost(actionChoice)
             else:
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeAction(actionChoice)
@@ -193,7 +215,95 @@ def finalizeAction(actionChoice):
                 return action()
             # Call the matching function
             fileChoice = list(fileItems[int(fileChoice)])[1]
-            return performAction(actionChoice, fileChoice)
+            return selectMethod(actionChoice, fileChoice)
+        except (ValueError, IndexError):
+            print("Error: Incorrect Index")
+        except Exception as e:
+            settings.maybePrint(e)
+            print("Error: Missing Method") 
+
+def selectMethod(actionChoice, fileChoice):
+    for item in methodItems:
+        print(colorize("[" + str(methodItems.index(item)) + "] ", 'teal') + list(item)[0])
+    while True:
+        methodChoice = input(">> ")
+        try:
+            if int(methodChoice) < 0 or int(methodChoice) >= len(methodItems): raise ValueError
+            methodChoice_ = list(methodItems[int(methodChoice)])[1]
+            if str(methodItems[int(methodChoice)][1]) == "main":
+                return action()
+            elif str(methodItems[int(methodChoice)][1]) == "choose":
+                if str(fileChoice) == "gallery":
+                    choices = displayFolders("galleries")
+                elif str(fileChoice) == "video":
+                    choices = displayFolders("videos")
+                elif str(fileChoice) == "image":
+                    choices = displayFolders("images")
+                elif str(fileChoice) == "performer":
+                    choices = displayFolders("performers")
+                elif str(fileChoice) == "scene":
+                    choices = displayFolders("scenes")
+                seeking = True
+                while seeking:
+                    choice = input(">> ")
+                    try:
+                        if int(choice) < 0 or int(choice) > len(choices): raise ValueError
+                        if int(choice) == 0:
+                            return selectMethod(actionChoice, fileChoice)
+                        file = choices[int(choice)-1]
+                        parent = file
+                        
+                        seeking = False
+                        if str(fileChoice) == "gallery" or str(fileChoice) == "image"  or str(fileChoice) == "video" or str(fileChoice) == "performer":
+                            if str(fileChoice) == "gallery":
+                                choices_ = displayFolders(file['title'], parent="galleries")
+                            elif str(fileChoice) == "image":
+                                choices_ = displayFiles(file['title'], parent="images")
+                            elif str(fileChoice) == "video":
+                                choices_ = displayFiles(file['title'], parent="videos")
+                            elif str(fileChoice) == "performer":
+                                choices_ = displayFolders(file['title'], parent="performers")
+                            seeking_ = True
+                            while seeking_:
+                                choice_ = input(">> ")
+                                try:
+                                    if int(choice_) < 0 or int(choice_) > len(choices_): raise ValueError
+                                    if int(choice_) == 0:
+                                        return selectMethod(actionChoice, fileChoice)
+                                    file = choices_[int(choice_)-1]
+                                    seeking_ = False
+                                    folderName = file['title']
+                                    if str(fileChoice) == "performer":
+                                        # parent = file
+                                        # choices_ = displayFiles(file['title'], parent=parent)
+                                        choices_ = displayBoth(file['title'], parent=parent)
+                                        seeking__ = True
+                                        while seeking__:
+                                            choice_ = input(">> ")
+                                            try:
+                                                if int(choice_) < 0 or int(choice_) > len(choices_): raise ValueError
+                                                if int(choice_) == 0:
+                                                    return selectMethod(actionChoice, fileChoice)
+                                                file = choices_[int(choice_)-1]
+                                                seeking__ = False
+                                                return performAction(actionChoice, fileChoice, methodChoice_, file=file, folderName=folderName, parent=parent)
+                                            except (ValueError, IndexError):
+                                                print(sys.exc_info()[0])
+                                                print("Error: Incorrect Index")
+                                                return finalizeAction(actionChoice)
+
+                                except (ValueError, IndexError):
+                                    print(sys.exc_info()[0])
+                                    print("Error: Incorrect Index")
+                                    return finalizeAction(actionChoice)
+                        return performAction(actionChoice, fileChoice, methodChoice_, file=file, folderName=folderName, parent=parent)
+
+
+                    except (ValueError, IndexError):
+                        print(sys.exc_info()[0])
+                        print("Error: Incorrect Index")
+                        return finalizeAction(actionChoice)
+            return performAction(actionChoice, fileChoice, methodChoice_)
         except (ValueError, IndexError):
             print("Error: Incorrect Index")
         except Exception as e:
@@ -201,10 +311,10 @@ def finalizeAction(actionChoice):
             print("Error: Missing Method") 
 
 ### Action Menu - perform
-def performAction(actionChoice, fileChoice):
+def performAction(actionChoice, fileChoice, methodChoice, file=None, folderName=None, parent=None):
     try:
         method = getattr(OnlySnarf, str(actionChoice))
-        response = method(fileChoice)
+        response = method(fileChoice, methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
         if response:
             if str(actionChoice) == "download":
                 for setting in settingItems:
@@ -292,8 +402,8 @@ def message(choice, image=None, username=None):
     if not image or not image[0] or image[0] == None:
         print("Error: Missing Image")
         return
-    file_path = Google.download_file(image[0])
-    successful_message = OnlySnarf.message(choice=choice, message=message, image=file_path, price=price, username=username)
+    image = Google.download_file(image[0]).get("path")
+    successful_message = OnlySnarf.message(choice=choice, message=message, image=image, price=price, username=username)
     if successful_message and str(choice) != "new":
         Google.move_file(image[0])
     else:
@@ -340,7 +450,6 @@ def performPromotion(actionChoice, promotionChoice):
                     if int(choice) == 0:
                         return finalizePromotion(actionChoice)
                     return promote(str(users[int(choice)-1].username))
-
                 except (ValueError, IndexError):
                     settings.maybePrint(sys.exc_info()[0])
                     print("Error: Incorrect Index")            
@@ -350,6 +459,80 @@ def performPromotion(actionChoice, promotionChoice):
         settings.maybePrint(e)
         print("Error: Missing Method") 
     mainMenu()
+
+def finalizeDiscount(actionChoice):
+    for item in messageItems:
+        print(colorize("[" + str(messageItems.index(item)) + "] ", 'teal') + list(item)[0])
+    while True:
+        choice = input(">> ")
+        try:
+            choice = int(choice)
+            if int(choice) < 0 or int(choice) >= len(messageItems): raise ValueError
+            if str(messageItems[int(choice)][1]) == "main":
+                return action()
+            return performDiscount(actionChoice, messageItems[int(choice)][1])
+        except (ValueError, IndexError):
+            print(sys.exc_info()[0])
+            print("Error: Incorrect Index")
+
+def performDiscount(actionChoice, discountChoice):
+    username = None
+    if str(discountChoice) == "user":
+        user = input("Username: ")
+        OnlySnarf.discount(user, depth=int(choice))
+        mainMenu()
+    elif str(discountChoice) == "select":
+        users = displayUsers()
+        seeking = True
+        while seeking:
+            choice = input(">> ")
+            try:
+                if int(choice) < 0 or int(choice) > len(users): raise ValueError
+                if int(choice) == 0:
+                    return finalizeDiscount(actionChoice)
+                OnlySnarf.discount(users[int(choice)-1], depth=int(choice))
+                mainMenu()
+            except (ValueError, IndexError):
+                print(sys.exc_info()[0])
+                print("Error: Incorrect Index")
+                return mainMenu()
+    OnlySnarf.discount(discountChoice)
+    mainMenu()    
+
+def finalizePost(actionChoice):
+    OnlySnarf.post()
+    mainMenu()
+
+def displayBoth(folderName, parent=None):
+    files = Google.get_files_of_folder(folderName, parent=parent)
+    folders = Google.get_folders_of_folder(folderName, parent=parent)
+    files_both = []
+    for f in files: files_both.append(f)
+    for f in folders: files_both.append(f)
+    print(colorize("[0] ", 'blue') + "Back")
+    i = 1
+    for file in files_both:
+        print(colorize("[" + str(i) + "] ", 'blue') + str(file['title']))
+        i = i+1
+    return files_both
+
+def displayFiles(folderName, parent=None):
+    files = Google.get_files_of_folder(folderName, parent=parent)
+    print(colorize("[0] ", 'blue') + "Back")
+    i = 1
+    for file in files:
+        print(colorize("[" + str(i) + "] ", 'blue') + str(file['title']))
+        i = i+1
+    return files
+
+def displayFolders(folderName, parent=None):
+    folders = Google.get_folders_of_folder(folderName, parent=parent)
+    print(colorize("[0] ", 'blue') + "Back")
+    i = 1
+    for folder in folders:
+        print(colorize("[" + str(i) + "] ", 'blue') + str(folder['title']))
+        i = i+1
+    return folders
 
 # displays and returns users
 def displayUsers():
@@ -371,7 +554,6 @@ def selectImage(folderName):
         i = i+1
     return images
     # performMessage -> [folder , image_file] -> performMessage
-
 
 ###########################
 
