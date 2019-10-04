@@ -152,6 +152,8 @@
   - added BROWSER.url checks
   **2.2.4**
   - user selections -> debug
+  **2.3.0**
+  - added: post
 
 ----------------------------------------
 

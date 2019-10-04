@@ -109,6 +109,7 @@ def initialize():
     if str(settings.DEBUG) == "True":
         actionItems.append([ "Test", "test"])
         actionItems.append([ "Promotion", "promotion" ])
+        actionItems.append([ "Post", "post" ])
     actionItems.insert(0,[ "Back", "main"])
 
     global messageItems
@@ -190,6 +191,9 @@ def action():
             elif str(actionItems[int(choice)][1]) == "promotion":
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizePromotion(actionChoice)
+            elif str(actionItems[int(choice)][1]) == "post":
+                actionChoice = list(actionItems[int(choice)])[1]
+                return finalizePost(actionChoice)
             else:
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeAction(actionChoice)
@@ -494,6 +498,10 @@ def performDiscount(actionChoice, discountChoice):
                 return mainMenu()
     OnlySnarf.discount(discountChoice)
     mainMenu()    
+
+def finalizePost(actionChoice):
+    OnlySnarf.post()
+    mainMenu()
 
 def displayBoth(folderName, parent=None):
     files = Google.get_files_of_folder(folderName, parent=parent)
