@@ -154,7 +154,13 @@
   - user selections -> debug
   **2.3.0**
   - added: post
-
+  **2.4.0**
+  - settings cleanup
+  - release -> upload
+  - onlyfans var cleanup
+  - added local input
+  - added posts beginning -> needs configparser
+  
 ----------------------------------------
 
 ## ToDo

@@ -44,7 +44,7 @@ def authGoogle():
         # PyDrive
         gauth = GoogleAuth()
         # Try to load saved client credentials
-        gauth.LoadCredentialsFile(settings.PATH_GOOGLE_CREDS)
+        gauth.LoadCredentialsFile(settings.GOOGLE_PATH)
         settings.maybePrint('Loaded: Google Credentials')
         if gauth.credentials is None:
             # Authenticate if they're not there
@@ -56,20 +56,20 @@ def authGoogle():
             # Initialize the saved creds
             gauth.Authorize()
         # Save the current credentials to a file
-        gauth.SaveCredentialsFile(settings.PATH_GOOGLE_CREDS)
+        gauth.SaveCredentialsFile(settings.GOOGLE_PATH)
         global PYDRIVE
         PYDRIVE = GoogleDrive(gauth)
         # Drive v3 API
         SCOPES = 'https://www.googleapis.com/auth/drive'
-        store = file.Storage(settings.PATH_GOOGLE_CREDS)
+        store = file.Storage(settings.GOOGLE_PATH)
         creds = store.get()
         if not creds or creds.invalid:
             flow = client.flow_from_clientsecrets(settings.PATH_SECRET, SCOPES)
             creds = tools.run_flow(flow, store)
         global DRIVE
         DRIVE = build('drive', 'v3', http=creds.authorize(Http()))
-    except:
-        settings.maybePrint(sys.exc_info()[0])
+    except Exception as e:
+        # settings.maybePrint(e)
         print('Error: Unable to Authenticate w/ Google')
         return False
     print('Authentication Success') 
@@ -87,7 +87,7 @@ def checkAuth():
 # Deletes online file
 def delete_file(file):
     checkAuth()
-    if str(settings.FORCE_DELETE_GOOGLE) == "True":
+    if str(settings.FORCE_DELETE) == "True":
         print("Deleting (Forced): {}".format(fileName))
     elif str(settings.DEBUG) == "True":
         print("Skipping Delete (Debug): {}".format(fileName))
@@ -195,7 +195,7 @@ def get_folder_by_name(folderName, parent=None):
         if str(folder['title'])==str(folderName):
             settings.maybePrint("Found Folder: {}".format(folderName))
             return folder
-    if str(settings.DRIVE_CREATE_MISSING) == "False":
+    if str(settings.CREATE_DRIVE) == "False":
         settings.maybePrint("Skipping: Create Missing Folder - {}".format(folderName))
         return None
     # create if missing
@@ -227,9 +227,9 @@ def get_folder_root():
     if OnlyFansFolder_ is not None:
         return OnlyFansFolder_
     OnlyFansFolder = None
-    if settings.PATH_DRIVE is not None:
+    if settings.DRIVE_PATH is not None:
         mount_root = "root"
-        root_folders = settings.PATH_DRIVE.split("/")
+        root_folders = settings.DRIVE_PATH.split("/")
         settings.maybePrint("Mount Folders: {}".format("/".join(root_folders)))    
         for folder in root_folders:
             mount_root = find_folder(mount_root, folder)
@@ -242,7 +242,7 @@ def get_folder_root():
             mount_root = {"id":"root"}
             print("Warning: Drive Mount Folder Not Found")
         else:
-            print("Found Root (alt): {}/{}".format(settings.PATH_DRIVE, settings.ROOT_FOLDER))
+            print("Found Root (alt): {}/{}".format(settings.DRIVE_PATH, settings.ROOT_FOLDER))
         OnlyFansFolder = mount_root
     else:
         file_list = PYDRIVE.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
@@ -269,6 +269,7 @@ def download_file(file, REPAIR=False):
     tmp = settings.getTmp()
     if str(settings.SKIP_DOWNLOAD) == "True":
         print("Skipping Download (debug)")
+        settings.update_value("input",tmp)
         return {"path":tmp}
     checkAuth()
     print('Downloading File: {}'.format(file['title']))
@@ -325,6 +326,7 @@ def download_file(file, REPAIR=False):
         settings.maybePrint("Error: File Size Too Small")
         print("Error: Download Failure")
         return False
+    settings.update_value("input",tmp)
     print('Downloaded: File')
     return {"path":tmp}
 
@@ -336,6 +338,7 @@ def download_gallery(folder):
     tmp = settings.getTmp()
     if str(settings.SKIP_DOWNLOAD) == "True":
         print("Skipping Download (debug)")
+        settings.update_value("input",tmp)
         return {"path":tmp,"files":[]}
     checkAuth()
     print('Downloading Gallery: {}'.format(folder['title']))
@@ -357,6 +360,7 @@ def download_gallery(folder):
         file.GetContentFile(os.path.join(tmp, str(file['title'])))
         i+=1
     print('Downloaded: Gallery')
+    settings.update_value("input",tmp)
     return {"path":tmp,"files":file_list}
 
 def download_message_image(folderName="random"):
@@ -369,6 +373,7 @@ def download_message_image(folderName="random"):
     except Exception as e:
         settings.maybePrint(e)
         return {}
+    settings.update_value("input",data.get("path"))
     return {"path":data.get("path"), "file":file.get("file")}
 
 def download_content(folder):
@@ -786,18 +791,69 @@ def random_download(fileChoice):
 ##### Upload #####
 ##################
 
-def upload_file(filename=None, mimetype="video/mp4"):
+def upload_file(path=None, parent=None):
     checkAuth()
-    if filename == None:
-        print("Error: Missing Filename")
+    file = os.path.basename(path)
+    filename = os.path.splitext(file)[0]
+    ext = os.path.splitext(file)[1].lower()
+    mimetype = None
+    if str(settings.FORCE_BACKUP) == "True":
+        print("Uploading File (forced): {}".format(filename))
+    elif str(settings.DEBUG) == "True":
+        print("Skipping Uploading File (debug): {}".format(filename))
+        return
+    elif str(settings.BACKUP) == "False":
+        print('Skipping Uploading File (disabled): {}'.format(filename))
+        return
+    else:
+        print('Uploading File (Google): {}'.format(filename))
+    if "mp4" in ext:
+        mimetype = "video/mp4"
+    elif "jpg" in ext or "jpeg" in ext:
+        mimetype = "image/jpeg"
+    if not mimetype:
+        print("Error: Missing Mimetype")
+        return
+    if not parent: parent = get_folder_by_name("posted")
+    if not parent:
+        print("Error: Missing Posted Folder")
+        return
+    # file_metadata = {
+    #     'name': str(filename),
+    #     'mimeType': str(mimetype),
+    #     'parents': [{"kind": "drive#fileLink", "id": str(parent['id'])}]
+    # }
+    # media = MediaFileUpload(path, mimetype=str(mimetype), resumable=True)
+    # file = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
+    file = PYDRIVE.CreateFile({'title':str(filename), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':str(mimetype)})
+    file.Upload()
+    # print('File ID: {}'.format(file.get('id')))
+
+def upload_gallery(path=None):
+    print("Uploading Gallery (Google): {}".format(path))
+    parent = get_folder_by_name("posted")
+    if not parent:
+        print("Error: Missing Posted Folder")
         return
     file_metadata = {
-        'name': str(filename),
-        'mimeType': str(mimetype)
+        'name': str(datetime.datetime.now()),
+        'mimeType': str("application/vnd.google-apps.folder"),
+        'parents': [{"kind": "drive#fileLink", "id": str(parent['id'])}]
     }
-    media = MediaFileUpload(str(filename), mimetype=str(mimetype), resumable=True)
-    file = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
-    print('File ID: %s' % file.get('id'))
+    tmp_folder = PYDRIVE.CreateFile({'title':str(datetime.datetime.now()), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':'application/vnd.google-apps.folder'})
+    tmp_folder.Upload()
+    # media = MediaFileUpload(path, mimetype="application/vnd.google-apps.folder", resumable=True)
+    # parent = DRIVE.files().create(body=file_metadata, fields='id').execute()
+    files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+    for file in files:
+        upload_file(path=file, parent=tmp_folder)
+
+def upload_input(path=None):
+    if not path: path = settings.INPUT
+    if os.path.isdir(path):
+        upload_gallery(path=path)
+    else:
+        upload_file(path=path)
 
 ##################
 ##### FFMPEG #####

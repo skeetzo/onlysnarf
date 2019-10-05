@@ -6,7 +6,7 @@ def deleteCron(comment):
     cron.remove(cron)  
 
 def deleteAllCrons():
-    cron = CronTab(user=str(settings.USER))
+    cron = CronTab(user=str(settings.CRON_USER))
     cron.remove_all()  
 
 # use cron.comment to set cron name and find crons
@@ -25,7 +25,7 @@ def createCron(comment,  minute=None, hour=None):
     if findCron(comment) is not None:
         print("Warning: Cron Exists")
         return
-    cron = CronTab(user=str(settings.USER))
+    cron = CronTab(user=str(settings.CRON_USER))
     newCron = cron.new(command='onlysnarf -cron -{}'.format(comment), comment=comment);
     newCron.hour.every(1)
     if minute is not None:
@@ -38,7 +38,7 @@ def createCron(comment,  minute=None, hour=None):
     print("Created Cron: {}".format(comment))
 
 def listCrons():
-    cron = CronTab(user=str(settings.USER))
+    cron = CronTab(user=str(settings.CRON_USER))
     for job in cron:
         print(job)
 
@@ -46,7 +46,7 @@ def listCrons():
 # cron.find_comment("comment")
 # cron.find_time(time schedule)
 def findCron(comment):
-    cron = CronTab(user=str(settings.USER))
+    cron = CronTab(user=str(settings.CRON_USER))
     print(cron.find_comment(str(comment)))
     if str(settings.DEBUG) == "True":
         return None
