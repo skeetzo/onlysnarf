@@ -2,10 +2,17 @@
 # Global Settings
 import sys
 import os
+import json
 
 class Settings:
     def __init__(self):
         pass
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def __setitem__(self, key, val):
+        return setattr(self, key, val)
 
     def initialize(self):
         # print("Initializing self...")
@@ -18,6 +25,9 @@ class Settings:
         # -backup
         # backup uploaded content to "posted" folder
         self.BACKUP = False
+        # -cron-user
+        # the user to run OnlySnarf as
+        self.CRON_USER = "root"
         # -force-backup
         # force Google backup
         self.FORCE_BACKUP = False
@@ -39,7 +49,7 @@ class Settings:
         self.DELETE_GOOGLE = False
         # -create-drive 
         # creates missing OnlySnarf folders in Google Drive
-        self.DRIVE_CREATE_MISSING = False
+        self.CREATE_DRIVE = False
         # configurable w/ profile.conf
         # OnlySnarf Drive folder list
         self.DRIVE_FOLDERS = [
@@ -51,7 +61,7 @@ class Settings:
         ]
         # -force-delete
         # force Google file deletion upon upload
-        self.FORCE_DELETE_GOOGLE = False
+        self.FORCE_DELETE = False
         # -force-reduce
         # force mp4 reduction
         self.FORCE_REDUCTION = False
@@ -61,6 +71,9 @@ class Settings:
         # -image-path
         # path to local file to use
         self.PATH_LOCAL = None
+        # -input
+        # path to local file(s) to upload
+        self.INPUT = None
         # -image
         # path to local image to use for message or upload
         self.IMAGE = None
@@ -69,24 +82,27 @@ class Settings:
         self.IMAGE_UPLOAD_LIMIT = 6
         # -image-max
         # maximum number of images that can be uploaded
-        self.IMAGE_UPLOAD_MAX = 15
+        self.IMAGE_UPLOAD_MAX = 20
         # -overwrite-local
         # self.OVERWRITE_LOCAL = False
         # -mount-path
         # the mounth path for a local directory of OnlyFans config files
-        self.PATH_MOUNT = None
+        self.MOUNT_PATH = None
+        # -password
+        # the password for the OnlyFans / Twitter
+        self.PASSWORD = None
         # -drive-path
         # the folder path within Google Drive for OnlySnarf's root folder
-        self.PATH_DRIVE = None
+        self.DRIVE_PATH = None
         # -user-path
         # the path to the users.json file
-        self.PATH_USERS = "users.json"
+        self.USERS_PATH = "users.json"
         # -config-path
         # the path to the config.json file
         self.PATH_CONFIG = "config.json"
         # -google-path
         # the path to the google_creds.txt
-        self.PATH_GOOGLE_CREDS = "google_creds.txt"
+        self.GOOGLE_PATH = "google_creds.txt"
         # the path to the client_secret.json
         self.PATH_SECRET = "client_secret.json"
         # -prefer-local
@@ -135,8 +151,13 @@ class Settings:
         # enabled tweeting
         self.TWEETING = False
         # -user
-        # the user to run OnlySnarf as
-        self.USER = "root"
+        # the user to target
+        self.USER = None
+        # user id found in OnlyFans
+        self.USER_ID = None
+        # -username
+        # the OnlyFans / Twitter username to use
+        self.USERNAME = None
         # -verbose
         # more output
         self.VERBOSE = False
@@ -145,86 +166,61 @@ class Settings:
         # updates w/ values from /etc/onlysnarf/profile.conf
         profile = None
         if os.path.exists("/etc/onlysnarf/profile.conf"):
-            readProfile(self, "/etc/onlysnarf/profile.conf")
+            readConf(self, "/etc/onlysnarf/profile.conf")
         elif os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf")):
-            readProfile(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf"))
+            readConf(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf"))
+        self.POSTS = {}
+        # if os.path.exists("/etc/onlysnarf/posts.conf"):
+        #     readPosts(self, "/etc/onlysnarf/posts.conf")
+        # elif os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), "posts.conf")):
+        #     readPosts(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "posts.conf"))
         i = 0
         while i < len(sys.argv):
-            if '-backup' in str(sys.argv[i]):
-                self.BACKUP = True
-            elif '-create-drive' in str(sys.argv[i]):
-                self.DRIVE_CREATE_MISSING = True
-            elif '-debug' in str(sys.argv[i]):
-                self.DEBUG = True
-            elif '-debug-delay' in str(sys.argv[i]):
-                self.DEBUG_DELAY = True
-            elif '-delete-google' in str(sys.argv[i]):
-                self.DELETE_GOOGLE = False
-            elif '-force-backup' in str(sys.argv[i]):
-                self.FORCE_BACKUP = True 
-            elif '-force-delete' in str(sys.argv[i]):
-                self.FORCE_DELETE_GOOGLE = True
-            elif '-force-upload' in str(sys.argv[i]):
-                self.FORCE_UPLOAD = True
-            elif '-force-reduc' in str(sys.argv[i]):
-                self.FORCE_REDUCTION = True
-            elif '-image' in str(sys.argv[i]):
-                self.IMAGE = str(sys.argv[i+1])
-            elif '-image-limit' in str(sys.argv[i]):
-                self.IMAGE_UPLOAD_LIMIT = str(sys.argv[i+1])
-            elif '-image-max' in str(sys.argv[i]):
-                self.IMAGE_UPLOAD_MAX = str(sys.argv[i+1])
-            # elif '-overwrite-local' in str(sys.argv[i]):
-                # self.OVERWRITE_LOCAL = True
-            elif '-prefer-local' in str(sys.argv[i]):
-                self.PREFER_LOCAL = True
-            elif '-save-users' in str(sys.argv[i]):
-                self.SAVE_USERS = True
-            elif '-show' in str(sys.argv[i]):
-                self.SHOW_WINDOW = True
-            elif '-skip-delete' in str(sys.argv[i]):
-                self.SKIP_DELETE = True
-            elif '-skip-download' in str(sys.argv[i]):
-                self.SKIP_DOWNLOAD= True
-            elif '-skip-reduce' in str(sys.argv[i]):
-                self.SKIP_REDUCE = True
-            elif '-skip-repair' in str(sys.argv[i]):
-                self.SKIP_REPAIR = True
-            elif '-skip-upload' in str(sys.argv[i]):
-                self.SKIP_UPLOAD = True
-            elif '-skip-thumb' in str(sys.argv[i]):
-                self.SKIP_THUMBNAIL = True
-            elif '-type' in str(sys.argv[i]):
-                self.TYPE = str(sys.argv[i+1])
-            elif '-text' in str(sys.argv[i]):
-                self.TEXT = str(sys.argv[i+1])
-            elif '-tweet' in str(sys.argv[i]):
-                self.TWEETING = True
-            elif '-user' in str(sys.argv[i]):
-                self.USER = str(sys.argv[i+1])
-            elif '-verbose' in str(sys.argv[i]):
-                self.VERBOSE = True
-            elif '-drive-path' in str(sys.argv[i]):
-                self.PATH_DRIVE = str(sys.argv[i+1])
-            elif '-google-path' in str(sys.argv[i]):
-                self.PATH_GOOGLE_CREDS = str(sys.argv[i+1])
-            elif '-mount-path' in str(sys.argv[i]):
-                self.PATH_MOUNT = str(sys.argv[i+1])
-            elif '-user-path' in str(sys.argv[i]):
-                self.PATH_USERS = str(sys.argv[i+1])
+            sys.argv[i] = sys.argv[i][1:] # remove - in front
+            truths_ = ["BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","SKIP_THUMBNAIL","TWEETING","VERBOSE"]
+            falses_ = []
+            nexts_ = ["CRON_USER","INPUT","IMAGE","IMAGE_UPLOAD_LIMIT","IMAGE_UPLOAD_MAX","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
+            j = 0
+            while j < len(truths_):
+
+                if str(truths_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
+                    # self.set(truths_[j], True)
+                    self[truths_[j]] = True
+                j = j + 1
+            j = 0
+            while j < len(falses_):
+                if str(falses_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
+                    # self.set(falses_[j], False)
+                    self[falses_[j]] = False
+                j = j + 1
+            j = 0
+            while j < len(nexts_):
+                if str(nexts_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
+                    # self.set(nexts_[j], sys.argv[i+1])  
+                    self[nexts_[j]] = sys.argv[i+1]
+                j = j + 1
             i += 1
-        if self.PATH_MOUNT is not None:
-            self.PATH_CONFIG = os.path.join(self.PATH_MOUNT, self.PATH_CONFIG)
-            self.PATH_SECRET = os.path.join(self.PATH_MOUNT, self.PATH_SECRET)
-            self.PATH_GOOGLE_CREDS = os.path.join(self.PATH_MOUNT, self.PATH_GOOGLE_CREDS)
-            self.PATH_USERS = os.path.join(self.PATH_MOUNT, self.PATH_USERS)
-            self.WORKING_VIDEO = os.path.join(self.PATH_MOUNT, self.WORKING_VIDEO)
+        if self.MOUNT_PATH is not None:
+            self.PATH_CONFIG = os.path.join(self.MOUNT_PATH, self.PATH_CONFIG)
+            self.PATH_SECRET = os.path.join(self.MOUNT_PATH, self.PATH_SECRET)
+            self.GOOGLE_PATH = os.path.join(self.MOUNT_PATH, self.GOOGLE_PATH)
+            self.USERS_PATH = os.path.join(self.MOUNT_PATH, self.USERS_PATH)
+            self.WORKING_VIDEO = os.path.join(self.MOUNT_PATH, self.WORKING_VIDEO)
         else:
             self.PATH_CONFIG = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.PATH_CONFIG)
             self.PATH_SECRET = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.PATH_SECRET)
-            self.PATH_GOOGLE_CREDS = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.PATH_GOOGLE_CREDS)
-            self.PATH_USERS = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.PATH_USERS)
+            self.GOOGLE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.GOOGLE_PATH)
+            self.USERS_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.USERS_PATH)
             self.WORKING_VIDEO = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.WORKING_VIDEO)
+        # config file
+        try:
+            with open(self.PATH_CONFIG) as config_file:    
+                config = json.load(config_file)
+            self.USERNAME = config.get("username")
+            self.PASSWORD = config.get("password")
+        except Exception as e:
+            print(e)
+        
         self.INITIALIZED = True
         # print("Settings Initialized")
     ###################################################
@@ -233,20 +229,41 @@ class Settings:
     ##### Functions #####
     #####################
 
+    def getInput(self):
+        if str(self.INPUT) == "None":
+            self.maybePrint("Error: Missing Input Path")
+            return False
+        if os.path.isdir(str(self.INPUT)):  
+            print("Found: Directory")  
+        elif os.path.isfile(str(self.INPUT)):  
+            print("Found: File")  
+        else:  
+            self.maybePrint("Error: Missing Input Path")
+            return False
+        return self.INPUT
+
     def getTmp(self):
         # mkdir /tmp
         tmp = os.getcwd()
-        if self.PATH_MOUNT != None:
-            tmp = os.path.join(self.PATH_MOUNT, "tmp")
+        if self.MOUNT_PATH != None:
+            tmp = os.path.join(self.MOUNT_PATH, "tmp")
         else:
             tmp = os.path.join(tmp, "tmp")
         if not os.path.exists(str(tmp)):
             os.mkdir(str(tmp))
         return tmp
 
+    def loginPrompt(self):
+        username = input("Twitter Username ({}): ".format(self.USERNAME))
+        password = input("Twitter Password: ")
+        if username != "" and username != " ":
+            self.USERNAME = username
+        if password != "" and password != " ":
+            self.PASSWORD = password
+
     def maybePrint(self, text):
         if str(self.VERBOSE) == "True":
-            print(text);
+            print(text)
 
     def update_value(self, variable, newValue):
         variable = str(variable).upper().replace(" ","_")
@@ -255,13 +272,21 @@ class Settings:
             setattr(self, variable, newValue)
             # print("Updated: {} = {}".format(variable, getattr(self, variable)))
         except Exception as e:
-            settings.maybePrint(e)
+            maybePrint(e)
 
 SETTINGS = Settings()
 
-def readProfile(self, profile):
-    with open(profile) as f:
+def readConf(self, conf):
+    with open(conf) as f:
         for line in f:
             (key, val) = line.split()
             if str(key[0]) == "#": continue
             setattr(self, key, val)
+
+def readPosts(self, conf):
+    with open(conf) as f:
+        for line in f:
+            (key, val) = line.split()
+            print("key: {} :- {}: val".format(key, val))
+            if str(key[0]) == "#": continue
+            setattr(self.POSTS, key, val)

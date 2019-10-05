@@ -70,7 +70,7 @@ def discount(user, depth=1):
 ##### Download #####
 ####################
 
-def download(fileChoice, methodChoice="random", file=None):
+def download(fileChoice, methodChoice="random", file=None, folderName=None, parent=None):
     if methodChoice == "random":
         return Google.random_download(fileChoice)
     elif methodChoice == "choose" and file is not None:
@@ -155,8 +155,9 @@ def remove_local():
 ###################
 
 def release(opt, methodChoice="random", file=None, folderName=None, parent=None):
-    print("0/3 : Deleting Locals")
-    remove_local()
+    if str(methodChoice) != "input":
+        print("0/3 : Deleting Locals")
+        remove_local()
     sys.stdout.flush()
     #################################################
     print("1/3 : Running - {}".format(opt))
@@ -178,7 +179,13 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
             print("Error: Missing Option")
             return False
         print("Releasing: {}".format(opt))
-        data = download(opt, methodChoice=methodChoice, file=file)
+        data = None
+        if str(methodChoice) == "input":
+            input_ = settings.getInput()
+            if not input_: return False
+            data = {"path":str(input_),"text":str(settings.TEXT)}
+        else:
+            data = download(opt, methodChoice=methodChoice, file=file)
         if data == None:
             print("Error: Missing Data")
             return False
@@ -189,8 +196,8 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
         files = None
         if parent: parent = parent.get("title")
         try:
-            if file == None: file = data.get("file")
-            text = file.get("title") or ""
+            if file == None: file = data.get("file") or {}
+            text = file.get("title") or data.get("text")
             path = data.get("path")
             files = data.get("files")
             keywords = data.get("keywords") or parent
@@ -243,8 +250,10 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
             print("Error: Missing Data Type")
         elif files:
             Google.move_files(text, files)
-        else:
+        elif str(methodChoice) != "input":
             Google.move_file(file)
+        elif str(methodChoice) == "input":
+            Google.upload_input()
     except Exception as e:
         settings.maybePrint(e)
         return False
@@ -368,10 +377,18 @@ def get_users():
 ##### Dev #####
 ###############
 
-def test(TYPE):
+def test(TYPE, methodChoice="random", file=None, folderName=None, parent=None):
     print('0/3 : Deleting Locals')
     remove_local()
     print('1/3 : Testing')
+
+    print('TESTING: Input')
+    data = download("gallery", methodChoice="random")
+    release("gallery", methodChoice="input")
+    reset = OnlySnarf.reset()
+    if not reset:
+        return print("Error: Failed to Reset")
+    return
 
     # ### Promotion ###
     print('TESTING: Cron')
@@ -389,7 +406,6 @@ if __name__ == "__main__":
     try:
         # os.system('clear')
         settings.initialize()
-        OnlySnarf.initialize()
         main(settings.TYPE)
     except:
         print(sys.exc_info()[0])
@@ -399,7 +415,6 @@ if __name__ == "__main__":
 else:
     try:
         settings.initialize()
-        OnlySnarf.initialize()
     except Exception as e:
         print(e)
         print("Shnnarf?")

@@ -62,27 +62,31 @@ def initialize():
     global settingItems
     # Settings Menu
     settingItems = sorted([
-        [ "Backup", settings.BACKUP, ["True","False"],True],
-        [ "Delete Google", settings.DELETE_GOOGLE, ["True","False"],False],
-        [ "Skip Delete Local", settings.SKIP_DELETE, ["True","False"],False],
-        [ "Force Backup", settings.FORCE_BACKUP, ["True","False"],False],
-        [ "Force Upload", settings.FORCE_UPLOAD, ["True","False"],False],
-        [ "Mount Path", settings.PATH_MOUNT,None,False],
-        [ "Google: Root Folder Path", settings.PATH_DRIVE,None,False],
-        [ "Users Path", settings.PATH_USERS,None,False],
-        [ "Show Window", settings.SHOW_WINDOW, ["True","False"],False],
-        [ "Google: Root Folder Name", settings.ROOT_FOLDER,None,False],
-        [ "Google: Drive Folders", settings.DRIVE_FOLDERS,None,False],
-        [ "Image Limit", settings.IMAGE_UPLOAD_LIMIT,None,True],
-        [ "Image Max", settings.IMAGE_UPLOAD_MAX,None,False],
-        [ "Tweeting", settings.TWEETING, ["True","False"],True],
+        [ "Verbose", settings.VERBOSE, ["True","False"],True],
         [ "Debug", settings.DEBUG, ["True","False"],False],
-        [ "Skip Download", settings.SKIP_DOWNLOAD, ["True","False"],False],    
-        [ "Create Missing Google Folders", settings.DRIVE_CREATE_MISSING, ["True","False"],False],    
-        [ "Verbose", settings.VERBOSE, ["True","False"],True]    
+        [ "Backup", settings.BACKUP, ["True","False"],True],
+        [ "Show Window", settings.SHOW_WINDOW, ["True","False"],False],
+        [ "Delete Google", settings.DELETE_GOOGLE, ["True","False"],False],
+        [ "Skip Delete", settings.SKIP_DELETE, ["True","False"],False],
+        [ "Tweeting", settings.TWEETING, ["True","False"],True],
+        [ "Image Limit", settings.IMAGE_UPLOAD_LIMIT,None,True],
     ])
+    if str(settings.VERBOSE) == "True":
+        settingItems.append([ "Skip Delete", settings.SKIP_DELETE, ["True","False"],False])
+        settingItems.append([ "Mount Path", settings.MOUNT_PATH,None,False])
+        settingItems.append([ "Drive Path", settings.DRIVE_PATH,None,False])
+        settingItems.append([ "Users Path", settings.USERS_PATH,None,False])
+        settingItems.append([ "Google Root", settings.ROOT_FOLDER,None,False])
+        settingItems.append([ "Drive Folder", settings.DRIVE_FOLDERS,None,False])
+        settingItems.append([ "Create Drive", settings.CREATE_DRIVE, ["True","False"],False])
     if str(settings.DEBUG) == "True":
+        settingItems.append([ "Force Delete", settings.FORCE_DELETE, ["True","False"],False])
+        settingItems.append([ "Force Backup", settings.FORCE_BACKUP, ["True","False"],False])
+        settingItems.append([ "Force Upload", settings.FORCE_UPLOAD, ["True","False"],False])
+        settingItems.append([ "Skip Download", settings.SKIP_DOWNLOAD, ["True","False"],False])
+        settingItems.append([ "Image Max", settings.IMAGE_UPLOAD_MAX,None,False])
         settingItems.append([ "Text", settings.TEXT,None,False])
+        settingItems.append([ "Input", settings.INPUT,None,False])
         settingItems.append([ "Image", settings.IMAGE,None,False])
         settingItems.append([ "Prefer Local", settings.PREFER_LOCAL,["True","False"],True])
         # settingItems.append([ "Overwrite Local", settings.OVERWRITE_LOCAL,["True","False"],True])
@@ -99,7 +103,7 @@ def initialize():
     global actionItems
     # Actions Menu
     actionItems = sorted([
-        [ "Release", "release" ],
+        [ "Upload", "release" ],
         [ "Download", "download" ],
         # [ "Promotion", "promotion" ],
         [ "Message", "message" ],
@@ -163,6 +167,19 @@ def initialize():
     ])
     methodItems.insert(0,[ "Back", "main"])
 
+    global postItems
+    postItems = sorted([
+        [ "Enter", "enter" ],
+        [ "Select", "select" ]
+    ])
+    postItems.insert(0,[ "Back", "main"])
+
+    global postMenu
+    postMenu = []
+    for key in settings.POSTS:
+        postMenu.append([ key, settings.POSTS[key]])
+    postMenu.insert(0,[ "Back", "main"])
+
     # print("Initialized Menu")
     INITIALIZED = True
 
@@ -223,8 +240,13 @@ def finalizeAction(actionChoice):
             print("Error: Missing Method") 
 
 def selectMethod(actionChoice, fileChoice):
+    # if settings.INPUT and methodItems doesn't include Input option already
+    if [ "Input", "input" ] not in methodItems and actionChoice == "release":
+        methodItems.append([ "Input", "input" ])
     for item in methodItems:
         print(colorize("[" + str(methodItems.index(item)) + "] ", 'teal') + list(item)[0])
+
+
     while True:
         methodChoice = input(">> ")
         try:
@@ -317,11 +339,7 @@ def performAction(actionChoice, fileChoice, methodChoice, file=None, folderName=
         response = method(fileChoice, methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
         if response:
             if str(actionChoice) == "download":
-                for setting in settingItems:
-                    if setting[0] == "File Name":
-                        setting[1] = response[0]
-                    elif setting[0] == "File Path":
-                        setting[1] = response[1]
+                settings.update_value("input",response.get("path"))
     except (ValueError, IndexError):
         print("Error: Incorrect Index")
     except Exception as e:
@@ -500,8 +518,39 @@ def performDiscount(actionChoice, discountChoice):
     mainMenu()    
 
 def finalizePost(actionChoice):
-    OnlySnarf.post()
-    mainMenu()
+    for item in postItems:
+        print(colorize("[" + str(postItems.index(item)) + "] ", 'teal') + list(item)[0])
+    while True:
+        choice = input(">> ")
+        try:
+            choice = int(choice)
+            if int(choice) < 0 or int(choice) >= len(postItems): raise ValueError
+            if str(postItems[int(choice)][1]) == "main":
+                return action()
+            elif str(postItems[int(choice)][1]) == "enter":
+                OnlySnarf.post()
+            else:
+                selectPost()
+            return mainMenu()
+        except (ValueError, IndexError):
+            print(sys.exc_info()[0])
+            print("Error: Incorrect Index")
+
+def selectPost():
+    for item in postMenu:
+        print(colorize("[" + str(postMenu.index(item)) + "] ", 'teal') + list(item)[0])
+    while True:
+        choice = input(">> ")
+        try:
+            choice = int(choice)
+            if int(choice) < 0 or int(choice) >= len(postMenu): raise ValueError
+            if str(postMenu[int(choice)][1]) == "main":
+                return action()
+            OnlySnarf.post(text=settings.getPost(postMenu[int(choice)][1]))
+            return mainMenu()
+        except (ValueError, IndexError):
+            print(sys.exc_info()[0])
+            print("Error: Incorrect Index")
 
 def displayBoth(folderName, parent=None):
     files = Google.get_files_of_folder(folderName, parent=parent)
@@ -593,6 +642,8 @@ def set_settings():
                 settingValue = input("Enter the image upload limit: ")
             elif str(settingChoice) == "Image Max":
                 settingValue = input("Enter the image upload max: ")
+            elif str(settingChoice) == "Input":
+                settingValue = input("Enter the input path: ")
             else:
                 list_ = list(settingItems[int(choice)][2])
                 print(colorize(str(settingChoice)+" =", 'blue'))
@@ -688,7 +739,6 @@ def showSettings():
             print(' - '+setting[0]+' = '+str(setting[1]))
         elif str(setting[0]) != "Back" and setting[3]:
             print(' - '+setting[0]+' = '+str(setting[1]))
-        
     global UPDATED
     global UPDATED_TO
     if str(UPDATED) != "False":
