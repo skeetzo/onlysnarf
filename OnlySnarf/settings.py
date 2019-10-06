@@ -3,6 +3,7 @@
 import sys
 import os
 import json
+import configparser
 
 class Settings:
     def __init__(self):
@@ -170,10 +171,10 @@ class Settings:
         elif os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf")):
             readConf(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf"))
         self.POSTS = {}
-        # if os.path.exists("/etc/onlysnarf/posts.conf"):
-        #     readPosts(self, "/etc/onlysnarf/posts.conf")
-        # elif os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), "posts.conf")):
-        #     readPosts(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "posts.conf"))
+        if os.path.exists("/etc/onlysnarf/posts.conf"):
+            readPosts(self, "/etc/onlysnarf/posts.conf")
+        elif os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), "posts.conf")):
+            readPosts(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "posts.conf"))
         i = 0
         while i < len(sys.argv):
             sys.argv[i] = sys.argv[i][1:] # remove - in front
@@ -277,16 +278,33 @@ class Settings:
 SETTINGS = Settings()
 
 def readConf(self, conf):
-    with open(conf) as f:
-        for line in f:
-            (key, val) = line.split()
-            if str(key[0]) == "#": continue
-            setattr(self, key, val)
+    config = configparser.ConfigParser()
+    config.read(conf)
+    for key in config['DEFAULT']:
+        # print("{} : {}".format(key,config['DEFAULT'][key]))
+        val = config['DEFAULT'][key]
+        if str(val)[0] == "\"": val = val[1:]
+        if str(val)[len(val)-1] == "\"": val = val[:len(val)-1]
+        setattr(self, key.upper(), val)
 
 def readPosts(self, conf):
-    with open(conf) as f:
-        for line in f:
-            (key, val) = line.split()
-            print("key: {} :- {}: val".format(key, val))
-            if str(key[0]) == "#": continue
-            setattr(self.POSTS, key, val)
+    config = configparser.ConfigParser()
+    config.read(conf)
+    self.POSTS = AttrDict()
+    for key in config['POSTS']:
+        # print("{} : {}".format(key,config['POSTS'][key]))
+        val = config['POSTS'][key]
+        if str(val)[0] == "\"": val = val[1:]
+        if str(val)[len(val)-1] == "\"": val = val[:len(val)-1]
+        setattr(self.POSTS, key, val)
+
+class AttrDict(dict):
+    def __init__(self):
+        dict.__init__(self)
+
+    # Override getattr and setattr so that they return the values of getitem / setitem
+    def __setattr__(self, name, value):
+        self[name] = value
+
+    def __getattr__(self, name):
+        return self[name]
