@@ -167,6 +167,8 @@
   |_ create multiple basic posts such as "greetings" or "going on holiday" or a trip, or question of what to post more of?
   |_ a menu of standardized posts like above
   |_ a menu of questions|greetings to message to users
+  **2.5.1**
+  - more verbose cleanup
 
 ----------------------------------------
 
