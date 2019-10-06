@@ -186,7 +186,7 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
         if not opt:
             print("Error: Missing Option")
             return False
-        print("Releasing: {}".format(opt))
+        print("Uploading: {}".format(opt))
         data = None
         if str(methodChoice) == "input":
             input_ = settings.getInput()

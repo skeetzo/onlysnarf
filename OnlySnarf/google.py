@@ -39,7 +39,7 @@ OnlyFansFolder_ = None
 
 # Google Auth
 def authGoogle():
-    print('Authenticating Google')
+    settings.maybePrint('Authenticating Google')
     try:
         # PyDrive
         gauth = GoogleAuth()
@@ -72,7 +72,7 @@ def authGoogle():
         # settings.maybePrint(e)
         print('Error: Unable to Authenticate w/ Google')
         return False
-    print('Authentication Success') 
+    settings.maybePrint('Authentication Success') 
     return True
 
 def checkAuth():
@@ -242,14 +242,14 @@ def get_folder_root():
             mount_root = {"id":"root"}
             print("Warning: Drive Mount Folder Not Found")
         else:
-            print("Found Root (alt): {}/{}".format(settings.DRIVE_PATH, settings.ROOT_FOLDER))
+            settings.maybePrint("Found Root (alt): {}/{}".format(settings.DRIVE_PATH, settings.ROOT_FOLDER))
         OnlyFansFolder = mount_root
     else:
         file_list = PYDRIVE.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
         for folder in file_list:
             if str(folder['title']) == str(settings.ROOT_FOLDER):
                 OnlyFansFolder = folder
-                print("Found Root: {}".format(settings.ROOT_FOLDER))
+                settings.maybePrint("Found Root: {}".format(settings.ROOT_FOLDER))
     if OnlyFansFolder is None:
         print("Creating Root: {}".format(settings.ROOT_FOLDER))
         OnlyFansFolder = PYDRIVE.CreateFile({"title": str(settings.ROOT_FOLDER), "mimeType": "application/vnd.google-apps.folder"})
