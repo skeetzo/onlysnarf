@@ -160,7 +160,14 @@
   - onlyfans var cleanup
   - added local input
   - added posts beginning -> needs configparser
-  
+  **2.5.0 : 10/5/2019**
+  - configparser -> profile.conf updated
+  - posts & text prompt
+  - functionality to create a post w/ text
+  |_ create multiple basic posts such as "greetings" or "going on holiday" or a trip, or question of what to post more of?
+  |_ a menu of standardized posts like above
+  |_ a menu of questions|greetings to message to users
+
 ----------------------------------------
 
 ## ToDo
@@ -172,10 +179,13 @@
   - update: backup function to include original folder name -> posted/galleries/$file
   - add: easier way to select local file to upload
 
-  - functionality to create a post w/ text
-  |_ create multiple basic posts such as "greetings" or "going on holiday" or a trip, or question of what to post more of?
-  |_ a menu of standardized posts like above
-  |_ a menu of questions|greetings to message to users
+  - add: Ask
+  - add: Poll
+  - add: Schedule
+  - add: Expiration
+
+  - post that prints out the bot commands
+  - cron that checks messages for !bot commands to print out commands
   - functionality to create a quiz / poll
   - bot functionality to check posts for quiz answers
 

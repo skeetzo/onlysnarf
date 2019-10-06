@@ -174,12 +174,6 @@ def initialize():
     ])
     postItems.insert(0,[ "Back", "main"])
 
-    global postMenu
-    postMenu = []
-    for key in settings.POSTS:
-        postMenu.append([ key, settings.POSTS[key]])
-    postMenu.insert(0,[ "Back", "main"])
-
     # print("Initialized Menu")
     INITIALIZED = True
 
@@ -537,6 +531,10 @@ def finalizePost(actionChoice):
             print("Error: Incorrect Index")
 
 def selectPost():
+    postMenu = []
+    for key in settings.POSTS:
+        postMenu.append([ key.title().replace("_"," "), settings.POSTS[key]])
+    postMenu.insert(0,[ "Back", "main"])
     for item in postMenu:
         print(colorize("[" + str(postMenu.index(item)) + "] ", 'teal') + list(item)[0])
     while True:
@@ -546,7 +544,8 @@ def selectPost():
             if int(choice) < 0 or int(choice) >= len(postMenu): raise ValueError
             if str(postMenu[int(choice)][1]) == "main":
                 return action()
-            OnlySnarf.post(text=settings.getPost(postMenu[int(choice)][1]))
+            text = postMenu[int(choice)][1]
+            OnlySnarf.post(text=text)
             return mainMenu()
         except (ValueError, IndexError):
             print(sys.exc_info()[0])
