@@ -107,8 +107,16 @@ def message(choice, message=None, image=None, price=None, username=None):
 ################
 
 def post(text=None):
-    if not text:
-        text = input("Text: ".format(text))
+    if not text: text = input("Text: ".format(text))
+    else: settings.maybePrint("Text: "+text)
+    print("[Enter] or Text or Cancel")
+    confirm = input()
+    if confirm != "":
+        if str(confirm) == "None" or str(confirm) == "Cancel" or str(confirm) == "C" or str(confirm) == "c":
+            print("Canceling Post")
+            return
+        else:
+            text = confirm
     OnlySnarf.post(text)
     OnlySnarf.exit()
 
