@@ -39,7 +39,7 @@ def create(comment, args=[], minute=None, hour=None):
     cron = CronTab(user=str(settings.CRON_USER))
     cron.remove_all(comment=comment)
     args = [n.strip() for n in args]
-    newCron = cron.new(command="onlysnarf -cron {} {}".format(comment, " ".join(args)), comment=comment);
+    newCron = cron.new(command="onlysnarfpy -cron {} {}".format(comment, " ".join(args)), comment=comment);
     newCron.hour.every(1)
     if minute is not None:
         newCron.minute.on(minute)
