@@ -187,12 +187,7 @@
   - add: read messages html for emojis
   - finalize / fix: script exit
   - update: backup function to include original folder name -> posted/galleries/$file
-
-  - add: Ask
-  - add: Poll
-  - add: Schedule
-  - add: Expiration
-
+  - [MESSAGES] layout in config for preset message formats
   - bot functionality to check posts for quiz answers
 
 ### Medium Priority
@@ -202,11 +197,23 @@
   - update: scene to include trailer
   - update: upload trailer same time as previews instead of content
   - add: feature for if missing scene previews to capture thumbnail from content/trailer
+  - rewrite scene release to NOT upload until releaseDate days after
+  -- requires daily check or cron job
+  - add: scene feature to check data.txts for content to release n days after trailer/preview
+  |_ requires: cron feature
+  - prepare: a scene for release
+  |_ requires: scene cron feature
 
   -> Promotions
   - add email|Twitter functionality for sending trial link; add clipboard function to copy link
 
   -> Cron & Bot functionality that checks user messages for bot commands
+
+### High Priority  
+  - add: Ask
+  - add: Poll
+  - add: Schedule
+  - add: Expiration
 
   -> Twitter
   - tweet reminders
@@ -215,14 +222,3 @@
   - must not spam, must follow a schedule. monthly, weekly on a day, daily at an hour
   -- maybe delete previous tweets?
   - maybe tweet once and pin it?
-
-### High Priority
-  - prepare: a scene for release
-  |_ requires: scene cron feature
-
-  - rewrite scene release to NOT upload until releaseDate days after
-  -- requires daily check or cron job
-
-  - add: scene feature to check data.txts for content to release n days after trailer/preview
-  |_ requires: cron feature
-

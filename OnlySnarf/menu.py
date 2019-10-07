@@ -115,7 +115,6 @@ def initialize():
     if str(settings.DEBUG) == "True":
         actionItems.append([ "Test", "test"])
         actionItems.append([ "Promotion", "promotion" ])
-        # actionItems.append([ "Post", "post" ])
         actionItems.append([ "Cron", "cron" ])
     actionItems.insert(0,[ "Back", "main"])
 
