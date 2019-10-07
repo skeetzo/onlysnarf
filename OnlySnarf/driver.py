@@ -94,6 +94,18 @@ def goToHome():
 # Login to OnlyFans
 def log_into_OnlyFans():
     print('Logging into OnlyFans')
+    username_ = str(settings.USERNAME)
+    password_ = str(settings.PASSWORD)
+    if not username_ or username_ == "":
+        username_ = input("Twitter Username: ")
+    if not password_ or password_ == "":
+        password_ = input("Twitter Password: ")
+    if username_ == "" or password_ == "":
+        print("Error: Missing Login Info")
+        return False
+    if str(settings.USERNAME) == "" or settings.USERNAME == None: settings.USERNAME = username_
+    if str(settings.PASSWORD) == "" or settings.PASSWORD == None: settings.PASSWORD = password_
+    settings.maybePrint("Opening Web Browser")
     options = webdriver.ChromeOptions()
     if str(settings.SHOW_WINDOW) != "True":
         options.add_argument('--headless')
@@ -134,10 +146,10 @@ def log_into_OnlyFans():
     try:
         login(0)
         # fill in username
-        username = BROWSER.find_element_by_xpath(USERNAME_XPATH).send_keys(str(settings.USERNAME))
+        username = BROWSER.find_element_by_xpath(USERNAME_XPATH).send_keys(username_)
         # fill in password and hit the login button 
         password = BROWSER.find_element_by_xpath(PASSWORD_XPATH)
-        password.send_keys(str(settings.PASSWORD))
+        password.send_keys(password_)
         password.send_keys(Keys.ENTER)
         WebDriverWait(BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.XPATH, SEND_BUTTON_XPATH)))
         print('Login Successful')

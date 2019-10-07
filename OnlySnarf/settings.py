@@ -164,17 +164,11 @@ class Settings:
         self.VERBOSE = False
         # custom repair option for shitty gopro videos
         self.WORKING_VIDEO = "video.mp4"
-        # updates w/ values from /etc/onlysnarf/profile.conf
-        profile = None
-        if os.path.exists("/etc/onlysnarf/profile.conf"):
-            readConf(self, "/etc/onlysnarf/profile.conf")
-        elif os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf")):
-            readConf(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "profile.conf"))
-        self.POSTS = {}
-        if os.path.exists("/etc/onlysnarf/posts.conf"):
-            readPosts(self, "/etc/onlysnarf/posts.conf")
-        elif os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), "posts.conf")):
-            readPosts(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "posts.conf"))
+        # config file
+        if os.path.exists("/etc/onlysnarf/config.conf"):
+            readConf(self, "/etc/onlysnarf/config.conf")
+        elif os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.conf")):
+            readConf(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.conf"))
         i = 0
         while i < len(sys.argv):
             sys.argv[i] = sys.argv[i][1:] # remove - in front
@@ -213,14 +207,7 @@ class Settings:
             self.GOOGLE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.GOOGLE_PATH)
             self.USERS_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.USERS_PATH)
             self.WORKING_VIDEO = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.WORKING_VIDEO)
-        # config file
-        try:
-            with open(self.PATH_CONFIG) as config_file:    
-                config = json.load(config_file)
-            self.USERNAME = config.get("username")
-            self.PASSWORD = config.get("password")
-        except Exception as e:
-            print(e)
+        
         
         self.INITIALIZED = True
         # print("Settings Initialized")
@@ -278,25 +265,26 @@ class Settings:
 SETTINGS = Settings()
 
 def readConf(self, conf):
-    config = configparser.ConfigParser()
-    config.read(conf)
-    for key in config['DEFAULT']:
-        # print("{} : {}".format(key,config['DEFAULT'][key]))
-        val = config['DEFAULT'][key]
-        if str(val)[0] == "\"": val = val[1:]
-        if str(val)[len(val)-1] == "\"": val = val[:len(val)-1]
-        setattr(self, key.upper(), val)
-
-def readPosts(self, conf):
-    config = configparser.ConfigParser()
-    config.read(conf)
+    posts = False
     self.POSTS = AttrDict()
-    for key in config['POSTS']:
-        # print("{} : {}".format(key,config['POSTS'][key]))
-        val = config['POSTS'][key]
-        if str(val)[0] == "\"": val = val[1:]
-        if str(val)[len(val)-1] == "\"": val = val[:len(val)-1]
-        setattr(self.POSTS, key, val)
+    with open(conf) as f:
+        for line in f:
+            # print(line)
+            if "Posts" in str(line): 
+                # print('now')
+                posts = True
+            if str(line[0]) == "#": continue
+            try:
+                (key, val) = line.split()
+                print("key: {}:{} :val".format(key.upper(),val))
+                if str(val)[0] == "\"": val = val[1:]
+                if str(val)[len(val)-1] == "\"": val = val[:len(val)-1]
+                if posts: 
+                    print(key)
+                    setattr(self.POSTS, key, val)
+                else: setattr(self, key.upper(), val)
+            except Exception as e:
+                self.maybePrint(e)
 
 class AttrDict(dict):
     def __init__(self):

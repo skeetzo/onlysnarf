@@ -169,6 +169,9 @@
   |_ a menu of questions|greetings to message to users
   **2.5.1**
   - more verbose cleanup
+  **2.6.0**
+  - config cleanup
+  |_ profile.conf & posts.conf & config.json -> config.conf
 
 ----------------------------------------
 
