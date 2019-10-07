@@ -3,45 +3,45 @@
 ## Changelog  
 **0.0.1 : 9/25/2018**
   - code organized
-**0.0.2 : 10/20/2018**
+  **0.0.2 : 10/20/2018**
   - python package organized
-**0.0.3 : 1/14/2019**
+  **0.0.3 : 1/14/2019**
   - sync with DBot updates; while loop upload
-**0.0.4 : 1/21/2019**
+  **0.0.4 : 1/21/2019**
   - upload fix & hashtagging
-**0.0.5 : 1/29/2019**
+  **0.0.5 : 1/29/2019**
   - demo
-**0.1.0 : 2/3/2019**
+  **0.1.0 : 2/3/2019**
   - menu
   - package & setup.py
-**0.1.1 : 2/4/2019**
+  **0.1.1 : 2/4/2019**
   - menu fixes
-**0.1.2 : 2/7/2019**
+  **0.1.2 : 2/7/2019**
   - config.py
   - script names updated
   - readme updated
   **2/9/2019**
   - fuck you PyDrive
-**0.1.3 : 2/24/2019**
+  **0.1.3 : 2/24/2019**
   - jpeg
-**0.1.4 : 3/4/2019**
+  **0.1.4 : 3/4/2019**
   - mount path
-**0.1.5 : 3/7/2019**
+  **0.1.5 : 3/7/2019**
   - updated send_post_button refs
-**0.1.6 : 3/19/2019**
+  **0.1.6 : 3/19/2019**
   - module separation
-**0.1.7 : 3/28/2019**
+  **0.1.7 : 3/28/2019**
   - settings.py
   - user.py
-**0.1.8 : 3/31/2019**
+  **0.1.8 : 3/31/2019**
   - debugging
   - Drive API for mp4 downloads
-**0.2.0 : 4/10/2019**
+  **0.2.0 : 4/10/2019**
   - User: read_chat
-**0.2.1 : 4/12/2019**
+  **0.2.1 : 4/12/2019**
   - upload performer
   - upload scene
-**0.2.2 : 4/15/2019**
+  **0.2.2 : 4/15/2019**
   - settings now actually updates
   - settings globals -> class
   **4/16/2019**
@@ -57,7 +57,7 @@
   - minor bug fixes
   **1.0.4 : 5/8/2019**
   - more minor bug fixes
-**1.1.0 : 5/12/2019**
+  **1.1.0 : 5/12/2019**
   - added: (settings).MOUNT_DRIVE, ROOT_FOLDER, DRIVE_FOLDERS, CREATE_MISSING_FOLDERS
   - create Google folder structure programmatically
   - predefine Google root
@@ -126,7 +126,7 @@
   - fixed verbose output
   **1.4.3 : 9/21/2019**
   - dbot issue
-  **2.0.0 : 9/25/2019**
+**2.0.0 : 9/25/2019**
   - added functionality to choose instead of random
   **2.0.1**
   - oops
@@ -167,37 +167,35 @@
   |_ create multiple basic posts such as "greetings" or "going on holiday" or a trip, or question of what to post more of?
   |_ a menu of standardized posts like above
   |_ a menu of questions|greetings to message to users
+  - added: easier way to select local file to upload
   **2.5.1**
   - more verbose cleanup
   **2.6.0**
   - config cleanup
   |_ profile.conf & posts.conf & config.json -> config.conf
+  - added: cron feature for adding, deleting, listing crons
+  - added: Twitter login prompt
+  - added: `local` setting
+  - added check for failed login
+  - added post: "OnlySnarf Bot commands: !pic | !pic dick | !pic ass"
 
 ----------------------------------------
 
 ## ToDo
-  - add check for failed internet connection - Google, OnlyFans
 
 ### Low Priority
   - add: read messages html for emojis
   - finalize / fix: script exit
   - update: backup function to include original folder name -> posted/galleries/$file
-  - add: easier way to select local file to upload
 
   - add: Ask
   - add: Poll
   - add: Schedule
   - add: Expiration
 
-  - post that prints out the bot commands
-  - cron that checks messages for !bot commands to print out commands
-  - functionality to create a quiz / poll
   - bot functionality to check posts for quiz answers
 
 ### Medium Priority
-  - add: login prompt for saving Twitter password -> base64 hash instead of in config.json
-  |_ add: `Auth` option to settings?
-  - add: `local` setting
 
   -> Scenes - FIX
   - update: data.txt for scenes with trailer
@@ -209,8 +207,6 @@
   - add email|Twitter functionality for sending trial link; add clipboard function to copy link
 
   -> Cron & Bot functionality that checks user messages for bot commands
-  - post: "OnlySnarf Bot commands: !pic | !pic dick | !pic ass"
-  -- sends [pic] to [user]
 
   -> Twitter
   - tweet reminders
@@ -229,5 +225,4 @@
 
   - add: scene feature to check data.txts for content to release n days after trailer/preview
   |_ requires: cron feature
-  - add: cron feature for installing crons
-  |_ all it has to do is write to the crontab file
+

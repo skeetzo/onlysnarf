@@ -20,43 +20,25 @@ from OnlySnarf import cron as Cron
 #################################################################
 #################################################################
 
-def main(opt):
-    print("0/3 : Deleting Locals")
-    remove_local()
-    sys.stdout.flush()
-    #################################################
-    print("1/3 : Main - {}".format(opt))
-    released = release_(opt)
-    if released == False: print("Error: Failed to release - {}".format(opt))
-    sys.stdout.flush()
-    #################################################
-    print('2/3 : Cleaning Up Files')
-    remove_local()
-    print('Files Cleaned ')
-    #################################################
-    print('3/3 : Google Drive to OnlyFans Upload Complete')
-    OnlySnarf.exit()
-    sys.stdout.flush()
-
 ####################
 ##### Discount #####
 ####################
 
-def discount(user, depth=1):
-    amount = input("Discount: ")
-    months = input("Months: ")
+def discount(choice, depth=1, amount=None, months=None):
+    if not amount: amount = input("Discount: ")
+    if not months: months = input("Months: ")
     users = []
-    if str(user) == "all":
+    if str(choice) == "all":
         users = User.get_all_users()
-    elif str(user) == "new":
+    elif str(choice) == "new":
         users = User.get_new_users()
-    elif str(user) == "favorite":
+    elif str(choice) == "favorite":
         users = User.get_favorite_users()
-    elif str(user) == "recent":
+    elif str(choice) == "recent":
         users = User.get_recent_users()
     else:
-        if isinstance(user, str):
-            user = User.get_user_by_username(user)
+        if isinstance(choice, str):
+            user = User.get_user_by_username(choice)
         users.append(user)
     for user in users:
         try:
@@ -65,6 +47,7 @@ def discount(user, depth=1):
             settings.maybePrint(e)
         depth = int(depth) + 1
     OnlySnarf.exit()
+    return True
 
 ####################
 ##### Download #####
@@ -96,29 +79,55 @@ def download(fileChoice, methodChoice="random", file=None, folderName=None, pare
 ###################
 
 def message(choice, message=None, image=None, price=None, username=None):
-    if not image[0] or image[0] == None:
+    if image and (not image[0] or image[0] == None):
         print("Error: Missing Image")
         return False
-    successful_message = OnlySnarf.message(choice=choice, message=message, image=image, price=price, username=username)
-    return successful_message
-
+    if str(choice) == "all":
+        print("Messaging: All")
+        users = User.get_all_users()
+    elif str(choice) == "recent":
+        print("Messaging: Recent")
+        users = User.get_recent_users()
+    elif str(choice) == "favorites":
+        print("Messaging: Recent")
+        users = User.get_favorite_users()
+    elif str(choice) == "new":
+        print("Messaging: New")
+        users = User.get_new_users()
+    elif str(choice) == "user":
+        print("Messaging: User - {}".format(username))
+        if username is None:
+            print("Error: Missing Username")
+            return
+        users = [User.get_user_by_username(str(username))]
+    else:
+        print("Error: Missing Message Choice")
+        return
+    for user in users:
+        if user:
+            success = user.sendMessage(message, image, price)
+            if not success:
+                print("Error: There was an error messaging - {}/{}".format(user.id, user.username))
+                
 ################
 ##### Post #####
 ################
 
-def post(text=None):
+def post(text=None, override=False):
     if not text: text = input("Text: ".format(text))
-    else: settings.maybePrint("Text: "+text)
-    print("[Enter] or Text or Cancel")
-    confirm = input()
-    if confirm != "":
-        if str(confirm) == "None" or str(confirm) == "Cancel" or str(confirm) == "C" or str(confirm) == "c":
-            print("Canceling Post")
-            return
-        else:
-            text = confirm
+    else: print("Text: "+text)
+    if not override:
+        print("[Enter] or Text or Cancel")
+        confirm = input()
+        if confirm != "":
+            if str(confirm) == "None" or str(confirm) == "Cancel" or str(confirm) == "C" or str(confirm) == "c":
+                print("Canceling Post")
+                return False
+            else:
+                text = confirm
     OnlySnarf.post(text)
     OnlySnarf.exit()
+    return True
 
 #####################
 ##### Promotion #####
@@ -208,8 +217,8 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
             text = file.get("title") or data.get("text")
             path = data.get("path")
             files = data.get("files")
-            keywords = data.get("keywords") or parent
-            performers = data.get("performers") or []
+            keywords = data.get("keywords") or parent or settings.KEYWORDS
+            performers = data.get("performers") or settings.PERFORMERS
             # if parent: keywords = parent.split(" ")
             if isinstance(keywords, str): keywords = keywords.split(" ")
             if str(opt) == "performer":
@@ -353,7 +362,7 @@ def release_scene(methodChoice="random", file=None, folderName=None, parent=None
 ##### Upload #####
 ##################
 
-def upload(path, text, keywords, performers):
+def upload(path, text="", keywords=[], performers=[]):
     settings.maybePrint("Uploading: {}".format(path))
     successful = False
     try:
@@ -390,14 +399,6 @@ def test(TYPE, methodChoice="random", file=None, folderName=None, parent=None):
     remove_local()
     print('1/3 : Testing')
 
-    print('TESTING: Input')
-    data = download("gallery", methodChoice="random")
-    release("gallery", methodChoice="input")
-    reset = OnlySnarf.reset()
-    if not reset:
-        return print("Error: Failed to Reset")
-    return
-
     # ### Promotion ###
     print('TESTING: Cron')
     response = Cron.test()
@@ -414,9 +415,21 @@ if __name__ == "__main__":
     try:
         # os.system('clear')
         settings.initialize()
-        main(settings.TYPE)
-    except:
-        print(sys.exc_info()[0])
+        if str(settings.ACTION) == "upload":
+            release(settings.TYPE, methodChoice=settings.METHOD)
+        elif str(settings.ACTION) == "post":
+            post(text=settings.TEXT, override=True)
+        elif str(settings.ACTION) == "message":
+            message(settings.CHOICE, message=settings.TEXT, image=settings.IMAGE, price=settings.PRICE, username=settings.USER)
+        elif str(settings.ACTION) == "discount":
+            if str(settings.USER) == "" or str(settings.USER) == "None": settings.USER = "all"
+            discount(settings.USER, amount=settings.AMOUNT, months=settings.MONTHS)
+        else:
+            print("Warning: Missing Method")
+        if str(settings.CRON) != "False":
+            Cron.delete(settings.CRON)
+    except Exception as e:
+        print(e)
         print("Shnarf!")
     finally:
         sys.exit(0)
