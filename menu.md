@@ -15,17 +15,6 @@
 - enter User by username
 
 ### Message
-All
-New
-Recent
-Username
-- users
-- text
-- price
-- /tmp
-
-### Message
-- choice
 **All**
 **Recent**
 - users subscribed within last 5 days
@@ -35,6 +24,14 @@ Username
 - selects User from list
 **Username**
 - enter User by username
+#
+- users
+- text
+- price
+- /tmp
+
+### Message
+- choice
 #
 - text
 - image
