@@ -181,7 +181,17 @@ class User:
 
     @staticmethod
     def get_favorite_users():
-        return []
+        settings.maybePrint("Getting Fav Users")
+        users = User.get_all_users()
+        favUsers = []
+        favorites = ",".join(str(settings.USERS_FAVORITE))
+        for user in users:
+            if user in favorites:
+                settings.maybePrint("Fav User: {}".format(user.username))
+                user = skipUserCheck(user)
+                if user is None: continue
+                favUsers.append(user)
+        return favUsers
 
     # returns users that have no messages sent to them
     @staticmethod
@@ -194,7 +204,7 @@ class User:
             started = datetime.strptime(user.started,"%b %d, %Y")
             # settings.maybePrint("date: "+str(date_)+" - "+str(started))
             if started < date_: continue
-            settings.maybePrint("New User: %s" % user.username)
+            settings.maybePrint("New User: {}".format(user.username))
             user = skipUserCheck(user)
             if user is None: continue
             newUsers.append(user)
