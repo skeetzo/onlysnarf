@@ -410,8 +410,7 @@ def test(TYPE, methodChoice="random", file=None, folderName=None, parent=None):
     return
 
 ################################################################################################################################################
-
-if __name__ == "__main__":
+def main():
     try:
         # os.system('clear')
         settings.initialize()
@@ -433,6 +432,9 @@ if __name__ == "__main__":
         print("Shnarf!")
     finally:
         sys.exit(0)
+        
+if __name__ == "__main__":
+    main()
 else:
     try:
         settings.initialize()

@@ -180,6 +180,9 @@
   - added post: "OnlySnarf Bot commands: !pic | !pic dick | !pic ass"
   **2.6.1**
   - creds cleanup
+  **2.7.0**
+  - menu sort
+  - onlysnarfpy
 
 ----------------------------------------
 
@@ -202,20 +205,20 @@
   - rewrite scene release to NOT upload until releaseDate days after
   -- requires daily check or cron job
   - add: scene feature to check data.txts for content to release n days after trailer/preview
-  |_ requires: cron feature
   - prepare: a scene for release
   |_ requires: scene cron feature
 
   -> Promotions
   - add email|Twitter functionality for sending trial link; add clipboard function to copy link
 
-  -> Cron & Bot functionality that checks user messages for bot commands
 
 ### High Priority  
   - add: Ask
   - add: Poll
   - add: Schedule
   - add: Expiration
+
+  -> Cron & Bot functionality that checks user messages for bot commands
 
   -> Twitter
   - tweet reminders

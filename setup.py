@@ -29,6 +29,7 @@ setuptools.setup(
     entry_points={
         'console_scripts' : [
             'onlysnarf = OnlySnarf.menu:main_other',
+            'onlysnarfpy = OnlySnarf.onlysnarf:main',
             'onlysnarf-config = OnlySnarf.config:main'
         ]
     },
