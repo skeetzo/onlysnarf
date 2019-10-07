@@ -175,7 +175,7 @@ class User:
             return None
         users = User.get_all_users()
         for user in users:
-            if str(user.username) == str(username):
+            if str(user.username) == "@"+str(username):
                 return user
         return None
 
@@ -236,7 +236,7 @@ def read_users_local():
     users = []
     users_ = []
     try:
-        with open(settings.PATH_USERS) as json_file:  
+        with open(settings.USERS_PATH) as json_file:  
             users = json.load(json_file)['users']
         settings.maybePrint("Loaded:")
         for user in users:
@@ -264,14 +264,14 @@ def write_users_local(users=None):
     if users is None:
         users = User.get_all_users()
     print("Saving Users Locally")
-    settings.maybePrint("local data path: "+str(settings.PATH_USERS))
+    settings.maybePrint("local data path: "+str(settings.USERS_PATH))
     data = {}
     data['users'] = []
     for user in users:
         settings.maybePrint("Saving: "+str(user.username))
         data['users'].append(user.toJSON())
     try:
-        with open(settings.PATH_USERS, 'w') as outfile:  
+        with open(settings.USERS_PATH, 'w') as outfile:  
             json.dump(data, outfile, indent=4, sort_keys=True)
     except FileNotFoundError:
         print("Error: Missing Local Users")

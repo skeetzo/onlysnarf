@@ -522,10 +522,7 @@ def download_scene(sceneFolder):
     preview = preview[0]
     preview = download_file(preview)
     if "mp4" in preview:
-        if str(settings.THUMBNAILING_PREVIEW) == "False":
-            print("Error: Preview Thumbnailing Disabled")
-            return
-        preview = thumbnail_preview_fix(preview)
+        preview = thumbnail_fix(preview)
     if data is None:
         print("Error: Missing Scene Data")
         return
@@ -923,54 +920,9 @@ def reduce(path):
     return reducedPath
 
 def thumbnail_fix(path):
-    if (settings.SKIP_THUMBNAIL):
-        print("Warning: Skipping Thumbnail")
+    if str(settings.THUMBNAILING_PREVIEW) == "False":
+        print("Warning: Preview Thumbnailing Disabled")
         return path
-    thumbedPath = str(path).replace(".mp4", "_thumbed.mp4")
-    try:
-        print("Thumbnailing: {}".format(path))
-        loglevel = "quiet"
-        if str(settings.VERBOSE) == "True":
-            loglevel = "debug"
-        thumbnail_path = os.path.join(os.path.dirname(str(path)), 'thumbnail.png')
-        settings.maybePrint("thumbnail path: {}".format(thumbnail_path))
-        p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-i', str(path),'-ss', '00:00:00.000', '-vframes', '1', str(thumbnail_path)])
-        p.communicate()
-    except FileNotFoundError:
-        print("Warning: Ignoring Thumbnail")
-        return path
-    except AttributeError:
-        print("Thumbnailing: Captured PNG")
-    except:
-        settings.maybePrint(sys.exc_info()[0])
-        print("Error: Thumbnailing Fuckup")
-        return path
-    try:
-        p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-y', '-i', str(path), '-i', str(thumbnail_path), '-pix_fmt', 'rgb24', '-c', 'copy', '-acodec', 'copy', '-vcodec', 'copy', '-map', '0', '-map', '1', '-c:v:1', 'png', '-disposition:v:1', 'attached_pic', str(thumbedPath)])
-        p.communicate()
-    except AttributeError:
-        print("Thumbnailing: Added PNG")
-    except:
-        settings.maybePrint(sys.exc_info()[0])
-        print("Error: Thumbnailing Adding Fuckup")
-        return path
-    print("Thumbnailing Complete")
-    originalSize = os.path.getsize(str(path))
-    newSize = os.path.getsize(str(thumbedPath))
-    print("Original Size: {}kb - {}mb".format(originalSize/1000, originalSize/1000000))
-    print("Thumbed Size: {}kb - {}mb".format(newSize/1000, newSize/1000000))
-    if int(originalSize) < int(newSize):
-        print("Warning: Original Size Smaller")
-        return path
-    if int(newSize) == 0:
-        print("Error: Missing Thumbnailed File")
-        return path
-    return thumbedPath
-
-def thumbnail_preview_fix(path):
-    # if (settings.SKIP_THUMBNAIL):
-        # print("Warning: Skipping Thumbnail")
-        # return
     try:
         print("Thumbnailing: {}".format(path))
         loglevel = "quiet"

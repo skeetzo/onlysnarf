@@ -17,6 +17,7 @@ import pkg_resources
 from OnlySnarf.settings import SETTINGS as settings
 from OnlySnarf import onlysnarf as OnlySnarf
 from OnlySnarf import google as Google
+from OnlySnarf import cron as Cron
 
 ###################
 ##### Globals #####
@@ -86,7 +87,7 @@ def initialize():
         settingItems.append([ "Skip Download", settings.SKIP_DOWNLOAD, ["True","False"],False])
         settingItems.append([ "Image Max", settings.IMAGE_UPLOAD_MAX,None,False])
         settingItems.append([ "Text", settings.TEXT,None,False])
-        settingItems.append([ "Input", settings.INPUT,None,False])
+        settingItems.append([ "Local", settings.LOCAL,None,False])
         settingItems.append([ "Image", settings.IMAGE,None,False])
         settingItems.append([ "Prefer Local", settings.PREFER_LOCAL,["True","False"],True])
         # settingItems.append([ "Overwrite Local", settings.OVERWRITE_LOCAL,["True","False"],True])
@@ -108,12 +109,14 @@ def initialize():
         # [ "Promotion", "promotion" ],
         [ "Message", "message" ],
         [ "Discount", "discount" ],
+        [ "Post", "post" ],
         [ "Reset", "reset" ]
     ])
     if str(settings.DEBUG) == "True":
         actionItems.append([ "Test", "test"])
         actionItems.append([ "Promotion", "promotion" ])
-        actionItems.append([ "Post", "post" ])
+        # actionItems.append([ "Post", "post" ])
+        actionItems.append([ "Cron", "cron" ])
     actionItems.insert(0,[ "Back", "main"])
 
     global messageItems
@@ -174,6 +177,15 @@ def initialize():
     ])
     postItems.insert(0,[ "Back", "main"])
 
+    global cronItems
+    cronItems = sorted([
+        [ "Add", "add" ],
+        [ "List", "list" ],
+        [ "Delete", "delete" ],
+        [ "Delete All", "deleteall" ]
+    ])
+    cronItems.insert(0,[ "Back", "main"])
+
     # print("Initialized Menu")
     INITIALIZED = True
 
@@ -205,6 +217,9 @@ def action():
             elif str(actionItems[int(choice)][1]) == "post":
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizePost(actionChoice)
+            elif str(actionItems[int(choice)][1]) == "cron":
+                actionChoice = list(actionItems[int(choice)])[1]
+                return finalizeCron(actionChoice)
             else:
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeAction(actionChoice)
@@ -235,8 +250,8 @@ def finalizeAction(actionChoice):
 
 def selectMethod(actionChoice, fileChoice):
     # if settings.INPUT and methodItems doesn't include Input option already
-    if [ "Input", "input" ] not in methodItems and actionChoice == "release":
-        methodItems.append([ "Input", "input" ])
+    if [ "Local", "local" ] not in methodItems and actionChoice == "release":
+        methodItems.append([ "Local", "local" ])
     for item in methodItems:
         print(colorize("[" + str(methodItems.index(item)) + "] ", 'teal') + list(item)[0])
 
@@ -551,6 +566,62 @@ def selectPost():
             print(sys.exc_info()[0])
             print("Error: Incorrect Index")
 
+def finalizeCron(actionChoice):
+    for item in cronItems:
+        print(colorize("[" + str(cronItems.index(item)) + "] ", 'teal') + list(item)[0])
+    while True:
+        cronChoice = input(">> ")
+        try:
+            if int(cronChoice) < 0 or int(cronChoice) >= len(cronItems): raise ValueError
+            if str(cronItems[int(cronChoice)][1]) == "main":
+                return action()
+            cronChoice = list(cronItems[int(cronChoice)])[1]
+            return performCron(actionChoice, cronChoice)
+        except (ValueError, IndexError):
+            print("Error: Incorrect Index")
+        except Exception as e:
+            settings.maybePrint(e)
+            print("Error: Missing Method") 
+
+def performCron(actionChoice, cronChoice):
+    if str(cronChoice) == "add":
+        print("Comment:")
+        comment = input(">> ")
+        print("Args:")
+        args = input(">> ")
+        args = args.split(",")
+        print("Minute:")
+        minute = input(">> ")
+        print("Hours:")
+        hour = input(">> ")
+        Cron.create(comment, args=args, minute=minute, hour=hour)
+    elif str(cronChoice) == "list":
+        Cron.list()
+    elif str(cronChoice) == "delete":
+        jobs = Cron.getAll()
+        print(colorize("[0] ", 'teal') + "Back")
+        jobs_ = []
+        for job in jobs:
+            jobs_.append(str(job.comment))
+            print(colorize("[" + str(jobs.index(job)+1) + "] ", 'teal') + str(job))
+        while True:
+            choice = input(">> ")
+            try:
+                choice = int(choice)
+                if int(choice) < 0 or int(choice) > len(jobs): raise ValueError
+                if int(choice) == 0: return finalizeCron(actionChoice)
+                Cron.delete(jobs_[int(choice)-1])
+                return mainMenu()
+            except (ValueError, IndexError):
+                print(sys.exc_info()[0])
+                print("Error: Incorrect Index")
+        
+    elif str(cronChoice) == "deleteall":
+        Cron.deleteAll()
+    else:
+        print("Error: Missing Cron Action")
+    mainMenu()    
+
 def displayBoth(folderName, parent=None):
     files = Google.get_files_of_folder(folderName, parent=parent)
     folders = Google.get_folders_of_folder(folderName, parent=parent)
@@ -641,8 +712,8 @@ def set_settings():
                 settingValue = input("Enter the image upload limit: ")
             elif str(settingChoice) == "Image Max":
                 settingValue = input("Enter the image upload max: ")
-            elif str(settingChoice) == "Input":
-                settingValue = input("Enter the input path: ")
+            elif str(settingChoice) == "Local":
+                settingValue = input("Enter the local path: ")
             else:
                 list_ = list(settingItems[int(choice)][2])
                 print(colorize(str(settingChoice)+" =", 'blue'))
@@ -727,22 +798,33 @@ def showHeader():
     # Print some badass ascii art header here !
     print(colorize(header, 'header'))
     print(colorize('version '+version+'\n', 'green'))
+    showUser()
     showSettings()
 
 def showSettings():
     print('Settings:')
     for setting in settingItems:
         if str(setting[0]) == "Image Limit" and setting[3]:
-            print(' - '+setting[0]+' = '+str(setting[1])+"/"+str(settings.IMAGE_UPLOAD_MAX))
+            print(" - {} = {}/{}".format(setting[0],setting[1],settings.IMAGE_UPLOAD_MAX))
         elif str(setting[0]) != "Back" and str(settings.DEBUG) == "True":
-            print(' - '+setting[0]+' = '+str(setting[1]))
+            print(" - {} = {}".format(setting[0],setting[1]))
         elif str(setting[0]) != "Back" and setting[3]:
-            print(' - '+setting[0]+' = '+str(setting[1]))
+            print(" - {} = {}".format(setting[0],setting[1]))
     global UPDATED
     global UPDATED_TO
     if str(UPDATED) != "False":
         print('\nUpdated: '+str(UPDATED)+' -> '+str(UPDATED_TO))
     UPDATED = False
+    print('\r')
+
+def showUser():
+    print("User:")
+    print(" - Username = {}".format(settings.USERNAME))
+    if settings.PASSWORD and str(settings.PASSWORD) != "":
+        pass_ = "******"
+    else:
+        pass_ = ""
+    print(" - Password = {}".format(pass_))
     print('\r')
 
 ###########################

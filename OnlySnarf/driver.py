@@ -100,6 +100,9 @@ def log_into_OnlyFans():
         username_ = input("Twitter Username: ")
     if not password_ or password_ == "":
         password_ = input("Twitter Password: ")
+        print("Save? y/n")
+        save_ = input(">> ")
+        if str(save_) != "n": settings.PASSWORD = password__
     if username_ == "" or password_ == "":
         print("Error: Missing Login Info")
         return False
@@ -258,34 +261,7 @@ def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
 ####################
 ##### Messages #####
 ####################
-
-def message(choice=None, message=None, image=None, price=None, username=None):
-    if str(choice) == "all":
-        print("Messaging: All")
-        users = User.get_all_users()
-    elif str(choice) == "recent":
-        print("Messaging: Recent")
-        users = User.get_recent_users()
-    elif str(choice) == "favorites":
-        print("Messaging: Recent")
-        users = User.get_favorite_users()
-    elif str(choice) == "new":
-        print("Messaging: New")
-        users = User.get_new_users()
-    elif str(choice) == "user":
-        print("Messaging: User - {}".format(username))
-        if username is None:
-            print("Error: Missing Username")
-            return
-        users = [User.get_user_by_username(str(username))]
-    else:
-        print("Error: Missing Message Choice")
-        return
-    for user in users:
-        success = user.sendMessage(message, image, price)
-        if not success:
-            print("Error: There was an error messaging - {}/{}".format(user.id, user.username))
-                
+ 
 def message_confirm():
     try:
         global BROWSER
@@ -303,8 +279,8 @@ def message_confirm():
 
 def message_text(text):
     try:
-        print("Enter text: %s" % text)
-        if not text or text == None:
+        print("Enter text: {}".format(text))
+        if not text or text == None or str(text) == "None":
             print("Error: Missing Text")
             return False
         global BROWSER
@@ -319,8 +295,8 @@ def message_text(text):
 
 def message_image(image):
     try:
-        print("Enter image: %s" % image)
-        if not image or image == None:
+        print("Enter image: {}".format(image))
+        if not image or image == None or str(image) == "None":
             print("Error: Missing Image")
             return False
         global BROWSER
@@ -334,8 +310,8 @@ def message_image(image):
 
 def message_price(price):
     try:
-        print("Enter price: %s" % price)
-        if not price or price == None:
+        print("Enter price: {}" .format(price))
+        if not price or price == None or str(price) == "None":
             print("Error: Missing Price")
             return False
         global BROWSER
@@ -353,7 +329,7 @@ def message_user(user):
     try:
         auth()
         userid = user.id
-        if not userid or userid == None:
+        if not userid or userid == None or str(userid) == "None":
             print("Warning: Missing User ID")
             if not user.username or user.username == None:
                 print("Error: Missing User ID & Username")

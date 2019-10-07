@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # Global Settings
+import re
 import sys
 import os
 import json
@@ -16,13 +17,22 @@ class Settings:
         return setattr(self, key, val)
 
     def initialize(self):
-        # print("Initializing self...")
+        # print("Initializing Settings")
         try:
             if self.INITIALIZED:
                 # print("Already Initialized, Skipping")
                 return
         except:
             self.INITIALIZED = False
+        self.ACTION = "upload"
+        self.AMOUNT = 0
+        self.MONTHS = 0
+        self.CHOICE = None
+        self.PRICE = 0
+        self.METHOD = "random"
+        self.CRON = False
+        self.KEYWORDS = []
+        self.PERFORMERS = []
         # -backup
         # backup uploaded content to "posted" folder
         self.BACKUP = False
@@ -72,9 +82,9 @@ class Settings:
         # -image-path
         # path to local file to use
         self.PATH_LOCAL = None
-        # -input
+        # -local
         # path to local file(s) to upload
-        self.INPUT = None
+        self.LOCAL = None
         # -image
         # path to local image to use for message or upload
         self.IMAGE = None
@@ -128,9 +138,6 @@ class Settings:
         # -skip-repair
         # skip mp4 repairs
         self.SKIP_REPAIR = False
-        # -skip-thumb
-        # skip video thumbnailing when repairing
-        self.SKIP_THUMBNAIL = False
         # can be set in profile.conf
         # -skip-upload
         # skips file upload
@@ -144,7 +151,7 @@ class Settings:
         # text for message or upload
         self.TEXT = None
         # fixes thumbnail preview
-        self.THUMBNAILING_PREVIEW = True
+        self.THUMBNAILING_PREVIEW = False
         # -type
         # the type of upload
         self.TYPE = None
@@ -172,9 +179,9 @@ class Settings:
         i = 0
         while i < len(sys.argv):
             sys.argv[i] = sys.argv[i][1:] # remove - in front
-            truths_ = ["BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","SKIP_THUMBNAIL","TWEETING","VERBOSE"]
+            truths_ = ["BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
             falses_ = []
-            nexts_ = ["CRON_USER","INPUT","IMAGE","IMAGE_UPLOAD_LIMIT","IMAGE_UPLOAD_MAX","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
+            nexts_ = ["CRON","METHOD","PRICE","CHOICE","AMOUNT","MONTHS","ACTION","CRON_USER","LOCAL","IMAGE","IMAGE_UPLOAD_LIMIT","IMAGE_UPLOAD_MAX","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0
             while j < len(truths_):
 
@@ -207,7 +214,26 @@ class Settings:
             self.GOOGLE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.GOOGLE_PATH)
             self.USERS_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.USERS_PATH)
             self.WORKING_VIDEO = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.WORKING_VIDEO)
-        
+        if self.KEYWORDS != "":
+            if str(self.KEYWORDS) == "None":
+                self.KEYWORDS = []
+            elif str(self.KEYWORDS) == "[]":
+                self.KEYWORDS = []
+            elif str(self.KEYWORDS) == " ":
+                self.KEYWORDS = []
+            else:
+                self.KEYWORDS = self.KEYWORDS.split(",")
+                self.KEYWORDS = [n.strip() for n in self.KEYWORDS]
+        if self.PERFORMERS != "":
+            if str(self.PERFORMERS) == "None":
+                self.PERFORMERS = []
+            elif str(self.PERFORMERS) == "[]":
+                self.PERFORMERS = []
+            elif str(self.PERFORMERS) == " ":
+                self.PERFORMERS = []
+            else:
+                self.PERFORMERS = self.PERFORMERS.split(",")
+                self.PERFORMERS = [n.strip() for n in self.PERFORMERS]
         
         self.INITIALIZED = True
         # print("Settings Initialized")
@@ -218,17 +244,17 @@ class Settings:
     #####################
 
     def getInput(self):
-        if str(self.INPUT) == "None":
-            self.maybePrint("Error: Missing Input Path")
+        if str(self.LOCAL) == "None":
+            self.maybePrint("Error: Missing Local Input")
             return False
-        if os.path.isdir(str(self.INPUT)):  
+        if os.path.isdir(str(self.LOCAL)):  
             print("Found: Directory")  
-        elif os.path.isfile(str(self.INPUT)):  
+        elif os.path.isfile(str(self.LOCAL)):  
             print("Found: File")  
         else:  
-            self.maybePrint("Error: Missing Input Path")
+            self.maybePrint("Error: Missing Local Path")
             return False
-        return self.INPUT
+        return self.LOCAL
 
     def getTmp(self):
         # mkdir /tmp
@@ -269,22 +295,24 @@ def readConf(self, conf):
     self.POSTS = AttrDict()
     with open(conf) as f:
         for line in f:
-            # print(line)
-            if "Posts" in str(line): 
-                # print('now')
-                posts = True
             if str(line[0]) == "#": continue
             try:
-                (key, val) = line.split()
-                print("key: {}:{} :val".format(key.upper(),val))
-                if str(val)[0] == "\"": val = val[1:]
-                if str(val)[len(val)-1] == "\"": val = val[:len(val)-1]
-                if posts: 
-                    print(key)
-                    setattr(self.POSTS, key, val)
+                if "\"" in str(line):
+                    spl = re.split("\"*\"", line)
+                    key = spl[0] or None
+                    val = spl[1] or None
+                else:
+                    (key, val) = line.split()
+                key = key.strip()
+                if str(val)[0] == "\"": val = str(val[1:])
+                if str(val)[len(val)-1] == "\"": val = str(val[:len(val)-1])
+                # print("{} : {} ".format(key.upper(),val))
+                if "_post" in key: setattr(self.POSTS, key.upper().replace("_post",""), val)
                 else: setattr(self, key.upper(), val)
             except Exception as e:
-                self.maybePrint(e)
+                pass
+                # self.maybePrint(e)
+                # print("Warning: Error Parsing Config")
 
 class AttrDict(dict):
     def __init__(self):
