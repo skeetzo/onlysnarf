@@ -234,7 +234,7 @@ class Settings:
             else:
                 self.PERFORMERS = self.PERFORMERS.split(",")
                 self.PERFORMERS = [n.strip() for n in self.PERFORMERS]
-        
+
         self.INITIALIZED = True
         # print("Settings Initialized")
     ###################################################
