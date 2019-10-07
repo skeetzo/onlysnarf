@@ -185,7 +185,6 @@ class Settings:
             nexts_ = ["USERS_FAVORITE","CRON","METHOD","PRICE","CHOICE","AMOUNT","MONTHS","ACTION","CRON_USER","LOCAL","IMAGE","IMAGE_UPLOAD_LIMIT","IMAGE_UPLOAD_MAX","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0
             while j < len(truths_):
-
                 if str(truths_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
                     # self.set(truths_[j], True)
                     self[truths_[j]] = True
@@ -200,8 +199,12 @@ class Settings:
             while j < len(nexts_):
                 if str(nexts_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
                     # self.set(nexts_[j], sys.argv[i+1])  
-                    self[nexts_[j]] = sys.argv[i+1]
-                j = j + 1
+                    try:
+                        self[nexts_[j]] = sys.argv[i+1]
+                    except Exception as e:
+                        # print(e)
+                        pass
+                j += 1
             i += 1
         if self.MOUNT_PATH is not None:
             self.PATH_CONFIG = os.path.join(self.MOUNT_PATH, self.PATH_CONFIG)

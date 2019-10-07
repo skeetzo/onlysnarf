@@ -62,7 +62,7 @@ def initialize():
         return
     global settingItems
     # Settings Menu
-    settingItems = sorted([
+    settingItems = [
         [ "Verbose", settings.VERBOSE, ["True","False"],True],
         [ "Debug", settings.DEBUG, ["True","False"],False],
         [ "Backup", settings.BACKUP, ["True","False"],True],
@@ -71,7 +71,7 @@ def initialize():
         [ "Skip Delete", settings.SKIP_DELETE, ["True","False"],False],
         [ "Tweeting", settings.TWEETING, ["True","False"],True],
         [ "Image Limit", settings.IMAGE_UPLOAD_LIMIT,None,True],
-    ])
+    ]
     if str(settings.VERBOSE) == "True":
         settingItems.append([ "Skip Delete", settings.SKIP_DELETE, ["True","False"],False])
         settingItems.append([ "Mount Path", settings.MOUNT_PATH,None,False])
@@ -91,6 +91,7 @@ def initialize():
         settingItems.append([ "Image", settings.IMAGE,None,False])
         settingItems.append([ "Prefer Local", settings.PREFER_LOCAL,["True","False"],True])
         # settingItems.append([ "Overwrite Local", settings.OVERWRITE_LOCAL,["True","False"],True])
+    settingItems = sorted(settingItems)
     settingItems.insert(0,[ "Back", "main"])
 
     global menuItems
@@ -103,7 +104,7 @@ def initialize():
 
     global actionItems
     # Actions Menu
-    actionItems = sorted([
+    actionItems = [
         [ "Upload", "release" ],
         [ "Download", "download" ],
         # [ "Promotion", "promotion" ],
@@ -111,39 +112,42 @@ def initialize():
         [ "Discount", "discount" ],
         [ "Post", "post" ],
         [ "Reset", "reset" ]
-    ])
+    ]
     if str(settings.DEBUG) == "True":
         actionItems.append([ "Test", "test"])
         actionItems.append([ "Promotion", "promotion" ])
         actionItems.append([ "Cron", "cron" ])
+    actionItems = sorted(actionItems)
     actionItems.insert(0,[ "Back", "main"])
 
     global messageItems
     # Message Menu
-    messageItems = sorted([
+    messageItems = [
         [ "All", "all"],
         # [ "New", "new"],
         [ "Recent", "recent"],
         # [ "Favorite", "favorite"],
         [ "User by Username", "user"],
         [ "Select User", "select"]
-    ])
+    ]
     if str(settings.DEBUG) == "True":
         messageItems.append([ "New", "new"])
         messageItems.append([ "Favorite", "favorite"])
+    messageItems = sorted(messageItems)
     messageItems.insert(0,[ "Back", "main"])
 
     global fileItems
     # File Type Menu
-    fileItems = sorted([
+    fileItems = [
         [ "Image", "image"],
         [ "Gallery", "gallery"],
         [ "Performer", "performer"],
         # [ "Scene", "scene"],
         [ "Video", "video"],
-    ])
+    ]
     if str(settings.DEBUG) == "True":
         fileItems.append([ "Scene", "scene"])
+    fileItems = sorted(fileItems)
     fileItems.insert(0,[ "Back", "main"])
 
     global locationItems
