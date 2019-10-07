@@ -178,6 +178,8 @@
   - added: `local` setting
   - added check for failed login
   - added post: "OnlySnarf Bot commands: !pic | !pic dick | !pic ass"
+  **2.6.1**
+  - creds cleanup
 
 ----------------------------------------
 
