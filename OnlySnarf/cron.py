@@ -39,7 +39,7 @@ def create(comment, args=[], minute=None, hour=None):
     cron = CronTab(user=str(settings.CRON_USER))
     cron.remove_all(comment=comment)
     args = [n.strip() for n in args]
-    newCron = cron.new(command="onlysnarfpy -cron {} {}".format(comment, " ".join(args)), comment=comment);
+    newCron = cron.new(command="/usr/local/bin/onlysnarfpy -cron {} {} >> /var/log/onlysnarf.log 2>&1".format(comment, " ".join(args)), comment=comment);
     newCron.hour.every(1)
     if minute is not None:
         newCron.minute.on(minute)
@@ -72,14 +72,40 @@ def getAll():
 ##### Special #####
 ###################
 
-def uploadRandom(opt):
-    # newCron = cron.new(command="onlysnarf -cron {} {}".format(comment, " ".join(args)), comment=comment);
-    pass
+def discount(user, amount=None, months=None):
+    args = ["-action","discount","-user",str(user)]
+    if amount: 
+        args.append(["-amount"])
+        args.append([amount])
+    if months:
+        args.append(["-months"])
+        args.append([months])
+    create("discount-"+user, args)
 
-def uploadLater(type_, path):
-    args = ["-type",str(type_),"-method","input","-input",path]
-    create("upload-me"+str(path), args)
-    pass
+def message(user, text=None, image=None, price=None):
+    args = ["-action","message","-user",str(user)]
+    if text: 
+        args.append(["-text"])
+        args.append(["\"{}\"".format(text)])
+    if image:
+        args.append(["-image"])
+        args.append(["\"{}\"".format(image)])
+    if price:
+        args.append(["-price"])
+        args.append(["\"{}\"".format(price)])
+    create("message-"+user, args)
+
+def post(text):
+    args = ["-action","post","-text","\"{}\"".format(text)]
+    create("post-"+user, args)
+
+def upload(opt):
+    args = ["-type",str(opt)]
+    create("upload", args)
+
+def uploadInput(type_, path):
+    args = ["-type",str(type_),"-method","input","-input","\"{}\"".format(path)]
+    create("upload-input"+str(path), args)
 
 # check all scenes folders' data.txt's for "releaseDate"
 def checkScenes():
