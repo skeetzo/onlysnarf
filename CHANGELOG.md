@@ -183,7 +183,12 @@
   **2.7.0**
   - menu sort
   - onlysnarfpy
-
+  **2.7.1**
+  - driver auth fix
+  - cron fix
+  **2.8.0**
+  - added expiration
+  
 ----------------------------------------
 
 ## ToDo
@@ -213,7 +218,6 @@
 
 
 ### High Priority  
-  - add: Ask
   - add: Poll
   - add: Schedule
   - add: Expiration

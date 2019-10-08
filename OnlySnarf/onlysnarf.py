@@ -42,7 +42,8 @@ def discount(choice, depth=1, amount=None, months=None):
         users.append(user)
     for user in users:
         try:
-            OnlySnarf.discount_user(user.id, depth=depth, discount=amount, months=months)
+            success = OnlySnarf.discount_user(user.id, depth=depth, discount=amount, months=months)
+            if not success: print("Error: There was an error discounting - {}/{}".format(user.id, user.username))
         except Exception as e:
             settings.maybePrint(e)
         depth = int(depth) + 1
@@ -105,15 +106,19 @@ def message(choice, message=None, image=None, price=None, username=None):
         return
     for user in users:
         if user:
-            success = user.sendMessage(message, image, price)
-            if not success:
-                print("Error: There was an error messaging - {}/{}".format(user.id, user.username))
+            try:
+                success = user.sendMessage(message, image, price)
+                if not success:
+                    print("Error: There was an error messaging - {}/{}".format(user.id, user.username))
+            except Exception as e:
+                settings.maybePrint(e)
                 
 ################
 ##### Post #####
 ################
 
 def post(text=None, override=False):
+    expires = None
     if not text: text = input("Text: ".format(text))
     else: print("Text: "+text)
     if not override:
@@ -125,10 +130,18 @@ def post(text=None, override=False):
                 return False
             else:
                 text = confirm
-    OnlySnarf.post(text)
-    OnlySnarf.exit()
-    return True
-
+        expires_ = input("Expiration ({}): ".format(expires_))
+        if expires_ != "":
+            expires = expires_
+    try:
+        successful = OnlySnarf.post(text, expires=expires)
+        # if successful: print("Post Successful")
+        # else: print("Post Failed")
+        OnlySnarf.exit()
+        return successful
+    except Exception as e:
+        settings.maybePrint(e)
+    
 #####################
 ##### Promotion #####
 #####################
@@ -172,23 +185,25 @@ def remove_local():
 ###################
 
 def release(opt, methodChoice="random", file=None, folderName=None, parent=None):
-    if str(methodChoice) != "input":
-        print("0/3 : Deleting Locals")
+    try:
+        if str(methodChoice) != "input":
+            print("0/3 : Deleting Locals")
+            remove_local()
+        sys.stdout.flush()
+        print("1/3 : Running - {}".format(opt))
+        released = release_(opt, methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
+        # if released == False: print("Upload Failed")
+        # else: print("Upload Successful")
+        sys.stdout.flush()
+        print('2/3 : Cleaning Up Files')
         remove_local()
-    sys.stdout.flush()
-    #################################################
-    print("1/3 : Running - {}".format(opt))
-    released = release_(opt, methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
-    if released == False: print("Error: Failed to release - {}".format(opt))
-    sys.stdout.flush()
-    #################################################
-    print('2/3 : Cleaning Up Files')
-    remove_local()
-    print('Files Cleaned ')
-    #################################################
-    print('3/3 : Google Drive to OnlyFans Upload Complete')
-    OnlySnarf.exit()
-    sys.stdout.flush()
+        print('Files Cleaned ')
+        print('3/3 : Google Drive to OnlyFans Upload Complete')
+        OnlySnarf.exit()
+        sys.stdout.flush()
+        return released
+    except Exception as e:
+        settings.maybePrint(e)
 
 def release_(opt, methodChoice="random", file=None, folderName=None, parent=None):
     try:
@@ -211,6 +226,7 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
         keywords = []
         performers = []
         files = None
+        expires = settings.EXPIRES or ""
         if parent: parent = parent.get("title")
         try:
             if file == None: file = data.get("file") or {}
@@ -251,18 +267,22 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
                     else:
                         performers = performers_.split(",")
                         performers = [n.strip() for n in performers]
+                expires_ = input("Expiration ({}): ".format(expires))
+                if expires_ != "":
+                    expires = expires_
         except Exception as e:
             settings.maybePrint(e)
         if text == None: print("Warning: Missing Title")
         if path == None: print("Warning: Missing Content")
         if keywords == None or len(keywords) == 0: print("Warning: Missing Keywords")
         if performers == None or len(performers) == 0: print("Warning: Missing Performers")
-        print("Data:")
-        print("- Text: {}".format(text)) # name of scene
-        print("- Keywords: {}".format(keywords)) # text sent in messages
-        print("- Content: {}".format(path)) # the file(s) to upload
-        print("- Performer(s): {}".format(performers)) # name of performers
-        successful_upload = upload(path, text, keywords, performers)
+        # print("Data:")
+        # print("- Text: {}".format(text)) # name of scene
+        # print("- Keywords: {}".format(keywords)) # text sent in messages
+        # print("- Content: {}".format(path)) # the file(s) to upload
+        # print("- Performer(s): {}".format(performers)) # name of performers
+        # print("- Expiration: {}".format(expires)) # name of performers
+        successful_upload = upload(path, text=text, keywords=keywords, performers=performers, expires=expires)
         if not successful_upload:
             print("Error: Missing Data Type")
         elif files:
@@ -271,6 +291,7 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
             Google.move_file(file)
         elif str(methodChoice) == "input":
             Google.upload_input()
+        return successful_upload
     except Exception as e:
         settings.maybePrint(e)
         return False
@@ -362,20 +383,17 @@ def release_scene(methodChoice="random", file=None, folderName=None, parent=None
 ##### Upload #####
 ##################
 
-def upload(path, text="", keywords=[], performers=[]):
-    settings.maybePrint("Uploading: {}".format(path))
-    successful = False
+def upload(path, text="", keywords=[], performers=[], expires=None):
+    # settings.maybePrint("Uploading: {}".format(path))
     try:
-        successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers)
+        successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers, expires=expires)
+        # if successful: print("Upload Successful")
+        # else: print("Upload Failed")
+        return successful
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Unable to Upload")
         return False
-    if successful:
-        print("Upload Complete")
-    else:
-        print("Upload Failure")
-    return successful
 
 #################
 ##### Users #####
@@ -410,29 +428,31 @@ def test(TYPE, methodChoice="random", file=None, folderName=None, parent=None):
     return
 
 ################################################################################################################################################
+
 def main():
     try:
         # os.system('clear')
         settings.initialize()
+        success = False
         if str(settings.ACTION) == "upload":
-            release(settings.TYPE, methodChoice=settings.METHOD)
+            success = release(settings.TYPE, methodChoice=settings.METHOD)
         elif str(settings.ACTION) == "post":
-            post(text=settings.TEXT, override=True)
+            success = post(text=settings.TEXT, override=True)
         elif str(settings.ACTION) == "message":
-            message(settings.CHOICE, message=settings.TEXT, image=settings.IMAGE, price=settings.PRICE, username=settings.USER)
+            success = message(settings.CHOICE, message=settings.TEXT, image=settings.IMAGE, price=settings.PRICE, username=settings.USER)
         elif str(settings.ACTION) == "discount":
             if str(settings.USER) == "" or str(settings.USER) == "None": settings.USER = "all"
-            discount(settings.USER, amount=settings.AMOUNT, months=settings.MONTHS)
+            success = discount(settings.USER, amount=settings.AMOUNT, months=settings.MONTHS)
         else:
             print("Warning: Missing Method")
-        if str(settings.CRON) != "False":
+        if success and str(settings.CRON) != "False":
             Cron.delete(settings.CRON)
     except Exception as e:
         print(e)
         print("Shnarf!")
     finally:
         sys.exit(0)
-        
+
 if __name__ == "__main__":
     main()
 else:

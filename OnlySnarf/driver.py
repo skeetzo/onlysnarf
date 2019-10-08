@@ -40,13 +40,15 @@ USERNAME_XPATH = "//input[@id='username_or_email']"
 PASSWORD_XPATH = "//input[@id='password']"
 MESSAGE_INPUT_CLASS = ".form-control.b-chat__message-input"
 MONTHS_INPUT = "g-input.form-control"
-
 DISCOUNT_TEXT = "g-input.form-control"
 DISCOUNT_USER_BUTTONS = "g-btn.m-rounded.m-border.m-sm"
 DISCOUNT_USER_BUTTONS1 = "g-btn.m-rounded"
 DISCOUNT_USERS = "g-btn.m-rounded.m-border.m-sm"
 DISCOUNT_USERS_ = "b-users__item.m-fans"
-
+EXPIRATION = "g-btn.m-flat.b-make-post__expire-period-btn"
+EXPIRATION_PERIODS = "b-make-post__expire__label"
+EXPIRATION_SAVE = "g-btn.m-rounded.js-make-post-poll-duration-save"
+EXPIRATION_CANCEL = "g-btn.m-rounded.m-border"
 ONLYFANS_TWEET = "//label[@for='new_post_tweet_send']"
 ONLYFANS_UPLOAD_PHOTO = "fileupload_photo"
 ONLYFANS_UPLOAD_MESSAGE_PHOTO = "cm_fileupload_photo"
@@ -64,6 +66,7 @@ ONLYFANS_UPLOAD_BUTTON = "g-btn.m-rounded.m-border"
 ONLYFANS_MESSAGES_FROM = "m-from-me"
 ONLYFANS_MESSAGES_ALL = "b-chat__message__text"
 ONLYFANS_MESSAGES = "b-chat__message__text"
+ONLYFANS_MORE = "g-btn.m-flat.b-make-post__more-btn"
 
 #####################
 ##### Functions #####
@@ -72,13 +75,10 @@ ONLYFANS_MESSAGES = "b-chat__message__text"
 def auth():
     logged_in = False
     global BROWSER
-    if not BROWSER or BROWSER == None:
-        logged_in = log_into_OnlyFans()
-    else:
-        logged_in = True
-    if logged_in == False:
-        print("Error: Failure to Login")
-        sys.exit(1)
+    if not BROWSER or BROWSER == None: logged_in = log_into_OnlyFans()
+    else: logged_in = True
+    if logged_in == False: print("Error: Failure to Login")
+    return logged_in
 
 def goToHome():
     global BROWSER
@@ -89,7 +89,6 @@ def goToHome():
         settings.maybePrint("goto -> onlyfans.com")
         BROWSER.get(ONLYFANS_HOME_URL)
         WebDriverWait(BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.XPATH, SEND_BUTTON_XPATH)))
-
 
 # Login to OnlyFans
 def log_into_OnlyFans():
@@ -183,7 +182,7 @@ def reset():
 
 # maximum discount = 55%
 def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
-    auth()
+    if not auth(): return False
     if int(discount) > 55:
         print("Warning: Discount Too High, Max -> 55%")
         discount = 55
@@ -258,6 +257,51 @@ def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
                 return True
     return True
 
+######################
+##### Expiration #####
+######################
+
+def expiration(period):
+    if not auth(): return False
+    if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99:
+        print("Error: Missing Expiration")
+        return False
+    global BROWSER
+    try:
+        goToHome()
+        print("Expiration:")
+        print("- Period: {}".format(period))
+        BROWSER.find_element_by_class_name(ONLYFANS_MORE).click()
+        BROWSER.find_element_by_class_name(EXPIRATION).click()
+        nums = BROWSER.find_elements_by_class_name(EXPIRATION_PERIODS)
+        for num in nums:
+            inner = num.get_attribute("innerHTML")
+            print("{} vs {}".format(period,inner))
+            if str(inner) == "1 day" and int(period) == 1: num.click()
+            if str(inner) == "3 days" and int(period) == 3: num.click()
+            if str(inner) == "7 days" and int(period) == 7: num.click()
+            if str(inner) == "30 days" and int(period) == 30: num.click()
+            if "No limit" in str(inner) and int(period) == 99: num.click()
+        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+        save = BROWSER.find_element_by_class_name(EXPIRATION_SAVE)
+        if str(settings.DEBUG) == "True":
+            print("Skipping Expiration (debug)")
+            cancels = BROWSER.find_elements_by_class_name(EXPIRATION_CANCEL)
+            cancels[1].click() # its the second cancel button
+            # for cancel in cancels:
+            #     print(cancel.get_attribute("innerHTML"))
+            #     if cancel.get_attribute("innerHTML") == "Cancel":
+            #         cancel.click()
+        else:
+            save.click()
+            print("Expiration Entered")
+        return True
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failed to enter Expiration")
+        return False
+
 ####################
 ##### Messages #####
 ####################
@@ -327,7 +371,7 @@ def message_price(price):
 
 def message_user(user):
     try:
-        auth()
+        if not auth(): return False
         userid = user.id
         if not userid or userid == None or str(userid) == "None":
             print("Warning: Missing User ID")
@@ -350,7 +394,7 @@ def message_user(user):
 
 def read_user_messages(user):
     try:
-        auth()
+        if not auth(): return False
         # go to onlyfans.com/my/subscribers/active
         message_user(user)
         messages_from_ = BROWSER.find_elements_by_class_name(ONLYFANS_MESSAGES_FROM)
@@ -381,7 +425,6 @@ def read_user_messages(user):
             message = message.find_element_by_class_name(ONLYFANS_MESSAGES)
             settings.maybePrint("from: {}".format(message.get_attribute("innerHTML")))
             messages_from.append(message.get_attribute("innerHTML"))
-
         i = 0
         for message in messages_all:
             from_ = False
@@ -435,13 +478,14 @@ def update_chat_log(user):
 ##### Post #####
 ################
 
-def post(text):
+def post(text, expires=None):
     try:
-        auth()
+        if not auth(): return False
         global BROWSER
         goToHome()
         print("Posting:")
         print("- Text: {}".format(text))
+        if expires: expiration(expires)
         BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_CLASS).send_keys(str(text))
         sends = BROWSER.find_elements_by_class_name(SEND_BUTTON_CLASS)
         for i in range(len(sends)):
@@ -467,7 +511,7 @@ def post(text):
 
 # or email
 def get_new_trial_link():
-    auth()
+    USERS_PATH
     # go to onlyfans.com/my/subscribers/active
     try:
         settings.maybePrint("goto -> /my/promotions")
@@ -508,9 +552,9 @@ def get_new_trial_link():
 ##################
 
 # Uploads a directory with a video file or image files to OnlyFans
-def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
+def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None, expires=False):
     try:
-        auth()
+        if not auth(): return False
         global BROWSER
         goToHome()
         if not path:
@@ -531,6 +575,8 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
         print("- Performers: {}".format(performers))
         print("- Text: {}".format(text))
         print("- Tweeting: {}".format(settings.TWEETING))
+        print("- Expiration: {}".format(expires))
+        if expires: expiration(expires)
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
         if str(settings.TWEETING) == "True":
             WAIT.until(EC.element_to_be_clickable((By.XPATH, ONLYFANS_TWEET))).click()
@@ -614,7 +660,7 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None):
 #################
 
 def get_users():
-    auth()
+    USERS_PATH
     try:
         if str(BROWSER.current_url) == str(ONLYFANS_USERS_ACTIVE_URL):
             settings.maybePrint("at -> /my/subscribers/active")
