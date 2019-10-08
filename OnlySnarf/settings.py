@@ -36,6 +36,8 @@ class Settings:
         self.USERS_FAVORITE = []
         self.EXPIRES = None
         self.SCHEDULE = None
+        self.DATE = None
+        self.TIME = None
         # -backup
         # backup uploaded content to "posted" folder
         self.BACKUP = False
@@ -184,7 +186,7 @@ class Settings:
             sys.argv[i] = sys.argv[i][1:] # remove - in front
             truths_ = ["BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
             falses_ = []
-            nexts_ = ["SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","CHOICE","AMOUNT","MONTHS","ACTION","CRON_USER","LOCAL","IMAGE","IMAGE_UPLOAD_LIMIT","IMAGE_UPLOAD_MAX","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
+            nexts_ = ["DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","CHOICE","AMOUNT","MONTHS","ACTION","CRON_USER","LOCAL","IMAGE","IMAGE_UPLOAD_LIMIT","IMAGE_UPLOAD_MAX","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0
             while j < len(truths_):
                 if str(truths_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
@@ -261,6 +263,13 @@ class Settings:
             self.maybePrint("Error: Missing Local Path")
             return False
         return self.LOCAL
+
+    def getSchedule(self):
+        if str(self.SCHEDULE) != "None": return self.SCHEDULE
+        if  str(self.DATE) != "None" and str(self.TIME) != "None":
+            self.SCHEDULE = "{}:{}".format(self.DATE,self.TIME)
+            return self.SCHEDULE
+        return None
 
     def getTmp(self):
         # mkdir /tmp

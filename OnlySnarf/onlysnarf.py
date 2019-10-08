@@ -117,8 +117,7 @@ def message(choice, message=None, image=None, price=None, username=None):
 ##### Post #####
 ################
 
-def post(text=None, override=False):
-    expires = None
+def post(text=None, override=False, schedule=None):
     if not text: text = input("Text: ".format(text))
     else: print("Text: "+text)
     if not override:
@@ -130,11 +129,22 @@ def post(text=None, override=False):
                 return False
             else:
                 text = confirm
-        expires_ = input("Expiration ({}): ".format(expires_))
-        if expires_ != "":
+        print("Expiration [1, 3, 7, 99 or 'No limit']: ")
+        expires_ = input("({})>> ".format(expires))
+        if str(expires_) != "":
             expires = expires_
+        schedule_ = input("Schedule (y/n): ".format(schedule))
+        if str(schedule_) != "" and str(schedule_) != "n":
+            date_ = settings.DATE or ""
+            print("Date [mm/dd/YY]: ")
+            date = input("({})>>".format(date_))
+            time_ = settings.TIME or ""
+            print("Time [HH:MM]: ")
+            time = input("({})>>".format(time_))
+            schedule = "{}:{}".format(date, time)
     try:
-        successful = OnlySnarf.post(text, expires=expires)
+        if not schedule: schedule = settings.getSchedule()
+        successful = OnlySnarf.post(text, expires=expires, schedule=schedule)
         # if successful: print("Post Successful")
         # else: print("Post Failed")
         OnlySnarf.exit()
@@ -243,10 +253,12 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
                 if parent: performers = parent.split(" ")
             if isinstance(keywords, list): keywords = [n.strip() for n in keywords]
             if str(methodChoice) == "choose":
-                text_ = input("Text ({}): ".format(text))
+                print("Text: ")
+                text_ = input("({})>> ".format(text))
                 if text_ != "":
                     text = text_
-                keywords_ = input("Keywords ({}): ".format(keywords))
+                print("Keywords: ")
+                keywords_ = input("({})>> ".format(keywords))
                 if keywords_ != "":
                     if str(keywords_) == "None":
                         keywords = []
@@ -257,7 +269,8 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
                     else:
                         keywords = keywords_.split(",")
                         keywords = [n.strip() for n in keywords]
-                performers_ = input("Performers ({}): ".format(performers))
+                print("Performers: ")
+                performers_ = input("({})>> ".format(performers))
                 if performers_ != "":
                     if str(performers_) == "None":
                         performers = []
@@ -268,31 +281,30 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
                     else:
                         performers = performers_.split(",")
                         performers = [n.strip() for n in performers]
-                expires_ = input("Expiration ({}): ".format(expires))
+                print("Expiration [1, 3, 7, 99 or 'No limit']: ")
+                expires_ = input("({})>> ".format(expires))
                 if str(expires_) != "":
                     expires = expires_
                 schedule_ = input("Schedule (y/n): ".format(schedule))
                 if str(schedule_) != "" and str(schedule_) != "n":
-                    date = input("Date: ")
-                    time = input("Time: ")
+                    date_ = settings.DATE or ""
+                    print("Date [mm/dd/YY]: ")
+                    date = input("({})>>".format(date_))
+                    time_ = settings.TIME or ""
+                    print("Time [HH:MM]: ")
+                    time = input("({})>>".format(time_))
                     schedule = "{}:{}".format(date, time)
-
         except Exception as e:
             settings.maybePrint(e)
-
-        schedule = "10/30/2019:20:40"
-
-
-        if text == None: print("Warning: Missing Title")
         if path == None: print("Warning: Missing Content")
-        if keywords == None or len(keywords) == 0: print("Warning: Missing Keywords")
-        if performers == None or len(performers) == 0: print("Warning: Missing Performers")
-        # print("Data:")
-        # print("- Text: {}".format(text)) # name of scene
-        # print("- Keywords: {}".format(keywords)) # text sent in messages
-        # print("- Content: {}".format(path)) # the file(s) to upload
-        # print("- Performer(s): {}".format(performers)) # name of performers
-        # print("- Expiration: {}".format(expires)) # name of performers
+        if str(settings.DEBUG) == "True" and str(settings.VERBOSE) == "True":
+            print("Data:")
+            print("- Text: {}".format(text)) # name of scene
+            print("- Keywords: {}".format(keywords)) # text sent in messages
+            print("- Content: {}".format(path)) # the file(s) to upload
+            print("- Performer(s): {}".format(performers)) # name of performers
+            print("- Expiration: {}".format(expires)) # name of performers
+            print("- Schedule: {}".format(schedule)) # name of performers
         successful_upload = upload(path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule)
         if not successful_upload:
             pass
@@ -397,6 +409,7 @@ def release_scene(methodChoice="random", file=None, folderName=None, parent=None
 def upload(path, text="", keywords=[], performers=[], expires=None, schedule=None):
     # settings.maybePrint("Uploading: {}".format(path))
     try:
+        if not schedule: schedule = settings.getSchedule()
         successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule)
         # if successful: print("Upload Successful")
         # else: print("Upload Failed")
