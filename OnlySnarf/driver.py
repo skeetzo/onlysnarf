@@ -67,6 +67,13 @@ ONLYFANS_MESSAGES_FROM = "m-from-me"
 ONLYFANS_MESSAGES_ALL = "b-chat__message__text"
 ONLYFANS_MESSAGES = "b-chat__message__text"
 ONLYFANS_MORE = "g-btn.m-flat.b-make-post__more-btn"
+SCHEDULE = "g-btn.m-flat.b-make-post__datepicker-btn"
+SCHEDULE_EXISTING_DATE = "vdatetime-calendar__current--month"
+SCHEDULE_NEXT_MONTH = "vdatetime-calendar__navigation--next"
+SCHEDULE_DAYS = "vdatetime-calendar__month__day"
+SCHEDULE_SAVE = "g-btn.m-rounded"
+SCHEDULE_HOURS = "vdatetime-time-picker__item.vdatetime-time-picker__item"
+SCHEDULE_MINUTES = "vdatetime-time-picker__item"
 
 #####################
 ##### Functions #####
@@ -263,12 +270,13 @@ def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
 
 def expiration(period):
     if not auth(): return False
-    if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99:
+    if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99 and str(period) != "No limit":
         print("Error: Missing Expiration")
         return False
     global BROWSER
     try:
         # goToHome()
+        if isinstance(period,str) and str(period) == "No limit": period = 99
         print("Expiration:")
         print("- Period: {}".format(period))
         try:
@@ -279,7 +287,6 @@ def expiration(period):
         nums = BROWSER.find_elements_by_class_name(EXPIRATION_PERIODS)
         for num in nums:
             inner = num.get_attribute("innerHTML")
-            print("{} vs {}".format(period,inner))
             if str(inner) == "1 day" and int(period) == 1: num.click()
             if str(inner) == "3 days" and int(period) == 3: num.click()
             if str(inner) == "7 days" and int(period) == 7: num.click()
@@ -292,10 +299,6 @@ def expiration(period):
             print("Skipping Expiration (debug)")
             cancels = BROWSER.find_elements_by_class_name(EXPIRATION_CANCEL)
             cancels[1].click() # its the second cancel button
-            # for cancel in cancels:
-            #     print(cancel.get_attribute("innerHTML"))
-            #     if cancel.get_attribute("innerHTML") == "Cancel":
-            #         cancel.click()
         else:
             save.click()
             print("Expiration Entered")
@@ -482,27 +485,20 @@ def update_chat_log(user):
 ####################
 
 def scheduling(schedule_):
-    # schedule_ = datetime.strptime(date, "%m/%d/%Y:%H:%M")
-    # print(schedule_)
-    # print(schedule_.date())
-    tehdate = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M")
-    date = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").date()
-    month_ = tehdate.month.strftime("%B")
-    day_ = tehdate.day
-    year_ = tehdate.year
-    print(month_)
-    print(day_)
-    print(year_)
-    time_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").time()
-    hour_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").hour
-    minute_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").minute
-
     if not auth(): return False
-    if not date:
-        print("Error: Missing Date")
-        return False
     global BROWSER
     try:
+        if not schedule_:
+            print("Error: Missing Schedule")
+            return False
+        tehdate = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M")
+        date = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").date()
+        month_ = tehdate.strftime("%B")
+        day_ = tehdate.day
+        year_ = tehdate.year
+        time_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").time()
+        hour_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").hour
+        minute_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").minute
         print("Schedule:")
         print("- Date: {}".format(date))
         print("- Time: {}".format(time_))
@@ -511,74 +507,47 @@ def scheduling(schedule_):
         except Exception as e:
             pass
         # click schedule
-        BROWSER.find_element_by_class_name("g-btn.m-flat.b-make-post__datepicker-btn").click()
-
-        
+        BROWSER.find_element_by_class_name(SCHEDULE).click()
         searching = True
         while searching:
-            existingDate = BROWSER.find_element_by_class_name("vdatetime-calendar__current--month").get_attribute("innerHTML")
-            print(existingDate)
+            existingDate = BROWSER.find_element_by_class_name(SCHEDULE_EXISTING_DATE).get_attribute("innerHTML")
             if str(month_) in str(existingDate) and str(year_) in str(existingDate):
-                print("found")
                 searching = False
             else:
-                BROWSER.find_element_by_class_name("vdatetime-calendar__navigation--next").click()
-                print("next")
-        days = BROWSER.find_elements_by_class_name("vdatetime-calendar__month__day")
+                BROWSER.find_element_by_class_name(SCHEDULE_NEXT_MONTH).click()
+        days = BROWSER.find_elements_by_class_name(SCHEDULE_DAYS)
         for day in days:
-            inner = day.get_attribute("innerHTML")
-            print(inner)
-            if str(day_) in str(inner):
-                print("found date")
+            inner = day.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>","")
+            if str(day_) == str(inner):
                 day.click()
-
-        
         if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
             time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
-
-
-
-        save = BROWSER.find_element_by_class_name("g-btn m-rounded")
-        print("save: {}".format(save.get_attribute("innerHTML")))
-        save.click()
-
-        hours = BROWSER.find_elements_by_class_name("vdatetime-time-picker__item.vdatetime-time-picker__item")
+        saves = BROWSER.find_elements_by_class_name(SCHEDULE_SAVE)
+        for save in saves:
+            if "Save" in str(save.get_attribute("innerHTML")):
+                save.click()
+                break
+        hours = BROWSER.find_elements_by_class_name(SCHEDULE_HOURS)
         for hour in hours:
             inner = hour.get_attribute("innerHTML")
-            print(inner)
             if str(hour_) in str(inner) and hour.is_enabled():
-                print("found hour")
                 hour.click()
-
-        minutes = BROWSER.find_elements_by_class_name("vdatetime-time-picker__item")
+        minutes = BROWSER.find_elements_by_class_name(SCHEDULE_MINUTES)
         for minute in minutes:
             inner = minute.get_attribute("innerHTML")
-            print(inner)
             if str(minute_) in str(inner) and minute.is_enabled():
-                print("found minute")
                 minute.click()
-
-        
-        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
-            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
-
-
-        save = BROWSER.find_element_by_class_name("g-btn m-rounded")
-        print("save: {}".format(save.get_attribute("innerHTML")))
-        save.click()
-
-
-        # if str(settings.DEBUG) == "True":
-        #     print("Skipping Expiration (debug)")
-        #     cancels = BROWSER.find_elements_by_class_name(EXPIRATION_CANCEL)
-        #     cancels[1].click() # its the second cancel button
-            # for cancel in cancels:
-            #     print(cancel.get_attribute("innerHTML"))
-            #     if cancel.get_attribute("innerHTML") == "Cancel":
-            #         cancel.click()
-        # else:
-            # save.click()
-        print("Schedule Entered")
+        if str(settings.DEBUG) == "True":
+            print("Skipping Schedule (debug)")
+            cancel = BROWSER.find_element_by_class_name(EXPIRATION_CANCEL)
+            cancel.click() # its the first cancel button
+        else:
+            saves = BROWSER.find_elements_by_class_name(SCHEDULE_SAVE)
+            for save in saves:
+                if "Save" in str(save.get_attribute("innerHTML")):
+                    save.click()
+                    break
+            print("Schedule Entered")
         return True
     except Exception as e:
         settings.maybePrint(e)
@@ -589,7 +558,7 @@ def scheduling(schedule_):
 ##### Post #####
 ################
 
-def post(text, expires=None):
+def post(text, expires=None, schedule=None):
     try:
         if not auth(): return False
         global BROWSER
@@ -597,6 +566,7 @@ def post(text, expires=None):
         print("Posting:")
         print("- Text: {}".format(text))
         if expires: expiration(expires)
+        if schedule: scheduling(schedule)
         BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_CLASS).send_keys(str(text))
         sends = BROWSER.find_elements_by_class_name(SEND_BUTTON_CLASS)
         for i in range(len(sends)):

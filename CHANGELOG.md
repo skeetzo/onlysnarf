@@ -186,8 +186,9 @@
   **2.7.1**
   - driver auth fix
   - cron fix
-  **2.8.0**
+  **2.8.0 : 10/8/2019**
   - added Expiration
+  - added Schedule
 
 ----------------------------------------
 
@@ -219,8 +220,7 @@
 
 ### High Priority  
   - add: Poll
-  - add: Schedule
-
+ 
   -> Cron & Bot functionality that checks user messages for bot commands
 
   -> Twitter
@@ -230,3 +230,10 @@
   - must not spam, must follow a schedule. monthly, weekly on a day, daily at an hour
   -- maybe delete previous tweets?
   - maybe tweet once and pin it?
+
+  -> Posts
+  - a post that advertises custom requests
+  - a post that advertises tipping price for messaging
+  - a post that advertises prices for paid messages for individual photo requests
+  - a post for requesting people to comment or dm me individuals they'd like to see me with
+  - a post thanking followers for being followers

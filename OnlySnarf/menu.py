@@ -257,8 +257,6 @@ def selectMethod(actionChoice, fileChoice):
         methodItems.append([ "Local", "local" ])
     for item in methodItems:
         print(colorize("[" + str(methodItems.index(item)) + "] ", 'teal') + list(item)[0])
-
-
     while True:
         methodChoice = input(">> ")
         try:
@@ -286,7 +284,6 @@ def selectMethod(actionChoice, fileChoice):
                             return selectMethod(actionChoice, fileChoice)
                         file = choices[int(choice)-1]
                         parent = file
-                        
                         seeking = False
                         if str(fileChoice) == "gallery" or str(fileChoice) == "image"  or str(fileChoice) == "video" or str(fileChoice) == "performer":
                             if str(fileChoice) == "gallery":
@@ -325,14 +322,11 @@ def selectMethod(actionChoice, fileChoice):
                                                 print(sys.exc_info()[0])
                                                 print("Error: Incorrect Index")
                                                 return finalizeAction(actionChoice)
-
                                 except (ValueError, IndexError):
                                     print(sys.exc_info()[0])
                                     print("Error: Incorrect Index")
                                     return finalizeAction(actionChoice)
                         return performAction(actionChoice, fileChoice, methodChoice_, file=file, folderName=folderName, parent=parent)
-
-
                     except (ValueError, IndexError):
                         print(sys.exc_info()[0])
                         print("Error: Incorrect Index")
