@@ -10,7 +10,7 @@ import sys
 import pathlib
 import chromedriver_binary
 import time
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -268,10 +268,13 @@ def expiration(period):
         return False
     global BROWSER
     try:
-        goToHome()
+        # goToHome()
         print("Expiration:")
         print("- Period: {}".format(period))
-        BROWSER.find_element_by_class_name(ONLYFANS_MORE).click()
+        try:
+            BROWSER.find_element_by_class_name(ONLYFANS_MORE).click()
+        except Exception as e:
+            pass
         BROWSER.find_element_by_class_name(EXPIRATION).click()
         nums = BROWSER.find_elements_by_class_name(EXPIRATION_PERIODS)
         for num in nums:
@@ -474,6 +477,114 @@ def update_chat_log(user):
         return print("Error: Missing User")
     user.readChat()
 
+####################
+##### Schedule #####
+####################
+
+def scheduling(schedule_):
+    # schedule_ = datetime.strptime(date, "%m/%d/%Y:%H:%M")
+    # print(schedule_)
+    # print(schedule_.date())
+    tehdate = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M")
+    date = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").date()
+    month_ = tehdate.month.strftime("%B")
+    day_ = tehdate.day
+    year_ = tehdate.year
+    print(month_)
+    print(day_)
+    print(year_)
+    time_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").time()
+    hour_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").hour
+    minute_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").minute
+
+    if not auth(): return False
+    if not date:
+        print("Error: Missing Date")
+        return False
+    global BROWSER
+    try:
+        print("Schedule:")
+        print("- Date: {}".format(date))
+        print("- Time: {}".format(time_))
+        try:
+            BROWSER.find_element_by_class_name(ONLYFANS_MORE).click()
+        except Exception as e:
+            pass
+        # click schedule
+        BROWSER.find_element_by_class_name("g-btn.m-flat.b-make-post__datepicker-btn").click()
+
+        
+        searching = True
+        while searching:
+            existingDate = BROWSER.find_element_by_class_name("vdatetime-calendar__current--month").get_attribute("innerHTML")
+            print(existingDate)
+            if str(month_) in str(existingDate) and str(year_) in str(existingDate):
+                print("found")
+                searching = False
+            else:
+                BROWSER.find_element_by_class_name("vdatetime-calendar__navigation--next").click()
+                print("next")
+        days = BROWSER.find_elements_by_class_name("vdatetime-calendar__month__day")
+        for day in days:
+            inner = day.get_attribute("innerHTML")
+            print(inner)
+            if str(day_) in str(inner):
+                print("found date")
+                day.click()
+
+        
+        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+
+
+
+        save = BROWSER.find_element_by_class_name("g-btn m-rounded")
+        print("save: {}".format(save.get_attribute("innerHTML")))
+        save.click()
+
+        hours = BROWSER.find_elements_by_class_name("vdatetime-time-picker__item.vdatetime-time-picker__item")
+        for hour in hours:
+            inner = hour.get_attribute("innerHTML")
+            print(inner)
+            if str(hour_) in str(inner) and hour.is_enabled():
+                print("found hour")
+                hour.click()
+
+        minutes = BROWSER.find_elements_by_class_name("vdatetime-time-picker__item")
+        for minute in minutes:
+            inner = minute.get_attribute("innerHTML")
+            print(inner)
+            if str(minute_) in str(inner) and minute.is_enabled():
+                print("found minute")
+                minute.click()
+
+        
+        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+
+
+        save = BROWSER.find_element_by_class_name("g-btn m-rounded")
+        print("save: {}".format(save.get_attribute("innerHTML")))
+        save.click()
+
+
+        # if str(settings.DEBUG) == "True":
+        #     print("Skipping Expiration (debug)")
+        #     cancels = BROWSER.find_elements_by_class_name(EXPIRATION_CANCEL)
+        #     cancels[1].click() # its the second cancel button
+            # for cancel in cancels:
+            #     print(cancel.get_attribute("innerHTML"))
+            #     if cancel.get_attribute("innerHTML") == "Cancel":
+            #         cancel.click()
+        # else:
+            # save.click()
+        print("Schedule Entered")
+        return True
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Failed to enter Schedule")
+        return False
+
 ################
 ##### Post #####
 ################
@@ -552,7 +663,7 @@ def get_new_trial_link():
 ##################
 
 # Uploads a directory with a video file or image files to OnlyFans
-def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None, expires=False):
+def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None, expires=False, schedule=False):
     try:
         if not auth(): return False
         global BROWSER
@@ -575,8 +686,12 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None, exp
         print("- Performers: {}".format(performers))
         print("- Text: {}".format(text))
         print("- Tweeting: {}".format(settings.TWEETING))
-        print("- Expiration: {}".format(expires))
+        # if expires:
+        #     print("- Expiration: {}".format(expires))
+        # if schedule:
+        #     print("- Expiration: {}".format(schedule))
         if expires: expiration(expires)
+        if schedule: scheduling(schedule)
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
         if str(settings.TWEETING) == "True":
             WAIT.until(EC.element_to_be_clickable((By.XPATH, ONLYFANS_TWEET))).click()
