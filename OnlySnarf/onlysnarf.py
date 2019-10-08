@@ -227,6 +227,7 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
         performers = []
         files = None
         expires = settings.EXPIRES or ""
+        schedule = settings.SCHEDULE or ""
         if parent: parent = parent.get("title")
         try:
             if file == None: file = data.get("file") or {}
@@ -268,10 +269,20 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
                         performers = performers_.split(",")
                         performers = [n.strip() for n in performers]
                 expires_ = input("Expiration ({}): ".format(expires))
-                if expires_ != "":
+                if str(expires_) != "":
                     expires = expires_
+                schedule_ = input("Schedule (y/n): ".format(schedule))
+                if str(schedule_) != "" and str(schedule_) != "n":
+                    date = input("Date: ")
+                    time = input("Time: ")
+                    schedule = "{}:{}".format(date, time)
+
         except Exception as e:
             settings.maybePrint(e)
+
+        schedule = "10/30/2019:20:40"
+
+
         if text == None: print("Warning: Missing Title")
         if path == None: print("Warning: Missing Content")
         if keywords == None or len(keywords) == 0: print("Warning: Missing Keywords")
@@ -282,9 +293,9 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
         # print("- Content: {}".format(path)) # the file(s) to upload
         # print("- Performer(s): {}".format(performers)) # name of performers
         # print("- Expiration: {}".format(expires)) # name of performers
-        successful_upload = upload(path, text=text, keywords=keywords, performers=performers, expires=expires)
+        successful_upload = upload(path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule)
         if not successful_upload:
-            print("Error: Missing Data Type")
+            pass
         elif files:
             Google.move_files(text, files)
         elif str(methodChoice) != "input":
@@ -383,10 +394,10 @@ def release_scene(methodChoice="random", file=None, folderName=None, parent=None
 ##### Upload #####
 ##################
 
-def upload(path, text="", keywords=[], performers=[], expires=None):
+def upload(path, text="", keywords=[], performers=[], expires=None, schedule=None):
     # settings.maybePrint("Uploading: {}".format(path))
     try:
-        successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers, expires=expires)
+        successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule)
         # if successful: print("Upload Successful")
         # else: print("Upload Failed")
         return successful

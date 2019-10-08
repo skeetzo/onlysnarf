@@ -187,8 +187,8 @@
   - driver auth fix
   - cron fix
   **2.8.0**
-  - added expiration
-  
+  - added Expiration
+
 ----------------------------------------
 
 ## ToDo
@@ -220,7 +220,6 @@
 ### High Priority  
   - add: Poll
   - add: Schedule
-  - add: Expiration
 
   -> Cron & Bot functionality that checks user messages for bot commands
 
