@@ -735,10 +735,6 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None, exp
         print("- Performers: {}".format(performers))
         print("- Text: {}".format(text))
         print("- Tweeting: {}".format(settings.TWEETING))
-        # if expires:
-        #     print("- Expiration: {}".format(expires))
-        # if schedule:
-        #     print("- Expiration: {}".format(schedule))
         if expires: expiration(expires)
         if schedule: scheduling(schedule)
         if poll: polling(poll)

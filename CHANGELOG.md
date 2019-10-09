@@ -218,7 +218,6 @@
   -> Promotions
   - add email|Twitter functionality for sending trial link; add clipboard function to copy link
 
-
 ### High Priority  
  
   -> Cron & Bot functionality that checks user messages for bot commands

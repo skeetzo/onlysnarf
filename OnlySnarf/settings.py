@@ -268,16 +268,19 @@ class Settings:
     def getPoll(self):
         if isinstance(self.QUESTIONS, str): self.QUESTIONS = self.QUESTIONS.split(",")
         poll = None
-        duration = self.DURATION or ""
-        questions = self.QUESTIONS or []
+        duration = self.DURATION or None
+        questions = self.QUESTIONS or None
         poll = {"period":duration,"questions":questions}
+        if not duration or not questions: return None
         return poll
 
     def getSchedule(self):
         if str(self.SCHEDULE) != "None": return self.SCHEDULE
-        if  str(self.DATE) != "None" and str(self.TIME) != "None":
-            self.SCHEDULE = "{}:{}".format(self.DATE,self.TIME)
-            return self.SCHEDULE
+        if  str(self.DATE) != "None":
+            if str(self.TIME) != "None":
+                self.SCHEDULE = "{}:{}".format(self.DATE,self.TIME)
+            else:
+                self.SCHEDULE = "{}:{}".format(self.DATE,"00:00")
         return None
 
     def getTmp(self):
