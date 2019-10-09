@@ -100,6 +100,8 @@ class Settings:
         # -image-max
         # maximum number of images that can be uploaded
         self.IMAGE_UPLOAD_MAX = 20
+        # maximum number of images that can be uploaded in a message
+        self.IMAGE_UPLOAD_MAX_MESSAGES = 5
         # -overwrite-local
         # self.OVERWRITE_LOCAL = False
         # -mount-path

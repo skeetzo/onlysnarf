@@ -553,9 +553,11 @@ def get_images():
     checkAuth()
     print('Getting Images')
     global PYDRIVE
-    random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("images")['id'])}).GetList()
+    images_folder = get_folder_by_name("images")
+    random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(images_folder['id'])}).GetList()
     images_list = []
     for folder in random_folders:
+        images_list.append([images_folder, folder])
         settings.maybePrint('checking folder: '+folder['title'])
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()      
         for image_file in images_list_tmp:

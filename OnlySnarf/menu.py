@@ -429,8 +429,17 @@ def message(choice, image=None, username=None):
             print("Enter a currency amount!")
     if not image or not image[0] or image[0] == None:
         print("Error: Missing Image")
-        return
-    image = Google.download_file(image[0]).get("path")
+        return        
+    OnlySnarf.remove_local()
+    try: 
+        image = Google.download_file(image[0]).get("path")
+    except Exception as e:
+        try:
+            image = Google.download_gallery(image[0]).get("path")
+        except Exception as e:
+            print("Error: Missing Image(s)")
+            image = None
+            # pass
     OnlySnarf.message(choice, message=message, image=image, price=price, username=username)
 
 # Promotion Menu - finalize

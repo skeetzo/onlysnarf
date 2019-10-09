@@ -441,6 +441,13 @@ def release_scene(methodChoice="random", file=None, folderName=None, parent=None
         settings.maybePrint(e)
         return False
 
+#################
+##### Reset #####
+#################
+
+def reset():
+    OnlySnarf.reset()
+
 ##################
 ##### Upload #####
 ##################
@@ -486,8 +493,8 @@ def test(TYPE, methodChoice="random", file=None, folderName=None, parent=None):
     response = Cron.test()
     if not response or response == None:
         print("Error: Failed to test crons")
-    reset = OnlySnarf.reset()
-    if not reset:
+    reset_ = reset()
+    if not reset_:
         return print("Error: Failed to Reset")
     return
 
