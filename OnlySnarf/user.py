@@ -47,20 +47,21 @@ class User:
             settings.maybePrint(e)
             settings.maybePrint("User: {}".format(self.id))
 
-    def sendMessage(self, message, image, price):
+    def sendMessage(self, message="", image=None, price=None):
         try:
             print("Sending Message: {} <- {} - {} - ${}".format(self.id, message, image, price))
             OnlySnarf.message_user(self)
             success = OnlySnarf.message_text(message)
             if not success:
                 return
-            image_name = os.path.basename(image)
-            if str(image_name) in self.sent_images:
-                print("Error: Image Already Sent: {} -> {}".format(image, self.id))
-                return False
-            success = OnlySnarf.message_image(image)
-            if not success: return False
-            if price != None:
+            if image:
+                image_name = os.path.basename(image)
+                if str(image_name) in self.sent_images:
+                    print("Error: Image Already Sent: {} -> {}".format(image, self.id))
+                    return False
+                success = OnlySnarf.message_image(image)
+                if not success: return False
+            if price:
                 global PRICE_MINIMUM
                 if image != None and Decimal(sub(r'[^\d.]', '', price)) < PRICE_MINIMUM:
                     print("Warning: Price Too Low, Free Image")
