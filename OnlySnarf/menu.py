@@ -372,7 +372,8 @@ def finalizeMessage(actionChoice):
 # Message Menu - perform
 def performMessage(actionChoice, messageChoice):
     username = None
-    if str(messageChoice) == "user":
+    if str(messageChoice) == "select":
+        messageChoice = "user"
         users = displayUsers()
         seeking = True
         while seeking:
@@ -427,12 +428,7 @@ def message(choice, image=None, username=None):
         print("Error: Missing Image")
         return
     image = Google.download_file(image[0]).get("path")
-    successful_message = OnlySnarf.message(choice=choice, message=message, image=image, price=price, username=username)
-    if successful_message and str(choice) != "new":
-        Google.move_file(image[0])
-    else:
-        print("Error: Failure Messaging")
-        return False
+    OnlySnarf.message(choice, message=message, image=image, price=price, username=username)
 
 # Promotion Menu - finalize
 def finalizePromotion(actionChoice):

@@ -167,6 +167,7 @@ class User:
         settings.maybePrint("pruning memberlist")
         settings.maybePrint("users: {}".format(len(active_users)))
         write_users_local(users=active_users)
+        settings.PREFER_LOCAL = True
         return active_users
 
     @staticmethod
@@ -176,7 +177,7 @@ class User:
             return None
         users = User.get_all_users()
         for user in users:
-            if str(user.username) == "@"+str(username):
+            if str(user.username) == "@"+str(username) or str(user.username) == str(username):
                 return user
         return None
 
