@@ -87,6 +87,9 @@ def checkAuth():
 # Deletes online file
 def delete_file(file):
     checkAuth()
+    if str(settings.SKIP_DOWNLOAD) == "True":
+        print("Warning: Unable to Delete, skipped download")
+        return True
     if str(settings.FORCE_DELETE) == "True":
         print("Deleting (Forced): {}".format(fileName))
     elif str(settings.DEBUG) == "True":
@@ -102,6 +105,9 @@ def delete_file(file):
 # Archives posted file / folder
 def move_file(file):
     checkAuth()
+    if str(settings.SKIP_DOWNLOAD) == "True":
+        print("Warning: Unable to Backup, skipped download")
+        return True
     if str(settings.FORCE_BACKUP) == "True":
         print("Backing Up (forced): {}".format(file['title']))
     elif str(settings.DEBUG) == "True":
@@ -118,6 +124,9 @@ def move_file(file):
 
 def move_files(fileName, files):
     checkAuth()
+    if str(settings.SKIP_DOWNLOAD) == "True":
+        print("Warning: Unable to Backup, skipped download")
+        return True
     if str(settings.FORCE_BACKUP) == "True":
         print("Backing Up (forced): {}".format(fileName))
     elif str(settings.DEBUG) == "True":
