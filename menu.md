@@ -54,3 +54,29 @@ Message [all, recent, new] users $message with $image for $price.
 - performers -> @
 
 Upload $type of content by $method as post with $text and tag $performer. Adds hashtagged $keywords.
+
+## args
+
+-debug  
+  `python3 onlysnarf.py -debug`  
+Tests configuration. Does not upload or remove from Google Drive.
+
+-image  
+  `python3 onlysnarf.py -type image`  
+Uploads an image labeled: 'imageName - %d%m%y'  
+
+-gallery  
+  `python3 onlysnarf.py -type gallery`  
+Uploads a gallery labeled: 'folderName - %d%m%y'  
+
+-video  
+  `python3 onlysnarf.py -type video`  
+Uploads a video labeled: 'folderName - %d%m%y'  
+
+-text  
+  `python3 onlysnarf.py -type video -text "your mom"`  
+Uploads a video labeled: 'your mom - %d%m%y'  
+
+-show-window
+  `python3 onlysnarf.py -show-window`
+Shows the Chromium browser
