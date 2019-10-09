@@ -355,19 +355,45 @@ def message_text(text):
 def message_image(image):
     try:
         if not image or image == None or str(image) == "None":
-            print("Error: Missing Image")
+            print("Error: Missing Image(s)")
             return False
-        print("Enter image: {}".format(image))
-        if not os.path.isfile(str(image)):
-            print("Error: Missing Image File")
-            return False
+        print("Enter image(s): {}".format(image))
         global BROWSER
-        BROWSER.find_element_by_id(ONLYFANS_UPLOAD_MESSAGE_PHOTO).send_keys(str(image))
-        settings.maybePrint("Image Entered")
+        files = []
+        if str(settings.SKIP_DOWNLOAD) == "True":
+            print("Warning: Unable to upload, skipped download")
+            return True
+        if os.path.isfile(str(image)):
+            files = [str(image)]
+        elif os.path.isdir(str(image)):
+            for file in os.listdir(str(image)):
+                files.append(os.path.join(os.path.abspath(str(image)),file))
+        else:
+            print("Error: Missing Image File(s)")
+            return False
+        if str(settings.SKIP_UPLOAD) == "True":
+            print("Skipping Upload")
+            return True
+        files = files[:int(settings.IMAGE_UPLOAD_MAX_MESSAGES)]
+        for file in files:  
+            print('Uploading: '+str(file))
+            BROWSER.find_element_by_id(ONLYFANS_UPLOAD_MESSAGE_PHOTO).send_keys(str(file))
+        try:
+            buttons = BROWSER.find_elements_by_class_name(ONLYFANS_UPLOAD_BUTTON)
+            if len(buttons) > 0: settings.maybePrint("Warning: Upload Error Message, Closing")
+            for butt in buttons:
+                if butt.get_attribute("innerHTML").strip() == "Close":
+                    butt.click()
+                    settings.maybePrint("Success: Upload Error Message Closed")
+        except Exception as e:
+            print("Error: Unable to Upload Images")
+            settings.maybePrint(e)
+            return False
+        settings.maybePrint("Image(s) Entered")
         return True
     except Exception as e:
         settings.maybePrint(e)
-        print("Error: Failure to Enter Image")
+        print("Error: Failure to Enter Image(s)")
         return False
 
 def message_price(price):
