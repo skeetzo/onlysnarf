@@ -28,15 +28,15 @@ Then from within project's OnlySnarf directory either:
   `python3 onlysnarf.py -debug`  
 Tests configuration. Does not upload or remove from Google Drive.
 
--image  
+-type image  
   `python3 onlysnarf.py -type image`  
 Uploads an image labeled: 'imageName - %d%m%y'  
 
--gallery  
+-type gallery  
   `python3 onlysnarf.py -type gallery`  
 Uploads a gallery labeled: 'folderName - %d%m%y'  
 
--video  
+-type video  
   `python3 onlysnarf.py -type video`  
 Uploads a video labeled: 'folderName - %d%m%y'  
 

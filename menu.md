@@ -3,55 +3,40 @@
 ## Actions
 
 ### Discount
-- user: choice or user
-**All**
-**Recent**
-- users subscribed within last 5 days
-**New**
-- users subscribed within last month who haven't been messaged
-**User**
-- selects User from list
-**Username**
-- enter User by username
-#
-- amount
-- months
+user: choice or user  
+**All**  : all users  
+**Recent** : users subscribed within last 5 days  
+**New** : users subscribed within last month who haven't been messaged  
+**User** : selects User from list  
+**Username** : enter User by username  
+amount  
+months  
 
 ### Message
-- user
-**All**
-**Recent**
-- users subscribed within last 5 days
-**New**
-- users subscribed within last month who haven't been messaged
-**User**
-- selects User from list
-**Username**
-- enter username
-#
-- text
-- image
-- price
+user  
+**All**  : all users  
+**Recent** : users subscribed within last 5 days  
+**New** : users subscribed within last month who haven't been messaged  
+**User** : selects User from list  
+**Username** : enter User by username  
+text  
+image  
+price  
 
 Message [all, recent, new] users $message with $image for $price.
 
 ### Post
-- text
-- schedule | -date && -time
-- questions & - duration
-- expires & - duration
+text  
+schedule | -date && -time  
+questions & - duration  
+expires & - duration  
 
 ### Upload
-- type
-**Image**
-**Gallery**
-**Video**
-**Performer**
-- text
-- method -> random | input | choose
-#
-- keywords -> hashtagged
-- performers -> @
+type : **Image** | **Gallery** | **Video** | **Performer**  
+text  
+method : random | input | choose  
+keywords -> hashtagged  
+performers -> @  
 
 Upload $type of content by $method as post with $text and tag $performer. Adds hashtagged $keywords.
 
@@ -61,15 +46,15 @@ Upload $type of content by $method as post with $text and tag $performer. Adds h
   `python3 onlysnarf.py -debug`  
 Tests configuration. Does not upload or remove from Google Drive.
 
--image  
+-type image  
   `python3 onlysnarf.py -type image`  
 Uploads an image labeled: 'imageName - %d%m%y'  
 
--gallery  
+-type gallery  
   `python3 onlysnarf.py -type gallery`  
 Uploads a gallery labeled: 'folderName - %d%m%y'  
 
--video  
+-type video  
   `python3 onlysnarf.py -type video`  
 Uploads a video labeled: 'folderName - %d%m%y'  
 
