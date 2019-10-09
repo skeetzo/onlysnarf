@@ -9,7 +9,7 @@ or
 OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans. OnlySnarf is capable of downloading and uploading a file (image or video) or gallery of files (images) from a Google Drive folder as specified by run time arguments to an OnlyFans account.
 
 ## Menu
-[Menu](https://github.com/skeetzo/onlysnarf/blob/master/OnlySnarf/menu.md)
+[Menu](https://github.com/skeetzo/onlysnarf/blob/master/menu.md)
 
 ## Preview
 ![preview](https://github.com/skeetzo/onlysnarf/blob/master/OnlySnarf/images/preview.jpeg)
