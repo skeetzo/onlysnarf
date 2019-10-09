@@ -1,7 +1,7 @@
 # OnlySnarf
 
-`pip3 install OnlySnarf`
-OR
+`pip3 install OnlySnarf`  
+or  
 `git clone git@github.com:skeetzo/onlysnarf && sudo python3 setup.py install`
 
 ## Description
