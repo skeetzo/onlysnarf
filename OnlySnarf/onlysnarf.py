@@ -330,8 +330,9 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
                     questions_ = input(">> ")
                     if str(questions_) != "":
                         questions = questions_
-                poll = {"period":duration,"questions":questions}
-
+                if len(questions) > 0:
+                    poll = {"period":duration,"questions":questions}
+                else: poll = None
         except Exception as e:
             settings.maybePrint(e)
         if path == None: print("Warning: Missing Content")
