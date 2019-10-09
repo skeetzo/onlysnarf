@@ -190,7 +190,8 @@
   - added Expiration
   - added Schedule
   - added: Poll
-  
+  - upload a gallery to a message
+
 ----------------------------------------
 
 ## ToDo
@@ -219,7 +220,6 @@
   - add email|Twitter functionality for sending trial link; add clipboard function to copy link
 
 ### High Priority  
-  - upload a gallery to a message
 
   -> Cron
   - bot functionality that checks user messages for bot commands
