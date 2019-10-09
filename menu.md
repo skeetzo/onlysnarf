@@ -3,22 +3,22 @@
 ## Actions
 
 ### Discount
-user: choice or user  
-- **All**  : all users  
-- **Recent** : users subscribed within last 5 days  
-- **New** : users subscribed within last month who haven't been messaged  
-- **User** : selects User from list  
-- **Username** : enter User by username  
+user:  
+**All**  : all users  
+**Recent** : users subscribed within last 5 days  
+**New** : users subscribed within last month who haven't been messaged  
+**User** : selects User from list  
+**Username** : enter User by username  
 amount  
 months  
 
 ### Message
-user  
-- **All**  : all users  
-- **Recent** : users subscribed within last 5 days  
-- **New** : users subscribed within last month who haven't been messaged  
-- **User** : selects User from list  
-- **Username** : enter User by username  
+user:  
+**All**  : all users  
+**Recent** : users subscribed within last 5 days  
+**New** : users subscribed within last month who haven't been messaged  
+**User** : selects User from list  
+**Username** : enter User by username  
 text  
 image  
 price  
