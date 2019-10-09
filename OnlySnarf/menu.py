@@ -388,6 +388,9 @@ def performMessage(actionChoice, messageChoice):
                 print(sys.exc_info()[0])
                 print("Error: Incorrect Index")
                 return mainMenu()
+    elif str(messageChoice) == "user":
+        print("Username:")
+        username = input(">> ")
     images = selectImage(messageChoice)
     # [folder , image_file]
     # print("len: " + str(len(images)))

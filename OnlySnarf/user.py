@@ -66,7 +66,8 @@ class User:
                 if image != None and Decimal(sub(r'[^\d.]', '', price)) < PRICE_MINIMUM:
                     print("Warning: Price Too Low, Free Image")
                     print("Price Minimum: ${}".format(PRICE_MINIMUM))
-                success = OnlySnarf.message_price(price)
+                else:
+                    success = OnlySnarf.message_price(price)
                 if not success: return False
             if str(settings.DEBUG) == "True":
                 self.sent_images.append("DEBUG")
@@ -175,9 +176,13 @@ class User:
         if not username or username == None:
             print("Error: Missing Username")
             return None
+        users = read_users_local()
+        for user in users:
+            if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
+                return user
         users = User.get_all_users()
         for user in users:
-            if str(user.username) == "@"+str(username) or str(user.username) == str(username):
+            if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
                 return user
         return None
 
