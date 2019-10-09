@@ -80,9 +80,6 @@ def download(fileChoice, methodChoice="random", file=None, folderName=None, pare
 ###################
 
 def message(choice, message=None, image=None, price=None, username=None):
-    if image and (not image[0] or image[0] == None):
-        print("Error: Missing Image")
-        return False
     if str(choice) == "all":
         print("Messaging: All")
         users = User.get_all_users()
@@ -104,20 +101,35 @@ def message(choice, message=None, image=None, price=None, username=None):
     else:
         print("Error: Missing Message Choice")
         return
+    if image == None and str(settings.METHOD) == "random": 
+        images = Google.get_images()
+        image = random.choice(images)
+        image = Google.download_file(image[1]).get("path")
+    success = False
+    backup = False
     for user in users:
         if user:
             try:
-                success = user.sendMessage(message, image, price)
-                if not success:
-                    print("Error: There was an error messaging - {}/{}".format(user.id, user.username))
+                success = user.sendMessage(message=message, image=image, price=price)
+                if not success: print("Error: There was an error messaging - {}/{}".format(user.id, user.username))
+                if success: backup = True
             except Exception as e:
                 settings.maybePrint(e)
+    if backup:
+        Google.upload_input(image)
+    OnlySnarf.exit()
+    return success
                 
 ################
 ##### Post #####
 ################
 
-def post(text=None, override=False, schedule=None):
+def post(text=None, override=False):
+    expires = settings.EXPIRES or ""
+    schedule = settings.getSchedule()
+    poll = None
+    duration = settings.DURATION or ""
+    questions = settings.QUESTIONS or []
     if not text: text = input("Text: ".format(text))
     else: print("Text: "+text)
     if not override:
@@ -129,12 +141,13 @@ def post(text=None, override=False, schedule=None):
                 return False
             else:
                 text = confirm
-        print("Expiration [1, 3, 7, 99 or 'No limit']: ")
+        print("Expiration [1, 3, 7, 99 or 'No limit']:")
         expires_ = input("({})>> ".format(expires))
         if str(expires_) != "":
             expires = expires_
-        schedule_ = input("Schedule (y/n): ".format(schedule))
-        if str(schedule_) != "" and str(schedule_) != "n":
+        schedule_ = input("Schedule (y/n): ")
+        if str(schedule_) != "" and str(schedule_).lower() != "n":
+            schedule_ = input( "({})>> ".format(schedule))
             date_ = settings.DATE or ""
             print("Date [mm/dd/YY]: ")
             date = input("({})>>".format(date_))
@@ -142,9 +155,19 @@ def post(text=None, override=False, schedule=None):
             print("Time [HH:MM]: ")
             time = input("({})>>".format(time_))
             schedule = "{}:{}".format(date, time)
+        questions_ = input("Poll (y/n): ")
+        if str(questions_) != "" and str(questions_).lower() != "n":
+            print("Duration [1, 3, 7, 99 or 'No limit']:")
+            duration_ = input("({})>> ".format(duration))
+            if str(duration_) != "":
+                duration = duration_
+            print("Questions:\n> {}".format("\n> ".join(questions)))
+            questions_ = input(">> ")
+            if str(questions_) != "":
+                questions = questions_
+        poll = {"period":duration,"questions":questions}
     try:
-        if not schedule: schedule = settings.getSchedule()
-        successful = OnlySnarf.post(text, expires=expires, schedule=schedule)
+        successful = OnlySnarf.post(text, expires=expires, schedule=schedule, poll=poll)
         # if successful: print("Post Successful")
         # else: print("Post Failed")
         OnlySnarf.exit()
@@ -236,8 +259,11 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
         keywords = []
         performers = []
         files = None
-        expires = settings.EXPIRES or ""
-        schedule = settings.SCHEDULE or ""
+        expires = settings.EXPIRES or None
+        schedule = settings.getSchedule()
+        poll = None
+        duration = settings.DURATION or ""
+        questions = settings.QUESTIONS or []
         if parent: parent = parent.get("title")
         try:
             if file == None: file = data.get("file") or {}
@@ -294,6 +320,18 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
                     print("Time [HH:MM]: ")
                     time = input("({})>>".format(time_))
                     schedule = "{}:{}".format(date, time)
+                questions_ = input("Poll (y/n): ")
+                if str(questions_) != "" and str(questions_).lower() != "n":
+                    print("Duration [1, 3, 7, 99 or 'No limit']:")
+                    duration_ = input("({})>> ".format(duration))
+                    if str(duration_) != "":
+                        duration = duration_
+                    print("Questions:\n> {}".format("\n> ".join(questions)))
+                    questions_ = input(">> ")
+                    if str(questions_) != "":
+                        questions = questions_
+                poll = {"period":duration,"questions":questions}
+
         except Exception as e:
             settings.maybePrint(e)
         if path == None: print("Warning: Missing Content")
@@ -305,7 +343,8 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
             print("- Performer(s): {}".format(performers)) # name of performers
             print("- Expiration: {}".format(expires)) # name of performers
             print("- Schedule: {}".format(schedule)) # name of performers
-        successful_upload = upload(path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule)
+            print("- Poll: {}".format(poll)) # name of performers
+        successful_upload = upload(path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule, poll=poll)
         if not successful_upload:
             pass
         elif files:
@@ -406,11 +445,12 @@ def release_scene(methodChoice="random", file=None, folderName=None, parent=None
 ##### Upload #####
 ##################
 
-def upload(path, text="", keywords=[], performers=[], expires=None, schedule=None):
+def upload(path, text="", keywords=[], performers=[], expires=None, schedule=None, poll=None):
     # settings.maybePrint("Uploading: {}".format(path))
     try:
         if not schedule: schedule = settings.getSchedule()
-        successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule)
+        if not poll: poll = settings.getPoll()
+        successful = OnlySnarf.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule, poll=poll)
         # if successful: print("Upload Successful")
         # else: print("Upload Failed")
         return successful
@@ -463,7 +503,9 @@ def main():
         elif str(settings.ACTION) == "post":
             success = post(text=settings.TEXT, override=True)
         elif str(settings.ACTION) == "message":
-            success = message(settings.CHOICE, message=settings.TEXT, image=settings.IMAGE, price=settings.PRICE, username=settings.USER)
+            METHOD_ = settings.METHOD
+            settings.METHOD = "random"
+            success = message(METHOD_, message=settings.TEXT, image=settings.IMAGE, price=settings.PRICE, username=settings.USER)
         elif str(settings.ACTION) == "discount":
             if str(settings.USER) == "" or str(settings.USER) == "None": settings.USER = "all"
             success = discount(settings.USER, amount=settings.AMOUNT, months=settings.MONTHS)

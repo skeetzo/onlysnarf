@@ -795,15 +795,15 @@ def upload_file(path=None, parent=None):
     ext = os.path.splitext(file)[1].lower()
     mimetype = None
     if str(settings.FORCE_BACKUP) == "True":
-        print("Uploading File (forced): {}".format(filename))
+        print("Google Upload (forced): {}".format(filename))
     elif str(settings.DEBUG) == "True":
-        print("Skipping Uploading File (debug): {}".format(filename))
+        print("Skipping Google Upload  (debug): {}".format(filename))
         return
     elif str(settings.BACKUP) == "False":
-        print('Skipping Uploading File (disabled): {}'.format(filename))
+        print('Skipping Google Upload  (disabled): {}'.format(filename))
         return
     else:
-        print('Uploading File (Google): {}'.format(filename))
+        print('Google Upload: {}'.format(filename))
     if "mp4" in ext:
         mimetype = "video/mp4"
     elif "jpg" in ext or "jpeg" in ext:
@@ -827,11 +827,20 @@ def upload_file(path=None, parent=None):
     # print('File ID: {}'.format(file.get('id')))
 
 def upload_gallery(path=None):
-    print("Uploading Gallery (Google): {}".format(path))
     parent = get_folder_by_name("posted")
     if not parent:
         print("Error: Missing Posted Folder")
         return
+    if str(settings.FORCE_BACKUP) == "True":
+        print("Google Upload (forced): {}".format(path))
+    elif str(settings.DEBUG) == "True":
+        print("Skipping Google Upload  (debug): {}".format(path))
+        return
+    elif str(settings.BACKUP) == "False":
+        print('Skipping Google Upload  (disabled): {}'.format(path))
+        return
+    else:
+        print('Google Upload: {}'.format(path))
     file_metadata = {
         'name': str(datetime.datetime.now()),
         'mimeType': str("application/vnd.google-apps.folder"),
