@@ -189,7 +189,8 @@
   **2.8.0 : 10/8/2019**
   - added Expiration
   - added Schedule
-
+  - added: Poll
+  
 ----------------------------------------
 
 ## ToDo
@@ -219,7 +220,6 @@
 
 
 ### High Priority  
-  - add: Poll
  
   -> Cron & Bot functionality that checks user messages for bot commands
 

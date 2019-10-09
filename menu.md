@@ -13,8 +13,12 @@
 - selects User from list
 **Username**
 - enter User by username
+#
+- amount
+- months
 
 ### Message
+- user
 **All**
 **Recent**
 - users subscribed within last 5 days
@@ -23,37 +27,30 @@
 **User**
 - selects User from list
 **Username**
-- enter User by username
-#
-- users
-- text
-- price
-- /tmp
-
-### Message
-- choice
+- enter username
 #
 - text
 - image
 - price
-- user
 
 Message [all, recent, new] users $message with $image for $price.
 
 ### Post
 - text
+- schedule | -date && -time
+- questions & - duration
+- expires & - duration
 
 ### Upload
+- type
 **Image**
 **Gallery**
 **Video**
 **Performer**
 - text
-- content
+- method -> random | input | choose
 #
-- type
-- method
 - keywords -> hashtagged
 - performers -> @
 
-Upload content as post with $text and tag $performer.
+Upload $type of content by $method as post with $text and tag $performer. Adds hashtagged $keywords.
