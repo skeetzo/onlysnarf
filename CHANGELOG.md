@@ -191,6 +191,12 @@
   - added Schedule
   - added: Poll
   - upload a gallery to a message
+  **2.9.0**
+  - a post that advertises custom requests
+  - a post that advertises tipping price for messaging
+  - a post that advertises prices for paid messages for individual photo requests
+  - a post for requesting people to comment or dm me individuals they'd like to see me with
+  - a post thanking followers for being followers
 
 ----------------------------------------
 
@@ -198,12 +204,14 @@
 
 ### Low Priority
   - add: read messages html for emojis
-  - finalize / fix: script exit
   - update: backup function to include original folder name -> posted/galleries/$file
   - [MESSAGES] layout in config for preset message formats
   - bot functionality to check posts for quiz answers
 
 ### Medium Priority
+
+  -> Promotions
+  - add email|Twitter functionality for sending trial link; add clipboard function to copy link
 
   -> Scenes - FIX
   - update: data.txt for scenes with trailer
@@ -215,9 +223,6 @@
   - add: scene feature to check data.txts for content to release n days after trailer/preview
   - prepare: a scene for release
   |_ requires: scene cron feature
-
-  -> Promotions
-  - add email|Twitter functionality for sending trial link; add clipboard function to copy link
 
 ### High Priority  
 
@@ -232,10 +237,3 @@
   - must not spam, must follow a schedule. monthly, weekly on a day, daily at an hour
   -- maybe delete previous tweets?
   - maybe tweet once and pin it?
-
-  -> Posts
-  - a post that advertises custom requests
-  - a post that advertises tipping price for messaging
-  - a post that advertises prices for paid messages for individual photo requests
-  - a post for requesting people to comment or dm me individuals they'd like to see me with
-  - a post thanking followers for being followers
