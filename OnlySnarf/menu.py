@@ -556,7 +556,7 @@ def selectPost():
         postMenu.append([ key.title().replace("_"," "), settings.POSTS[key]])
     postMenu.insert(0,[ "Back", "main"])
     for item in postMenu:
-        print(colorize("[" + str(postMenu.index(item)) + "] ", 'teal') + list(item)[0])
+        print(colorize("[" + str(postMenu.index(item)) + "] ", 'teal') + list(item)[0] + " - {}".format(list(item)[1][:50]))
     while True:
         choice = input(">> ")
         try:
