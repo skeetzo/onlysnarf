@@ -87,7 +87,7 @@ def initialize():
         settingItems.append([ "Skip Download", settings.SKIP_DOWNLOAD, ["True","False"],False])
         settingItems.append([ "Image Max", settings.IMAGE_UPLOAD_MAX,None,False])
         settingItems.append([ "Text", settings.TEXT,None,False])
-        settingItems.append([ "Local", settings.LOCAL,None,False])
+        settingItems.append([ "Local", settings.INPUT,None,False])
         settingItems.append([ "Image", settings.IMAGE,None,False])
         settingItems.append([ "Prefer Local", settings.PREFER_LOCAL,["True","False"],True])
         # settingItems.append([ "Overwrite Local", settings.OVERWRITE_LOCAL,["True","False"],True])
