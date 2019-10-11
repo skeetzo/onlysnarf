@@ -88,9 +88,9 @@ class Settings:
         # -image-path
         # path to local file to use
         self.PATH_LOCAL = None
-        # -local
+        # -input
         # path to local file(s) to upload
-        self.LOCAL = None
+        self.INPUT = None
         # -image
         # path to local image to use for message or upload
         self.IMAGE = None
@@ -189,7 +189,7 @@ class Settings:
             sys.argv[i] = sys.argv[i][1:] # remove - in front
             truths_ = ["BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
             falses_ = []
-            nexts_ = ["PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","LOCAL","IMAGE","IMAGE_UPLOAD_LIMIT","IMAGE_UPLOAD_MAX","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
+            nexts_ = ["PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_UPLOAD_LIMIT","IMAGE_UPLOAD_MAX","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0
             while j < len(truths_):
                 if str(truths_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
@@ -255,17 +255,17 @@ class Settings:
     #####################
 
     def getInput(self):
-        if str(self.LOCAL) == "None":
+        if str(self.INPUT) == "None":
             self.maybePrint("Error: Missing Local Input")
             return False
-        if os.path.isdir(str(self.LOCAL)):  
+        if os.path.isdir(str(self.INPUT)):  
             print("Found: Directory")  
-        elif os.path.isfile(str(self.LOCAL)):  
+        elif os.path.isfile(str(self.INPUT)):  
             print("Found: File")  
         else:  
             self.maybePrint("Error: Missing Local Path")
             return False
-        return self.LOCAL
+        return self.INPUT
 
     def getPoll(self):
         if isinstance(self.QUESTIONS, str): self.QUESTIONS = self.QUESTIONS.split(",")
