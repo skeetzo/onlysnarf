@@ -199,7 +199,9 @@
   - a post thanking followers for being followers
   **2.9.1**
   - args fix: keywords, performers, input
-
+  **2.9.2**
+  - text fix
+  
 ----------------------------------------
 
 ## ToDo

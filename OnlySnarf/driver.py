@@ -738,7 +738,7 @@ def scheduling(schedule_):
 ##################
 
 # Uploads a directory with a video file or image files to OnlyFans
-def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None, expires=False, schedule=False, poll=False):
+def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=False, schedule=False, poll=False):
     try:
         if not auth(): return False
         global BROWSER
@@ -746,15 +746,16 @@ def upload_to_OnlyFans(path=None, text=None, keywords=None, performers=None, exp
         if not path:
             print("Error: Missing Upload Path")
             return False
-        if not text:
-            print("Error: Missing Upload Text")
-            return False
+        if not text or text == None or str(text) == "None":
+            print("Warning: Missing Upload Text")
+            text = ""
         text = text.replace(".mp4","")
         text = text.replace(".MP4","")
         text = text.replace(".jpg","")
         text = text.replace(".jpeg","")
         if isinstance(performers, list) and len(performers) > 0: text += " w/ @"+" @".join(performers)
         if isinstance(keywords, list) and len(keywords) > 0: text += " #"+" #".join(keywords)
+        text = text.strip()
         print("Uploading:")
         settings.maybePrint("- Path: {}".format(path))
         print("- Keywords: {}".format(keywords))
