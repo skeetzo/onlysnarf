@@ -197,6 +197,8 @@
   - a post that advertises prices for paid messages for individual photo requests
   - a post for requesting people to comment or dm me individuals they'd like to see me with
   - a post thanking followers for being followers
+  **2.9.1**
+  - args fix: keywords, performers, input
 
 ----------------------------------------
 
