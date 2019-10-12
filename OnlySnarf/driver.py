@@ -32,7 +32,7 @@ BROWSER = None
 ONLYFANS_HOME_URL = 'https://onlyfans.com/'
 ONLYFANS_USERS_ACTIVE_URL = "https://onlyfans.com/my/subscribers/active"
 SEND_BUTTON_XPATH = "//button[@type='submit' and @class='g-btn m-rounded send_post_button']"
-SEND_BUTTON_CLASS = "send_post_button"
+SEND_BUTTON_CLASS = "g-btn.m-rounded.send_post_button"
 TWITTER_LOGIN0 = "//a[@class='g-btn m-rounded m-flex m-lg']"
 TWITTER_LOGIN1 = "//a[@class='g-btn m-rounded m-flex m-lg btn-twitter']"
 TWITTER_LOGIN2 = "//a[@class='btn btn-default btn-block btn-lg btn-twitter']"
@@ -811,6 +811,17 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
                     return False
         try:
             BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_CLASS).send_keys(str(text))
+            # first one is disabled
+            sends = BROWSER.find_elements_by_class_name(SEND_BUTTON_CLASS)
+            for i in range(len(sends)):
+                if sends[i].is_enabled():
+                    sends = sends[i]
+            if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+                time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+            if str(settings.DEBUG) == "True":
+                print('Skipped: OnlyFans Upload (debug)')
+                return True
+            sends.click()
         except:
             settings.maybePrint("Warning: Upload Error Message, Closing")
             try:
@@ -819,22 +830,24 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
                     if butt.get_attribute("innerHTML").strip() == "Close":
                         butt.click()
                         settings.maybePrint("Success: Upload Error Message Closed")
-                        BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_CLASS).send_keys(str(text))
+                        send_text = BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_CLASS)
+                        send_text.clear()
+                        send_text.send_keys(str(text))
+                        # first one is disabled
+                        sends = BROWSER.find_elements_by_class_name(SEND_BUTTON_CLASS)
+                        for i in range(len(sends)):
+                            if sends[i].is_enabled():
+                                sends = sends[i]
+                        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+                            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+                        if str(settings.DEBUG) == "True":
+                            print('Skipped: OnlyFans Upload (debug)')
+                            return True
+                        sends.click()
             except Exception as e:
                 print("Error: Unable to Upload Images")
                 settings.maybePrint(e)
                 return False
-        # first one is disabled
-        sends = BROWSER.find_elements_by_class_name(SEND_BUTTON_CLASS)
-        for i in range(len(sends)):
-            if sends[i].is_enabled():
-                sends = sends[i]
-        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
-            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
-        if str(settings.DEBUG) == "True":
-            print('Skipped: OnlyFans Upload (debug)')
-            return True
-        sends.click()
         # send[1].click() # the 0th one is disabled
         print('OnlyFans Upload Complete')
         return True

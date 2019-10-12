@@ -15,10 +15,11 @@ from OnlySnarf import driver as OnlySnarf
 from OnlySnarf.user import User
 from OnlySnarf import cron as Cron
 
-# from pprint import pprint
 #################################################################
 #################################################################
 #################################################################
+
+FIFTY_MEGABYTES = 50000000
 
 ####################
 ##### Discount #####
@@ -248,6 +249,9 @@ def release_(opt, methodChoice="random", file=None, folderName=None, parent=None
         if str(methodChoice) == "input":
             input_ = settings.getInput()
             if not input_: return False
+            global FIFTY_MEGABYTES
+            if int(os.stat(str(input_)).st_size) >= FIFTY_MEGABYTES or settings.FORCE_REDUCTION: # greater than 1GB
+                input_ = Google.reduce(input_)
             data = {"path":str(input_),"text":str(settings.TEXT)}
         else:
             data = download(opt, methodChoice=methodChoice, file=file)

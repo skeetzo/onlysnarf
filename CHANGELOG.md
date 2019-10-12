@@ -201,6 +201,8 @@
   - args fix: keywords, performers, input
   **2.9.2**
   - text fix
+  **2.9.3**
+  - add video reduce to somewhere it can impact INPUT files
 
 ----------------------------------------
 
