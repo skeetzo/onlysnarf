@@ -434,6 +434,7 @@ def message(choice, image=None, username=None):
     try: 
         image = Google.download_file(image[0]).get("path")
     except Exception as e:
+        OnlySnarf.remove_local()
         try:
             image = Google.download_gallery(image[0]).get("path")
         except Exception as e:

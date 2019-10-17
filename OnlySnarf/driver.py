@@ -40,8 +40,9 @@ USERNAME_XPATH = "//input[@id='username_or_email']"
 PASSWORD_XPATH = "//input[@id='password']"
 MESSAGE_INPUT_CLASS = ".form-control.b-chat__message-input"
 MESSAGE_CONFIRM = "g-btn.m-rounded.b-chat__btn-submit"
-MONTHS_INPUT = "g-input.form-control"
-DISCOUNT_TEXT = "g-input.form-control"
+MONTHS_INPUT = "form-control.b-fans__trial__select"
+DISCOUNT_INPUT = "form-control.b-fans__trial__select"
+DISCOUNT_TEXT = "form-control.b-fans__trial__select"
 DISCOUNT_USER_BUTTONS = "g-btn.m-rounded.m-border.m-sm"
 DISCOUNT_USER_BUTTONS1 = "g-btn.m-rounded"
 DISCOUNT_USERS = "g-btn.m-rounded.m-border.m-sm"
@@ -200,6 +201,9 @@ def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
     if int(discount) > 55:
         print("Warning: Discount Too High, Max -> 55%")
         discount = 55
+    elif int(discount) < 5:
+        print("Warning: Discount Too Low, Min -> 5%")
+        discount = 5
     if int(months) > 12:
         print("Warning: Months Too High, Max -> 12")
         months = 12
@@ -207,15 +211,16 @@ def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
     try:
         if str(BROWSER.current_url) == str(ONLYFANS_USERS_ACTIVE_URL):
             settings.maybePrint("at -> /my/subscribers/active")
+            BROWSER.execute_script("window.scrollTo(0, 0);")
         else:
             settings.maybePrint("goto -> /my/subscribers/active")
             BROWSER.get(ONLYFANS_USERS_ACTIVE_URL)
-            if tryAll: depth = BROWSER.find_element_by_class_name(ONLYFANS_USER_COUNT).get_attribute("innerHTML")
-            settings.maybePrint("Depth: {}".format(depth))
-            for n in range(int(int(int(depth)/10)+1)):
-                settings.maybePrint("scrolling...")
-                BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(1)
+        if tryAll: depth = BROWSER.find_element_by_class_name(ONLYFANS_USER_COUNT).get_attribute("innerHTML")
+        # settings.maybePrint("Depth: {}".format(depth))
+        for n in range(int(int(int(depth)/10)+1)):
+            settings.maybePrint("scrolling...")
+            BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(1)
     except Exception as e:
         settings.maybePrint(e)
         print("Error: Failed to Find Users")
@@ -241,24 +246,34 @@ def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
             except Exception as e:
                 print("Warning: Unable To Find User, retrying")
                 settings.maybePrint(e)
-                return discount_user(user, depth=depth, discount=dicount, months=months, tryAll=True)
+                return discount_user(user, depth=depth, discount=discount, months=months, tryAll=True)
     time.sleep(1)
     buttons_ = BROWSER.find_elements_by_class_name(DISCOUNT_USER_BUTTONS1)
     try:
-        discountText = BROWSER.find_elements_by_class_name(DISCOUNT_TEXT)[0]
-        if discountText.get_attribute("value") != "":
-            print("Warning: Existing Discount")
-        discountText.clear()
-        discountText.send_keys(str(discount))
-        months_ = BROWSER.find_elements_by_class_name(MONTHS_INPUT)[1]
+        (months_, discount_) = BROWSER.find_elements_by_class_name(DISCOUNT_INPUT)
+        # removed in 2.10, inputs changed to above
+        # months_ = BROWSER.find_element_by_class_name(MONTHS_INPUT)
+        # if discount_.get_attribute("value") != "":
+            # print("Warning: Existing Discount")
+        # discount_.clear()
+        for n in range(11):
+            discount_.send_keys(str(Keys.UP))
+        # if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+        #     time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+        for n in range(round(int(discount)/5)-1):
+            discount_.send_keys(Keys.DOWN)
+        for n in range(11):
+            months_.send_keys(str(Keys.UP))
         for n in range(int(months)-1):
             months_.send_keys(Keys.DOWN)
+        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
         for button in buttons_:
             if "Cancel" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "True":
                 button.click()
                 print("Skipping: Save Discount (Debug)")
                 return True
-            elif "Save" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "False":
+            elif "Apply" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "False":
                 button.click()
                 print("Discounted User: {}".format(user))
                 return True
@@ -269,7 +284,6 @@ def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
                 button.click()
                 print("Skipping: Save Discount")
                 return True
-    return True
 
 ######################
 ##### Expiration #####
@@ -385,11 +399,14 @@ def message_image(image):
                 if butt.get_attribute("innerHTML").strip() == "Close":
                     butt.click()
                     settings.maybePrint("Success: Upload Error Message Closed")
+                    time.sleep(1)
         except Exception as e:
             print("Error: Unable to Upload Images")
             settings.maybePrint(e)
             return False
         settings.maybePrint("Image(s) Entered")
+        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
         return True
     except Exception as e:
         settings.maybePrint(e)
@@ -402,11 +419,15 @@ def message_price(price):
             print("Error: Missing Price")
             return False
         print("Enter price: {}" .format(price))
+
         global BROWSER
-        BROWSER.find_element_by_css_selector(ONLYFANS_PRICE).click()
+        WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ONLYFANS_PRICE))).click()
+        # BROWSER.find_element_by_css_selector(ONLYFANS_PRICE)
         BROWSER.find_elements_by_css_selector(ONLYFANS_PRICE_INPUT)[1].send_keys(str(price))
         BROWSER.find_elements_by_css_selector(ONLYFANS_PRICE_CLICK)[4].click()
         settings.maybePrint("Price Entered")
+        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
         return True
     except Exception as e:
         settings.maybePrint(e)
