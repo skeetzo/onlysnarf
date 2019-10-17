@@ -208,6 +208,7 @@
   **2.10.0**
   - discount css update
   - message image upload fix
+  - added gifs
   
 ----------------------------------------
 
