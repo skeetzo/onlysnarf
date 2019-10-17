@@ -263,8 +263,7 @@ class Settings:
         elif os.path.isfile(str(self.INPUT)):  
             print("Found: File")  
         else:  
-            self.maybePrint("Error: Missing Local Path")
-            return False
+            self.maybePrint("Warning: Missing Local Path")
         return self.INPUT
 
     def getPoll(self):

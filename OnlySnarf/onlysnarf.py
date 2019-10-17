@@ -209,10 +209,8 @@ def remove_local():
             print('Local File(s) Removed')
         else:
             print('Local Files Not Found')
-    except OSError as e:
-        print("Error: Missing Local Path")
     except Exception as e:
-        print(e)
+        settings.maybePrint(e)
 
 ###################
 ##### Release #####
