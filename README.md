@@ -13,10 +13,10 @@ OnlySnarf is a python based automation tool to assist with uploading content to 
 
 ## Previews
 ![preview](https://github.com/skeetzo/onlysnarf/blob/master/images/preview.jpeg)
-![Gallery](https://github.com/skeetzo/onlysnarf/blob/master/images/gallery.gif)
-![Video](https://github.com/skeetzo/onlysnarf/blob/master/images/video.gif)
-![Discount](https://github.com/skeetzo/onlysnarf/blob/master/images/discount-recent.gif)
-![Message](https://github.com/skeetzo/onlysnarf/blob/master/images/message-recent-debug.gif)
+[Gallery](https://github.com/skeetzo/onlysnarf/blob/master/images/gallery.gif)
+[Video](https://github.com/skeetzo/onlysnarf/blob/master/images/video.gif)
+[Discount](https://github.com/skeetzo/onlysnarf/blob/master/images/discount-recent.gif)
+[Message](https://github.com/skeetzo/onlysnarf/blob/master/images/message-recent-debug.gif)
 
 ## Scripts
 First run:  
