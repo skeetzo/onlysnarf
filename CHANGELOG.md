@@ -211,6 +211,8 @@
   - added gifs
   **2.11.0**
   - OFKEYWORD - specifies random folder
+  **2.11.1**
+  - oops
   
 ----------------------------------------
 
