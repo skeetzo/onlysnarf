@@ -209,6 +209,8 @@
   - discount css update
   - message image upload fix
   - added gifs
+  **2.11.0**
+  - OFKEYWORD - specifies random folder
   
 ----------------------------------------
 
