@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="2.11.3",
+    version="2.11.4",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
@@ -42,3 +42,7 @@ setuptools.setup(
     "Operating System :: OS Independent",
   ]
 )
+
+## TEST
+# 'imageio<3.0,>=2.5'
+# imageio req, maybe not needed?
