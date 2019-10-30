@@ -583,7 +583,9 @@ def get_message_image(folderName):
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()      
-        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): continue
+        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']):
+            settings.maybePrint('-> not keyword')
+            continue
         if len(images_list_tmp)>0:
             images_list.append(folder)
             settings.maybePrint(" -> added")
@@ -613,7 +615,9 @@ def get_random_image():
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()      
-        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): continue
+        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']):
+            settings.maybePrint('-> not keyword')
+            continue
         if len(images_list_tmp)>0:
             images_list.append(folder)
             settings.maybePrint(" -> added")
@@ -643,7 +647,9 @@ def get_random_gallery():
         if str(settings.VERBOSE) == "True":
             print('checking galleries: {}'.format(folder['title']),end="")
         gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): continue
+        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']):
+            settings.maybePrint('-> not keyword')
+            continue
         if len(gallery_list_tmp)>0:
             folder_list.append(folder)
             settings.maybePrint(" -> added")
@@ -678,16 +684,18 @@ def get_random_performer():
     random_performer = None
     # print('random folders: '+str(random_folders))
     for folder in random_folders:
-        random_folder_folder = random.choice(random_folders)
-        settings.maybePrint('random performer: '+random_folder_folder['title'])
-        performer_content_list = PYDRIVE.ListFile({'q': "'"+random_folder_folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+        # random_folder_folder = random.choice(random_folders)
+        settings.maybePrint('random performer: '+folder['title'])
+        performer_content_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         # print('random folders: '+str(performer_list))
-        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): continue
+        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): 
+            settings.maybePrint('- skipping nonkeyword: '+folder['title'])
+            continue
         if len(performer_content_list)==0:
-            settings.maybePrint('- skipping empty performer: '+random_folder_folder['title'])
+            settings.maybePrint('- skipping empty performer: '+folder['title'])
         elif len(performer_content_list)>0:
-            settings.maybePrint('- performer found: '+random_folder_folder['title'])
-            performer_list.append(random_folder_folder)
+            settings.maybePrint('- performer found: '+folder['title'])
+            performer_list.append(folder)
     if len(performer_list)==0:
         print('Error: Missing Performer Folder')
         return {}
@@ -708,7 +716,9 @@ def get_random_video():
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
         video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
-        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): continue
+        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']):
+            settings.maybePrint('-> not keyword')
+            continue
         if len(video_list_tmp)>0:
             video_list.append(folder)
             settings.maybePrint(" -> added")
@@ -738,7 +748,9 @@ def get_random_scene():
         if str(settings.VERBOSE) == "True":
             print('checking scenes: '+folder['title'],end="")
         scene_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): continue
+        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']):
+            settings.maybePrint('-> not keyword')
+            continue
         if len(scene_list_tmp)>0:
             folder_list.append(folder)
             settings.maybePrint(" -> added")
