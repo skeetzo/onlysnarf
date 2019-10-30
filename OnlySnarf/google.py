@@ -583,7 +583,7 @@ def get_message_image(folderName):
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()      
-        if str(settings.BYKEYWORD) != None and if str(settings.BYKEYWORD) != str(folder['title']): continue
+        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): continue
         if len(images_list_tmp)>0:
             images_list.append(folder)
             settings.maybePrint(" -> added")
@@ -613,7 +613,7 @@ def get_random_image():
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()      
-        if str(settings.BYKEYWORD) != None and if str(settings.BYKEYWORD) != str(folder['title']): continue
+        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): continue
         if len(images_list_tmp)>0:
             images_list.append(folder)
             settings.maybePrint(" -> added")
@@ -643,7 +643,7 @@ def get_random_gallery():
         if str(settings.VERBOSE) == "True":
             print('checking galleries: {}'.format(folder['title']),end="")
         gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        if str(settings.BYKEYWORD) != None and if str(settings.BYKEYWORD) != str(folder['title']): continue
+        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): continue
         if len(gallery_list_tmp)>0:
             folder_list.append(folder)
             settings.maybePrint(" -> added")
@@ -682,7 +682,7 @@ def get_random_performer():
         settings.maybePrint('random performer: '+random_folder_folder['title'])
         performer_content_list = PYDRIVE.ListFile({'q': "'"+random_folder_folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         # print('random folders: '+str(performer_list))
-        if str(settings.BYKEYWORD) != None and if str(settings.BYKEYWORD) != str(folder['title']): continue
+        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): continue
         if len(performer_content_list)==0:
             settings.maybePrint('- skipping empty performer: '+random_folder_folder['title'])
         elif len(performer_content_list)>0:
@@ -708,7 +708,7 @@ def get_random_video():
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
         video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
-        if str(settings.BYKEYWORD) != None and if str(settings.BYKEYWORD) != str(folder['title']): continue
+        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): continue
         if len(video_list_tmp)>0:
             video_list.append(folder)
             settings.maybePrint(" -> added")
@@ -738,7 +738,7 @@ def get_random_scene():
         if str(settings.VERBOSE) == "True":
             print('checking scenes: '+folder['title'],end="")
         scene_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        if str(settings.BYKEYWORD) != None and if str(settings.BYKEYWORD) != str(folder['title']): continue
+        if str(settings.BYKEYWORD) != None and str(settings.BYKEYWORD) != str(folder['title']): continue
         if len(scene_list_tmp)>0:
             folder_list.append(folder)
             settings.maybePrint(" -> added")
@@ -883,7 +883,7 @@ def upload_input(path=None):
 ##################
 
 def repair(path):
-    if (settings.SKIP_REPAIR):
+    if str(settings.SKIP_REPAIR) == "True":
         print("Warning: Skipping Repair")
         return path
     repairedPath = str(path).replace(".mp4", "_fixed.mp4")
@@ -905,7 +905,7 @@ def repair(path):
     return str(repairedPath)
 
 def reduce(path):
-    if (settings.SKIP_REDUCE):
+    if str(settings.SKIP_REDUCE) == "True":
         print("Warning: Skipping Reduction")
         return path
     reducedPath = str(path).replace(".mp4", "_reduced.mp4")
