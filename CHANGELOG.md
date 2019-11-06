@@ -219,6 +219,8 @@
   - oopsies
   **2.11.4**
   - more oopsies
+  **2.12.0**
+  - added setting: skip-backup
 
 ----------------------------------------
 
