@@ -42,11 +42,11 @@ def discount(choice, depth=1, amount=None, months=None):
             user = User.get_user_by_username(choice)
         users.append(user)
     for user in users:
-        try:
-            success = OnlySnarf.discount_user(user.id, depth=depth, discount=amount, months=months)
-            if not success: print("Error: There was an error discounting - {}/{}".format(user.id, user.username))
-        except Exception as e:
-            settings.maybePrint(e)
+        # try:
+        success = OnlySnarf.discount_user(user.id, depth=depth, discount=amount, months=months)
+        if not success: print("Error: There was an error discounting - {}/{}".format(user.id, user.username))
+        # except Exception as e:
+            # settings.maybePrint(e)
         depth = int(depth) + 1
     OnlySnarf.exit()
     return True
@@ -209,10 +209,8 @@ def remove_local():
             print('Local File(s) Removed')
         else:
             print('Local Files Not Found')
-    except OSError as e:
-        print("Error: Missing Local Path")
     except Exception as e:
-        print(e)
+        settings.maybePrint(e)
 
 ###################
 ##### Release #####
