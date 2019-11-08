@@ -73,7 +73,7 @@ def initialize():
         [ "Image Limit", settings.IMAGE_UPLOAD_LIMIT,None,True],
     ]
     if str(settings.VERBOSE) == "True":
-        settingItems.append([ "Skip Delete", settings.SKIP_DELETE, ["True","False"],False])
+        settingItems.append([ "Skip Backup", settings.SKIP_BACKUP, ["True","False"],False])
         settingItems.append([ "Mount Path", settings.MOUNT_PATH,None,False])
         settingItems.append([ "Drive Path", settings.DRIVE_PATH,None,False])
         settingItems.append([ "Users Path", settings.USERS_PATH,None,False])
@@ -81,6 +81,7 @@ def initialize():
         settingItems.append([ "Drive Folder", settings.DRIVE_FOLDERS,None,False])
         settingItems.append([ "Create Drive", settings.CREATE_DRIVE, ["True","False"],False])
     if str(settings.DEBUG) == "True":
+        settingItems.append([ "Skip Upload", settings.SKIP_UPLOAD, ["True","False"],False])
         settingItems.append([ "Force Delete", settings.FORCE_DELETE, ["True","False"],False])
         settingItems.append([ "Force Backup", settings.FORCE_BACKUP, ["True","False"],False])
         settingItems.append([ "Force Upload", settings.FORCE_UPLOAD, ["True","False"],False])
