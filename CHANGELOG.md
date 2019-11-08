@@ -203,6 +203,24 @@
   - text fix
   **2.9.3**
   - add video reduce to somewhere it can impact INPUT files
+  **2.9.4**
+  - input bug?
+  **2.10.0**
+  - discount css update
+  - message image upload fix
+  - added gifs
+  **2.11.0**
+  - OFKEYWORD - specifies random folder
+  **2.11.1**
+  - oops
+  **2.11.2**
+  - oops
+  **2.11.3**
+  - oopsies
+  **2.11.4**
+  - more oopsies
+  **2.12.0**
+  - added setting: skip-backup
 
 ----------------------------------------
 

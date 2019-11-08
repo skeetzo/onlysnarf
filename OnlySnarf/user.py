@@ -264,10 +264,8 @@ def read_users_local():
             except Exception as e:
                 settings.maybePrint(e)
         return users_
-    except FileNotFoundError:
-        print("Error: Missing Local Users")
-    except OSError:
-        print("Error: Missing Local Path")
+    except Exception as e:
+        settings.maybePrint(e)
     return users_
 
 def skipUserCheck(user):
