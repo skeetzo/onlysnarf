@@ -221,6 +221,8 @@
   - more oopsies
   **2.12.0**
   - added setting: skip-backup
+  **2.12.1**
+  - fixed BYKEYWORD bug preventing random upload
 
 ----------------------------------------
 
