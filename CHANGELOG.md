@@ -223,6 +223,7 @@
   - added setting: skip-backup
   **2.12.1**
   - fixed BYKEYWORD bug preventing random upload
+  - fixed messaging folder of images
 
 ----------------------------------------
 

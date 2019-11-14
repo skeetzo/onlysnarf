@@ -309,10 +309,11 @@ def download_file(file, REPAIR=False):
                     if str(settings.VERBOSE) == "True":
                         print("Downloading: %d%%\r" % (status.progress() * 100),end="")
                 # print("D")
-                print("Download Complete")
+                print("Download Complete: Regular")
         except Exception as e:
             settings.maybePrint(e)
             file.GetContentFile(tmp)
+            print("Download Complete: Alternative")
         if REPAIR:
             tmp = repair(tmp)
         global FIFTY_MEGABYTES
@@ -321,6 +322,7 @@ def download_file(file, REPAIR=False):
         tmp = thumbnail_fix(tmp)
     else:
         file.GetContentFile(tmp)
+        print("Download Complete: Alt")
     ### Finish ###
     if not os.path.isfile(str(tmp)):
         print("Error: Missing Downloaded File")
