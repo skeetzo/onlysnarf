@@ -179,10 +179,12 @@ class User:
         users = read_users_local()
         for user in users:
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
+                settings.maybePrint("Found User: Local")
                 return user
         users = User.get_all_users()
         for user in users:
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
+                settings.maybePrint("Found User: Members")
                 return user
         return None
 
