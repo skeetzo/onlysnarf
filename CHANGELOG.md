@@ -224,6 +224,9 @@
   **2.12.1**
   - fixed BYKEYWORD bug preventing random upload
   - fixed messaging folder of images
+  **2.13.0**
+  - fixed: skip-backup
+  - added: skip-delete-google
 
 ----------------------------------------
 
