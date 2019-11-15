@@ -137,11 +137,14 @@ class Settings:
         # saves OnlyFans users upon exit
         self.SAVE_USERS = False
         # -skip-backup
-        # skips file backup if toggled by .conf
+        # skips file backup if enabled by .conf
         self.SKIP_BACKUP = False
         # -skip-delete
         # skip local file deletion before and after upload
         self.SKIP_DELETE = False
+        # -skip-delete-google
+        # skips Google file deltion if enabled by .conf
+        self.SKIP_DELETE_GOOGLE = False
         # -skip-download
         self.SKIP_DOWNLOAD = False
         # -skip-reduce
@@ -191,7 +194,7 @@ class Settings:
         i = 0
         while i < len(sys.argv):
             sys.argv[i] = sys.argv[i][1:] # remove - in front
-            truths_ = ["SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
+            truths_ = ["SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
             falses_ = []
             nexts_ = ["BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_UPLOAD_LIMIT","IMAGE_UPLOAD_MAX","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0

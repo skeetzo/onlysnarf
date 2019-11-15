@@ -98,6 +98,9 @@ def delete_file(file):
     elif str(settings.DELETE_GOOGLE) == "False":
         print('Skipping Delete (Disabled): {}'.format(fileName))
         return
+    elif str(settings.SKIP_DELETE_GOOGLE) == "True":
+        print('Skipping Delete: {}'.format(file['title']))
+        return
     else:
         print('Deleting: {}'.format(fileName))
     file.Trash()
@@ -115,6 +118,9 @@ def move_file(file):
         return
     elif str(settings.BACKUP) == "False":
         print('Skipping Backup (disabled): {}'.format(file['title']))
+        return
+    elif str(settings.SKIP_BACKUP) == "True":
+        print('Skipping Backup: {}'.format(file['title']))
         return
     else:
         print('Backing Up: {}'.format(file['title']))
@@ -134,6 +140,9 @@ def move_files(fileName, files):
         return
     elif str(settings.BACKUP) == "False":
         print('Skipping Backup (disabled): {}'.format(fileName))
+        return
+    elif str(settings.SKIP_BACKUP) == "True":
+        print('Skipping Backup: {}'.format(file['title']))
         return
     else:
         print('Backing Up: {}'.format(fileName))
