@@ -336,6 +336,10 @@ def expiration(period):
 def message_confirm():
     try:
         global BROWSER
+        sends = BROWSER.find_elements_by_class_name(MESSAGE_CONFIRM)
+        for send in sends:
+            print(send)
+            print(send.get_attribute("value"))
         send = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
         if str(settings.DEBUG) == "True":
             if str(settings.DEBUG_DELAY) == "True":
