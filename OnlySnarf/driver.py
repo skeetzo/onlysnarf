@@ -774,6 +774,7 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
         if not text or text == None or str(text) == "None":
             print("Warning: Missing Upload Text")
             text = ""
+        text = text.replace(".mov","")
         text = text.replace(".mp4","")
         text = text.replace(".MP4","")
         text = text.replace(".jpg","")
