@@ -230,6 +230,7 @@
   **2.13.1**
   - fixed fixed: skip-backup
   - fixed: enter upload
+  **2.13.2**
   - updated: google mimetypes
 
 ----------------------------------------

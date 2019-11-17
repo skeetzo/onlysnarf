@@ -43,7 +43,7 @@ OnlyFansFolder_ = None
 # A/V Interleave  .avi    video/x-msvideo
 # Windows Media   .wmv    video/x-ms-wmv
 MIMETYPES_IMAGES = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"
-MIMETYPES_VIDEOS = "(mimeType contains 'video/mp4' or mimeType contains 'video/quicktime')"
+MIMETYPES_VIDEOS = "(mimeType contains 'video/mp4' or mimeType contains 'video/quicktime' or mimeType contains 'video/x-ms-wmv' or mimeType contains 'video/x-flv')"
 MIMETYPES_ALL = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or mimeType contains 'video/mp4' or mimeType contains 'video/quicktime')"
 
 ################
@@ -862,7 +862,7 @@ def upload_file(path=None, parent=None):
         return
     else:
         print('Google Upload (file): {}'.format(filename))
-    if "mp4" in ext:
+    if "mov" in ext or "mp4" in ext:
         mimetype = "video/mp4"
     elif "jpg" in ext or "jpeg" in ext:
         mimetype = "image/jpeg"
