@@ -46,7 +46,7 @@
   - settings globals -> class
   **4/16/2019**
   - fucking default variables
-**1.0.0 : Release : 4/22/2019**
+**1.0.0 : 4/22/2019**
   - save image_name instead of path
   - uploaded to pip
   **1.0.1**
@@ -62,7 +62,7 @@
   - create Google folder structure programmatically
   - predefine Google root
   **5/14/2019**
-  - removed: settings.TYPE
+  - replaced: settings.TYPE - settings.ACTION
   - added: settings profile -> skeetzo
   - updated: scenes to include trailer addition
   **1.1.1 : 5/23/2019**
@@ -232,7 +232,8 @@
   - fixed: enter upload
   **2.13.2**
   - updated: google mimetypes
-
+  - added: NOTKEYWORD for excluding folders by keyword
+  
 ----------------------------------------
 
 ## ToDo
