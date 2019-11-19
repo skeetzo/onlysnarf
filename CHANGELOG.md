@@ -232,6 +232,7 @@
   - fixed: enter upload
   **2.13.2**
   - updated: google mimetypes
+  **2.14.0**
   - added: NOTKEYWORD for excluding folders by keyword
   
 ----------------------------------------
