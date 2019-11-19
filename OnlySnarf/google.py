@@ -33,6 +33,19 @@ FIFTY_MEGABYTES = 50000000
 ONE_HUNDRED_KILOBYTES = 100000
 OnlyFansFolder_ = None
 
+# Video MimeTypes
+# Flash   .flv    video/x-flv
+# MPEG-4  .mp4    video/mp4
+# iPhone Index    .m3u8   application/x-mpegURL
+# iPhone Segment  .ts     video/MP2T
+# 3GP Mobile  .3gp    video/3gpp
+# QuickTime   .mov    video/quicktime
+# A/V Interleave  .avi    video/x-msvideo
+# Windows Media   .wmv    video/x-ms-wmv
+MIMETYPES_IMAGES = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"
+MIMETYPES_VIDEOS = "(mimeType contains 'video/mp4' or mimeType contains 'video/quicktime' or mimeType contains 'video/x-ms-wmv' or mimeType contains 'video/x-flv')"
+MIMETYPES_ALL = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or mimeType contains 'video/mp4' or mimeType contains 'video/quicktime')"
+
 ################
 ##### Auth #####
 ################
@@ -123,7 +136,7 @@ def move_file(file):
         print('Skipping Backup: {}'.format(file['title']))
         return
     else:
-        print('Backing Up: {}'.format(file['title']))
+        print('Backing Up (file): {}'.format(file['title']))
     file['parents'] = [{"kind": "drive#fileLink", "id": str(get_folder_by_name("posted")['id'])}]
     file.Upload()
     print('Google File Backed Up: {}'.format(file['title']))
@@ -145,7 +158,7 @@ def move_files(fileName, files):
         print('Skipping Backup: {}'.format(file['title']))
         return
     else:
-        print('Backing Up: {}'.format(fileName))
+        print('Backing Up (gallery): {}'.format(fileName))
     title = fileName+" - "+datetime.datetime.now().strftime("%d-%m@%I-%M")
     settings.maybePrint('Moving To: '+title)
     global PYDRIVE
@@ -364,7 +377,7 @@ def download_gallery(folder):
     print('Downloading Gallery: {}'.format(folder['title']))
     # download folder
     global PYDRIVE
-    file_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()
+    file_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
     folder_size = len(file_list)
     settings.maybePrint('Folder size: '+str(folder_size))
     settings.maybePrint('Upload limit: '+str(settings.IMAGE_UPLOAD_LIMIT))
@@ -406,9 +419,9 @@ def download_content(folder):
     global PYDRIVE
     content_title = folder['title']
     # download folder
-    # file_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or mimeType contains 'video/mp4')"}).GetList()
-    image_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()
-    video_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
+    # file_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or (mimeType contains 'video/mp4' or mimeType contains 'video/quicktime'))"}).GetList()
+    image_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
+    video_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
     file_list = []
     for i in image_list: file_list.append(i)
     for v in video_list: file_list.append(v)
@@ -418,6 +431,7 @@ def download_content(folder):
     settings.maybePrint('Total: {}'.format(folder_size))
     # settings.maybePrint("Files: {}".format(file_list))
     content = {}
+    file = None
     # if it contains only 1 file, I want to download a file
     if int(folder_size) == 1:
         file = file_list[0]
@@ -457,7 +471,7 @@ def download_performer(folder):
     content_title = None
     for folder in content_folders:
         settings.maybePrint('content: '+folder['title'])
-        content_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or mimeType contains 'video/mp4')"}).GetList()
+        content_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_ALL)}).GetList()
         # video_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()
         # image_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
         if len(content_list) == 0:
@@ -535,7 +549,7 @@ def download_scene(sceneFolder):
     with open(os.path.join(tmp, "data.json"), 'r', encoding='utf-8') as f:
         data = json.load(f)
     settings.maybePrint("data.json: {}".format(data))
-    preview = PYDRIVE.ListFile({'q': "'"+preview['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()
+    preview = PYDRIVE.ListFile({'q': "'"+preview['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
     if len(preview) == 0:
         print("Error: Missing Scene Preview")
         return
@@ -570,7 +584,7 @@ def get_images():
     for folder in random_folders:
         images_list.append([images_folder, folder])
         settings.maybePrint('checking folder: '+folder['title'])
-        images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()      
+        images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()      
         for image_file in images_list_tmp:
             # images_list.append({"folder":folder['title'],"folder_id":folder['id'],"id":image_file['id'],"image":image_file['title']})
             images_list.append([folder, image_file])
@@ -593,7 +607,7 @@ def get_message_image(folderName):
             continue
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
-        images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()      
+        images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()      
         if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
             settings.maybePrint('-> not keyword')
             continue
@@ -611,7 +625,7 @@ def get_message_image(folderName):
     random_image = random.choice(images_list)
     folder_name = random_image['title'];
     print('Messages Folder: '+random_image['title'])
-    random_image = PYDRIVE.ListFile({'q': "'"+random_image['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()
+    random_image = PYDRIVE.ListFile({'q': "'"+random_image['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
     random_image = random.choice(random_image)
     print('Messages Image: '+random_image['title'])
     return {"file":random_image}
@@ -628,7 +642,7 @@ def get_random_image():
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
-        images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()      
+        images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()      
         if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
             settings.maybePrint('-> not keyword')
             continue
@@ -646,7 +660,7 @@ def get_random_image():
     random_image = random.choice(images_list)
     folder_name = random_image['title'];
     print('Random Folder: '+random_image['title'])
-    random_image = PYDRIVE.ListFile({'q': "'"+random_image['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()
+    random_image = PYDRIVE.ListFile({'q': "'"+random_image['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
     random_image = random.choice(random_image)
     print('Random Image: '+random_image['title'])
     return {"file":random_image,"keywords":folder_name}
@@ -681,7 +695,7 @@ def get_random_gallery():
             print('checking gallery: {}'.format(folder['title']),end="")
         gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         random_gallery_tmp = random.choice(gallery_list_tmp)
-        gallery_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+random_gallery_tmp['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"}).GetList()
+        gallery_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+random_gallery_tmp['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
         if len(gallery_list_tmp_tmp)>0:
             folder_name = folder['title']
             random_gallery = random_gallery_tmp
@@ -738,7 +752,7 @@ def get_random_video():
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
-        video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
+        video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
         if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
             settings.maybePrint('-> not keyword')
             continue
@@ -756,7 +770,7 @@ def get_random_video():
     random_video = random.choice(video_list)
     folder_name = random_video['title'];
     print('Random Folder: '+random_video['title'])
-    random_video = PYDRIVE.ListFile({'q': "'"+random_video['id']+"' in parents and trashed=false and mimeType contains 'video/mp4'"}).GetList()
+    random_video = PYDRIVE.ListFile({'q': "'"+random_video['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
     random_video = random.choice(random_video)
     print('Random Video: '+random_video['title'])
     return {"file":random_video,"keywords":folder_name}
@@ -852,17 +866,21 @@ def upload_file(path=None, parent=None):
     filename = os.path.splitext(file)[0]
     ext = os.path.splitext(file)[1].lower()
     mimetype = None
+    print(settings.SKIP_BACKUP)
     if str(settings.FORCE_BACKUP) == "True":
         print("Google Upload (forced): {}".format(filename))
     elif str(settings.DEBUG) == "True":
-        print("Skipping Google Upload  (debug): {}".format(filename))
+        print("Skipping Google Upload (debug): {}".format(filename))
         return
     elif str(settings.BACKUP) == "False":
-        print('Skipping Google Upload  (disabled): {}'.format(filename))
+        print('Skipping Google Upload (disabled): {}'.format(filename))
+        return
+    elif str(settings.SKIP_BACKUP) == "True":
+        print('Skipping Backup: {}'.format(file['title']))
         return
     else:
-        print('Google Upload: {}'.format(filename))
-    if "mp4" in ext:
+        print('Google Upload (file): {}'.format(filename))
+    if "mov" in ext or "mp4" in ext:
         mimetype = "video/mp4"
     elif "jpg" in ext or "jpeg" in ext:
         mimetype = "image/jpeg"
@@ -889,13 +907,17 @@ def upload_gallery(path=None):
     if not parent:
         print("Error: Missing Posted Folder")
         return
+    print(settings.SKIP_BACKUP)
     if str(settings.FORCE_BACKUP) == "True":
         print("Google Upload (forced): {}".format(path))
     elif str(settings.DEBUG) == "True":
-        print("Skipping Google Upload  (debug): {}".format(path))
+        print("Skipping Google Upload (debug): {}".format(path))
         return
     elif str(settings.BACKUP) == "False":
-        print('Skipping Google Upload  (disabled): {}'.format(path))
+        print('Skipping Google Upload (disabled): {}'.format(path))
+        return
+    elif str(settings.SKIP_BACKUP) == "True":
+        print('Skipping Backup (gallery): {}'.format(file['title']))
         return
     else:
         print('Google Upload: {}'.format(path))

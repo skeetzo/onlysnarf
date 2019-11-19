@@ -336,6 +336,10 @@ def expiration(period):
 def message_confirm():
     try:
         global BROWSER
+        sends = BROWSER.find_elements_by_class_name(MESSAGE_CONFIRM)
+        for send in sends:
+            print(send)
+            print(send.get_attribute("value"))
         send = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
         if str(settings.DEBUG) == "True":
             if str(settings.DEBUG_DELAY) == "True":
@@ -770,6 +774,7 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
         if not text or text == None or str(text) == "None":
             print("Warning: Missing Upload Text")
             text = ""
+        text = text.replace(".mov","")
         text = text.replace(".mp4","")
         text = text.replace(".MP4","")
         text = text.replace(".jpg","")
