@@ -24,22 +24,56 @@ class Settings:
                 return
         except:
             self.INITIALIZED = False
+        # -action
+        # the action to be performed
         self.ACTION = "upload"
+        # -amount
+        # the amount to discount a user by
         self.AMOUNT = 0
+        # -months
+        # the number of months to discount for
         self.MONTHS = 0
+        # -price
+        # the price to be set in a message
         self.PRICE = 0
+        # -method
+        # random | input
         self.METHOD = "random"
+        # -cron
+        # determines whether script running is a cronjob
         self.CRON = False
+        # -keywords
+        # keywords to # in post
         self.KEYWORDS = []
+        # -performers
+        # list of performers to tag in post
         self.PERFORMERS = []
+        # -users-favorite
+        # list of favorited users
         self.USERS_FAVORITE = []
+        # -expires
+        # date of post or poll expiration
         self.EXPIRES = None
+        # -schedule
+        # 
         self.SCHEDULE = None
+        # -date
+        # date in MM-DD-YYYY:HH:MM 
         self.DATE = None
+        # -time
+        # time in HH:MM
         self.TIME = None
+        # -duration
+        # poll or post duration
         self.DURATION = None
+        # -questions
+        # poll questions
         self.QUESTIONS = []
+        # -bykeyword
+        # the keyword to find in folder selection
         self.BYKEYWORD = None
+        # -notkeyword
+        # the keyword to skip in folder selection
         self.NOTKEYWORD = None
         # -backup
         # backup uploaded content to "posted" folder
