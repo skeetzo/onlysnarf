@@ -41,11 +41,11 @@ class User:
         self.sent_images = ",".join(self.messages_from).split(",")
         self.statement_history = ",".join(self.messages_from).split(",")
         #########################
-        try:
-            settings.maybePrint("User: {} - {} - {}".format(self.name, self.username, self.id))
-        except Exception as e:
-            settings.maybePrint(e)
-            settings.maybePrint("User: {}".format(self.id))
+        # try:
+        #     settings.maybePrint("User: {} - {} - {}".format(self.name, self.username, self.id))
+        # except Exception as e:
+        #     settings.maybePrint(e)
+        #     settings.maybePrint("User: {}".format(self.id))
 
     def sendMessage(self, message="", image=None, price=None):
         try:
@@ -53,7 +53,7 @@ class User:
             OnlySnarf.message_user(self)
             success = OnlySnarf.message_text(message)
             if not success:
-                return
+                return False
             if image:
                 image_name = os.path.basename(image)
                 if str(image_name) in self.sent_images:
@@ -68,7 +68,7 @@ class User:
                     print("Price Minimum: ${}".format(PRICE_MINIMUM))
                 else:
                     success = OnlySnarf.message_price(price)
-                if not success: return False
+                    if not success: return False
             if str(settings.DEBUG) == "True":
                 self.sent_images.append("DEBUG")
             else:
