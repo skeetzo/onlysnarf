@@ -82,6 +82,7 @@ POLL_ADD_QUESTION = "g-btn.m-flat.new_vote_add_option"
 POLL_SAVE = "g-btn.m-rounded.js-make-post-poll-duration-save"
 POLL_CANCEL = "b-dropzone__preview__delete"
 POLL_INPUT_XPATH = "//input[@class='form-control']"
+REMEMBERME_CHECKBOX_XPATH = "//input[@id='remember']"
 
 #####################
 ##### Functions #####
@@ -94,6 +95,12 @@ def auth():
     else: logged_in = True
     if logged_in == False: print("Error: Failure to Login")
     return logged_in
+
+def error_checker(e):
+    if "Unable to locate element" in str(e):
+        print("Warning: OnlySnarf requires an update")
+    if "Message:" not in str(e):
+        settings.maybePrint(e)
 
 def goToHome():
     global BROWSER
@@ -137,12 +144,12 @@ def log_into_OnlyFans():
     try:
         BROWSER = webdriver.Chrome(chrome_options=options)
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Warning: Missing chromedriver_path, retrying")
         try:
             BROWSER = webdriver.Chrome(CHROMEDRIVER_PATH, chrome_options=options)
         except Exception as e:
-            settings.maybePrint(e)
+            error_checker(e)
             print("Error: Missing chromedriver_path, exiting")
             return False
     BROWSER.implicitly_wait(10) # seconds
@@ -158,10 +165,15 @@ def log_into_OnlyFans():
             elif int(opt)==2:
                 twitter = BROWSER.find_element_by_xpath(TWITTER_LOGIN2).click()
         except NoSuchElementException as e:
-            print("Warning: Login Failure, Retrying")
-            login(opt+1)
+            opt+=1
+            print("Warning: Login Failure, Retrying ({})".format(opt))
+            login(opt)
     try:
         login(0)
+        # rememberMe checkbox doesn't actually cause login to be remembered
+        rememberMe = BROWSER.find_element_by_xpath(REMEMBERME_CHECKBOX_XPATH)
+        if not rememberMe.is_selected():
+            rememberMe.click()
         # fill in username
         username = BROWSER.find_element_by_xpath(USERNAME_XPATH).send_keys(username_)
         # fill in password and hit the login button 
@@ -172,7 +184,7 @@ def log_into_OnlyFans():
         print('Login Successful')
         return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print('Login Failure')
         return False
 
@@ -187,7 +199,7 @@ def reset():
         print('OnlyFans Reset')
         return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print('Error: Failure Resetting OnlyFans')
         return False
 
@@ -197,7 +209,8 @@ def reset():
 
 # maximum discount = 55%
 def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
-    if not auth(): return False
+    auth_ = auth()
+    if not auth_: return False
     if int(discount) > 55:
         print("Warning: Discount Too High, Max -> 55%")
         discount = 55
@@ -222,34 +235,37 @@ def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
             BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(1)
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: Failed to Find Users")
         return False
-    users = BROWSER.find_elements_by_class_name(DISCOUNT_USERS_)
-    print("Discounting User: {} - {}/{}".format(user, depth, len(users)))
-    time.sleep(2)
-    # get all the users
-    user__ = users[0]
-    for user_ in users:
-        text = user_.get_attribute("innerHTML")
-        buttons_ = user_.find_elements_by_class_name(DISCOUNT_USER_BUTTONS)
-        if str(user) in text:
-            user__ = user_
-            break
-    ActionChains(BROWSER).move_to_element(user_).perform()
-    buttons = user__.find_elements_by_class_name(DISCOUNT_USER_BUTTONS)
-    for button in buttons:
-        if "Discount" in button.get_attribute("innerHTML"):
-            try:
-                button.click()
-                break
-            except Exception as e:
-                print("Warning: Unable To Find User, retrying")
-                settings.maybePrint(e)
-                return discount_user(user, depth=depth, discount=discount, months=months, tryAll=True)
-    time.sleep(1)
-    buttons_ = BROWSER.find_elements_by_class_name(DISCOUNT_USER_BUTTONS1)
     try:
+        users = BROWSER.find_elements_by_class_name(DISCOUNT_USERS_)
+        if int(len(users)) == 0:
+            print("Error: Missing Users")
+            return False
+        print("Discounting User: {} - {}/{}".format(user, depth, len(users)))
+        time.sleep(2)
+        # get all the users
+        user__ = users[0]
+        for user_ in users:
+            text = user_.get_attribute("innerHTML")
+            buttons_ = user_.find_elements_by_class_name(DISCOUNT_USER_BUTTONS)
+            if str(user) in text:
+                user__ = user_
+                break
+        ActionChains(BROWSER).move_to_element(user_).perform()
+        buttons = user__.find_elements_by_class_name(DISCOUNT_USER_BUTTONS)
+        for button in buttons:
+            if "Discount" in button.get_attribute("innerHTML"):
+                try:
+                    button.click()
+                    break
+                except Exception as e:
+                    error_checker(e)
+                    print("Warning: Unable To Find User, retrying")
+                    return discount_user(user, depth=depth, discount=discount, months=months, tryAll=True)
+        time.sleep(1)
+        buttons_ = BROWSER.find_elements_by_class_name(DISCOUNT_USER_BUTTONS1)
         (months_, discount_) = BROWSER.find_elements_by_class_name(DISCOUNT_INPUT)
         # removed in 2.10, inputs changed to above
         # months_ = BROWSER.find_element_by_class_name(MONTHS_INPUT)
@@ -278,19 +294,20 @@ def discount_user(user, depth=0, discount=10, months=1, tryAll=False):
                 print("Discounted User: {}".format(user))
                 return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         for button in buttons_:
             if "Cancel" in button.get_attribute("innerHTML"):
                 button.click()
-                print("Skipping: Save Discount")
-                return True
+                return False
+        return False
 
 ######################
 ##### Expiration #####
 ######################
 
 def expiration(period):
-    if not auth(): return False
+    auth_ = auth()
+    if not auth_: return False
     if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99 and str(period) != "No limit":
         print("Error: Missing Expiration")
         return False
@@ -325,7 +342,7 @@ def expiration(period):
             print("Expiration Entered")
         return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: Failed to enter Expiration")
         return False
 
@@ -336,10 +353,6 @@ def expiration(period):
 def message_confirm():
     try:
         global BROWSER
-        sends = BROWSER.find_elements_by_class_name(MESSAGE_CONFIRM)
-        for send in sends:
-            print(send)
-            print(send.get_attribute("value"))
         send = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
         if str(settings.DEBUG) == "True":
             if str(settings.DEBUG_DELAY) == "True":
@@ -350,7 +363,7 @@ def message_confirm():
         print('OnlyFans Message: Sent')
         return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: Failure to Confirm Message")
         return False
 
@@ -366,7 +379,7 @@ def message_text(text):
         settings.maybePrint("Text Entered")
         return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: Failure to Enter Message")
         return False
 
@@ -379,7 +392,7 @@ def message_image(image):
         global BROWSER
         files = []
         if str(settings.SKIP_DOWNLOAD) == "True":
-            print("Warning: Unable to upload, skipped download")
+            print("Warning: Unable to Upload, skipped download")
             return True
         if os.path.isfile(str(image)):
             files = [str(image)]
@@ -405,15 +418,15 @@ def message_image(image):
                     settings.maybePrint("Success: Upload Error Message Closed")
                     time.sleep(1)
         except Exception as e:
+            error_checker(e)
             print("Error: Unable to Upload Images")
-            settings.maybePrint(e)
             return False
         settings.maybePrint("Image(s) Entered")
         if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
             time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
         return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: Failure to Enter Image(s)")
         return False
 
@@ -422,25 +435,36 @@ def message_price(price):
         if not price or price == None or str(price) == "None":
             print("Error: Missing Price")
             return False
-        print("Enter price: {}" .format(price))
-
+        print("Enter price: {}".format(price))
         global BROWSER
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ONLYFANS_PRICE))).click()
         # BROWSER.find_element_by_css_selector(ONLYFANS_PRICE)
         BROWSER.find_elements_by_css_selector(ONLYFANS_PRICE_INPUT)[1].send_keys(str(price))
-        BROWSER.find_elements_by_css_selector(ONLYFANS_PRICE_CLICK)[4].click()
-        settings.maybePrint("Price Entered")
+        submits = BROWSER.find_elements_by_css_selector(ONLYFANS_PRICE_CLICK)
+        found = False
+        for submit in submits:
+            # print(submit.get_attribute("innerHTML"))
+            # print(submit.is_enabled())
+            if submit.get_attribute("innerHTML").strip() == "Save" and submit.is_enabled():
+                submit.click()
+                settings.maybePrint("Price Entered")
+                found = True
+                break
         if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
             time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+        if not found:
+            print("Warning: Unable to Enter Price")
+            return False
         return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: Failure to Enter Price")
         return False
 
 def message_user(user):
     try:
-        if not auth(): return False
+        auth_ = auth()
+        if not auth_: return False
         userid = user.id
         if not userid or userid == None or str(userid) == "None":
             print("Warning: Missing User ID")
@@ -457,13 +481,14 @@ def message_user(user):
         BROWSER.get(str(ONLYFANS_CHAT_URL)+str(userid))
         return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: Failure to Goto User - {}/{}".format(user.id, user.username))
         return False
 
 def read_user_messages(user):
     try:
-        if not auth(): return False
+        auth_ = auth()
+        if not auth_: return False
         global BROWSER
         # go to onlyfans.com/my/subscribers/active
         message_user(user)
@@ -524,7 +549,7 @@ def read_user_messages(user):
         settings.maybePrint("Messages All: {}".format(len(messages_all)))
         return [messages_all, messages_and_timestamps, messages_to, messages_from]
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: Failure to Read Chat - {}".format(user.username))
         return [[],[],[]]
 
@@ -553,7 +578,8 @@ def polling(poll):
     questions = poll.get("questions")
     if isinstance(questions, str): questions = questions.split(",\"*\"")
     questions = [n.strip() for n in questions]
-    if not auth(): return False
+    auth_ = auth()
+    if not auth_: return False
     if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99 and str(period) != "No limit":
         print("Error: Missing Duration")
         return False
@@ -601,12 +627,9 @@ def polling(poll):
             print("Poll Entered")
         return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: Failed to enter Poll")
         return False
-
-# b-dropzone__preview__delete
-
 
 ################
 ##### Post #####
@@ -614,7 +637,8 @@ def polling(poll):
 
 def post(text, expires=None, schedule=False, poll=False):
     try:
-        if not auth(): return False
+        auth_ = auth()
+        if not auth_: return False
         global BROWSER
         goToHome()
         print("Posting:")
@@ -637,7 +661,7 @@ def post(text, expires=None, schedule=False, poll=False):
         print('OnlyFans Post Complete')
         return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: OnlyFans Post Failure")
         return False
 
@@ -647,7 +671,8 @@ def post(text, expires=None, schedule=False, poll=False):
 
 # or email
 def get_new_trial_link():
-    if not auth(): return False
+    auth_ = auth()
+    if not auth_: return False
     global BROWSER
     # go to onlyfans.com/my/subscribers/active
     try:
@@ -680,7 +705,7 @@ def get_new_trial_link():
         link = "https://onlyfans.com/action/trial/$number"
         return link
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: Failed to Apply Promotion")
         return None
 
@@ -689,7 +714,8 @@ def get_new_trial_link():
 ####################
 
 def scheduling(schedule_):
-    if not auth(): return False
+    auth_ = auth()
+    if not auth_: return False
     global BROWSER
     try:
         if not schedule_:
@@ -754,7 +780,7 @@ def scheduling(schedule_):
             print("Schedule Entered")
         return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: Failed to enter Schedule")
         return False
 
@@ -765,7 +791,8 @@ def scheduling(schedule_):
 # Uploads a directory with a video file or image files to OnlyFans
 def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=False, schedule=False, poll=False):
     try:
-        if not auth(): return False
+        auth_ = auth()
+        if not auth_: return False
         global BROWSER
         goToHome()
         if not path:
@@ -774,7 +801,6 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
         if not text or text == None or str(text) == "None":
             print("Warning: Missing Upload Text")
             text = ""
-        text = text.replace(".mov","")
         text = text.replace(".mp4","")
         text = text.replace(".MP4","")
         text = text.replace(".jpg","")
@@ -823,6 +849,7 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
             except Exception as e:
                 # try: 
                 #     # check for existence of "thumbnail is fucked up" modal and hit ok button
+                #     # haven't seen in long enough time to properly add
                 #     BROWSER.switchTo().frame("iframe");
                 #     BROWSER.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
                 #     print("Error: Thumbnail Missing")
@@ -830,55 +857,73 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
                 # except Exception as ef:
                 #     settings.maybePrint(ef)
                 print('uploading...')
-                settings.maybePrint(e)
+                error_checker(e)
                 i+=1
                 if i == maxUploadCount and settings.FORCE_UPLOAD is not True:
                     print('Error: Max Upload Time Reached')
                     return False
-        try:
-            BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_CLASS).send_keys(str(text))
-            # first one is disabled
+        
+        def get_send_button():
+            sendText = BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_CLASS)
+            sendText.clear()
+            sendText.send_keys(str(text))
+            # first send btn is disabled
             sends = BROWSER.find_elements_by_class_name(SEND_BUTTON_CLASS)
+            send = None
             for i in range(len(sends)):
+                print(sends[i].get_attribute("innerHTML"))
                 if sends[i].is_enabled():
-                    sends = sends[i]
-            if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
-                time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
-            if str(settings.DEBUG) == "True":
-                print('Skipped: OnlyFans Upload (debug)')
-                return True
-            sends.click()
-        except:
-            settings.maybePrint("Warning: Upload Error Message, Closing")
+                    send = sends[i]
+            return send
+
+        try:
+            send = get_send_button()
+            if send:
+                if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+                    time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+                if str(settings.DEBUG) == "True":
+                    print('Skipped: OnlyFans Upload (debug)')
+                    return True
+                send.click()
+            else:
+                settings.maybePrint("Error: Unable to locate 'Send Post' button")
+                return False
+        except Exception as e:
+            if "Unable to locate element" in str(e):
+                print("Error: Really unable to locate 'Send Post' button")
+                return False
+            else:
+                settings.maybePrint(e)
             try:
-                buttons = BROWSER.find_elements_by_class_name(ONLYFANS_UPLOAD_BUTTON)
-                for butt in buttons:
-                    if butt.get_attribute("innerHTML").strip() == "Close":
-                        butt.click()
-                        settings.maybePrint("Success: Upload Error Message Closed")
-                        send_text = BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_CLASS)
-                        send_text.clear()
-                        send_text.send_keys(str(text))
-                        # first one is disabled
-                        sends = BROWSER.find_elements_by_class_name(SEND_BUTTON_CLASS)
-                        for i in range(len(sends)):
-                            if sends[i].is_enabled():
-                                sends = sends[i]
-                        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
-                            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
-                        if str(settings.DEBUG) == "True":
-                            print('Skipped: OnlyFans Upload (debug)')
-                            return True
-                        sends.click()
+                # missing check for if error message modal is in the way
+                # close error message
+                def close_error_modal():
+                    buttons = BROWSER.find_elements_by_class_name(SEND_BUTTON_CLASS)
+                    for butt in buttons:
+                        if butt.get_attribute("innerHTML").strip() == "Close":
+                            butt.click()
+                            settings.maybePrint("Success: Upload Error Message Closed")
+                close_error_modal()
+                send = get_send_button()
+                if send:
+                    if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+                        time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+                    if str(settings.DEBUG) == "True":
+                        print('Skipped: OnlyFans Upload (debug)')
+                        return True
+                    send.click()
+                else:
+                    settings.maybePrint("Error: Unable to locate 'Send Post' button")
+                    return False
             except Exception as e:
-                print("Error: Unable to Upload Images")
+                print("Error: Unable to Send Post")
                 settings.maybePrint(e)
                 return False
         # send[1].click() # the 0th one is disabled
         print('OnlyFans Upload Complete')
         return True
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: OnlyFans Upload Failure")
         return False
 
@@ -887,7 +932,8 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
 #################
 
 def get_users():
-    if not auth(): return False
+    auth_ = auth()
+    if not auth_: return False
     global BROWSER
     try:
         if str(BROWSER.current_url) == str(ONLYFANS_USERS_ACTIVE_URL):
@@ -902,7 +948,7 @@ def get_users():
                 BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(1)
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
         print("Error: Failed to Find Users")
         return []
     # avatars = BROWSER.find_elements_by_class_name('b-avatar')
@@ -969,7 +1015,7 @@ def get_users():
             except Exception as e:
                 settings.maybePrint(e)
     except Exception as e:
-        settings.maybePrint(e)
+        error_checker(e)
     settings.maybePrint("Found: {}".format(len(users_)))
     return users_
 

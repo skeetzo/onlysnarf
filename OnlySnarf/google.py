@@ -582,6 +582,12 @@ def get_images():
     random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(images_folder['id'])}).GetList()
     images_list = []
     for folder in random_folders:
+        if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
+            settings.maybePrint('-> not keyword')
+            continue
+        elif settings.NOTKEYWORD != None and str(settings.NOTKEYWORD) == str(folder['title']):
+            settings.maybePrint('-> by not keyword')
+            continue
         images_list.append([images_folder, folder])
         settings.maybePrint('checking folder: '+folder['title'])
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()      
@@ -639,6 +645,9 @@ def get_random_image():
     images_list = []
     random_image = None
     folder_name = None
+    if random_folders == None:
+        print("Error: Unable to Connect to Google Drive")
+        return {}
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
@@ -674,6 +683,9 @@ def get_random_gallery():
     folder_list = []
     random_gallery = None
     folder_name = None
+    if random_folders == None:
+        print("Error: Unable to Connect to Google Drive")
+        return {}
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
             print('checking galleries: {}'.format(folder['title']),end="")
@@ -717,6 +729,9 @@ def get_random_performer():
     performer_list = []
     random_performer = None
     # print('random folders: '+str(random_folders))
+    if random_folders == None:
+        print("Error: Unable to Connect to Google Drive")
+        return {}
     for folder in random_folders:
         # random_folder_folder = random.choice(random_folders)
         settings.maybePrint('random performer: '+folder['title'])
@@ -749,6 +764,9 @@ def get_random_video():
     video_list = []
     random_video = None
     folder_name = None
+    if random_folders == None:
+        print("Error: Unable to Connect to Google Drive")
+        return {}
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
@@ -784,6 +802,9 @@ def get_random_scene():
     folder_list = []
     random_scene = None
     folder_name = None
+    if random_folders == None:
+        print("Error: Unable to Connect to Google Drive")
+        return {}
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
             print('checking scenes: '+folder['title'],end="")
