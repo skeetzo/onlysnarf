@@ -6,6 +6,8 @@ client_secrets.json
 users.json
 video.mp4
 
+/logs/
+
 # Temporary downloads
 OnlySnarf/tmp
 
