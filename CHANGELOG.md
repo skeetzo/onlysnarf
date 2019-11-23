@@ -234,7 +234,14 @@
   - updated: google mimetypes
   **2.14.0**
   - added: NOTKEYWORD for excluding folders by keyword
-  
+  **2.14.1**
+  - updated: upload_to_OnlyFans w/ more error checks in attempt to fix below bug
+  - BUG: does not find "send_post_button" from chromebook ubuntu laptop using ChromeDriver 74.0.3729.6 | Google Chrome 74.0.3729.131
+  - cleaned up settings.py comments
+  - added: remember me upon login is checked, does nothing
+  **2.14.2**
+  - added: error_checker for not found elements
+
 ----------------------------------------
 
 ## ToDo

@@ -24,85 +24,64 @@ class Settings:
                 return
         except:
             self.INITIALIZED = False
+        ##
         # -action
         # the action to be performed
         self.ACTION = "upload"
+        ##
         # -amount
+        # action: discount
         # the amount to discount a user by
         self.AMOUNT = 0
-        # -months
-        # the number of months to discount for
-        self.MONTHS = 0
-        # -price
-        # the price to be set in a message
-        self.PRICE = 0
-        # -method
-        # random | input
-        self.METHOD = "random"
-        # -cron
-        # determines whether script running is a cronjob
-        self.CRON = False
-        # -keywords
-        # keywords to # in post
-        self.KEYWORDS = []
-        # -performers
-        # list of performers to tag in post
-        self.PERFORMERS = []
-        # -users-favorite
-        # list of favorited users
-        self.USERS_FAVORITE = []
-        # -expires
-        # date of post or poll expiration
-        self.EXPIRES = None
-        # -schedule
-        # 
-        self.SCHEDULE = None
-        # -date
-        # date in MM-DD-YYYY:HH:MM 
-        self.DATE = None
-        # -time
-        # time in HH:MM
-        self.TIME = None
-        # -duration
-        # poll or post duration
-        self.DURATION = None
-        # -questions
-        # poll questions
-        self.QUESTIONS = []
-        # -bykeyword
-        # the keyword to find in folder selection
-        self.BYKEYWORD = None
-        # -notkeyword
-        # the keyword to skip in folder selection
-        self.NOTKEYWORD = None
+        ##
         # -backup
         # backup uploaded content to "posted" folder
         self.BACKUP = False
-        # -cron-user
-        # the user to run OnlySnarf as
-        self.CRON_USER = "root"
-        # -force-backup
-        # force Google backup
-        self.FORCE_BACKUP = False
-        # -debug
-        # debugging - skips uploading and deleting unless otherwise forced
-        self.DEBUG = False
-        # default message for debugging
-        self.DEFAULT_MESSAGE = ":)"
-        # default price for user messages
-        self.DEFAULT_PRICE = "10.00"
-        # default user greeting
-        self.DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
-        # -debug-delay
-        # user message delay
-        self.DEBUG_DELAY = False
-        self.DEBUG_DELAY_AMOUNT = 10
-        # -delete-google
-        # delete uploaded content
-        self.DELETE_GOOGLE = False
+        ##
+        # -bykeyword
+        # the keyword to find in folder selection
+        self.BYKEYWORD = None
+        ##
         # -create-drive 
         # creates missing OnlySnarf folders in Google Drive
         self.CREATE_DRIVE = False
+        ##
+        # -cron
+        # determines whether script running is a cronjob
+        self.CRON = False
+        ##
+        # -cron-user
+        # the user to run OnlySnarf as
+        self.CRON_USER = "root"
+        ##
+        # -date
+        # date in MM-DD-YYYY:HH:MM 
+        self.DATE = None
+        ##
+        # -debug
+        # debugging - skips uploading and deleting unless otherwise forced
+        self.DEBUG = False
+        ##
+        # -debug-delay
+        # user message delay
+        self.DEBUG_DELAY = False
+        # -debug-delay-amount
+        # duration in seconds
+        self.DEBUG_DELAY_AMOUNT = 10
+        ##
+        # -delete-google
+        # delete uploaded content
+        self.DELETE_GOOGLE = False
+        ##
+        # default message for debugging
+        self.DEFAULT_MESSAGE = ":)"
+        ##
+        # default price for user messages
+        self.DEFAULT_PRICE = "10.00"
+        ##
+        # default user greeting
+        self.DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
+        ##
         # configurable w/ profile.conf
         # OnlySnarf Drive folder list
         self.DRIVE_FOLDERS = [
@@ -112,113 +91,199 @@ class Settings:
             "scenes",
             "videos"
         ]
+        ##
+        # -duration
+        # poll or post duration
+        self.DURATION = None
+        ##
+        # -expires
+        # date of post or poll expiration
+        self.EXPIRES = None
+        ##
+        # -force-backup
+        # force Google backup
+        self.FORCE_BACKUP = False
+        ##
         # -force-delete
         # force Google file deletion upon upload
         self.FORCE_DELETE = False
+        ##
         # -force-reduce
         # force mp4 reduction
         self.FORCE_REDUCTION = False
+        ##
         # -force-upload
         # ignore upload max wait
         self.FORCE_UPLOAD = False
-        # -image-path
-        # path to local file to use
-        self.PATH_LOCAL = None
+        ##
         # -input
         # path to local file(s) to upload
         self.INPUT = None
+        ##
         # -image
         # path to local image to use for message or upload
         self.IMAGE = None
+        ##
         # -image-limit
         # maximum number of images to upload
         self.IMAGE_UPLOAD_LIMIT = 6
+        ##
         # -image-max
         # maximum number of images that can be uploaded
         self.IMAGE_UPLOAD_MAX = 20
+        ##
         # maximum number of images that can be uploaded in a message
         self.IMAGE_UPLOAD_MAX_MESSAGES = 5
-        # -overwrite-local
-        # self.OVERWRITE_LOCAL = False
+        ##
+        # -keywords
+        # keywords to # in post
+        self.KEYWORDS = []
+        ##
+        # -months
+        # action: discount
+        # the number of months to discount for
+        self.MONTHS = 0
+        ##
+        # -method
+        # random | input
+        self.METHOD = "random"
+        ##
         # -mount-path
         # the mounth path for a local directory of OnlyFans config files
         self.MOUNT_PATH = None
+        ##
+        # -notkeyword
+        # the keyword to skip in folder selection
+        self.NOTKEYWORD = None
+        ##
+        # -overwrite-local
+        # self.OVERWRITE_LOCAL = False
+        ##
         # -password
         # the password for the OnlyFans / Twitter
         self.PASSWORD = None
+        ##
+        # -performers
+        # list of performers to tag in post
+        self.PERFORMERS = []
+        # -prefer-local
+        # prefers local cache over refreshing first call
+        self.PREFER_LOCAL = False
+        ##
+        # -price
+        # action: message
+        # the price to be set in a message
+        self.PRICE = 0
+        ###
+        ### PATHS ###
         # -drive-path
         # the folder path within Google Drive for OnlySnarf's root folder
         self.DRIVE_PATH = None
-        # -user-path
-        # the path to the users.json file
-        self.USERS_PATH = "users.json"
         # -config-path
         # the path to the config.json file
-        self.PATH_CONFIG = "config.json"
+        self.CONFIG_PATH = "config.json"
         # -google-path
         # the path to the google_creds.txt
         self.GOOGLE_PATH = "google_creds.txt"
         # the path to the client_secret.json
-        self.PATH_SECRET = "client_secret.json"
-        # -prefer-local
-        # prefers local cache over refreshing first call
-        self.PREFER_LOCAL = False
+        self.SECRET_PATH = "client_secret.json"
+        # -user-path
+        # the path to the users.json file
+        self.USERS_PATH = "users.json"
+        ###
+        ##
+        # -questions
+        # poll questions
+        self.QUESTIONS = []
+        ###
         # the maximum number of recent users
         self.RECENT_USER_COUNT = 3
+        ##
         # can be set in profile.conf
         # root Google drive folder
         self.ROOT_FOLDER = "OnlySnarf"
+        ##
         # -save-users
         # saves OnlyFans users upon exit
         self.SAVE_USERS = False
+        ##
+        # -schedule
+        # 
+        self.SCHEDULE = None
+        ##
         # -skip-backup
         # skips file backup if enabled by .conf
         self.SKIP_BACKUP = False
+        ##
         # -skip-delete
         # skip local file deletion before and after upload
         self.SKIP_DELETE = False
+        ##
         # -skip-delete-google
         # skips Google file deltion if enabled by .conf
         self.SKIP_DELETE_GOOGLE = False
+        ##
         # -skip-download
         self.SKIP_DOWNLOAD = False
+        ##
         # -skip-reduce
         # skip mp4 reducing
         self.SKIP_REDUCE = False
+        ##
         # -skip-repair
         # skip mp4 repairs
         self.SKIP_REPAIR = False
-        # can be set in profile.conf
+        ##
         # -skip-upload
         # skips file upload
         self.SKIP_UPLOAD = False
+        ##
         # list of users to skip
         self.SKIP_USERS = []
+        ##
         # -show 
         # shows window
         self.SHOW_WINDOW = False
+        ##
         # -text
         # text for message or upload
         self.TEXT = None
+        ##
+        # -time
+        # time in HH:MM
+        self.TIME = None
+        ##
         # fixes thumbnail preview
         self.THUMBNAILING_PREVIEW = False
+        ##
         # -type
         # the type of upload
         self.TYPE = None
+        ##
         # -tweet
         # enabled tweeting
         self.TWEETING = False
+        ##
         # -user
         # the user to target
         self.USER = None
+        ##
         # user id found in OnlyFans
         self.USER_ID = None
+        ##
+        # -users-favorite
+        # list of favorited users
+        self.USERS_FAVORITE = []
+        ##
         # -username
         # the OnlyFans / Twitter username to use
         self.USERNAME = None
+        ##
         # -verbose
         # more output
         self.VERBOSE = False
+        ##
+        # not currently implemented
         # custom repair option for shitty gopro videos
         self.WORKING_VIDEO = "video.mp4"
         # config file
@@ -256,14 +321,14 @@ class Settings:
                 j += 1
             i += 1
         if self.MOUNT_PATH is not None:
-            self.PATH_CONFIG = os.path.join(self.MOUNT_PATH, self.PATH_CONFIG)
-            self.PATH_SECRET = os.path.join(self.MOUNT_PATH, self.PATH_SECRET)
+            self.CONFIG_PATH = os.path.join(self.MOUNT_PATH, self.CONFIG_PATH)
+            self.SECRET_PATH = os.path.join(self.MOUNT_PATH, self.SECRET_PATH)
             self.GOOGLE_PATH = os.path.join(self.MOUNT_PATH, self.GOOGLE_PATH)
             self.USERS_PATH = os.path.join(self.MOUNT_PATH, self.USERS_PATH)
             self.WORKING_VIDEO = os.path.join(self.MOUNT_PATH, self.WORKING_VIDEO)
         else:
-            self.PATH_CONFIG = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.PATH_CONFIG)
-            self.PATH_SECRET = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.PATH_SECRET)
+            self.CONFIG_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.CONFIG_PATH)
+            self.SECRET_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.SECRET_PATH)
             self.GOOGLE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.GOOGLE_PATH)
             self.USERS_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.USERS_PATH)
             self.WORKING_VIDEO = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.WORKING_VIDEO)

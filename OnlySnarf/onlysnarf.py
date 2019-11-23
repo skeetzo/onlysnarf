@@ -105,7 +105,11 @@ def message(choice, message=None, image=None, price=None, username=None):
     if image == None and str(settings.METHOD) == "random": 
         images = Google.get_images()
         image = random.choice(images)
-        image = Google.download_file(image[1]).get("path")
+        # download_file doesn't work with a folder[]
+        if image[1]['mimeType'] == "application/vnd.google-apps.folder":
+            image = Google.download_gallery(image[1]).get("path")
+        else:
+            image = Google.download_file(image[1]).get("path")
     success = False
     backup = False
     for user in users:

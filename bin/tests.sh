@@ -1,83 +1,112 @@
 #!/usr/bin/env bash
 sudo python3 setup.py install
+echo "-----------------------------------------------------"
+echo "Testing OnlySnarf"
 
-/usr/local/bin/onlysnarfpy \
--show-window \
--debug \
--verbose \
--action "message" \
--method "recent" \
--text "suck my balls" \
--price "10.00" \
--prefer-local \
--debug-delay
+# echo "## MESSAGE - RECENT ##"
 
-exit 1
+# /usr/local/bin/onlysnarfpy \
+# -debug \
+# -verbose \
+# -action "message" \
+# -method "recent" \
+# -text "suck my balls" \
+# -price "10.00" \
+# -show-window
+
+# sleep 2
+
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "################## Start #########################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+
+echo "[*] Upload - Image & Poll"
 
 # Image
 /usr/local/bin/onlysnarfpy \
--show-window \
 -debug \
 -verbose \
 -action "upload" -type "image" \
 -duration 3 \
 -text "image testes" \
--questions "your mom","some toast","a nice sandwich" \
--date "6/6/2020" \
--time "6:26" \
--schedule "6/6/2020:6:26" \
--expires 3
+-questions "your mom","some toast","a nice sandwich" >> ../onlysnarf/logs/tests.txt 2>&1
+
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+
+sleep 2
+
+echo "[*] Upload - Video & Schedule"
 
 # Video
 /usr/local/bin/onlysnarfpy \
--show-window \
 -debug \
 -verbose \
 -action "upload" -type "video" \
--duration 99 \
 -text "video testes" \
--questions "your mom","some toast","a nice sandwich" \
 -schedule "6/6/2020:6:26" \
--expires 3 \
--skip-reduce
+-skip-download >> ../onlysnarf/logs/tests.txt 2>&1
+
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+
+sleep 2
+
+echo "[*] Upload - Gallery & Expiration"
 
 # Gallery
 /usr/local/bin/onlysnarfpy \
--show-window \
 -debug \
 -verbose \
 -action "upload" -type "gallery" \
--duration 7 \
 -text "gallery testes" \
--questions "your mom","some toast","a nice sandwich" \
--date "6/6/2020" \
--time "6:26" \
--expires 3
+-expires 3 >> ../onlysnarf/logs/tests.txt 2>&1
+
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+
+sleep 2
+
+echo "[*] Post - Text"
 
 # Post
 /usr/local/bin/onlysnarfpy \
--show-window \
 -debug \
 -verbose \
 -action "post" \
--duration 7 \
--text "post testes" \
--questions "your mom","toast","a sandwich" \
--expires 3
+-text "post testes" >> ../onlysnarf/logs/tests.txt 2>&1
+
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+
+sleep 2
+
+echo "[*] Discount - Recent"
 
 # Discount
 /usr/local/bin/onlysnarfpy \
--show-window \
 -debug \
 -verbose \
 -action "discount" \
 -user "recent" \
 -amount 40 \
--months 3 
+-months 3 \
+-prefer-local >> ../onlysnarf/logs/tests.txt 2>&1
+
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+
+sleep 2
+
+echo "[*] Message - Recent & Local Image"
 
 # Users
 /usr/local/bin/onlysnarfpy \
--show-window \
 -debug \
 -verbose \
 -action "message" \
@@ -85,17 +114,25 @@ exit 1
 -text "suck my balls" \
 -price "10.00" \
 -image /opt/apps/onlysnarf/tmp \
--prefer-local \
--debug-delay
+-prefer-local >> ../onlysnarf/logs/tests.txt 2>&1
+
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+
+sleep 2
+
+echo "[*] Message - User"
 
 # User
 /usr/local/bin/onlysnarfpy \
--show-window \
 -debug \
 -verbose \
 -action "message" \
 -method "user" \
--user "jamescosmo" \
 -text "suck my balls" \
--prefer-local
+-prefer-local >> ../onlysnarf/logs/tests.txt 2>&1
 
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "################### End ##########################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
