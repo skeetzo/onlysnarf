@@ -190,6 +190,74 @@ def initialize():
     ])
     cronItems.insert(0,[ "Back", "main"])
 
+    global profileSettingsItems
+    profileSettingsItems = sorted([
+        [ "Cover Image", "add" ],
+        [ "Profile Photo", "list" ],
+        [ "Display Name", "list" ],
+        [ "Subscription Price", "list" ],
+        [ "About", "list" ],
+        [ "Location", "list" ],
+        [ "Website URL", "list" ]
+    ])
+    profileSettingsItems.insert(0,[ "Back", "main"])
+
+    global accountSettingsItems
+    accountSettingsItems = sorted([
+        [ "Connect Twitter", "list" ],
+        [ "Username", "list" ],
+        [ "Email", "list" ],
+        [ "Password", "list" ]
+    ])
+    accountSettingsItems.insert(0,[ "Back", "main"])
+
+    global notificationSettingsItems
+    notificationSettingsItems = sorted([
+        [ "Email Notifications", "list" ],
+        # New Referral
+        # New Stream
+        # New Subscriber
+        # New Tip
+        # Renewal
+        [ "New Likes Summary", "list" ],
+        [ "New Posts Summary", "list" ],
+        [ "New Private Message Summary", "list" ],
+        [ "Site Notifications", "list" ],
+        # New comment
+        # New favorite (like)
+        # Discounts from users I've used to follow
+        # New Subscriber
+        # New Tip
+        [ "Toast Notifications", "list" ]
+        # New comment
+        # New favorite (like)
+        # New Subscriber
+        # New Tip
+    ])
+    notificationSettingsItems.insert(0,[ "Back", "main"])
+
+    global securitySettingsItems
+    securitySettingsItems = sorted([
+        [ "Fully Private Profile", "list" ],
+        [ "Enable Comments", "list" ],
+        [ "Show Fans Count on your Profile", "list" ],
+        [ "Show Posts Tips Summary", "list" ]
+        [ "Public Friends List", "list" ]
+        [ "IP and Geo Blocking - By Country", "list" ]
+        [ "IP and Geo Blocking - By IP", "list" ]
+        [ "Watermark - Photos", "list" ]
+        [ "Watermark - Videos", "list" ]
+        [ "Watermark - Custom Text", "list" ]
+    ])
+    securitySettingsItems.insert(0,[ "Back", "main"])
+
+    global otherSettingsItems
+    otherSettingsItems = sorted([
+        [ "Live Server", "list" ],
+        [ "Live Key", "list" ]
+    ])
+    otherSettingsItems.insert(0,[ "Back", "main"])
+
     # print("Initialized Menu")
     INITIALIZED = True
 

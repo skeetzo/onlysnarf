@@ -108,3 +108,7 @@ Text will be generated if not provided with `-text`
 
 ## Dependencies
   ### Google Chrome -> `sudo apt install -y google-chrome-beta`
+
+## Referral
+Feel free to make use of my referral code ;)  
+https://onlyfans.com/?ref=409408
