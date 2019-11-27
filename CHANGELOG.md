@@ -241,6 +241,10 @@
   - added: remember me upon login is checked, does nothing
   **2.14.2**
   - added: error_checker for not found elements
+  
+----------------
+  **2.15.0**
+  - added: Settings options
 
 ----------------------------------------
 
@@ -281,3 +285,22 @@
   - must not spam, must follow a schedule. monthly, weekly on a day, daily at an hour
   -- maybe delete previous tweets?
   - maybe tweet once and pin it?
+
+
+
+
+3) setup features
+a) 'new account': setup - Twitter -> profile, banner; Price and Settings
+b) 'new account': first post
+c) 'new account': response behavior - configure how/if you want to auto respond to messages
+d) 'new account': tweeting behavior - tweet to advertise new account, tweet to ask about what you should post, etc
+
+
+Referral Code
+https://onlyfans.com/?ref=409408
+
+
+ToDO
+- add in abililty to toggle account settings & geo ip stuff
+- finalze bot activity
+- add Tweeting ala Posting prompts
