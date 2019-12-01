@@ -510,7 +510,6 @@ def test(TYPE, methodChoice="random", file=None, folderName=None, parent=None):
 def main():
     try:
         # os.system('clear')
-        settings.initialize()
         success = False
         if str(settings.ACTION) == "upload":
             success = release(settings.TYPE, methodChoice=settings.METHOD)
@@ -534,6 +533,7 @@ def main():
         sys.exit(0)
 
 if __name__ == "__main__":
+    settings.initialize()
     main()
 else:
     try:

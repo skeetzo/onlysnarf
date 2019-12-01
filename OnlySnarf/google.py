@@ -85,7 +85,7 @@ def authGoogle():
         # settings.maybePrint(e)
         print('Error: Unable to Authenticate w/ Google')
         return False
-    settings.maybePrint('Authentication Success') 
+    settings.maybePrint('Authentication Successful') 
     return True
 
 def checkAuth():
