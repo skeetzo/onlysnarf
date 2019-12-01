@@ -245,6 +245,7 @@
 ----------------
   **2.15.0**
   - added: Settings options
+  - updated: config.py, unable to test
 
 ----------------------------------------
 
@@ -282,25 +283,22 @@
   - tweet reminders
   - can enter text that is tweeted
   - any links to include (counts against text limit) of content or images
-  - must not spam, must follow a schedule. monthly, weekly on a day, daily at an hour
-  -- maybe delete previous tweets?
-  - maybe tweet once and pin it?
+  -- check for previously existing tweet
 
 
 
 
 3) setup features
 a) 'new account': setup - Twitter -> profile, banner; Price and Settings
+- profile settings
 b) 'new account': first post
+- check posts
 c) 'new account': response behavior - configure how/if you want to auto respond to messages
+- revisit bot ideas
 d) 'new account': tweeting behavior - tweet to advertise new account, tweet to ask about what you should post, etc
-
+- posts that are meant to be tweeted; skips requiring app creds for Twitter
 
 Referral Code
 https://onlyfans.com/?ref=409408
 
 
-ToDO
-- add in abililty to toggle account settings & geo ip stuff
-- finalze bot activity
-- add Tweeting ala Posting prompts

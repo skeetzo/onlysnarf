@@ -30,6 +30,7 @@ from OnlySnarf.settings import SETTINGS as settings
 
 BROWSER = None
 ONLYFANS_HOME_URL = 'https://onlyfans.com/'
+ONLYFANS_SETTINGS_URL = "https://onlyfans.com/my/settings"
 ONLYFANS_USERS_ACTIVE_URL = "https://onlyfans.com/my/subscribers/active"
 SEND_BUTTON_XPATH = "//button[@type='submit' and @class='g-btn m-rounded send_post_button']"
 SEND_BUTTON_CLASS = "g-btn.m-rounded.send_post_button"
@@ -102,7 +103,7 @@ def error_checker(e):
     if "Message:" not in str(e):
         settings.maybePrint(e)
 
-def goToHome():
+def go_to_home():
     global BROWSER
     if BROWSER == None: return False
     if str(BROWSER.current_url) == str(ONLYFANS_HOME_URL):
@@ -313,7 +314,7 @@ def expiration(period):
         return False
     global BROWSER
     try:
-        # goToHome()
+        # go_to_home()
         if isinstance(period,str) and str(period) == "No limit": period = 99
         print("Expiration:")
         print("- Period: {}".format(period))
@@ -640,7 +641,7 @@ def post(text, expires=None, schedule=False, poll=False):
         auth_ = auth()
         if not auth_: return False
         global BROWSER
-        goToHome()
+        go_to_home()
         print("Posting:")
         print("- Text: {}".format(text))
         if expires: expiration(expires)
@@ -708,6 +709,53 @@ def get_new_trial_link():
         error_checker(e)
         print("Error: Failed to Apply Promotion")
         return None
+
+####################
+##### Settings #####
+####################
+
+# onlyfans.com/my/settings
+def go_to_settings(settingsTab):
+    global BROWSER
+    if BROWSER == None: return False
+    if str(BROWSER.current_url) == str(ONLYFANS_SETTINGS_URL) and str(settingsTab) == "profile":
+        settings.maybePrint("at -> onlyfans.com/settings/{}".format(settingsTab))
+    else:
+        settings.maybePrint("goto -> onlyfans.com/settings/{}".format(settingsTab))
+        BROWSER.get("{}/{}".format(ONLYFANS_SETTINGS_URL, settingsTab))
+        # WebDriverWait(BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.XPATH, SEND_BUTTON_XPATH)))
+        # fix above with correct element to locate
+
+    # profile -> /
+    # account -> /advanced
+    # notifications -> /notifications
+    # security -> /security
+    # other -> /other
+
+def settings_profile(settings):
+    go_to_settings("profile")
+    # search for all elements and ensure states based on passed in settings var
+    pass
+
+def settings_account(settings):
+    go_to_settings("advanced")
+    # search for all elements and ensure states based on passed in settings var
+    pass
+
+def settings_notifications(settings):
+    go_to_settings("notifications")
+    # search for all elements and ensure states based on passed in settings var
+    pass
+
+def settings_security(settings):
+    go_to_settings("security")
+    # search for all elements and ensure states based on passed in settings var
+    pass
+
+def settings_other(settings):
+    go_to_settings("other")
+    # search for all elements and ensure states based on passed in settings var
+    pass
 
 ####################
 ##### Schedule #####
@@ -794,7 +842,7 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
         auth_ = auth()
         if not auth_: return False
         global BROWSER
-        goToHome()
+        go_to_home()
         if not path:
             print("Error: Missing Upload Path")
             return False
@@ -1023,7 +1071,7 @@ def get_users():
 ##### Exit #####
 ################
 
-def exit(force=False):
+def exit():
     if str(settings.SAVE_USERS) == "True":
         print("Saving and Exiting OnlyFans")
         write_users_local()

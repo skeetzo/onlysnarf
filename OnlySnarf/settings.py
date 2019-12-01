@@ -4,7 +4,111 @@ import re
 import sys
 import os
 import json
-import configparser
+
+class Profile:
+
+    # profile settings are either:
+    #   enabled or disabled
+    #   display text, variable type, variable name in settings
+    def __init__(self):
+        # url path or file upload
+        self.coverImage = None
+        # url path or file upload
+        self.profilePhoto = None
+        # text
+        self.displayName = ""
+        # text in $
+        # minimum $4.99 or free
+        self.subscriptionPrice = "4.99"
+        # text
+        self.about = ""
+        # text
+        self.location = ""
+        # text as url
+        self.websiteURL = None
+        # text
+        self.username = ""
+        # text, can't be changed
+        self.email = ""
+        # text
+        self.password = ""
+        # enabled or disabled
+        self.emailNotifs = False
+        # enabled or disabled
+        self.emailNotifsNewReferral = False
+        # enabled or disabled
+        self.emailNotifsNewStream = False
+        # enabled or disabled
+        self.emailNotifsNewSubscriber = False
+        # enabled or disabled
+        self.emailNotifsNewTip = False
+        # enabled or disabled
+        self.emailNotifsRenewal = False
+        # enabled or disabled
+        self.emailNotifsNewLikes = False
+        # enabled or disabled
+        self.emailNotifsNewPosts = False
+        # enabled or disabled
+        self.emailNotifsNewPrivMessages = False
+        # enabled or disabled
+        self.siteNotifs = False
+        # enabled or disabled
+        self.siteNotifsNewComment = False
+        # enabled or disabled
+        self.siteNotifsNewFavorite = False
+        # enabled or disabled
+        self.siteNotifsDiscounts = False
+        # enabled or disabled
+        self.siteNotifsNewSubscriber = False
+        # enabled or disabled
+        self.siteNotifsNewTip = False
+        # enabled or disabled
+        self.toastNotifs = False
+        # enabled or disabled
+        self.toastNotifsNewComment = False
+        # enabled or disabled
+        self.toastNotifsNewFavorite = False
+        # enabled or disabled
+        self.toastNotifsNewSubscriber = False
+        # enabled or disabled
+        self.toastNotifsNewTip = False
+        # enabled or disabled
+        self.fullyPrivate = False
+        # enabled or disabled
+        self.enableComments = False
+        # enabled or disabled
+        self.showFansCount = False
+        # enabled or disabled
+        self.showPostsTip = False
+        # enabled or disabled
+        self.publicFriendsList = False
+        # selection of countries
+        self.ipCountry = self.getCountryList()
+        # text of ip ranges
+        self.ipIP = ""
+        # enabled or disabled
+        self.watermark = True
+        # enabled or disabled
+        self.watermarkPhoto = False
+        # enabled or disabled
+        self.watermarkVideo = False
+        # the custom watermark text
+        self.watermarkText = ""
+        if self.username and str(self.username) != "":
+            self.watermarkText = "OnlyFans.com/{}".format(self.username)
+        # the obs live server
+        self.liveServer = ""
+        # the obs live server key
+        self.liveServerKey = ""
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def __setitem__(self, key, val):
+        return setattr(self, key, val)
+
+    def getCountryList():
+        return ["USA","Canada"]
 
 class Settings:
     def __init__(self):
@@ -17,10 +121,10 @@ class Settings:
         return setattr(self, key, val)
 
     def initialize(self):
-        # print("Initializing Settings")
+        print("Initializing Settings")
         try:
             if self.INITIALIZED:
-                # print("Already Initialized, Skipping")
+                print("Already Initialized, Skipping")
                 return
         except:
             self.INITIALIZED = False
@@ -174,14 +278,19 @@ class Settings:
         # action: message
         # the price to be set in a message
         self.PRICE = 0
+
+        ##
+        # profile settings for the account
+        self.PROFILE = Profile()
+
         ###
         ### PATHS ###
         # -drive-path
         # the folder path within Google Drive for OnlySnarf's root folder
         self.DRIVE_PATH = None
         # -config-path
-        # the path to the config.json file
-        self.CONFIG_PATH = "config.json"
+        # the path to the config.conf file
+        self.CONFIG_PATH = "/etc/onlysnarf/config.conf"
         # -google-path
         # the path to the google_creds.txt
         self.GOOGLE_PATH = "google_creds.txt"
@@ -287,8 +396,8 @@ class Settings:
         # custom repair option for shitty gopro videos
         self.WORKING_VIDEO = "video.mp4"
         # config file
-        if os.path.exists("/etc/onlysnarf/config.conf"):
-            readConf(self, "/etc/onlysnarf/config.conf")
+        if os.path.exists(self.CONFIG_PATH):
+            readConf(self, self.CONFIG_PATH)
         elif os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.conf")):
             readConf(self, os.path.join(os.path.dirname(os.path.realpath(__file__)), "config.conf"))
         i = 0
@@ -405,9 +514,9 @@ class Settings:
     def loginPrompt(self):
         username = input("Twitter Username ({}): ".format(self.USERNAME))
         password = input("Twitter Password: ")
-        if username != "" and username != " ":
+        if str(username) != "" and str(username) != " ":
             self.USERNAME = username
-        if password != "" and password != " ":
+        if str(password) != "" and str(password) != " ":
             self.PASSWORD = password
 
     def maybePrint(self, text):
@@ -419,6 +528,15 @@ class Settings:
         try:
             # print("Updating: {} = {}".format(variable, newValue))
             setattr(self, variable, newValue)
+            # print("Updated: {} = {}".format(variable, getattr(self, variable)))
+        except Exception as e:
+            maybePrint(e)
+
+    def update_profile_value(self, variable, newValue):
+        variable = str(variable).upper().replace(" ","_")
+        try:
+            # print("Updating: {} = {}".format(variable, newValue))
+            self.PROFILE.setattr(self, variable, newValue)
             # print("Updated: {} = {}".format(variable, getattr(self, variable)))
         except Exception as e:
             maybePrint(e)
