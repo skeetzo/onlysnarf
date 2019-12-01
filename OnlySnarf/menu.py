@@ -99,9 +99,15 @@ def initialize():
     # Main Menu
     menuItems = [
         [ "Actions", "action"],
-        [ "Settings", "set_settings"],
-        [ "Exit", "exit"]
+        [ "Profile", "profile"],
+        [ "Settings", "set_settings"]
     ]
+    menuItems = sorted(menuItems)
+    menuItems.insert(0,[ "Exit", "exit"])
+
+    ###
+    ### Actions
+    ###
 
     global actionItems
     # Actions Menu
@@ -181,6 +187,10 @@ def initialize():
     ])
     postItems.insert(0,[ "Back", "main"])
 
+    ###
+    ### Cron
+    ###
+
     global cronItems
     cronItems = sorted([
         [ "Add", "add" ],
@@ -190,71 +200,87 @@ def initialize():
     ])
     cronItems.insert(0,[ "Back", "main"])
 
+    ###
+    ### Settings
+    ###
+
+    global settingsItems
+    settingsItems = sorted([
+        [ "Profile", "profileSettings" ],
+        [ "Account", "accountSettings" ],
+        [ "Notification", "notificationSettings" ],
+        [ "Security", "securitySettings" ],
+        [ "Other", "otherSettings" ],
+        [ "Sync", "sync" ]
+    ])
+    settingsItems.insert(0,[ "Back", "main", "main"])
+
+    # text, path, url, price, get, country, ip, or bool
     global profileSettingsItems
     profileSettingsItems = sorted([
-        [ "Cover Image", "add" ],
-        [ "Profile Photo", "list" ],
-        [ "Display Name", "list" ],
-        [ "Subscription Price", "list" ],
-        [ "About", "list" ],
-        [ "Location", "list" ],
-        [ "Website URL", "list" ]
+        [ "Cover Image", "coverImage", "path" ],
+        [ "Profile Photo", "profilePhoto", "path" ],
+        [ "Display Name", "displayName", "text" ],
+        [ "Subscription Price", "subscriptionPrice", "price" ],
+        [ "About", "about", "text" ],
+        [ "Location", "location", "text" ],
+        [ "Website URL", "websiteURL", "url" ]
     ])
-    profileSettingsItems.insert(0,[ "Back", "main"])
+    profileSettingsItems.insert(0,[ "Back", "main", "main"])
 
     global accountSettingsItems
     accountSettingsItems = sorted([
-        [ "Connect Twitter", "list" ],
-        [ "Username", "list" ],
-        [ "Email", "list" ],
-        [ "Password", "list" ]
+        [ "Username", "username", "text" ],
+        [ "Email", "email", "text" ],
+        [ "Password", "password", "text" ]
     ])
     accountSettingsItems.insert(0,[ "Back", "main"])
 
     global notificationSettingsItems
     notificationSettingsItems = sorted([
-        [ "Email Notifications", "list" ],
-        # New Referral
-        # New Stream
-        # New Subscriber
-        # New Tip
-        # Renewal
-        [ "New Likes Summary", "list" ],
-        [ "New Posts Summary", "list" ],
-        [ "New Private Message Summary", "list" ],
-        [ "Site Notifications", "list" ],
-        # New comment
-        # New favorite (like)
-        # Discounts from users I've used to follow
-        # New Subscriber
-        # New Tip
-        [ "Toast Notifications", "list" ]
-        # New comment
-        # New favorite (like)
-        # New Subscriber
-        # New Tip
+        [ "Email Notifications", "emailNotifs", "bool" ],
+        [ "New Referral", "emailNotifsNewReferral", "bool" ],
+        [ "New Stream", "emailNotifsNewStream", "bool" ],
+        [ "New Subscriber", "emailNotifsNewSubscriber", "bool" ],
+        [ "New Tip", "emailNotifsNewTip", "bool" ],
+        [ "Renewal", "emailNotifsRenewal", "bool" ],
+        [ "New Likes Summary", "emailNotifsNewLikes", "bool" ],
+        [ "New Posts Summary", "emailNotifsNewPosts", "bool" ],
+        [ "New Private Message Summary", "emailNotifsNewPrivMessages", "bool" ],
+        [ "Site Notifications", "siteNotifs", "bool" ],
+        [ "New Comment", "siteNotifsNewComment", "bool" ],
+        [ "New Favorite", "siteNotifsNewFavorite", "bool" ],
+        [ "New Discounts", "siteNotifsDiscounts", "bool" ],
+        [ "New Subscriber", "siteNotifsNewSubscriber", "bool" ],
+        [ "New Tip", "siteNotifsNewTip", "bool" ],
+        [ "Toast Notifications", "toastNotifs", "bool" ],
+        [ "New Comment", "toastNotifsNewComment", "bool" ],
+        [ "New Favorite", "toastNotifsNewFavorite", "bool" ],
+        [ "New Subscriber", "toastNotifsNewSubscriber", "bool" ],
+        [ "New Tip", "toastNotifsNewTip", "bool" ]
     ])
     notificationSettingsItems.insert(0,[ "Back", "main"])
 
     global securitySettingsItems
     securitySettingsItems = sorted([
-        [ "Fully Private Profile", "list" ],
-        [ "Enable Comments", "list" ],
-        [ "Show Fans Count on your Profile", "list" ],
-        [ "Show Posts Tips Summary", "list" ]
-        [ "Public Friends List", "list" ]
-        [ "IP and Geo Blocking - By Country", "list" ]
-        [ "IP and Geo Blocking - By IP", "list" ]
-        [ "Watermark - Photos", "list" ]
-        [ "Watermark - Videos", "list" ]
-        [ "Watermark - Custom Text", "list" ]
+        [ "Fully Private Profile", "fullyPrivate", "bool" ],
+        [ "Enable Comments", "enableComments", "bool" ],
+        [ "Show Fans Count on your Profile", "showFansCount", "bool" ],
+        [ "Show Posts Tips Summary", "showPostsTip", "bool" ],
+        [ "Public Friends List", "publicFriendsList", "bool" ],
+        [ "IP and Geo Blocking - By Country", "ipCountry", "country" ],
+        [ "IP and Geo Blocking - By IP", "ipIP", "ip" ],
+        [ "Watermark - Enabled", "watermark", "bool" ],
+        [ "Watermark - Photos", "watermarkPhoto", "bool" ],
+        [ "Watermark - Videos", "watermarkVideo", "bool" ],
+        [ "Watermark - Custom Text", "watermarkText", "text" ]
     ])
     securitySettingsItems.insert(0,[ "Back", "main"])
 
     global otherSettingsItems
     otherSettingsItems = sorted([
-        [ "Live Server", "list" ],
-        [ "Live Key", "list" ]
+        [ "Live Server", "liveServer", "get" ],
+        [ "Live Key", "liveServerKey", "get" ]
     ])
     otherSettingsItems.insert(0,[ "Back", "main"])
 
@@ -749,9 +775,113 @@ def selectImage(folderName):
     return images
     # performMessage -> [folder , image_file] -> performMessage
 
-###########################
 
-### Settings Menu
+#################################################################################################
+#################################################################################################
+#################################################################################################
+# this pattern needs to be turned into a function
+# it needs to take one of the arrays of settings options and update the ones passed in
+
+### Profile Settings
+# profile settings need to know what is currently configured in your OnlyFans
+# the driver needs to be updated with functionality that scans your settings
+# 
+### Profile Menu
+def set_profile():
+    showHeader()
+    print(colorize("Set:",'menu'))
+    def selectProfileSettings():
+        global settingItems
+        for item in settingsItems:
+            print(colorize("[" + str(settingsItems.index(item)) + "] ", 'teal') + list(item)[0])
+        while True:
+            choice = input(">> ")
+            try:
+                if int(choice) < 0 or int(choice) >= len(settingsItems): raise ValueError
+                if str(choice) == 0: return main()
+                # selection points to the array of the next selection
+                if str(settingsItems[int(choice)][1]) == "sync": return sync_profile()
+                array = globals()[str(settingsItems[int(choice)][1])]
+                print("array: "+str(array))
+                response = selectProfileSetting(settingsItems[int(choice)][0],array)
+                return main()
+            except (ValueError, IndexError):
+                print("Error: Incorrect Index")
+            except Exception as e:
+                settings.maybePrint(e)
+                return main()
+    def selectProfileSetting(label, setting)
+        for item in setting:
+                print(colorize("[" + str(setting.index(item)) + "] ", 'teal') + list(item)[0])
+            while True:
+                choice = input(">> ")
+                try:
+                    if int(choice) < 0 or int(choice) >= len(setting): raise ValueError
+                    if str(choice) == 0: return set_profile()
+                    # text, path, url, price, get, country, ip, or bool
+                    settingChoice = list(setting[int(choice)])[0] # text
+                    settingValue = list(setting[int(choice)])[1] # var name
+                    settingType = list(setting[int(choice)])[2] # var type
+                    if str(settingChoice) == "Sync":
+                        return sync_to_profile_tab(label)
+                    elif str(settingType) == "text":
+                        print("> {}".format(settingValue))
+                        settingValue = input("Enter text: ")
+                    elif str(settingChoice) == "path":
+                        settingValue = input("Enter the file path: ")
+                    elif str(settingChoice) == "url":
+                        settingValue = input("Enter the url: ")
+                    elif str(settingChoice) == "price":
+                        settingValue = input("Enter the new price ($): ")
+                        ###
+                        # price checking here
+                        ###
+                    elif str(settingChoice) == "country":
+                        # enter list of countries as text
+                        # verify against country list
+                        pass
+                    elif str(settingChoice) == "ip":
+                        # enter ip range as text
+                        # verify ip range text
+                        pass
+                    elif str(settingChoice) == "bool":
+                        settingValueText = "Enabled"
+                        if str(settingValue) == "False":
+                            settingValueText = "Disabled"
+                        print("> {}".format(settingValueText))
+                        settingValue = input("Enabled|Disabled: ")
+                    elif str(settingChoice) == "get":
+                        print("> {}".format(settingValue))
+                        return selectProfileSettings()
+                    global UPDATED
+                    UPDATED = settingChoice
+                    global UPDATED_TO
+                    UPDATED_TO = settingValue
+                    setting[int(choice)][1] = settingValue
+                    settings.update_profile_value(settingChoice, settingValue)
+                    return set_profile()
+                except (ValueError, IndexError):
+                    print("Error: Incorrect Index")
+                except Exception as e:
+                    settings.maybePrint(e)
+                    return set_profile()
+    #
+    selectProfileSettings()
+    #
+
+def sync_from_profile():
+    # syncs profile settings w/ onlyfans
+    pass
+
+def sync_to_profile():
+    # syncs profile settings to onlyfans
+    pass
+
+def sync_to_profile_tab(label):
+    # syncs profile settings for the specificed tab to onlyfans
+    pass
+    
+### OnlySnarf Settings Menu
 def set_settings():
     showHeader()
     print(colorize("Set:",'menu'))
@@ -766,29 +896,25 @@ def set_settings():
             settingValue = list(settingItems[int(choice)])[1]
             if str(settingChoice) == "Back":
                 return main()
-            elif str(settingChoice) == "File Name":
-                settingValue = input("Enter the file name: ")
-            elif str(settingChoice) == "File Path":
+            elif str(settingChoice) == "Local":
                 settingValue = input("Enter the file path: ")
             elif str(settingChoice) == "Text":
                 settingValue = input("Enter the upload text: ")
             elif str(settingChoice) == "Mount Path":
                 settingValue = input("Enter the mount path: ")
-            elif str(settingChoice) == "Google: Root Folder Path":
+            elif str(settingChoice) == "Drive Path":
                 settingValue = input("Enter the drive path (folderName/folderName/...): ")
             elif str(settingChoice) == "Image":
                 settingValue = input("Enter the image path: ")
-            elif str(settingChoice) == "Google: Root Folder Name":
+            elif str(settingChoice) == "Google Root":
                 settingValue = input("Enter the Google root folder name: ")
-            elif str(settingChoice) == "Google: Drive Folders":
-                settingValue = input("Enter the Google drive folders (separated by ',', no spaces): ")
-                settingValue = settingValue.split(",")
+            # elif str(settingChoice) == "Google: Drive Folders":
+            #     settingValue = input("Enter the Google drive folders (separated by ',', no spaces): ")
+            #     settingValue = settingValue.split(",")
             elif str(settingChoice) == "Image Limit":
                 settingValue = input("Enter the image upload limit: ")
             elif str(settingChoice) == "Image Max":
                 settingValue = input("Enter the image upload max: ")
-            elif str(settingChoice) == "Local":
-                settingValue = input("Enter the local path: ")
             else:
                 list_ = list(settingItems[int(choice)][2])
                 print(colorize(str(settingChoice)+" =", 'blue'))
