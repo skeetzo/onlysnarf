@@ -1039,9 +1039,10 @@ def get_users():
             startedsFailed = True
         # settings.maybePrint("ids vs starteds vs avatars: "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(avatars)))
         settings.maybePrint("users vs ids vs starteds vs usernames:"+str(len(users))+" - "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(usernames)))
-        usersRange = len(usernames)
-        i = 0
-        while i < usersRange: # the first is you and doesn't count towards total
+        # first 2 usernames are self
+        usernames.pop(0)
+        usernames.pop(0)
+        for i in range(len(users)): # the first is you and doesn't count towards total
             try:
                 if not startedsFailed:
                     start = starteds_[i]
@@ -1058,13 +1059,12 @@ def get_users():
                 # settings.maybePrint("name: "+str(name))
                 # settings.maybePrint("username: "+str(username))
                 # settings.maybePrint("user_id: "+str(user_id))
-                if str(settings.USERNAME).lower() in str(username).lower():
-                    settings.maybePrint("(self): %s = %s" % (settings.USERNAME, username))
-                    # first user is always active user but just in case find it in list of users
-                    settings.USER_ID = username
-                else:
-                    users_.append({"name":name, "username":username, "id":user_id, "started":start})
-                i += 1
+                # if str(settings.USERNAME).lower() in str(username).lower():
+                #     settings.maybePrint("(self): %s = %s" % (settings.USERNAME, username))
+                #     # first user is always active user but just in case find it in list of users
+                #     settings.USER_ID = username
+                # else:
+                users_.append({"name":name, "username":username, "id":user_id, "started":start})
             except Exception as e:
                 settings.maybePrint(e)
     except Exception as e:
