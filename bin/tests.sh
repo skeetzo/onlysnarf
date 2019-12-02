@@ -2,7 +2,7 @@
 sudo python3 setup.py install
 echo "-----------------------------------------------------"
 echo "Testing OnlySnarf"
-
+mkdir ../onlysnarf/logs
 # echo "## MESSAGE - RECENT ##"
 
 # /usr/local/bin/onlysnarfpy \
