@@ -66,6 +66,7 @@ ONLYFANS_PRICE_INPUT = ".form-control.b-chat__panel__input"
 ONLYFANS_PRICE_CLICK = ".g-btn.m-rounded"
 ONLYFANS_CHAT_URL = "https://onlyfans.com/my/chats/chat"
 ONLYFANS_UPLOAD_BUTTON = "g-btn.m-rounded.m-border"
+ONLYFANS_MESSAGE_SEND_BUTTON = "g-btn.m-rounded.b-chat__btn-submit"
 ONLYFANS_MESSAGES_FROM = "m-from-me"
 ONLYFANS_MESSAGES_ALL = "b-chat__message__text"
 ONLYFANS_MESSAGES = "b-chat__message__text"
@@ -100,7 +101,8 @@ def auth():
 def error_checker(e):
     if "Unable to locate element" in str(e):
         print("Warning: OnlySnarf requires an update")
-    if "Message:" not in str(e):
+    print(e)
+    if "Message: " not in str(e):
         settings.maybePrint(e)
 
 def go_to_home():
@@ -354,12 +356,19 @@ def expiration(period):
 def message_confirm():
     try:
         global BROWSER
+        message = BROWSER.find_elements_by_class_name(MESSAGE_CONFIRM)  
+        print(len(message))
+        for m in message:
+            print(m.get_attribute("innerHTML"))
+        print("waiting")
         send = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
         if str(settings.DEBUG) == "True":
             if str(settings.DEBUG_DELAY) == "True":
                 time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
             print('OnlyFans Message: Skipped (debug)')
             return True
+        
+        
         send.click()
         print('OnlyFans Message: Sent')
         return True
@@ -410,22 +419,22 @@ def message_image(image):
         for file in files:  
             print('Uploading: '+str(file))
             BROWSER.find_element_by_id(ONLYFANS_UPLOAD_MESSAGE_PHOTO).send_keys(str(file))
+            time.sleep(1)
         try:
-            buttons = BROWSER.find_elements_by_class_name(ONLYFANS_UPLOAD_BUTTON)
-            if len(buttons) > 0: settings.maybePrint("Warning: Upload Error Message, Closing")
-            for butt in buttons:
-                if butt.get_attribute("innerHTML").strip() == "Close":
+            error_buttons = BROWSER.find_elements_by_class_name(ONLYFANS_UPLOAD_BUTTON)
+            for butt in error_buttons:
+                if butt.get_attribute("innerHTML").strip() == "Close" and butt.is_enabled():
+                    settings.maybePrint("Warning: Upload Error Message, Closing")
                     butt.click()
                     settings.maybePrint("Success: Upload Error Message Closed")
-                    time.sleep(1)
+            settings.maybePrint("Image(s) Entered")
+            if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+                time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+            return True
         except Exception as e:
             error_checker(e)
             print("Error: Unable to Upload Images")
             return False
-        settings.maybePrint("Image(s) Entered")
-        if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
-            time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
-        return True
     except Exception as e:
         error_checker(e)
         print("Error: Failure to Enter Image(s)")

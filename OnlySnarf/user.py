@@ -54,13 +54,6 @@ class User:
             success = OnlySnarf.message_text(message)
             if not success:
                 return False
-            if image:
-                image_name = os.path.basename(image)
-                if str(image_name) in self.sent_images:
-                    print("Error: Image Already Sent: {} -> {}".format(image, self.id))
-                    return False
-                success = OnlySnarf.message_image(image)
-                if not success: return False
             if price:
                 global PRICE_MINIMUM
                 if image != None and Decimal(sub(r'[^\d.]', '', price)) < PRICE_MINIMUM:
@@ -69,6 +62,13 @@ class User:
                 else:
                     success = OnlySnarf.message_price(price)
                     if not success: return False
+            if image:
+                image_name = os.path.basename(image)
+                if str(image_name) in self.sent_images:
+                    print("Error: Image Already Sent: {} -> {}".format(image, self.id))
+                    return False
+                success = OnlySnarf.message_image(image)
+                if not success: return False
             if str(settings.DEBUG) == "True":
                 self.sent_images.append("DEBUG")
             else:
