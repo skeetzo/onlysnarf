@@ -102,9 +102,16 @@ def message(choice, message=None, image=None, price=None, username=None):
     else:
         print("Error: Missing Message Choice")
         return
-    if image == None and str(settings.METHOD) == "random": 
+    if image == None and str(settings.METHOD) == "random":
         images = Google.get_images()
+        # if str(settings.TYPE) == "image" or str(settings.TYPE) == "None": 
         image = random.choice(images)
+        if str(settings.TYPE) == "gallery":
+            folders = []
+            for image in images:
+                if image[1]['mimeType'] == "application/vnd.google-apps.folder":
+                    folders.append(image)
+            image = random.choice(folders)
         # download_file doesn't work with a folder[]
         if image[1]['mimeType'] == "application/vnd.google-apps.folder":
             image = Google.download_gallery(image[1]).get("path")
