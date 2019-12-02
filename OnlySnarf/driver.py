@@ -1005,7 +1005,9 @@ def get_users():
     # users = BROWSER.find_elements_by_class_name('g-user-name')
     users = BROWSER.find_elements_by_class_name(ONLYFANS_USERS)
     usernames = BROWSER.find_elements_by_class_name(ONLYFANS_USERSNAMES)
-    usernames.pop(0)
+    # usernames.pop(0)
+    # print("My User Id: {}".format(user_ids[0]))
+    # user_ids.pop(0)
     active_users = []
     # settings.maybePrint("user_ids: "+str(len(user_ids)))
     # settings.maybePrint("starteds: "+str(len(starteds)))
@@ -1036,15 +1038,17 @@ def get_users():
             print("Warning: Unable to find starting dates")
             startedsFailed = True
         # settings.maybePrint("ids vs starteds vs avatars: "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(avatars)))
-        settings.maybePrint("ids vs starteds vs usernames:"+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(usernames)))
-        for i in range(len(users)): # the first is you and doesn't count towards total
+        settings.maybePrint("users vs ids vs starteds vs usernames:"+str(len(users))+" - "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(usernames)))
+        usersRange = len(usernames)
+        i = 0
+        while i < usersRange: # the first is you and doesn't count towards total
             try:
                 if not startedsFailed:
                     start = starteds_[i]
                 else:
                     start = datetime.now().strftime("%b %d, %Y")
                 if not useridsFailed:
-                    user_id = user_ids_[i][35:]
+                    user_id = user_ids_[i][35:] # cuts out initial chars instead of unwieldy regex
                 else:
                     user_id = None
                 name = users[i]
@@ -1058,8 +1062,9 @@ def get_users():
                     settings.maybePrint("(self): %s = %s" % (settings.USERNAME, username))
                     # first user is always active user but just in case find it in list of users
                     settings.USER_ID = username
-                    continue
-                users_.append({"name":name, "username":username, "id":user_id, "started":start})
+                else:
+                    users_.append({"name":name, "username":username, "id":user_id, "started":start})
+                i += 1
             except Exception as e:
                 settings.maybePrint(e)
     except Exception as e:
