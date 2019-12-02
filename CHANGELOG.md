@@ -246,7 +246,8 @@
   **2.15.0**
   - added: Settings options
   - updated: config.py, unable to test
-
+  - fixed: user scrapes
+  
 ----------------------------------------
 
 ## ToDo
