@@ -64,7 +64,7 @@ ONLYFANS_POST_TEXT_CLASS = "new_post_text_input"
 ONLYFANS_PRICE = ".b-chat__btn-set-price"
 ONLYFANS_PRICE_INPUT = ".form-control.b-chat__panel__input"
 ONLYFANS_PRICE_CLICK = ".g-btn.m-rounded"
-ONLYFANS_CHAT_URL = "https://onlyfans.com/my/chats/chat/"
+ONLYFANS_CHAT_URL = "https://onlyfans.com/my/chats/chat"
 ONLYFANS_UPLOAD_BUTTON = "g-btn.m-rounded.m-border"
 ONLYFANS_MESSAGES_FROM = "m-from-me"
 ONLYFANS_MESSAGES_ALL = "b-chat__message__text"
@@ -479,7 +479,7 @@ def message_user(user):
                     return False
         settings.maybePrint("goto -> /my/chats/chat/%s" % userid)
         global BROWSER
-        BROWSER.get(str(ONLYFANS_CHAT_URL)+str(userid))
+        BROWSER.get("{}/{}".format(ONLYFANS_CHAT_URL,userid))
         return True
     except Exception as e:
         error_checker(e)
