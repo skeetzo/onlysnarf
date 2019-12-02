@@ -2,19 +2,7 @@
 sudo python3 setup.py install
 echo "-----------------------------------------------------"
 echo "Testing OnlySnarf"
-
-# echo "## MESSAGE - RECENT ##"
-
-# /usr/local/bin/onlysnarfpy \
-# -debug \
-# -verbose \
-# -action "message" \
-# -method "recent" \
-# -text "suck my balls" \
-# -price "10.00" \
-# -show-window
-
-# sleep 2
+mkdir ../onlysnarf/logs
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "################## Start #########################" >> ../onlysnarf/logs/tests.txt 2>&1

@@ -103,7 +103,7 @@ def initialize():
         [ "Settings", "set_settings"]
     ]
     menuItems = sorted(menuItems)
-    menuItems.insert(0,[ "Exit", "exit"])
+    menuItems.append([ "Exit", "exit"])
 
     ###
     ### Actions
@@ -526,7 +526,7 @@ def message(choice, image=None, username=None):
         print("Error: Missing Image")
         return        
     OnlySnarf.remove_local()
-    try: 
+    try:
         image = Google.download_file(image[0]).get("path")
     except Exception as e:
         OnlySnarf.remove_local()
@@ -810,9 +810,9 @@ def set_profile():
             except Exception as e:
                 settings.maybePrint(e)
                 return main()
-    def selectProfileSetting(label, setting)
+    def selectProfileSetting(label, setting):
         for item in setting:
-                print(colorize("[" + str(setting.index(item)) + "] ", 'teal') + list(item)[0])
+            print(colorize("[" + str(setting.index(item)) + "] ", 'teal') + list(item)[0])
             while True:
                 choice = input(">> ")
                 try:
