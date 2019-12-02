@@ -281,11 +281,12 @@ def write_users_local(users=None):
     if users is None:
         users = User.get_all_users()
     print("Saving Users Locally")
-    settings.maybePrint("local data path: "+str(settings.USERS_PATH))
+    settings.maybePrint("local users path: "+str(settings.USERS_PATH))
     data = {}
     data['users'] = []
     for user in users:
-        settings.maybePrint("Saving: "+str(user.username))
+        if str(settings.DEBUG) == "True":
+            settings.maybePrint("Saving: "+str(user.username))
         data['users'].append(user.toJSON())
     try:
         with open(settings.USERS_PATH, 'w') as outfile:  

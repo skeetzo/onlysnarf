@@ -490,12 +490,16 @@ def get_users():
 ##### Dev #####
 ###############
 
-def test(TYPE, methodChoice="random", file=None, folderName=None, parent=None):
+def test():
     print('0/3 : Deleting Locals')
     remove_local()
     print('1/3 : Testing')
 
-    # ### Promotion ###
+
+    print('TESTING: Users')
+    response = get_users()
+    return
+
     print('TESTING: Cron')
     response = Cron.test()
     if not response or response == None:
@@ -509,6 +513,8 @@ def test(TYPE, methodChoice="random", file=None, folderName=None, parent=None):
 
 def main():
     try:
+        if str(settings.ACTION) == "test":
+            return test()
         # os.system('clear')
         success = False
         if str(settings.ACTION) == "upload":
