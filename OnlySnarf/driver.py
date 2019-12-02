@@ -1005,7 +1005,9 @@ def get_users():
     # users = BROWSER.find_elements_by_class_name('g-user-name')
     users = BROWSER.find_elements_by_class_name(ONLYFANS_USERS)
     usernames = BROWSER.find_elements_by_class_name(ONLYFANS_USERSNAMES)
-    usernames.pop(0)
+    # usernames.pop(0)
+    # print("My User Id: {}".format(user_ids[0]))
+    # user_ids.pop(0)
     active_users = []
     # settings.maybePrint("user_ids: "+str(len(user_ids)))
     # settings.maybePrint("starteds: "+str(len(starteds)))
@@ -1036,7 +1038,10 @@ def get_users():
             print("Warning: Unable to find starting dates")
             startedsFailed = True
         # settings.maybePrint("ids vs starteds vs avatars: "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(avatars)))
-        settings.maybePrint("ids vs starteds vs usernames:"+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(usernames)))
+        settings.maybePrint("users vs ids vs starteds vs usernames:"+str(len(users))+" - "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(usernames)))
+        # first 2 usernames are self
+        usernames.pop(0)
+        usernames.pop(0)
         for i in range(len(users)): # the first is you and doesn't count towards total
             try:
                 if not startedsFailed:
@@ -1044,7 +1049,7 @@ def get_users():
                 else:
                     start = datetime.now().strftime("%b %d, %Y")
                 if not useridsFailed:
-                    user_id = user_ids_[i][35:]
+                    user_id = user_ids_[i][35:] # cuts out initial chars instead of unwieldy regex
                 else:
                     user_id = None
                 name = users[i]
@@ -1054,11 +1059,11 @@ def get_users():
                 # settings.maybePrint("name: "+str(name))
                 # settings.maybePrint("username: "+str(username))
                 # settings.maybePrint("user_id: "+str(user_id))
-                if str(settings.USERNAME).lower() in str(username).lower():
-                    settings.maybePrint("(self): %s = %s" % (settings.USERNAME, username))
-                    # first user is always active user but just in case find it in list of users
-                    settings.USER_ID = username
-                    continue
+                # if str(settings.USERNAME).lower() in str(username).lower():
+                #     settings.maybePrint("(self): %s = %s" % (settings.USERNAME, username))
+                #     # first user is always active user but just in case find it in list of users
+                #     settings.USER_ID = username
+                # else:
                 users_.append({"name":name, "username":username, "id":user_id, "started":start})
             except Exception as e:
                 settings.maybePrint(e)

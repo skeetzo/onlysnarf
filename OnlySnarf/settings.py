@@ -83,7 +83,7 @@ class Profile:
         # enabled or disabled
         self.publicFriendsList = False
         # selection of countries
-        self.ipCountry = self.getCountryList()
+        self.ipCountry = getCountryList()
         # text of ip ranges
         self.ipIP = ""
         # enabled or disabled
@@ -106,9 +106,6 @@ class Profile:
 
     def __setitem__(self, key, val):
         return setattr(self, key, val)
-
-    def getCountryList():
-        return ["USA","Canada"]
 
 class Settings:
     def __init__(self):
@@ -542,6 +539,9 @@ class Settings:
             maybePrint(e)
 
 SETTINGS = Settings()
+
+def getCountryList():
+    return ["USA","Canada"]
 
 def readConf(self, conf):
     posts = False
