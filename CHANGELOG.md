@@ -241,12 +241,13 @@
   - added: remember me upon login is checked, does nothing
   **2.14.2**
   - added: error_checker for not found elements
+  **2.14.3**
+  - fixed: user scrapes
+  - updated: config.py, unable to test
   
 ----------------
   **2.15.0**
   - added: Settings options
-  - updated: config.py, unable to test
-  - fixed: user scrapes
   
 ----------------------------------------
 

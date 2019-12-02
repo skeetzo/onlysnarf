@@ -99,9 +99,10 @@ def initialize():
     # Main Menu
     menuItems = [
         [ "Actions", "action"],
-        [ "Profile", "profile"],
         [ "Settings", "set_settings"]
     ]
+    if str(settings.DEBUG) == "True":
+        menuItems.append(["Profile", "profile"])
     menuItems = sorted(menuItems)
     menuItems.append([ "Exit", "exit"])
 
