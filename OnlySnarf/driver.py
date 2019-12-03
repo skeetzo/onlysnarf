@@ -101,7 +101,6 @@ def auth():
 def error_checker(e):
     if "Unable to locate element" in str(e):
         print("Warning: OnlySnarf requires an update")
-    print(e)
     if "Message: " not in str(e):
         settings.maybePrint(e)
 
@@ -356,20 +355,31 @@ def expiration(period):
 def message_confirm():
     try:
         global BROWSER
-        message = BROWSER.find_elements_by_class_name(MESSAGE_CONFIRM)  
-        print(len(message))
-        for m in message:
-            print(m.get_attribute("innerHTML"))
-        print("waiting")
-        send = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
+        WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
+        i = 0
+        while True:
+            try:                
+                WAIT.until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
+                break
+            except Exception as e:
+                print('uploading...')
+                error_checker(e)
+                i += 1
+                if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
+                    print('Error: Max Upload Time Reached')
+                    return False
+
+        confirm = BROWSER.find_element_by_class_name(MESSAGE_CONFIRM)  
+        # send = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
         if str(settings.DEBUG) == "True":
             if str(settings.DEBUG_DELAY) == "True":
                 time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
             print('OnlyFans Message: Skipped (debug)')
             return True
         
+        confirm.click()
         
-        send.click()
+        # send.click()
         print('OnlyFans Message: Sent')
         return True
     except Exception as e:
@@ -897,7 +907,6 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
         for file in files:  
             print('Uploading: '+str(file))
             BROWSER.find_element_by_id(ONLYFANS_UPLOAD_PHOTO).send_keys(str(file))
-        maxUploadCount = 12 # 2 hours max attempt time
         i = 0
         while True:
             try:                
@@ -916,7 +925,7 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
                 print('uploading...')
                 error_checker(e)
                 i+=1
-                if i == maxUploadCount and settings.FORCE_UPLOAD is not True:
+                if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
                     print('Error: Max Upload Time Reached')
                     return False
         
