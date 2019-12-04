@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # sudo cp ../onlysnarf/OnlySnarf/config.conf /etc/onlysnarf
-sudo python3 setup.py install
-
+sudo python3 ../onlysnarf/setup.py install
+wait
 echo "-----------------------------------------------------"
 echo "Testing OnlySnarf"
 # mkdir ../onlysnarf/logs
@@ -18,8 +18,6 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 # Message
 sudo onlysnarfpy \
--debug \
--verbose \
 -action "message" \
 -method "user" \
 -user "10041738" \

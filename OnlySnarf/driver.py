@@ -355,11 +355,12 @@ def expiration(period):
 def message_confirm():
     try:
         global BROWSER
-        WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
+        WAIT = WebDriverWait(BROWSER, 120, poll_frequency=30)
         i = 0
         while True:
             try:                
                 WAIT.until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
+                print("waited")
                 break
             except Exception as e:
                 print('uploading...')
@@ -368,18 +369,14 @@ def message_confirm():
                 if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
                     print('Error: Max Upload Time Reached')
                     return False
-
         confirm = BROWSER.find_element_by_class_name(MESSAGE_CONFIRM)  
-        # send = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
+        # confirm = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
         if str(settings.DEBUG) == "True":
             if str(settings.DEBUG_DELAY) == "True":
                 time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
             print('OnlyFans Message: Skipped (debug)')
             return True
-        
         confirm.click()
-        
-        # send.click()
         print('OnlyFans Message: Sent')
         return True
     except Exception as e:
