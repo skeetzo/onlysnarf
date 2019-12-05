@@ -104,6 +104,19 @@ def error_checker(e):
     if "Message: " not in str(e):
         settings.maybePrint(e)
 
+# should already be logged in
+def find_element(element):
+    global BROWSER
+    if BROWSER == None: return False
+    try:
+        element = BROWSER.find_element_by_class_name(element)
+        if not element: print("Warning Message About Element Not Found")
+        return element
+    except Exception as e:
+        settings.maybePrint(e)
+        print("Error: Element not found")
+        return None
+
 def go_to_home():
     global BROWSER
     if BROWSER == None: return False
@@ -742,36 +755,63 @@ def go_to_settings(settingsTab):
         # WebDriverWait(BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.XPATH, SEND_BUTTON_XPATH)))
         # fix above with correct element to locate
 
-    # profile -> /
-    # account -> /advanced
-    # notifications -> /notifications
-    # security -> /security
-    # other -> /other
+def settings_get(key):
+     # find the var from the list of var names in settingsVariables
+    var = None
+    settingsVariables = settings.get_settings_variables()
+    for key in settingsVariables:
+        if str(var) == str(key[0]):
+            var = key
+    if not var or var == None:
+        print("Error: Unable to Find Variable")
+        return False
+    #
+    key_ = var[0]
+    page_ = var[1]
+    class_ = var[2]
+    type_ = var[3]
+    go_to_settings(page_)
+    find_element(class_)
+    if str(type_) == "text":
+        # get attr text
+        pass
+    elif str(type_) == "toggle":
+        # get state true|false
+        pass
+    # other stuff
+    settings_save()
 
-def settings_profile(settings):
-    go_to_settings("profile")
-    # search for all elements and ensure states based on passed in settings var
+def settings_set(key, value):
+    # find the var from the list of var names in settingsVariables
+    var = None
+    settingsVariables = settings.get_settings_variables()
+    for key in settingsVariables:
+        if str(var) == str(key[0]):
+            var = key
+    if not var or var == None:
+        print("Error: Unable to Find Variable")
+        return False
+    #
+    key_ = var[0]
+    page_ = var[1]
+    class_ = var[2]
+    type_ = var[3]
+    go_to_settings(page_)
+    find_element(class_)
+    # text, path, state, list (text), price 
+    if str(type_) == "text":
+        # set attr text
+        pass
+    elif str(type_) == "toggle":
+        # set state == value
+        pass
+    # other stuff
+    settings_save()
+
+# saves the settings page
+def settings_save():
     pass
 
-def settings_account(settings):
-    go_to_settings("advanced")
-    # search for all elements and ensure states based on passed in settings var
-    pass
-
-def settings_notifications(settings):
-    go_to_settings("notifications")
-    # search for all elements and ensure states based on passed in settings var
-    pass
-
-def settings_security(settings):
-    go_to_settings("security")
-    # search for all elements and ensure states based on passed in settings var
-    pass
-
-def settings_other(settings):
-    go_to_settings("other")
-    # search for all elements and ensure states based on passed in settings var
-    pass
 
 ####################
 ##### Schedule #####

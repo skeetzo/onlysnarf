@@ -581,3 +581,108 @@ class AttrDict(dict):
 
     def __getattr__(self, name):
         return self[name]
+
+# returns list of settings and their classes
+def get_settings_variables():
+    # ["settingVariableName","pageProfile",".setting.html.class","inputType-text"]
+    return [
+         ### Profile ###
+        ["coverImage","profile","b-user-panel__cover__img","inputType"],
+        ["profilePhoto","profile","g-btn.m-rounded.m-sm.m-border","inputType"],
+        # display name needs to match: placeholder="Display name"
+        ["displayName","profile","form-control.g-input","inputType"],
+        # subscription price needs to match: name="subscribePrice" 
+        ["subscriptionPrice","form-control.g-input","classname","inputType"],
+        # about placeholder is: placeholder="About"
+        # id="input-about"
+        ["about","profile","form-control.g-input.unlimsize","inputType"],
+        # id="input-location"
+        ["location","profile","form-control.g-input","inputType"],
+        # id="input-website"
+        ["websiteURL","profile","form-control.g-input","inputType"],
+        #### Account ###
+        # id="input-login"
+        ["username","account","form-control.g-input","inputType"],
+        # id="input-email"
+        ["email","account","form-control.g-input","inputType"],
+        # id="old_password_input"
+        ["password","account","form-control.g-input","inputType"],
+        # id="new_password_input"
+        ["newPassword","account","form-control.g-input","inputType"],
+        # id="new_password2_input"
+        ["confirmPassword","account","form-control.g-input","inputType"],
+        ### Notifications ###
+        # id="push-notifications"
+        ["emailNotifs","notifications","checkbox","inputType"],
+        # id="email-notifications"
+        ["emailNotifsNewReferral","notifications","checkbox","inputType"],
+
+        ["emailNotifsNewStream","notifications","b-input-radio","inputType"],
+
+        ["emailNotifsNewSubscriber","notifications","b-input-radio","inputType"],
+
+        ["emailNotifsNewTip","notifications","b-input-radio","inputType"],
+
+        ["emailNotifsRenewal","notifications","b-input-radio","inputType"],
+
+
+
+    # this is a dropdown
+        ["emailNotifsNewLikes","notifications","checkbox","inputType"],
+
+
+        # get inner text of all these
+
+        ["emailNotifsNewPosts","notifications","checkbox","inputType"],
+
+        ["emailNotifsNewPrivMessages","notifications","checkbox","inputType"],
+
+        ["siteNotifs","notifications","checkbox","inputType"],
+
+        ["siteNotifsNewComment","notifications","b-input-radio","inputType"],
+
+        ["siteNotifsNewFavorite","notifications","b-input-radio","inputType"],
+
+        ["siteNotifsDiscounts","notifications","b-input-radio","inputType"],
+
+        ["siteNotifsNewSubscriber","notifications","b-input-radio","inputType"],
+
+        ["siteNotifsNewTip","notifications","b-input-radio","inputType"],
+
+        ["toastNotifsNewComment","notifications","b-input-radio","inputType"],
+
+        ["toastNotifsNewFavorite","notifications","b-input-radio","inputType"],
+
+        ["toastNotifsNewSubscriber","notifications","b-input-radio","inputType"],
+
+        ["toastNotifsNewTip","notifications","b-input-radio","inputType"],
+
+        ### Security ###
+
+        ["fullyPrivate","security","checkbox","inputType"],
+
+        ["enableComments","security","classname","inputType"],
+
+        ["showFansCount","security","classname","inputType"],
+
+        ["showPostsTip","security","classname","inputType"],
+
+        ["publicFriendsList","security","classname","inputType"],
+
+        ["ipCountry","security","multiselect__input","inputType"],
+        # id="input-blocked-ips"
+        ["ipIP","security","form-control.g-input.unlimsize","inputType"],
+        # id="hasWatermarkPhoto"
+        ["watermarkPhoto","security","classname","inputType"],
+        # id="hasWatermarkVideo"
+        ["watermarkVideo","security","classname","inputType"],
+        # placeholder="Watermark custom text"
+        ["watermarkText","security","form-control.g-input","inputType"],
+
+        ### Other ###
+        ["liveServer","other","form-control.g-input","inputType"],
+
+        ["liveServerKey","other","form-control.g-input","inputType"]
+
+    ]
+
