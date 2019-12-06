@@ -32,8 +32,9 @@ BROWSER = None
 ONLYFANS_HOME_URL = 'https://onlyfans.com/'
 ONLYFANS_SETTINGS_URL = "https://onlyfans.com/my/settings"
 ONLYFANS_USERS_ACTIVE_URL = "https://onlyfans.com/my/subscribers/active"
-SEND_BUTTON_XPATH = "//button[@type='submit' and @class='g-btn m-rounded send_post_button']"
-SEND_BUTTON_CLASS = "g-btn.m-rounded.send_post_button"
+SEND_BUTTON_XPATH = "//button[@type='submit' and @class='g-btn.m-rounded']"
+SEND_BUTTON_CLASS = "g-btn m-rounded"
+LIVE_BUTTON_CLASS = "b-make-post__streaming-link"
 TWITTER_LOGIN0 = "//a[@class='g-btn m-rounded m-flex m-lg']"
 TWITTER_LOGIN1 = "//a[@class='g-btn m-rounded m-flex m-lg btn-twitter']"
 TWITTER_LOGIN2 = "//a[@class='btn btn-default btn-block btn-lg btn-twitter']"
@@ -100,7 +101,7 @@ def auth():
 
 def error_checker(e):
     if "Unable to locate element" in str(e):
-        print("Warning: OnlySnarf requires an update")
+        print("Warning: OnlySnarf may require an update")
     if "Message: " not in str(e):
         settings.maybePrint(e)
 
@@ -125,7 +126,7 @@ def go_to_home():
     else:
         settings.maybePrint("goto -> onlyfans.com")
         BROWSER.get(ONLYFANS_HOME_URL)
-        WebDriverWait(BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.XPATH, SEND_BUTTON_XPATH)))
+        WebDriverWait(BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, LIVE_BUTTON_CLASS)))
 
 # Login to OnlyFans
 def log_into_OnlyFans():
@@ -195,7 +196,7 @@ def log_into_OnlyFans():
         password = BROWSER.find_element_by_xpath(PASSWORD_XPATH)
         password.send_keys(password_)
         password.send_keys(Keys.ENTER)
-        WebDriverWait(BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.XPATH, SEND_BUTTON_XPATH)))
+        WebDriverWait(BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, LIVE_BUTTON_CLASS)))
         print('Login Successful')
         return True
     except Exception as e:
@@ -945,11 +946,21 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
             print('Uploading: '+str(file))
             BROWSER.find_element_by_id(ONLYFANS_UPLOAD_PHOTO).send_keys(str(file))
         i = 0
-        while True:
+        notFound = True
+        while notFound:
             try:                
+                print(SEND_BUTTON_CLASS)
+                print(SEND_BUTTON_XPATH)
+                sends = BROWSER.find_elements_by_class_name(".g-btn.m-rounded")
+                print(len(sends))
+                sends2 = BROWSER.find_elements_by_xpath(SEND_BUTTON_XPATH)
+                print(len(sends2))
+                print("waiting for stuff")
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, SEND_BUTTON_XPATH)))
-                break
+                print("fucking hell")
+                # notFound = False
             except Exception as e:
+                print(e)
                 # try: 
                 #     # check for existence of "thumbnail is fucked up" modal and hit ok button
                 #     # haven't seen in long enough time to properly add
@@ -972,6 +983,7 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
             sendText.send_keys(str(text))
             # first send btn is disabled
             sends = BROWSER.find_elements_by_class_name(SEND_BUTTON_CLASS)
+            print(len(sends))
             send = None
             for i in range(len(sends)):
                 print(sends[i].get_attribute("innerHTML"))
