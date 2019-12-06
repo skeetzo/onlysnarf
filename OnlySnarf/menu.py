@@ -70,7 +70,7 @@ def initialize():
         [ "Delete Google", settings.DELETE_GOOGLE, ["True","False"],False],
         [ "Skip Delete", settings.SKIP_DELETE, ["True","False"],False],
         [ "Tweeting", settings.TWEETING, ["True","False"],True],
-        [ "Image Limit", settings.IMAGE_UPLOAD_LIMIT,None,True],
+        [ "Image Limit", settings.IMAGE_DOWNLOAD_LIMIT,None,True],
     ]
     if str(settings.VERBOSE) == "True":
         settingItems.append([ "Skip Backup", settings.SKIP_BACKUP, ["True","False"],False])
@@ -86,7 +86,7 @@ def initialize():
         settingItems.append([ "Force Backup", settings.FORCE_BACKUP, ["True","False"],False])
         settingItems.append([ "Force Upload", settings.FORCE_UPLOAD, ["True","False"],False])
         settingItems.append([ "Skip Download", settings.SKIP_DOWNLOAD, ["True","False"],False])
-        settingItems.append([ "Image Max", settings.IMAGE_UPLOAD_MAX,None,False])
+        settingItems.append([ "Image Max", settings.IMAGE_UPLOAD_LIMIT,None,False])
         settingItems.append([ "Text", settings.TEXT,None,False])
         settingItems.append([ "Local", settings.INPUT,None,False])
         settingItems.append([ "Image", settings.IMAGE,None,False])
@@ -1007,7 +1007,7 @@ def showSettings():
     print('Settings:')
     for setting in settingItems:
         if str(setting[0]) == "Image Limit" and setting[3]:
-            print(" - {} = {}/{}".format(setting[0],setting[1],settings.IMAGE_UPLOAD_MAX))
+            print(" - {} = {}/{}".format(setting[0],setting[1],settings.IMAGE_UPLOAD_LIMIT))
         elif str(setting[0]) != "Back" and str(settings.DEBUG) == "True":
             print(" - {} = {}".format(setting[0],setting[1]))
         elif str(setting[0]) != "Back" and setting[3]:

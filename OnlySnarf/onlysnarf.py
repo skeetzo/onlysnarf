@@ -530,7 +530,8 @@ def main():
             success = post(text=settings.TEXT, override=True)
         elif str(settings.ACTION) == "message":
             METHOD_ = settings.METHOD
-            settings.METHOD = "random"
+            settings.update_value("METHOD","random")
+            # settings.METHOD = "random"
             success = message(METHOD_, message=settings.TEXT, image=settings.IMAGE, price=settings.PRICE, username=settings.USER)
         elif str(settings.ACTION) == "discount":
             if str(settings.USER) == "" or str(settings.USER) == "None": settings.USER = "all"
