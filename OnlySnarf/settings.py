@@ -225,16 +225,17 @@ class Settings:
         # path to local image to use for message or upload
         self.IMAGE = None
         ##
-        # -image-limit
-        # maximum number of images to upload
-        self.IMAGE_UPLOAD_LIMIT = 6
+        # -image-download-limit
+        # maximum number of images to download
+        self.IMAGE_DOWNLOAD_LIMIT = 6
         ##
-        # -image-max
+        # -image-upload-limit
         # maximum number of images that can be uploaded
-        self.IMAGE_UPLOAD_MAX = 20
+        self.IMAGE_UPLOAD_LIMIT = 20
         ##
+        # - image-upload-limit-messages
         # maximum number of images that can be uploaded in a message
-        self.IMAGE_UPLOAD_MAX_MESSAGES = 5
+        self.IMAGE_UPLOAD_LIMIT_MESSAGES = 5
         ##
         # -keywords
         # keywords to # in post
@@ -406,22 +407,22 @@ class Settings:
             sys.argv[i] = sys.argv[i][1:] # remove - in front
             truths_ = ["SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
             falses_ = []
-            nexts_ = ["UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_UPLOAD_LIMIT","IMAGE_UPLOAD_MAX","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
+            nexts_ = ["IMAGE_UPLOAD_LIMIT_MESSAGES","UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_DOWNLOAD_LIMIT","IMAGE_UPLOAD_LIMIT","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0
             while j < len(truths_):
-                if str(truths_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
+                if str(truths_[j]).upper() == str(sys.argv[i]).upper().replace("-","_"):
                     # self.set(truths_[j], True)
                     self[truths_[j]] = True
                 j = j + 1
             j = 0
             while j < len(falses_):
-                if str(falses_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
+                if str(falses_[j]).upper() == str(sys.argv[i]).upper().replace("-","_"):
                     # self.set(falses_[j], False)
                     self[falses_[j]] = False
                 j = j + 1
             j = 0
             while j < len(nexts_):
-                if str(nexts_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
+                if str(nexts_[j]).upper() == str(sys.argv[i]).upper().replace("-","_"):
                     # self.set(nexts_[j], sys.argv[i+1])  
                     try:
                         self[nexts_[j]] = sys.argv[i+1]

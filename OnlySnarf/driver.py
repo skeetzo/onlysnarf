@@ -32,8 +32,8 @@ BROWSER = None
 ONLYFANS_HOME_URL = 'https://onlyfans.com/'
 ONLYFANS_SETTINGS_URL = "https://onlyfans.com/my/settings"
 ONLYFANS_USERS_ACTIVE_URL = "https://onlyfans.com/my/subscribers/active"
-SEND_BUTTON_XPATH = "//button[@type='submit' and @class='g-btn.m-rounded']"
-SEND_BUTTON_CLASS = "g-btn m-rounded"
+SEND_BUTTON_XPATH = "//button[@type='submit' and @class='g-btn m-rounded']"
+SEND_BUTTON_CLASS = "g-btn.m-rounded"
 LIVE_BUTTON_CLASS = "b-make-post__streaming-link"
 TWITTER_LOGIN0 = "//a[@class='g-btn m-rounded m-flex m-lg']"
 TWITTER_LOGIN1 = "//a[@class='g-btn m-rounded m-flex m-lg btn-twitter']"
@@ -370,11 +370,20 @@ def message_confirm():
     try:
         global BROWSER
         WAIT = WebDriverWait(BROWSER, 120, poll_frequency=30)
+        
+        def get_confirm_button():
+            # first send btn is disabled
+            sends = BROWSER.find_elements_by_class_name(MESSAGE_CONFIRM)
+            for i in range(len(sends)):
+                print(sends[i].get_attribute("innerHTML").strip())
+                if sends[i].is_enabled():
+                    return sends[i]
+            return None
+
         i = 0
         while True:
             try:                
                 WAIT.until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
-                print("waited")
                 break
             except Exception as e:
                 print('uploading...')
@@ -383,7 +392,7 @@ def message_confirm():
                 if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
                     print('Error: Max Upload Time Reached')
                     return False
-        confirm = BROWSER.find_element_by_class_name(MESSAGE_CONFIRM)  
+        confirm = get_confirm_button()
         # confirm = WebDriverWait(BROWSER, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
         if str(settings.DEBUG) == "True":
             if str(settings.DEBUG_DELAY) == "True":
@@ -436,10 +445,31 @@ def message_image(image):
         if str(settings.SKIP_UPLOAD) == "True":
             print("Skipping Upload")
             return True
-        files = files[:int(settings.IMAGE_UPLOAD_MAX_MESSAGES)]
+        files = files[:int(settings.IMAGE_UPLOAD_LIMIT_MESSAGES)]
         for file in files:  
             print('Uploading: '+str(file))
             BROWSER.find_element_by_id(ONLYFANS_UPLOAD_MESSAGE_PHOTO).send_keys(str(file))
+
+            def error_window():
+                # get text of modal
+                # if text == "error: media already added"
+                # rename file
+                # reupload filepath
+                try:
+                    error_buttons = BROWSER.find_elements_by_class_name(ONLYFANS_UPLOAD_BUTTON)
+                    for butt in error_buttons:
+                        if butt.get_attribute("innerHTML").strip() == "Close" and butt.is_enabled():
+                            settings.maybePrint("Warning: Upload Error Message, Closing")
+                            butt.click()
+                            settings.maybePrint("Success: Upload Error Message Closed")
+                            return True
+                    return False
+                except Exception as e:
+                    error_checker(e)
+                    return False
+            # if error_window():
+                # BROWSER.find_element_by_id(ONLYFANS_UPLOAD_MESSAGE_PHOTO).send_keys(str(file))
+            error_window()
             time.sleep(1)
         try:
             error_buttons = BROWSER.find_elements_by_class_name(ONLYFANS_UPLOAD_BUTTON)
@@ -919,12 +949,15 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
         print("- Performers: {}".format(performers))
         print("- Text: {}".format(text))
         print("- Tweeting: {}".format(settings.TWEETING))
+        ## Expires, Schedule, Poll
         if expires: expiration(expires)
         if schedule: scheduling(schedule)
         if poll: polling(poll)
         WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
+        ## Tweeting
         if str(settings.TWEETING) == "True":
             WAIT.until(EC.element_to_be_clickable((By.XPATH, ONLYFANS_TWEET))).click()
+        ## Files
         files = []
         if str(settings.SKIP_DOWNLOAD) == "True":
             print("Warning: Unable to upload, skipped download")
@@ -941,26 +974,29 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
         if str(settings.SKIP_UPLOAD) == "True":
             print("Skipping Upload")
             return True
-        files = files[:int(settings.IMAGE_UPLOAD_MAX)]
+        files = files[:int(settings.IMAGE_UPLOAD_LIMIT)]
         for file in files:  
             print('Uploading: '+str(file))
             BROWSER.find_element_by_id(ONLYFANS_UPLOAD_PHOTO).send_keys(str(file))
+        ## Text
+        sendText = BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_CLASS)
+        sendText.clear()
+        sendText.send_keys(str(text))
+        
+        def get_send_button():
+            # first send btn is disabled
+            sends = BROWSER.find_elements_by_class_name(SEND_BUTTON_CLASS)
+            for i in range(len(sends)):
+                if sends[i].get_attribute("innerHTML").strip() == "Post" and sends[i].is_enabled():
+                    return sends[i]
+            return None
+        
         i = 0
-        notFound = True
-        while notFound:
+        while True:
             try:                
-                print(SEND_BUTTON_CLASS)
-                print(SEND_BUTTON_XPATH)
-                sends = BROWSER.find_elements_by_class_name(".g-btn.m-rounded")
-                print(len(sends))
-                sends2 = BROWSER.find_elements_by_xpath(SEND_BUTTON_XPATH)
-                print(len(sends2))
-                print("waiting for stuff")
-                WAIT.until(EC.element_to_be_clickable((By.XPATH, SEND_BUTTON_XPATH)))
-                print("fucking hell")
-                # notFound = False
+                WAIT.until(EC.element_to_be_clickable((By.CLASS_NAME, SEND_BUTTON_CLASS)))
+                break
             except Exception as e:
-                print(e)
                 # try: 
                 #     # check for existence of "thumbnail is fucked up" modal and hit ok button
                 #     # haven't seen in long enough time to properly add
@@ -977,19 +1013,6 @@ def upload_to_OnlyFans(path=None, text="", keywords=[], performers=[], expires=F
                     print('Error: Max Upload Time Reached')
                     return False
         
-        def get_send_button():
-            sendText = BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_CLASS)
-            sendText.clear()
-            sendText.send_keys(str(text))
-            # first send btn is disabled
-            sends = BROWSER.find_elements_by_class_name(SEND_BUTTON_CLASS)
-            print(len(sends))
-            send = None
-            for i in range(len(sends)):
-                print(sends[i].get_attribute("innerHTML"))
-                if sends[i].is_enabled():
-                    send = sends[i]
-            return send
 
         try:
             send = get_send_button()
