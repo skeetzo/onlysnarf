@@ -14,18 +14,18 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # sudo onlysnarfpy -verbose -type gallery -notkeyword feet -show-window -debug -debug-delay
 # sudo onlysnarf-config
 # sudo onlysnarfpy -debug -verbose -action test
-# sudo onlysnarf -debug -verbose -show-window
+sudo onlysnarfpy -debug -verbose -show-window -type gallery -bykeyword "boxers abs"
 
 # Message
-sudo onlysnarfpy \
--action "message" \
--method "user" \
--user "10041738" \
--text "owed dick" \
--price "0.00" \
--bykeyword "mirror dick" \
--type "gallery" \
--prefer-local
+# sudo onlysnarfpy \
+# -action "message" \
+# -method "user" \
+# -user "10041738" \
+# -text "owed dick" \
+# -price "0.00" \
+# -bykeyword "mirror dick" \
+# -type "gallery" \
+# -prefer-local
 
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 echo "################### End ##########################" >> ../onlysnarf/logs/test.txt 2>&1
