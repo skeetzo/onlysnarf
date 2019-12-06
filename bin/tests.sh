@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 sudo python3 setup.py install
+wait
 echo "-----------------------------------------------------"
 echo "Testing OnlySnarf"
 mkdir ../onlysnarf/logs
@@ -17,6 +18,7 @@ echo "[*] Upload - Image & Poll"
 -action "upload" -type "image" \
 -duration 3 \
 -text "image testes" \
+-show-window \
 -questions "your mom","some toast","a nice sandwich" >> ../onlysnarf/logs/tests.txt 2>&1
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
