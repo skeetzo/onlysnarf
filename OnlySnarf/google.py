@@ -897,7 +897,7 @@ def upload_file(path=None, parent=None):
         print('Skipping Google Upload (disabled): {}'.format(filename))
         return
     elif str(settings.SKIP_BACKUP) == "True":
-        print('Skipping Backup: {}'.format(file['title']))
+        print('Skipping Backup: {}'.format(filename))
         return
     else:
         print('Google Upload (file): {}'.format(filename))
@@ -920,6 +920,7 @@ def upload_file(path=None, parent=None):
     # media = MediaFileUpload(path, mimetype=str(mimetype), resumable=True)
     # file = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
     file = PYDRIVE.CreateFile({'title':str(filename), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':str(mimetype)})
+    file.SetContentFile(path)
     file.Upload()
     # print('File ID: {}'.format(file.get('id')))
 
@@ -928,7 +929,6 @@ def upload_gallery(path=None):
     if not parent:
         print("Error: Missing Posted Folder")
         return
-    print(settings.SKIP_BACKUP)
     if str(settings.FORCE_BACKUP) == "True":
         print("Google Upload (forced): {}".format(path))
     elif str(settings.DEBUG) == "True":
@@ -938,19 +938,19 @@ def upload_gallery(path=None):
         print('Skipping Google Upload (disabled): {}'.format(path))
         return
     elif str(settings.SKIP_BACKUP) == "True":
-        print('Skipping Backup (gallery): {}'.format(file['title']))
+        print('Skipping Backup (gallery): {}'.format(path))
         return
     else:
         print('Google Upload: {}'.format(path))
-    file_metadata = {
-        'name': str(datetime.datetime.now()),
-        'mimeType': str("application/vnd.google-apps.folder"),
-        'parents': [{"kind": "drive#fileLink", "id": str(parent['id'])}]
-    }
-    tmp_folder = PYDRIVE.CreateFile({'title':str(datetime.datetime.now()), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':'application/vnd.google-apps.folder'})
-    tmp_folder.Upload()
+    # file_metadata = {
+    #     'name': str(datetime.datetime.now()),
+    #     'mimeType': str("application/vnd.google-apps.folder"),
+    #     'parents': [{"kind": "drive#fileLink", "id": str(parent['id'])}]
+    # }
     # media = MediaFileUpload(path, mimetype="application/vnd.google-apps.folder", resumable=True)
     # parent = DRIVE.files().create(body=file_metadata, fields='id').execute()
+    tmp_folder = PYDRIVE.CreateFile({'title':str(datetime.datetime.now()), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':'application/vnd.google-apps.folder'})
+    tmp_folder.Upload()
     files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
     for file in files:
         upload_file(path=file, parent=tmp_folder)
