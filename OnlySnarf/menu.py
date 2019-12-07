@@ -811,7 +811,7 @@ def set_profile():
             except Exception as e:
                 settings.maybePrint(e)
                 return main()
-    def selectProfileSetting(label, setting)
+    def selectProfileSetting(label, setting):
         for item in setting:
                 print(colorize("[" + str(setting.index(item)) + "] ", 'teal') + list(item)[0])
             while True:
