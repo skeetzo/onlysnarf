@@ -245,9 +245,11 @@
   - fixed: user scrapes
   - updated: config.py, unable to test
   
-----------------
+----------------------------------------
   **2.15.0**
   - added: Settings options
+  - class reorg
+  - major functions pending complete testing
   
 ----------------------------------------
 

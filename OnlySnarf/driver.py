@@ -21,7 +21,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.action_chains import ActionChains
-from OnlySnarf.user import User
+##
 from OnlySnarf.settings import SETTINGS as settings
 
 ###################
@@ -60,10 +60,10 @@ ONLYFANS_USERS_IDS = "a.g-btn.m-rounded.m-border.m-sm"
 ONLYFANS_USERS_STARTEDS = "b-fans__item__list__item"
 ONLYFANS_USERS = "g-user-name__wrapper"
 ONLYFANS_USERSNAMES = "g-user-username"
-ONLYFANS_POST_TEXT_CLASS = "new_post_text_input"
-ONLYFANS_PRICE = ".b-chat__btn-set-price"
-ONLYFANS_PRICE_INPUT = ".form-control.b-chat__panel__input"
-ONLYFANS_PRICE_CLICK = ".g-btn.m-rounded"
+ONLYFANS_POST_TEXT_ID = "new_post_text_input"
+ONLYFANS_PRICE = "b-chat__btn-set-price"
+ONLYFANS_PRICE_INPUT = "form-control.g-input"
+ONLYFANS_PRICE_CLICK = "g-btn.m-rounded"
 ONLYFANS_CHAT_URL = "https://onlyfans.com/my/chats/chat"
 ONLYFANS_UPLOAD_BUTTON = "g-btn.m-rounded.m-border"
 ONLYFANS_MESSAGE_SEND_BUTTON = "g-btn.m-rounded.b-chat__btn-submit"
@@ -79,72 +79,147 @@ SCHEDULE_SAVE = "g-btn.m-rounded"
 SCHEDULE_HOURS = "vdatetime-time-picker__item.vdatetime-time-picker__item"
 SCHEDULE_MINUTES = "vdatetime-time-picker__item"
 POLL = "g-btn.m-flat.b-make-post__voting-btn"
+# POLL = "g-btn.m-flat.b-make-post__voting-btn.has-tooltip"
 POLL_DURATION = "g-btn.m-flat.b-make-post__voting__duration"
 POLL_ADD_QUESTION = "g-btn.m-flat.new_vote_add_option"
-POLL_SAVE = "g-btn.m-rounded.js-make-post-poll-duration-save"
+POLL_SAVE = "g-btn.m-rounded"
 POLL_CANCEL = "b-dropzone__preview__delete"
 POLL_INPUT_XPATH = "//input[@class='form-control']"
 REMEMBERME_CHECKBOX_XPATH = "//input[@id='remember']"
 
 ONLYFANS_ELEMENTS = [
     {
-        "name": "",
-        "class_name": "",
-        "text": "",
-        "id": ""
-    },
-    {
         "name": "confirm",
         "class_name": MESSAGE_CONFIRM,
         "text": "",
-        "id": ""
+        "id": None
     },
     {
         "name": "post",
         "class_name": SEND_BUTTON_CLASS,
         "text": "Post",
-        "id": ""
+        "id": None
     },
     {
         "name": "uploadImage",
         "class_name": "",
-        "text": "",
+        "text": None,
         "id": ONLYFANS_UPLOAD_PHOTO
     },
     {
         "name": "uploadImageMessage",
         "class_name": "",
-        "text": "",
+        "text": None,
         "id": ONLYFANS_UPLOAD_MESSAGE_PHOTO
     },
     {
         "name": "errorUpload",
         "class_name": "g-btn.m-rounded.m-border",
-        "text": "",
-        "id": ""
+        "text": None,
+        "id": None
     },
+    {
+        "name": "poll",
+        "class_name": POLL,
+        "text": "<svg class=\"g-icon\" aria-hidden=\"true\"><use xlink:href=\"#icon-more\" href=\"#icon-more\"></use></svg>",
+        "id": None
+    },
+    {
+        "name": "pollCancel",
+        "class_name": POLL_CANCEL,
+        "text": "Cancel",
+        "id": None
+    },
+    {
+        "name": "pollDuration",
+        "class_name": POLL_DURATION,
+        "text": None,
+        "id": None
+    },
+    {
+        "name": "pollDurations",
+        "class_name": EXPIRATION_PERIODS,
+        "text": None,
+        "id": None
+    },
+    {
+        "name": "pollSave",
+        "class_name": POLL_SAVE,
+        "text": "Save",
+        "id": None
+    },
+    {
+        "name": "pollQuestionAdd",
+        "class_name": POLL_ADD_QUESTION,
+        "text": None,
+        "id": None
+    },
+    {
+        "name": "moreOptions",
+        "class_name": ONLYFANS_MORE,
+        "text": "<svg class=\"g-icon\" aria-hidden=\"true\"><use xlink:href=\"#icon-more\" href=\"#icon-more\"></use></svg>",
+        "id": None
+    },
+    {
+        "name": "expiration",
+        "class_name": EXPIRATION,
+        "text": None,
+        "id": None
+    },
+    {
+        "name": "expirationPeriods",
+        "class_name": EXPIRATION_PERIODS,
+        "text": None,
+        "id": None
+    },
+    {
+        "name": "expirationSave",
+        "class_name": EXPIRATION_SAVE,
+        "text": None,
+        "id": None
+    },
+    {
+        "name": "priceEnter",
+        "class_name": ONLYFANS_PRICE_INPUT,
+        "text": "Free",
+        "id": None
+    },
+    {
+        "name": "saveSchedule",
+        "class_name": SCHEDULE_SAVE,
+        "text": "Save",
+        "id": None
+    }
+
+    
     
 ]
+
 
 def error_checker(e):
     if "Unable to locate element" in str(e):
         print("Warning: OnlySnarf may require an update")
-    if "Message: " not in str(e):
+    if str(settings.DEBUG) == "True" and str(settings.VERBOSE) == "True":
+        print(e)
+    elif "Message: " not in str(e):
         settings.maybePrint(e)
 
 def get_element_by_name(name):
+    settings.devPrint("getting element: {}".format(name))
     if name == None:
         settings.maybePrint("Error: Missing Element Name")
         return None
     global ONLYFANS_ELEMENTS
     for element in ONLYFANS_ELEMENTS:
-        if str(element.name) == str(name):
+        if str(element["name"]) == str(name):
+            settings.devPrint("found element: {}".format(name))
             return element
     return None
 
 class Driver:
+
     def __init__(self):
-        pass
+        self.browser = None
 
     #####################
     ##### Functions #####
@@ -152,16 +227,16 @@ class Driver:
 
     def auth(self):
         logged_in = False
-        if not self.browser or self.browser == None: logged_in = log_into_OnlyFans()
+        if not self.browser or self.browser == None: logged_in = self.login()
         else: logged_in = True
         if logged_in == False: print("Error: Failure to Login")
         return logged_in
 
-
     def error_window_upload(self):
         try:
             element = get_element_by_name("errorUpload")
-            error_buttons = self.browser.find_elements_by_class_name(element.class_name)
+            error_buttons = self.browser.find_elements_by_class_name(element["class_name"])
+            settings.devPrint("errors btns: {}".format(len(error_buttons)))
             for butt in error_buttons:
                 if butt.get_attribute("innerHTML").strip() == "Close" and butt.is_enabled():
                     settings.maybePrint("Warning: Upload Error Message, Closing")
@@ -175,14 +250,13 @@ class Driver:
 
     # should already be logged in
     def find_element_by_name(self, name):
-        
         if self.browser == None: return False
         try:
             element = get_element_by_name(name)
             if not element:
                 print("Error: Unable to find Element Reference")
                 return False
-            element = self.browser.find_element_by_class_name(element.class_name)
+            element = self.browser.find_element_by_class_name(element["class_name"])
             if not element: print("Warning Message About Element Not Found")
             return element
         except Exception as e:
@@ -193,11 +267,20 @@ class Driver:
     def get_element_to_click(self, name):
         global ONLYFANS_ELEMENTS
         element = get_element_by_name(name)
-        eles = self.browser.find_elements_by_class_name(element.class_name)
+        eles = self.browser.find_elements_by_class_name(element["class_name"])
+        settings.devPrint("clickable eles: {}".format(len(eles)))
         for i in range(len(eles)):
-            if str(element.text) == eles[i].get_attribute("innerHTML").strip() and eles[i].is_enabled():
+            settings.devPrint("ele: {} -> {}".format(eles[i].get_attribute("innerHTML").strip(), element["text"]))
+            if (element["text"] and str(element["text"]) == eles[i].get_attribute("innerHTML").strip()) and eles[i].is_enabled():
+                settings.devPrint("found matching ele: {}".format(eles[i].get_attribute("innerHTML").strip()))
                 return eles[i]
-        return None
+            elif (element["text"] and str(element["text"]) == eles[i].get_attribute("innerHTML").strip()):
+                settings.devPrint("found text ele: {}".format(eles[i].get_attribute("innerHTML").strip()))
+                return eles[i]
+            elif not element["text"] and eles[i].is_enabled():
+                settings.devPrint("found enabled ele: {}".format(eles[i].get_attribute("innerHTML").strip()))
+                return eles[i]
+        return eles[0] or None
 
     def go_to_home(self):
         if self.browser == None: return False
@@ -221,16 +304,17 @@ class Driver:
         else:
             print("Error: Missing Image File(s)")
             return False
+        enter_file = self.browser.find_element_by_id(get_element_by_name(str(name))["id"])
         files = files[:int(settings.IMAGE_UPLOAD_LIMIT_MESSAGES)]
         for file in files:  
             print('Uploading: '+str(file))
-            element = get_element_by_name(name)
-            self.browser.find_element_by_id(element.id).send_keys(str(file))
-            if error_window_upload():
-                print("Fixing Filename")
+            enter_file.send_keys(str(file))
+            if self.error_window_upload():
                 # move file to change its name
                 filename = os.path.basename(file)
                 filename = os.path.splitext(filename)[0]
+                if "_fixed" in str(filename): continue
+                print("Fixing Filename")
                 filename += "_fixed"
                 ext = os.path.splitext(filename)[1].lower()
                 print("{} -> {}.{}".format(os.path.dirname(file), filename, ext))
@@ -241,99 +325,7 @@ class Driver:
                 # if this doesn't force it then it'll loop forever without a stopper
             time.sleep(1)
 
-
     ### Drivers
-
-    # Login to OnlyFans
-    def log_into_OnlyFans(self):
-        print('Logging into OnlyFans')
-        username_ = str(settings.USERNAME)
-        password_ = str(settings.PASSWORD)
-        if not username_ or username_ == "":
-            username_ = input("Twitter Username: ")
-        if not password_ or password_ == "":
-            password_ = input("Twitter Password: ")
-            print("Save? y/n")
-            save_ = input(">> ")
-            if str(save_) != "n": settings.PASSWORD = password__
-        if username_ == "" or password_ == "":
-            print("Error: Missing Login Info")
-            return False
-        if str(settings.USERNAME) == "" or settings.USERNAME == None: settings.USERNAME = username_
-        if str(settings.PASSWORD) == "" or settings.PASSWORD == None: settings.PASSWORD = password_
-        settings.maybePrint("Opening Web Browser")
-        options = webdriver.ChromeOptions()
-        if str(settings.SHOW_WINDOW) != "True":
-            options.add_argument('--headless')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        # options.setExperimentalOption('useAutomationExtension', false);
-        options.add_argument('--disable-gpu')
-        # self.browser = webdriver.Chrome(binary=CHROMEDRIVER_PATH, chrome_options=options)
-        CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
-        os.environ["webdriver.chrome.driver"] = CHROMEDRIVER_PATH
-        
-        try:
-            self.browser = webdriver.Chrome(chrome_options=options)
-        except Exception as e:
-            error_checker(e)
-            print("Warning: Missing chromedriver_path, retrying")
-            try:
-                self.browser = webdriver.Chrome(CHROMEDRIVER_PATH, chrome_options=options)
-            except Exception as e:
-                error_checker(e)
-                print("Error: Missing chromedriver_path, exiting")
-                return False
-        self.browser.implicitly_wait(10) # seconds
-        self.browser.set_page_load_timeout(1200)    
-        def login(opt):
-            try:
-                self.browser.get(ONLYFANS_HOME_URL)
-                # login via Twitter
-                if int(opt)==0:
-                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN0).click()
-                elif int(opt)==1:
-                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN1).click()
-                elif int(opt)==2:
-                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN2).click()
-            except NoSuchElementException as e:
-                opt+=1
-                print("Warning: Login Failure, Retrying ({})".format(opt))
-                login(opt)
-        try:
-            login(0)
-            # rememberMe checkbox doesn't actually cause login to be remembered
-            rememberMe = self.browser.find_element_by_xpath(REMEMBERME_CHECKBOX_XPATH)
-            if not rememberMe.is_selected():
-                rememberMe.click()
-            # fill in username
-            username = self.browser.find_element_by_xpath(USERNAME_XPATH).send_keys(username_)
-            # fill in password and hit the login button 
-            password = self.browser.find_element_by_xpath(PASSWORD_XPATH)
-            password.send_keys(password_)
-            password.send_keys(Keys.ENTER)
-            WebDriverWait(self.browser, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, LIVE_BUTTON_CLASS)))
-            print('Login Successful')
-            return True
-        except Exception as e:
-            error_checker(e)
-            print('Login Failure')
-            return False
-
-    # Reset to home
-    def reset(self):
-        
-        if not self.browser or self.browser == None:
-            print('OnlyFans Not Open, Skipping Reset')
-            return True
-        try:
-            self.browser.get(ONLYFANS_HOME_URL)
-            print('OnlyFans Reset')
-            return True
-        except Exception as e:
-            error_checker(e)
-            print('Error: Failure Resetting OnlyFans')
-            return False
 
     ####################
     ##### Discount #####
@@ -341,7 +333,7 @@ class Driver:
 
     # maximum discount = 55%
     def discount_user(self, user, depth=0, discount=10, months=1, tryAll=False):
-        auth_ = auth()
+        auth_ = self.auth()
         if not auth_: return False
         if int(discount) > 55:
             print("Warning: Discount Too High, Max -> 55%")
@@ -352,7 +344,6 @@ class Driver:
         if int(months) > 12:
             print("Warning: Months Too High, Max -> 12")
             months = 12
-        
         try:
             if str(self.browser.current_url) == str(ONLYFANS_USERS_ACTIVE_URL):
                 settings.maybePrint("at -> /my/subscribers/active")
@@ -395,7 +386,7 @@ class Driver:
                     except Exception as e:
                         error_checker(e)
                         print("Warning: Unable To Find User, retrying")
-                        return discount_user(user, depth=depth, discount=discount, months=months, tryAll=True)
+                        return self.discount_user(user, depth=depth, discount=discount, months=months, tryAll=True)
             time.sleep(1)
             buttons_ = self.browser.find_elements_by_class_name(DISCOUNT_USER_BUTTONS1)
             (months_, discount_) = self.browser.find_elements_by_class_name(DISCOUNT_INPUT)
@@ -416,11 +407,11 @@ class Driver:
                 months_.send_keys(Keys.DOWN)
             settings.debug_delay_check()
             for button in buttons_:
-                if "Cancel" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "True":
-                    button.click()
-                    print("Skipping: Save Discount (Debug)")
-                    return True
-                elif "Apply" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "False":
+                # if "Cancel" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "True":
+                #     button.click()
+                #     print("Skipping: Save Discount (Debug)")
+                #     return True
+                if "Apply" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "False":
                     button.click()
                     print("Discounted User: {}".format(user))
                     return True
@@ -432,37 +423,64 @@ class Driver:
                     return False
             return False
 
+    def enter_text(self, text):
+        try:
+            settings.devPrint("finding text")
+            sendText = self.browser.find_element_by_id(ONLYFANS_POST_TEXT_ID)
+            settings.devPrint("found text")
+            sendText.clear()
+            settings.devPrint("sending text")
+            sendText.send_keys(str(text))
+            return True
+        except Exception as e:
+            settings.maybePrint(e)
+            return False
+
     ######################
     ##### Expiration #####
     ######################
 
     def expiration(self, period):
-        auth_ = auth()
-        if not auth_: return False
+        settings.devPrint("expiration")   
         if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99 and str(period) != "No limit":
             print("Error: Missing Expiration")
             return False
-        
+        auth_ = self.auth()
+        if not auth_: return False
         try:
-            # go_to_home()
+            # go_to_home() # this should be run only from upload anyways
             if isinstance(period,str) and str(period) == "No limit": period = 99
             print("Expiration:")
             print("- Period: {}".format(period))
             try:
-                self.browser.find_element_by_class_name(ONLYFANS_MORE).click()
+                settings.devPrint("opening options")
+                self.get_element_to_click("moreOptions").click()
             except Exception as e:
                 pass
-            self.browser.find_element_by_class_name(EXPIRATION).click()
-            nums = self.browser.find_elements_by_class_name(EXPIRATION_PERIODS)
+            # open expiration window
+            settings.devPrint("adding expiration")
+            self.get_element_to_click("expiration").click()
+            # select duration
+            settings.devPrint("selecting expiration")
+            nums = self.browser.find_elements_by_class_name(get_element_by_name("expirationPeriods")["class_name"])
             for num in nums:
                 inner = num.get_attribute("innerHTML")
-                if str(inner) == "1 day" and int(period) == 1: num.click()
-                if str(inner) == "3 days" and int(period) == 3: num.click()
-                if str(inner) == "7 days" and int(period) == 7: num.click()
-                if str(inner) == "30 days" and int(period) == 30: num.click()
-                if "No limit" in str(inner) and int(period) == 99: num.click()
+                ##
+                # <span class="g-first-letter">1</span> day
+                # <span class="g-first-letter">3</span> days
+                # <span class="g-first-letter">7</span> days
+                # <span class="g-first-letter">30</span> days
+                # <span><span class="g-first-letter">N</span>o limit</span>
+                ##
+                if ">1<" in str(inner) and int(period) == 1: num.click()
+                if ">3<" in str(inner) and int(period) == 3: num.click()
+                if ">7<" in str(inner) and int(period) == 7: num.click()
+                if ">30<" in str(inner) and int(period) == 30: num.click()
+                if ">o limit<" in str(inner) and int(period) == 99: num.click()
             settings.debug_delay_check()
-            save = self.browser.find_element_by_class_name(EXPIRATION_SAVE)
+            # save
+            settings.devPrint("saving expiration")
+            save = self.get_element_to_click("expirationSave")
             if str(settings.DEBUG) == "True":
                 print("Skipping Expiration (debug)")
                 cancels = self.browser.find_elements_by_class_name(EXPIRATION_CANCEL)
@@ -476,13 +494,90 @@ class Driver:
             print("Error: Failed to enter Expiration")
             return False
 
+    ##################
+    ###### Login #####
+    ##################
+
+    def login(self):
+        print('Logging into OnlyFans')
+        username_ = str(settings.USERNAME)
+        password_ = str(settings.PASSWORD)
+        if not username_ or username_ == "":
+            username_ = input("Twitter Username: ")
+        if not password_ or password_ == "":
+            password_ = input("Twitter Password: ")
+            print("Save? y/n")
+            save_ = input(">> ")
+            if str(save_) != "n": settings.PASSWORD = password__
+        if username_ == "" or password_ == "":
+            print("Error: Missing Login Info")
+            return False
+        if str(settings.USERNAME) == "" or settings.USERNAME == None: settings.USERNAME = username_
+        if str(settings.PASSWORD) == "" or settings.PASSWORD == None: settings.PASSWORD = password_
+        settings.maybePrint("Opening Web Browser")
+        options = webdriver.ChromeOptions()
+        if str(settings.SHOW_WINDOW) != "True":
+            options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        # options.setExperimentalOption('useAutomationExtension', false);
+        options.add_argument('--disable-gpu')
+        # self.browser = webdriver.Chrome(binary=CHROMEDRIVER_PATH, chrome_options=options)
+        CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
+        os.environ["webdriver.chrome.driver"] = CHROMEDRIVER_PATH
+        try:
+            self.browser = webdriver.Chrome(chrome_options=options)
+        except Exception as e:
+            error_checker(e)
+            print("Warning: Missing chromedriver_path, retrying")
+            try:
+                self.browser = webdriver.Chrome(CHROMEDRIVER_PATH, chrome_options=options)
+            except Exception as e:
+                error_checker(e)
+                print("Error: Missing chromedriver_path, exiting")
+                return False
+        self.browser.implicitly_wait(10) # seconds
+        self.browser.set_page_load_timeout(1200)    
+        def attempt_login(opt):
+            try:
+                self.browser.get(ONLYFANS_HOME_URL)
+                # login via Twitter
+                if int(opt)==0:
+                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN0).click()
+                elif int(opt)==1:
+                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN1).click()
+                elif int(opt)==2:
+                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN2).click()
+            except NoSuchElementException as e:
+                opt+=1
+                print("Warning: Login Failure, Retrying ({})".format(opt))
+                attempt_login(opt)
+        try:
+            attempt_login(0)
+            # rememberMe checkbox doesn't actually cause login to be remembered
+            rememberMe = self.browser.find_element_by_xpath(REMEMBERME_CHECKBOX_XPATH)
+            if not rememberMe.is_selected():
+                rememberMe.click()
+            # fill in username
+            username = self.browser.find_element_by_xpath(USERNAME_XPATH).send_keys(username_)
+            # fill in password and hit the login button 
+            password = self.browser.find_element_by_xpath(PASSWORD_XPATH)
+            password.send_keys(password_)
+            password.send_keys(Keys.ENTER)
+            WebDriverWait(self.browser, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, LIVE_BUTTON_CLASS)))
+            print('Login Successful')
+            return True
+        except Exception as e:
+            error_checker(e)
+            print('Login Failure')
+            return False
+
     ####################
     ##### Messages #####
     ####################
      
     def message_confirm(self):
         try:
-            
             WAIT = WebDriverWait(self.browser, 120, poll_frequency=30)
             i = 0
             while True:
@@ -496,7 +591,7 @@ class Driver:
                     if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
                         print('Error: Max Upload Time Reached')
                         return False
-            confirm = get_element_to_click("confirm")
+            confirm = self.get_element_to_click("confirm")
             # confirm = WebDriverWait(self.browser, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
             if str(settings.DEBUG) == "True":
                 if str(settings.DEBUG_DELAY) == "True":
@@ -517,7 +612,6 @@ class Driver:
                 print("Error: Missing Text")
                 return False
             print("Enter text: {}".format(text))
-            
             message = self.browser.find_element_by_css_selector(MESSAGE_INPUT_CLASS)        
             message.send_keys(str(text))
             settings.maybePrint("Text Entered")
@@ -527,12 +621,12 @@ class Driver:
             print("Error: Failure to Enter Message")
             return False
 
-    def message_image(self, image):
+    def message_image(self, path):
         try:
-            if not image or image == None or str(image) == "None":
+            if not path or path == None or str(path) == "None":
                 print("Error: Missing Image(s)")
                 return False
-            print("Enter image(s): {}".format(image))
+            print("Enter image(s): {}".format(path))
             if str(settings.SKIP_UPLOAD) == "True":
                 print("Skipping Upload")
                 return True
@@ -540,7 +634,7 @@ class Driver:
                 print("Warning: Unable to Upload, skipped download")
                 return True
             try:
-                upload_image_files("uploadImageMessage", files)
+                self.upload_image_files("uploadImageMessage", path)
                 settings.maybePrint("Image(s) Entered")
                 settings.debug_delay_check()
                 return True
@@ -559,10 +653,16 @@ class Driver:
                 print("Error: Missing Price")
                 return False
             print("Enter price: {}".format(price))
-            
             WAIT = WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ONLYFANS_PRICE))).click()
             # self.browser.find_element_by_css_selector(ONLYFANS_PRICE)
+            settings.devPrint("entering price")
+            eles = self.browser.find_elements_by_css_selector(ONLYFANS_PRICE_INPUT)
+            print(len(eles))
             self.browser.find_elements_by_css_selector(ONLYFANS_PRICE_INPUT)[1].send_keys(str(price))
+            price = get_element_by_name("priceEnter")
+            print(price)
+            print(price.get_attribute("innerHTML"))
+            settings.devPrint("saving price")
             submits = self.browser.find_elements_by_css_selector(ONLYFANS_PRICE_CLICK)
             found = False
             for submit in submits:
@@ -572,6 +672,7 @@ class Driver:
                     submit.click()
                     settings.maybePrint("Price Entered")
                     found = True
+                    settings.devPrint("saved price")
                     break
             settings.debug_delay_check()
             if not found:
@@ -585,7 +686,7 @@ class Driver:
 
     def message_user(self, user):
         try:
-            auth_ = auth()
+            auth_ = self.auth()
             if not auth_: return False
             userid = user.id
             if not userid or userid == None or str(userid) == "None":
@@ -599,7 +700,6 @@ class Driver:
                     if str(settings.DEBUG) == "False":
                         return False
             settings.maybePrint("goto -> /my/chats/chat/%s" % userid)
-            
             self.browser.get("{}/{}".format(ONLYFANS_CHAT_URL,userid))
             return True
         except Exception as e:
@@ -609,11 +709,10 @@ class Driver:
 
     def read_user_messages(self, user):
         try:
-            auth_ = auth()
+            auth_ = self.auth()
             if not auth_: return False
-            
             # go to onlyfans.com/my/subscribers/active
-            message_user(user)
+            self.message_user(user)
             messages_from_ = self.browser.find_elements_by_class_name(ONLYFANS_MESSAGES_FROM)
             # print("first message: {}".format(messages_to_[0].get_attribute("innerHTML")))
             # messages_to_.pop(0) # drop self user at top of page
@@ -680,9 +779,9 @@ class Driver:
         global USER_CACHE_LOCKED
         USER_CACHE_LOCKED = True
         print("Updating User Chats")
-        users = get_users()
+        users = self.get_users()
         for user in users:
-            update_chat_log(user)
+            self.update_chat_log(user)
         USER_CACHE_LOCKED = False
 
     def update_chat_log(self, user):
@@ -696,11 +795,12 @@ class Driver:
     ################
 
     def polling(self, poll):
+        settings.devPrint("polling")
         period = poll.get("period")
         questions = poll.get("questions")
         if isinstance(questions, str): questions = questions.split(",\"*\"")
         questions = [n.strip() for n in questions]
-        auth_ = auth()
+        auth_ = self.auth()
         if not auth_: return False
         if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99 and str(period) != "No limit":
             print("Error: Missing Duration")
@@ -708,42 +808,69 @@ class Driver:
         if not questions or len(questions) == 0:
             print("Error: Missing Questions")
             return False
-        
         try:
             print("Poll:")
             print("- Duration: {}".format(period))
             print("- Questions:\n> {}".format("\n> ".join(questions)))
+            # make sure the extra options are shown
             try:
-                self.browser.find_element_by_class_name(ONLYFANS_MORE).click()
+                settings.devPrint("opening options")
+                self.get_element_to_click("moreOptions").click()
             except Exception as e:
                 pass
-            self.browser.find_element_by_class_name(POLL).click()
-            self.browser.find_element_by_class_name(POLL_DURATION).click()
-            nums = self.browser.find_elements_by_class_name(EXPIRATION_PERIODS)
+            # add a poll
+            settings.devPrint("adding poll")
+            self.get_element_to_click("poll").click()
+            # open the poll duration
+            settings.devPrint("adding duration")
+            self.get_element_to_click("pollDuration").click()
+            # click on the correct duration number
+            settings.devPrint("setting duration")
+            nums = self.browser.find_elements_by_class_name(get_element_by_name("pollDurations")["class_name"])
             for num in nums:
                 inner = num.get_attribute("innerHTML")
-                if str(inner) == "1 day" and int(period) == 1: num.click()
-                if str(inner) == "3 days" and int(period) == 3: num.click()
-                if str(inner) == "7 days" and int(period) == 7: num.click()
-                if str(inner) == "30 days" and int(period) == 30: num.click()
-                if "No limit" in str(inner) and int(period) == 99: num.click()
-            save = self.browser.find_element_by_class_name(POLL_SAVE).click()
-            time.sleep(1)
+                ##
+                # <span class="g-first-letter">1</span> day
+                # <span class="g-first-letter">3</span> days
+                # <span class="g-first-letter">7</span> days
+                # <span class="g-first-letter">30</span> days
+                # <span><span class="g-first-letter">N</span>o limit</span>
+                ##
+                if ">1<" in str(inner) and int(period) == 1: num.click()
+                if ">3<" in str(inner) and int(period) == 3: num.click()
+                if ">7<" in str(inner) and int(period) == 7: num.click()
+                if ">30<" in str(inner) and int(period) == 30: num.click()
+                if ">o limit<" in str(inner) and int(period) == 99: num.click()
+            # save the duration
+            settings.devPrint("### this is not working ###")
+            settings.devPrint("saving duration")
+            save = self.get_element_to_click("pollSave").click()
+            settings.devPrint("saved duration")
+            # add extra question space
             if len(questions) > 2:
                 for question in questions[2:]:
-                    self.browser.find_element_by_class_name(POLL_ADD_QUESTION).click()
+                    settings.devPrint("adding question")
+                    question_ = self.get_element_to_click("pollQuestionAdd").click()
+                    settings.devPrint("added question")
+            # find the question inputs
+            settings.devPrint("locating question paths")
             questions_ = self.browser.find_elements_by_xpath(POLL_INPUT_XPATH)
+            settings.devPrint("question paths: {}".format(len(questions_)))
+            # enter the questions
             i = 0
             # print("questions: {}".format(questions))
             for question in list(questions):
+                settings.devPrint("entering question: {}".format(question))
                 questions_[i].send_keys(str(question))
+                settings.devPrint("entered question")
                 time.sleep(1)
                 i+=1
             settings.debug_delay_check()
             if str(settings.DEBUG) == "True":
                 print("Skipping Poll (debug)")
-                cancel = self.browser.find_element_by_class_name(POLL_CANCEL)
-                cancel.click() # its the second cancel button
+                cancel = self.get_element_to_click("pollCancel")
+                cancel.click()
+                settings.devPrint("canceled poll")
             else:
                 print("Poll Entered")
             return True
@@ -758,25 +885,31 @@ class Driver:
 
     def post(self, text, expires=None, schedule=False, poll=False):
         try:
-            auth_ = auth()
+            auth_ = self.auth()
             if not auth_: return False
-            
-            go_to_home()
+            self.go_to_home()
             print("Posting:")
             print("- Text: {}".format(text))
-            if expires: expiration(expires)
-            if schedule: scheduling(schedule)
-            if poll: polling(poll)
-            self.browser.find_element_by_id(ONLYFANS_POST_TEXT_CLASS).send_keys(str(text))
-            sends = self.browser.find_elements_by_class_name(SEND_BUTTON_CLASS)
-            for i in range(len(sends)):
-                if sends[i].is_enabled():
-                    sends = sends[i]
+            if expires: self.expiration(expires)
+            if schedule: self.scheduling(schedule)
+            if poll: self.polling(poll)
+            settings.devPrint("entering text")
+            self.browser.find_element_by_id(ONLYFANS_POST_TEXT_ID).send_keys(str(text))
+            settings.devPrint("entered text")
+            settings.devPrint("finding send")
+            # sends = self.browser.find_elements_by_class_name(SEND_BUTTON_CLASS)
+            # for i in range(len(sends)):
+                # if sends[i].is_enabled():
+                    # sends = sends[i]
+                    # settings.devPrint("found send")
+            send = self.get_element_to_click("post")
+            print("send btn: {}".format(send))
             settings.debug_delay_check()
             if str(settings.DEBUG) == "True":
                 print('Skipped: OnlyFans Post (debug)')
                 return True
-            sends.click()
+            settings.devPrint("sending post")
+            send.click()
             # send[1].click() # the 0th one is disabled
             print('OnlyFans Post Complete')
             return True
@@ -791,9 +924,8 @@ class Driver:
 
     # or email
     def get_new_trial_link(self):
-        auth_ = auth()
+        auth_ = self.auth()
         if not auth_: return False
-        
         # go to onlyfans.com/my/subscribers/active
         try:
             settings.maybePrint("goto -> /my/promotions")
@@ -829,13 +961,30 @@ class Driver:
             print("Error: Failed to Apply Promotion")
             return None
 
+    #################
+    ##### Reset #####
+    #################
+
+    # Reset to home
+    def reset(self):
+        if not self.browser or self.browser == None:
+            print('OnlyFans Not Open, Skipping Reset')
+            return True
+        try:
+            self.browser.get(ONLYFANS_HOME_URL)
+            print('OnlyFans Reset')
+            return True
+        except Exception as e:
+            error_checker(e)
+            print('Error: Failure Resetting OnlyFans')
+            return False
+
     ####################
     ##### Settings #####
     ####################
 
     # onlyfans.com/my/settings
     def go_to_settings(self, settingsTab):
-        
         if self.browser == None: return False
         if str(self.browser.current_url) == str(ONLYFANS_SETTINGS_URL) and str(settingsTab) == "profile":
             settings.maybePrint("at -> onlyfans.com/settings/{}".format(settingsTab))
@@ -860,8 +1009,8 @@ class Driver:
         page_ = var[1]
         class_ = var[2]
         type_ = var[3]
-        go_to_settings(page_)
-        find_element_by_name(class_)
+        self.go_to_settings(page_)
+        self.find_element_by_name(class_)
         if str(type_) == "text":
             # get attr text
             pass
@@ -886,8 +1035,8 @@ class Driver:
         page_ = var[1]
         class_ = var[2]
         type_ = var[3]
-        go_to_settings(page_)
-        find_element_by_name(class_)
+        self.go_to_settings(page_)
+        self.find_element_by_name(class_)
         # text, path, state, list (text), price 
         if str(type_) == "text":
             # set attr text
@@ -902,15 +1051,13 @@ class Driver:
     def settings_save(self):
         pass
 
-
     ####################
     ##### Schedule #####
     ####################
 
     def scheduling(self, schedule_):
-        auth_ = auth()
+        auth_ = self.auth()
         if not auth_: return False
-        
         try:
             if not schedule_:
                 print("Error: Missing Schedule")
@@ -927,50 +1074,66 @@ class Driver:
             print("- Date: {}".format(date))
             print("- Time: {}".format(time_))
             try:
-                self.browser.find_element_by_class_name(ONLYFANS_MORE).click()
+                self.get_element_to_click("moreOptions").click()
             except Exception as e:
                 pass
             # click schedule
+            settings.devPrint("adding schedule")
             self.browser.find_element_by_class_name(SCHEDULE).click()
             searching = True
             while searching:
+                settings.devPrint("getting date")
                 existingDate = self.browser.find_element_by_class_name(SCHEDULE_EXISTING_DATE).get_attribute("innerHTML")
                 if str(month_) in str(existingDate) and str(year_) in str(existingDate):
                     searching = False
                 else:
                     self.browser.find_element_by_class_name(SCHEDULE_NEXT_MONTH).click()
+            settings.devPrint("setting days")
             days = self.browser.find_elements_by_class_name(SCHEDULE_DAYS)
             for day in days:
                 inner = day.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>","")
                 if str(day_) == str(inner):
                     day.click()
+                    settings.devPrint("clicked day")
             settings.debug_delay_check()
             saves = self.browser.find_elements_by_class_name(SCHEDULE_SAVE)
             for save in saves:
                 if "Save" in str(save.get_attribute("innerHTML")):
                     save.click()
+                    settings.devPrint("clicked save")
                     break
+            settings.devPrint("setting hours")
             hours = self.browser.find_elements_by_class_name(SCHEDULE_HOURS)
             for hour in hours:
                 inner = hour.get_attribute("innerHTML")
                 if str(hour_) in str(inner) and hour.is_enabled():
                     hour.click()
+                    settings.devPrint("hours set")
+            settings.devPrint("setting minutes")
             minutes = self.browser.find_elements_by_class_name(SCHEDULE_MINUTES)
             for minute in minutes:
                 inner = minute.get_attribute("innerHTML")
                 if str(minute_) in str(inner) and minute.is_enabled():
                     minute.click()
-            if str(settings.DEBUG) == "True":
-                print("Skipping Schedule (debug)")
-                cancel = self.browser.find_element_by_class_name(EXPIRATION_CANCEL)
-                cancel.click() # its the first cancel button
-            else:
-                saves = self.browser.find_elements_by_class_name(SCHEDULE_SAVE)
-                for save in saves:
-                    if "Save" in str(save.get_attribute("innerHTML")):
-                        save.click()
-                        break
-                print("Schedule Entered")
+                    settings.devPrint("minutes set")
+            # if str(settings.DEBUG) == "True":
+                # print("Skipping Schedule (debug)")
+                # cancel = self.browser.find_element_by_class_name(EXPIRATION_CANCEL)
+                # cancel.click() # its the first cancel button
+            # else:
+
+            # self.get_element_to_click("saveSchedule").click()
+            settings.devPrint("saving schedule")
+            saves = self.browser.find_elements_by_class_name(SCHEDULE_SAVE)
+            settings.devPrint("saves: {}".format(len(saves)))
+            for save in saves:
+                settings.devPrint("save: {}".format(save.get_attribute("innerHTML")))
+                settings.devPrint("enabled: {}".format(save.is_enabled()))
+                if "Save" in str(save.get_attribute("innerHTML")) and save.is_enabled():
+                    save.click()
+                    settings.devPrint("schedule saved")
+                    break
+            print("Schedule Entered")
             return True
         except Exception as e:
             error_checker(e)
@@ -982,22 +1145,19 @@ class Driver:
     ##################
 
     # Uploads a directory with a video file or image files to OnlyFans
-    def upload_to_OnlyFans(self, path=None, text="", keywords=[], performers=[], expires=False, schedule=False, poll=False):
+    def upload(self, path=None, text="", keywords=[], performers=[], expires=False, schedule=False, poll=False):
+        settings.devPrint("uploading")
         try:
-            auth_ = auth()
+            auth_ = self.auth()
             if not auth_: return False
-            
-            go_to_home()
+            self.go_to_home()
             if not path:
                 print("Error: Missing Upload Path")
                 return False
             if not text or text == None or str(text) == "None":
                 print("Warning: Missing Upload Text")
                 text = ""
-            text = text.replace(".mp4","")
-            text = text.replace(".MP4","")
-            text = text.replace(".jpg","")
-            text = text.replace(".jpeg","")
+            text = text.replace(".mp4","").replace(".MP4","").replace(".jpg","").replace(".jpeg","")
             if isinstance(performers, list) and len(performers) > 0: text += " w/ @"+" @".join(performers)
             if isinstance(keywords, list) and len(keywords) > 0: text += " #"+" #".join(keywords)
             text = text.strip()
@@ -1008,13 +1168,18 @@ class Driver:
             print("- Text: {}".format(text))
             print("- Tweeting: {}".format(settings.TWEETING))
             ## Expires, Schedule, Poll
-            if expires: expiration(expires)
-            if schedule: scheduling(schedule)
-            if poll: polling(poll)
+            if expires: self.expiration(expires)
+            if schedule: self.scheduling(schedule)
+            if poll: 
+                self.polling(poll)
+                time.sleep(3)
             WAIT = WebDriverWait(self.browser, 600, poll_frequency=10)
             ## Tweeting
             if str(settings.TWEETING) == "True":
+                settings.devPrint("tweeting")
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, ONLYFANS_TWEET))).click()
+            else:
+                settings.devPrint("not tweeting")
             ## Skips
             if str(settings.SKIP_UPLOAD) == "True":
                 print("Skipping Upload")
@@ -1022,22 +1187,26 @@ class Driver:
             elif str(settings.SKIP_DOWNLOAD) == "True":
                 print("Warning: Unable to Upload, skipped download")
                 return True
+            ## Text
+            successful_text = self.enter_text(text)
+            if not successful_text:
+                print("Error: Unable to Enter Text")
+                return False
             ## Images
             try:
-                upload_image_files("uploadImage", files)
+                settings.devPrint("uploading files")
+                self.upload_image_files("uploadImage", path)
             except Exception as e:
                 error_checker(e)
                 print("Error: Unable to Upload Images")
                 return False
-            ## Text
-            sendText = self.browser.find_element_by_id(ONLYFANS_POST_TEXT_CLASS)
-            sendText.clear()
-            sendText.send_keys(str(text))
             ## Confirm
+            settings.devPrint("waiting for upload")
             i = 0
             while True:
                 try:                
                     WAIT.until(EC.element_to_be_clickable((By.CLASS_NAME, SEND_BUTTON_CLASS)))
+                    settings.devPrint("upload complete")
                     break
                 except Exception as e:
                     # try: 
@@ -1056,13 +1225,14 @@ class Driver:
                         print('Error: Max Upload Time Reached')
                         return False
             try:
-                send = get_element_to_click("post")
+                send = self.get_element_to_click("post")
                 if send:
                     if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
                         time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
                     if str(settings.DEBUG) == "True":
                         print('Skipped: OnlyFans Upload (debug)')
                         return True
+                    settings.devPrint("confirming upload")
                     send.click()
                 else:
                     settings.maybePrint("Error: Unable to locate 'Send Post' button")
@@ -1084,9 +1254,8 @@ class Driver:
     #################
 
     def get_users(self):
-        auth_ = auth()
+        auth_ = self.auth()
         if not auth_: return False
-        
         try:
             if str(self.browser.current_url) == str(ONLYFANS_USERS_ACTIVE_URL):
                 settings.maybePrint("at -> /my/subscribers/active")
