@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# 3/28/2019 Skeetzo
+# main OnlySnarf class
 
 import random
 import os
@@ -9,12 +9,12 @@ import json
 import sys
 import pathlib
 import time
-from OnlySnarf.settings import SETTINGS as settings
-from OnlySnarf import driver as Driver
+##
 from OnlySnarf import google as Google
-from OnlySnarf import driver as OnlySnarf
-from OnlySnarf.user import User
 from OnlySnarf import cron as Cron
+from OnlySnarf.driver import Driver
+from OnlySnarf.settings import SETTINGS as settings
+from OnlySnarf.user import User
 
 #################################################################
 #################################################################
@@ -27,8 +27,9 @@ FIFTY_MEGABYTES = 50000000
 #####################
 
 class OnlySnarf:
+
     def __init__(self):
-        self.browser = Driver()
+        self.driver = Driver()
 
     ####################
     ##### Discount #####
@@ -39,25 +40,25 @@ class OnlySnarf:
         if not months: months = input("Months: ")
         users = []
         if str(choice) == "all":
-            users = User.get_all_users()
+            users = User.get_all_users(self.driver)
         elif str(choice) == "new":
-            users = User.get_new_users()
+            users = User.get_new_users(self.driver)
         elif str(choice) == "favorite":
-            users = User.get_favorite_users()
+            users = User.get_favorite_users(self.driver)
         elif str(choice) == "recent":
-            users = User.get_recent_users()
+            users = User.get_recent_users(self.driver)
         else:
             if isinstance(choice, str):
-                user = User.get_user_by_username(choice)
+                user = User.get_user_by_username(self.driver, choice)
             users.append(user)
         for user in users:
             # try:
-            success = self.discount_user(user.id, depth=depth, discount=amount, months=months)
+            success = self.driver.discount_user(user.id, depth=depth, discount=amount, months=months)
             if not success: print("Error: There was an error discounting - {}/{}".format(user.id, user.username))
             # except Exception as e:
                 # settings.maybePrint(e)
             depth = int(depth) + 1
-        self.browser.exit()
+        self.driver.exit()
         return True
 
     ################
@@ -65,7 +66,7 @@ class OnlySnarf:
     ################
 
     def exit(self):
-        self.browser.exit()
+        self.driver.exit()
 
     ###################
     ##### Message #####
@@ -74,22 +75,22 @@ class OnlySnarf:
     def message(self, choice, message=None, image=None, price=None, username=None):
         if str(choice) == "all":
             print("Messaging: All")
-            users = User.get_all_users()
+            users = User.get_all_users(self.driver)
         elif str(choice) == "recent":
             print("Messaging: Recent")
-            users = User.get_recent_users()
+            users = User.get_recent_users(self.driver)
         elif str(choice) == "favorites":
             print("Messaging: Recent")
-            users = User.get_favorite_users()
+            users = User.get_favorite_users(self.driver)
         elif str(choice) == "new":
             print("Messaging: New")
-            users = User.get_new_users()
+            users = User.get_new_users(self.driver)
         elif str(choice) == "user":
             print("Messaging: User - {}".format(username))
             if username is None:
                 print("Error: Missing Username")
                 return
-            users = [User.get_user_by_username(str(username))]
+            users = [User.get_user_by_username(self.driver, str(username))]
         else:
             print("Error: Missing Message Choice")
             return
@@ -113,14 +114,14 @@ class OnlySnarf:
         for user in users:
             if user:
                 try:
-                    success = user.sendMessage(message=message, image=image, price=price)
+                    success = user.sendMessage(self.driver, message=message, image=image, price=price)
                     if not success: print("Error: There was an error messaging - {}/{}".format(user.id, user.username))
                     if success: backup = True
                 except Exception as e:
                     settings.maybePrint(e)
         if backup:
             Google.upload_input(image)
-        self.browser.exit()
+        self.driver.exit()
         return success
                 
     ################
@@ -170,10 +171,10 @@ class OnlySnarf:
                     questions = questions_
             poll = {"period":duration,"questions":questions}
         try:
-            successful = self.browser.post(text, expires=expires, schedule=schedule, poll=poll)
+            successful = self.driver.post(text, expires=expires, schedule=schedule, poll=poll)
             # if successful: print("Post Successful")
             # else: print("Post Failed")
-            self.browser.exit()
+            self.driver.exit()
             return successful
         except Exception as e:
             settings.maybePrint(e)
@@ -184,7 +185,7 @@ class OnlySnarf:
 
     def give_trial(self, user):
         print("Applying Promotion: "+user)
-        link = self.browser.get_new_trial_link()
+        link = self.driver.get_new_trial_link()
         text = "Here's your free trial link!\n"+link
         settings.maybePrint("Link: "+str(text))
         # settings.send_email(email, text)
@@ -194,7 +195,7 @@ class OnlySnarf:
     #################
 
     def reset(self):
-        self.browser.reset()
+        self.driver.reset()
 
     ##################
     ##### Upload #####
@@ -205,7 +206,7 @@ class OnlySnarf:
         try:
             if not schedule: schedule = settings.getSchedule()
             if not poll: poll = settings.getPoll()
-            successful = self.browser.upload_to_OnlyFans(path=path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule, poll=poll)
+            successful = self.driver.upload(path=path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule, poll=poll)
             # if successful: print("Upload Successful")
             # else: print("Upload Failed")
             return successful
@@ -321,9 +322,9 @@ class OnlySnarf:
                 print("- Keywords: {}".format(keywords)) # text sent in messages
                 print("- Content: {}".format(path)) # the file(s) to upload
                 print("- Performer(s): {}".format(performers)) # name of performers
-                print("- Expiration: {}".format(expires)) # name of performers
-                print("- Schedule: {}".format(schedule)) # name of performers
-                print("- Poll: {}".format(poll)) # name of performers
+                print("- Expiration: {}".format(expires))
+                print("- Schedule: {}".format(schedule))
+                print("- Poll: {}".format(poll))
             successful_upload = self.upload(path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule, poll=poll)
             if not successful_upload:
                 pass

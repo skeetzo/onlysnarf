@@ -9,8 +9,7 @@ import threading
 from datetime import datetime
 from re import sub
 from decimal import Decimal
-
-from OnlySnarf import driver as OnlySnarf
+##
 from OnlySnarf.settings import SETTINGS as settings
 
 PRICE_MINIMUM = 3
@@ -47,11 +46,11 @@ class User:
         #     settings.maybePrint(e)
         #     settings.maybePrint("User: {}".format(self.id))
 
-    def sendMessage(self, message="", image=None, price=None):
+    def sendMessage(self, Driver, message="", image=None, price=None):
         try:
             print("Sending Message: {} <- {} - {} - ${}".format(self.id, message, image, price))
-            OnlySnarf.message_user(self)
-            success = OnlySnarf.message_text(message)
+            Driver.message_user(self)
+            success = Driver.message_text(message)
             if not success:
                 return False
             if price:
@@ -60,14 +59,14 @@ class User:
                     print("Warning: Price Too Low, Free Image")
                     print("Price Minimum: ${}".format(PRICE_MINIMUM))
                 else:
-                    success = OnlySnarf.message_price(price)
+                    success = Driver.message_price(price)
                     if not success: return False
             if image:
                 image_name = os.path.basename(image)
                 if str(image_name) in self.sent_images:
                     print("Error: Image Already Sent: {} -> {}".format(image, self.id))
                     return False
-                success = OnlySnarf.message_image(image)
+                success = Driver.message_image(image)
                 if not success: return False
             if str(settings.DEBUG) == "True":
                 self.sent_images.append("DEBUG")
@@ -75,7 +74,7 @@ class User:
                 self.sent_images.append(str(image_name))
             if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
                 time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
-            success = OnlySnarf.message_confirm()
+            success = Driver.message_confirm()
             if not success: return False
             if str(settings.DEBUG) == "False":
                 self.last_messaged_on = datetime.now()
@@ -123,9 +122,9 @@ class User:
         self.sendMessage(message=settings.user_DEFAULT_REFRESHER)
 
     # saves chat log to user
-    def readChat(self):
+    def readChat(self, Driver):
         print("Reading Chat: {} - {}".format(self.username, self.id))
-        messages = OnlySnarf.read_user_messages(self.id)
+        messages = Driver.read_user_messages(self.id)
         self.messages = messages[0]
         # self.messages_and_timestamps = messages[1]
         self.messages_to = messages[2]
@@ -133,9 +132,9 @@ class User:
         settings.maybePrint("Chat Read: {} - {}".format(self.username, self.id))
 
     # saves statement / payment history
-    def statementHistory(self, history):
+    def statementHistory(self, Driver, history):
         print("Reading Statement History: {} - {}".format(self.username, self.id))
-        OnlySnarf.read_statements(user=self.id)
+        Driver.read_statements(user=self.id)
 
     # sets as favorite
     def favor(self):
@@ -148,15 +147,15 @@ class User:
         self.isFavorite = False
 
     @staticmethod
-    def get_all_users():
-        return User.get_active_users()
+    def get_all_users(Driver):
+        return User.get_active_users(Driver)
 
     # gets users from local or refreshes from onlyfans.com
     @staticmethod
-    def get_active_users():
+    def get_active_users(Driver):
         if str(settings.PREFER_LOCAL) == "True": return read_users_local()
         active_users = []
-        users = OnlySnarf.get_users()
+        users = Driver.get_users()
         for user in users:
             try:
                 user = User(user)
@@ -172,7 +171,7 @@ class User:
         return active_users
 
     @staticmethod
-    def get_user_by_username(username):
+    def get_user_by_username(Driver, username):
         if not username or username == None:
             print("Error: Missing Username")
             return None
@@ -181,7 +180,7 @@ class User:
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
                 settings.maybePrint("Found User: Local")
                 return user
-        users = User.get_all_users()
+        users = User.get_all_users(Driver)
         for user in users:
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
                 settings.maybePrint("Found User: Members")
@@ -189,9 +188,9 @@ class User:
         return None
 
     @staticmethod
-    def get_favorite_users():
+    def get_favorite_users(Driver):
         settings.maybePrint("Getting Fav Users")
-        users = User.get_all_users()
+        users = User.get_all_users(Driver)
         favUsers = []
         favorites = ",".join(str(settings.USERS_FAVORITE))
         for user in users:
@@ -204,9 +203,9 @@ class User:
 
     # returns users that have no messages sent to them
     @staticmethod
-    def get_new_users():
+    def get_new_users(Driver):
         settings.maybePrint("Getting New Users")
-        users = User.get_all_users()
+        users = User.get_all_users(Driver)
         newUsers = []
         date_ = datetime.today() - timedelta(days=10)
         for user in users:
@@ -220,10 +219,10 @@ class User:
         return newUsers
 
     @staticmethod
-    def get_never_messaged_users():
+    def get_never_messaged_users(Driver):
         settings.maybePrint("Getting New Users")
-        update_chat_logs()
-        users = User.get_all_users()
+        update_chat_logs(Driver)
+        users = User.get_all_users(Driver)
         newUsers = []
         for user in users:
             if len(user.messages_to) == 0:
@@ -234,9 +233,9 @@ class User:
         return newUsers
 
     @staticmethod
-    def get_recent_users():
+    def get_recent_users(Driver):
         settings.maybePrint("Getting Recent Users")
-        users = User.get_all_users()
+        users = User.get_all_users(Driver)
         i = 0
         users_ = []
         for user in users:

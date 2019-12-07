@@ -18,6 +18,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 # Message
 sudo onlysnarfpy \
+-debug \
 -verbose \
 -action "message" \
 -method "user" \
