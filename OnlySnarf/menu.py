@@ -23,6 +23,8 @@ from OnlySnarf import cron as Cron
 ##### Globals #####
 ###################
 
+snarf = OnlySnarf()
+
 version = str(pkg_resources.get_distribution("onlysnarf").version)
 header = "\n ________         .__          _________                     _____ \n \
 \\_____  \\   ____ |  | ___.__./   _____/ ____ _____ ________/ ____\\\n \
@@ -70,7 +72,7 @@ def initialize():
         [ "Delete Google", settings.DELETE_GOOGLE, ["True","False"],False],
         [ "Skip Delete", settings.SKIP_DELETE, ["True","False"],False],
         [ "Tweeting", settings.TWEETING, ["True","False"],True],
-        [ "Image Limit", settings.IMAGE_UPLOAD_LIMIT,None,True],
+        [ "Image Limit", settings.IMAGE_DOWNLOAD_LIMIT,None,True],
     ]
     if str(settings.VERBOSE) == "True":
         settingItems.append([ "Skip Backup", settings.SKIP_BACKUP, ["True","False"],False])
@@ -86,7 +88,7 @@ def initialize():
         settingItems.append([ "Force Backup", settings.FORCE_BACKUP, ["True","False"],False])
         settingItems.append([ "Force Upload", settings.FORCE_UPLOAD, ["True","False"],False])
         settingItems.append([ "Skip Download", settings.SKIP_DOWNLOAD, ["True","False"],False])
-        settingItems.append([ "Image Max", settings.IMAGE_UPLOAD_MAX,None,False])
+        settingItems.append([ "Image Max", settings.IMAGE_UPLOAD_LIMIT,None,False])
         settingItems.append([ "Text", settings.TEXT,None,False])
         settingItems.append([ "Local", settings.INPUT,None,False])
         settingItems.append([ "Image", settings.IMAGE,None,False])
@@ -104,7 +106,7 @@ def initialize():
     if str(settings.DEBUG) == "True":
         menuItems.append(["Profile", "profile"])
     menuItems = sorted(menuItems)
-    menuItems.insert(0,[ "Exit", "exit"])
+    menuItems.append([ "Exit", "exit"])
 
     ###
     ### Actions
@@ -113,7 +115,7 @@ def initialize():
     global actionItems
     # Actions Menu
     actionItems = [
-        [ "Upload", "release" ],
+        [ "Upload", "upload_prep" ],
         [ "Download", "download" ],
         # [ "Promotion", "promotion" ],
         [ "Message", "message" ],
@@ -303,7 +305,7 @@ def action():
             if str(actionItems[int(choice)][1]) == "main":
                 return main()
             elif str(actionItems[int(choice)][1]) == "reset":
-                OnlySnarf.remove_local()
+                settings.remove_local()
             elif str(actionItems[int(choice)][1]) == "message":
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeMessage(actionChoice)
@@ -437,8 +439,8 @@ def selectMethod(actionChoice, fileChoice):
 ### Action Menu - perform
 def performAction(actionChoice, fileChoice, methodChoice, file=None, folderName=None, parent=None):
     try:
-        method = getattr(OnlySnarf, str(actionChoice))
-        response = method(fileChoice, methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
+        # method = getattr(snarf, str(actionChoice))
+        response = snarf.upload_prep(fileChoice, methodChoice=methodChoice, file=file, folderName=folderName, parent=parent)
         if response:
             if str(actionChoice) == "download":
                 settings.update_value("input",response.get("path"))
@@ -526,18 +528,18 @@ def message(choice, image=None, username=None):
     if not image or not image[0] or image[0] == None:
         print("Error: Missing Image")
         return        
-    OnlySnarf.remove_local()
-    try: 
+    settings.remove_local()
+    try:
         image = Google.download_file(image[0]).get("path")
     except Exception as e:
-        OnlySnarf.remove_local()
+        settings.remove_local()
         try:
             image = Google.download_gallery(image[0]).get("path")
         except Exception as e:
             print("Error: Missing Image(s)")
             image = None
             # pass
-    OnlySnarf.message(choice, message=message, image=image, price=price, username=username)
+    snarf.message(choice, message=message, image=image, price=price, username=username)
 
 # Promotion Menu - finalize
 def finalizePromotion(actionChoice):
@@ -561,7 +563,7 @@ def performPromotion(actionChoice, promotionChoice):
         if username == None:
             print("Warning: No user found")
         else:
-            OnlySnarf.give_trial(username)
+            snarf.give_trial(username)
         mainMenu()    
     try:
         username = None
@@ -608,7 +610,7 @@ def performDiscount(actionChoice, discountChoice):
     username = None
     if str(discountChoice) == "user":
         user = input("Username: ")
-        OnlySnarf.discount(user, depth=int(choice))
+        snarf.discount(user, depth=int(choice))
         mainMenu()
     elif str(discountChoice) == "select":
         users = displayUsers()
@@ -619,13 +621,13 @@ def performDiscount(actionChoice, discountChoice):
                 if int(choice) < 0 or int(choice) > len(users): raise ValueError
                 if int(choice) == 0:
                     return finalizeDiscount(actionChoice)
-                OnlySnarf.discount(users[int(choice)-1], depth=int(choice))
+                snarf.discount(users[int(choice)-1], depth=int(choice))
                 mainMenu()
             except (ValueError, IndexError):
                 print(sys.exc_info()[0])
                 print("Error: Incorrect Index")
                 return mainMenu()
-    OnlySnarf.discount(discountChoice)
+    snarf.discount(discountChoice)
     mainMenu()    
 
 def finalizePost(actionChoice):
@@ -639,7 +641,7 @@ def finalizePost(actionChoice):
             if str(postItems[int(choice)][1]) == "main":
                 return action()
             elif str(postItems[int(choice)][1]) == "enter":
-                OnlySnarf.post()
+                snarf.post()
             else:
                 selectPost()
             return mainMenu()
@@ -662,7 +664,7 @@ def selectPost():
             if str(postMenu[int(choice)][1]) == "main":
                 return action()
             text = postMenu[int(choice)][1]
-            OnlySnarf.post(text=text)
+            snarf.post(text=text)
             return mainMenu()
         except (ValueError, IndexError):
             print(sys.exc_info()[0])
@@ -757,7 +759,7 @@ def displayFolders(folderName, parent=None):
 
 # displays and returns users
 def displayUsers():
-    users = OnlySnarf.get_users()
+    users = snarf.get_users()
     print(colorize("[0] ", 'blue') + "Back")
     # show list
     i = 1
@@ -813,7 +815,7 @@ def set_profile():
                 return main()
     def selectProfileSetting(label, setting):
         for item in setting:
-                print(colorize("[" + str(setting.index(item)) + "] ", 'teal') + list(item)[0])
+            print(colorize("[" + str(setting.index(item)) + "] ", 'teal') + list(item)[0])
             while True:
                 choice = input(">> ")
                 try:
@@ -1007,7 +1009,7 @@ def showSettings():
     print('Settings:')
     for setting in settingItems:
         if str(setting[0]) == "Image Limit" and setting[3]:
-            print(" - {} = {}/{}".format(setting[0],setting[1],settings.IMAGE_UPLOAD_MAX))
+            print(" - {} = {}/{}".format(setting[0],setting[1],settings.IMAGE_UPLOAD_LIMIT))
         elif str(setting[0]) != "Back" and str(settings.DEBUG) == "True":
             print(" - {} = {}".format(setting[0],setting[1]))
         elif str(setting[0]) != "Back" and setting[3]:

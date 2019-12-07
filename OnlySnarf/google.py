@@ -18,6 +18,7 @@ from apiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file, client, tools
 from apiclient.http import MediaFileUpload,MediaIoBaseDownload
+##
 from .settings import SETTINGS as settings
 
 ###################
@@ -291,6 +292,27 @@ def get_folder_root():
 ####################
 ##### Download #####
 ####################
+
+def download(fileChoice, methodChoice="random", file=None):
+    if methodChoice == "random":
+        return random_download(fileChoice)
+    elif methodChoice == "choose" and file is not None:
+        if fileChoice == 'image' or fileChoice == 'video':
+            return download_file(file)
+        elif fileChoice == 'gallery':
+            return download_gallery(file)
+        elif fileChoice == 'performer':
+            if "folder" in file.get("mimeType"):
+                return download_content(file)
+            else:          
+                return download_file(file)  
+#################################################################
+        elif fileChoice == 'scene':
+            return download_scene(file)
+#################################################################
+    else:
+        print("Error: Unable to Download")
+        return None
 
 # Download File
 def download_file(file, REPAIR=False):
@@ -582,10 +604,10 @@ def get_images():
     random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(images_folder['id'])}).GetList()
     images_list = []
     for folder in random_folders:
-        if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
+        if settings.BYKEYWORD != None and str(folder['title']) not in str(settings.BYKEYWORD):
             settings.maybePrint('-> not keyword')
             continue
-        elif settings.NOTKEYWORD != None and str(settings.NOTKEYWORD) == str(folder['title']):
+        elif settings.NOTKEYWORD != None and str(folder['title']) not in str(settings.NOTKEYWORD):
             settings.maybePrint('-> by not keyword')
             continue
         images_list.append([images_folder, folder])
@@ -614,10 +636,10 @@ def get_message_image(folderName):
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()      
-        if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
+        if settings.BYKEYWORD != None and str(folder['title']) not in str(settings.BYKEYWORD):
             settings.maybePrint('-> not keyword')
             continue
-        elif settings.NOTKEYWORD != None and str(settings.NOTKEYWORD) == str(folder['title']):
+        elif settings.NOTKEYWORD != None and str(folder['title']) not in str(settings.NOTKEYWORD):
             settings.maybePrint('-> by not keyword')
             continue
         if len(images_list_tmp)>0:
@@ -652,10 +674,10 @@ def get_random_image():
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()      
-        if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
+        if settings.BYKEYWORD != None and str(folder['title']) not in str(settings.BYKEYWORD):
             settings.maybePrint('-> not keyword')
             continue
-        elif settings.NOTKEYWORD != None and str(settings.NOTKEYWORD) == str(folder['title']):
+        elif settings.NOTKEYWORD != None and str(folder['title']) not in str(settings.NOTKEYWORD):
             settings.maybePrint('-> by not keyword')
             continue
         if len(images_list_tmp)>0:
@@ -690,10 +712,10 @@ def get_random_gallery():
         if str(settings.VERBOSE) == "True":
             print('checking galleries: {}'.format(folder['title']),end="")
         gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
+        if settings.BYKEYWORD != None and str(folder['title']) not in str(settings.BYKEYWORD):
             settings.maybePrint('-> not keyword')
             continue
-        elif settings.NOTKEYWORD != None and str(settings.NOTKEYWORD) == str(folder['title']):
+        elif settings.NOTKEYWORD != None and str(folder['title']) not in str(settings.NOTKEYWORD):
             settings.maybePrint('-> by not keyword')
             continue
         if len(gallery_list_tmp)>0:
@@ -737,10 +759,10 @@ def get_random_performer():
         settings.maybePrint('random performer: '+folder['title'])
         performer_content_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
         # print('random folders: '+str(performer_list))
-        if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']): 
+        if settings.BYKEYWORD != None and str(folder['title']) not in str(settings.BYKEYWORD): 
             settings.maybePrint('- skipping nonkeyword: '+folder['title'])
             continue
-        elif settings.NOTKEYWORD != None and str(settings.NOTKEYWORD) == str(folder['title']):
+        elif settings.NOTKEYWORD != None and str(folder['title']) not in str(settings.NOTKEYWORD):
             settings.maybePrint('-> by not keyword')
             continue
         if len(performer_content_list)==0:
@@ -771,10 +793,10 @@ def get_random_video():
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
         video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
-        if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
+        if settings.BYKEYWORD != None and str(folder['title']) not in str(settings.BYKEYWORD):
             settings.maybePrint('-> not keyword')
             continue
-        elif settings.NOTKEYWORD != None and str(settings.NOTKEYWORD) == str(folder['title']):
+        elif settings.NOTKEYWORD != None and str(folder['title']) not in str(settings.NOTKEYWORD):
             settings.maybePrint('-> by not keyword')
             continue
         if len(video_list_tmp)>0:
@@ -809,10 +831,10 @@ def get_random_scene():
         if str(settings.VERBOSE) == "True":
             print('checking scenes: '+folder['title'],end="")
         scene_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
+        if settings.BYKEYWORD != None and str(folder['title']) not in str(settings.BYKEYWORD):
             settings.maybePrint('-> not keyword')
             continue
-        elif settings.NOTKEYWORD != None and str(settings.NOTKEYWORD) == str(folder['title']):
+        elif settings.NOTKEYWORD != None and str(folder['title']) not in str(settings.NOTKEYWORD):
             settings.maybePrint('-> by not keyword')
             continue
         if len(scene_list_tmp)>0:
@@ -897,7 +919,7 @@ def upload_file(path=None, parent=None):
         print('Skipping Google Upload (disabled): {}'.format(filename))
         return
     elif str(settings.SKIP_BACKUP) == "True":
-        print('Skipping Backup: {}'.format(file['title']))
+        print('Skipping Backup: {}'.format(filename))
         return
     else:
         print('Google Upload (file): {}'.format(filename))
@@ -920,6 +942,7 @@ def upload_file(path=None, parent=None):
     # media = MediaFileUpload(path, mimetype=str(mimetype), resumable=True)
     # file = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
     file = PYDRIVE.CreateFile({'title':str(filename), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':str(mimetype)})
+    file.SetContentFile(path)
     file.Upload()
     # print('File ID: {}'.format(file.get('id')))
 
@@ -928,7 +951,6 @@ def upload_gallery(path=None):
     if not parent:
         print("Error: Missing Posted Folder")
         return
-    print(settings.SKIP_BACKUP)
     if str(settings.FORCE_BACKUP) == "True":
         print("Google Upload (forced): {}".format(path))
     elif str(settings.DEBUG) == "True":
@@ -938,19 +960,19 @@ def upload_gallery(path=None):
         print('Skipping Google Upload (disabled): {}'.format(path))
         return
     elif str(settings.SKIP_BACKUP) == "True":
-        print('Skipping Backup (gallery): {}'.format(file['title']))
+        print('Skipping Backup (gallery): {}'.format(path))
         return
     else:
         print('Google Upload: {}'.format(path))
-    file_metadata = {
-        'name': str(datetime.datetime.now()),
-        'mimeType': str("application/vnd.google-apps.folder"),
-        'parents': [{"kind": "drive#fileLink", "id": str(parent['id'])}]
-    }
-    tmp_folder = PYDRIVE.CreateFile({'title':str(datetime.datetime.now()), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':'application/vnd.google-apps.folder'})
-    tmp_folder.Upload()
+    # file_metadata = {
+    #     'name': str(datetime.datetime.now()),
+    #     'mimeType': str("application/vnd.google-apps.folder"),
+    #     'parents': [{"kind": "drive#fileLink", "id": str(parent['id'])}]
+    # }
     # media = MediaFileUpload(path, mimetype="application/vnd.google-apps.folder", resumable=True)
     # parent = DRIVE.files().create(body=file_metadata, fields='id').execute()
+    tmp_folder = PYDRIVE.CreateFile({'title':str(datetime.datetime.now()), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':'application/vnd.google-apps.folder'})
+    tmp_folder.Upload()
     files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
     for file in files:
         upload_file(path=file, parent=tmp_folder)
