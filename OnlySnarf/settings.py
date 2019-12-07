@@ -1,111 +1,11 @@
 #!/usr/bin/python3
-# Global Settings
+# App Settings
 import re
 import sys
 import os
 import json
-
-class Profile:
-
-    # profile settings are either:
-    #   enabled or disabled
-    #   display text, variable type, variable name in settings
-    def __init__(self):
-        # url path or file upload
-        self.coverImage = None
-        # url path or file upload
-        self.profilePhoto = None
-        # text
-        self.displayName = ""
-        # text in $
-        # minimum $4.99 or free
-        self.subscriptionPrice = "4.99"
-        # text
-        self.about = ""
-        # text
-        self.location = ""
-        # text as url
-        self.websiteURL = None
-        # text
-        self.username = ""
-        # text, can't be changed
-        self.email = ""
-        # text
-        self.password = ""
-        # enabled or disabled
-        self.emailNotifs = False
-        # enabled or disabled
-        self.emailNotifsNewReferral = False
-        # enabled or disabled
-        self.emailNotifsNewStream = False
-        # enabled or disabled
-        self.emailNotifsNewSubscriber = False
-        # enabled or disabled
-        self.emailNotifsNewTip = False
-        # enabled or disabled
-        self.emailNotifsRenewal = False
-        # enabled or disabled
-        self.emailNotifsNewLikes = False
-        # enabled or disabled
-        self.emailNotifsNewPosts = False
-        # enabled or disabled
-        self.emailNotifsNewPrivMessages = False
-        # enabled or disabled
-        self.siteNotifs = False
-        # enabled or disabled
-        self.siteNotifsNewComment = False
-        # enabled or disabled
-        self.siteNotifsNewFavorite = False
-        # enabled or disabled
-        self.siteNotifsDiscounts = False
-        # enabled or disabled
-        self.siteNotifsNewSubscriber = False
-        # enabled or disabled
-        self.siteNotifsNewTip = False
-        # enabled or disabled
-        self.toastNotifs = False
-        # enabled or disabled
-        self.toastNotifsNewComment = False
-        # enabled or disabled
-        self.toastNotifsNewFavorite = False
-        # enabled or disabled
-        self.toastNotifsNewSubscriber = False
-        # enabled or disabled
-        self.toastNotifsNewTip = False
-        # enabled or disabled
-        self.fullyPrivate = False
-        # enabled or disabled
-        self.enableComments = False
-        # enabled or disabled
-        self.showFansCount = False
-        # enabled or disabled
-        self.showPostsTip = False
-        # enabled or disabled
-        self.publicFriendsList = False
-        # selection of countries
-        self.ipCountry = getCountryList()
-        # text of ip ranges
-        self.ipIP = ""
-        # enabled or disabled
-        self.watermark = True
-        # enabled or disabled
-        self.watermarkPhoto = False
-        # enabled or disabled
-        self.watermarkVideo = False
-        # the custom watermark text
-        self.watermarkText = ""
-        if self.username and str(self.username) != "":
-            self.watermarkText = "OnlyFans.com/{}".format(self.username)
-        # the obs live server
-        self.liveServer = ""
-        # the obs live server key
-        self.liveServerKey = ""
-
-    def __getitem__(self, key):
-        return getattr(self, key)
-
-    def __setitem__(self, key, val):
-        return setattr(self, key, val)
+import shutil
+from OnlySnarf.profile import Profile
 
 class Settings:
     def __init__(self):
@@ -118,10 +18,10 @@ class Settings:
         return setattr(self, key, val)
 
     def initialize(self):
-        print("Initializing Settings")
+        # print("Initializing Settings")
         try:
             if self.INITIALIZED:
-                print("Already Initialized, Skipping")
+                # print("Already Initialized, Skipping")
                 return
         except:
             self.INITIALIZED = False
@@ -225,16 +125,17 @@ class Settings:
         # path to local image to use for message or upload
         self.IMAGE = None
         ##
-        # -image-limit
-        # maximum number of images to upload
-        self.IMAGE_UPLOAD_LIMIT = 6
+        # -image-download-limit
+        # maximum number of images to download
+        self.IMAGE_DOWNLOAD_LIMIT = 6
         ##
-        # -image-max
+        # -image-upload-limit
         # maximum number of images that can be uploaded
-        self.IMAGE_UPLOAD_MAX = 20
+        self.IMAGE_UPLOAD_LIMIT = 20
         ##
+        # - image-upload-limit-messages
         # maximum number of images that can be uploaded in a message
-        self.IMAGE_UPLOAD_MAX_MESSAGES = 5
+        self.IMAGE_UPLOAD_LIMIT_MESSAGES = 5
         ##
         # -keywords
         # keywords to # in post
@@ -370,6 +271,10 @@ class Settings:
         # enabled tweeting
         self.TWEETING = False
         ##
+        # -upload-max
+        # the max number of 10 minute intervals to upload for
+        self.UPLOAD_MAX_DURATION = 12 # 2 hours
+        ##
         # -user
         # the user to target
         self.USER = None
@@ -402,22 +307,22 @@ class Settings:
             sys.argv[i] = sys.argv[i][1:] # remove - in front
             truths_ = ["SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
             falses_ = []
-            nexts_ = ["NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_UPLOAD_LIMIT","IMAGE_UPLOAD_MAX","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
+            nexts_ = ["IMAGE_UPLOAD_LIMIT_MESSAGES","UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_DOWNLOAD_LIMIT","IMAGE_UPLOAD_LIMIT","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0
             while j < len(truths_):
-                if str(truths_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
+                if str(truths_[j]).upper() == str(sys.argv[i]).upper().replace("-","_"):
                     # self.set(truths_[j], True)
                     self[truths_[j]] = True
                 j = j + 1
             j = 0
             while j < len(falses_):
-                if str(falses_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
+                if str(falses_[j]).upper() == str(sys.argv[i]).upper().replace("-","_"):
                     # self.set(falses_[j], False)
                     self[falses_[j]] = False
                 j = j + 1
             j = 0
             while j < len(nexts_):
-                if str(nexts_[j]).upper() in str(sys.argv[i]).upper().replace("-","_"):
+                if str(nexts_[j]).upper() == str(sys.argv[i]).upper().replace("-","_"):
                     # self.set(nexts_[j], sys.argv[i+1])  
                     try:
                         self[nexts_[j]] = sys.argv[i+1]
@@ -458,7 +363,6 @@ class Settings:
             else:
                 self.PERFORMERS = self.PERFORMERS.split(",")
                 self.PERFORMERS = [n.strip() for n in self.PERFORMERS]
-
         self.INITIALIZED = True
         # print("Settings Initialized")
     ###################################################
@@ -467,6 +371,14 @@ class Settings:
     ##### Functions #####
     #####################
 
+    def debug_delay_check(self):
+        if str(self.DEBUG) == "True" and str(self.DEBUG_DELAY) == "True":
+            time.sleep(int(self.DEBUG_DELAY_AMOUNT))
+
+    def devPrint(self, text):
+        if str(self.VERBOSE) == "True" and str(self.DEBUG) == "True":
+            print(text)
+            
     def getInput(self):
         if str(self.INPUT) == "None":
             self.maybePrint("Error: Missing Local Input")
@@ -520,6 +432,24 @@ class Settings:
         if str(self.VERBOSE) == "True":
             print(text)
 
+    # Deletes local file
+    def remove_local(self):
+        try:
+            if str(self.SKIP_DELETE) == "True" or str(self.INPUT) != "None":
+                self.maybePrint("Skipping Local Remove")
+                return
+            # print('Deleting Local File(s)')
+            # delete /tmp
+            tmp = self.getTmp()
+            if os.path.exists(tmp):
+                shutil.rmtree(tmp)
+                print('Local File(s) Removed')
+            else:
+                print('Local Files Not Found')
+        except Exception as e:
+            self.maybePrint(e)
+
+
     def update_value(self, variable, newValue):
         variable = str(variable).upper().replace(" ","_")
         try:
@@ -539,9 +469,6 @@ class Settings:
             maybePrint(e)
 
 SETTINGS = Settings()
-
-def getCountryList():
-    return ["USA","Canada"]
 
 def readConf(self, conf):
     posts = False
@@ -567,6 +494,10 @@ def readConf(self, conf):
                 # self.maybePrint(e)
                 # print("Warning: Error Parsing Config")
 
+# def send_email(email, text):
+#     print("Sending Email: "+str(email))
+#     pass
+
 class AttrDict(dict):
     def __init__(self):
         dict.__init__(self)
@@ -577,3 +508,108 @@ class AttrDict(dict):
 
     def __getattr__(self, name):
         return self[name]
+
+# returns list of settings and their classes
+def get_settings_variables():
+    # ["settingVariableName","pageProfile",".setting.html.class","inputType-text"]
+    return [
+         ### Profile ###
+        ["coverImage","profile","b-user-panel__cover__img","inputType"],
+        ["profilePhoto","profile","g-btn.m-rounded.m-sm.m-border","inputType"],
+        # display name needs to match: placeholder="Display name"
+        ["displayName","profile","form-control.g-input","inputType"],
+        # subscription price needs to match: name="subscribePrice" 
+        ["subscriptionPrice","form-control.g-input","classname","inputType"],
+        # about placeholder is: placeholder="About"
+        # id="input-about"
+        ["about","profile","form-control.g-input.unlimsize","inputType"],
+        # id="input-location"
+        ["location","profile","form-control.g-input","inputType"],
+        # id="input-website"
+        ["websiteURL","profile","form-control.g-input","inputType"],
+        #### Account ###
+        # id="input-login"
+        ["username","account","form-control.g-input","inputType"],
+        # id="input-email"
+        ["email","account","form-control.g-input","inputType"],
+        # id="old_password_input"
+        ["password","account","form-control.g-input","inputType"],
+        # id="new_password_input"
+        ["newPassword","account","form-control.g-input","inputType"],
+        # id="new_password2_input"
+        ["confirmPassword","account","form-control.g-input","inputType"],
+        ### Notifications ###
+        # id="push-notifications"
+        ["emailNotifs","notifications","checkbox","inputType"],
+        # id="email-notifications"
+        ["emailNotifsNewReferral","notifications","checkbox","inputType"],
+
+        ["emailNotifsNewStream","notifications","b-input-radio","inputType"],
+
+        ["emailNotifsNewSubscriber","notifications","b-input-radio","inputType"],
+
+        ["emailNotifsNewTip","notifications","b-input-radio","inputType"],
+
+        ["emailNotifsRenewal","notifications","b-input-radio","inputType"],
+
+
+
+    # this is a dropdown
+        ["emailNotifsNewLikes","notifications","checkbox","inputType"],
+
+
+        # get inner text of all these
+
+        ["emailNotifsNewPosts","notifications","checkbox","inputType"],
+
+        ["emailNotifsNewPrivMessages","notifications","checkbox","inputType"],
+
+        ["siteNotifs","notifications","checkbox","inputType"],
+
+        ["siteNotifsNewComment","notifications","b-input-radio","inputType"],
+
+        ["siteNotifsNewFavorite","notifications","b-input-radio","inputType"],
+
+        ["siteNotifsDiscounts","notifications","b-input-radio","inputType"],
+
+        ["siteNotifsNewSubscriber","notifications","b-input-radio","inputType"],
+
+        ["siteNotifsNewTip","notifications","b-input-radio","inputType"],
+
+        ["toastNotifsNewComment","notifications","b-input-radio","inputType"],
+
+        ["toastNotifsNewFavorite","notifications","b-input-radio","inputType"],
+
+        ["toastNotifsNewSubscriber","notifications","b-input-radio","inputType"],
+
+        ["toastNotifsNewTip","notifications","b-input-radio","inputType"],
+
+        ### Security ###
+
+        ["fullyPrivate","security","checkbox","inputType"],
+
+        ["enableComments","security","classname","inputType"],
+
+        ["showFansCount","security","classname","inputType"],
+
+        ["showPostsTip","security","classname","inputType"],
+
+        ["publicFriendsList","security","classname","inputType"],
+
+        ["ipCountry","security","multiselect__input","inputType"],
+        # id="input-blocked-ips"
+        ["ipIP","security","form-control.g-input.unlimsize","inputType"],
+        # id="hasWatermarkPhoto"
+        ["watermarkPhoto","security","classname","inputType"],
+        # id="hasWatermarkVideo"
+        ["watermarkVideo","security","classname","inputType"],
+        # placeholder="Watermark custom text"
+        ["watermarkText","security","form-control.g-input","inputType"],
+
+        ### Other ###
+        ["liveServer","other","form-control.g-input","inputType"],
+
+        ["liveServerKey","other","form-control.g-input","inputType"]
+
+    ]
+

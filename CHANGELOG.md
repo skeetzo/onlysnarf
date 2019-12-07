@@ -245,9 +245,11 @@
   - fixed: user scrapes
   - updated: config.py, unable to test
   
-----------------
+----------------------------------------
   **2.15.0**
   - added: Settings options
+  - class reorg
+  - major functions pending complete testing
   
 ----------------------------------------
 
@@ -304,3 +306,4 @@ Referral Code
 https://onlyfans.com/?ref=409408
 
 
+Message: "mirror dick" to u10041738
