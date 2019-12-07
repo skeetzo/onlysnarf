@@ -292,6 +292,27 @@ def get_folder_root():
 ##### Download #####
 ####################
 
+def download(fileChoice, methodChoice="random", file=None):
+    if methodChoice == "random":
+        return random_download(fileChoice)
+    elif methodChoice == "choose" and file is not None:
+        if fileChoice == 'image' or fileChoice == 'video':
+            return download_file(file)
+        elif fileChoice == 'gallery':
+            return download_gallery(file)
+        elif fileChoice == 'performer':
+            if "folder" in file.get("mimeType"):
+                return download_content(file)
+            else:          
+                return download_file(file)  
+#################################################################
+        elif fileChoice == 'scene':
+            return download_scene(file)
+#################################################################
+    else:
+        print("Error: Unable to Download")
+        return None
+
 # Download File
 def download_file(file, REPAIR=False):
     if not file:

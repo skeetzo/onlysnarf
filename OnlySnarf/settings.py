@@ -4,6 +4,7 @@ import re
 import sys
 import os
 import json
+import shutil
 
 class Profile:
 
@@ -118,10 +119,10 @@ class Settings:
         return setattr(self, key, val)
 
     def initialize(self):
-        print("Initializing Settings")
+        # print("Initializing Settings")
         try:
             if self.INITIALIZED:
-                print("Already Initialized, Skipping")
+                # print("Already Initialized, Skipping")
                 return
         except:
             self.INITIALIZED = False
@@ -463,7 +464,6 @@ class Settings:
             else:
                 self.PERFORMERS = self.PERFORMERS.split(",")
                 self.PERFORMERS = [n.strip() for n in self.PERFORMERS]
-
         self.INITIALIZED = True
         # print("Settings Initialized")
     ###################################################
@@ -471,6 +471,10 @@ class Settings:
     #####################
     ##### Functions #####
     #####################
+
+    def debug_delay_check(self):
+        if str(self.DEBUG) == "True" and str(self.DEBUG_DELAY) == "True":
+            time.sleep(int(self.DEBUG_DELAY_AMOUNT))
 
     def getInput(self):
         if str(self.INPUT) == "None":
@@ -525,6 +529,24 @@ class Settings:
         if str(self.VERBOSE) == "True":
             print(text)
 
+    # Deletes local file
+    def remove_local(self):
+        try:
+            if str(self.SKIP_DELETE) == "True" or str(self.INPUT) != "None":
+                self.maybePrint("Skipping Local Remove")
+                return
+            # print('Deleting Local File(s)')
+            # delete /tmp
+            tmp = self.getTmp()
+            if os.path.exists(tmp):
+                shutil.rmtree(tmp)
+                print('Local File(s) Removed')
+            else:
+                print('Local Files Not Found')
+        except Exception as e:
+            self.maybePrint(e)
+
+
     def update_value(self, variable, newValue):
         variable = str(variable).upper().replace(" ","_")
         try:
@@ -544,6 +566,7 @@ class Settings:
             maybePrint(e)
 
 SETTINGS = Settings()
+
 
 def getCountryList():
     return ["USA","Canada"]
@@ -571,6 +594,10 @@ def readConf(self, conf):
                 pass
                 # self.maybePrint(e)
                 # print("Warning: Error Parsing Config")
+
+# def send_email(email, text):
+#     print("Sending Email: "+str(email))
+#     pass
 
 class AttrDict(dict):
     def __init__(self):
