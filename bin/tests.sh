@@ -5,7 +5,7 @@ echo "-----------------------------------------------------"
 echo "Testing OnlySnarf"
 mkdir ../onlysnarf/logs
 
-echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" 2>&1 | tee >> ../onlysnarf/logs/tests.txt 2>&1
 echo "################## Start #########################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 
@@ -19,7 +19,8 @@ sudo onlysnarfpy \
 -duration 3 \
 -text "image testes" \
 -bykeyword "pussycats" \
--questions "your mom","some toast","a nice sandwich" >> ../onlysnarf/logs/tests.txt
+-skip-download \
+-questions "your mom","some toast","a nice sandwich" | tee ../onlysnarf/logs/tests.txt
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -37,7 +38,7 @@ sudo onlysnarfpy \
 -text "image testes" \
 -bykeyword "pussycats" \
 -schedule "6/6/2020:6:26" \
--skip-download >> ../onlysnarf/logs/tests.txt
+-skip-download | tee ../onlysnarf/logs/tests.txt
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -54,7 +55,8 @@ sudo onlysnarfpy \
 -action "upload" -type "image" \
 -text "image testes" \
 -bykeyword "pussycats" \
--expires 3 >> ../onlysnarf/logs/tests.txt
+-skip-download \
+-expires 3 | tee ../onlysnarf/logs/tests.txt
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -69,7 +71,7 @@ sudo onlysnarfpy \
 -debug \
 -verbose \
 -action "post" \
--text "post testes" >> ../onlysnarf/logs/tests.txt
+-text "post testes" | tee ../onlysnarf/logs/tests.txt
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -87,7 +89,7 @@ sudo onlysnarfpy \
 -user "recent" \
 -amount 40 \
 -months 3 \
--prefer-local >> ../onlysnarf/logs/tests.txt
+-prefer-local | tee ../onlysnarf/logs/tests.txt
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -107,7 +109,8 @@ sudo onlysnarfpy \
 -price "10.00" \
 -bykeyword "pussycats" \
 -type "gallery" \
--prefer-local >> ../onlysnarf/logs/tests.txt
+-skip-download \
+-prefer-local | tee ../onlysnarf/logs/tests.txt
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -126,7 +129,8 @@ sudo onlysnarfpy \
 -user "10041738" \
 -bykeyword "pussycats" \
 -text "pussycat" \
--prefer-local >> ../onlysnarf/logs/tests.txt
+-skip-download \
+-prefer-local | tee ../onlysnarf/logs/tests.txt
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "################### End ##########################" >> ../onlysnarf/logs/tests.txt 2>&1
