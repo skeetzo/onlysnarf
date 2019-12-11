@@ -189,6 +189,12 @@ ONLYFANS_ELEMENTS = [
         "class_name": SCHEDULE_SAVE,
         "text": "Save",
         "id": None
+    },
+    {
+        "name": "login",
+        "class_name": LIVE_BUTTON_CLASS,
+        "text": "",
+        "id": None
     }
 
     
@@ -211,9 +217,7 @@ def get_element_by_name(name):
         return None
     global ONLYFANS_ELEMENTS
     for element in ONLYFANS_ELEMENTS:
-        if str(element["name"]) == str(name):
-            settings.devPrint("found element: {}".format(name))
-            return element
+        if str(element["name"]) == str(name): return element
     return None
 
 class Driver:
@@ -295,6 +299,9 @@ class Driver:
         if path == None:
             print("Error: Missing Upload Path")
             return False
+        if str(settings.SKIP_UPLOAD) == "True":
+            print("Skipping Upload: Disabled")
+            return True
         files = []
         if os.path.isfile(str(path)):
             files = [str(path)]
@@ -303,6 +310,9 @@ class Driver:
                 files.append(os.path.join(os.path.abspath(str(path)),file))
         else:
             print("Error: Missing Image File(s)")
+            return False
+        if len(files) == 0:
+            print("Warning: Empty File Path")
             return False
         enter_file = self.browser.find_element_by_id(get_element_by_name(str(name))["id"])
         files = files[:int(settings.IMAGE_UPLOAD_LIMIT_MESSAGES)]
@@ -324,6 +334,30 @@ class Driver:
                 files.append(dst)
                 # if this doesn't force it then it'll loop forever without a stopper
             time.sleep(1)
+         ## Wait for Confirm
+        i = 0
+        while True:
+            try:                
+                WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, get_element_by_name(name)["class_name"])))
+                settings.devPrint("upload complete")
+                return True
+            except Exception as e:
+                # try: 
+                #     # check for existence of "thumbnail is fucked up" modal and hit ok button
+                #     # haven't seen in long enough time to properly add
+                #     self.browser.switchTo().frame("iframe");
+                #     self.browser.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
+                #     print("Error: Thumbnail Missing")
+                #     break
+                # except Exception as ef:
+                #     settings.maybePrint(ef)
+                print('uploading...')
+                error_checker(e)
+                i+=1
+                if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
+                    print('Error: Max Upload Time Reached')
+                    return False
+        return True
 
     ### Drivers
 
@@ -564,12 +598,21 @@ class Driver:
             password = self.browser.find_element_by_xpath(PASSWORD_XPATH)
             password.send_keys(password_)
             password.send_keys(Keys.ENTER)
-            WebDriverWait(self.browser, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, LIVE_BUTTON_CLASS)))
-            print('Login Successful')
-            return True
+            try:
+                WebDriverWait(self.browser, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, get_element_by_name("login")["class_name"])))
+                print("OnlyFans Login Successful")
+                return True
+            except TimeoutException as te:
+                settings.devPrint(te)
+                print("Login Failure: Timed Out! Please check your Twitter credentials.")
+                print(": If the problem persists, OnlySnarf may require an update.")
+            except Exception as e:
+                error_checker(e)
+                print("Login Failure: OnlySnarf may require an update")
+            return False
         except Exception as e:
             error_checker(e)
-            print('Login Failure')
+            print("OnlyFans Login Failed")
             return False
 
     ####################
@@ -627,14 +670,8 @@ class Driver:
                 print("Error: Missing Image(s)")
                 return False
             print("Enter image(s): {}".format(path))
-            if str(settings.SKIP_UPLOAD) == "True":
-                print("Skipping Upload")
-                return True
-            elif str(settings.SKIP_DOWNLOAD) == "True":
-                print("Warning: Unable to Upload, skipped download")
-                return True
             try:
-                self.upload_image_files("uploadImageMessage", path)
+                self.upload_image_files(name="confirm", path=path)
                 settings.maybePrint("Image(s) Entered")
                 settings.debug_delay_check()
                 return True
@@ -1180,13 +1217,6 @@ class Driver:
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, ONLYFANS_TWEET))).click()
             else:
                 settings.devPrint("not tweeting")
-            ## Skips
-            if str(settings.SKIP_UPLOAD) == "True":
-                print("Skipping Upload")
-                return True
-            elif str(settings.SKIP_DOWNLOAD) == "True":
-                print("Warning: Unable to Upload, skipped download")
-                return True
             ## Text
             successful_text = self.enter_text(text)
             if not successful_text:
@@ -1195,35 +1225,12 @@ class Driver:
             ## Images
             try:
                 settings.devPrint("uploading files")
-                self.upload_image_files("uploadImage", path)
+                successful_upload = self.upload_image_files("uploadImage", path)
             except Exception as e:
                 error_checker(e)
                 print("Error: Unable to Upload Images")
                 return False
             ## Confirm
-            settings.devPrint("waiting for upload")
-            i = 0
-            while True:
-                try:                
-                    WAIT.until(EC.element_to_be_clickable((By.CLASS_NAME, SEND_BUTTON_CLASS)))
-                    settings.devPrint("upload complete")
-                    break
-                except Exception as e:
-                    # try: 
-                    #     # check for existence of "thumbnail is fucked up" modal and hit ok button
-                    #     # haven't seen in long enough time to properly add
-                    #     self.browser.switchTo().frame("iframe");
-                    #     self.browser.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
-                    #     print("Error: Thumbnail Missing")
-                    #     break
-                    # except Exception as ef:
-                    #     settings.maybePrint(ef)
-                    print('uploading...')
-                    error_checker(e)
-                    i+=1
-                    if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
-                        print('Error: Max Upload Time Reached')
-                        return False
             try:
                 send = self.get_element_to_click("post")
                 if send:
