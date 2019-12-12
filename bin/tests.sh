@@ -77,23 +77,23 @@ echo "##################################################" >> ../onlysnarf/logs/t
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 
-sleep 2
+# sleep 2
 
 # Discount
-echo "[*] Discount - Recent"
-echo "############# Discount - Recent ##################">> ../onlysnarf/logs/tests.txt
-sudo onlysnarfpy \
--debug \
--verbose \
--action "discount" \
--user "recent" \
--amount 40 \
--months 3 \
--prefer-local | tee ../onlysnarf/logs/tests.txt
+# echo "[*] Discount - Recent"
+# echo "############# Discount - Recent ##################">> ../onlysnarf/logs/tests.txt
+# sudo onlysnarfpy \
+# -debug \
+# -verbose \
+# -action "discount" \
+# -user "recent" \
+# -amount 40 \
+# -months 3 \
+# -prefer-local | tee ../onlysnarf/logs/tests.txt
 
-echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
-echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
-echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+# echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+# echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+# echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 
 sleep 2
 
