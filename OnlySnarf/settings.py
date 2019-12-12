@@ -5,6 +5,7 @@ import sys
 import os
 import json
 import shutil
+import time
 from OnlySnarf.profile import Profile
 
 class Settings:
@@ -377,7 +378,7 @@ class Settings:
 
     def devPrint(self, text):
         if str(self.VERBOSE) == "True" and str(self.DEBUG) == "True":
-            print(text)
+            print(colorize(text, "blue"))
             
     def getInput(self):
         if str(self.INPUT) == "None":
@@ -430,7 +431,7 @@ class Settings:
 
     def maybePrint(self, text):
         if str(self.VERBOSE) == "True":
-            print(text)
+            print(colorize(text, "teal"))
 
     # Deletes local file
     def remove_local(self):
@@ -469,6 +470,20 @@ class Settings:
             maybePrint(e)
 
 SETTINGS = Settings()
+
+def colorize(string, color):
+    if not color in colors: return string
+    return colors[color] + string + '\033[0m'
+ 
+colors = {
+        'blue': '\033[94m',
+        'header': '\033[48;1;34m',
+        'teal': '\033[96m',
+        'pink': '\033[95m',
+        'green': '\033[92m',
+        'yellow': '\033[93m',
+        'menu': '\033[48;1;44m'
+        }
 
 def readConf(self, conf):
     posts = False
