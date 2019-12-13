@@ -5,6 +5,11 @@ echo "-----------------------------------------------------"
 echo "Testing OnlySnarf"
 mkdir -p ../onlysnarf/logs
 
+## Add
+# read messages
+# promotional trial link
+# settings
+
 ### Working ###
 # image & expiration
 # image & poll

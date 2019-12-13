@@ -245,15 +245,15 @@
   - fixed: user scrapes
   - updated: config.py, unable to test
   **2.14.4**
+  - class reorg
   - added 'dynamic' element searching
   - fixed css elements for major functions
+  - added element.py
   
 ----------------------------------------
   **2.15.0**
   - added: Settings options
-  - class reorg
-  - major functions pending complete testing
-  
+
 ----------------------------------------
 
 ## ToDo
@@ -307,6 +307,3 @@ d) 'new account': tweeting behavior - tweet to advertise new account, tweet to a
 
 Referral Code
 https://onlyfans.com/?ref=409408
-
-
-Message: "mirror dick" to u10041738
