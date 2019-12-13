@@ -155,7 +155,7 @@ class User:
     def get_active_users(Driver):
         if str(settings.PREFER_LOCAL) == "True": return read_users_local()
         active_users = []
-        users = Driver.user_get()
+        users = Driver.users_get()
         for user in users:
             try:
                 user = User(user)
