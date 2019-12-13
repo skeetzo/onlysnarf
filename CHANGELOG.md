@@ -244,6 +244,9 @@
   **2.14.3**
   - fixed: user scrapes
   - updated: config.py, unable to test
+  **2.14.4**
+  - added 'dynamic' element searching
+  - fixed css elements for major functions
   
 ----------------------------------------
   **2.15.0**
