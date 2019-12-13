@@ -3,13 +3,42 @@ sudo python3 setup.py install
 wait
 echo "-----------------------------------------------------"
 echo "Testing OnlySnarf"
-mkdir ../onlysnarf/logs
+mkdir -p ../onlysnarf/logs
 
-echo "##################################################" 2>&1 | tee >> ../onlysnarf/logs/tests.txt 2>&1
+### Working ###
+# image & expiration
+# image & poll
+# image & schedule
+# gallery & message recent users
+# message user
+# post
+# discount users
+### Not Working ###
+
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "################## Start #########################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 
-# Image
+# Image & Expiration
+echo "[*] Upload - Image & Expiration"
+echo "############# Upload - Image & Expiration ########">> ../onlysnarf/logs/tests.txt
+sudo onlysnarfpy \
+-debug \
+-verbose \
+-action "upload" -type "image" \
+-text "image testes" \
+-bykeyword "pussycats" \
+-skip-download \
+-debug-delay \
+-expires 3 | tee ../onlysnarf/logs/tests.txt
+
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+
+sleep 2
+
+# Image & Poll
 echo "[*] Upload - Image & Poll"
 echo "############# Upload - Image & Poll ##############">> ../onlysnarf/logs/tests.txt
 sudo onlysnarfpy \
@@ -20,6 +49,7 @@ sudo onlysnarfpy \
 -text "image testes" \
 -bykeyword "pussycats" \
 -skip-download \
+-debug-delay \
 -questions "your mom","some toast","a nice sandwich" | tee ../onlysnarf/logs/tests.txt
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -28,7 +58,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 sleep 2
 
-# Video
+# Image & Schedule
 echo "[*] Upload - Image & Schedule"
 echo "############# Upload - Image & Schedule ##########">> ../onlysnarf/logs/tests.txt
 sudo onlysnarfpy \
@@ -38,25 +68,8 @@ sudo onlysnarfpy \
 -text "image testes" \
 -bykeyword "pussycats" \
 -schedule "6/6/2020:6:26" \
+-debug-delay \
 -skip-download | tee ../onlysnarf/logs/tests.txt
-
-echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
-echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
-echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
-
-sleep 2
-
-# Gallery
-echo "[*] Upload - Image & Expiration"
-echo "############# Upload - Image & Expiration ########">> ../onlysnarf/logs/tests.txt
-sudo onlysnarfpy \
--debug \
--verbose \
--action "upload" -type "image" \
--text "image testes" \
--bykeyword "pussycats" \
--skip-download \
--expires 3 | tee ../onlysnarf/logs/tests.txt
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -77,27 +90,27 @@ echo "##################################################" >> ../onlysnarf/logs/t
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 
-# sleep 2
+sleep 2
 
 # Discount
-# echo "[*] Discount - Recent"
-# echo "############# Discount - Recent ##################">> ../onlysnarf/logs/tests.txt
-# sudo onlysnarfpy \
-# -debug \
-# -verbose \
-# -action "discount" \
-# -user "recent" \
-# -amount 40 \
-# -months 3 \
-# -prefer-local | tee ../onlysnarf/logs/tests.txt
+echo "[*] Discount - Recent"
+echo "############# Discount - Recent ##################">> ../onlysnarf/logs/tests.txt
+sudo onlysnarfpy \
+-debug \
+-verbose \
+-action "discount" \
+-user "recent" \
+-amount 40 \
+-months 3 \
+-show-window | tee ../onlysnarf/logs/tests.txt
 
-# echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
-# echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
-# echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 
 sleep 2
 
-# Users
+# Users Recent - Gallery
 echo "[*] Message - Recent & Gallery"
 echo "############# Message - Recent & Gallery #########">> ../onlysnarf/logs/tests.txt
 sudo onlysnarfpy \
@@ -110,6 +123,7 @@ sudo onlysnarfpy \
 -bykeyword "pussycats" \
 -type "gallery" \
 -skip-download \
+-debug-delay \
 -prefer-local | tee ../onlysnarf/logs/tests.txt
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -130,6 +144,7 @@ sudo onlysnarfpy \
 -bykeyword "pussycats" \
 -text "pussycat" \
 -skip-download \
+-debug-delay \
 -prefer-local | tee ../onlysnarf/logs/tests.txt
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1

@@ -411,7 +411,6 @@ def main():
         sys.stdout.flush()
         print('2/3 : Cleaning Up Files')
         settings.remove_local()
-        print('Files Cleaned ')
         print('3/3 : OnlySnarf Exiting')
         snarf.exit()
         sys.stdout.flush()

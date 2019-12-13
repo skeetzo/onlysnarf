@@ -30,6 +30,7 @@ location = ""
 # text as url
 websiteURL = None
 <input id="input-website" type="text" autocomplete="on" placeholder="Website URL" name="website" maxlength="100" class="form-control g-input">
+
 # text
 username = ""
 <input id="input-login" type="text" autocomplete="on" placeholder="" name="username" maxlength="24" class="form-control g-input">
@@ -105,8 +106,10 @@ siteNotifsNewComment = False
 siteNotifsNewFavorite = False
 <div class="b-input-radio__wrapper g-input__wrapper"><span class="b-input-radio__container"><input type="checkbox" name="" class="b-input-radio"><label for="" class="b-input-radio__label"><svg class="g-icon" aria-hidden="true"><use xlink:href="#icon-done" href="#icon-done"></use></svg></label></span><label for="">New favorite (like)</label><!----></div>
 # enabled or disabled
+
 siteNotifsDiscounts = False
 <div class="b-input-radio__wrapper g-input__wrapper"><span class="b-input-radio__container"><input type="checkbox" name="" class="b-input-radio"><label for="" class="b-input-radio__label"><svg class="g-icon" aria-hidden="true"><use xlink:href="#icon-done" href="#icon-done"></use></svg></label></span><label for="">Discounts from users I've used to follow</label><!----></div>
+
 # enabled or disabled
 siteNotifsNewSubscriber = False
 <div class="b-input-radio__wrapper g-input__wrapper"><span class="b-input-radio__container"><input type="checkbox" name="" class="b-input-radio"><label for="" class="b-input-radio__label"><svg class="g-icon" aria-hidden="true"><use xlink:href="#icon-done" href="#icon-done"></use></svg></label></span><label for="">New Subscriber</label><!----></div>
@@ -125,8 +128,10 @@ toastNotifsNewComment = False
 toastNotifsNewFavorite = False
 <div class="b-input-radio__wrapper g-input__wrapper"><span class="b-input-radio__container"><input type="checkbox" name="" class="b-input-radio"><label for="" class="b-input-radio__label"><svg class="g-icon" aria-hidden="true"><use xlink:href="#icon-done" href="#icon-done"></use></svg></label></span><label for="">New favorite (like)</label><!----></div>
 # enabled or disabled
+
 toastNotifsNewSubscriber = False
 <div class="b-input-radio__wrapper g-input__wrapper"><span class="b-input-radio__container"><input type="checkbox" name="" class="b-input-radio"><label for="" class="b-input-radio__label"><svg class="g-icon" aria-hidden="true"><use xlink:href="#icon-done" href="#icon-done"></use></svg></label></span><label for="">New Subscriber</label><!----></div>
+
 # enabled or disabled
 toastNotifsNewTip = False
 <div class="b-input-radio__wrapper g-input__wrapper"><span class="b-input-radio__container"><input type="checkbox" name="" class="b-input-radio"><label for="" class="b-input-radio__label"><svg class="g-icon" aria-hidden="true"><use xlink:href="#icon-done" href="#icon-done"></use></svg></label></span><label for="">New Tip</label><!----></div>
@@ -164,7 +169,7 @@ showPostsTip = False
 publicFriendsList = False
 
 # selection of countries
-ipCountry = getCountryList()
+ipCouipCountryntry = getCountryList()
 <input name="" type="text" autocomplete="nope" placeholder="Select from available options" tabindex="0" class="multiselect__input" style="width: 0px; position: absolute; padding: 0px;">
 
 # text of ip ranges
