@@ -380,6 +380,7 @@ class OnlySnarf:
 
 def main():
     try:
+        if str(settings.VERSION) == "True": return settings.version_check()
         if str(settings.METHOD) != "input":
             print("0/3 : Deleting Locals")
             settings.remove_local()
