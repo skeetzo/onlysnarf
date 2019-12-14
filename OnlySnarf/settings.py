@@ -4,6 +4,7 @@ import re
 import sys
 import os
 import json
+import pkg_resources
 import shutil
 import time
 from OnlySnarf.profile import Profile
@@ -301,6 +302,10 @@ class Settings:
         # more verbose
         self.VERBOSER = False
         ##
+        # -version
+        # prints version
+        self.VERSION = False
+        ##
         # not currently implemented
         # custom repair option for shitty gopro videos
         self.WORKING_VIDEO = "video.mp4"
@@ -313,7 +318,7 @@ class Settings:
         while i < len(sys.argv):
             sys.argv[i] = sys.argv[i][1:] # remove - in front
             # truths set the variable True when provided
-            truths_ = ["VERBOSER","DEBUG_FORCE","SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
+            truths_ = ["VERSION","VERBOSER","DEBUG_FORCE","SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
             # falses set the variable False when provided
             falses_ = []
             # nexts set the variable to the next provided argument input
@@ -459,6 +464,8 @@ class Settings:
         except Exception as e:
             self.maybePrint(e)
 
+    def version_check(self):
+        print("OnlySnarf version: {}".format(colorize(pkg_resources.get_distribution("onlysnarf").version,"yellow")))
 
     def update_value(self, variable, newValue):
         variable = str(variable).upper().replace(" ","_")
