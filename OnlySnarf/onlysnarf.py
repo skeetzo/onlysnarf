@@ -111,6 +111,7 @@ class OnlySnarf:
                 image = Google.download_file(image[1]).get("path")
         success = False
         backup = False
+        if len(users) == 0: print("Warning: No Users Found")
         for user in users:
             if user:
                 try:
