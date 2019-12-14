@@ -64,6 +64,10 @@ class Settings:
         # debugging - skips uploading and deleting unless otherwise forced
         self.DEBUG = False
         ##
+        # -debug-force
+        # forces expiration and poll modals to save instead of cancel when debugging
+        self.DEBUG_FORCE = False
+        ##
         # -debug-delay
         # user message delay
         self.DEBUG_DELAY = False
@@ -294,6 +298,8 @@ class Settings:
         # -verbose
         # more output
         self.VERBOSE = False
+        # more verbose
+        self.VERBOSER = False
         ##
         # not currently implemented
         # custom repair option for shitty gopro videos
@@ -306,8 +312,11 @@ class Settings:
         i = 0
         while i < len(sys.argv):
             sys.argv[i] = sys.argv[i][1:] # remove - in front
-            truths_ = ["SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
+            # truths set the variable True when provided
+            truths_ = ["VERBOSER","DEBUG_FORCE","SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
+            # falses set the variable False when provided
             falses_ = []
+            # nexts set the variable to the next provided argument input
             nexts_ = ["IMAGE_UPLOAD_LIMIT_MESSAGES","UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_DOWNLOAD_LIMIT","IMAGE_UPLOAD_LIMIT","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0
             while j < len(truths_):
@@ -377,7 +386,7 @@ class Settings:
             time.sleep(int(self.DEBUG_DELAY_AMOUNT))
 
     def devPrint(self, text):
-        if str(self.VERBOSE) == "True" and str(self.DEBUG) == "True":
+        if str(self.VERBOSER) == "True":
             print(colorize(text, "blue"))
             
     def getInput(self):

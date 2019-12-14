@@ -40,11 +40,11 @@ class User:
         self.sent_images = ",".join(self.messages_from).split(",")
         self.statement_history = ",".join(self.messages_from).split(",")
         #########################
-        # try:
-        #     settings.maybePrint("User: {} - {} - {}".format(self.name, self.username, self.id))
-        # except Exception as e:
-        #     settings.maybePrint(e)
-        #     settings.maybePrint("User: {}".format(self.id))
+        try:
+            settings.devPrint("User: {} - {} - {}".format(self.name, self.username, self.id))
+        except Exception as e:
+            settings.devPrint(e)
+            settings.devPrint("User: {}".format(self.id))
 
     def sendMessage(self, Driver, message="", image=None, price=None):
         try:
@@ -279,6 +279,9 @@ def skipUserCheck(user):
 def write_users_local(users=None):
     if users is None:
         users = User.get_all_users()
+    if len(users) == 0:
+        settings.maybePrint("Skipping: Local Users Save - No Users")
+        return
     print("Saving Users Locally")
     settings.maybePrint("local users path: "+str(settings.USERS_PATH))
     data = {}

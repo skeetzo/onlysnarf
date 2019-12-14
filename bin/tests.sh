@@ -10,15 +10,15 @@ mkdir -p ../onlysnarf/logs
 # promotional trial link
 # settings
 
+### Testing ###
 ### Working ###
+# discount users
 # image & expiration
 # image & poll
 # image & schedule
-# gallery & message recent users
-# message user
 # post
-# discount users
-### Not Working ###
+# message recent users - image
+# message user - gallery
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "################## Start #########################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -30,12 +30,15 @@ echo "############# Upload - Image & Expiration ########">> ../onlysnarf/logs/te
 sudo onlysnarfpy \
 -debug \
 -verbose \
+-verboser \
 -action "upload" -type "image" \
 -text "image testes" \
 -bykeyword "pussycats" \
 -skip-download \
 -debug-delay \
--expires 3 | tee ../onlysnarf/logs/tests.txt
+-debug-force \
+-show-window \
+-expires 3 >> ../onlysnarf/logs/tests.txt 2>&1
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -49,13 +52,16 @@ echo "############# Upload - Image & Poll ##############">> ../onlysnarf/logs/te
 sudo onlysnarfpy \
 -debug \
 -verbose \
+-verboser \
 -action "upload" -type "image" \
 -duration 3 \
 -text "image testes" \
 -bykeyword "pussycats" \
 -skip-download \
 -debug-delay \
--questions "your mom","some toast","a nice sandwich" | tee ../onlysnarf/logs/tests.txt
+-debug-force \
+-show-window \
+-questions "your mom","some toast","a nice sandwich" >> ../onlysnarf/logs/tests.txt 2>&1
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -69,12 +75,15 @@ echo "############# Upload - Image & Schedule ##########">> ../onlysnarf/logs/te
 sudo onlysnarfpy \
 -debug \
 -verbose \
+-verboser \
 -action "upload" -type "image" \
 -text "image testes" \
 -bykeyword "pussycats" \
 -schedule "6/6/2020:6:26" \
 -debug-delay \
--skip-download | tee ../onlysnarf/logs/tests.txt
+-show-window \
+-debug-force \
+-skip-download >> ../onlysnarf/logs/tests.txt 2>&1
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -88,8 +97,10 @@ echo "############# Post - Text ########################">> ../onlysnarf/logs/te
 sudo onlysnarfpy \
 -debug \
 -verbose \
+-verboser \
 -action "post" \
--text "post testes" | tee ../onlysnarf/logs/tests.txt
+-show-window \
+-text "post testes" >> ../onlysnarf/logs/tests.txt 2>&1
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -107,7 +118,8 @@ sudo onlysnarfpy \
 -user "recent" \
 -amount 40 \
 -months 3 \
--show-window | tee ../onlysnarf/logs/tests.txt
+-prefer-local \
+-show-window >> ../onlysnarf/logs/tests.txt 2>&1
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -115,9 +127,9 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 sleep 2
 
-# Users Recent - Gallery
-echo "[*] Message - Recent & Gallery"
-echo "############# Message - Recent & Gallery #########">> ../onlysnarf/logs/tests.txt
+# Users Recent - Image
+echo "[*] Message - Recent & Image"
+echo "############# Message - Recent & Image #########">> ../onlysnarf/logs/tests.txt
 sudo onlysnarfpy \
 -debug \
 -verbose \
@@ -126,10 +138,8 @@ sudo onlysnarfpy \
 -text "pussycat" \
 -price "10.00" \
 -bykeyword "pussycats" \
--type "gallery" \
--skip-download \
--debug-delay \
--prefer-local | tee ../onlysnarf/logs/tests.txt
+-show-window \
+-prefer-local >> ../onlysnarf/logs/tests.txt 2>&1
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -138,19 +148,19 @@ echo "##################################################" >> ../onlysnarf/logs/t
 sleep 2
 
 # User
-echo "[*] Message - User"
-echo "############# Message - User #####################">> ../onlysnarf/logs/tests.txt
+echo "[*] Message - User & Gallery"
+echo "############# Message - User & Gallery #####################">> ../onlysnarf/logs/tests.txt
 sudo onlysnarfpy \
 -debug \
 -verbose \
 -action "message" \
 -method "user" \
 -user "10041738" \
+-type "gallery" \
+-text "pussy" \
 -bykeyword "pussycats" \
--text "pussycat" \
--skip-download \
--debug-delay \
--prefer-local | tee ../onlysnarf/logs/tests.txt
+-show-window \
+-prefer-local >> ../onlysnarf/logs/tests.txt 2>&1
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "################### End ##########################" >> ../onlysnarf/logs/tests.txt 2>&1
