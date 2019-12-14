@@ -16,24 +16,27 @@ USERNAME_XPATH = "//input[@id='username_or_email']"
 PASSWORD_XPATH = "//input[@id='password']"
 MESSAGE_INPUT_CLASS = ".form-control.b-chat__message-input"
 MESSAGE_CONFIRM = "g-btn.m-rounded.b-chat__btn-submit"
+MESSAGE_CONFIRM2 = "button.g-btn.m-rounded.b-chat__btn-submit"
 MONTHS_INPUT = "form-control.b-fans__trial__select"
 DISCOUNT_INPUT = "form-control.b-fans__trial__select"
 DISCOUNT_TEXT = "form-control.b-fans__trial__select"
 DISCOUNT_USER_BUTTONS = "g-btn.m-rounded.m-border.m-sm"
-DISCOUNT_USER_BUTTONS1 = "g-btn.m-rounded"
+DISCOUNT_USER_BUTTON = "g-btn.m-rounded"
 DISCOUNT_USERS = "g-btn.m-rounded.m-border.m-sm"
 DISCOUNT_USERS_ = "b-users__item.m-fans"
 EXPIRATION = "g-btn.m-flat.b-make-post__expire-period-btn"
 EXPIRATION2 = "button.g-btn.m-flat.b-make-post__expire-period-btn"
 EXPIRATION_PERIODS = "b-make-post__expire__label"
 EXPIRATION_PERIODS2 = "button.b-make-post__expire__label"
-EXPIRATION_SAVE = "g-btn.m-rounded.js-make-post-poll-duration-save"
-EXPIRATION_SAVE2 = "button.g-btn.m-rounded.js-make-post-poll-duration-save"
+EXPIRATION_SAVE = "g-btn.m-rounded"
+EXPIRATION_SAVE2 = "button.g-btn.m-rounded"
+EXPIRATION_SAVE3 = "button.g-btn.m-rounded.js-make-post-poll-duration-save"
+EXPIRATION_SAVE4 = "g-btn.m-rounded.js-make-post-poll-duration-save"
 EXPIRATION_CANCEL = "g-btn.m-rounded.m-border"
 EXPIRATION_CANCEL2 = "button.g-btn.m-rounded.m-border"
 ONLYFANS_TWEET = "//label[@for='new_post_tweet_send']"
-ONLYFANS_UPLOAD_PHOTO = "fileupload_photo"
-ONLYFANS_UPLOAD_MESSAGE_PHOTO = "cm_fileupload_photo"
+ONLYFANS_UPLOAD_PHOTO_ID = "fileupload_photo"
+ONLYFANS_UPLOAD_MESSAGE_PHOTO_ID = "cm_fileupload_photo"
 ONLYFANS_USER_COUNT = "l-sidebar__user-data__item__count"
 ONLYFANS_USERS_IDS = "a.g-btn.m-rounded.m-border.m-sm"
 ONLYFANS_USERS_STARTEDS = "b-fans__item__list__item"
@@ -60,6 +63,9 @@ ONLYFANS_MORE2 = "button.g-btn.m-flat.b-make-post__more-btn"
 SCHEDULE = "g-btn.m-flat.b-make-post__datepicker-btn"
 SCHEDULE2 = "button.g-btn.m-flat.b-make-post__datepicker-btn"
 SCHEDULE_EXISTING_DATE = "vdatetime-calendar__current--month"
+SCHEDULE_EXISTING_DATE6 = "div.vdatetime-calendar__navigation > div.vdatetime-calendar__current--month"
+# <div class="vdatetime-calendar__current--month">January 2020</div>
+# //*[@id="make_post_form"]/div/div[1]/div[3]/div/div[2]/div[2]/div/div[1]/div[2]
 SCHEDULE_EXISTING_DATE2 = ".vdatetime-calendar__current--month"
 SCHEDULE_EXISTING_DATE3 = "div.vdatetime-calendar__current--month"
 SCHEDULE_EXISTING_DATE4 = "vdatetime-popup__date"
@@ -92,230 +98,230 @@ REMEMBERME_CHECKBOX_XPATH = "//input[@id='remember']"
 
 ONLYFANS_ELEMENTS = [
     {
-        "name": "confirm",
-        "className": [MESSAGE_CONFIRM],
+        "name": "message",
+        "classes": [MESSAGE_CONFIRM, MESSAGE_CONFIRM2],
         "text": [],
-        "id": []
+        "id": [ONLYFANS_UPLOAD_MESSAGE_PHOTO_ID]
     },
     {
         "name": "loginCheck",
-        "className": [LIVE_BUTTON_CLASS],
+        "classes": [LIVE_BUTTON_CLASS],
         "text": [],
         "id": []
     },
     {
         "name": "post",
-        "className": [SEND_BUTTON_CLASS, SEND_BUTTON_CLASS2],
+        "classes": [SEND_BUTTON_CLASS, SEND_BUTTON_CLASS2],
         "text": ["Post"],
         "id": []
     },
     {
         "name": "uploadImage",
-        "className": "",
+        "classes": [MESSAGE_CONFIRM, MESSAGE_CONFIRM2],
         "text": [],
-        "id": [ONLYFANS_UPLOAD_PHOTO]
+        "id": [ONLYFANS_UPLOAD_PHOTO_ID]
     },
     {
         "name": "uploadImageMessage",
-        "className": "",
+        "classes": "",
         "text": [],
-        "id": [ONLYFANS_UPLOAD_MESSAGE_PHOTO]
+        "id": [ONLYFANS_UPLOAD_MESSAGE_PHOTO_ID]
     },
     {
         "name": "errorUpload",
-        "className": "g-btn.m-rounded.m-border",
-        "text": [],
+        "classes": [EXPIRATION_CANCEL, EXPIRATION_CANCEL2],
+        "text": ["Close"],
         "id": []
     },
     {
         "name": "poll",
-        "className": [POLL, POLL2, POLL3, POLL4],
+        "classes": [POLL, POLL2, POLL3, POLL4],
         "text": ["<svg class=\"g-icon\" aria-hidden=\"true\"><use xlink:href=\"#icon-more\" href=\"#icon-more\"></use></svg>"],
         "id": []
     },
     {
         "name": "pollCancel",
-        "className": [POLL_CANCEL],
+        "classes": [POLL_CANCEL],
         "text": ["Cancel"],
         "id": []
     },
     {
         "name": "pollDuration",
-        "className": [POLL_DURATION, POLL_DURATION2, POLL_DURATION3, POLL_DURATION4],
+        "classes": [POLL_DURATION, POLL_DURATION2, POLL_DURATION3, POLL_DURATION4],
         "text": [],
         "id": []
     },
     {
         "name": "pollDurations",
-        "className": [EXPIRATION_PERIODS],
+        "classes": [EXPIRATION_PERIODS],
         "text": [],
         "id": []
     },
     {
         "name": "pollSave",
-        "className": [POLL_SAVE, POLL_SAVE2],
+        "classes": [POLL_SAVE, POLL_SAVE2],
         "text": ["Save"],
         "id": []
     },
     {
         "name": "pollQuestionAdd",
-        "className": [POLL_ADD_QUESTION, POLL_ADD_QUESTION2],
+        "classes": [POLL_ADD_QUESTION, POLL_ADD_QUESTION2],
         "text": [],
         "id": []
     },
     {
         "name": "moreOptions",
-        "className": [ONLYFANS_MORE, ONLYFANS_MORE2],
+        "classes": [ONLYFANS_MORE, ONLYFANS_MORE2],
         "text": [],
         "id": []
     },
     {
         "name": "expirationAdd",
-        "className": [EXPIRATION, EXPIRATION2],
+        "classes": [EXPIRATION, EXPIRATION2],
         "text": [],
         "id": []
     },
     {
         "name": "expirationPeriods",
-        "className": [EXPIRATION_PERIODS, EXPIRATION_PERIODS2],
+        "classes": [EXPIRATION_PERIODS, EXPIRATION_PERIODS2],
         "text": [],
         "id": []
     },
     {
         "name": "expirationSave",
-        "className": [EXPIRATION_SAVE, EXPIRATION_SAVE2],
-        "text": [],
-        "id": []
-    },
-    {
-        "name": "expirationCancel",
-        "className": [EXPIRATION_CANCEL, EXPIRATION_CANCEL2],
-        "text": [],
-        "id": []
-    },
-    {
-        "name": "discountUserButtons",
-        "className": [DISCOUNT_USER_BUTTONS1],
+        "classes": [EXPIRATION_SAVE, EXPIRATION_SAVE2, EXPIRATION_SAVE3, EXPIRATION_SAVE4],
         "text": ["Save"],
         "id": []
     },
     {
+        "name": "expirationCancel",
+        "classes": [EXPIRATION_CANCEL, EXPIRATION_CANCEL2],
+        "text": ["Cancel"],
+        "id": []
+    },
+    {
+        "name": "discountUserButton",
+        "classes": [DISCOUNT_USER_BUTTON],
+        "text": ["Apply"],
+        "id": []
+    },
+    {
         "name": "discountUsers",
-        "className": [DISCOUNT_USERS_],
+        "classes": [DISCOUNT_USERS_],
         "text": ["Save"],
         "id": []
     },
     {
         "name": "priceClick",
-        "className": [ONLYFANS_PRICE_CLICK, ONLYFANS_PRICE_CLICK2],
-        "text": [],
+        "classes": [ONLYFANS_PRICE_CLICK, ONLYFANS_PRICE_CLICK2],
+        "text": ["Save"],
         "id": []
     },
     {
         "name": "priceEnter",
-        "className": [ONLYFANS_PRICE_INPUT, ONLYFANS_PRICE_INPUT2, ONLYFANS_PRICE_INPUT3, ONLYFANS_PRICE_INPUT4],
+        "classes": [ONLYFANS_PRICE_INPUT, ONLYFANS_PRICE_INPUT2, ONLYFANS_PRICE_INPUT3, ONLYFANS_PRICE_INPUT4],
         "text": ["Free"],
         "id": []
     },
     {
         "name": "scheduleAdd",
-        "className": [SCHEDULE, SCHEDULE2],
+        "classes": [SCHEDULE, SCHEDULE2],
         "text": [],
         "id": []
     },
     {
         "name": "scheduleNextMonth",
-        "className": [SCHEDULE_NEXT_MONTH, SCHEDULE_NEXT_MONTH2],
+        "classes": [SCHEDULE_NEXT_MONTH, SCHEDULE_NEXT_MONTH2],
         "text": [],
         "id": []
     },
     {
         "name": "scheduleDate",
-        "className": [SCHEDULE_EXISTING_DATE, SCHEDULE_EXISTING_DATE2, SCHEDULE_EXISTING_DATE3, SCHEDULE_EXISTING_DATE4, SCHEDULE_EXISTING_DATE5],
+        "classes": [SCHEDULE_EXISTING_DATE, SCHEDULE_EXISTING_DATE6, SCHEDULE_EXISTING_DATE2, SCHEDULE_EXISTING_DATE3, SCHEDULE_EXISTING_DATE4, SCHEDULE_EXISTING_DATE5],
         "text": [],
         "id": []
     },
     {
         "name": "scheduleMinutes",
-        "className": [SCHEDULE_MINUTES, SCHEDULE_MINUTES2],
+        "classes": [SCHEDULE_MINUTES, SCHEDULE_MINUTES2],
         "text": [],
         "id": []
     },
     {
         "name": "scheduleHours",
-        "className": [SCHEDULE_HOURS, SCHEDULE_HOURS2],
+        "classes": [SCHEDULE_HOURS, SCHEDULE_HOURS2],
         "text": [],
         "id": []
     },
     {
         "name": "scheduleDays",
-        "className": [SCHEDULE_DAYS, SCHEDULE_DAYS2],
+        "classes": [SCHEDULE_DAYS, SCHEDULE_DAYS2],
         "text": [],
         "id": []
     },
     {
         "name": "scheduleSave",
-        "className": [SCHEDULE_SAVE, SCHEDULE_SAVE2],
+        "classes": [SCHEDULE_SAVE, SCHEDULE_SAVE2],
         "text": ["Save"],
         "id": []
     },
     {
         "name": "messagesAll",
-        "className": [ONLYFANS_MESSAGES_ALL],
+        "classes": [ONLYFANS_MESSAGES_ALL],
         "text": [],
         "id": []
     },
     {
         "name": "messagesFrom",
-        "className": [ONLYFANS_MESSAGES_FROM],
+        "classes": [ONLYFANS_MESSAGES_FROM],
         "text": [],
         "id": []
     },
     {
         "name": "usersUsernames",
-        "className": [ONLYFANS_USERSNAMES],
+        "classes": [ONLYFANS_USERSNAMES],
         "text": [],
         "id": []
     },
     {
         "name": "usersUsers",
-        "className": [ONLYFANS_USERS],
+        "classes": [ONLYFANS_USERS],
         "text": [],
         "id": []
     },
     {
         "name": "usersStarteds",
-        "className": [ONLYFANS_USERS_STARTEDS],
+        "classes": [ONLYFANS_USERS_STARTEDS],
         "text": [],
         "id": []
     },
     {
-        "name": "userIds",
-        "className": [ONLYFANS_USERS_IDS],
+        "name": "usersIds",
+        "classes": [ONLYFANS_USERS_IDS],
         "text": [],
         "id": []
     },
     {
-        "name": "userCount",
-        "className": [ONLYFANS_USER_COUNT],
+        "name": "usersCount",
+        "classes": [ONLYFANS_USER_COUNT],
         "text": [],
         "id": []
     },
     {
         "name": "discountUserButtons",
-        "className": [DISCOUNT_USER_BUTTONS],
+        "classes": [DISCOUNT_USER_BUTTONS],
         "text": [],
         "id": []
     },
     {
         "name": "messageInput",
-        "className": [MESSAGE_INPUT_CLASS],
+        "classes": [MESSAGE_INPUT_CLASS],
         "text": [],
         "id": []
     },
     {
         "name": "messages",
-        "className": [ONLYFANS_MESSAGES],
+        "classes": [ONLYFANS_MESSAGES],
         "text": [],
         "id": []
     }
@@ -335,7 +341,7 @@ class Element:
         return ""
 
     def getClasses(self):
-        return self.classes or []
+        return self.classes
 
     def getText(self):
         if self.text and len(self.text) > 0:
@@ -343,7 +349,11 @@ class Element:
         return ""
 
     def getTexts(self):
-        return self.text or []
+        return self.text
+
+    def getId(self):
+        if self.id and len(self.id) > 0:
+            return self.id[0]
 
     @staticmethod
     def get_element_by_name(name):
@@ -353,9 +363,9 @@ class Element:
             return None
         global ONLYFANS_ELEMENTS
         for element in ONLYFANS_ELEMENTS:
-            # element = Element(name=element["name"], classes=element["className"], text=element["text"], id=element["id"])
+            # element = Element(name=element["name"], classes=element["classes"], text=element["text"], id=element["id"])
             if str(element["name"]) == str(name):
                 settings.devPrint("prepped ele: {}".format(element["name"]))
-                return Element(name=element["name"], classes=element["className"], text=element["text"], id=element["id"])
+                return Element(name=element["name"], classes=element["classes"], text=element["text"], id=element["id"])
         settings.devPrint("Warning: Missing Element Fetch - {}".format(name))
         return None

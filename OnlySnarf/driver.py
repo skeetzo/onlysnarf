@@ -29,7 +29,7 @@ from OnlySnarf.element import Element
 ##### Globals #####
 ###################
 
-ONLYFANS_HOME_URL = 'https://onlyfans.com/'
+ONLYFANS_HOME_URL = 'https://onlyfans.com'
 ONLYFANS_CHAT_URL = "{}/my/chats/chat".format(ONLYFANS_HOME_URL)
 ONLYFANS_SETTINGS_URL = "{}/my/settings".format(ONLYFANS_HOME_URL)
 ONLYFANS_USERS_ACTIVE_URL = "{}/my/subscribers/active".format(ONLYFANS_HOME_URL)
@@ -49,7 +49,7 @@ ONLYFANS_TWEET = "//label[@for='new_post_tweet_send']"
 ONLYFANS_PRICE2 = "button.b-chat__btn-set-price"
 POLL_INPUT_XPATH = "//input[@class='form-control']"
 REMEMBERME_CHECKBOX_XPATH = "//input[@id='remember']"
-
+DISCOUNT_USER_BUTTONS = "g-btn.m-rounded.m-border.m-sm"
 class Driver:
 
     def __init__(self):
@@ -86,7 +86,7 @@ class Driver:
             else:
                 settings.maybePrint("goto -> /my/subscribers/active")
                 self.browser.get(ONLYFANS_USERS_ACTIVE_URL)
-            if tryAll: depth = self.find_element_by_name("userCount").get_attribute("innerHTML")
+            if tryAll: depth = self.find_element_by_name("usersCount").get_attribute("innerHTML")
             settings.devPrint("scrolling: {}".format(int(int(int(depth)/10)+1)))
             for n in range(int(int(int(depth)/10)+1)):
                 settings.maybePrint("scrolling...")
@@ -119,7 +119,7 @@ class Driver:
             ActionChains(self.browser).move_to_element(user__).perform()
             settings.devPrint("moved to user")
             settings.devPrint("finding discount btn")
-            buttons = self.find_elements_by_name("discountUserButtons")
+            buttons = user__.find_elements_by_class_name(DISCOUNT_USER_BUTTONS)
             for button in buttons:
                 if "Discount" in button.get_attribute("innerHTML") and button.is_enabled() and button.is_displayed():
                     try:
@@ -156,15 +156,15 @@ class Driver:
             settings.devPrint("entered discount months")
             settings.debug_delay_check()
             settings.devPrint("applying discount")
-            buttons_ = self.find_elements_by_name("discountUserButtons")
+            buttons_ = self.find_elements_by_name("discountUserButton")
             for button in buttons_:
                 if not button.is_enabled() and not button.is_displayed(): continue
-                if "Cancel" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "True":
+                if "Cancel" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "True" and str(settings.DEBUG_FORCE) == "False":
                     button.click()
                     print("Skipping: Save Discount (Debug)")
                     settings.devPrint("### Discount Successfully Canceled ###")
                     return True
-                if "Apply" in button.get_attribute("innerHTML") and str(settings.DEBUG) == "False":
+                elif "Apply" in button.get_attribute("innerHTML"):
                     button.click()
                     print("Discounted User: {}".format(user))
                     settings.devPrint("### Discount Successful ###")
@@ -259,16 +259,18 @@ class Driver:
             settings.devPrint("selected expiration")
             settings.debug_delay_check()
             # save
-            settings.devPrint("saving expiration")
-            if str(settings.DEBUG) == "True":
-                print("Skipping Expiration (debug)")
+            if str(settings.DEBUG) == "True" and str(settings.DEBUG_FORCE) == "False":
+                print("Skipping: Expiration (debug)")
+                settings.devPrint("skipping expiration")
                 self.get_element_to_click("expirationCancel").click()
                 settings.devPrint("canceled expiration")
+                settings.devPrint("### Expiration Successfully Canceled ###")
             else:
+                settings.devPrint("saving expiration")
                 self.get_element_to_click("expirationSave").click()
                 settings.devPrint("saved expiration")
                 print("Expiration Entered")
-            settings.devPrint("### Expiration Successful ###")
+                settings.devPrint("### Expiration Successful ###")
             return True
         except Exception as e:
             Driver.error_checker(e)
@@ -292,13 +294,15 @@ class Driver:
             print("Error: Unable to find Element Reference")
             return False
         for className in element.getClasses():
-            try:
-                eles = self.browser.find_element_by_class_name(className)
-                elesCSS = self.browser.find_element_by_css_selector(className)
-                settings.devPrint("class: {} - {}:css".format(eles, elesCSS))
-                if eles: return eles
-                if elesCSS: return elesCSS
-            except: pass
+            ele = None
+            eleCSS = None
+            try: ele = self.browser.find_element_by_class_name(className)
+            except: ele = None
+            try: eleCSS = self.browser.find_element_by_css_selector(className)
+            except: eleCSS = None
+            settings.devPrint("class: {} - {}:css".format(ele, eleCSS))
+            if ele: return ele
+            if eleCSS: return eleCSS
         raise Exception("Error: Unable to Locate Element")
 
     def find_elements_by_name(self, name):
@@ -309,10 +313,12 @@ class Driver:
             return False
         eles = []
         for className in element.getClasses():
+            eles_ = []
+            elesCSS_ = []
             try: eles_ = self.browser.find_elements_by_class_name(className)
-            except: pass
+            except: eles_ = []
             try: elesCSS_ = self.browser.find_elements_by_css_selector(className)
-            except: pass
+            except: elesCSS_ = []
             settings.devPrint("class: {} - {}:css".format(len(eles_), len(elesCSS_)))
             eles.extend(eles_)
             eles.extend(elesCSS_)
@@ -333,9 +339,9 @@ class Driver:
             eles = []
             elesCSS = []
             try: eles = self.browser.find_elements_by_class_name(className)
-            except: pass
+            except: eles = []
             try: elesCSS = self.browser.find_elements_by_css_selector(className)
-            except: pass
+            except: elesCSS = []
             settings.devPrint("class: {} - {}:css".format(len(eles), len(elesCSS)))
             eles.extend(elesCSS)
             for i in range(len(eles)):
@@ -508,7 +514,7 @@ class Driver:
                 return False
             print("Enter image(s): {}".format(path))
             try:
-                self.upload_image_files(name="confirm", path=path)
+                self.upload_image_files(name="message", path=path)
                 settings.maybePrint("Image(s) Entered")
                 settings.debug_delay_check()
                 return True
@@ -528,18 +534,16 @@ class Driver:
                 return False
             print("Enter price: {}".format(price))
             priceElement = WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ONLYFANS_PRICE2)))
-            priceElement.click()
             settings.devPrint("entering price")
-            priceElement.send_keys(str(price))
+            priceElement.click()
+            actions = ActionChains(self.browser)
+            actions.send_keys(str(price)) 
+            actions.perform()
             settings.devPrint("entered price")
+            # settings.debug_delay_check()
             settings.devPrint("saving price")
-            priceElement.send_keys(Keys.ENTER) 
+            self.get_element_to_click("priceClick").click()    
             settings.devPrint("saved price")
-            ## unneeded because of entering 'Enter' key
-            # self.find_element_by_name("priceEnter").send_keys(str(price))
-            # self.get_element_to_click("priceClick").click()    
-            ##
-            settings.debug_delay_check()
             return True
         except Exception as e:
             Driver.error_checker(e)
@@ -681,8 +685,8 @@ class Driver:
                 time.sleep(1)
                 i+=1
             settings.debug_delay_check()
-            if str(settings.DEBUG) == "True":
-                print("Skipping Poll (debug)")
+            if str(settings.DEBUG) == "True" and str(settings.DEBUG_FORCE) == "False":
+                print("Skipping: Poll (debug)")
                 cancel = self.get_element_to_click("pollCancel")
                 cancel.click()
                 settings.devPrint("canceled poll")
@@ -939,6 +943,14 @@ class Driver:
             time_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").time()
             hour_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").hour
             minute_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").minute
+            # add check for if date is before today
+            today = datetime.now()
+            todaysMonth = today.strftime("%B")
+            todaysYear = today.strftime("%Y")
+            settings.devPrint("today: {} {}".format(todaysMonth, todaysYear))
+            if tehdate < today:
+                print("Error: Unable to Schedule Earlier Date")
+                return False
             print("Schedule:")
             print("- Date: {}".format(date))
             print("- Time: {}".format(time_))
@@ -950,6 +962,7 @@ class Driver:
             while True:
                 settings.devPrint("getting date")
                 existingDate = self.find_element_by_name("scheduleDate").get_attribute("innerHTML")
+                settings.devPrint("date: {} - {} {}".format(existingDate, month_, year_))
                 if str(month_) in str(existingDate) and str(year_) in str(existingDate): break
                 else: self.get_element_to_click("scheduleNextMonth").click()
             # set day in month
@@ -982,8 +995,8 @@ class Driver:
             # save time
             settings.devPrint("saving schedule")
             settings.debug_delay_check()
-            if str(settings.DEBUG) == "True":
-                print("Skipping Schedule (debug)")
+            if str(settings.DEBUG) == "True" and str(settings.DEBUG_FORCE) == "False":
+                print("Skipping: Schedule (debug)")
                 self.get_element_to_click("scheduleCancel").click()
                 settings.devPrint("canceled schedule")
             else:
@@ -1115,11 +1128,12 @@ class Driver:
         if len(files) == 0:
             print("Warning: Empty File Path")
             return False
-        enter_file = self.browser.find_element_by_id(Element.get_element_by_name(str(name))["id"])
+        enter_file = self.browser.find_element_by_id(Element.get_element_by_name(str(name)).getId())
         files = files[:int(settings.IMAGE_UPLOAD_LIMIT_MESSAGES)]
         for file in files:  
             print('Uploading: '+str(file))
             enter_file.send_keys(str(file))
+            time.sleep(1)
             if self.error_window_upload():
                 # move file to change its name
                 filename = os.path.basename(file)
@@ -1134,12 +1148,14 @@ class Driver:
                 # add file to end of list so it gets retried
                 files.append(dst)
                 # if this doesn't force it then it'll loop forever without a stopper
-            time.sleep(1)
+            # time.sleep(1)
          ## Wait for Confirm
+        self.error_window_upload()
+        settings.debug_delay_check()
         i = 0
         while True:
             try:                
-                WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name(name).getClass())))
+                WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name(str(name)).getClass())))
                 settings.devPrint("upload complete")
                 return True
             except Exception as e:
@@ -1173,7 +1189,7 @@ class Driver:
             else:
                 settings.maybePrint("goto -> /my/subscribers/active")
                 self.browser.get(ONLYFANS_USERS_ACTIVE_URL)
-                num = self.find_element_by_name("userCount").get_attribute("innerHTML")
+                num = self.find_element_by_name("usersCount").get_attribute("innerHTML")
                 settings.maybePrint("User count: {}".format(num))
                 for n in range(int(int(int(num)/10)+1)):
                     settings.maybePrint("scrolling...")
@@ -1184,17 +1200,16 @@ class Driver:
             print("Error: Failed to Find Users")
             return []
         # avatars = self.browser.find_elements_by_class_name('b-avatar')
-        user_ids = self.browser.find_elements_by_css_selector("userIds")
-        starteds = self.browser.find_elements_by_class_name("usersStarteds")
-        # users = self.browser.find_elements_by_class_name('g-user-name')
-        users = self.browser.find_elements_by_class_name("usersUsers")
-        usernames = self.browser.find_elements_by_class_name("usersUsernames")
+        user_ids = self.find_elements_by_name("usersIds")
+        starteds = self.find_elements_by_name("usersStarteds")
+        users = self.find_elements_by_name("usersUsers")
+        usernames = self.find_elements_by_name("usersUsernames")
         # usernames.pop(0)
         # print("My User Id: {}".format(user_ids[0]))
         # user_ids.pop(0)
         active_users = []
-        # settings.maybePrint("user_ids: "+str(len(user_ids)))
-        # settings.maybePrint("starteds: "+str(len(starteds)))
+        settings.devPrint("user_ids: "+str(len(user_ids)))
+        settings.devPrint("starteds: "+str(len(starteds)))
         useridsFailed = False
         startedsFailed = False
         if len(user_ids) == 0:

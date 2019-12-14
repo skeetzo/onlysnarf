@@ -249,6 +249,8 @@
   - added 'dynamic' element searching
   - fixed css elements for major functions
   - added element.py
+  **2.15.0**
+  - major functionality restored
   
 ----------------------------------------
   **2.15.0**

@@ -618,7 +618,7 @@ def get_images():
             images_list.append([folder, image_file])
     if len(images_list)==0:
         print('Warning: Missing Message Files')
-        return
+        return []
     return images_list
 
 # gets all the images in the messages folders
