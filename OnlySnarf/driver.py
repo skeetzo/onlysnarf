@@ -23,6 +23,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 ##
 from OnlySnarf.settings import SETTINGS as settings
 from OnlySnarf.element import Element
+from OnlySnarf.profile import Profile
 
 ###################
 ##### Globals #####
@@ -869,7 +870,7 @@ class Driver:
     def settings_get(self, key):
          # find the var from the list of var names in settingsVariables
         var = None
-        settingsVariables = settings.get_settings_variables()
+        settingsVariables = Profile.get_settings_variables()
         for key in settingsVariables:
             if str(var) == str(key[0]):
                 var = key
@@ -879,23 +880,30 @@ class Driver:
         #
         key_ = var[0]
         page_ = var[1]
-        class_ = var[2]
+        name = var[2]
         type_ = var[3]
+        settings.devPrint("going to settings page: {}".format(page))
         self.go_to_settings(page_)
-        self.find_element_by_name(class_)
+        settings.devPrint("reached page")
+        settings.devPrint("")
+        settingsPage = self.find_element_by_name(name)
+
         if str(type_) == "text":
             # get attr text
             pass
+
+            self.
+
         elif str(type_) == "toggle":
             # get state true|false
             pass
         # other stuff
-        settings_save()
+        self.settings_save()
 
     def settings_set(self, key, value):
         # find the var from the list of var names in settingsVariables
         var = None
-        settingsVariables = settings.get_settings_variables()
+        settingsVariables = Profile.get_settings_variables()
         for key in settingsVariables:
             if str(var) == str(key[0]):
                 var = key
@@ -905,10 +913,10 @@ class Driver:
         #
         key_ = var[0]
         page_ = var[1]
-        class_ = var[2]
+        name = var[2]
         type_ = var[3]
         self.go_to_settings(page_)
-        self.find_element_by_name(class_)
+        self.find_element_by_name(name)
         # text, path, state, list (text), price 
         if str(type_) == "text":
             # set attr text
@@ -917,7 +925,7 @@ class Driver:
             # set state == value
             pass
         # other stuff
-        settings_save()
+        self.settings_save()
 
     # saves the settings page
     def settings_save(self):

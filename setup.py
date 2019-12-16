@@ -5,17 +5,15 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="2.14.4",
+    version="2.15.1",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
-    keywords = ['OnlyFans', 'Content', 'OnlySnarf'],
+    keywords = ['OnlyFans', 'OnlySnarf'],
     description="OnlyFans Content Distribution Tool",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
-    # package_data={'': ['/path/to/google']},
-    # include_package_data=True,
     install_requires=[
         'selenium',
         'pydrive',
