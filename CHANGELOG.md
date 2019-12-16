@@ -251,8 +251,14 @@
   - added element.py
   **2.15.0**
   - major functionality restored
+  **2.15.1**
+  - fixed menu
+  - added -version flag
   
 ----------------------------------------
+  **2.15.2**
+  - settings options debugging
+
   **2.15.0**
   - added: Settings options
 
