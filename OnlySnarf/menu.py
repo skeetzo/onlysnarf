@@ -15,9 +15,10 @@ import sys
 import pathlib
 import pkg_resources
 from OnlySnarf.settings import SETTINGS as settings
-from OnlySnarf import onlysnarf as OnlySnarf
+# from OnlySnarf import OnlySnarf
 from OnlySnarf import google as Google
 from OnlySnarf import cron as Cron
+from OnlySnarf.onlysnarf import OnlySnarf
 
 ###################
 ##### Globals #####
@@ -1040,9 +1041,10 @@ if __name__ == "__main__":
         # print(sys.exc_info()[0])
         print("Shhhhhnnnnnarf!")
     finally:
-        sys.exit(0)
+        exit()
 
 def main_other():
     settings.initialize()
+    if str(settings.VERSION) == "True": return settings.version_check()
     initialize()
     main()
