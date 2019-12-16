@@ -110,7 +110,6 @@ def get_country_list():
     return ["USA","Canada"]
 
 
-# replace the classes with their name references
 # place the classes in their respective elements in elements.py
 # add welcome chat message to new subscribers toggle and upload options
 
@@ -132,43 +131,43 @@ def get_settings_variables():
     # ["settingVariableName","pageProfile",".setting.html.class","inputType-text"]
     return [
          ### Profile ###
-        ["coverImage","profile","b-user-panel__cover__img","inputType"],
-        ["profilePhoto","profile","g-btn.m-rounded.m-sm.m-border","inputType"],
+        ["coverImage","profile","inputType"],
+        ["profilePhoto","profile","inputType"],
         # display name needs to match: placeholder="Display name"
-        ["displayName","profile","form-control.g-input","inputType"],
+        ["displayName","profile","inputType"],
         # subscription price needs to match: name="subscribePrice" 
-        ["subscriptionPrice","form-control.g-input","classname","inputType"],
+        ["subscriptionPrice","inputType"],
         # about placeholder is: placeholder="About"
         # id="input-about"
-        ["about","profile","form-control.g-input.unlimsize","inputType"],
+        ["about","profile","inputType"],
         # id="input-location"
-        ["location","profile","form-control.g-input","inputType"],
+        ["location","profile","inputType"],
         # id="input-website"
-        ["websiteURL","profile","form-control.g-input","inputType"],
+        ["websiteURL","profile","inputType"],
         #### Account ###
         # id="input-login"
-        ["username","account","form-control.g-input","inputType"],
+        ["username","account","inputType"],
         # id="input-email"
-        ["email","account","form-control.g-input","inputType"],
+        ["email","account","inputType"],
         # id="old_password_input"
-        ["password","account","form-control.g-input","inputType"],
+        ["password","account","inputType"],
         # id="new_password_input"
-        ["newPassword","account","form-control.g-input","inputType"],
+        ["newPassword","account","inputType"],
         # id="new_password2_input"
-        ["confirmPassword","account","form-control.g-input","inputType"],
+        ["confirmPassword","account","checkbox"],
         ### Notifications ###
         # id="push-notifications"
-        ["emailNotifs","notifications","checkbox","inputType"],
+        ["emailNotifs","notifications","inputType"],
         # id="email-notifications"
-        ["emailNotifsNewReferral","notifications","checkbox","inputType"],
+        ["emailNotifsNewReferral","notifications","checkbox"],
 
-        ["emailNotifsNewStream","notifications","b-input-radio","inputType"],
+        ["emailNotifsNewStream","notifications","toggle"],
 
-        ["emailNotifsNewSubscriber","notifications","b-input-radio","inputType"],
+        ["emailNotifsNewSubscriber","notifications","inputType"],
 
-        ["emailNotifsNewTip","notifications","b-input-radio","inputType"],
+        ["emailNotifsNewTip","notifications","toggle"],
 
-        ["emailNotifsRenewal","notifications","b-input-radio","inputType"],
+        ["emailNotifsRenewal","notifications","inputType"],
 
 
 
