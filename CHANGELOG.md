@@ -256,6 +256,9 @@
   - added -version flag
   
 ----------------------------------------
+  **2.15.2**
+  - settings options debugging
+
   **2.15.0**
   - added: Settings options
 
