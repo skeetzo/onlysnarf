@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+# a mess of css references to be cleaned up another time
+
 from OnlySnarf.settings import SETTINGS as settings
 
 ONLYFANS_HOME_URL = 'https://onlyfans.com/'
