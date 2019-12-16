@@ -4,6 +4,22 @@
 
 from OnlySnarf.settings import SETTINGS as settings
 
+
+##
+# new idea
+
+# alt tab until the correct flag is reached ala
+# alt tab through on a settings page until the innerHTML text marks the proceeding input
+
+# an alt tab count works on everything
+# so transition the elements.py class into providing the correct number of alt tabs or text element to search 
+#   for the desired element
+
+# *boom noises*
+
+##
+
+
 ONLYFANS_HOME_URL = 'https://onlyfans.com/'
 ONLYFANS_SETTINGS_URL = "https://onlyfans.com/my/settings"
 ONLYFANS_USERS_ACTIVE_URL = "https://onlyfans.com/my/subscribers/active"
@@ -326,7 +342,258 @@ ONLYFANS_ELEMENTS = [
         "classes": [ONLYFANS_MESSAGES],
         "text": [],
         "id": []
-    }
+    },
+
+    ## Settings ##
+
+    {
+        "name": "coverImage",
+        "classes": ["b-user-panel__cover__img"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "profilePhoto",
+        "classes": ["g-btn.m-rounded.m-sm.m-border"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "displayName",
+        "classes": ["form-control.g-input"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "subscriptionPrice",
+        "classes": ["form-control.g-input","classname"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "about",
+        "classes": ["form-control.g-input.unlimsize"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "location",
+        "classes": ["form-control.g-input"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "websiteURL",
+        "classes": ["form-control.g-input"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "username",
+        "classes": ["form-control.g-input"],
+        "text": [],
+        "id": []
+    },
+
+
+    {
+        "name": "email",
+        "classes": ["form-control.g-input"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "password",
+        "classes": ["form-control.g-input"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "newPassword",
+        "classes": ["form-control.g-input"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "confirmPassword",
+        "classes": ["form-control.g-input"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "emailNotifs",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "emailNotifsNewReferral",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "emailNotifsNewStream",
+        "classes": ["b-input-radio"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "emailNotifsNewSubscriber",
+        "classes": ["b-input-radio"],
+        "text": [],
+        "id": []
+    },
+
+    {
+        "name": "emailNotifsNewSubscriber",
+        "classes": ["b-input-radio"],
+        "text": [],
+        "id": []
+    },
+
+    {
+        "name": "emailNotifsNewSubscriber",
+        "classes": ["b-input-radio"],
+        "text": [],
+        "id": []
+    },
+
+    {
+        "name": "emailNotifsNewTip",
+        "classes": ["b-input-radio"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "emailNotifsRenewal",
+        "classes": ["b-input-radio"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "emailNotifsNewLikes",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "emailNotifsNewPosts",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "emailNotifsNewPrivMessages",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "siteNotifs",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "siteNotifsNewComment",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": []
+    },
+
+
+
 ]
 
 # represents elements the webdriver sortof looks for
