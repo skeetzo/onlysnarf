@@ -114,485 +114,916 @@ POLL_CANCEL = "b-dropzone__preview__delete"
 POLL_INPUT_XPATH = "//input[@class='form-control']"
 REMEMBERME_CHECKBOX_XPATH = "//input[@id='remember']"
 
+BALLSBALLS = None
 ONLYFANS_ELEMENTS = [
+    ### login
     {
-        "name": "message",
-        "classes": [MESSAGE_CONFIRM, MESSAGE_CONFIRM2],
+        "name": "login",
+        "classes": [],
         "text": [],
-        "id": [ONLYFANS_UPLOAD_MESSAGE_PHOTO_ID]
+        "id": [],
+        "tabIndex": 2,
+        "from": "load"
+    },
+    # username
+    {
+        "name": "loginUsername",
+        "classes": [],
+        "text": [],
+        "id": [],
+        "tabIndex": 1,
+        "from": "login"
+    },
+    # password
+    {
+        "name": "loginPassword",
+        "classes": [],
+        "text": [],
+        "id": [],
+        "tabIndex": 1,
+        "from": "loginUsername"
     },
     {
         "name": "loginCheck",
         "classes": [LIVE_BUTTON_CLASS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    ### upload
+    # send
     {
-        "name": "post",
+        "name": "new_post",
         "classes": [SEND_BUTTON_CLASS, SEND_BUTTON_CLASS2],
         "text": ["Post"],
-        "id": []
+        "id": [],
+        "tabIndex": 30,
+        "from": "load"
     },
+
+
+    # record voice
     {
-        "name": "uploadImage",
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": 1,
+        "from": "new_post"
+    },
+    # post price
+    {
+        "name": "post_price",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": 9,
+        "from": "new_post"
+    },
+    # post price cancel
+    {
+        "name": "post_price_cancel",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": 1,
+        "from": "new_post"
+    },
+    # post price save
+    {
+        "name": "post_price_save",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": 2,
+        "from": "new_post"
+    },
+    # go live
+    {
+        "name": "go_live",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": 12,
+        "from": "new_post"
+    },
+    # 
+
+    # upload image file
+    {
+        "name": "image_upload",
         "classes": [MESSAGE_CONFIRM, MESSAGE_CONFIRM2],
         "text": [],
-        "id": [ONLYFANS_UPLOAD_PHOTO_ID]
+        "id": [ONLYFANS_UPLOAD_PHOTO_ID],
+        "tabIndex": 11,
+        "from": "new_post"
     },
-    {
-        "name": "uploadImageMessage",
-        "classes": "",
-        "text": [],
-        "id": [ONLYFANS_UPLOAD_MESSAGE_PHOTO_ID]
-    },
-    {
-        "name": "errorUpload",
-        "classes": [EXPIRATION_CANCEL, EXPIRATION_CANCEL2],
-        "text": ["Close"],
-        "id": []
-    },
+    # show more options # unnecessary w/ tabbing
+    # {
+    #     "name": "moreOptions",
+    #     "classes": [ONLYFANS_MORE, ONLYFANS_MORE2],
+    #     "text": [],
+    #     "id": [],
+    #     "tabIndex": None,
+    #     "from": "load"
+    # },
+    # poll
     {
         "name": "poll",
         "classes": [POLL, POLL2, POLL3, POLL4],
         "text": ["<svg class=\"g-icon\" aria-hidden=\"true\"><use xlink:href=\"#icon-more\" href=\"#icon-more\"></use></svg>"],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # poll cancel
     {
         "name": "pollCancel",
         "classes": [POLL_CANCEL],
         "text": ["Cancel"],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # poll duration
     {
         "name": "pollDuration",
         "classes": [POLL_DURATION, POLL_DURATION2, POLL_DURATION3, POLL_DURATION4],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # duration tabs
     {
         "name": "pollDurations",
         "classes": [EXPIRATION_PERIODS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # poll save duration
     {
         "name": "pollSave",
         "classes": [POLL_SAVE, POLL_SAVE2],
         "text": ["Save"],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # poll add question
     {
         "name": "pollQuestionAdd",
         "classes": [POLL_ADD_QUESTION, POLL_ADD_QUESTION2],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
-    {
-        "name": "moreOptions",
-        "classes": [ONLYFANS_MORE, ONLYFANS_MORE2],
-        "text": [],
-        "id": []
-    },
+
+    # expiration
     {
         "name": "expirationAdd",
         "classes": [EXPIRATION, EXPIRATION2],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # expiration periods (same for duration)
     {
         "name": "expirationPeriods",
         "classes": [EXPIRATION_PERIODS, EXPIRATION_PERIODS2],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # expiration save
     {
         "name": "expirationSave",
         "classes": [EXPIRATION_SAVE, EXPIRATION_SAVE2, EXPIRATION_SAVE3, EXPIRATION_SAVE4],
         "text": ["Save"],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # expiration cancel
     {
         "name": "expirationCancel",
         "classes": [EXPIRATION_CANCEL, EXPIRATION_CANCEL2],
         "text": ["Cancel"],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # discount modal for user
     {
         "name": "discountUserButton",
         "classes": [DISCOUNT_USER_BUTTON],
         "text": ["Apply"],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # discount save for user
     {
         "name": "discountUsers",
         "classes": [DISCOUNT_USERS_],
         "text": ["Save"],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+
+    ## price
+    # price add
     {
         "name": "priceClick",
         "classes": [ONLYFANS_PRICE_CLICK, ONLYFANS_PRICE_CLICK2],
         "text": ["Save"],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # price enter (adds .00)
     {
         "name": "priceEnter",
         "classes": [ONLYFANS_PRICE_INPUT, ONLYFANS_PRICE_INPUT2, ONLYFANS_PRICE_INPUT3, ONLYFANS_PRICE_INPUT4],
         "text": ["Free"],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+
+    # schedule add
     {
         "name": "scheduleAdd",
         "classes": [SCHEDULE, SCHEDULE2],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # schedule next month
     {
         "name": "scheduleNextMonth",
         "classes": [SCHEDULE_NEXT_MONTH, SCHEDULE_NEXT_MONTH2],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # schedule date
     {
         "name": "scheduleDate",
         "classes": [SCHEDULE_EXISTING_DATE, SCHEDULE_EXISTING_DATE6, SCHEDULE_EXISTING_DATE2, SCHEDULE_EXISTING_DATE3, SCHEDULE_EXISTING_DATE4, SCHEDULE_EXISTING_DATE5],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # schedule minutes
     {
         "name": "scheduleMinutes",
         "classes": [SCHEDULE_MINUTES, SCHEDULE_MINUTES2],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # schedule hours
     {
         "name": "scheduleHours",
         "classes": [SCHEDULE_HOURS, SCHEDULE_HOURS2],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # schedule days
     {
         "name": "scheduleDays",
         "classes": [SCHEDULE_DAYS, SCHEDULE_DAYS2],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+    # schedule save
     {
         "name": "scheduleSave",
         "classes": [SCHEDULE_SAVE, SCHEDULE_SAVE2],
         "text": ["Save"],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "new_post"
     },
+
+    ### message
+    # message enter text
+    {
+        "name": "new_message",
+        "classes": [MESSAGE_INPUT_CLASS],
+        "text": [],
+        "id": [],
+        "tabIndex": 14,
+        "from": "load"
+    },
+    # message upload image
+    {
+        "name": "uploadImageMessage",
+        "classes": [],
+        "text": [],
+        "id": [ONLYFANS_UPLOAD_MESSAGE_PHOTO_ID],
+        "tabIndex": None, # can't find
+        "from": "load"
+    },
+    # upload error window close
+    # tab probably closes error windows...
+    {
+        "name": "errorUpload",
+        "classes": [EXPIRATION_CANCEL, EXPIRATION_CANCEL2],
+        "text": ["Close"],
+        "id": [],
+        "tabIndex": None,
+        "from": "new_message"
+    },
+    # messages all
     {
         "name": "messagesAll",
         "classes": [ONLYFANS_MESSAGES_ALL],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # messages from user
     {
         "name": "messagesFrom",
         "classes": [ONLYFANS_MESSAGES_FROM],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # messages to user
     {
         "name": "usersUsernames",
         "classes": [ONLYFANS_USERSNAMES],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    ## Users
+    # users
     {
         "name": "usersUsers",
         "classes": [ONLYFANS_USERS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # users started dates
     {
         "name": "usersStarteds",
         "classes": [ONLYFANS_USERS_STARTEDS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # users ids
     {
         "name": "usersIds",
         "classes": [ONLYFANS_USERS_IDS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # users count
     {
         "name": "usersCount",
         "classes": [ONLYFANS_USER_COUNT],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # users discount buttons
     {
         "name": "discountUserButtons",
         "classes": [DISCOUNT_USER_BUTTONS],
         "text": [],
-        "id": []
-    },
-    {
-        "name": "messageInput",
-        "classes": [MESSAGE_INPUT_CLASS],
-        "text": [],
-        "id": []
-    },
-    {
-        "name": "messages",
-        "classes": [ONLYFANS_MESSAGES],
-        "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
 
     ## Settings ##
 
+    ## Account
+    # cover image enter
     {
         "name": "coverImage",
         "classes": ["b-user-panel__cover__img"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # cover image cancel
+    {
+        "name": "coverImageCancel",
+        "classes": [],
+        "text": [],
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
+    },
+    # profile photo
     {
         "name": "profilePhoto",
         "classes": ["g-btn.m-rounded.m-sm.m-border"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # display name
     {
         "name": "displayName",
         "classes": ["form-control.g-input"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": 7, # left
+        "from": "load"
     },
+    # subscription price
     {
         "name": "subscriptionPrice",
         "classes": ["form-control.g-input","classname"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": 6, # left
+        "from": "load"
     },
+    # ADD reward for subscriber referrals
+    # about
     {
         "name": "about",
         "classes": ["form-control.g-input.unlimsize"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": 5, # left
+        "from": "load"
     },
+    # location
     {
         "name": "location",
         "classes": ["form-control.g-input"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": 4, # left
+        "from": "load"
     },
+    # website url
     {
         "name": "websiteURL",
         "classes": ["form-control.g-input"],
         "text": [],
-        "id": []
-    },
-    {
-        "name": "username",
-        "classes": ["form-control.g-input"],
-        "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": 3, # left
+        "from": "load"
     },
 
-
+    ## Advanced
+    # username
+    # BLANK
+    # email
     {
         "name": "email",
         "classes": ["form-control.g-input"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": 3, # left
+        "from": "load"
     },
+    # username
+    {
+        "name": "username",
+        "classes": ["form-control.g-input"],
+        "text": [],
+        "id": [],
+        "tabIndex": 4, # left
+        "from": "load"
+    },
+    # connect other onlyfans accounts username enter area
+    # BLANK
+    # password
     {
         "name": "password",
         "classes": ["form-control.g-input"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # password 2x
     {
         "name": "newPassword",
         "classes": ["form-control.g-input"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # confirm new password
     {
         "name": "confirmPassword",
         "classes": ["form-control.g-input"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+
+    ## Notifications
+    # push notifications
+    # BLANK
+    # email notifications
     {
         "name": "emailNotifs",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # new referral email
     {
         "name": "emailNotifsNewReferral",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # new stream email
     {
         "name": "emailNotifsNewStream",
         "classes": ["b-input-radio"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # new subscriber email
     {
         "name": "emailNotifsNewSubscriber",
         "classes": ["b-input-radio"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
-
+    # new tip email
     {
         "name": "emailNotifsNewSubscriber",
         "classes": ["b-input-radio"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
-
+    # new renewal email
     {
         "name": "emailNotifsNewSubscriber",
         "classes": ["b-input-radio"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
 
     {
         "name": "emailNotifsNewTip",
         "classes": ["b-input-radio"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    #
     {
         "name": "emailNotifsRenewal",
         "classes": ["b-input-radio"],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # new likes summary
     {
         "name": "emailNotifsNewLikes",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # new posts summary
     {
         "name": "emailNotifsNewPosts",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # new private message summary
     {
         "name": "emailNotifsNewPrivMessages",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # telegram bot button
+    # BLANK
+    # site notifications
     {
         "name": "siteNotifs",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # new comment notification
     {
         "name": "siteNotifsNewComment",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # new favorite notification
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # discounts from users i've used to follow notification
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # new subscriber notification
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # new tip notification
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # toast notification new comment
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # toast notification new favorite
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # toast notification new subscriber
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # toast notification new tip
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    ## Security
+    # two step toggle
+    # BLANK
+    # fully private profile
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # enable comments
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # show fans count on profile
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # show posts tips summary
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # public friends list
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
     },
+    # geo blocking
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": 4, # left
+        "from": "load"
     },
+    # ip blocking
     {
         "name": "BALLS",
         "classes": [BALLSBALLS],
         "text": [],
-        "id": []
+        "id": [],
+        "tabIndex": 3, # left
+        "from": "load"
     },
-
-
+    # watermarks photos
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
+    },
+    # watermarks video
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
+    },
+    # watermarks text
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": 2,
+        "from": "load"
+    },
+    ####### save changes may be the same for each
+    ## Story
+    # allow message replies - nobody
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
+    },
+    # allow message replies - subscribers
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
+    },
+    # show story for - everyone
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
+    },
+    # show story for - subscribers
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": None,
+        "from": "load"
+    },
+    ## Other
+    # obs server
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": 12, # left
+        "from": "load"
+    },
+    # obs key
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": 11, # left
+        "from": "load"
+    },
+    # welcome chat message toggle
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": 10, 
+        "from": "load"
+    },
+    # then same pattern for message enter text or add stuff and price
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": None, # lefts
+        "from": "load"
+    },
+    # save button for welcome chat message
+    {
+        "name": "BALLS",
+        "classes": [BALLSBALLS],
+        "text": [],
+        "id": [],
+        "tabIndex": None, # left
+        "from": "load"
+    },
 
 ]
 

@@ -427,32 +427,25 @@ class Driver:
                 return False
         self.browser.implicitly_wait(10) # seconds
         self.browser.set_page_load_timeout(1200)    
-        def attempt_login(opt):
-            try:
-                self.browser.get(ONLYFANS_HOME_URL)
-                # login via Twitter
-                if int(opt)==0:
-                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN0).click()
-                elif int(opt)==1:
-                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN1).click()
-                elif int(opt)==2:
-                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN2).click()
-            except NoSuchElementException as e:
-                opt+=1
-                print("Warning: Login Failure, Retrying ({})".format(opt))
-                attempt_login(opt)
         try:
-            attempt_login(0)
-            # rememberMe checkbox doesn't actually cause login to be remembered
-            rememberMe = self.browser.find_element_by_xpath(REMEMBERME_CHECKBOX_XPATH)
-            if not rememberMe.is_selected():
-                rememberMe.click()
-            # fill in username
-            username = self.browser.find_element_by_xpath(USERNAME_XPATH).send_keys(username_)
-            # fill in password and hit the login button 
-            password = self.browser.find_element_by_xpath(PASSWORD_XPATH)
-            password.send_keys(password_)
-            password.send_keys(Keys.ENTER)
+            self.browser.get(ONLYFANS_HOME_URL)
+            actions = ActionChains(self.browser)
+            actions.send_keys(Keys.ALT+Keys.TAB) 
+            # actions.perform()
+            # actions = ActionChains(self.browser)
+            actions.send_keys(Keys.ALT+Keys.TAB) 
+            # actions.perform()
+            # actions = ActionChains(self.browser)
+            actions.send_keys(Keys.ENTER) 
+            actions.perform()
+            username = self.browser.find_element_by_xpath()
+            WebDriverWait(self.browser, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.XPATH, USERNAME_XPATH)))
+            actions = ActionChains(self.browser)
+            actions.send_keys(username_)
+            actions.send_keys(Keys.ALT+Keys.TAB)
+            actions.send_keys(password_)
+            actions.send_keys(Keys.ENTER) 
+            actions.perform()
             try:
                 WebDriverWait(self.browser, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
                 print("OnlyFans Login Successful")
@@ -887,13 +880,9 @@ class Driver:
         settings.devPrint("reached page")
         settings.devPrint("")
         settingsPage = self.find_element_by_name(name)
-
         if str(type_) == "text":
             # get attr text
             pass
-
-            self.
-
         elif str(type_) == "toggle":
             # get state true|false
             pass
