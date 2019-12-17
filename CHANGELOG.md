@@ -258,6 +258,7 @@
 ----------------------------------------
   **2.15.2**
   - settings options debugging
+  - added: tabbing to inputs
 
   **2.15.0**
   - added: Settings options
