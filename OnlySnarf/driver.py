@@ -413,6 +413,7 @@ class Driver:
         options.add_argument('--disable-gpu')
         # self.browser = webdriver.Chrome(binary=CHROMEDRIVER_PATH, chrome_options=options)
         CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
+        # options.setBinary(CHROMEDRIVER_PATH);
         os.environ["webdriver.chrome.driver"] = CHROMEDRIVER_PATH
         try:
             self.browser = webdriver.Chrome(chrome_options=options)
@@ -424,6 +425,11 @@ class Driver:
             except Exception as e:
                 Driver.error_checker(e)
                 print("Error: Missing chromedriver_path, exiting")
+                try:
+                    self.browser = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH)
+                except Exception as e:
+                    print(e)
+                    print("Super Fucked")
                 return False
         self.browser.implicitly_wait(10) # seconds
         self.browser.set_page_load_timeout(1200)    
