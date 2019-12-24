@@ -18,7 +18,6 @@ setuptools.setup(
         'selenium',
         'pydrive',
         'pathlib', 
-        # 'chromedriver-binary==77.0.3865.40',
         'chromedriver-binary',
         'moviepy',
         'google-api-python-client',

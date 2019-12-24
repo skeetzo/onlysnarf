@@ -185,6 +185,7 @@ class User:
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
                 settings.maybePrint("Found User: Members")
                 return user
+        print("Error: Missing User by Username - {}".format(username))
         return None
 
     @staticmethod
