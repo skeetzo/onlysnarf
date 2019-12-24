@@ -73,6 +73,7 @@ class OnlySnarf:
     ###################
 
     def message(self, choice, message=None, image=None, price=None, username=None):
+        users = []
         if str(choice) == "all":
             print("Messaging: All")
             users = User.get_all_users(self.driver)
@@ -90,7 +91,10 @@ class OnlySnarf:
             if username is None:
                 print("Error: Missing Username")
                 return
-            users = [User.get_user_by_username(self.driver, str(username))]
+            user = User.get_user_by_username(self.driver, str(username))
+            if user is None: return False
+            users = [user]
+            settings.maybePrint("User Found: {}".format(username))
         else:
             print("Error: Missing Message Choice")
             return

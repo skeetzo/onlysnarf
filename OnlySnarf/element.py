@@ -213,7 +213,7 @@ ONLYFANS_ELEMENTS = [
     # upload image file
     {
         "name": "image_upload",
-        "classes": [MESSAGE_CONFIRM, MESSAGE_CONFIRM2],
+        "classes": [MESSAGE_CONFIRM2, MESSAGE_CONFIRM],
         "text": [],
         "id": [ONLYFANS_UPLOAD_PHOTO_ID],
         "tabIndex": 11,
@@ -425,7 +425,7 @@ ONLYFANS_ELEMENTS = [
     ### message
     # message enter text
     {
-        "name": "new_message",
+        "name": "messageText",
         "classes": [MESSAGE_INPUT_CLASS],
         "text": [],
         "id": [],
@@ -435,7 +435,7 @@ ONLYFANS_ELEMENTS = [
     # message upload image
     {
         "name": "uploadImageMessage",
-        "classes": [],
+        "classes": [MESSAGE_CONFIRM],
         "text": [],
         "id": [ONLYFANS_UPLOAD_MESSAGE_PHOTO_ID],
         "tabIndex": None, # can't find
