@@ -29,6 +29,7 @@ sudo onlysnarfpy \
 -type "gallery" \
 -prefer-local \
 -show-window \
+-skip-download \
 -image-upload-limit 20 \
 -image-download-limit 20 \
 -force-upload
