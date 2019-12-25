@@ -11,7 +11,7 @@ sudo onlysnarfpy \
 -debug \
 -verbose \
 -action "message" \
--user "all" \
+-method "all" \
 -text "Merry Christmas! ;*" \
 -price "0.00" \
 -bykeyword "xmas" \
@@ -22,7 +22,7 @@ sudo onlysnarfpy \
 -debug \
 -verbose \
 -action "message" \
--user "all" \
+-method "all" \
 -text "Santa left you some presents to unwrap..." \
 -price "10.00" \
 -bykeyword "xmas dick" \
