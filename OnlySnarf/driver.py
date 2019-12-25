@@ -1074,11 +1074,6 @@ class Driver:
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, ONLYFANS_TWEET))).click()
             else:
                 settings.devPrint("not tweeting")
-            ## Text
-            successful_text = self.enter_text(text)
-            if not successful_text:
-                print("Error: Unable to Enter Text")
-                return False
             ## Images
             try:
                 settings.devPrint("uploading files")
@@ -1086,6 +1081,11 @@ class Driver:
             except Exception as e:
                 Driver.error_checker(e)
                 print("Error: Unable to Upload Images")
+                return False
+            ## Text
+            successful_text = self.enter_text(text)
+            if not successful_text:
+                print("Error: Unable to Enter Text")
                 return False
             ## Confirm
             i = 0
