@@ -33,6 +33,10 @@ ONLYFANS_HOME_URL = 'https://onlyfans.com'
 ONLYFANS_CHAT_URL = "{}/my/chats/chat".format(ONLYFANS_HOME_URL)
 ONLYFANS_SETTINGS_URL = "{}/my/settings".format(ONLYFANS_HOME_URL)
 ONLYFANS_USERS_ACTIVE_URL = "{}/my/subscribers/active".format(ONLYFANS_HOME_URL)
+LOGIN_FORM = "b-loginreg__form"
+SEND_BUTTON_XPATH = "//button[@type='submit' and @class='g-btn m-rounded']"
+SEND_BUTTON_CLASS = "g-btn.m-rounded"
+SEND_BUTTON_CLASS2 = "button.g-btn.m-rounded"
 # Login References
 LIVE_BUTTON_CLASS = "b-make-post__streaming-link"
 TWITTER_LOGIN0 = "//a[@class='g-btn m-rounded m-flex m-lg']"
@@ -335,6 +339,9 @@ class Driver:
     def get_element_to_click(self, name):
         settings.devPrint("finding click: {}".format(name))
         element = Element.get_element_by_name(name)
+        if not element:
+            print("Error: Unable to find Element Reference")
+            return False
         for className in element.getClasses():
             eles = []
             elesCSS = []
@@ -409,11 +416,9 @@ class Driver:
             options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
-        # options.setExperimentalOption('useAutomationExtension', false);
         options.add_argument('--disable-gpu')
-        # self.browser = webdriver.Chrome(binary=CHROMEDRIVER_PATH, chrome_options=options)
+        # options.setExperimentalOption('useAutomationExtension', false);
         CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
-        os.environ["webdriver.chrome.driver"] = CHROMEDRIVER_PATH
         try:
             self.browser = webdriver.Chrome(chrome_options=options)
         except Exception as e:
@@ -424,35 +429,34 @@ class Driver:
             except Exception as e:
                 Driver.error_checker(e)
                 print("Error: Missing chromedriver_path, exiting")
+                try:
+                    self.browser = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH)
+                except Exception as e:
+                    print(e)
+                    print("Super Fucked")
                 return False
         self.browser.implicitly_wait(10) # seconds
         self.browser.set_page_load_timeout(1200)    
-        def attempt_login(opt):
-            try:
-                self.browser.get(ONLYFANS_HOME_URL)
-                # login via Twitter
-                if int(opt)==0:
-                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN0).click()
-                elif int(opt)==1:
-                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN1).click()
-                elif int(opt)==2:
-                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN2).click()
-            except NoSuchElementException as e:
-                opt+=1
-                print("Warning: Login Failure, Retrying ({})".format(opt))
-                attempt_login(opt)
         try:
-            attempt_login(0)
-            # rememberMe checkbox doesn't actually cause login to be remembered
-            rememberMe = self.browser.find_element_by_xpath(REMEMBERME_CHECKBOX_XPATH)
-            if not rememberMe.is_selected():
-                rememberMe.click()
-            # fill in username
-            username = self.browser.find_element_by_xpath(USERNAME_XPATH).send_keys(username_)
-            # fill in password and hit the login button 
-            password = self.browser.find_element_by_xpath(PASSWORD_XPATH)
-            password.send_keys(password_)
-            password.send_keys(Keys.ENTER)
+            self.browser.get(ONLYFANS_HOME_URL)
+            WebDriverWait(self.browser, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, LOGIN_FORM)))
+            actions = ActionChains(self.browser)
+            actions.send_keys(Keys.ALT+Keys.TAB) 
+            # actions.perform()
+            # actions = ActionChains(self.browser)
+            actions.send_keys(Keys.ALT+Keys.TAB) 
+            # actions.perform()
+            # actions = ActionChains(self.browser)
+            actions.send_keys(Keys.ENTER) 
+            actions.perform()
+            username = self.browser.find_element_by_xpath(USERNAME_XPATH)
+            WebDriverWait(self.browser, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.XPATH, USERNAME_XPATH)))
+            actions = ActionChains(self.browser)
+            actions.send_keys(username_)
+            actions.send_keys(Keys.ALT+Keys.TAB)
+            actions.send_keys(password_)
+            actions.send_keys(Keys.ENTER) 
+            actions.perform()
             try:
                 WebDriverWait(self.browser, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
                 print("OnlyFans Login Successful")
@@ -489,7 +493,7 @@ class Driver:
                     if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
                         print('Error: Max Upload Time Reached')
                         return False
-            confirm = self.get_element_to_click("confirm")
+            confirm = self.get_element_to_click("new_post")
             # confirm = WebDriverWait(self.browser, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
             if str(settings.DEBUG) == "True":
                 if str(settings.DEBUG_DELAY) == "True":
@@ -514,7 +518,7 @@ class Driver:
                 return False
             print("Enter image(s): {}".format(path))
             try:
-                self.upload_image_files(name="message", path=path)
+                self.upload_image_files(name="uploadImageMessage", path=path)
                 settings.maybePrint("Image(s) Entered")
                 settings.debug_delay_check()
                 return True
@@ -556,7 +560,7 @@ class Driver:
                 print("Error: Missing Text")
                 return False
             print("Enter text: {}".format(text))
-            message = self.find_element_by_name("messageInput")        
+            message = self.find_element_by_name("messageText")        
             message.send_keys(str(text))
             settings.maybePrint("Text Entered")
             return True
@@ -717,7 +721,7 @@ class Driver:
             self.browser.find_element_by_id(ONLYFANS_POST_TEXT_ID).send_keys(str(text))
             settings.devPrint("entered text")
             settings.devPrint("finding send")
-            send = self.get_element_to_click("post")
+            send = self.get_element_to_click("new_post")
             settings.debug_delay_check()
             if str(settings.DEBUG) == "True":
                 print('Skipped: OnlyFans Post (debug)')
@@ -887,13 +891,9 @@ class Driver:
         settings.devPrint("reached page")
         settings.devPrint("")
         settingsPage = self.find_element_by_name(name)
-
         if str(type_) == "text":
             # get attr text
             pass
-
-            self.
-
         elif str(type_) == "toggle":
             # get state true|false
             pass
@@ -1074,22 +1074,44 @@ class Driver:
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, ONLYFANS_TWEET))).click()
             else:
                 settings.devPrint("not tweeting")
+            ## Images
+            try:
+                settings.devPrint("uploading files")
+                successful_upload = self.upload_image_files("image_upload", path)
+            except Exception as e:
+                Driver.error_checker(e)
+                print("Error: Unable to Upload Images")
+                return False
             ## Text
             successful_text = self.enter_text(text)
             if not successful_text:
                 print("Error: Unable to Enter Text")
                 return False
-            ## Images
-            try:
-                settings.devPrint("uploading files")
-                successful_upload = self.upload_image_files("uploadImage", path)
-            except Exception as e:
-                Driver.error_checker(e)
-                print("Error: Unable to Upload Images")
-                return False
             ## Confirm
+            i = 0
+            while True:
+                try:
+                    WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, SEND_BUTTON_CLASS)))
+                    settings.devPrint("upload complete")
+                    break
+                except Exception as e:
+                    # try: 
+                    #     # check for existence of "thumbnail is fucked up" modal and hit ok button
+                    #     # haven't seen in long enough time to properly add
+                    #     self.browser.switchTo().frame("iframe");
+                    #     self.browser.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
+                    #     print("Error: Thumbnail Missing")
+                    #     break
+                    # except Exception as ef:
+                    #     settings.maybePrint(ef)
+                    print('uploading...')
+                    Driver.error_checker(e)
+                    i+=1
+                    if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
+                        print('Error: Max Upload Time Reached')
+                        return False
             try:
-                send = self.get_element_to_click("post")
+                send = self.get_element_to_click("new_post")
                 if send:
                     if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
                         time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
@@ -1116,7 +1138,7 @@ class Driver:
             return False
 
     # uploads image into post or message
-    def upload_image_files(self, name="post", path=None):
+    def upload_image_files(self, name="image_upload", path=None):
         if path == None:
             print("Error: Missing Upload Path")
             return False
@@ -1159,28 +1181,7 @@ class Driver:
          ## Wait for Confirm
         self.error_window_upload()
         settings.debug_delay_check()
-        i = 0
-        while True:
-            try:                
-                WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name(str(name)).getClass())))
-                settings.devPrint("upload complete")
-                return True
-            except Exception as e:
-                # try: 
-                #     # check for existence of "thumbnail is fucked up" modal and hit ok button
-                #     # haven't seen in long enough time to properly add
-                #     self.browser.switchTo().frame("iframe");
-                #     self.browser.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
-                #     print("Error: Thumbnail Missing")
-                #     break
-                # except Exception as ef:
-                #     settings.maybePrint(ef)
-                print('uploading...')
-                Driver.error_checker(e)
-                i+=1
-                if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
-                    print('Error: Max Upload Time Reached')
-                    return False
+        settings.devPrint("files uploaded")
         return True
 
     #################
