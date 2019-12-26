@@ -31,12 +31,11 @@ echo "Merry XMAS"
 
 # Nudes
 sudo onlysnarfpy \
--debug \
 -verbose \
 -action "message" \
 -type "video" \
 -method "all" \
 -image "/home/schizo/Documents/xmas-dick.mp4" \
 -text "Merry Christmas! Santa left a present for you to unwrap...  ;*" \
--price "10.00" \
+-price "6.00" \
 -prefer-local
