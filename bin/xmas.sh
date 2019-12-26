@@ -10,7 +10,6 @@ echo "Merry XMAS"
 sudo onlysnarfpy \
 -debug \
 -verbose \
--verboser \
 -action "upload" \
 -type "gallery" \
 -text "xmas nudes" \
