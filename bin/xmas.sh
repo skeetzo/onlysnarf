@@ -1,35 +1,41 @@
 #!/usr/bin/env bash
-# messages all users a non nude teaser for free
-# and a nude for $10
+# releases teasers and free nudes
+# messages a short nude video for $6
+
 sudo python3 ../onlysnarf/setup.py install
 wait
 echo "-----------------------------------------------------"
 echo "Merry XMAS"
 
-# Gallery
-# sudo onlysnarfpy \
-# -action "upload" \
-# -type "gallery" \
-# -text "xmas nudes" \
-# -bykeyword "xmas nudes" \
-# -image-upload-limit 10 \
-# -image-download-limit 10
-
+##
 # Freebies
-# sudo onlysnarfpy \
-# -debug \
-# -verbose \
-# -action "message" \
-# -type "gallery" \
-# -method "all" \
-# -image "/home/schizo/Documents/xmas tease" \
-# -text "Merry Christmas! ;*" \
-# -price "0.00" \
-# -image-upload-limit 10 \
-# -image-download-limit 10 \
-# -prefer-local
+##
 
+sudo onlysnarfpy \
+-action "upload" \
+-type "gallery" \
+-method "input" \
+-input "/home/schizo/Documents/xmas tease" \
+-text "xmas tease" \
+-image-upload-limit 10 \
+-image-download-limit 10 \
+-force-upload
+
+# could be run as a cron to schedule itself later in the day
+sudo onlysnarfpy \
+-action "upload" \
+-type "gallery" \
+-method "input" \
+-input "/home/schizo/Documents/xmas nudes" \
+-text "Christmas 2019" \
+-image-upload-limit 10 \
+-image-download-limit 10 \
+-force-upload
+
+##
 # Nudes
+##
+
 sudo onlysnarfpy \
 -verbose \
 -action "message" \

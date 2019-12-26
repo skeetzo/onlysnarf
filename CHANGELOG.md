@@ -254,14 +254,17 @@
   **2.15.1**
   - fixed menu
   - added -version flag
-  
-----------------------------------------
   **2.15.2**
   - settings options debugging
   - added: tabbing to inputs
-  - undid tabbing to login -> unpredictable odd behavior
+  - undid tabbing to inputs -> unpredictable odd behavior
+  - minor random debugging (??wtf?)
+  - xmas scripts
 
-  **2.15.0**
+----------------------------------------
+  **2.15.3**
+
+  **2.16.0**
   - added: Settings options
 
 ----------------------------------------
@@ -273,6 +276,7 @@
   - update: backup function to include original folder name -> posted/galleries/$file
   - [MESSAGES] layout in config for preset message formats
   - bot functionality to check posts for quiz answers
+  - fix literally everything
 
 ### Medium Priority
 
