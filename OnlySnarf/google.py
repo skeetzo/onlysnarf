@@ -399,6 +399,10 @@ def download_gallery(folder):
     print('Downloading Gallery: {}'.format(folder['title']))
     # download folder
     global PYDRIVE
+    other_files = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false"}).GetList()
+    print(len(other_files))
+    print(other_files)
+
     file_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
     folder_size = len(file_list)
     settings.maybePrint('Folder size: '+str(folder_size))
