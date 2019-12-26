@@ -16,17 +16,18 @@ echo "Merry XMAS"
 # -image-download-limit 10
 
 # Freebies
-sudo onlysnarfpy \
--debug \
--verbose \
--action "message" \
--type "gallery" \
--method "all" \
--image "/home/schizo/Documents/xmas tease" \
--text "Merry Christmas! ;*" \
--price "0.00" \
--image-upload-limit 10 \
--image-download-limit 10
+# sudo onlysnarfpy \
+# -debug \
+# -verbose \
+# -action "message" \
+# -type "gallery" \
+# -method "all" \
+# -image "/home/schizo/Documents/xmas tease" \
+# -text "Merry Christmas! ;*" \
+# -price "0.00" \
+# -image-upload-limit 10 \
+# -image-download-limit 10 \
+# -prefer-local
 
 # Nudes
 sudo onlysnarfpy \
@@ -36,7 +37,6 @@ sudo onlysnarfpy \
 -type "video" \
 -method "all" \
 -image "/home/schizo/Documents/xmas-dick.mp4" \
--text "Santa left a present for you to unwrap..." \
+-text "Merry Christmas! Santa left a present for you to unwrap...  ;*" \
 -price "10.00" \
--bykeyword "xmas dick" \
 -prefer-local
