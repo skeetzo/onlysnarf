@@ -66,7 +66,7 @@ Uploads a random video labeled: 'your mom - %d%m%y'
   `onlysnarfpy -input /path/to/fileOrDirectory`  
 Uploads a file or directory of files at path.  
 
--input /path/to/fileOrDirectory
+- ?
   `onlysnarfpy -type video -date "12/25/2019" -expires 7`  
 Uploads a random video, schedules it to release at midnight on Christmas, and sets the post to expire after 7 days.  
 
