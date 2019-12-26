@@ -213,7 +213,7 @@ class Driver:
             error_buttons = self.browser.find_elements_by_class_name(element.getClass())
             settings.devPrint("errors btns: {}".format(len(error_buttons)))
             for butt in error_buttons:
-                if butt.get_attribute("innerHTML").strip() == "Close" and butt.is_enabled() and butt.is_visible():
+                if butt.get_attribute("innerHTML").strip() == "Close" and butt.is_enabled():
                     settings.maybePrint("Warning: Upload Error Message, Closing")
                     butt.click()
                     settings.maybePrint("Success: Upload Error Message Closed")
