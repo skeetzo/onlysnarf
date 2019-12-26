@@ -10,6 +10,7 @@ echo "Merry XMAS"
 sudo onlysnarfpy \
 -debug \
 -verbose \
+-verboser \
 -action "upload" \
 -type "gallery" \
 -text "xmas nudes" \
@@ -39,5 +40,6 @@ sudo onlysnarfpy \
 -method "all" \
 -text "Santa left a present for you to unwrap..." \
 -price "10.00" \
--bykeyword "xmas dick"
+-bykeyword "xmas dick" \
+-prefer-local
 
