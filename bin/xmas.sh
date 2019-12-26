@@ -22,7 +22,7 @@ sudo onlysnarfpy \
 -action "message" \
 -type "gallery" \
 -method "all" \
--input "/home/schizo/Documents/xmas tease" \
+-image "/home/schizo/Documents/xmas tease" \
 -text "Merry Christmas! ;*" \
 -price "0.00" \
 -image-upload-limit 10 \
@@ -35,7 +35,7 @@ sudo onlysnarfpy \
 -action "message" \
 -type "video" \
 -method "all" \
--input "/home/schizo/Documents/xmas-dick.mp4" \
+-image "/home/schizo/Documents/xmas-dick.mp4" \
 -text "Santa left a present for you to unwrap..." \
 -price "10.00" \
 -bykeyword "xmas dick" \
