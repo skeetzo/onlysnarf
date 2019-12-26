@@ -1179,7 +1179,7 @@ class Driver:
                 # if this doesn't force it then it'll loop forever without a stopper
             # time.sleep(1)
          ## Wait for Confirm
-        self.error_window_upload()
+        # self.error_window_upload()
         settings.debug_delay_check()
         settings.devPrint("files uploaded")
         return True
