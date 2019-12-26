@@ -6,24 +6,38 @@ wait
 echo "-----------------------------------------------------"
 echo "Merry XMAS"
 
+# Gallery
+sudo onlysnarfpy \
+-debug \
+-verbose \
+-action "upload" \
+-type "video" \
+-text "xmas nudes" \
+-bykeyword "xmas nudes" \
+-image-upload-limit 10 \
+-image-download-limit 10
+
 # Freebies
 sudo onlysnarfpy \
 -debug \
 -verbose \
 -action "message" \
+-type "gallery" \
 -method "all" \
 -text "Merry Christmas! ;*" \
 -price "0.00" \
--bykeyword "xmas" \
--type "image"
+-bykeyword "xmas tease" \
+-image-upload-limit 10 \
+-image-download-limit 10
 
 # Nudes
 sudo onlysnarfpy \
 -debug \
 -verbose \
 -action "message" \
+-type "video" \
 -method "all" \
--text "Santa left you some presents to unwrap..." \
+-text "Santa left a present for you to unwrap..." \
 -price "10.00" \
--bykeyword "xmas dick" \
--type "gallery"
+-bykeyword "xmas dick"
+
