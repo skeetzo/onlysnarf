@@ -8,8 +8,6 @@ echo "Merry XMAS"
 
 # Gallery
 sudo onlysnarfpy \
--debug \
--verbose \
 -action "upload" \
 -type "gallery" \
 -text "xmas nudes" \
@@ -18,27 +16,32 @@ sudo onlysnarfpy \
 -image-download-limit 10
 
 # Freebies
-sudo onlysnarfpy \
--debug \
--verbose \
--action "message" \
--type "gallery" \
--method "all" \
--text "Merry Christmas! ;*" \
--price "0.00" \
--bykeyword "xmas tease" \
--image-upload-limit 10 \
--image-download-limit 10
+# sudo onlysnarfpy \
+# -debug \
+# -verbose \
+# -action "message" \
+# -type "gallery" \
+# -method "all" \
+# -text "Merry Christmas! ;*" \
+# -price "0.00" \
+# -bykeyword "xmas tease" \
+# -image-upload-limit 10 \
+# -image-download-limit 10 \
+# -show-window
 
 # Nudes
-sudo onlysnarfpy \
--debug \
--verbose \
--action "message" \
--type "video" \
--method "all" \
--text "Santa left a present for you to unwrap..." \
--price "10.00" \
--bykeyword "xmas dick" \
--prefer-local
+# sudo onlysnarfpy \
+# -debug \
+# -verbose \
+# -action "message" \
+# -type "video" \
+# -method "all" \
+# -text "Santa left a present for you to unwrap..." \
+# -price "10.00" \
+# -bykeyword "xmas dick" \
+# -prefer-local
 
+
+
+# move files to desktop
+# upload from local
