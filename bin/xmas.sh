@@ -11,7 +11,7 @@ sudo onlysnarfpy \
 -debug \
 -verbose \
 -action "upload" \
--type "video" \
+-type "gallery" \
 -text "xmas nudes" \
 -bykeyword "xmas nudes" \
 -image-upload-limit 10 \
