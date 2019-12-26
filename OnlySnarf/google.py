@@ -621,6 +621,89 @@ def get_images():
         return []
     return images_list
 
+
+def get_galleries():
+    checkAuth()
+    print('Getting Galleries')
+    global PYDRIVE
+    gallery_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("galleries")['id'])}).GetList()
+    folder_list = []
+    random_gallery = None
+    folder_name = None
+    if gallery_folders == None:
+        print("Error: Unable to Connect to Google Drive")
+        return {}
+    for folder in gallery_folders:
+        if str(settings.VERBOSE) == "True":
+            print('checking galleries: {}'.format(folder['title']),end="")
+        gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+        if settings.BYKEYWORD != None and str(folder['title']) not in str(settings.BYKEYWORD):
+            settings.maybePrint('-> not keyword')
+            continue
+        elif settings.NOTKEYWORD != None and str(folder['title']) not in str(settings.NOTKEYWORD):
+            settings.maybePrint('-> by not keyword')
+            continue
+        if len(gallery_list_tmp)>0:
+            folder_list.append(folder)
+            settings.maybePrint(" -> added")
+        else:
+            settings.maybePrint(" -> empty")
+    galleries = []
+    for folder in folder_list:
+        if str(settings.VERBOSE) == "True":
+            print('checking gallery: {}'.format(folder['title']),end="")
+        gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
+        for folder_ in gallery_list_tmp:
+            gallery_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+folder_['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
+            if len(gallery_list_tmp_tmp)>0:
+                folder_name = folder['title']
+                settings.maybePrint(" -> found")
+                galleries.append(folder_)
+            else:
+                settings.maybePrint(" -> empty")
+    print('Galleries: '+str(len(galleries)))
+    return galleries
+
+# this doesn't work
+def get_videos():
+    checkAuth()
+    print('Getting Videos')
+    global PYDRIVE
+    random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("videos")['id'])}).GetList()
+    video_list = []
+    random_video = None
+    folder_name = None
+    if random_folders == None:
+        print("Error: Unable to Connect to Google Drive")
+        return {}
+    for folder in random_folders:
+        if str(settings.VERBOSE) == "True":
+            print('checking folder: '+folder['title'],end="")
+        video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
+        if settings.BYKEYWORD != None and str(folder['title']) not in str(settings.BYKEYWORD):
+            settings.maybePrint('-> not keyword')
+            continue
+        elif settings.NOTKEYWORD != None and str(folder['title']) not in str(settings.NOTKEYWORD):
+            settings.maybePrint('-> by not keyword')
+            continue
+        if len(video_list_tmp)>0:
+            video_list.append(folder)
+            settings.maybePrint(" -> added")
+        else:
+            settings.maybePrint(" -> empty")
+    if len(video_list)==0:
+        print('Error: Missing Video File')
+        return {}
+    return video_list
+    random_video = random.choice(video_list)
+    folder_name = random_video['title'];
+    print('Random Folder: '+random_video['title'])
+    random_video = PYDRIVE.ListFile({'q': "'"+random_video['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
+    random_video = random.choice(random_video)
+    print('Random Video: '+random_video['title'])
+    return {"file":random_video,"keywords":folder_name}
+
+
 # gets all the images in the messages folders
 def get_message_image(folderName):
     checkAuth()

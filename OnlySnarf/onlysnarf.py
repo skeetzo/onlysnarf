@@ -99,7 +99,12 @@ class OnlySnarf:
             print("Error: Missing Message Choice")
             return
         if image == None and str(settings.METHOD) == "random":
-            images = Google.get_images()
+            if str(settings.TYPE) == "image":
+                images = Google.get_images()
+            elif str(settings.TYPE) == "gallery":
+                images = Google.get_galleries()
+            elif str(settings.TYPE) == "video":
+                images = Google.get_videos()
             # if str(settings.TYPE) == "image" or str(settings.TYPE) == "None": 
             image = random.choice(images)
             if str(settings.TYPE) == "gallery":
