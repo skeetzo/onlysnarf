@@ -208,7 +208,6 @@ class Driver:
             settings.maybePrint(e)
 
     def error_window_upload(self):
-        return False
         try:
             element = Element.get_element_by_name("errorUpload")
             error_buttons = self.browser.find_elements_by_class_name(element.getClass())
@@ -437,27 +436,33 @@ class Driver:
                     print("Super Fucked")
                 return False
         self.browser.implicitly_wait(10) # seconds
-        self.browser.set_page_load_timeout(1200)    
+        self.browser.set_page_load_timeout(1200)
+        def attempt_login(opt):
+            try:
+                self.browser.get(ONLYFANS_HOME_URL)
+                # login via Twitter
+                if int(opt)==0:
+                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN0).click()
+                elif int(opt)==1:
+                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN1).click()
+                elif int(opt)==2:
+                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN2).click()
+            except NoSuchElementException as e:
+                opt+=1
+                print("Warning: Login Failure, Retrying ({})".format(opt))
+                attempt_login(opt)
         try:
-            self.browser.get(ONLYFANS_HOME_URL)
-            WebDriverWait(self.browser, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, LOGIN_FORM)))
-            actions = ActionChains(self.browser)
-            actions.send_keys(Keys.ALT+Keys.TAB) 
-            # actions.perform()
-            # actions = ActionChains(self.browser)
-            actions.send_keys(Keys.ALT+Keys.TAB) 
-            # actions.perform()
-            # actions = ActionChains(self.browser)
-            actions.send_keys(Keys.ENTER) 
-            actions.perform()
-            username = self.browser.find_element_by_xpath(USERNAME_XPATH)
-            WebDriverWait(self.browser, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.XPATH, USERNAME_XPATH)))
-            actions = ActionChains(self.browser)
-            actions.send_keys(username_)
-            actions.send_keys(Keys.ALT+Keys.TAB)
-            actions.send_keys(password_)
-            actions.send_keys(Keys.ENTER) 
-            actions.perform()
+            attempt_login(0)
+            # rememberMe checkbox doesn't actually cause login to be remembered
+            rememberMe = self.browser.find_element_by_xpath(REMEMBERME_CHECKBOX_XPATH)
+            if not rememberMe.is_selected():
+                rememberMe.click()
+            # fill in username
+            username = self.browser.find_element_by_xpath(USERNAME_XPATH).send_keys(username_)
+            # fill in password and hit the login button 
+            password = self.browser.find_element_by_xpath(PASSWORD_XPATH)
+            password.send_keys(password_)
+            password.send_keys(Keys.ENTER)
             try:
                 WebDriverWait(self.browser, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
                 print("OnlyFans Login Successful")
@@ -1158,10 +1163,10 @@ class Driver:
         if len(files) == 0:
             print("Warning: Empty File Path")
             return False
-        enter_file = self.browser.find_element_by_id(Element.get_element_by_name(str(name)).getId())
         files = files[:int(settings.IMAGE_UPLOAD_LIMIT_MESSAGES)]
         for file in files:  
             print('Uploading: '+str(file))
+            enter_file = self.browser.find_element_by_id(Element.get_element_by_name(str(name)).getId())
             enter_file.send_keys(str(file))
             time.sleep(1)
             if self.error_window_upload():
@@ -1180,7 +1185,7 @@ class Driver:
                 # if this doesn't force it then it'll loop forever without a stopper
             # time.sleep(1)
          ## Wait for Confirm
-        # self.error_window_upload()
+        self.error_window_upload()
         settings.debug_delay_check()
         settings.devPrint("files uploaded")
         return True

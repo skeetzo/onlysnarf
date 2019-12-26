@@ -259,6 +259,7 @@
   **2.15.2**
   - settings options debugging
   - added: tabbing to inputs
+  - undid tabbing to login -> unpredictable odd behavior
 
   **2.15.0**
   - added: Settings options
