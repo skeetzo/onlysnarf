@@ -208,6 +208,7 @@ class Driver:
             settings.maybePrint(e)
 
     def error_window_upload(self):
+        return False
         try:
             element = Element.get_element_by_name("errorUpload")
             error_buttons = self.browser.find_elements_by_class_name(element.getClass())
