@@ -263,6 +263,8 @@
 
 ----------------------------------------
   **2.15.3**
+  - better sorted test scripts
+  - changed error_window:filename fix to just closing window
 
   **2.16.0**
   - added: Settings options
