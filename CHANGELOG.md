@@ -273,6 +273,7 @@
 ----------------------------------------
 
 ## ToDo
+  - properly remove empty folders that all images have been removed from when backing up / moving files
 
 ### Low Priority
   - add: read messages html for emojis

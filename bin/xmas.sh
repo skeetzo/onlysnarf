@@ -14,9 +14,8 @@ echo "Merry XMAS"
 sudo onlysnarfpy \
 -action "upload" \
 -type "gallery" \
--method "input" \
--input "/home/schizo/Documents/xmas tease" \
 -text "xmas tease" \
+-bykeyword "xmas tease" \
 -image-upload-limit 10 \
 -image-download-limit 10 \
 -force-upload
