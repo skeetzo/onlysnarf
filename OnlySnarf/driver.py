@@ -1169,11 +1169,14 @@ class Driver:
             enter_file = self.browser.find_element_by_id(Element.get_element_by_name(str(name)).getId())
             enter_file.send_keys(str(file))
             time.sleep(1)
-            if self.error_window_upload():
+            self.error_window_upload()
+            # if self.error_window_upload(): fix_filename(file)
+            
+            def fix_filename(file):
                 # move file to change its name
                 filename = os.path.basename(file)
                 filename = os.path.splitext(filename)[0]
-                if "_fixed" in str(filename): continue
+                if "_fixed" in str(filename): return
                 print("Fixing Filename")
                 filename += "_fixed"
                 ext = os.path.splitext(filename)[1].lower()
@@ -1183,6 +1186,8 @@ class Driver:
                 # add file to end of list so it gets retried
                 files.append(dst)
                 # if this doesn't force it then it'll loop forever without a stopper
+
+
             # time.sleep(1)
          ## Wait for Confirm
         self.error_window_upload()
