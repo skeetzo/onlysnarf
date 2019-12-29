@@ -22,26 +22,25 @@ sudo onlysnarfpy \
 -force-upload
 
 # could be run as a cron to schedule itself later in the day
-sudo onlysnarfpy \
--action "upload" \
--type "gallery" \
--method "input" \
--input "/home/schizo/Documents/xmas nudes" \
--text "Christmas 2019" \
--image-upload-limit 10 \
--image-download-limit 10 \
--force-upload
+# sudo onlysnarfpy \
+# -action "upload" \
+# -type "gallery" \
+# -method "input" \
+# -input "/home/schizo/Documents/xmas nudes" \
+# -text "Christmas 2019" \
+# -image-upload-limit 10 \
+# -image-download-limit 10 \
+# -force-upload
 
 ##
 # Nudes
-##
-
-sudo onlysnarfpy \
--verbose \
--action "message" \
--type "video" \
--method "all" \
--image "/home/schizo/Documents/xmas-dick.mp4" \
--text "Merry Christmas! Santa left a present for you to unwrap...  ;*" \
--price "6.00" \
--prefer-local
+# ##
+# sudo onlysnarfpy \
+# -verbose \
+# -action "message" \
+# -type "video" \
+# -method "all" \
+# -image "/home/schizo/Documents/xmas-dick.mp4" \
+# -text "Merry Christmas! Santa left a present for you to unwrap...  ;*" \
+# -price "6.00" \
+# -prefer-local

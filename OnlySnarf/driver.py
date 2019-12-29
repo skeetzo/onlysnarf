@@ -1187,7 +1187,6 @@ class Driver:
                 files.append(dst)
                 # if this doesn't force it then it'll loop forever without a stopper
 
-
             # time.sleep(1)
          ## Wait for Confirm
         self.error_window_upload()
