@@ -1006,13 +1006,14 @@ def upload_file(path=None, parent=None):
         return
     else:
         print('Google Upload (file): {}'.format(filename))
-    if "mov" in ext or "mp4" in ext:
-        mimetype = "video/mp4"
-    elif "jpg" in ext or "jpeg" in ext:
+    # if "mov" in ext or "mp4" in ext:
+    if "jpg" in ext or "jpeg" in ext:
         mimetype = "image/jpeg"
-    if not mimetype:
-        print("Error: Missing Mimetype")
-        return
+    else:
+        mimetype = "video/mp4"
+    # if not mimetype:
+    #     print("Error: Missing Mimetype")
+    #     return
     if not parent: parent = get_folder_by_name("posted")
     if not parent:
         print("Error: Missing Posted Folder")

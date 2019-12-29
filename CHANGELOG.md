@@ -260,11 +260,12 @@
   - undid tabbing to inputs -> unpredictable odd behavior
   - minor random debugging (??wtf?)
   - xmas scripts
-
-----------------------------------------
   **2.15.3**
   - better sorted test scripts
   - changed error_window:filename fix to just closing window
+  - fixed mimetype upload (sorta)
+
+----------------------------------------
 
   **2.16.0**
   - added: Settings options
