@@ -2,7 +2,6 @@
 
 # Image & Poll
 echo "[*] Misc - Poll"
-echo "############# Misc - Poll ##############">> ../onlysnarf/logs/tests.txt
 sudo onlysnarfpy \
 -debug \
 -verbose \
@@ -14,5 +13,4 @@ sudo onlysnarfpy \
 -questions "your mom","some toast","a nice sandwich" \
 -debug-delay \
 -$1 \
--debug-force >> ../onlysnarf/logs/tests.txt 2>&1
-# -show-window
+-debug-force

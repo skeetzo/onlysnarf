@@ -266,6 +266,9 @@
   - fixed mimetype upload (sorta)
 
 ----------------------------------------
+  **2.15.4**
+  - updated test scripts output
+  - added setting: verbosest
 
   **2.16.0**
   - added: Settings options
