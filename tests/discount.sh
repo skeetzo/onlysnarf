@@ -2,7 +2,6 @@
 
 # Discount
 echo "[*] Discount - Recent"
-echo "############# Discount - Recent ##################">> ../onlysnarf/logs/tests.txt
 sudo onlysnarfpy \
 -debug \
 -verbose \
@@ -10,5 +9,5 @@ sudo onlysnarfpy \
 -user "recent" \
 -amount 40 \
 -$1 \
--months 3 >> ../onlysnarf/logs/tests.txt 2>&1
+-months 3
 # -prefer-local
