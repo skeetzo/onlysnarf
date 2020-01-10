@@ -274,6 +274,7 @@
 
 ## ToDo
   - properly remove empty folders that all images have been removed from when backing up / moving files
+  - functionality to scan profiles to estimate their posts-to-fan income ratios
 
 ### Low Priority
   - add: read messages html for emojis
