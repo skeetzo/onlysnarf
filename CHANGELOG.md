@@ -264,11 +264,12 @@
   - better sorted test scripts
   - changed error_window:filename fix to just closing window
   - fixed mimetype upload (sorta)
-
-----------------------------------------
   **2.15.4**
   - updated test scripts output
   - added setting: verbosest
+  - cleaned up driver&profile elements
+
+----------------------------------------
 
   **2.16.0**
   - added: Settings options

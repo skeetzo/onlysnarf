@@ -877,6 +877,16 @@ class Driver:
     ##### Settings #####
     ####################
 
+    # has save:
+    # profile
+    # account
+    # security
+
+    # doesn't have save:
+    # story
+    # notifications
+    # other
+
     def settings_get(self, key):
          # find the var from the list of var names in settingsVariables
         var = None

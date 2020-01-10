@@ -1,4 +1,6 @@
+# profile settings elements
 
+ELEMENTS = [
     ## Settings ##
 
     ## Account
@@ -14,7 +16,7 @@
     # cover image cancel
     {
         "name": "coverImageCancel",
-        "classes": [],
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -47,6 +49,27 @@
         "tabIndex": 6, # left
         "from": "load"
     },
+    # subscription bundle
+    # TODO
+    {
+        "name": "subscriptionBundle",
+        "classes": [None],
+        "text": [],
+        "id": [],
+        "tabIndex": 0,
+        "from": "load"
+    },
+    # referral award enabled / disabled
+    # TODO
+    {
+        "name": "referralReward",
+        "classes": [None],
+        "text": [],
+        "id": [],
+        "tabIndex": 0,
+        "from": "load"
+    },
+
     # ADD reward for subscriber referrals
     # about
     {
@@ -79,15 +102,6 @@
     ## Advanced
     # username
     # BLANK
-    # email
-    {
-        "name": "email",
-        "classes": ["form-control.g-input"],
-        "text": [],
-        "id": [],
-        "tabIndex": 3, # left
-        "from": "load"
-    },
     # username
     {
         "name": "username",
@@ -95,6 +109,15 @@
         "text": [],
         "id": [],
         "tabIndex": 4, # left
+        "from": "load"
+    },
+    # email
+    {
+        "name": "email",
+        "classes": ["form-control.g-input"],
+        "text": [],
+        "id": [],
+        "tabIndex": 3, # left
         "from": "load"
     },
     # connect other onlyfans accounts username enter area
@@ -127,13 +150,79 @@
         "from": "load"
     },
 
+    ## Messaging
+    # all TODO
+
+    {
+        "name": "welcomeMessageToggle",
+        "classes": [None],
+        "text": [],
+        "id": []
+    },
+
+    {
+        "name": "welcomeMessageText",
+        "classes": [None],
+        "text": [],
+        "id": []
+    },
+
+    {
+        "name": "welcomeMessageUpload",
+        "classes": [None],
+        "text": [],
+        "id": []
+    },
+
+    {
+        "name": "welcomeMessageVoice",
+        "classes": [None],
+        "text": [],
+        "id": []
+    },
+
+    {
+        "name": "welcomeMessageVideo",
+        "classes": [None],
+        "text": [],
+        "id": []
+    },
+
+    {
+        "name": "welcomeMessagePrice",
+        "classes": [None],
+        "text": [],
+        "id": []
+    },
+
+    {
+        "name": "welcomeMessageSave",
+        "classes": [None],
+        "text": [],
+        "id": []
+    },
+
+    {
+        "name": "welcomeMessageHideToggle",
+        "classes": [None],
+        "text": [],
+        "id": []
+    },
+
+    {
+        "name": "showFullTextInEmailToggle",
+        "classes": [None],
+        "text": [],
+        "id": []
+    },
+
     ## Notifications
     # push notifications
     # BLANK
     # email notifications
     {
         "name": "emailNotifs",
-        "classes": [BALLSBALLS],
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -141,8 +230,8 @@
     },
     # new referral email
     {
-        "name": "emailNotifsNewReferral",
-        "classes": [BALLSBALLS],
+        "name": "emailNotifsReferral",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -150,7 +239,7 @@
     },
     # new stream email
     {
-        "name": "emailNotifsNewStream",
+        "name": "emailNotifsStream",
         "classes": ["b-input-radio"],
         "text": [],
         "id": [],
@@ -159,7 +248,7 @@
     },
     # new subscriber email
     {
-        "name": "emailNotifsNewSubscriber",
+        "name": "emailNotifsSubscriber",
         "classes": ["b-input-radio"],
         "text": [],
         "id": [],
@@ -168,7 +257,7 @@
     },
     # new tip email
     {
-        "name": "emailNotifsNewSubscriber",
+        "name": "emailNotifsSubscriber",
         "classes": ["b-input-radio"],
         "text": [],
         "id": [],
@@ -177,7 +266,7 @@
     },
     # new renewal email
     {
-        "name": "emailNotifsNewSubscriber",
+        "name": "emailNotifsSubscriber",
         "classes": ["b-input-radio"],
         "text": [],
         "id": [],
@@ -186,7 +275,7 @@
     },
 
     {
-        "name": "emailNotifsNewTip",
+        "name": "emailNotifsTip",
         "classes": ["b-input-radio"],
         "text": [],
         "id": [],
@@ -204,8 +293,8 @@
     },
     # new likes summary
     {
-        "name": "emailNotifsNewLikes",
-        "classes": [BALLSBALLS],
+        "name": "emailNotifsLikes",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -213,8 +302,8 @@
     },
     # new posts summary
     {
-        "name": "emailNotifsNewPosts",
-        "classes": [BALLSBALLS],
+        "name": "emailNotifsPosts",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -222,8 +311,8 @@
     },
     # new private message summary
     {
-        "name": "emailNotifsNewPrivMessages",
-        "classes": [BALLSBALLS],
+        "name": "emailNotifsPrivMessages",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -234,7 +323,7 @@
     # site notifications
     {
         "name": "siteNotifs",
-        "classes": [BALLSBALLS],
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -242,8 +331,8 @@
     },
     # new comment notification
     {
-        "name": "siteNotifsNewComment",
-        "classes": [BALLSBALLS],
+        "name": "siteNotifsComment",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -251,8 +340,8 @@
     },
     # new favorite notification
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "siteNotifsFavorite",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -260,8 +349,8 @@
     },
     # discounts from users i've used to follow notification
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "siteNotifsDiscounts",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -269,8 +358,8 @@
     },
     # new subscriber notification
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "siteNotifsSubscriber",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -278,8 +367,8 @@
     },
     # new tip notification
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "siteNotifsTip",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -287,8 +376,8 @@
     },
     # toast notification new comment
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "toastNotifsComment",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -296,8 +385,8 @@
     },
     # toast notification new favorite
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "toastNotifsFavorite",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -305,8 +394,8 @@
     },
     # toast notification new subscriber
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "toastNotifsSubscriber",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -314,20 +403,22 @@
     },
     # toast notification new tip
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "toastNotifsTip",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
         "from": "load"
     },
+
     ## Security
+
     # two step toggle
     # BLANK
     # fully private profile
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "fullyPrivate",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -335,8 +426,8 @@
     },
     # enable comments
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "enableComments",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -344,8 +435,8 @@
     },
     # show fans count on profile
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "showFansCount",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -353,8 +444,8 @@
     },
     # show posts tips summary
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "showPostsTip",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -362,8 +453,8 @@
     },
     # public friends list
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "publicFriendsList",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -371,8 +462,8 @@
     },
     # geo blocking
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "ipCountry",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": 4, # left
@@ -380,8 +471,8 @@
     },
     # ip blocking
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "ipIP",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": 3, # left
@@ -389,8 +480,8 @@
     },
     # watermarks photos
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "watermarkPhoto",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -398,8 +489,8 @@
     },
     # watermarks video
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "watermarkVideo",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -407,8 +498,8 @@
     },
     # watermarks text
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "watermarkText",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": 2,
@@ -418,8 +509,8 @@
     ## Story
     # allow message replies - nobody
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "storyAllowRepliesNobody",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -427,26 +518,8 @@
     },
     # allow message replies - subscribers
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
-        "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
-    },
-    # show story for - everyone
-    {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
-        "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
-    },
-    # show story for - subscribers
-    {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "storyAllowRepliesSubscribers",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None,
@@ -455,8 +528,8 @@
     ## Other
     # obs server
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "liveServer",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": 12, # left
@@ -464,8 +537,8 @@
     },
     # obs key
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "liveServerKey",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": 11, # left
@@ -473,8 +546,8 @@
     },
     # welcome chat message toggle
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "welcomeMessageToggle",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": 10, 
@@ -482,8 +555,8 @@
     },
     # then same pattern for message enter text or add stuff and price
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "welcomeMessageText",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None, # lefts
@@ -491,10 +564,11 @@
     },
     # save button for welcome chat message
     {
-        "name": "BALLS",
-        "classes": [BALLSBALLS],
+        "name": "welcomeMessageSave",
+        "classes": [None],
         "text": [],
         "id": [],
         "tabIndex": None, # left
         "from": "load"
-    },
+    }
+]

@@ -79,7 +79,7 @@ class Profile:
         # enabled or disabled
         self.publicFriendsList = False
         # selection of countries
-        self.ipCountry = get_country_list()
+        self.ipCountry = Profile.get_country_list()
         # text of ip ranges
         self.ipIP = ""
         # enabled or disabled
@@ -103,41 +103,24 @@ class Profile:
     def __setitem__(self, key, val):
         return setattr(self, key, val)
 
-
-
     @staticmethod
     def get_country_list():
         return ["USA","Canada"]
 
-
-    # place the classes in their respective elements in elements.py
-    # add welcome chat message to new subscribers toggle and upload options
-
-
-    # has save:
-    # profile
-    # account
-    # security
-
-    # doesn't have save:
-    # story
-    # notifications
-    # other
-
-    # update inputTypes with either text or toggle
-
     # returns list of settings and their classes
+    # ["settingVariableName","pageProfile","inputType-text"]
     @staticmethod
     def get_settings_variables():
-        # ["settingVariableName","pageProfile","inputType-text"]
         return [
-             ### Profile ###
+            ### Profile ###
+
             ["coverImage","profile","file"],
             ["profilePhoto","profile","file"],
             # display name needs to match: placeholder="Display name"
             ["displayName","profile","text"],
             # subscription price needs to match: name="subscribePrice" 
             ["subscriptionPrice","text"],
+            ["referralReward","dropdown"],
             # about placeholder is: placeholder="About"
             # id="input-about"
             ["about","profile","text"],
@@ -145,7 +128,9 @@ class Profile:
             ["location","profile","text"],
             # id="input-website"
             ["websiteURL","profile","text"],
+
             #### Account ###
+
             # id="input-login"
             ["username","account","text"],
             # id="input-email"
@@ -156,59 +141,39 @@ class Profile:
             ["newPassword","account","text"],
             # id="new_password2_input"
             ["confirmPassword","account","checkbox"],
+
             ### Notifications ###
+
             # id="push-notifications"
             ["emailNotifs","notifications","toggle"],
             # id="email-notifications"
-            ["emailNotifsNewReferral","notifications","checkbox"],
-
-            ["emailNotifsNewStream","notifications","toggle"],
-
-            ["emailNotifsNewSubscriber","notifications","toggle"],
-
-            ["emailNotifsNewTip","notifications","toggle"],
-
+            ["emailNotifsReferral","notifications","checkbox"],
+            ["emailNotifsStream","notifications","toggle"],
+            ["emailNotifsSubscriber","notifications","toggle"],
+            ["emailNotifsTip","notifications","toggle"],
             ["emailNotifsRenewal","notifications","toggle"],
-
             # this is a dropdown
-            ["emailNotifsNewLikes","notifications","dropdown"],
-
-            ["emailNotifsNewPosts","notifications","toggle"],
-
-            ["emailNotifsNewPrivMessages","notifications","toggle"],
-
+            ["emailNotifsLikes","notifications","dropdown"],
+            ["emailNotifsPosts","notifications","toggle"],
+            ["emailNotifsPrivMessages","notifications","toggle"],
             ["siteNotifs","notifications","toggle"],
-
-            ["siteNotifsNewComment","notifications","toggle"],
-
-            ["siteNotifsNewFavorite","notifications","toggle"],
-
+            ["siteNotifsComment","notifications","toggle"],
+            ["siteNotifsFavorite","notifications","toggle"],
             ["siteNotifsDiscounts","notifications","toggle"],
-
-            ["siteNotifsNewSubscriber","notifications","toggle"],
-
-            ["siteNotifsNewTip","notifications","toggle"],
-
-            ["toastNotifsNewComment","notifications","toggle"],
-
-            ["toastNotifsNewFavorite","notifications","toggle"],
-
-            ["toastNotifsNewSubscriber","notifications","toggle"],
-
-            ["toastNotifsNewTip","notifications","toggle"],
+            ["siteNotifsSubscriber","notifications","toggle"],
+            ["siteNotifsTip","notifications","toggle"],
+            ["toastNotifsComment","notifications","toggle"],
+            ["toastNotifsFavorite","notifications","toggle"],
+            ["toastNotifsSubscriber","notifications","toggle"],
+            ["toastNotifsTip","notifications","toggle"],
 
             ### Security ###
 
-            ["fullyPrivate","security","checkbox","toggle"],
-
+            ["fullyPrivate","security","checkbox"],
             ["enableComments","security","toggle"],
-
             ["showFansCount","security","toggle"],
-
             ["showPostsTip","security","toggle"],
-
             ["publicFriendsList","security","toggle"],
-
             ["ipCountry","security","list"],
             # id="input-blocked-ips"
             ["ipIP","security","list"],
@@ -220,9 +185,10 @@ class Profile:
             ["watermarkText","security","text"],
 
             ### Other ###
-            ["liveServer","other","text"],
 
-            ["liveServerKey","other","text"]
+            ["liveServer","other","text"],
+            ["liveServerKey","other","text"],
+            ["welcomeMessageToggle","other","toggle"],
+            ["welcomeMessageText","other","text"],
 
         ]
-
