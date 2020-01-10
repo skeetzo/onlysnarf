@@ -33,6 +33,7 @@ function testes() {
 	echo "Running: "$test
 
 	../onlysnarf/tests/$test.sh $show
+	# ../onlysnarf/tests/$test.sh $show >> ../onlysnarf/logs/tests.txt 2>&1
 
 	echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 	echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1

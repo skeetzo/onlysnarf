@@ -1069,3 +1069,61 @@ class Element:
                 return Element(name=element["name"], classes=element["classes"], text=element["text"], id=element["id"])
         settings.devPrint("Warning: Missing Element Fetch - {}".format(name))
         return None
+
+
+
+
+
+            ["emailNotifsNewPosts","notifications","checkbox","inputType"],
+
+            ["emailNotifsNewPrivMessages","notifications","checkbox","inputType"],
+
+            ["siteNotifs","notifications","checkbox","inputType"],
+
+            ["siteNotifsNewComment","notifications","b-input-radio","inputType"],
+
+            ["siteNotifsNewFavorite","notifications","b-input-radio","inputType"],
+
+            ["siteNotifsDiscounts","notifications","b-input-radio","inputType"],
+
+            ["siteNotifsNewSubscriber","notifications","b-input-radio","inputType"],
+
+            ["siteNotifsNewTip","notifications","b-input-radio","inputType"],
+
+            ["toastNotifsNewComment","notifications","b-input-radio","inputType"],
+
+            ["toastNotifsNewFavorite","notifications","b-input-radio","inputType"],
+
+            ["toastNotifsNewSubscriber","notifications","b-input-radio","inputType"],
+
+            ["toastNotifsNewTip","notifications","b-input-radio","inputType"],
+
+            ### Security ###
+
+            ["fullyPrivate","security","checkbox","inputType"],
+
+            ["enableComments","security","classname","inputType"],
+
+            ["showFansCount","security","classname","inputType"],
+
+            ["showPostsTip","security","classname","inputType"],
+
+            ["publicFriendsList","security","classname","inputType"],
+
+            ["ipCountry","security","multiselect__input","inputType"],
+            # id="input-blocked-ips"
+            ["ipIP","security","form-control.g-input.unlimsize","inputType"],
+            # id="hasWatermarkPhoto"
+            ["watermarkPhoto","security","classname","inputType"],
+            # id="hasWatermarkVideo"
+            ["watermarkVideo","security","classname","inputType"],
+            # placeholder="Watermark custom text"
+            ["watermarkText","security","form-control.g-input","inputType"],
+
+            ### Other ###
+            ["liveServer","other","form-control.g-input","inputType"],
+
+            ["liveServerKey","other","form-control.g-input","inputType"]
+
+        ]
+
