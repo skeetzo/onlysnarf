@@ -894,8 +894,7 @@ class Driver:
         type_ = var[3]
         settings.devPrint("going to settings page: {}".format(page))
         self.go_to_settings(page_)
-        settings.devPrint("reached page")
-        settings.devPrint("")
+        settings.devPrint("reached settings: {}".format(page))
         settingsPage = self.find_element_by_name(name)
         if str(type_) == "text":
             # get attr text
@@ -903,7 +902,19 @@ class Driver:
         elif str(type_) == "toggle":
             # get state true|false
             pass
-        # other stuff
+        elif str(type_) == "dropdown":
+
+            pass
+        elif str(type_) == "list":
+
+            pass
+        elif str(type_) == "file":
+
+            pass
+        elif str(type_) == "checkbox":
+
+            pass
+        settings.devPrint("setting gotten of type: {}".format(type_))
         self.settings_save()
 
     def settings_set(self, key, value):

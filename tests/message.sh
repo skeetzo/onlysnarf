@@ -2,7 +2,6 @@
 
 # Users Recent - Image
 echo "[*] Message - Recent & Image"
-echo "############# Message - Recent & Image #########">> ../onlysnarf/logs/tests.txt
 sudo onlysnarfpy \
 -debug \
 -verbose \
@@ -12,12 +11,10 @@ sudo onlysnarfpy \
 -type "image" \
 -text "message testes" \
 -$1 \
--price "2.00" >> ../onlysnarf/logs/tests.txt 2>&1
-# -show-window
+-price "2.00"
 
 # User
 echo "[*] Message - User & Gallery"
-echo "############# Message - User & Gallery #####################">> ../onlysnarf/logs/tests.txt
 sudo onlysnarfpy \
 -debug \
 -verbose \
@@ -29,5 +26,4 @@ sudo onlysnarfpy \
 -text "message testes" \
 -price "2.00" \
 -$1 \
--prefer-local >> ../onlysnarf/logs/tests.txt 2>&1
-# -show-window 
+-prefer-local

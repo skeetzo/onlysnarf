@@ -105,128 +105,124 @@ class Profile:
 
 
 
-
-def get_country_list():
-    return ["USA","Canada"]
-
-
-# place the classes in their respective elements in elements.py
-# add welcome chat message to new subscribers toggle and upload options
+    @staticmethod
+    def get_country_list():
+        return ["USA","Canada"]
 
 
-# has save:
-# profile
-# account
-# security
-
-# doesn't have save:
-# story
-# notifications
-# other
-
-# update inputTypes with either text or toggle
-
-# returns list of settings and their classes
-def get_settings_variables():
-    # ["settingVariableName","pageProfile",".setting.html.class","inputType-text"]
-    return [
-         ### Profile ###
-        ["coverImage","profile","inputType"],
-        ["profilePhoto","profile","inputType"],
-        # display name needs to match: placeholder="Display name"
-        ["displayName","profile","inputType"],
-        # subscription price needs to match: name="subscribePrice" 
-        ["subscriptionPrice","inputType"],
-        # about placeholder is: placeholder="About"
-        # id="input-about"
-        ["about","profile","inputType"],
-        # id="input-location"
-        ["location","profile","inputType"],
-        # id="input-website"
-        ["websiteURL","profile","inputType"],
-        #### Account ###
-        # id="input-login"
-        ["username","account","inputType"],
-        # id="input-email"
-        ["email","account","inputType"],
-        # id="old_password_input"
-        ["password","account","inputType"],
-        # id="new_password_input"
-        ["newPassword","account","inputType"],
-        # id="new_password2_input"
-        ["confirmPassword","account","checkbox"],
-        ### Notifications ###
-        # id="push-notifications"
-        ["emailNotifs","notifications","inputType"],
-        # id="email-notifications"
-        ["emailNotifsNewReferral","notifications","checkbox"],
-
-        ["emailNotifsNewStream","notifications","toggle"],
-
-        ["emailNotifsNewSubscriber","notifications","inputType"],
-
-        ["emailNotifsNewTip","notifications","toggle"],
-
-        ["emailNotifsRenewal","notifications","inputType"],
+    # place the classes in their respective elements in elements.py
+    # add welcome chat message to new subscribers toggle and upload options
 
 
+    # has save:
+    # profile
+    # account
+    # security
 
-    # this is a dropdown
-        ["emailNotifsNewLikes","notifications","checkbox","inputType"],
+    # doesn't have save:
+    # story
+    # notifications
+    # other
 
+    # update inputTypes with either text or toggle
 
-        # get inner text of all these
+    # returns list of settings and their classes
+    @staticmethod
+    def get_settings_variables():
+        # ["settingVariableName","pageProfile","inputType-text"]
+        return [
+             ### Profile ###
+            ["coverImage","profile","file"],
+            ["profilePhoto","profile","file"],
+            # display name needs to match: placeholder="Display name"
+            ["displayName","profile","text"],
+            # subscription price needs to match: name="subscribePrice" 
+            ["subscriptionPrice","text"],
+            # about placeholder is: placeholder="About"
+            # id="input-about"
+            ["about","profile","text"],
+            # id="input-location"
+            ["location","profile","text"],
+            # id="input-website"
+            ["websiteURL","profile","text"],
+            #### Account ###
+            # id="input-login"
+            ["username","account","text"],
+            # id="input-email"
+            ["email","account","text"],
+            # id="old_password_input"
+            ["password","account","text"],
+            # id="new_password_input"
+            ["newPassword","account","text"],
+            # id="new_password2_input"
+            ["confirmPassword","account","checkbox"],
+            ### Notifications ###
+            # id="push-notifications"
+            ["emailNotifs","notifications","toggle"],
+            # id="email-notifications"
+            ["emailNotifsNewReferral","notifications","checkbox"],
 
-        ["emailNotifsNewPosts","notifications","checkbox","inputType"],
+            ["emailNotifsNewStream","notifications","toggle"],
 
-        ["emailNotifsNewPrivMessages","notifications","checkbox","inputType"],
+            ["emailNotifsNewSubscriber","notifications","toggle"],
 
-        ["siteNotifs","notifications","checkbox","inputType"],
+            ["emailNotifsNewTip","notifications","toggle"],
 
-        ["siteNotifsNewComment","notifications","b-input-radio","inputType"],
+            ["emailNotifsRenewal","notifications","toggle"],
 
-        ["siteNotifsNewFavorite","notifications","b-input-radio","inputType"],
+            # this is a dropdown
+            ["emailNotifsNewLikes","notifications","dropdown"],
 
-        ["siteNotifsDiscounts","notifications","b-input-radio","inputType"],
+            ["emailNotifsNewPosts","notifications","toggle"],
 
-        ["siteNotifsNewSubscriber","notifications","b-input-radio","inputType"],
+            ["emailNotifsNewPrivMessages","notifications","toggle"],
 
-        ["siteNotifsNewTip","notifications","b-input-radio","inputType"],
+            ["siteNotifs","notifications","toggle"],
 
-        ["toastNotifsNewComment","notifications","b-input-radio","inputType"],
+            ["siteNotifsNewComment","notifications","toggle"],
 
-        ["toastNotifsNewFavorite","notifications","b-input-radio","inputType"],
+            ["siteNotifsNewFavorite","notifications","toggle"],
 
-        ["toastNotifsNewSubscriber","notifications","b-input-radio","inputType"],
+            ["siteNotifsDiscounts","notifications","toggle"],
 
-        ["toastNotifsNewTip","notifications","b-input-radio","inputType"],
+            ["siteNotifsNewSubscriber","notifications","toggle"],
 
-        ### Security ###
+            ["siteNotifsNewTip","notifications","toggle"],
 
-        ["fullyPrivate","security","checkbox","inputType"],
+            ["toastNotifsNewComment","notifications","toggle"],
 
-        ["enableComments","security","classname","inputType"],
+            ["toastNotifsNewFavorite","notifications","toggle"],
 
-        ["showFansCount","security","classname","inputType"],
+            ["toastNotifsNewSubscriber","notifications","toggle"],
 
-        ["showPostsTip","security","classname","inputType"],
+            ["toastNotifsNewTip","notifications","toggle"],
 
-        ["publicFriendsList","security","classname","inputType"],
+            ### Security ###
 
-        ["ipCountry","security","multiselect__input","inputType"],
-        # id="input-blocked-ips"
-        ["ipIP","security","form-control.g-input.unlimsize","inputType"],
-        # id="hasWatermarkPhoto"
-        ["watermarkPhoto","security","classname","inputType"],
-        # id="hasWatermarkVideo"
-        ["watermarkVideo","security","classname","inputType"],
-        # placeholder="Watermark custom text"
-        ["watermarkText","security","form-control.g-input","inputType"],
+            ["fullyPrivate","security","checkbox","toggle"],
 
-        ### Other ###
-        ["liveServer","other","form-control.g-input","inputType"],
+            ["enableComments","security","toggle"],
 
-        ["liveServerKey","other","form-control.g-input","inputType"]
+            ["showFansCount","security","toggle"],
 
-    ]
+            ["showPostsTip","security","toggle"],
+
+            ["publicFriendsList","security","toggle"],
+
+            ["ipCountry","security","list"],
+            # id="input-blocked-ips"
+            ["ipIP","security","list"],
+            # id="hasWatermarkPhoto"
+            ["watermarkPhoto","security","toggle"],
+            # id="hasWatermarkVideo"
+            ["watermarkVideo","security","toggle"],
+            # placeholder="Watermark custom text"
+            ["watermarkText","security","text"],
+
+            ### Other ###
+            ["liveServer","other","text"],
+
+            ["liveServerKey","other","text"]
+
+        ]
 
