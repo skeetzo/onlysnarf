@@ -887,44 +887,48 @@ class Driver:
     # notifications
     # other
 
-    def settings_get(self, key):
+    # goes through the settings and get all the values
+    def settings_get_all(self):
          # find the var from the list of var names in settingsVariables
-        var = None
         settingsVariables = Profile.get_settings_variables()
-        for key in settingsVariables:
-            if str(var) == str(key[0]):
-                var = key
-        if not var or var == None:
-            print("Error: Unable to Find Variable")
-            return False
-        #
-        key_ = var[0]
-        page_ = var[1]
-        name = var[2]
-        type_ = var[3]
-        settings.devPrint("going to settings page: {}".format(page))
-        self.go_to_settings(page_)
-        settings.devPrint("reached settings: {}".format(page))
-        settingsPage = self.find_element_by_name(name)
-        if str(type_) == "text":
-            # get attr text
-            pass
-        elif str(type_) == "toggle":
-            # get state true|false
-            pass
-        elif str(type_) == "dropdown":
+        for var in settingsVariables:
+            name = var[0]
+            page_ = var[1]
+            type_ = var[2]
+            settings.devPrint("going to settings page: {}".format(page_))
+            self.go_to_settings(page_)
+            settings.devPrint("reached settings: {}".format(page_))
+            element = self.find_element_by_name(name)
+            settings.devPrint("getting gotten of type: {}".format(type_))
+            status = ""
+            if str(type_) == "text":
+                # get attr text
+                status = element.get_attribute("innerHTML")
+            elif str(type_) == "toggle":
+                # get state true|false
+                status = element.is_selected()
+            elif str(type_) == "dropdown":
+                Select(driver.find_element_by_id("mySelectID"))
+                status = element.first_selected_option
+            elif str(type_) == "list":
+                status = element.get_attribute("innerHTML")
+            elif str(type_) == "file":
+                status = element.get_attribute("innerHTML")
+            elif str(type_) == "checkbox":
+                status = element.is_selected()
+            settings.maybePrint("{} : {}".format(var, status))
+            settings.update_value(var, status)
 
-            pass
-        elif str(type_) == "list":
+    def settings_set_all(self):
+        # goes through each page and sets all the values
+        
 
-            pass
-        elif str(type_) == "file":
+        # dropdown
+        # select by visible text
+        select.select_by_visible_text('Banana')
+        # select by value 
+        select.select_by_value('1')
 
-            pass
-        elif str(type_) == "checkbox":
-
-            pass
-        settings.devPrint("setting gotten of type: {}".format(type_))
         self.settings_save()
 
     def settings_set(self, key, value):
@@ -938,11 +942,12 @@ class Driver:
             print("Error: Unable to Find Variable")
             return False
         #
-        key_ = var[0]
+        name = var[0]
         page_ = var[1]
-        name = var[2]
-        type_ = var[3]
+        type_ = var[2]
+        settings.devPrint("going to settings page: {}".format(page))
         self.go_to_settings(page_)
+        settings.devPrint("reached settings: {}".format(page))
         self.find_element_by_name(name)
         # text, path, state, list (text), price 
         if str(type_) == "text":
