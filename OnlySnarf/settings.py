@@ -89,6 +89,9 @@ class Settings:
         # default user greeting
         self.DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
         ##
+        # download path
+        self.DOWNLOAD_PATH = "/opt/apps/onlysnarf/downloads"
+        ##
         # configurable w/ profile.conf
         # OnlySnarf Drive folder list
         self.DRIVE_FOLDERS = [
@@ -324,7 +327,7 @@ class Settings:
             # falses set the variable False when provided
             falses_ = []
             # nexts set the variable to the next provided argument input
-            nexts_ = ["IMAGE_UPLOAD_LIMIT_MESSAGES","UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_DOWNLOAD_LIMIT","IMAGE_UPLOAD_LIMIT","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
+            nexts_ = ["DOWNLOAD_PATH","IMAGE_UPLOAD_LIMIT_MESSAGES","UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_DOWNLOAD_LIMIT","IMAGE_UPLOAD_LIMIT","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0
             while j < len(truths_):
                 if str(truths_[j]).upper() == str(sys.argv[i]).upper().replace("-","_"):
