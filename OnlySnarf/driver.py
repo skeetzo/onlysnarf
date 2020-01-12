@@ -411,9 +411,10 @@ class Driver:
         if str(settings.USERNAME) == "" or settings.USERNAME == None: settings.USERNAME = username_
         if str(settings.PASSWORD) == "" or settings.PASSWORD == None: settings.PASSWORD = password_
         settings.maybePrint("Opening Web Browser")
+        CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
         options = webdriver.ChromeOptions()
         # options.setExperimentalOption('useAutomationExtension', false);
-        # options.binary_location = "/usr/bin/chromium"
+        options.binary_location = chromedriver_binary.chromedriver_filename
         if str(settings.SHOW_WINDOW) != "True":
             options.add_argument('--headless')
             #
@@ -436,23 +437,12 @@ class Driver:
         #   "safebrowsing.enabled": True
         # })
 
-        CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
         try:
             self.browser = webdriver.Chrome(chrome_options=options)
         except Exception as e:
             Driver.error_checker(e)
-            print("Warning: Missing chromedriver_path, retrying")
-            try:
-                self.browser = webdriver.Chrome(CHROMEDRIVER_PATH, chrome_options=options)
-            except Exception as e:
-                Driver.error_checker(e)
-                print("Error: Missing chromedriver_path, exiting")
-                try:
-                    self.browser = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH)
-                except Exception as e:
-                    print(e)
-                    print("Super Fucked")
-                return False
+            print("Warning: Missing Chromedriver")
+            return False
         self.browser.implicitly_wait(10) # seconds
         self.browser.set_page_load_timeout(1200)
         def attempt_login(opt):
@@ -472,15 +462,18 @@ class Driver:
         try:
             attempt_login(0)
             # rememberMe checkbox doesn't actually cause login to be remembered
-            rememberMe = self.browser.find_element_by_xpath(REMEMBERME_CHECKBOX_XPATH)
-            if not rememberMe.is_selected():
-                rememberMe.click()
-            # fill in username
-            username = self.browser.find_element_by_xpath(USERNAME_XPATH).send_keys(username_)
-            # fill in password and hit the login button 
-            password = self.browser.find_element_by_xpath(PASSWORD_XPATH)
-            password.send_keys(password_)
-            password.send_keys(Keys.ENTER)
+            # rememberMe = self.browser.find_element_by_xpath(REMEMBERME_CHECKBOX_XPATH)
+            # if not rememberMe.is_selected():
+                # rememberMe.click()
+            if str(settings.MANUAL) == "True":
+                print("Please Login")
+            else:
+                # fill in username
+                username = self.browser.find_element_by_xpath(USERNAME_XPATH).send_keys(username_)
+                # fill in password and hit the login button 
+                password = self.browser.find_element_by_xpath(PASSWORD_XPATH)
+                password.send_keys(password_)
+                password.send_keys(Keys.ENTER)
             try:
                 WebDriverWait(self.browser, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
                 print("OnlyFans Login Successful")
@@ -895,50 +888,95 @@ class Driver:
     ##### Settings #####
     ####################
 
+    # gets all settings from whichever page its on
+    # or get a specific setting
+    # probably just way easier and resourceful to do it all at once
+    # though it would be ideal to also be able to update individual settings without risking other settings
+    def settings_get(self, variables);
+        pass
+
+
     # goes through the settings and get all the values
     def settings_get_all(self):
-         # find the var from the list of var names in settingsVariables
-        settingsVariables = Profile.get_settings_variables()
-        for var in settingsVariables:
-            name = var[0]
-            page_ = var[1]
-            type_ = var[2]
-            settings.devPrint("going to settings page: {}".format(page_))
-            self.go_to_settings(page_)
-            settings.devPrint("reached settings: {}".format(page_))
-            element = self.find_element_by_name(name)
-            settings.devPrint("getting gotten of type: {}".format(type_))
-            status = ""
-            if str(type_) == "text":
-                # get attr text
-                status = element.get_attribute("innerHTML")
-            elif str(type_) == "toggle":
-                # get state true|false
-                status = element.is_selected()
-            elif str(type_) == "dropdown":
-                Select(driver.find_element_by_id("mySelectID"))
-                status = element.first_selected_option
-            elif str(type_) == "list":
-                status = element.get_attribute("innerHTML")
-            elif str(type_) == "file":
-                status = element.get_attribute("innerHTML")
-            elif str(type_) == "checkbox":
-                status = element.is_selected()
-            settings.maybePrint("{} : {}".format(var, status))
-            settings.update_value(var, status)
+        pages = Profile.get_pages()
+        for page in pages:
+            variables = Profile.get_variables_for_page(page)
+            settings.devPrint("going to settings page: {}".format(page))
+            self.go_to_settings(page)
+            settings.devPrint("reached settings: {}".format(page))
+            for var in variables:
+                name = var[0]
+                # page_ = var[1]
+                type_ = var[2]
+                element = self.find_element_by_name(name)
+                settings.devPrint("getting gotten of type: {}".format(type_))
+                status = ""
+                if str(type_) == "text":
+                    # get attr text
+                    status = element.get_attribute("innerHTML")
+                elif str(type_) == "toggle":
+                    # get state true|false
+                    status = element.is_selected()
+                elif str(type_) == "dropdown":
+                    Select(driver.find_element_by_id("mySelectID"))
+                    status = element.first_selected_option
+                elif str(type_) == "list":
+                    status = element.get_attribute("innerHTML")
+                elif str(type_) == "file":
+                    status = element.get_attribute("innerHTML")
+                elif str(type_) == "checkbox":
+                    status = element.is_selected()
+                settings.maybePrint("{} : {}".format(var, status))
+                Profile.update_value(var, status)
+            self.settings_save(page=page)
+            # this should return all the values etc instead ofsetting them to something directly from here
 
 
+    # goes through each page and sets all the values
     def settings_set_all(self):
-        # goes through each page and sets all the values
-        
+        pages = Profile.get_pages()
+        for page in pages:
+            variables = Profile.get_variables_for_page(page)
+            settings.devPrint("going to settings page: {}".format(page))
+            self.go_to_settings(page)
+            settings.devPrint("reached settings: {}".format(page))
+            for var in variables:
+                name = var[0]
+                # page_ = var[1]
+                type_ = var[2]
+                # everything below should be eventually moved to the settings_set() below once it all works to prevent duplication
+                element = self.find_element_by_name(name)
+                settings.devPrint("getting gotten of type: {}".format(type_))
+                status = ""
+                if str(type_) == "text":
+                    # get attr text
+                    status = element.get_attribute("innerHTML") 
 
-        # dropdown
-        # select by visible text
-        select.select_by_visible_text('Banana')
-        # select by value 
-        select.select_by_value('1')
+                elif str(type_) == "toggle":
+                    # get state true|false
+                    status = element.is_selected()
 
-        self.settings_save()
+                elif str(type_) == "dropdown":
+                    # dropdown
+                    # select by visible text
+                    # select.select_by_visible_text('Banana')
+                    # select by value 
+                    # select.select_by_value('1')
+                    Select(driver.find_element_by_id("mySelectID"))
+                    status = element.first_selected_option
+
+                elif str(type_) == "list":
+                    status = element.get_attribute("innerHTML")
+
+                elif str(type_) == "file":
+                    status = element.get_attribute("innerHTML")
+
+                elif str(type_) == "checkbox":
+                    status = element.is_selected()
+
+                settings.maybePrint("{} : {}".format(var, status))
+            self.settings_save(page=page)
+
 
     def settings_set(self, key, value):
         # find the var from the list of var names in settingsVariables
@@ -968,8 +1006,8 @@ class Driver:
         # other stuff
         self.settings_save()
 
-    # saves the settings page
-    def settings_save(self):
+    # saves the settings page if it is a page that needs to be saved
+    def settings_save(self, page=None):
         # has save:
         # profile
         # account

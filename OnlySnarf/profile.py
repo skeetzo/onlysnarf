@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # Profile Settings
 
+from OnlySnarf.driver import Driver
+
 class Profile:
 
     # profile settings are either:
@@ -103,9 +105,34 @@ class Profile:
     def __setitem__(self, key, val):
         return setattr(self, key, val)
 
+    def syncFrom(self):
+        # opens every settings page in the browser from pages or all
+        # gets necessary variables from browser
+        variables = Profile.get_setting_variables()
+        pages = []
+        for var in variables:
+            if var[1] not in pages:
+                pages.append(var[1])
+        for page in pages:
+            Driver.go_to_settings_page(page)
+        pass            
+
+    def syncTo(self):
+        # opens every settings page in the browser from pages or all
+        # updates necessary variables in browser
+        pass
+
     @staticmethod
     def get_country_list():
         return ["USA","Canada"]
+
+    @staticmethod
+    def get_setting_variable(key):
+        variables = get_setting_variables()
+        for var in variables:
+            if str(var[0]) == str(key):
+                return var
+        return None
 
     # returns list of settings and their classes
     # ["settingVariableName","pageProfile","inputType-text"]
@@ -192,3 +219,14 @@ class Profile:
             ["welcomeMessageText","other","text"],
 
         ]
+
+    def get_variables_for_page(page):
+        variables = Profile.get_setting_variables()
+        variables_ = []
+        for var in variables:
+            if str(var[1]) == str(page):
+                variables_.append(var)
+        return variables_
+
+    def update_value(self, key, value):
+        pass
