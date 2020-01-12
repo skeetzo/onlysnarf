@@ -150,6 +150,9 @@ class Settings:
         # keywords to # in post
         self.KEYWORDS = []
         ##
+        # -manual
+        self.MANUAL = False
+        ##
         # -months
         # action: discount
         # the number of months to discount for
@@ -323,7 +326,7 @@ class Settings:
         while i < len(sys.argv):
             sys.argv[i] = sys.argv[i][1:] # remove - in front
             # truths set the variable True when provided
-            truths_ = ["VERBOSEST","VERSION","VERBOSER","DEBUG_FORCE","SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
+            truths_ = ["MANUAL","VERBOSEST","VERSION","VERBOSER","DEBUG_FORCE","SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
             # falses set the variable False when provided
             falses_ = []
             # nexts set the variable to the next provided argument input

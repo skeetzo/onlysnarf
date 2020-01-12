@@ -270,6 +270,8 @@
   - cleaned up driver&profile elements
 
 ----------------------------------------
+  **2.15.5**
+  - more settings prep
 
   **2.16.0**
   - added: Settings options
