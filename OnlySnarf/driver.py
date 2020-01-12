@@ -412,12 +412,30 @@ class Driver:
         if str(settings.PASSWORD) == "" or settings.PASSWORD == None: settings.PASSWORD = password_
         settings.maybePrint("Opening Web Browser")
         options = webdriver.ChromeOptions()
+        # options.setExperimentalOption('useAutomationExtension', false);
+        # options.binary_location = "/usr/bin/chromium"
         if str(settings.SHOW_WINDOW) != "True":
             options.add_argument('--headless')
+            #
+            options.add_argument('--disable-gpu')
+            options.add_argument('--disable-smooth-scrolling')
+            options.add_argument('--disable-software-rasterizer')
+        #
+        options.add_argument('--disable-login-animations')
+        options.add_argument('--disable-modal-animations')
+        options.add_argument('--disable-sync')
+        options.add_argument('--incognito')
+        options.add_argument('--user-agent=OnlySnarf')
+        #
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
-        options.add_argument('--disable-gpu')
-        # options.setExperimentalOption('useAutomationExtension', false);
+        # options.add_experimental_option("prefs", {
+        #   "download.default_directory": str(settings.DOWNLOAD_PATH),
+        #   "download.prompt_for_download": False,
+        #   "download.directory_upgrade": True,
+        #   "safebrowsing.enabled": True
+        # })
+
         CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
         try:
             self.browser = webdriver.Chrome(chrome_options=options)
@@ -877,16 +895,6 @@ class Driver:
     ##### Settings #####
     ####################
 
-    # has save:
-    # profile
-    # account
-    # security
-
-    # doesn't have save:
-    # story
-    # notifications
-    # other
-
     # goes through the settings and get all the values
     def settings_get_all(self):
          # find the var from the list of var names in settingsVariables
@@ -918,6 +926,7 @@ class Driver:
                 status = element.is_selected()
             settings.maybePrint("{} : {}".format(var, status))
             settings.update_value(var, status)
+
 
     def settings_set_all(self):
         # goes through each page and sets all the values
@@ -961,6 +970,15 @@ class Driver:
 
     # saves the settings page
     def settings_save(self):
+        # has save:
+        # profile
+        # account
+        # security
+
+        # doesn't have save:
+        # story
+        # notifications
+        # other
         pass
 
     ####################
