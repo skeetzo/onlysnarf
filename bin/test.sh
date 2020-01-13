@@ -12,7 +12,8 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 # sudo onlysnarfpy -debug -verbose -verboser -type gallery -debug-delay -show-window -skip-reduce
 
-sudo onlysnarf -debug -verbose -show-window -debug-delay -prefer-local
+# sudo onlysnarf -debug -verbose -show-window -debug-delay -prefer-local
+sudo onlysnarfpy -verbose -verboser -verbosest -action post -debug -text "incoming massive shower upload"
 # sudo onlysnarfpy -verbose -type gallery -notkeyword feet -show-window -debug -debug-delay
 # sudo onlysnarf-config
 # sudo onlysnarfpy -debug -verbose -action test
