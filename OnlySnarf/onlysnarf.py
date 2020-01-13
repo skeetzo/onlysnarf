@@ -58,7 +58,7 @@ class OnlySnarf:
             # except Exception as e:
                 # settings.maybePrint(e)
             depth = int(depth) + 1
-        self.driver.exit()
+        self.exit()
         return True
 
     ################
@@ -66,7 +66,8 @@ class OnlySnarf:
     ################
 
     def exit(self):
-        self.driver.exit()
+        if str(settings.EXIT) == "True":
+            self.driver.exit()
 
     ###################
     ##### Message #####
@@ -131,7 +132,7 @@ class OnlySnarf:
                     settings.maybePrint(e)
         if backup:
             Google.upload_input(image)
-        self.driver.exit()
+        self.exit()
         return success
                 
     ################
@@ -141,7 +142,7 @@ class OnlySnarf:
     def post(self, text=None, override=False):
         expires = settings.EXPIRES or ""
         schedule = settings.getSchedule()
-        poll = None
+        poll = {"period":None,"questions":None}
         duration = settings.DURATION or ""
         questions = settings.QUESTIONS or []
         if not text: text = input("Text: ".format(text))
@@ -182,9 +183,7 @@ class OnlySnarf:
             poll = {"period":duration,"questions":questions}
         try:
             successful = self.driver.post(text, expires=expires, schedule=schedule, poll=poll)
-            # if successful: print("Post Successful")
-            # else: print("Post Failed")
-            self.driver.exit()
+            self.exit()
             return successful
         except Exception as e:
             settings.maybePrint(e)
@@ -423,7 +422,7 @@ def main():
         print('2/3 : Cleaning Up Files')
         settings.remove_local()
         print('3/3 : OnlySnarf Exiting')
-        snarf.exit()
+        snarf.browser.exit()
         sys.stdout.flush()
     except Exception as e:
         print(e)

@@ -106,6 +106,10 @@ class Settings:
         # poll or post duration
         self.DURATION = None
         ##
+        # -exit
+        # exit upon each action
+        self.EXIT = True
+        ##
         # -expires
         # date of post or poll expiration
         self.EXPIRES = None
@@ -151,6 +155,7 @@ class Settings:
         self.KEYWORDS = []
         ##
         # -manual
+        # posting requires clicking open window
         self.MANUAL = False
         ##
         # -months
@@ -328,7 +333,7 @@ class Settings:
             # truths set the variable True when provided
             truths_ = ["MANUAL","VERBOSEST","VERSION","VERBOSER","DEBUG_FORCE","SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
             # falses set the variable False when provided
-            falses_ = []
+            falses_ = ["EXIT"]
             # nexts set the variable to the next provided argument input
             nexts_ = ["DOWNLOAD_PATH","IMAGE_UPLOAD_LIMIT_MESSAGES","UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_DOWNLOAD_LIMIT","IMAGE_UPLOAD_LIMIT","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0

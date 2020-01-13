@@ -204,7 +204,7 @@ class Driver:
     def error_checker(e):
         if "Unable to locate element" in str(e):
             print("Warning: OnlySnarf may require an update")
-        if str(settings.DEBUG) == "True" and str(settings.VERBOSE) == "True":
+        if str(settings.VERBOSER) == "True":
             print(e)
         elif "Message: " not in str(e):
             settings.maybePrint(e)
@@ -229,8 +229,9 @@ class Driver:
     ##### Expiration #####
     ######################
 
-    def expiration(self, period):
-        settings.devPrint("expiration")   
+    def expires(self, period):
+        settings.devPrint("expires")
+        if period == None or str(period) == "": return False
         if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99 and str(period) != "No limit":
             print("Error: Missing Expiration")
             return False
@@ -242,12 +243,12 @@ class Driver:
             print("Expiration:")
             print("- Period: {}".format(period))
             self.open_more_options()
-            # open expiration window
-            settings.devPrint("adding expiration")
-            self.get_element_to_click("expirationAdd").click()
+            # open expires window
+            settings.devPrint("adding expires")
+            self.get_element_to_click("expiresAdd").click()
             # select duration
-            settings.devPrint("selecting expiration")
-            nums = self.find_elements_by_name("expirationPeriods")
+            settings.devPrint("selecting expires")
+            nums = self.find_elements_by_name("expiresPeriods")
             for num in nums:
                 ##
                 # <span class="g-first-letter">1</span> day
@@ -262,19 +263,19 @@ class Driver:
                 if ">7<" in str(inner) and int(period) == 7: num.click()
                 if ">30<" in str(inner) and int(period) == 30: num.click()
                 if ">o limit<" in str(inner) and int(period) == 99: num.click()
-            settings.devPrint("selected expiration")
+            settings.devPrint("selected expires")
             settings.debug_delay_check()
             # save
             if str(settings.DEBUG) == "True" and str(settings.DEBUG_FORCE) == "False":
                 print("Skipping: Expiration (debug)")
-                settings.devPrint("skipping expiration")
-                self.get_element_to_click("expirationCancel").click()
-                settings.devPrint("canceled expiration")
+                settings.devPrint("skipping expires")
+                self.get_element_to_click("expiresCancel").click()
+                settings.devPrint("canceled expires")
                 settings.devPrint("### Expiration Successfully Canceled ###")
             else:
-                settings.devPrint("saving expiration")
-                self.get_element_to_click("expirationSave").click()
-                settings.devPrint("saved expiration")
+                settings.devPrint("saving expires")
+                self.get_element_to_click("expiresSave").click()
+                settings.devPrint("saved expires")
                 print("Expiration Entered")
                 settings.devPrint("### Expiration Successful ###")
             return True
@@ -282,9 +283,9 @@ class Driver:
             Driver.error_checker(e)
             print("Error: Failed to Enter Expiration")
             try:
-                settings.devPrint("canceling expiration")
-                self.get_element_to_click("expirationCancel").click()
-                settings.devPrint("canceled expiration")
+                settings.devPrint("canceling expires")
+                self.get_element_to_click("expiresCancel").click()
+                settings.devPrint("canceled expires")
                 settings.devPrint("### Expiration Successful Failure ###")
             except: 
                 settings.devPrint("### Expiration Failure Failure")
@@ -642,17 +643,22 @@ class Driver:
     ##### Poll #####
     ################
 
-    def polling(self, poll):
-        settings.devPrint("polling")
+    def poll(self, poll):
+        settings.devPrint("poll")
         period = poll.get("period")
         questions = poll.get("questions")
+        if period == None or str(period) == "": return False
         if isinstance(questions, str): questions = questions.split(",\"*\"")
         questions = [n.strip() for n in questions]
         auth_ = self.auth()
         if not auth_: return False
-        if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99 and str(period) != "No limit":
-            print("Error: Missing Duration")
-            return False
+        if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99:
+            try:
+                if str(period) != "No limit":
+                    print("Error: Missing Duration")
+                    return False
+            except Exception as e:
+                return False
         if not questions or len(questions) == 0:
             print("Error: Missing Questions")
             return False
@@ -735,10 +741,13 @@ class Driver:
             self.go_to_home()
             print("Posting:")
             print("- Text: {}".format(text))
-            if expires: self.expiration(expires)
-            if schedule: self.scheduling(schedule)
-            if poll: self.polling(poll)
+            if expires: self.expires(expires)
+            if schedule: self.schedule(schedule)
+            if poll: self.poll(poll)
             settings.devPrint("entering text")
+            enter_text = self.browser.find_element_by_id(ONLYFANS_POST_TEXT_ID)
+            actionChains = ActionChains(self.browser)
+            actionChains.double_click(enter_text).perform()
             self.browser.find_element_by_id(ONLYFANS_POST_TEXT_ID).send_keys(str(text))
             settings.devPrint("entered text")
             settings.devPrint("finding send")
@@ -1027,7 +1036,7 @@ class Driver:
     ##### Schedule #####
     ####################
 
-    def scheduling(self, schedule_):
+    def schedule(self, schedule_):
         auth_ = self.auth()
         if not auth_: return False
         try:
@@ -1154,10 +1163,10 @@ class Driver:
             print("- Text: {}".format(text))
             print("- Tweeting: {}".format(settings.TWEETING))
             ## Expires, Schedule, Poll
-            if expires: self.expiration(expires)
-            if schedule: self.scheduling(schedule)
+            if expires: self.expires(expires)
+            if schedule: self.schedule(schedule)
             if poll: 
-                self.polling(poll)
+                self.poll(poll)
                 time.sleep(3)
             WAIT = WebDriverWait(self.browser, 600, poll_frequency=10)
             ## Tweeting
