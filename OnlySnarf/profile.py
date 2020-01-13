@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # Profile Settings
 
-from OnlySnarf.driver import Driver
+# from OnlySnarf.driver import Driver
 
 class Profile:
 
@@ -114,7 +114,8 @@ class Profile:
             if var[1] not in pages:
                 pages.append(var[1])
         for page in pages:
-            Driver.go_to_settings_page(page)
+            pass
+            # Driver.go_to_settings_page(page)
         pass            
 
     def syncTo(self):
