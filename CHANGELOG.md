@@ -271,7 +271,10 @@
   **2.15.5**
   - more settings prep
   - minor fixes to login
-
+  **2.16.0**
+  - fixed: post
+  - updated menu.md
+  
 ----------------------------------------
 
   **2.16.0**

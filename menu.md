@@ -42,9 +42,12 @@ Upload $type of content by $method as post with $text and tag $performer. Adds h
 
 ## args
 
--debug  
-  `onlysnarfpy -debug`  
-Tests configuration. Does not upload or remove from Google Drive.
+-method [input|random]
+  `onlysnarfpy -method input -input '/path/to/fileOrDirector'`  
+The specific method to upload or provide input.
+
+-backup
+Backup content to Google Drive via upload or moving original file
 
 -type image  
   `onlysnarfpy -type image`  
@@ -62,14 +65,56 @@ Uploads a random video labeled: 'folderName - %d%m%y'
   `onlysnarfpy -type video -text "your mom"`  
 Uploads a random video labeled: 'your mom - %d%m%y'  
 
+-tweeting
+  `onlysnarfpy -tweeting -action post -text 'hi mom'`  
+Enables tweeting upon posting
+
 -input /path/to/fileOrDirectory
   `onlysnarfpy -input /path/to/fileOrDirectory`  
 Uploads a file or directory of files at path.  
+
+-username
+  `onlysnarfpy -username 'dontdothis'`  
+Twitter username for login
+-password
+  `onlysnarfpy -username 'usetheconfigfile' -password 'reallypls'`  
+Twitter password for login
+
+-skip-reduce
+  `onlysnarfpy -skip-reduce -input /path/to/fileOrDirectory`  
+Skip reduction of mp4s before uploading
 
 - ?
   `onlysnarfpy -type video -date "12/25/2019" -expires 7`  
 Uploads a random video, schedules it to release at midnight on Christmas, and sets the post to expire after 7 days.  
 
+## Debugging
+
+-debug  
+  `onlysnarfpy -debug`  
+Tests configuration. Does not upload or remove from Google Drive.
+
+-debug-delay
+  `onlysnarfpy -debug -debug-delay`
+Delays certain portions for visual monitoring.
+
 -show-window
-  `python3 onlysnarf.py -show-window`
+  `onlysnarfpy -show-window`
 Shows the Chromium browser
+
+-verbose
+  `onlysnarfpy -verbose`
+Shows additional log output
+-verboser
+  `onlysnarfpy -verboser`
+Shows additionaler log output
+-verbosest
+  `onlysnarfpy -verbosest`
+Shows additionalest log output
+
+-version
+  `onlysnarfpy -version`
+Prints the version
+
+Complete Debugging:
+  `onlysnarfpy -debug -verbose -verboser -verbosest -show-window -debug-delay`
