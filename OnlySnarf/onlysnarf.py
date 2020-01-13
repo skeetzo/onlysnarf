@@ -422,7 +422,7 @@ def main():
         print('2/3 : Cleaning Up Files')
         settings.remove_local()
         print('3/3 : OnlySnarf Exiting')
-        snarf.browser.exit()
+        snarf.exit()
         sys.stdout.flush()
     except Exception as e:
         print(e)
