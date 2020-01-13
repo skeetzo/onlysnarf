@@ -274,7 +274,9 @@
   **2.16.0**
   - fixed: post
   - updated menu.md
-  
+  **2.16.1**
+  - fixed: browser closes now
+
 ----------------------------------------
 
   **2.16.0**
