@@ -42,6 +42,7 @@ LIVE_BUTTON_CLASS = "b-make-post__streaming-link"
 TWITTER_LOGIN0 = "//a[@class='g-btn m-rounded m-flex m-lg']"
 TWITTER_LOGIN1 = "//a[@class='g-btn m-rounded m-flex m-lg btn-twitter']"
 TWITTER_LOGIN2 = "//a[@class='btn btn-default btn-block btn-lg btn-twitter']"
+TWITTER_LOGIN3 = "//a[@class='g-btn m-rounded m-flex m-lg m-with-icon']"
 USERNAME_XPATH = "//input[@id='username_or_email']"
 PASSWORD_XPATH = "//input[@id='password']"
 # IDs and xpaths not yet required fancy element sorting
@@ -54,6 +55,7 @@ ONLYFANS_PRICE2 = "button.b-chat__btn-set-price"
 POLL_INPUT_XPATH = "//input[@class='form-control']"
 REMEMBERME_CHECKBOX_XPATH = "//input[@id='remember']"
 DISCOUNT_USER_BUTTONS = "g-btn.m-rounded.m-border.m-sm"
+
 class Driver:
 
     def __init__(self):
@@ -414,7 +416,7 @@ class Driver:
         CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
         options = webdriver.ChromeOptions()
         # options.setExperimentalOption('useAutomationExtension', false);
-        options.binary_location = chromedriver_binary.chromedriver_filename
+        # options.binary_location = chromedriver_binary.chromedriver_filename
         if str(settings.SHOW_WINDOW) != "True":
             options.add_argument('--headless')
             #
@@ -450,11 +452,13 @@ class Driver:
                 self.browser.get(ONLYFANS_HOME_URL)
                 # login via Twitter
                 if int(opt)==0:
-                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN0).click()
+                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN3).click()
                 elif int(opt)==1:
                     twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN1).click()
                 elif int(opt)==2:
                     twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN2).click()
+                elif int(opt)==3:
+                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN0).click()
             except NoSuchElementException as e:
                 opt+=1
                 print("Warning: Login Failure, Retrying ({})".format(opt))
@@ -892,7 +896,7 @@ class Driver:
     # or get a specific setting
     # probably just way easier and resourceful to do it all at once
     # though it would be ideal to also be able to update individual settings without risking other settings
-    def settings_get(self, variables);
+    def settings_get(self, variables):
         pass
 
 
