@@ -128,6 +128,19 @@ class Profile:
         return ["USA","Canada"]
 
     @staticmethod
+    def get_pages():
+        return ["profile", "advanced", "messaging", "notifications", "security", "story", "other"]
+
+    @staticmethod
+    def get_variables_for_page(page):
+        variables = get_settings_variables()
+        vars_ = []
+        for var in variables:
+            if str(var[1]) == str(page):
+                vars_.append(var)
+        return vars_
+
+    @staticmethod
     def get_setting_variable(key):
         variables = get_setting_variables()
         for var in variables:
@@ -135,99 +148,105 @@ class Profile:
                 return var
         return None
 
+    def update_value(self, key, value):
+        try:
+            if key == None or str(key) == "" or str(key) == "None": return
+            self[key] = value
+        except Exception as e:
+            print(e)
+
     # returns list of settings and their classes
     # ["settingVariableName","pageProfile","inputType-text"]
-    @staticmethod
-    def get_settings_variables():
-        return [
-            ### Profile ###
+    
+def get_settings_variables():
+    return [
 
-            ["coverImage","profile","file"],
-            ["profilePhoto","profile","file"],
-            # display name needs to match: placeholder="Display name"
-            ["displayName","profile","text"],
-            # subscription price needs to match: name="subscribePrice" 
-            ["subscriptionPrice","text"],
-            ["referralReward","dropdown"],
-            # about placeholder is: placeholder="About"
-            # id="input-about"
-            ["about","profile","text"],
-            # id="input-location"
-            ["location","profile","text"],
-            # id="input-website"
-            ["websiteURL","profile","text"],
+        ### Profile ###
 
-            #### Account ###
+        ["coverImage","profile","file"],
+        ["profilePhoto","profile","file"],
+        ["username","profile","text"],
+        ["displayName","profile","text"],
+        ["subscriptionPrice","text"],
+        ["referralReward","dropdown"],
+        ["about","profile","text"],
+        ["location","profile","text"],
+        ["websiteURL","profile","text"],
 
-            # id="input-login"
-            ["username","account","text"],
-            # id="input-email"
-            ["email","account","text"],
-            # id="old_password_input"
-            ["password","account","text"],
-            # id="new_password_input"
-            ["newPassword","account","text"],
-            # id="new_password2_input"
-            ["confirmPassword","account","checkbox"],
+        #### Account / Advanced ###
 
-            ### Notifications ###
+        # id="input-email"
+        ["email","advanced","text"],
+        # id="old_password_input"
+        ["password","advanced","text"],
+        # id="new_password_input"
+        ["newPassword","advanced","text"],
+        # id="new_password2_input"
+        ["confirmPassword","advanced","checkbox"],
 
-            # id="push-notifications"
-            ["emailNotifs","notifications","toggle"],
-            # id="email-notifications"
-            ["emailNotifsReferral","notifications","checkbox"],
-            ["emailNotifsStream","notifications","toggle"],
-            ["emailNotifsSubscriber","notifications","toggle"],
-            ["emailNotifsTip","notifications","toggle"],
-            ["emailNotifsRenewal","notifications","toggle"],
-            # this is a dropdown
-            ["emailNotifsLikes","notifications","dropdown"],
-            ["emailNotifsPosts","notifications","toggle"],
-            ["emailNotifsPrivMessages","notifications","toggle"],
-            ["siteNotifs","notifications","toggle"],
-            ["siteNotifsComment","notifications","toggle"],
-            ["siteNotifsFavorite","notifications","toggle"],
-            ["siteNotifsDiscounts","notifications","toggle"],
-            ["siteNotifsSubscriber","notifications","toggle"],
-            ["siteNotifsTip","notifications","toggle"],
-            ["toastNotifsComment","notifications","toggle"],
-            ["toastNotifsFavorite","notifications","toggle"],
-            ["toastNotifsSubscriber","notifications","toggle"],
-            ["toastNotifsTip","notifications","toggle"],
+        ### Chats / Messages ###
+        # welcome message toggle
+        # welcome message text
+        # welcome message file
+        # welcome message record voice, video
+        # welcome message price
+        # welcome message submit
 
-            ### Security ###
+        # hide outgoing message toggle
+        # show full text of message in the notification email
 
-            ["fullyPrivate","security","checkbox"],
-            ["enableComments","security","toggle"],
-            ["showFansCount","security","toggle"],
-            ["showPostsTip","security","toggle"],
-            ["publicFriendsList","security","toggle"],
-            ["ipCountry","security","list"],
-            # id="input-blocked-ips"
-            ["ipIP","security","list"],
-            # id="hasWatermarkPhoto"
-            ["watermarkPhoto","security","toggle"],
-            # id="hasWatermarkVideo"
-            ["watermarkVideo","security","toggle"],
-            # placeholder="Watermark custom text"
-            ["watermarkText","security","text"],
+        ### Notifications ###
 
-            ### Other ###
+        # id="push-notifications"
+        ["emailNotifs","notifications","toggle"],
+        # id="email-notifications"
+        ["emailNotifsReferral","notifications","checkbox"],
+        ["emailNotifsStream","notifications","toggle"],
+        ["emailNotifsSubscriber","notifications","toggle"],
+        ["emailNotifsTip","notifications","toggle"],
+        ["emailNotifsRenewal","notifications","toggle"],
+        # this is a dropdown
+        ["emailNotifsLikes","notifications","dropdown"],
+        ["emailNotifsPosts","notifications","toggle"],
+        ["emailNotifsPrivMessages","notifications","toggle"],
+        ["siteNotifs","notifications","toggle"],
+        ["siteNotifsComment","notifications","toggle"],
+        ["siteNotifsFavorite","notifications","toggle"],
+        ["siteNotifsDiscounts","notifications","toggle"],
+        ["siteNotifsSubscriber","notifications","toggle"],
+        ["siteNotifsTip","notifications","toggle"],
+        ["toastNotifsComment","notifications","toggle"],
+        ["toastNotifsFavorite","notifications","toggle"],
+        ["toastNotifsSubscriber","notifications","toggle"],
+        ["toastNotifsTip","notifications","toggle"],
 
-            ["liveServer","other","text"],
-            ["liveServerKey","other","text"],
-            ["welcomeMessageToggle","other","toggle"],
-            ["welcomeMessageText","other","text"],
+        ### Security ###
 
-        ]
+        ["fullyPrivate","security","checkbox"],
+        ["enableComments","security","toggle"],
+        ["showFansCount","security","toggle"],
+        ["showPostsTip","security","toggle"],
+        ["publicFriendsList","security","toggle"],
+        ["ipCountry","security","list"],
+        # id="input-blocked-ips"
+        ["ipIP","security","list"],
+        # id="hasWatermarkPhoto"
+        ["watermarkPhoto","security","toggle"],
+        # id="hasWatermarkVideo"
+        ["watermarkVideo","security","toggle"],
+        # placeholder="Watermark custom text"
+        ["watermarkText","security","text"],
 
-    def get_variables_for_page(page):
-        variables = Profile.get_setting_variables()
-        variables_ = []
-        for var in variables:
-            if str(var[1]) == str(page):
-                variables_.append(var)
-        return variables_
+        ### Story ###
+        # allow message replies - nobody
+        # allow message replies - subscribers
 
-    def update_value(self, key, value):
-        pass
+        ### Other ###
+
+        ["liveServer","other","text"],
+        ["liveServerKey","other","text"],
+        ["welcomeMessageToggle","other","toggle"],
+        ["welcomeMessageText","other","text"],
+
+    ]
+

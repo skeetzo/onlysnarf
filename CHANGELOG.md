@@ -278,8 +278,10 @@
   - fixed: browser closes now
 
 ----------------------------------------
+  **2.16.2**
+  - more Settings integration
 
-  **2.16.0**
+  **2.17.0**
   - added: Settings options
 
 ----------------------------------------
