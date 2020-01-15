@@ -202,18 +202,23 @@ ELEMENTS = [
 
     ## Notifications
     # push notifications
-    # BLANK
+    {
+        "name": "pushNotifs",
+        "classes": [],
+        "text": ["push-notifications"],
+        "id": []
+    },
     # email notifications
     {
         "name": "emailNotifs",
-        "classes": [None],
-        "text": [],
+        "classes": [],
+        "text": ["email-notifications"],
         "id": []
     },
     # new referral email
     {
         "name": "emailNotifsReferral",
-        "classes": [None],
+        "classes": ["b-input-radio"],
         "text": [],
         "id": []
     },
@@ -487,3 +492,55 @@ ELEMENTS = [
     }
 
 ]
+
+
+# # working
+# username
+# displayName
+# about
+# location
+# websiteURL
+
+# # sorta working
+# coverImage
+# profilePhoto
+# password
+# newPassword
+# confirmPassword
+
+# # all the notifs are probably false positives
+# # are all b.input radio should maybe nth one found
+# emailNotifsReferral
+# emailNotifsStream
+# emailNotifsSubscriber
+# emailNotifsTip
+# emailNotifsRenewal
+
+# ########################
+# email
+# emailNotifs
+# emailNotifsPosts
+# emailNotifsPrivMessages
+# siteNotifs
+# siteNotifsComment
+# siteNotifsFavorite
+# siteNotifsDiscounts
+# siteNotifsSubscriber
+# siteNotifsTip
+# toastNotifsComment
+# toastNotifsSubscriber
+# toastNotifsTip
+# fullyPrivate
+# enableComments
+# showFansCount
+# showPostsTip
+# publicFriendsList
+# ipCountry
+# ipIP
+# watermarkPhoto
+# watermarkVideo
+# watermarkText
+# liveServer
+# liveServerKey
+# welcomeMessageToggle
+# welcomeMessageText
