@@ -167,7 +167,7 @@ def get_settings_variables():
         ["profilePhoto","profile","file"],
         ["username","profile","text"],
         ["displayName","profile","text"],
-        ["subscriptionPrice","text"],
+        ["subscriptionPrice","profile","text"],
         ["referralReward","dropdown"],
         ["about","profile","text"],
         ["location","profile","text"],

@@ -302,7 +302,7 @@ class Driver:
             return False
         # prioritize id over class name
         eleID = None
-        try: eleID = self.browser.find_element_by_id(classID)
+        try: eleID = self.browser.find_element_by_id(element.getId())
         except: eleID = None
         if eleID: return eleID
         for className in element.getClasses():
@@ -947,7 +947,8 @@ class Driver:
                         # get state true|false
                         status = element.is_selected()
                     elif str(type_) == "dropdown":
-                        Select(driver.find_element_by_id("mySelectID"))
+                        ele = self.find_element_by_name(name)
+                        Select(driver.find_element_by_id(ele.getId()))
                         status = element.first_selected_option
                     elif str(type_) == "list":
                         status = element.get_attribute("innerHTML")
