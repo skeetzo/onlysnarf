@@ -268,10 +268,20 @@
   - updated test scripts output
   - added setting: verbosest
   - cleaned up driver&profile elements
+  **2.15.5**
+  - more settings prep
+  - minor fixes to login
+  **2.16.0**
+  - fixed: post
+  - updated menu.md
+  **2.16.1**
+  - fixed: browser closes now
 
 ----------------------------------------
+  **2.16.2**
+  - more Settings integration
 
-  **2.16.0**
+  **2.17.0**
   - added: Settings options
 
 ----------------------------------------
