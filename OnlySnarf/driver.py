@@ -30,6 +30,7 @@ from OnlySnarf.profile import Profile
 ###################
 
 ONLYFANS_HOME_URL = 'https://onlyfans.com'
+ONLYFANS_MESSAGES_URL = "{}/my/chats/".format(ONLYFANS_HOME_URL)
 ONLYFANS_CHAT_URL = "{}/my/chats/chat".format(ONLYFANS_HOME_URL)
 ONLYFANS_SETTINGS_URL = "{}/my/settings".format(ONLYFANS_HOME_URL)
 ONLYFANS_USERS_ACTIVE_URL = "{}/my/subscribers/active".format(ONLYFANS_HOME_URL)
@@ -361,11 +362,11 @@ class Driver:
             eles.extend(elesCSS)
             for i in range(len(eles)):
                 # settings.devPrint("ele: {} -> {}".format(eles[i].get_attribute("innerHTML").strip(), element.getText()))
-                if (eles[i].is_displayed() and element.getText() and str(element.getText()) == eles[i].get_attribute("innerHTML").strip()) and eles[i].is_enabled():
+                if (eles[i].is_displayed() and element.getText() and str(element.getText().lower()) == eles[i].get_attribute("innerHTML").strip().lower()) and eles[i].is_enabled():
                     settings.devPrint("found matching ele")
                     # settings.devPrint("found matching ele: {}".format(eles[i].get_attribute("innerHTML").strip()))
                     return eles[i]
-                elif (eles[i].is_displayed() and element.getText() and str(element.getText()) == eles[i].get_attribute("innerHTML").strip()):
+                elif (eles[i].is_displayed() and element.getText() and str(element.getText().lower()) == eles[i].get_attribute("innerHTML").strip().lower()):
                     settings.devPrint("found text ele")
                     # settings.devPrint("found text ele: {}".format(eles[i].get_attribute("innerHTML").strip()))
                     return eles[i]
@@ -505,14 +506,43 @@ class Driver:
     ####################
     ##### Messages #####
     ####################
+
+    def message(self, type_):
+        try:
+            auth_ = self.auth()
+            if not auth_: return False
+            # go to /message
+            settings.devPrint("going to /chats")
+            settings.maybePrint("goto -> /my/chats/")
+            self.browser.get(ONLYFANS_MESSAGES_URL)
+            settings.devPrint("ready for new message")
+            # click the new message
+            settings.devPrint("clicking new message")
+            self.get_element_to_click("newMessage").click()
+            settings.devPrint("clicked new message")
+            # click the message all
+            type__ = "all" # default
+            if str(type_) == "all": type__ = "messageAll"
+            elif str(type_) == "recent": type__ = "messageRecent"
+            elif str(type_) == "favorite": type__ = "messageFavorite"
+            settings.devPrint("clicking message {}".format(type_))
+            self.get_element_to_click(type__).click()
+            settings.devPrint("Successfully messaged {}".format(type_))
+            return True
+        except Exception as e:
+            Driver.error_checker(e)
+            print("Error: Failure to Message All")
+            return False
      
     def message_confirm(self):
         try:
             WAIT = WebDriverWait(self.browser, 120, poll_frequency=30)
             i = 0
+            settings.devPrint("waiting for message confirm to be clickable")
             while True:
                 try:                
                     WAIT.until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
+                    settings.devPrint("message confirm is clickable")
                     break
                 except Exception as e:
                     print('uploading...')
@@ -521,14 +551,15 @@ class Driver:
                     if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
                         print('Error: Max Upload Time Reached')
                         return False
+            settings.devPrint("getting confirm to click")
             confirm = self.get_element_to_click("new_post")
-            # confirm = WebDriverWait(self.browser, 60, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
             if str(settings.DEBUG) == "True":
                 if str(settings.DEBUG_DELAY) == "True":
                     time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
                 print('OnlyFans Message: Skipped (debug)')
-                settings.devPrint("### Message Maybe Successful ###")
+                settings.devPrint("### Message Successful (debug) ###")
                 return True
+            settings.devPrint("clicking confirm")
             confirm.click()
             print('OnlyFans Message: Sent')
             settings.devPrint("### Message Successful ###")
@@ -539,6 +570,7 @@ class Driver:
             settings.devPrint("### Message Failure ###")
             return False
 
+    # this will be deleted
     def message_image(self, path):
         try:
             if not path or path == None or str(path) == "None":
@@ -546,6 +578,7 @@ class Driver:
                 return False
             print("Enter image(s): {}".format(path))
             try:
+                settings.devPrint("uploading file")
                 self.upload_image_files(name="uploadImageMessage", path=path)
                 settings.maybePrint("Image(s) Entered")
                 settings.debug_delay_check()
@@ -559,12 +592,32 @@ class Driver:
             print("Error: Failure to Enter Image(s)")
             return False
 
+    def message_file(self, path):
+        try:
+            if not path or path == None or str(path) == "None":
+                print("Error: Missing File(s)")
+                return False
+            print("Uploading file(s): {}".format(path))
+            try:
+                self.upload_image_files(name="uploadImageMessage", path=path)
+                settings.debug_delay_check()
+                return True
+            except Exception as e:
+                Driver.error_checker(e)
+                print("Error: Unable to Upload File(s)")
+                return False
+        except Exception as e:
+            Driver.error_checker(e)
+            print("Error: Failure to Enter File(s)")
+            return False
+
     def message_price(self, price):
         try:
             if not price or price == None or str(price) == "None":
                 print("Error: Missing Price")
                 return False
             print("Enter price: {}".format(price))
+            settings.devPrint("waiting for price area to enter price")
             priceElement = WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ONLYFANS_PRICE2)))
             settings.devPrint("entering price")
             priceElement.click()
@@ -588,9 +641,11 @@ class Driver:
                 print("Error: Missing Text")
                 return False
             print("Enter text: {}".format(text))
-            message = self.find_element_by_name("messageText")        
+            settings.devPrint("finding text area")
+            message = self.find_element_by_name("messageText")     
+            settings.devPrint("entering text")
             message.send_keys(str(text))
-            settings.maybePrint("Text Entered")
+            settings.devPrint("entered text")
             return True
         except Exception as e:
             Driver.error_checker(e)
@@ -612,13 +667,17 @@ class Driver:
                     print("Warning: Invalid User ID")
                     if str(settings.DEBUG) == "False":
                         return False
-            settings.maybePrint("goto -> /my/chats/chat/%s" % userid)
-            self.browser.get("{}/{}".format(ONLYFANS_CHAT_URL,userid))
+            settings.maybePrint("goto -> /my/chats/chat/{}".format(userid))
+            self.browser.get("{}/{}".format(ONLYFANS_CHAT_URL, userid))
             return True
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failure to Goto User - {}/{}".format(user.id, user.username))
             return False
+
+    ####################################################################################################
+    ####################################################################################################
+    ####################################################################################################
 
     # tries both and throws error for not found element internally
     def open_more_options(self):
@@ -1255,6 +1314,7 @@ class Driver:
 
     # uploads image into post or message
     def upload_image_files(self, name="image_upload", path=None):
+        settings.devPrint("uploading image files: {} - {}".format(name, path))
         if path == None:
             print("Error: Missing Upload Path")
             return False
@@ -1280,25 +1340,23 @@ class Driver:
             enter_file.send_keys(str(file))
             time.sleep(1)
             self.error_window_upload()
-            # if self.error_window_upload(): fix_filename(file)
-            
+            ###
             def fix_filename(file):
                 # move file to change its name
                 filename = os.path.basename(file)
                 filename = os.path.splitext(filename)[0]
                 if "_fixed" in str(filename): return
-                print("Fixing Filename")
+                settings.devPrint("fixing filename...")
                 filename += "_fixed"
                 ext = os.path.splitext(filename)[1].lower()
-                print("{} -> {}.{}".format(os.path.dirname(file), filename, ext))
+                settings.devPrint("{} -> {}.{}".format(os.path.dirname(file), filename, ext))
                 dst = "{}/{}.{}".format(os.path.dirname(file), filename, ext)
                 shutil.move(file, dst)
                 # add file to end of list so it gets retried
                 files.append(dst)
                 # if this doesn't force it then it'll loop forever without a stopper
-
-            # time.sleep(1)
-         ## Wait for Confirm
+            ###
+        # one last final check
         self.error_window_upload()
         settings.debug_delay_check()
         settings.devPrint("files uploaded")

@@ -414,7 +414,7 @@ class Settings:
             
     def getInput(self):
         if str(self.INPUT) == "None":
-            self.maybePrint("Error: Missing Local Input")
+            self.maybePrint("Warning: Missing Local Input")
             return False
         if os.path.isdir(str(self.INPUT)):  
             print("Found: Directory")  

@@ -204,50 +204,50 @@ ELEMENTS = [
     # push notifications
     {
         "name": "pushNotifs",
-        "classes": [],
-        "text": ["push-notifications"],
-        "id": []
+        "classes": ["g-input__wrapper.m-checkbox__toggle"],
+        "text": [],
+        "id": ["push-notifications"]
     },
     # email notifications
     {
         "name": "emailNotifs",
-        "classes": [],
-        "text": ["email-notifications"],
-        "id": []
+        "classes": ["g-input__wrapper.m-checkbox__toggle"],
+        "text": [],
+        "id": ["email-notifications"]
     },
     # new referral email
     {
         "name": "emailNotifsReferral",
         "classes": ["b-input-radio"],
-        "text": [],
+        "text": ["New Referral"],
         "id": []
     },
     # new stream email
     {
         "name": "emailNotifsStream",
         "classes": ["b-input-radio"],
-        "text": [],
+        "text": ["New Stream"],
         "id": []
     },
     # new subscriber email
     {
         "name": "emailNotifsSubscriber",
         "classes": ["b-input-radio"],
-        "text": [],
+        "text": ["New Subscriber"],
         "id": []
     },
     # new tip email
     {
         "name": "emailNotifsSubscriber",
         "classes": ["b-input-radio"],
-        "text": [],
+        "text": ["New Tip"],
         "id": []
     },
     # new renewal email
     {
         "name": "emailNotifsSubscriber",
         "classes": ["b-input-radio"],
-        "text": [],
+        "text": ["Renewal"],
         "id": []
     },
 
@@ -297,64 +297,64 @@ ELEMENTS = [
     # new comment notification
     {
         "name": "siteNotifsComment",
-        "classes": [None],
-        "text": [],
+        "classes": [],
+        "text": ["New comment"],
         "id": []
     },
     # new favorite notification
     {
         "name": "siteNotifsFavorite",
-        "classes": [None],
-        "text": [],
+        "classes": [],
+        "text": ["New favorite (like)"],
         "id": []
     },
     # discounts from users i've used to follow notification
     {
         "name": "siteNotifsDiscounts",
-        "classes": [None],
-        "text": [],
+        "classes": [],
+        "text": ["Discounts from users I used to follow"],
         "id": []
     },
     # new subscriber notification
     {
         "name": "siteNotifsSubscriber",
-        "classes": [None],
-        "text": [],
+        "classes": [],
+        "text": ["New Subscriber"],
         "id": []
     },
     # new tip notification
     {
         "name": "siteNotifsTip",
-        "classes": [None],
-        "text": [],
+        "classes": [],
+        "text": ["New Tip"],
         "id": []
     },
     # toast notification new comment
     {
         "name": "toastNotifsComment",
-        "classes": [None],
-        "text": [],
+        "classes": [],
+        "text": ["New comment"],
         "id": []
     },
     # toast notification new favorite
     {
         "name": "toastNotifsFavorite",
-        "classes": [None],
-        "text": [],
+        "classes": [],
+        "text": ["New favorite (like)"],
         "id": []
     },
     # toast notification new subscriber
     {
         "name": "toastNotifsSubscriber",
-        "classes": [None],
-        "text": [],
+        "classes": [],
+        "text": ["New Subscriber"],
         "id": []
     },
     # toast notification new tip
     {
         "name": "toastNotifsTip",
-        "classes": [None],
-        "text": [],
+        "classes": [],
+        "text": ["New Tip"],
         "id": []
     },
 
@@ -365,70 +365,70 @@ ELEMENTS = [
     # fully private profile
     {
         "name": "fullyPrivate",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["is_private"]
     },
     # enable comments
     {
         "name": "enableComments",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["is_want_comments"]
     },
     # show fans count on profile
     {
         "name": "showFansCount",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["show_subscribers_count"]
     },
     # show posts tips summary
     {
         "name": "showPostsTip",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["show_posts_tips"]
     },
     # public friends list
     {
         "name": "publicFriendsList",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["show_friends_list"]
     },
     # geo blocking
     {
         "name": "ipCountry",
-        "classes": [None],
+        "classes": ["multiselect__input"],
         "text": [],
         "id": []
     },
     # ip blocking
     {
         "name": "ipIP",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["input-blocked-ips"]
     },
     # watermarks photos
     {
         "name": "watermarkPhoto",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["hasWatermarkPhoto"]
     },
     # watermarks video
     {
         "name": "watermarkVideo",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["hasWatermarkVideo"]
     },
     # watermarks text
     {
         "name": "watermarkText",
-        "classes": [None],
+        "classes": ["form-control.g-input"],
         "text": [],
         "id": []
     },
@@ -437,50 +437,50 @@ ELEMENTS = [
     # allow message replies - nobody
     {
         "name": "storyAllowRepliesNobody",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["allowNobody"]
     },
     # allow message replies - subscribers
     {
         "name": "storyAllowRepliesSubscribers",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["allowSubscribers"]
     },
     ## Other
     # obs server
     {
         "name": "liveServer",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["obsstreamingserver"]
     },
     # obs key
     {
         "name": "liveServerKey",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["streamingobskey"]
     },
     # welcome chat message toggle
     {
         "name": "welcomeMessageToggle",
-        "classes": [None],
+        "classes": [],
         "text": [],
-        "id": []
+        "id": ["autoMessage"]
     },
     # then same pattern for message enter text or add stuff and price
     {
         "name": "welcomeMessageText",
-        "classes": [None],
+        "classes": ["form-control.b-chat__message-input"],
         "text": [],
         "id": []
     },
     # save button for welcome chat message
     {
         "name": "welcomeMessageSave",
-        "classes": [None],
+        "classes": ["g-btn.m-rounded.b-chat__btn-submit"],
         "text": [],
         "id": []
     },
@@ -495,13 +495,31 @@ ELEMENTS = [
 
 
 # # working
+########################
 # username
 # displayName
 # about
 # location
 # websiteURL
 
+## security
+# fullyPrivate
+# enableComments
+# showFansCount
+# showPostsTip
+# publicFriendsList
+# ipCountry
+# ipIP
+# watermarkPhoto
+# watermarkVideo
+# watermarkText
+# welcomeMessageToggle
+## other
+# liveServer
+# liveServerKey
+
 # # sorta working
+########################
 # coverImage
 # profilePhoto
 # password
@@ -516,6 +534,7 @@ ELEMENTS = [
 # emailNotifsTip
 # emailNotifsRenewal
 
+# # not working
 # ########################
 # email
 # emailNotifs
@@ -530,17 +549,4 @@ ELEMENTS = [
 # toastNotifsComment
 # toastNotifsSubscriber
 # toastNotifsTip
-# fullyPrivate
-# enableComments
-# showFansCount
-# showPostsTip
-# publicFriendsList
-# ipCountry
-# ipIP
-# watermarkPhoto
-# watermarkVideo
-# watermarkText
-# liveServer
-# liveServerKey
-# welcomeMessageToggle
 # welcomeMessageText

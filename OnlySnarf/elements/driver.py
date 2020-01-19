@@ -73,26 +73,20 @@ ELEMENTS = [
         "text": [],
         "id": []
     },
-    # 
-
     # upload image file
     {
         "name": "image_upload",
         "classes": ["button.g-btn.m-rounded.b-chat__btn-submit", "g-btn.m-rounded.b-chat__btn-submit"],
         "text": [],
-        "id": ["fileupload_photo"],
-        "tabIndex": 11,
-        "from": "new_post"
+        "id": ["fileupload_photo"]
     },
     # show more options # unnecessary w/ tabbing
-    # {
-    #     "name": "moreOptions",
-    #     "classes": ["g-btn.m-flat.b-make-post__more-btn", "button.g-btn.m-flat.b-make-post__more-btn"],
-    #     "text": [],
-    #     "id": [],
-    #     "tabIndex": None,
-    #     "from": "load"
-    # },
+    {
+        "name": "moreOptions",
+        "classes": ["g-btn.m-flat.b-make-post__more-btn", "button.g-btn.m-flat.b-make-post__more-btn"],
+        "text": [],
+        "id": []
+    },
     # poll
     {
         "name": "poll",
@@ -258,9 +252,7 @@ ELEMENTS = [
         "name": "uploadImageMessage",
         "classes": ["g-btn.m-rounded.b-chat__btn-submit"],
         "text": [],
-        "id": ["cm_fileupload_photo"],
-        "tabIndex": None, # can't find
-        "from": "load"
+        "id": ["cm_fileupload_photo"]
     },
     # upload error window close
     # tab probably closes error windows...
@@ -326,6 +318,30 @@ ELEMENTS = [
         "classes": ["g-btn.m-rounded.m-border.m-sm"],
         "text": [],
         "id": []
+    },
+    {
+        "name": "newMessage",
+        "classes": ["g-page__header__btn.b-chats__btn-new.has-tooltip"],
+        "text": ["/my/chats/send"],
+        "id": [],
+    },
+    {
+        "name": "messageAll",
+        "classes": ["g-btn__text"],
+        "text": ["ALL"],
+        "id": [],
+    },
+    {
+        "name": "messageRecent",
+        "classes": ["g-btn__text"],
+        "text": ["RECENT"],
+        "id": [],
+    },
+    {
+        "name": "messageFavorite",
+        "classes": ["g-btn__text"],
+        "text": ["FAVORITE"],
+        "id": [],
     }
 
 ]
