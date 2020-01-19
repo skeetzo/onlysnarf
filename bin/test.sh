@@ -12,7 +12,9 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 # sudo onlysnarfpy -debug -verbose -verboser -type gallery -debug-delay -show-window -skip-reduce
 
-sudo onlysnarf -debug -verbose -show-window -debug-delay -prefer-local
+# sudo onlysnarf -debug -verbose -show-window -debug-delay -prefer-local
+sudo onlysnarfpy -debug -verbose -verboser -verbosest -action test 
+# -show-window
 # sudo onlysnarfpy -verbose -type gallery -notkeyword feet -show-window -debug -debug-delay
 # sudo onlysnarf-config
 # sudo onlysnarfpy -debug -verbose -action test

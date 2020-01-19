@@ -89,6 +89,9 @@ class Settings:
         # default user greeting
         self.DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
         ##
+        # download path
+        self.DOWNLOAD_PATH = "/opt/apps/onlysnarf/downloads"
+        ##
         # configurable w/ profile.conf
         # OnlySnarf Drive folder list
         self.DRIVE_FOLDERS = [
@@ -102,6 +105,10 @@ class Settings:
         # -duration
         # poll or post duration
         self.DURATION = None
+        ##
+        # -exit
+        # exit upon each action
+        self.EXIT = True
         ##
         # -expires
         # date of post or poll expiration
@@ -146,6 +153,10 @@ class Settings:
         # -keywords
         # keywords to # in post
         self.KEYWORDS = []
+        ##
+        # -manual
+        # posting requires clicking open window
+        self.MANUAL = False
         ##
         # -months
         # action: discount
@@ -320,11 +331,11 @@ class Settings:
         while i < len(sys.argv):
             sys.argv[i] = sys.argv[i][1:] # remove - in front
             # truths set the variable True when provided
-            truths_ = ["VERBOSEST","VERSION","VERBOSER","DEBUG_FORCE","SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
+            truths_ = ["MANUAL","VERBOSEST","VERSION","VERBOSER","DEBUG_FORCE","SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
             # falses set the variable False when provided
-            falses_ = []
+            falses_ = ["EXIT"]
             # nexts set the variable to the next provided argument input
-            nexts_ = ["IMAGE_UPLOAD_LIMIT_MESSAGES","UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_DOWNLOAD_LIMIT","IMAGE_UPLOAD_LIMIT","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
+            nexts_ = ["DOWNLOAD_PATH","IMAGE_UPLOAD_LIMIT_MESSAGES","UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_DOWNLOAD_LIMIT","IMAGE_UPLOAD_LIMIT","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0
             while j < len(truths_):
                 if str(truths_[j]).upper() == str(sys.argv[i]).upper().replace("-","_"):

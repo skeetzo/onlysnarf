@@ -42,6 +42,7 @@ LIVE_BUTTON_CLASS = "b-make-post__streaming-link"
 TWITTER_LOGIN0 = "//a[@class='g-btn m-rounded m-flex m-lg']"
 TWITTER_LOGIN1 = "//a[@class='g-btn m-rounded m-flex m-lg btn-twitter']"
 TWITTER_LOGIN2 = "//a[@class='btn btn-default btn-block btn-lg btn-twitter']"
+TWITTER_LOGIN3 = "//a[@class='g-btn m-rounded m-flex m-lg m-with-icon']"
 USERNAME_XPATH = "//input[@id='username_or_email']"
 PASSWORD_XPATH = "//input[@id='password']"
 # IDs and xpaths not yet required fancy element sorting
@@ -54,6 +55,7 @@ ONLYFANS_PRICE2 = "button.b-chat__btn-set-price"
 POLL_INPUT_XPATH = "//input[@class='form-control']"
 REMEMBERME_CHECKBOX_XPATH = "//input[@id='remember']"
 DISCOUNT_USER_BUTTONS = "g-btn.m-rounded.m-border.m-sm"
+
 class Driver:
 
     def __init__(self):
@@ -202,7 +204,7 @@ class Driver:
     def error_checker(e):
         if "Unable to locate element" in str(e):
             print("Warning: OnlySnarf may require an update")
-        if str(settings.DEBUG) == "True" and str(settings.VERBOSE) == "True":
+        if str(settings.VERBOSER) == "True":
             print(e)
         elif "Message: " not in str(e):
             settings.maybePrint(e)
@@ -227,8 +229,9 @@ class Driver:
     ##### Expiration #####
     ######################
 
-    def expiration(self, period):
-        settings.devPrint("expiration")   
+    def expires(self, period):
+        settings.devPrint("expires")
+        if period == None or str(period) == "": return False
         if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99 and str(period) != "No limit":
             print("Error: Missing Expiration")
             return False
@@ -240,12 +243,12 @@ class Driver:
             print("Expiration:")
             print("- Period: {}".format(period))
             self.open_more_options()
-            # open expiration window
-            settings.devPrint("adding expiration")
-            self.get_element_to_click("expirationAdd").click()
+            # open expires window
+            settings.devPrint("adding expires")
+            self.get_element_to_click("expiresAdd").click()
             # select duration
-            settings.devPrint("selecting expiration")
-            nums = self.find_elements_by_name("expirationPeriods")
+            settings.devPrint("selecting expires")
+            nums = self.find_elements_by_name("expiresPeriods")
             for num in nums:
                 ##
                 # <span class="g-first-letter">1</span> day
@@ -260,19 +263,19 @@ class Driver:
                 if ">7<" in str(inner) and int(period) == 7: num.click()
                 if ">30<" in str(inner) and int(period) == 30: num.click()
                 if ">o limit<" in str(inner) and int(period) == 99: num.click()
-            settings.devPrint("selected expiration")
+            settings.devPrint("selected expires")
             settings.debug_delay_check()
             # save
             if str(settings.DEBUG) == "True" and str(settings.DEBUG_FORCE) == "False":
                 print("Skipping: Expiration (debug)")
-                settings.devPrint("skipping expiration")
-                self.get_element_to_click("expirationCancel").click()
-                settings.devPrint("canceled expiration")
+                settings.devPrint("skipping expires")
+                self.get_element_to_click("expiresCancel").click()
+                settings.devPrint("canceled expires")
                 settings.devPrint("### Expiration Successfully Canceled ###")
             else:
-                settings.devPrint("saving expiration")
-                self.get_element_to_click("expirationSave").click()
-                settings.devPrint("saved expiration")
+                settings.devPrint("saving expires")
+                self.get_element_to_click("expiresSave").click()
+                settings.devPrint("saved expires")
                 print("Expiration Entered")
                 settings.devPrint("### Expiration Successful ###")
             return True
@@ -280,9 +283,9 @@ class Driver:
             Driver.error_checker(e)
             print("Error: Failed to Enter Expiration")
             try:
-                settings.devPrint("canceling expiration")
-                self.get_element_to_click("expirationCancel").click()
-                settings.devPrint("canceled expiration")
+                settings.devPrint("canceling expires")
+                self.get_element_to_click("expiresCancel").click()
+                settings.devPrint("canceled expires")
                 settings.devPrint("### Expiration Successful Failure ###")
             except: 
                 settings.devPrint("### Expiration Failure Failure")
@@ -297,6 +300,11 @@ class Driver:
         if not element:
             print("Error: Unable to find Element Reference")
             return False
+        # prioritize id over class name
+        eleID = None
+        try: eleID = self.browser.find_element_by_id(element.getId())
+        except: eleID = None
+        if eleID: return eleID
         for className in element.getClasses():
             ele = None
             eleCSS = None
@@ -394,6 +402,7 @@ class Driver:
         if str(self.browser.current_url) == str(ONLYFANS_SETTINGS_URL) and str(settingsTab) == "profile":
             settings.maybePrint("at -> onlyfans.com/settings/{}".format(settingsTab))
         else:
+            if str(settingsTab) == "profile": settingsTab = ""
             settings.maybePrint("goto -> onlyfans.com/settings/{}".format(settingsTab))
             self.browser.get("{}/{}".format(ONLYFANS_SETTINGS_URL, settingsTab))
             # fix above with correct element to locate
@@ -419,42 +428,52 @@ class Driver:
         if str(settings.USERNAME) == "" or settings.USERNAME == None: settings.USERNAME = username_
         if str(settings.PASSWORD) == "" or settings.PASSWORD == None: settings.PASSWORD = password_
         settings.maybePrint("Opening Web Browser")
+        CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
         options = webdriver.ChromeOptions()
+        # options.setExperimentalOption('useAutomationExtension', false);
+        # options.binary_location = chromedriver_binary.chromedriver_filename
         if str(settings.SHOW_WINDOW) != "True":
             options.add_argument('--headless')
+            #
+            options.add_argument('--disable-gpu')
+            options.add_argument('--disable-smooth-scrolling')
+            options.add_argument('--disable-software-rasterizer')
+        #
+        options.add_argument('--disable-login-animations')
+        options.add_argument('--disable-modal-animations')
+        options.add_argument('--disable-sync')
+        options.add_argument('--incognito')
+        options.add_argument('--user-agent=OnlySnarf')
+        #
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
-        options.add_argument('--disable-gpu')
-        # options.setExperimentalOption('useAutomationExtension', false);
-        CHROMEDRIVER_PATH = chromedriver_binary.chromedriver_filename
+        # options.add_experimental_option("prefs", {
+        #   "download.default_directory": str(settings.DOWNLOAD_PATH),
+        #   "download.prompt_for_download": False,
+        #   "download.directory_upgrade": True,
+        #   "safebrowsing.enabled": True
+        # })
+
         try:
             self.browser = webdriver.Chrome(chrome_options=options)
         except Exception as e:
             Driver.error_checker(e)
-            print("Warning: Missing chromedriver_path, retrying")
-            try:
-                self.browser = webdriver.Chrome(CHROMEDRIVER_PATH, chrome_options=options)
-            except Exception as e:
-                Driver.error_checker(e)
-                print("Error: Missing chromedriver_path, exiting")
-                try:
-                    self.browser = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH)
-                except Exception as e:
-                    print(e)
-                    print("Super Fucked")
-                return False
-        self.browser.implicitly_wait(10) # seconds
+            print("Warning: Missing Chromedriver")
+            return False
+        self.browser.implicitly_wait(30) # seconds
         self.browser.set_page_load_timeout(1200)
         def attempt_login(opt):
             try:
                 self.browser.get(ONLYFANS_HOME_URL)
                 # login via Twitter
                 if int(opt)==0:
-                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN0).click()
+                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN3).click()
                 elif int(opt)==1:
                     twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN1).click()
                 elif int(opt)==2:
                     twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN2).click()
+                elif int(opt)==3:
+                    twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN0).click()
             except NoSuchElementException as e:
                 opt+=1
                 print("Warning: Login Failure, Retrying ({})".format(opt))
@@ -462,15 +481,18 @@ class Driver:
         try:
             attempt_login(0)
             # rememberMe checkbox doesn't actually cause login to be remembered
-            rememberMe = self.browser.find_element_by_xpath(REMEMBERME_CHECKBOX_XPATH)
-            if not rememberMe.is_selected():
-                rememberMe.click()
-            # fill in username
-            username = self.browser.find_element_by_xpath(USERNAME_XPATH).send_keys(username_)
-            # fill in password and hit the login button 
-            password = self.browser.find_element_by_xpath(PASSWORD_XPATH)
-            password.send_keys(password_)
-            password.send_keys(Keys.ENTER)
+            # rememberMe = self.browser.find_element_by_xpath(REMEMBERME_CHECKBOX_XPATH)
+            # if not rememberMe.is_selected():
+                # rememberMe.click()
+            if str(settings.MANUAL) == "True":
+                print("Please Login")
+            else:
+                # fill in username
+                username = self.browser.find_element_by_xpath(USERNAME_XPATH).send_keys(username_)
+                # fill in password and hit the login button 
+                password = self.browser.find_element_by_xpath(PASSWORD_XPATH)
+                password.send_keys(password_)
+                password.send_keys(Keys.ENTER)
             try:
                 WebDriverWait(self.browser, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
                 print("OnlyFans Login Successful")
@@ -635,17 +657,22 @@ class Driver:
     ##### Poll #####
     ################
 
-    def polling(self, poll):
-        settings.devPrint("polling")
+    def poll(self, poll):
+        settings.devPrint("poll")
         period = poll.get("period")
         questions = poll.get("questions")
+        if period == None or str(period) == "": return False
         if isinstance(questions, str): questions = questions.split(",\"*\"")
         questions = [n.strip() for n in questions]
         auth_ = self.auth()
         if not auth_: return False
-        if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99 and str(period) != "No limit":
-            print("Error: Missing Duration")
-            return False
+        if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99:
+            try:
+                if str(period) != "No limit":
+                    print("Error: Missing Duration")
+                    return False
+            except Exception as e:
+                return False
         if not questions or len(questions) == 0:
             print("Error: Missing Questions")
             return False
@@ -728,10 +755,13 @@ class Driver:
             self.go_to_home()
             print("Posting:")
             print("- Text: {}".format(text))
-            if expires: self.expiration(expires)
-            if schedule: self.scheduling(schedule)
-            if poll: self.polling(poll)
+            if expires: self.expires(expires)
+            if schedule: self.schedule(schedule)
+            if poll: self.poll(poll)
             settings.devPrint("entering text")
+            enter_text = self.browser.find_element_by_id(ONLYFANS_POST_TEXT_ID)
+            actionChains = ActionChains(self.browser)
+            actionChains.double_click(enter_text).perform()
             self.browser.find_element_by_id(ONLYFANS_POST_TEXT_ID).send_keys(str(text))
             settings.devPrint("entered text")
             settings.devPrint("finding send")
@@ -885,97 +915,151 @@ class Driver:
     ##### Settings #####
     ####################
 
-    # has save:
-    # profile
-    # account
-    # security
-
-    # doesn't have save:
-    # story
-    # notifications
-    # other
+    # gets all settings from whichever page its on
+    # or get a specific setting
+    # probably just way easier and resourceful to do it all at once
+    # though it would be ideal to also be able to update individual settings without risking other settings
 
     # goes through the settings and get all the values
     def settings_get_all(self):
-         # find the var from the list of var names in settingsVariables
-        settingsVariables = Profile.get_settings_variables()
-        for var in settingsVariables:
-            name = var[0]
-            page_ = var[1]
-            type_ = var[2]
-            settings.devPrint("going to settings page: {}".format(page_))
-            self.go_to_settings(page_)
-            settings.devPrint("reached settings: {}".format(page_))
-            element = self.find_element_by_name(name)
-            settings.devPrint("getting gotten of type: {}".format(type_))
-            status = ""
-            if str(type_) == "text":
-                # get attr text
-                status = element.get_attribute("innerHTML")
-            elif str(type_) == "toggle":
-                # get state true|false
-                status = element.is_selected()
-            elif str(type_) == "dropdown":
-                Select(driver.find_element_by_id("mySelectID"))
-                status = element.first_selected_option
-            elif str(type_) == "list":
-                status = element.get_attribute("innerHTML")
-            elif str(type_) == "file":
-                status = element.get_attribute("innerHTML")
-            elif str(type_) == "checkbox":
-                status = element.is_selected()
-            settings.maybePrint("{} : {}".format(var, status))
-            settings.update_value(var, status)
+        print("Getting All Settings")
+        try:
+            auth_ = self.auth()
+            if not auth_: return False
+            profile = Profile()
+            pages = Profile.get_pages()
+            for page in pages:
+                variables = Profile.get_variables_for_page(page)
+                settings.devPrint("going to settings page: {}".format(page))
+                self.go_to_settings(page)
+                settings.devPrint("reached settings: {}".format(page))
+                for var in variables:
+                    name = var[0]
+                    page_ = var[1]
+                    type_ = var[2]
+                    status = None
+                    settings.devPrint("searching: {} - {}".format(name, type_))
+                    try:
+                        element = self.find_element_by_name(name)
+                        settings.devPrint("Successful ele: {}".format(name))
+                    except Exception as e:
+                        Driver.error_checker(e)
+                        continue
+                    if str(type_) == "text":
+                        # get attr text
+                        status = element.get_attribute("innerHTML").strip() or None
+                        status2 = element.get_attribute("value").strip() or None
+                        print("{} - {}".format(status, status2))
+                        if not status and status2: status = status2
+                    elif str(type_) == "toggle":
+                        # get state true|false
+                        status = element.is_selected()
+                    elif str(type_) == "dropdown":
+                        ele = self.find_element_by_name(name)
+                        Select(driver.find_element_by_id(ele.getId()))
+                        status = element.first_selected_option
+                    elif str(type_) == "list":
+                        status = element.get_attribute("innerHTML")
+                    elif str(type_) == "file":
+                        # can get file from image above
+                        # can set once found
+                        # status = element.get_attribute("innerHTML")
+                        pass
+                    elif str(type_) == "checkbox":
+                        status = element.is_selected()
+                    if status is not None: settings.devPrint("Successful value: {}".format(status))
+                    settings.maybePrint("{} : {}".format(name, status))
+                    profile.update_value(name, status)
+                self.settings_save(page=page)
+                # this should return all the values etc instead of setting them to something directly from here
+        except Exception as e:
+            Driver.error_checker(e)
 
+    # goes through each page and sets all the values
     def settings_set_all(self):
-        # goes through each page and sets all the values
-        
+        print("Updating All Settings")
+        try:
+            auth_ = self.auth()
+            if not auth_: return False
+            # self.go_to_home()
+            pages = Profile.get_pages()
+            for page in pages:
+                variables = Profile.get_variables_for_page(page)
+                settings.devPrint("going to settings page: {}".format(page))
+                self.go_to_settings(page)
+                settings.devPrint("reached settings: {}".format(page))
+                for var in variables:
+                    name = var[0]
+                    # page_ = var[1]
+                    type_ = var[2]
+                    # everything below should be eventually moved to the settings_set() below once it all works to prevent duplication
+                    element = self.find_element_by_name(name)
+                    settings.devPrint("getting gotten of type: {}".format(type_))
+                    status = ""
+                    if str(type_) == "text":
+                        # get attr text
+                        status = element.get_attribute("innerHTML") 
 
-        # dropdown
-        # select by visible text
-        select.select_by_visible_text('Banana')
-        # select by value 
-        select.select_by_value('1')
+                    elif str(type_) == "toggle":
+                        # get state true|false
+                        status = element.is_selected()
 
-        self.settings_save()
+                    elif str(type_) == "dropdown":
+                        # dropdown
+                        # select by visible text
+                        # select.select_by_visible_text('Banana')
+                        # select by value 
+                        # select.select_by_value('1')
+                        Select(driver.find_element_by_id("mySelectID"))
+                        status = element.first_selected_option
 
-    def settings_set(self, key, value):
-        # find the var from the list of var names in settingsVariables
-        var = None
-        settingsVariables = Profile.get_settings_variables()
-        for key in settingsVariables:
-            if str(var) == str(key[0]):
-                var = key
-        if not var or var == None:
-            print("Error: Unable to Find Variable")
-            return False
-        #
-        name = var[0]
-        page_ = var[1]
-        type_ = var[2]
-        settings.devPrint("going to settings page: {}".format(page))
-        self.go_to_settings(page_)
-        settings.devPrint("reached settings: {}".format(page))
-        self.find_element_by_name(name)
-        # text, path, state, list (text), price 
-        if str(type_) == "text":
-            # set attr text
-            pass
-        elif str(type_) == "toggle":
-            # set state == value
-            pass
-        # other stuff
-        self.settings_save()
+                    elif str(type_) == "list":
+                        status = element.get_attribute("innerHTML")
 
-    # saves the settings page
-    def settings_save(self):
-        pass
+                    elif str(type_) == "file":
+                        status = element.get_attribute("innerHTML")
+
+                    elif str(type_) == "checkbox":
+                        status = element.is_selected()
+
+                    settings.maybePrint("{} : {}".format(var, status))
+                self.settings_save(page=page)
+        except Exception as e:
+            Driver.error_checker(e)
+    # saves the settings page if it is a page that needs to be saved
+        # has save:
+        # profile
+        # account
+        # security
+        ##
+        # doesn't have save:
+        # story
+        # notifications
+        # other
+    def settings_save(self, page=None):
+        if str(page) not in ["profile", "account", "security"]:
+            settings.devPrint("not saving: {}".format(page))
+            return
+        try:
+            settings.devPrint("saving: {}".format(page))
+            element = self.find_element_by_name("profileSave")
+            settings.devPrint("derp")
+            element = self.get_element_to_click("profileSave")
+            settings.devPrint("found page save")
+            if str(settings.DEBUG) == "True":
+                print("Skipping: Save (debug)")
+            else:
+                settings.devPrint("saving page")
+                element.click()
+                settings.devPrint("page saved")
+        except Exception as e:
+            Driver.error_checker(e)
 
     ####################
     ##### Schedule #####
     ####################
 
-    def scheduling(self, schedule_):
+    def schedule(self, schedule_):
         auth_ = self.auth()
         if not auth_: return False
         try:
@@ -1102,10 +1186,10 @@ class Driver:
             print("- Text: {}".format(text))
             print("- Tweeting: {}".format(settings.TWEETING))
             ## Expires, Schedule, Poll
-            if expires: self.expiration(expires)
-            if schedule: self.scheduling(schedule)
+            if expires: self.expires(expires)
+            if schedule: self.schedule(schedule)
             if poll: 
-                self.polling(poll)
+                self.poll(poll)
                 time.sleep(3)
             WAIT = WebDriverWait(self.browser, 600, poll_frequency=10)
             ## Tweeting
