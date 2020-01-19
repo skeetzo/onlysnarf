@@ -380,6 +380,14 @@ class Driver:
 
     ###################################
 
+    def go_to_page(self, page):
+        if self.browser == None: return False
+        if str(self.browser.current_url) == str(page):
+            settings.maybePrint("at -> {}".format(page))
+        else:
+            settings.maybePrint("goto -> {}".format(page))
+            self.browser.get("{}/{}".format(ONLYFANS_HOME_URL, page))
+
     def go_to_home(self):
         if self.browser == None: return False
         if str(self.browser.current_url) == str(ONLYFANS_HOME_URL):
