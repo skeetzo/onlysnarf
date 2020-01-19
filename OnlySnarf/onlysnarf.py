@@ -58,7 +58,7 @@ class OnlySnarf:
             # except Exception as e:
                 # settings.maybePrint(e)
             depth = int(depth) + 1
-        self.driver.exit()
+        self.exit()
         return True
 
     ################
@@ -66,7 +66,8 @@ class OnlySnarf:
     ################
 
     def exit(self):
-        self.driver.exit()
+        if str(settings.EXIT) == "True":
+            self.driver.exit()
 
     ###################
     ##### Message #####
@@ -131,7 +132,7 @@ class OnlySnarf:
                     settings.maybePrint(e)
         if backup:
             Google.upload_input(image)
-        self.driver.exit()
+        self.exit()
         return success
                 
     ################
@@ -141,7 +142,7 @@ class OnlySnarf:
     def post(self, text=None, override=False):
         expires = settings.EXPIRES or ""
         schedule = settings.getSchedule()
-        poll = None
+        poll = {"period":None,"questions":None}
         duration = settings.DURATION or ""
         questions = settings.QUESTIONS or []
         if not text: text = input("Text: ".format(text))
@@ -182,9 +183,7 @@ class OnlySnarf:
             poll = {"period":duration,"questions":questions}
         try:
             successful = self.driver.post(text, expires=expires, schedule=schedule, poll=poll)
-            # if successful: print("Post Successful")
-            # else: print("Post Failed")
-            self.driver.exit()
+            self.exit()
             return successful
         except Exception as e:
             settings.maybePrint(e)
@@ -217,8 +216,6 @@ class OnlySnarf:
             if not schedule: schedule = settings.getSchedule()
             if not poll: poll = settings.getPoll()
             successful = self.driver.upload(path=path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule, poll=poll)
-            # if successful: print("Upload Successful")
-            # else: print("Upload Failed")
             return successful
         except Exception as e:
             settings.maybePrint(e)
@@ -366,11 +363,15 @@ class OnlySnarf:
     ##### Dev #####
     ###############
 
-    def test():
+    def test(self):
         print('0/3 : Deleting Locals')
         settings.remove_local()
         print('1/3 : Testing')
 
+        print('TESTING: Settings - Get')
+        response = self.driver.settings_get_all()
+
+        return True
 
         print('TESTING: Users')
         response = get_users()

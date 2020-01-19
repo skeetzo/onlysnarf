@@ -7,47 +7,51 @@ ELEMENTS = [
     # cover image enter
     {
         "name": "coverImage",
-        "classes": ["b-user-panel__cover__img"],
-        "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "classes": ["g-btn.m-rounded.m-sm.m-border"],
+        "text": ["Upload cover image"],
+        "id": []
     },
-    # cover image cancel
+    # cover image cancel button
     {
         "name": "coverImageCancel",
-        "classes": [None],
+        "classes": ["b-user-panel__del-btn.m-cover"],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # profile photo
     {
         "name": "profilePhoto",
         "classes": ["g-btn.m-rounded.m-sm.m-border"],
+        "text": ["Upload profile photo"],
+        "id": []
+    },
+    # profile photo cancel button
+    {
+        "name": "profilePhotoCancel",
+        "classes": ["b-user-panel__del-btn.m-avatar"],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
+    },
+    # username
+    {
+        "name": "username",
+        "classes": [],
+        "text": [],
+        "id": ["input-login"]
     },
     # display name
     {
         "name": "displayName",
-        "classes": ["form-control.g-input"],
+        "classes": [],
         "text": [],
-        "id": [],
-        "tabIndex": 7, # left
-        "from": "load"
+        "id": ["input-name"]
     },
     # subscription price
     {
         "name": "subscriptionPrice",
-        "classes": ["form-control.g-input","classname"],
-        "text": [],
-        "id": [],
-        "tabIndex": 6, # left
-        "from": "load"
+        "classes": ["form-control.g-input"],
+        "text": ["Free"],
+        "id": []
     },
     # subscription bundle
     # TODO
@@ -55,9 +59,7 @@ ELEMENTS = [
         "name": "subscriptionBundle",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": 0,
-        "from": "load"
+        "id": []
     },
     # referral award enabled / disabled
     # TODO
@@ -65,60 +67,48 @@ ELEMENTS = [
         "name": "referralReward",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": 0,
-        "from": "load"
+        "id": []
     },
 
     # ADD reward for subscriber referrals
     # about
     {
         "name": "about",
-        "classes": ["form-control.g-input.unlimsize"],
+        "classes": [],
         "text": [],
-        "id": [],
-        "tabIndex": 5, # left
-        "from": "load"
+        "id": ["input-about"]
     },
     # location
     {
         "name": "location",
-        "classes": ["form-control.g-input"],
+        "classes": [],
         "text": [],
-        "id": [],
-        "tabIndex": 4, # left
-        "from": "load"
+        "id": ["input-location"]
     },
     # website url
     {
         "name": "websiteURL",
-        "classes": ["form-control.g-input"],
+        "classes": [],
         "text": [],
-        "id": [],
-        "tabIndex": 3, # left
-        "from": "load"
+        "id": ["input-website"]
     },
 
     ## Advanced
     # username
     # BLANK
     # username
-    {
-        "name": "username",
-        "classes": ["form-control.g-input"],
-        "text": [],
-        "id": [],
-        "tabIndex": 4, # left
-        "from": "load"
-    },
+    # {
+    #     "name": "username",
+    #     "classes": ["form-control.g-input"],
+    #     "text": [],
+    #     "id": []
+    # },
     # email
     {
         "name": "email",
         "classes": ["form-control.g-input"],
         "text": [],
-        "id": [],
-        "tabIndex": 3, # left
-        "from": "load"
+        "id": []
     },
     # connect other onlyfans accounts username enter area
     # BLANK
@@ -127,27 +117,21 @@ ELEMENTS = [
         "name": "password",
         "classes": ["form-control.g-input"],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # password 2x
     {
         "name": "newPassword",
         "classes": ["form-control.g-input"],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # confirm new password
     {
         "name": "confirmPassword",
         "classes": ["form-control.g-input"],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
 
     ## Messaging
@@ -218,105 +202,88 @@ ELEMENTS = [
 
     ## Notifications
     # push notifications
-    # BLANK
+    {
+        "name": "pushNotifs",
+        "classes": [],
+        "text": ["push-notifications"],
+        "id": []
+    },
     # email notifications
     {
         "name": "emailNotifs",
-        "classes": [None],
-        "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "classes": [],
+        "text": ["email-notifications"],
+        "id": []
     },
     # new referral email
     {
         "name": "emailNotifsReferral",
-        "classes": [None],
+        "classes": ["b-input-radio"],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # new stream email
     {
         "name": "emailNotifsStream",
         "classes": ["b-input-radio"],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # new subscriber email
     {
         "name": "emailNotifsSubscriber",
         "classes": ["b-input-radio"],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # new tip email
     {
         "name": "emailNotifsSubscriber",
         "classes": ["b-input-radio"],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # new renewal email
     {
         "name": "emailNotifsSubscriber",
         "classes": ["b-input-radio"],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
 
     {
         "name": "emailNotifsTip",
         "classes": ["b-input-radio"],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     #
     {
         "name": "emailNotifsRenewal",
         "classes": ["b-input-radio"],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # new likes summary
     {
         "name": "emailNotifsLikes",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # new posts summary
     {
         "name": "emailNotifsPosts",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # new private message summary
     {
         "name": "emailNotifsPrivMessages",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # telegram bot button
     # BLANK
@@ -325,90 +292,70 @@ ELEMENTS = [
         "name": "siteNotifs",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # new comment notification
     {
         "name": "siteNotifsComment",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # new favorite notification
     {
         "name": "siteNotifsFavorite",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # discounts from users i've used to follow notification
     {
         "name": "siteNotifsDiscounts",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # new subscriber notification
     {
         "name": "siteNotifsSubscriber",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # new tip notification
     {
         "name": "siteNotifsTip",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # toast notification new comment
     {
         "name": "toastNotifsComment",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # toast notification new favorite
     {
         "name": "toastNotifsFavorite",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # toast notification new subscriber
     {
         "name": "toastNotifsSubscriber",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # toast notification new tip
     {
         "name": "toastNotifsTip",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
 
     ## Security
@@ -420,90 +367,70 @@ ELEMENTS = [
         "name": "fullyPrivate",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # enable comments
     {
         "name": "enableComments",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # show fans count on profile
     {
         "name": "showFansCount",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # show posts tips summary
     {
         "name": "showPostsTip",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # public friends list
     {
         "name": "publicFriendsList",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # geo blocking
     {
         "name": "ipCountry",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": 4, # left
-        "from": "load"
+        "id": []
     },
     # ip blocking
     {
         "name": "ipIP",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": 3, # left
-        "from": "load"
+        "id": []
     },
     # watermarks photos
     {
         "name": "watermarkPhoto",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # watermarks video
     {
         "name": "watermarkVideo",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # watermarks text
     {
         "name": "watermarkText",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": 2,
-        "from": "load"
+        "id": []
     },
     ####### save changes may be the same for each
     ## Story
@@ -512,18 +439,14 @@ ELEMENTS = [
         "name": "storyAllowRepliesNobody",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     # allow message replies - subscribers
     {
         "name": "storyAllowRepliesSubscribers",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None,
-        "from": "load"
+        "id": []
     },
     ## Other
     # obs server
@@ -531,44 +454,93 @@ ELEMENTS = [
         "name": "liveServer",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": 12, # left
-        "from": "load"
+        "id": []
     },
     # obs key
     {
         "name": "liveServerKey",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": 11, # left
-        "from": "load"
+        "id": []
     },
     # welcome chat message toggle
     {
         "name": "welcomeMessageToggle",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": 10, 
-        "from": "load"
+        "id": []
     },
     # then same pattern for message enter text or add stuff and price
     {
         "name": "welcomeMessageText",
         "classes": [None],
         "text": [],
-        "id": [],
-        "tabIndex": None, # lefts
-        "from": "load"
+        "id": []
     },
     # save button for welcome chat message
     {
         "name": "welcomeMessageSave",
         "classes": [None],
         "text": [],
+        "id": []
+    },
+    {
+        "name": "profileSave",
+        "classes": ["g-btn.m-rounded"],
+        "text": ["Save changes"],
         "id": [],
-        "tabIndex": None, # left
-        "from": "load"
     }
+
 ]
+
+
+# # working
+# username
+# displayName
+# about
+# location
+# websiteURL
+
+# # sorta working
+# coverImage
+# profilePhoto
+# password
+# newPassword
+# confirmPassword
+
+# # all the notifs are probably false positives
+# # are all b.input radio should maybe nth one found
+# emailNotifsReferral
+# emailNotifsStream
+# emailNotifsSubscriber
+# emailNotifsTip
+# emailNotifsRenewal
+
+# ########################
+# email
+# emailNotifs
+# emailNotifsPosts
+# emailNotifsPrivMessages
+# siteNotifs
+# siteNotifsComment
+# siteNotifsFavorite
+# siteNotifsDiscounts
+# siteNotifsSubscriber
+# siteNotifsTip
+# toastNotifsComment
+# toastNotifsSubscriber
+# toastNotifsTip
+# fullyPrivate
+# enableComments
+# showFansCount
+# showPostsTip
+# publicFriendsList
+# ipCountry
+# ipIP
+# watermarkPhoto
+# watermarkVideo
+# watermarkText
+# liveServer
+# liveServerKey
+# welcomeMessageToggle
+# welcomeMessageText
