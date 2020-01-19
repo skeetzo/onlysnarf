@@ -276,10 +276,11 @@
   - updated menu.md
   **2.16.1**
   - fixed: browser closes now
-
-----------------------------------------
   **2.16.2**
   - more Settings integration
+  - updated method of messaging all, recent, favorite
+
+----------------------------------------
 
   **2.17.0**
   - added: Settings options

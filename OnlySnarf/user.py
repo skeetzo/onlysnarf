@@ -83,6 +83,32 @@ class User:
             settings.maybePrint(e)
             return False
 
+    @staticmethod
+    def enter_message(Driver, message="", path=None, price=None):
+        try:
+            print("Entering Message: {} - ${}".format(message, price))
+            success = Driver.message_text(message)
+            if not success: return False
+            if price:
+                global PRICE_MINIMUM
+                if path != None and Decimal(sub(r'[^\d.]', '', price)) < PRICE_MINIMUM:
+                    print("Warning: Price Too Low, Free Media")
+                    print("Price Minimum: ${}".format(PRICE_MINIMUM))
+                else:
+                    success = Driver.message_price(price)
+                    if not success: return False
+            if path:
+                success = Driver.message_image(path)
+                if not success: return False
+            settings.debug_delay_check()
+            success = Driver.message_confirm()
+            if not success: return False
+            print("Message Entered")
+            return True
+        except Exception as e:
+            settings.maybePrint(e)
+            return False
+
     def equals(self, user):
         # print(str(user.username)+" == "+str(self.username))
         if user.username == self.username:
@@ -145,6 +171,19 @@ class User:
     def unfavor(self):
         print("Unfavoring: {}".format(self.username))
         self.isFavorite = False
+
+    @staticmethod
+    def message(Driver, user=None, message="", path=None, price=None):
+        if not user: return print("User Error: Missing Message User")
+        print("Messaging: {}".format(user))
+        successful = False
+        if isinstance(user, User): successful = Driver.message_user(user)
+        elif user in ["all","recent","favorite"]: successful = Driver.message(user)
+        else: print("User Error: Missing Message Type")
+        if not successful: return False
+        successful = User.enter_message(Driver, message, path, price)
+        if not successful: return False
+        print("Messaged: {}".format(user))
 
     @staticmethod
     def get_all_users(Driver):

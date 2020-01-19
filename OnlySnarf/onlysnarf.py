@@ -74,38 +74,17 @@ class OnlySnarf:
     ###################
 
     def message(self, choice, message=None, image=None, price=None, username=None):
-        users = []
-        if str(choice) == "all":
-            print("Messaging: All")
-            users = User.get_all_users(self.driver)
-        elif str(choice) == "recent":
-            print("Messaging: Recent")
-            users = User.get_recent_users(self.driver)
-        elif str(choice) == "favorites":
-            print("Messaging: Recent")
-            users = User.get_favorite_users(self.driver)
-        elif str(choice) == "new":
-            print("Messaging: New")
-            users = User.get_new_users(self.driver)
-        elif str(choice) == "user":
-            print("Messaging: User - {}".format(username))
-            if username is None:
-                print("Error: Missing Username")
-                return
-            user = User.get_user_by_username(self.driver, str(username))
-            if user is None: return False
-            users = [user]
-            settings.maybePrint("User Found: {}".format(username))
-        else:
-            print("Error: Missing Message Choice")
-            return
         if image == None and str(settings.METHOD) == "random":
+            images = []
             if str(settings.TYPE) == "image":
                 images = Google.get_images()
             elif str(settings.TYPE) == "gallery":
                 images = Google.get_galleries()
             elif str(settings.TYPE) == "video":
                 images = Google.get_videos()
+            else: 
+                print("Error: Missing Type")
+                return False
             # if str(settings.TYPE) == "image" or str(settings.TYPE) == "None": 
             image = random.choice(images)
             if str(settings.TYPE) == "gallery":
@@ -119,21 +98,31 @@ class OnlySnarf:
                 image = Google.download_gallery(image[1]).get("path")
             else:
                 image = Google.download_file(image[1]).get("path")
-        success = False
-        backup = False
-        if len(users) == 0: print("Warning: No Users Found")
-        for user in users:
-            if user:
-                try:
-                    success = user.sendMessage(self.driver, message=message, image=image, price=price)
-                    if not success: print("Error: There was an error messaging - {}/{}".format(user.id, user.username))
-                    if success: backup = True
-                except Exception as e:
-                    settings.maybePrint(e)
-        if backup:
-            Google.upload_input(image)
+        successful = False
+        if str(choice) == "all":
+            print("Messaging: All")
+            successful = User.message(self.driver, "all", message, image, price)
+        elif str(choice) == "recent":
+            print("Messaging: Recent")
+            successful = User.message(self.driver, "recent", message, image, price)
+        elif str(choice) == "favorites":
+            print("Messaging: Recent")
+            successful = User.message(self.driver, "favorite", message, image, price)
+        elif str(choice) == "user":
+            print("Messaging: User - {}".format(username))
+            if username is None:
+                print("Error: Missing Username")
+                return
+            user = User.get_user_by_username(self.driver, str(username))
+            if user is None: return False
+            settings.maybePrint("User Found: {}".format(username))
+            successful = User.message(self.driver, user, message, image, price)
+        else:
+            print("Error: Missing Message Option")
+            return
+        if successful: Google.upload_input(image)
         self.exit()
-        return success
+        return successful
                 
     ################
     ##### Post #####
@@ -370,8 +359,8 @@ class OnlySnarf:
 
         print('TESTING: Settings - Get')
         response = self.driver.settings_get_all()
-
         return True
+
 
         print('TESTING: Users')
         response = get_users()
