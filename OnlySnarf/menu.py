@@ -18,13 +18,13 @@ from OnlySnarf.settings import SETTINGS as settings
 # from OnlySnarf import OnlySnarf
 from OnlySnarf import google as Google
 from OnlySnarf import cron as Cron
-from OnlySnarf.onlysnarf import OnlySnarf
+from OnlySnarf.onlysnarf import Snarf
 
 ###################
 ##### Globals #####
 ###################
 
-snarf = OnlySnarf()
+snarf = Snarf()
 
 version = str(pkg_resources.get_distribution("onlysnarf").version)
 header = "\n ________         .__          _________                     _____ \n \

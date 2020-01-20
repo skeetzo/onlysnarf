@@ -26,7 +26,7 @@ FIFTY_MEGABYTES = 50000000
 ##### OnlySnarf #####
 #####################
 
-class OnlySnarf:
+class Snarf:
 
     def __init__(self):
         self.driver = Driver()
@@ -385,7 +385,7 @@ def main():
             settings.remove_local()
         sys.stdout.flush()
         ##
-        snarf = OnlySnarf()
+        snarf = Snarf()
         ##
         print("1/3 : Running - {}".format(settings.ACTION))
         ## Actions
