@@ -281,6 +281,7 @@
   - updated method of messaging all, recent, favorite
 
 ----------------------------------------
+  - OnlySnarf classname -> Snarf
 
   **2.17.0**
   - added: Settings options
