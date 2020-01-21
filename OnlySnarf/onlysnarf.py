@@ -13,6 +13,7 @@ import time
 from OnlySnarf import google as Google
 from OnlySnarf import cron as Cron
 from OnlySnarf.driver import Driver
+from OnlySnarf.profile import Profile
 from OnlySnarf.settings import SETTINGS as settings
 from OnlySnarf.user import User
 
@@ -30,6 +31,7 @@ class Snarf:
 
     def __init__(self):
         self.driver = Driver()
+        self.profile = Profile({})
 
     ####################
     ##### Discount #####

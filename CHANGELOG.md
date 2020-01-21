@@ -285,6 +285,11 @@
 
 ----------------------------------------
 
+  **2.16.**
+  - tested: settings get
+  - tested: settings set
+  - Settings options functional
+
   **2.17.0**
   - added: Settings options
 
