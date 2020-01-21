@@ -188,6 +188,73 @@ class Driver:
             settings.devPrint("### Discount Failure ###")
             return False
 
+    def discount_user_directly(self, user, expiration=10, duration=1, message=""):
+        auth_ = self.auth()
+        if not auth_: return False
+
+        if int(expiration) > 30:
+            print("Warning: Expiration Too High, Max -> 30 days")
+            discount = 55
+        elif int(duration) < 7:
+            print("Warning: Duration Too High, Max -> 7 days")
+
+        try:
+            settings.maybePrint("goto -> /{}".format(user.username))
+            self.browser.get("{}/{}".format(ONLYFANS_HOME_URL, user.username))
+    
+            # click discount button
+            self.get_element_to_click("discountUser").click()
+            # enter expiration
+            expirations = self.find_element_by_name("promotionalTrialExpirationUser")
+            # enter duration
+            durations = self.find_element_by_name("promotionalTrialDurationUser")
+            # enter message
+            message = self.find_element_by_name("promotionalTrialMessageUser")
+            # save
+
+            settings.devPrint("entering expiration")
+            for n in range(11):
+                expirations.send_keys(str(Keys.UP))
+            for n in range(round(int(discount)/5)-1):
+                expirations.send_keys(Keys.DOWN)
+            settings.devPrint("entered expiration")
+            settings.devPrint("entering duration")
+            for n in range(11):
+                durations.send_keys(str(Keys.UP))
+            for n in range(int(months)-1):
+                durations.send_keys(Keys.DOWN)
+            settings.devPrint("entered duration")
+            settings.debug_delay_check()
+
+            settings.devPrint("entering message")
+            message.clear()
+            message.send_keys(message)
+            settings.devPrint("entered message")
+
+            settings.devPrint("applying discount")
+            save = self.find_element_by_name("promotionalTrialApply")
+
+            if str(settings.DEBUG) == "True":
+                self.find_element_by_name("promotionalTrialCancel").click()
+                print("Skipping: Save Discount (Debug)")
+                settings.devPrint("### Discount Successfully Canceled ###")
+                cancel.click()
+                return True
+            save.click()
+            print("Discounted User: {}".format(user.username))
+            settings.devPrint("### User Discount Successful ###")
+            return True
+        except Exception as e:
+            Driver.error_checker(e)
+            try:
+                self.find_element_by_name("promotionalTrialCancel").click()
+                settings.devPrint("### Discount Successful Failure ###")
+                return False
+            except Exception as e:
+                self.driver.error_checker(e)
+            settings.devPrint("### Discount Failure ###")
+            return False
+
     def enter_text(self, text):
         try:
             settings.devPrint("finding text")
@@ -292,7 +359,7 @@ class Driver:
                 settings.devPrint("### Expiration Failure Failure")
             return False
 
-    ###################################
+    ######################################################################
 
     # should already be logged in
     def find_element_by_name(self, name):
@@ -378,7 +445,7 @@ class Driver:
             settings.devPrint("unable to find element - {}".format(className))
         raise Exception("Error Locating Element")
 
-    ###################################
+    ######################################################################
 
     def go_to_page(self, page):
         if self.browser == None: return False
@@ -847,43 +914,92 @@ class Driver:
     ######################
 
     # or email
-    def promotional_trial_link(self):
+    def promotional_trial_link(self, user, depth=0, limit=1, expiration=1, duration=1, tryAll=False):
         auth_ = self.auth()
         if not auth_: return False
         # go to onlyfans.com/my/subscribers/active
         try:
             settings.maybePrint("goto -> /my/promotions")
             self.browser.get(('https://onlyfans.com/my/promotions'))
-            trial = self.browser.find_elements_by_class_name("g-btn.m-rounded.m-sm")[0].click()
-            create = self.browser.find_elements_by_class_name("g-btn.m-rounded")
-            for i in range(len(create)):
-                if create[i].get_attribute("innerHTML").strip() == "Create":
-                    create[i].click()
-                    break
 
-            # copy to clipboard? email to user by email?
-            # count number of links
-            # div class="b-users__item.m-fans"
-            trials = self.browser.find_elements_by_class_name("b-users__item.m-fans")
-            # print("trials")
-            # find last one in list of trial link buttons
-            # button class="g-btn m-sm m-rounded" Copy trial link
-            # trials = self.browser.find_elements_by_class_name("g-btn.m-sm.m-rounded")
-            # print("trials: "+str(len(trials)))
-            # trials[len(trials)-1].click()
-            # for i in range(len(create)):
-            #     print(create[i].get_attribute("innerHTML"))
-           
-            # find the css for the email / user
-            # which there isn't, so, create a 1 person limited 7 day trial and send it to their email
-            # add a fucking emailing capacity
-            # send it
-            link = "https://onlyfans.com/action/trial/$number"
-            return link
+            settings.devPrint("creating promotional trial")
+            self.get_element_to_click("promotionalTrial").click()
+
+            # limit dropdown
+            settings.devPrint("setting trial count")
+            limitDropwdown = self.find_element_by_name("promotionalTrialCount")
+            for n in range(11): # 11 max subscription limits
+                limitDropwdown.send_keys(str(Keys.UP))
+            settings.debug_delay_check()
+            if int(limit) == 99: limit = 1
+            for n in range(int(limit)-1):
+                limitDropwdown.send_keys(Keys.DOWN)
+
+            settings.debug_delay_check()
+
+            # expiration dropdown
+            settings.devPrint("settings trial expiration")
+            expirationDropdown = self.find_element_by_name("promotionalTrialExpiration")
+            for n in range(11): # 31 max days
+                expirationDropdown.send_keys(str(Keys.UP))
+            settings.debug_delay_check()
+            if int(expiration) == 99: expiration = 1
+            for n in range(int(expiration)-1):
+                expirationDropdown.send_keys(Keys.DOWN)
+
+            settings.debug_delay_check()
+
+            # duration dropdown
+            settings.devPrint("settings trial duration")
+            durationDropwdown = self.find_element_by_name("promotionalTrialDuration")
+            for n in range(11): # 32 max duration
+                durationDropwdown.send_keys(str(Keys.UP))
+            settings.debug_delay_check()
+            if int(duration) == 99: duration = 1
+            for n in range(int(duration)-1):
+                durationDropwdown.send_keys(Keys.DOWN)
+
+            settings.debug_delay_check()
+
+            # find and click promotionalTrialConfirm
+            if str(settings.DEBUG) == "True":
+                settings.devPrint("finding trial cancel")
+                self.get_element_to_click("promotionalTrialCancel").click()
+                print("Skipping: Promotion (debug)")
+                settings.devPrint("Successful trial cancellation")
+                return True
+            settings.devPrint("finding trial save")
+            save_ = self.get_element_to_click("promotionalTrialConfirm")
+            settings.devPrint("saving promotion")
+            save_.click()
+            settings.devPrint("promotion saved")
+            settings.devPrint("copying trial link")
+            self.find_element_by_name("promotionalTrialLink").click()
+            settings.devPrint("copied trial link")
+
+            # go to /home
+            # enter copied paste into new post
+            # get text in new post
+            # email link to user
+            
+            # Actions actions = new Actions(self.driver);
+            # actions.sendKeys(Keys.chord(Keys.LEFT_CONTROL, "v")).build().perform();
+            # sendemail(from_addr    = 'python@RC.net', 
+            #   to_addr_list = ['RC@gmail.com'],
+            #   cc_addr_list = ['RC@xx.co.uk'], 
+            #   subject      = 'Howdy', 
+            #   message      = 'Howdy from a python function', 
+            #   login        = 'pythonuser', 
+            #   password     = 'XXXXX')
+
+            settings.devPrint("Successful Promotion")
+            return True
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to Apply Promotion")
             return None
+
+    ######################################################################
 
     def read_user_messages(self, user):
         try:
@@ -1490,5 +1606,21 @@ class Driver:
 
 
 
-
-    
+import smtplib
+ 
+def sendemail(from_addr, to_addr_list, cc_addr_list,
+              subject, message,
+              login, password,
+              smtpserver='smtp.gmail.com:587'):
+    header  = 'From: %s\n' % from_addr
+    header += 'To: %s\n' % ','.join(to_addr_list)
+    header += 'Cc: %s\n' % ','.join(cc_addr_list)
+    header += 'Subject: %s\n\n' % subject
+    message = header + message
+ 
+    server = smtplib.SMTP(smtpserver)
+    server.starttls()
+    server.login(login,password)
+    problems = server.sendmail(from_addr, to_addr_list, message)
+    server.quit()
+    return problems
