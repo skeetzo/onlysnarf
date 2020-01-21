@@ -279,9 +279,11 @@
   **2.16.2**
   - more Settings integration
   - updated method of messaging all, recent, favorite
+  **2.16.3**
+  - OnlySnarf classname -> Snarf
+  - updated profile init
 
 ----------------------------------------
-  - OnlySnarf classname -> Snarf
 
   **2.17.0**
   - added: Settings options
