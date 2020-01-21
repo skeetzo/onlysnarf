@@ -8,96 +8,96 @@ class Profile:
     # profile settings are either:
     #   enabled or disabled
     #   display text, variable type, variable name in settings
-    def __init__(self):
+    def __init__(self, data):
         # url path or file upload
-        self.coverImage = None
+        self.coverImage =  data.get("coverImage") or None
         # url path or file upload
-        self.profilePhoto = None
+        self.profilePhoto = data.get("profilePhoto") or None
         # text
-        self.displayName = ""
+        self.displayName = data.get("displayName") or ""
         # text in $
         # minimum $4.99 or free
-        self.subscriptionPrice = "4.99"
+        self.subscriptionPrice = data.get("subscriptionPrice") or "4.99"
         # text
-        self.about = ""
+        self.about = data.get("about") or ""
         # text
-        self.location = ""
+        self.location = data.get("location") or ""
         # text as url
-        self.websiteURL = None
+        self.websiteURL = data.get("websiteURL") or None
         # text
-        self.username = ""
+        self.username = data.get("username") or ""
         # text, can't be changed
-        self.email = ""
+        self.email = data.get("email") or ""
         # text
-        self.password = ""
+        self.password = data.get("password") or ""
         # enabled or disabled
-        self.emailNotifs = False
+        self.emailNotifs = data.get("emailNotifs") or False
         # enabled or disabled
-        self.emailNotifsNewReferral = False
+        self.emailNotifsNewReferral = data.get("emailNotifsNewReferral") or False
         # enabled or disabled
-        self.emailNotifsNewStream = False
+        self.emailNotifsNewStream = data.get("emailNotifsNewStream") or False
         # enabled or disabled
-        self.emailNotifsNewSubscriber = False
+        self.emailNotifsNewSubscriber = data.get("emailNotifsNewSubscriber") or False
         # enabled or disabled
-        self.emailNotifsNewTip = False
+        self.emailNotifsNewTip = data.get("emailNotifsNewTip") or False
         # enabled or disabled
-        self.emailNotifsRenewal = False
+        self.emailNotifsRenewal = data.get("emailNotifsRenewal") or False
         # enabled or disabled
-        self.emailNotifsNewLikes = False
+        self.emailNotifsNewLikes = data.get("emailNotifsNewLikes") or False
         # enabled or disabled
-        self.emailNotifsNewPosts = False
+        self.emailNotifsNewPosts = data.get("emailNotifsNewPosts") or False
         # enabled or disabled
-        self.emailNotifsNewPrivMessages = False
+        self.emailNotifsNewPrivMessages = data.get("emailNotifsNewPrivMessages") or False
         # enabled or disabled
-        self.siteNotifs = False
+        self.siteNotifs = data.get("siteNotifs") or False
         # enabled or disabled
-        self.siteNotifsNewComment = False
+        self.siteNotifsNewComment = data.get("siteNotifsNewComment") or False
         # enabled or disabled
-        self.siteNotifsNewFavorite = False
+        self.siteNotifsNewFavorite = data.get("siteNotifsNewFavorite") or False
         # enabled or disabled
-        self.siteNotifsDiscounts = False
+        self.siteNotifsDiscounts = data.get("siteNotifsDiscounts") or False
         # enabled or disabled
-        self.siteNotifsNewSubscriber = False
+        self.siteNotifsNewSubscriber = data.get("siteNotifsNewSubscriber") or False
         # enabled or disabled
-        self.siteNotifsNewTip = False
+        self.siteNotifsNewTip = data.get("siteNotifsNewTip") or False
         # enabled or disabled
-        self.toastNotifs = False
+        self.toastNotifs = data.get("toastNotifs") or False
         # enabled or disabled
-        self.toastNotifsNewComment = False
+        self.toastNotifsNewComment = data.get("toastNotifsNewComment") or False
         # enabled or disabled
-        self.toastNotifsNewFavorite = False
+        self.toastNotifsNewFavorite = data.get("toastNotifsNewFavorite") or False
         # enabled or disabled
-        self.toastNotifsNewSubscriber = False
+        self.toastNotifsNewSubscriber = data.get("toastNotifsNewSubscriber") or False
         # enabled or disabled
-        self.toastNotifsNewTip = False
+        self.toastNotifsNewTip = data.get("toastNotifsNewTip") or False
         # enabled or disabled
-        self.fullyPrivate = False
+        self.fullyPrivate = data.get("fullyPrivate") or False
         # enabled or disabled
-        self.enableComments = False
+        self.enableComments = data.get("enableComments") or False
         # enabled or disabled
-        self.showFansCount = False
+        self.showFansCount = data.get("showFansCount") or False
         # enabled or disabled
-        self.showPostsTip = False
+        self.showPostsTip = data.get("showPostsTip") or False
         # enabled or disabled
-        self.publicFriendsList = False
+        self.publicFriendsList = data.get("publicFriendsList") or False
         # selection of countries
-        self.ipCountry = Profile.get_country_list()
+        self.ipCountry = data.get("ipCountry") or Profile.get_country_list()
         # text of ip ranges
-        self.ipIP = ""
+        self.ipIP = data.get("ipIP") or ""
         # enabled or disabled
-        self.watermark = True
+        self.watermark = data.get("watermark") or True
         # enabled or disabled
-        self.watermarkPhoto = False
+        self.watermarkPhoto = data.get("watermarkPhoto") or False
         # enabled or disabled
-        self.watermarkVideo = False
+        self.watermarkVideo = data.get("watermarkVideo") or False
         # the custom watermark text
-        self.watermarkText = ""
-        if self.username and str(self.username) != "":
+        self.watermarkText = data.get("watermarkText") or ""
+        if self.username and str(self.username) != "" and self.watermarkText == "":
             self.watermarkText = "OnlyFans.com/{}".format(self.username)
         # the obs live server
-        self.liveServer = ""
+        self.liveServer = data.get("liveServer") or ""
         # the obs live server key
-        self.liveServerKey = ""
+        self.liveServerKey = data.get("liveServerKey") or ""
 
     def __getitem__(self, key):
         return getattr(self, key)
