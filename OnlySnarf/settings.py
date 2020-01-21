@@ -7,7 +7,6 @@ import json
 import pkg_resources
 import shutil
 import time
-from OnlySnarf.profile import Profile
 
 class Settings:
     def __init__(self):
@@ -196,7 +195,7 @@ class Settings:
 
         ##
         # profile settings for the account
-        self.PROFILE = Profile()
+        self.PROFILE = None
 
         ###
         ### PATHS ###

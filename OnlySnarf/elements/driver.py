@@ -386,8 +386,14 @@ ELEMENTS = [
         "id": [],
     },
     {
+        "name": "userOptions",
+        "classes": ["btn.dropdown-toggle.btn-link"],
+        "text": [],
+        "id": ["__BVID__56__BV_toggle_"],
+    },
+    {
         "name": "discountUser",
-        "classes": [],
+        "classes": ["button"],
         "text": ["Give user a discount"],
         "id": [],
     },
@@ -396,7 +402,7 @@ ELEMENTS = [
         "name": "promotionalTrialExpirationUser",
         "classes": [],
         "text": [],
-        "id": ["trial-expire-select "],
+        "id": ["trial-expire-select"],
     },
     {
         "name": "promotionalTrialDurationUser",
