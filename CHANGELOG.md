@@ -282,6 +282,8 @@
   **2.16.3**
   - OnlySnarf classname -> Snarf
   - updated profile init
+  **2.16.4**
+  - minor bugs
 
 ----------------------------------------
 
