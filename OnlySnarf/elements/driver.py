@@ -342,6 +342,86 @@ ELEMENTS = [
         "classes": ["g-btn__text"],
         "text": ["FAVORITE"],
         "id": [],
+    },
+    {
+        "name": "promotionalTrial",
+        "classes": ["g.btn.m-rounded.m-sm"],
+        "text": ["Create new trial link"],
+        "id": [],
+    },
+    {
+        "name": "promotionalTrialCount",
+        "classes": [],
+        "text": [],
+        "id": ["trial-count-select"],
+    },
+    {
+        "name": "promotionalTrialExpiration",
+        "classes": [],
+        "text": [],
+        "id": ["trial-expiration-select"],
+    },
+    {
+        "name": "promotionalTrialDuration",
+        "classes": [],
+        "text": [],
+        "id": ["promo-campaign-period-select"],
+    },
+    {
+        "name": "promotionalTrialConfirm",
+        "classes": ["g-btn.m-rounded"],
+        "text": ["Create"],
+        "id": [],
+    },
+    {
+        "name": "promotionalTrialCancel",
+        "classes": ["g-btn.m-rounded.m-border"],
+        "text": ["Cancel"],
+        "id": [],
+    },
+    {
+        "name": "promotionalTrialLink",
+        "classes": ["g.btn.m-rounded"],
+        "text": ["Copy trial link"],
+        "id": [],
+    },
+    {
+        "name": "discountUser",
+        "classes": [],
+        "text": ["Give user a discount"],
+        "id": [],
+    },
+
+    {
+        "name": "promotionalTrialExpirationUser",
+        "classes": [],
+        "text": [],
+        "id": ["trial-expire-select "],
+    },
+    {
+        "name": "promotionalTrialDurationUser",
+        "classes": [],
+        "text": [],
+        "id": ["trial-period-select"],
+    },
+    {
+        "name": "promotionalTrialMessageUser",
+        "classes": ["form-control.g-input"],
+        "text": [],
+        "id": [],
+    },
+    {
+        "name": "promotionalTrialApply",
+        "classes": ["g-btn.m-rounded"],
+        "text": ["Apply"],
+        "id": [],
+    },
+    {
+        "name": "promotionalTrialCancel",
+        "classes": ["g-btn.m-rounded.m-border"],
+        "text": ["Cancel"],
+        "id": [],
     }
+
 
 ]
