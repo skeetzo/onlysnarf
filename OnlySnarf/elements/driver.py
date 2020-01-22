@@ -427,6 +427,12 @@ ELEMENTS = [
         "classes": ["g-btn.m-rounded.m-border"],
         "text": ["Cancel"],
         "id": [],
+    },
+    {
+        "name": "numberOfPosts",
+        "classes": ["b-profile__actions__count"],
+        "text": [],
+        "id": [],
     }
 
 
