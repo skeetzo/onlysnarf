@@ -503,18 +503,21 @@ class Driver:
         if str(settings.SHOW_WINDOW) != "True":
             options.add_argument('--headless')
             #
-            options.add_argument('--disable-gpu')
             options.add_argument('--disable-smooth-scrolling')
             options.add_argument('--disable-software-rasterizer')
+            options.add_argument("disable-infobars") # disabling infobars
+            options.add_argument("--disable-extensions") # disabling extensions
+            options.add_argument("--disable-gpu") # applicable to windows os only
         #
         options.add_argument('--disable-login-animations')
         options.add_argument('--disable-modal-animations')
         options.add_argument('--disable-sync')
-        options.add_argument('--incognito')
+        # options.add_argument('--incognito')
         options.add_argument('--user-agent=OnlySnarf')
         #
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument("--disable-dev-shm-usage") # overcome limited resource problems
+        options.add_argument("--no-sandbox") # Bypass OS security model
+
         # options.add_experimental_option("prefs", {
         #   "download.default_directory": str(settings.DOWNLOAD_PATH),
         #   "download.prompt_for_download": False,
