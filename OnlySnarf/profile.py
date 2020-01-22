@@ -10,7 +10,7 @@ class Profile:
     #   display text, variable type, variable name in settings
     # this is the absolute worst way to do this
     def __init__(self, data):
-        if not data: data = fill_data()
+        if not data: data = Profile.fill_data()
         # url path or file upload
         self.coverImage = data.get("coverImage") or None
         # url path or file upload
@@ -160,6 +160,60 @@ class Profile:
         except Exception as e:
             print(e)
 
+    
+    @staticmethod
+    def fill_data():
+        prof = {
+            "coverImage": None,
+            "profilePhoto": None,
+            "displayName": "",
+            "subscriptionPrice": "4.99",
+            "about": "",
+            "location": "",
+            "websiteURL": None,
+            "username": "",
+            "email": "",
+            "password": "",
+            "emailNotifs": False,
+            "emailNotifsNewReferral": False,
+            "emailNotifsNewStream": False,
+            "emailNotifsNewSubscriber": False,
+            "emailNotifsNewTip": False,
+            "emailNotifsRenewal": False,
+            "emailNotifsNewLikes": False,
+            "emailNotifsNewPosts": False,
+            "emailNotifsNewPrivMessages": False,
+            "siteNotifs": False,
+            "siteNotifsNewComment": False,
+            "siteNotifsNewFavorite": False,
+            "siteNotifsDiscounts": False,
+            "siteNotifsNewSubscriber": False,
+            "siteNotifsNewTip": False,
+            "toastNotifs": False,
+            "toastNotifsNewComment": False,
+            "toastNotifsNewFavorite": False,
+            "toastNotifsNewSubscriber": False,
+            "toastNotifsNewTip": False,
+            "fullyPrivate": False,
+            "enableComments": False,
+            "showFansCount": False,
+            "showPostsTip": False,
+            "publicFriendsList": False,
+            "ipCountry": Profile.get_country_list(),
+            "ipIP": "",
+            "watermark": True,
+            "watermarkPhoto": False,
+            "watermarkVideo": False,
+            "watermarkText": "",
+            "liveServer": "",
+            "liveServerKey": ""
+        }
+        if prof.get("username") and str(prof.get("username")) != "" and prof.get("watermarkText") == "":
+            prof.set("watermarkText", "OnlyFans.com/{}".format(prof.get("username")))
+        return prof
+
+
+
     # returns list of settings and their classes
     # ["settingVariableName","pageProfile","inputType-text"]
     
@@ -254,55 +308,4 @@ def get_settings_variables():
         ["welcomeMessageText","other","text"],
 
     ]
-
-
-def fill_data():
-    prof = {
-        "coverImage": None,
-        "profilePhoto": None,
-        "displayName": "",
-        "subscriptionPrice": "4.99",
-        "about": "",
-        "location": "",
-        "websiteURL": None,
-        "username": "",
-        "email": "",
-        "password": "",
-        "emailNotifs": False,
-        "emailNotifsNewReferral": False,
-        "emailNotifsNewStream": False,
-        "emailNotifsNewSubscriber": False,
-        "emailNotifsNewTip": False,
-        "emailNotifsRenewal": False,
-        "emailNotifsNewLikes": False,
-        "emailNotifsNewPosts": False,
-        "emailNotifsNewPrivMessages": False,
-        "siteNotifs": False,
-        "siteNotifsNewComment": False,
-        "siteNotifsNewFavorite": False,
-        "siteNotifsDiscounts": False,
-        "siteNotifsNewSubscriber": False,
-        "siteNotifsNewTip": False,
-        "toastNotifs": False,
-        "toastNotifsNewComment": False,
-        "toastNotifsNewFavorite": False,
-        "toastNotifsNewSubscriber": False,
-        "toastNotifsNewTip": False,
-        "fullyPrivate": False,
-        "enableComments": False,
-        "showFansCount": False,
-        "showPostsTip": False,
-        "publicFriendsList": False,
-        "ipCountry": Profile.get_country_list(),
-        "ipIP": "",
-        "watermark": True,
-        "watermarkPhoto": False,
-        "watermarkVideo": False,
-        "watermarkText": "",
-        "liveServer": "",
-        "liveServerKey": ""
-    }
-    if prof.get("username") and str(prof.get("username")) != "" and prof.get("watermarkText") == "":
-        prof.set("watermarkText", "OnlyFans.com/{}".format(prof.get("username")))
-    return prof
 
