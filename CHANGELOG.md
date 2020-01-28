@@ -284,7 +284,9 @@
   - updated profile init
   **2.16.4**
   - minor bugs
-
+  **2.16.5**
+  - updated BYKEYWORD and NOTKEYWORD -> str != str
+  
 ----------------------------------------
 
   **2.16.**
