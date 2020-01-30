@@ -648,16 +648,15 @@ class Driver:
             settings.devPrint("### Message Failure ###")
             return False
 
-    # this will be deleted
-    def message_image(self, path):
+    def message_files(self, path):
         try:
             if not path or path == None or str(path) == "None":
                 print("Error: Missing Image(s)")
                 return False
-            print("Enter image(s): {}".format(path))
+            print("Entering image(s): {}".format(path.get("path")))
             try:
                 settings.devPrint("uploading file")
-                self.upload_image_files(name="uploadImageMessage", path=path)
+                self.upload_image_files(name="uploadImageMessage", path=path.get("path"))
                 settings.maybePrint("Image(s) Entered")
                 settings.debug_delay_check()
                 return True
@@ -668,25 +667,6 @@ class Driver:
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failure to Enter Image(s)")
-            return False
-
-    def message_file(self, path):
-        try:
-            if not path or path == None or str(path) == "None":
-                print("Error: Missing File(s)")
-                return False
-            print("Uploading file(s): {}".format(path))
-            try:
-                self.upload_image_files(name="uploadImageMessage", path=path)
-                settings.debug_delay_check()
-                return True
-            except Exception as e:
-                Driver.error_checker(e)
-                print("Error: Unable to Upload File(s)")
-                return False
-        except Exception as e:
-            Driver.error_checker(e)
-            print("Error: Failure to Enter File(s)")
             return False
 
     def message_price(self, price):

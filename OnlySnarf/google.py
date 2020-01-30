@@ -664,7 +664,6 @@ def get_galleries():
     print('Galleries: '+str(len(galleries)))
     return galleries
 
-# this doesn't work
 def get_videos():
     checkAuth()
     print('Getting Videos')
@@ -675,7 +674,7 @@ def get_videos():
     folder_name = None
     if random_folders == None:
         print("Error: Unable to Connect to Google Drive")
-        return {}
+        return video_list
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
@@ -691,18 +690,8 @@ def get_videos():
             settings.maybePrint(" -> added")
         else:
             settings.maybePrint(" -> empty")
-    if len(video_list)==0:
-        print('Error: Missing Video File')
-        return {}
+    if len(video_list)==0: print('Warning: Missing Video File')
     return video_list
-    random_video = random.choice(video_list)
-    folder_name = random_video['title'];
-    print('Random Folder: '+random_video['title'])
-    random_video = PYDRIVE.ListFile({'q': "'"+random_video['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
-    random_video = random.choice(random_video)
-    print('Random Video: '+random_video['title'])
-    return {"file":random_video,"keywords":folder_name}
-
 
 # gets all the images in the messages folders
 def get_message_image(folderName):
@@ -739,7 +728,7 @@ def get_message_image(folderName):
     random_image = PYDRIVE.ListFile({'q': "'"+random_image['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
     random_image = random.choice(random_image)
     print('Messages Image: '+random_image['title'])
-    return {"file":random_image}
+    return {"file":random_image, "keywords":folder_name}
 
 # Downloads random image from Google Drive
 def get_random_image():

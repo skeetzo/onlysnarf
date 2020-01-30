@@ -66,7 +66,7 @@ class User:
                 if str(image_name) in self.sent_images:
                     print("Error: Image Already Sent: {} -> {}".format(image, self.id))
                     return False
-                success = Driver.message_image(image)
+                success = Driver.message_files(image)
                 if not success: return False
             if str(settings.DEBUG) == "True":
                 self.sent_images.append("DEBUG")
@@ -98,7 +98,7 @@ class User:
                     success = Driver.message_price(price)
                     if not success: return False
             if path:
-                success = Driver.message_image(path)
+                success = Driver.message_files(path)
                 if not success: return False
             settings.debug_delay_check()
             success = Driver.message_confirm()
