@@ -177,7 +177,7 @@ ELEMENTS = [
     # price add
     {
         "name": "priceClick",
-        "classes": ["b-chat__btn-set-price", "button.g-btn.m-rounded"],
+        "classes": ["g-btn.m-rounded"], # "b-chat__btn-set-price", "button.g-btn.m-rounded"
         "text": ["Save"],
         "id": []
     },

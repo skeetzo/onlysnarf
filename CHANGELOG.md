@@ -286,6 +286,9 @@
   - minor bugs
   **2.16.5**
   - updated BYKEYWORD and NOTKEYWORD -> str != str
+  **2.16.6**
+  - fixed: message all price submit
+  - fixed: random files now properly downloaded, again
   
 ----------------------------------------
 
