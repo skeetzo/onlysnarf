@@ -31,6 +31,7 @@ from OnlySnarf.profile import Profile
 
 ONLYFANS_HOME_URL = 'https://onlyfans.com'
 ONLYFANS_MESSAGES_URL = "{}/my/chats/".format(ONLYFANS_HOME_URL)
+ONLYFANS_NEW_MESSAGE_URL = "{}/my/chats/send".format(ONLYFANS_HOME_URL)
 ONLYFANS_CHAT_URL = "{}/my/chats/chat".format(ONLYFANS_HOME_URL)
 ONLYFANS_SETTINGS_URL = "{}/my/settings".format(ONLYFANS_HOME_URL)
 ONLYFANS_USERS_ACTIVE_URL = "{}/my/subscribers/active".format(ONLYFANS_HOME_URL)
@@ -449,7 +450,7 @@ class Driver:
 
     def go_to_page(self, page):
         if self.browser == None: return False
-        if str(self.browser.current_url) == str(page):
+        if str(self.browser.current_url) == str(page) or str(page) in str(self.browser.current_url):
             settings.maybePrint("at -> {}".format(page))
         else:
             settings.maybePrint("goto -> {}".format(page))
@@ -590,14 +591,14 @@ class Driver:
             auth_ = self.auth()
             if not auth_: return False
             # go to /message
-            settings.devPrint("going to /chats")
-            settings.maybePrint("goto -> /my/chats/")
-            self.browser.get(ONLYFANS_MESSAGES_URL)
-            settings.devPrint("ready for new message")
+            settings.devPrint("going to /my/chats/send")
+            settings.maybePrint("goto -> /my/chats/send")
+            self.browser.get(ONLYFANS_NEW_MESSAGE_URL)
+            # settings.devPrint("ready for new message")
             # click the new message
-            settings.devPrint("clicking new message")
-            self.get_element_to_click("newMessage").click()
-            settings.devPrint("clicked new message")
+            # settings.devPrint("clicking new message")
+            # self.get_element_to_click("newMessage").click()
+            # settings.devPrint("clicked new message")
             # click the message all
             type__ = "all" # default
             if str(type_) == "all": type__ = "messageAll"

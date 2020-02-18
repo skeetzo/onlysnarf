@@ -21,9 +21,9 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # sudo onlysnarf-config
 # sudo onlysnarfpy -debug -verbose -verboser -verbosest -action test
 # sudo onlysnarfpy -debug -verbose -show-window -type image -bykeyword "pussycats"
-sudo onlysnarfpy -action "message" -type "video" -method "all" -bykeyword "dailydick" -text "10 min of stroking" -price "3.69" -debug -verbose -verboser 
+sudo onlysnarfpy -action "message" -type image -bykeyword "pussycats" -method "all" -text "10 min of stroking" -price "3.69" -debug -verbose -verboser -verbosest -show-window
+# -method "input" -input "/opt/apps/onlysnarf/tmp/20200130_122808.mp4"
 # -show-window
-
 # sudo onlysnarfpy -debug -action post -text "shnarf!" -verbose -verboser -show-window
 
 # # Message
