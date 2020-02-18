@@ -289,6 +289,9 @@
   **2.16.6**
   - fixed: message all price submit
   - fixed: random files now properly downloaded, again
+  **2.16.7**
+  - fixed: messageAll
+  - fixed: go_to_page
   
 ----------------------------------------
 
