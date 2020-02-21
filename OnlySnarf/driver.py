@@ -57,6 +57,12 @@ POLL_INPUT_XPATH = "//input[@class='form-control']"
 REMEMBERME_CHECKBOX_XPATH = "//input[@id='remember']"
 DISCOUNT_USER_BUTTONS = "g-btn.m-rounded.m-border.m-sm"
 
+def print_same_line(text):
+    sys.stdout.write('\r')
+    sys.stdout.flush()
+    sys.stdout.write(text)
+    sys.stdout.flush()
+
 class Driver:
 
     def __init__(self):
@@ -97,6 +103,7 @@ class Driver:
             settings.devPrint("scrolling: {}".format(int(int(int(depth)/10)+1)))
             for n in range(int(int(int(depth)/10)+1)):
                 settings.maybePrint("scrolling...")
+                # print_same_line("({}/{}) scrolling...".format(n,int(int(int(num)/5)+1)))
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(1)
         except Exception as e:
@@ -191,7 +198,6 @@ class Driver:
     def discount_user_directly(self, user, expiration=10, duration=1, message=""):
         auth_ = self.auth()
         if not auth_: return False
-
         if int(expiration) > 30:
             print("Warning: Expiration Too High, Max -> 30 days")
             discount = 55
@@ -448,8 +454,9 @@ class Driver:
     ######################################################################
 
     def go_to_page(self, page):
-        if self.browser == None: return False
-        if str(self.browser.current_url) == str(page):
+        auth_ = self.auth()
+        if not auth_: return False
+        if str(self.browser.current_url) == str(url) or str(url) in str(self.browser.current_url):
             settings.maybePrint("at -> {}".format(page))
         else:
             settings.maybePrint("goto -> {}".format(page))
@@ -1505,6 +1512,7 @@ class Driver:
                 settings.maybePrint("User count: {}".format(num))
                 for n in range(int(int(int(num)/10)+1)):
                     settings.maybePrint("scrolling...")
+                    # print_same_line("({}/{}) scrolling...".format(n,int(int(int(num)/5)+1)))
                     self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                     time.sleep(1)
         except Exception as e:
