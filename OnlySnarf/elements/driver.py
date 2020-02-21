@@ -322,7 +322,8 @@ ELEMENTS = [
     {
         "name": "newMessage",
         "classes": ["g-page__header__btn.b-chats__btn-new.has-tooltip"],
-        "text": ["/my/chats/send"],
+        "text": [],
+        "href": ["/my/chats/send"],
         "id": [],
     },
     {
