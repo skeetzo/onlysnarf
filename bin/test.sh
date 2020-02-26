@@ -13,7 +13,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # sudo onlysnarfpy -debug -verbose -verboser -type gallery -debug-delay -show-window -skip-reduce
 
 # sudo onlysnarf -debug -verbose -show-window -debug-delay -prefer-local
-sudo onlysnarfpy -debug -verbose -verboser -verbosest -action test
+sudo onlysnarfpy -debug -verbose -verboser -verbosest -action test -show-window
 # sudo onlysnarfpy -debug -verbose -verboser -verbosest -action message -type image -method "all" -text "test pussy" -bykeyword "pussycats" -show-window
 # sudo onlysnarfpy -debug -verbose -verboser -verbosest -action message -method "recent" -text "test pussy" -bykeyword "pussycats" -show-window
 # sudo onlysnarfpy -debug -verbose -verboser -verbosest -action message -method "favorite" -text "test pussy" -bykeyword "pussycats" -show-window
