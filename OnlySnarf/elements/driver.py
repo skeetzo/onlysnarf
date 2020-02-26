@@ -83,7 +83,7 @@ ELEMENTS = [
     # show more options # unnecessary w/ tabbing
     {
         "name": "moreOptions",
-        "classes": ["g-btn.m-flat.b-make-post__more-btn", "button.g-btn.m-flat.b-make-post__more-btn"],
+        "classes": ["g-btn.m-flat.b-make-post__more-btn.has-tooltip", "g-btn.m-flat.b-make-post__more-btn", "button.g-btn.m-flat.b-make-post__more-btn"],
         "text": [],
         "id": []
     },
