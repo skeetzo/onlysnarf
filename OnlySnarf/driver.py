@@ -31,9 +31,12 @@ from OnlySnarf.profile import Profile
 
 ONLYFANS_HOME_URL = 'https://onlyfans.com'
 ONLYFANS_MESSAGES_URL = "{}/my/chats/".format(ONLYFANS_HOME_URL)
+ONLYFANS_NEW_MESSAGE_URL = "{}/my/chats/send".format(ONLYFANS_HOME_URL)
 ONLYFANS_CHAT_URL = "{}/my/chats/chat".format(ONLYFANS_HOME_URL)
 ONLYFANS_SETTINGS_URL = "{}/my/settings".format(ONLYFANS_HOME_URL)
 ONLYFANS_USERS_ACTIVE_URL = "{}/my/subscribers/active".format(ONLYFANS_HOME_URL)
+ONLYFANS_USERS_FOLLOWING_URL = "{}/my/subscriptions/active".format(ONLYFANS_HOME_URL)
+ONLYFANS_USERS_FOLLOWING_URL_SHORT = "/my/subscriptions/active"
 LOGIN_FORM = "b-loginreg__form"
 SEND_BUTTON_XPATH = "//button[@type='submit' and @class='g-btn m-rounded']"
 SEND_BUTTON_CLASS = "g-btn.m-rounded"
@@ -456,14 +459,15 @@ class Driver:
     def go_to_page(self, page):
         auth_ = self.auth()
         if not auth_: return False
-        if str(self.browser.current_url) == str(url) or str(url) in str(self.browser.current_url):
+        if str(self.browser.current_url) == str(page) or str(page) in str(self.browser.current_url):
             settings.maybePrint("at -> {}".format(page))
         else:
             settings.maybePrint("goto -> {}".format(page))
             self.browser.get("{}/{}".format(ONLYFANS_HOME_URL, page))
 
     def go_to_home(self):
-        if self.browser == None: return False
+        auth_ = self.auth()
+        if not auth_: return False
         if str(self.browser.current_url) == str(ONLYFANS_HOME_URL):
             settings.maybePrint("at -> onlyfans.com")
         else:
@@ -473,7 +477,8 @@ class Driver:
 
     # onlyfans.com/my/settings
     def go_to_settings(self, settingsTab):
-        if self.browser == None: return False
+        auth_ = self.auth()
+        if not auth_: return False
         if str(self.browser.current_url) == str(ONLYFANS_SETTINGS_URL) and str(settingsTab) == "profile":
             settings.maybePrint("at -> onlyfans.com/settings/{}".format(settingsTab))
         else:
@@ -576,7 +581,7 @@ class Driver:
                 print("OnlyFans Login Successful")
                 return True
             except TimeoutException as te:
-                settings.devPrint(te)
+                settings.devPrint(str(te))
                 print("Login Failure: Timed Out! Please check your Twitter credentials.")
                 print(": If the problem persists, OnlySnarf may require an update.")
             except Exception as e:
@@ -597,14 +602,14 @@ class Driver:
             auth_ = self.auth()
             if not auth_: return False
             # go to /message
-            settings.devPrint("going to /chats")
-            settings.maybePrint("goto -> /my/chats/")
-            self.browser.get(ONLYFANS_MESSAGES_URL)
-            settings.devPrint("ready for new message")
+            settings.devPrint("going to /my/chats/send")
+            settings.maybePrint("goto -> /my/chats/send")
+            self.browser.get(ONLYFANS_NEW_MESSAGE_URL)
+            # settings.devPrint("ready for new message")
             # click the new message
-            settings.devPrint("clicking new message")
-            self.get_element_to_click("newMessage").click()
-            settings.devPrint("clicked new message")
+            # settings.devPrint("clicking new message")
+            # self.get_element_to_click("newMessage").click()
+            # settings.devPrint("clicked new message")
             # click the message all
             type__ = "all" # default
             if str(type_) == "all": type__ = "messageAll"
@@ -655,16 +660,15 @@ class Driver:
             settings.devPrint("### Message Failure ###")
             return False
 
-    # this will be deleted
-    def message_image(self, path):
+    def message_files(self, path):
         try:
             if not path or path == None or str(path) == "None":
                 print("Error: Missing Image(s)")
                 return False
-            print("Enter image(s): {}".format(path))
+            print("Entering image(s): {}".format(path.get("path")))
             try:
                 settings.devPrint("uploading file")
-                self.upload_image_files(name="uploadImageMessage", path=path)
+                self.upload_image_files(name="uploadImageMessage", path=path.get("path"))
                 settings.maybePrint("Image(s) Entered")
                 settings.debug_delay_check()
                 return True
@@ -675,25 +679,6 @@ class Driver:
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failure to Enter Image(s)")
-            return False
-
-    def message_file(self, path):
-        try:
-            if not path or path == None or str(path) == "None":
-                print("Error: Missing File(s)")
-                return False
-            print("Uploading file(s): {}".format(path))
-            try:
-                self.upload_image_files(name="uploadImageMessage", path=path)
-                settings.debug_delay_check()
-                return True
-            except Exception as e:
-                Driver.error_checker(e)
-                print("Error: Unable to Upload File(s)")
-                return False
-        except Exception as e:
-            Driver.error_checker(e)
-            print("Error: Failure to Enter File(s)")
             return False
 
     def message_price(self, price):
@@ -1499,97 +1484,92 @@ class Driver:
     ##### Users #####
     #################
 
-    def users_get(self):
-        auth_ = self.auth()
-        if not auth_: return False
+    # returns list of accounts you follow
+    def following_get(self):
         try:
-            if str(self.browser.current_url) == str(ONLYFANS_USERS_ACTIVE_URL):
-                settings.maybePrint("at -> /my/subscribers/active")
-            else:
-                settings.maybePrint("goto -> /my/subscribers/active")
-                self.browser.get(ONLYFANS_USERS_ACTIVE_URL)
-                num = self.find_element_by_name("usersCount").get_attribute("innerHTML")
-                settings.maybePrint("User count: {}".format(num))
-                for n in range(int(int(int(num)/10)+1)):
-                    settings.maybePrint("scrolling...")
-                    # print_same_line("({}/{}) scrolling...".format(n,int(int(int(num)/5)+1)))
-                    self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                    time.sleep(1)
+            self.go_to_page(ONLYFANS_USERS_FOLLOWING_URL_SHORT)
+
+
+
+            count = 0
+
+
+            while True:
+                print("scrolling")
+                time.sleep(1)
+                try:
+                    user_ids = self.find_elements_by_name("usersIds")
+                    usernames = self.find_elements_by_name("usersUsernames")
+                    users = self.find_elements_by_name("usersUsers")
+                    print("{}  {}  {}".format(user_ids, usernames, users))
+                    if len(user_ids) == count: break
+                    count = len(user_ids)
+                except Exception as e:
+                    print(e)
+            
+            return []
+
+            num = self.find_element_by_name("followingCount").get_attribute("innerHTML")
+            num = num[num.find("Active"):].replace("Active","").replace("(","").replace(")","").strip()
+            settings.maybePrint("User count: {}".format(num))
+            for n in range(int(int(int(num)/10)+1)):
+                print_same_line("({}/{}) scrolling...".format(n,int(int(int(num)/5)+1)))
+                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(1)
+            print()
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to Find Users")
             return []
         # avatars = self.browser.find_elements_by_class_name('b-avatar')
-        user_ids = self.find_elements_by_name("usersIds")
-        starteds = self.find_elements_by_name("usersStarteds")
+        # user_ids = self.find_elements_by_name("usersIds")
+        user_ids = [ele for ele in self.browser.find_elements_by_tag_name("a")
+                    if str("/my/chats/chat") in str(ele.get_attribute("href"))]
+        # starteds = self.find_elements_by_name("usersStarteds")
+        starteds = []
         users = self.find_elements_by_name("usersUsers")
         usernames = self.find_elements_by_name("usersUsernames")
-        # usernames.pop(0)
-        # print("My User Id: {}".format(user_ids[0]))
-        # user_ids.pop(0)
-        active_users = []
-        settings.devPrint("user_ids: "+str(len(user_ids)))
-        settings.devPrint("starteds: "+str(len(starteds)))
-        useridsFailed = False
-        startedsFailed = False
-        if len(user_ids) == 0:
-            print("Warning: Unable to find user ids")
-            useridsFailed = True
-        if len(starteds) == 0:
-            print("Warning: Unable to find starting dates")
-            startedsFailed = True
-        users_ = []
-        try:
-            user_ids_ = []
-            starteds_ = []
-            for i in range(len(user_ids)):
-                if user_ids[i].get_attribute("href"):
-                    user_ids_.append(user_ids[i].get_attribute("href"))
-            for i in range(len(starteds)):
-                text = starteds[i].get_attribute("innerHTML")
-                match = re.findall("Started.*([A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4})", text)
-                if len(match) > 0:
-                    starteds_.append(match[0])
-            if len(user_ids_) == 0:
-                print("Warning: Unable to find user ids")
-                useridsFailed = True
-            if len(starteds_) == 0:
-                print("Warning: Unable to find starting dates")
-                startedsFailed = True
-            # settings.maybePrint("ids vs starteds vs avatars: "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(avatars)))
-            settings.maybePrint("users vs ids vs starteds vs usernames:"+str(len(users))+" - "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(usernames)))
-            # first 2 usernames are self
-            usernames.pop(0)
-            usernames.pop(0)
-            for i in range(len(users)): # the first is you and doesn't count towards total
-                try:
-                    if not startedsFailed:
-                        start = starteds_[i]
-                    else:
-                        start = datetime.now().strftime("%b %d, %Y")
-                    if not useridsFailed:
-                        user_id = user_ids_[i][35:] # cuts out initial chars instead of unwieldy regex
-                    else:
-                        user_id = None
-                    name = users[i]
-                    username = usernames[i]
-                    name = str(name.get_attribute("innerHTML")).strip()
-                    username = str(username.get_attribute("innerHTML")).strip()
-                    # settings.maybePrint("name: "+str(name))
-                    # settings.maybePrint("username: "+str(username))
-                    # settings.maybePrint("user_id: "+str(user_id))
-                    # if str(settings.USERNAME).lower() in str(username).lower():
-                    #     settings.maybePrint("(self): %s = %s" % (settings.USERNAME, username))
-                    #     # first user is always active user but just in case find it in list of users
-                    #     settings.USER_ID = username
-                    # else:
-                    users_.append({"name":name, "username":username, "id":user_id, "started":start})
-                except Exception as e:
-                    settings.maybePrint(e)
-        except Exception as e:
-            Driver.error_checker(e)
+        users_ = parse_users(user_ids, starteds, users, usernames)
         settings.maybePrint("Found: {}".format(len(users_)))
         return users_
+
+    # returns list of accounts that follow you
+    def users_get(self):
+        try:
+            self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
+            count = 0
+
+            # num = self.find_element_by_name("usersCount").get_attribute("innerHTML")
+            # settings.maybePrint("User count: {}".format(num))
+            # for n in range(int(int(int(num)/10)+1)):
+            while True:
+                # print_same_line("({}/{}) scrolling...".format(n,int(int(int(num)/5)+1)))
+                print("scrolling")
+                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(1)
+                try:
+                    # user_ids = self.find_elements_by_name("usersIds")
+                    # usernames = self.find_elements_by_name("usersUsernames")
+                    # users = self.find_elements_by_name("usersUsers")
+                    print("{}  {}  {}".format(user_ids, usernames, users))
+                except Exception as e:
+                    print(e)
+                    pass
+                # if count == len(users): break
+                # count = len(users)
+
+            # avatars = self.browser.find_elements_by_class_name('b-avatar')
+            user_ids = self.find_elements_by_name("usersIds")
+            starteds = self.find_elements_by_name("usersStarteds")
+            users = self.find_elements_by_name("usersUsers")
+            usernames = self.find_elements_by_name("usersUsernames")
+            users_ = parse_users(user_ids, starteds, users, usernames)
+            settings.maybePrint("Found: {}".format(len(users_)))
+            return users_
+        except Exception as e:
+            Driver.error_checker(e)
+            print("Error: Failed to Find Users")
+            return []
 
     ################
     ##### Exit #####
@@ -1612,12 +1592,105 @@ class Driver:
 
 
 
-
+def parse_users(user_ids, starteds, users, usernames):
+    # usernames.pop(0)
+    # print("My User Id: {}".format(user_ids[0]))
+    # user_ids.pop(0)
+    settings.devPrint("user_ids: "+str(len(user_ids)))
+    settings.devPrint("starteds: "+str(len(starteds)))
+    useridsFailed = False
+    startedsFailed = False
+    if len(user_ids) == 0:
+        print("Warning: Unable to find user ids")
+        useridsFailed = True
+    if len(starteds) == 0:
+        print("Warning: Unable to find starting dates")
+        startedsFailed = True
+    users_ = []
+    try:
+        user_ids_ = []
+        starteds_ = []
+        for i in range(len(user_ids)):
+            if user_ids[i].get_attribute("href"):
+                user_ids_.append(user_ids[i].get_attribute("href"))
+        for i in range(len(starteds)):
+            text = starteds[i].get_attribute("innerHTML")
+            match = re.findall("Started.*([A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4})", text)
+            if len(match) > 0:
+                starteds_.append(match[0])
+        if len(user_ids_) == 0:
+            print("Warning: Unable to find user ids")
+            useridsFailed = True
+        if len(starteds_) == 0:
+            print("Warning: Unable to find starting dates")
+            startedsFailed = True
+        # settings.maybePrint("ids vs starteds vs avatars: "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(avatars)))
+        settings.maybePrint("users vs ids vs starteds vs usernames:"+str(len(users))+" - "+str(len(user_ids_))+" - "+str(len(starteds_))+" - "+str(len(usernames)))
+        # for user in usernames:
+            # print(user.get_attribute("innerHTML"))
+        if len(usernames) > 2:
+            # first 2 usernames are self
+            usernames.pop(0)
+            usernames.pop(0)
+        if len(users) > 2:
+            users.pop(0)
+            users.pop(0)
+        for i in range(len(users)): # the first is you and doesn't count towards total
+            try:
+                if not startedsFailed:
+                    start = starteds_[i]
+                else:
+                    start = datetime.now().strftime("%b %d, %Y")
+                if not useridsFailed:
+                    user_id = user_ids_[i][35:] # cuts out initial chars instead of unwieldy regex
+                else:
+                    user_id = None
+                name = users[i]
+                username = usernames[i]
+                name = str(name.get_attribute("innerHTML"))
+                # print("name: "+name)
+                # if "<!" in str(name):
+                name = re.sub("<!-*>", "", name)
+                # print(name)
+                # if "<" in str(name) and ">" in str(name):
+                name = re.sub("<.*\">", "", name).strip()
+                # print(name)
+                name = re.sub("</.*>", "", name).strip()
+                # print(name)
+                # name = re.sub(name, "<.*>", "").strip()
+                # print(name)
+                # name = re.sub(name, "<!-*>", "")
+                username = str(username.get_attribute("innerHTML"))
+                # print("username: "+username)
+                # if "<!" in str(username):
+                username = re.sub("<!-*>", "", username)
+                # print(username)
+                # if "<" in str(username) and ">" in str(username):
+                username = re.sub("<.*\">", "", username).strip()
+                # print(username)
+                username = re.sub("</.*>", "", username).strip()
+                username = username.replace("@","")
+                # print(username)
+                # username = re.sub("<.*>", "", username).strip()
+                # print(username)
+                # username = re.sub(username, "<!-*>", "")
+                # settings.maybePrint("name: "+str(name))
+                # settings.maybePrint("username: "+str(username))
+                # settings.maybePrint("user_id: "+str(user_id))
+                # if str(settings.USERNAME).lower() in str(username).lower():
+                #     settings.maybePrint("(self): %s = %s" % (settings.USERNAME, username))
+                #     # first user is always active user but just in case find it in list of users
+                #     settings.USER_ID = username
+                # else:
+                users_.append({"name":name, "username":username, "id":user_id, "started":start})
+            except Exception as e: settings.maybePrint(e)
+    except Exception as e: Driver.error_checker(e)
+    return users_
 
 
 
 import smtplib
- 
+
 def sendemail(from_addr, to_addr_list, cc_addr_list,
               subject, message,
               login, password,

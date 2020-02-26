@@ -77,39 +77,47 @@ class Snarf:
 
     def message(self, choice, message=None, image=None, price=None, username=None):
         if image == None and str(settings.METHOD) == "random":
-            images = []
-            if str(settings.TYPE) == "image":
-                images = Google.get_images()
+            files = []
+            if str(settings.TYPE) == "image" and str(settings.METHOD) == "random":
+                file = Google.get_random_image()
+                files = [file.get("file"), file.get("keywords")]
+            elif str(settings.TYPE) == "image":
+                files = Google.get_images()
+            elif str(settings.TYPE) == "gallery" and str(settings.METHOD) == "random":
+                file = Google.get_random_gallery()
+                files = [file.get("file"), file.get("keywords")]
             elif str(settings.TYPE) == "gallery":
-                images = Google.get_galleries()
+                files = Google.get_galleries()
+            elif str(settings.TYPE) == "video" and str(settings.METHOD) == "random":
+                file = Google.get_random_video()
+                files = [file.get("file"), file.get("keywords")]
             elif str(settings.TYPE) == "video":
-                images = Google.get_videos()
+                files = Google.get_videos()
             else: 
                 print("Error: Missing Type")
                 return False
             # if str(settings.TYPE) == "image" or str(settings.TYPE) == "None": 
-            image = random.choice(images)
             if str(settings.TYPE) == "gallery":
                 folders = []
-                for image in images:
-                    if image[1]['mimeType'] == "application/vnd.google-apps.folder":
-                        folders.append(image)
-                image = random.choice(folders)
+                for file_ in files:
+                    if file_.get("file").get("mimeType") == "application/vnd.google-apps.folder":
+                        folders.append(file_)
+                file = random.choice(folders)
             # download_file doesn't work with a folder[]
-            if image[1]['mimeType'] == "application/vnd.google-apps.folder":
-                image = Google.download_gallery(image[1]).get("path")
+            if file.get("file").get("mimeType") == "application/vnd.google-apps.folder":
+                file = Google.download_gallery(file.get("file"))
             else:
-                image = Google.download_file(image[1]).get("path")
+                file = Google.download_file(file.get("file"))
         successful = False
         if str(choice) == "all":
             print("Messaging: All")
-            successful = User.message(self.driver, "all", message, image, price)
+            successful = User.message(self.driver, "all", message, file, price)
         elif str(choice) == "recent":
             print("Messaging: Recent")
-            successful = User.message(self.driver, "recent", message, image, price)
+            successful = User.message(self.driver, "recent", message, file, price)
         elif str(choice) == "favorites":
             print("Messaging: Recent")
-            successful = User.message(self.driver, "favorite", message, image, price)
+            successful = User.message(self.driver, "favorite", message, file, price)
         elif str(choice) == "user":
             print("Messaging: User - {}".format(username))
             if username is None:
@@ -118,11 +126,11 @@ class Snarf:
             user = User.get_user_by_username(self.driver, str(username))
             if user is None: return False
             settings.maybePrint("User Found: {}".format(username))
-            successful = User.message(self.driver, user, message, image, price)
+            successful = User.message(self.driver, user, message, file, price)
         else:
             print("Error: Missing Message Option")
             return
-        if successful: Google.upload_input(image)
+        if successful: Google.upload_input(file)
         self.exit()
         return successful
                 
@@ -359,14 +367,21 @@ class Snarf:
         settings.remove_local()
         print('1/3 : Testing')
 
+        print('TESTING: Following')
+        response = self.driver.following_get()
+        return True
+
+
+
+        print('TESTING: Users')
+        response = self.driver.users_get()
+        return True
+
         print('TESTING: Settings - Get')
         response = self.driver.settings_get_all()
         return True
 
 
-        print('TESTING: Users')
-        response = get_users()
-        return True
 
         print('TESTING: Cron')
         response = Cron.test()
