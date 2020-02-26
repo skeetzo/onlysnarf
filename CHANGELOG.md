@@ -284,7 +284,18 @@
   - updated profile init
   **2.16.4**
   - minor bugs
-
+  **2.16.5**
+  - updated BYKEYWORD and NOTKEYWORD -> str != str
+  **2.16.6**
+  - fixed: message all price submit
+  - fixed: random files now properly downloaded, again
+  **2.16.7**
+  - fixed: messageAll
+  - fixed: go_to_page
+  **2.16.8**
+  - update: go_to_* auths first
+  - added: following_get
+  
 ----------------------------------------
 
   **2.16.**

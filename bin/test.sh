@@ -13,7 +13,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # sudo onlysnarfpy -debug -verbose -verboser -type gallery -debug-delay -show-window -skip-reduce
 
 # sudo onlysnarf -debug -verbose -show-window -debug-delay -prefer-local
-# sudo onlysnarfpy -debug -verbose -verboser -verbosest -action test -show-window
+sudo onlysnarfpy -debug -verbose -verboser -verbosest -action test
 # sudo onlysnarfpy -debug -verbose -verboser -verbosest -action message -type image -method "all" -text "test pussy" -bykeyword "pussycats" -show-window
 # sudo onlysnarfpy -debug -verbose -verboser -verbosest -action message -method "recent" -text "test pussy" -bykeyword "pussycats" -show-window
 # sudo onlysnarfpy -debug -verbose -verboser -verbosest -action message -method "favorite" -text "test pussy" -bykeyword "pussycats" -show-window
@@ -21,10 +21,12 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # sudo onlysnarf-config
 # sudo onlysnarfpy -debug -verbose -verboser -verbosest -action test
 # sudo onlysnarfpy -debug -verbose -show-window -type image -bykeyword "pussycats"
-
+# sudo onlysnarfpy -action "message" -type image -bykeyword "pussycats" -method "all" -text "10 min of stroking" -price "3.69" -debug -verbose -verboser -verbosest -show-window
+# -method "input" -input "/opt/apps/onlysnarf/tmp/20200130_122808.mp4"
+# -show-window
 # sudo onlysnarfpy -debug -action post -text "shnarf!" -verbose -verboser -show-window
 
-sudo onlysnarfpy -debug -verbose -verboser -verbosest -action "message" -method "all" -type "image" -bykeyword "dailydick" -text "daily dick" -price "3.69" -show-window
+# sudo onlysnarfpy -debug -verbose -verboser -verbosest -action "message" -method "all" -type "image" -bykeyword "dailydick" -text "daily dick" -price "3.69" -show-window
 
 
 
