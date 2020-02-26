@@ -100,11 +100,11 @@ class Snarf:
             if str(settings.TYPE) == "gallery":
                 folders = []
                 for file_ in files:
-                    if file_.get("file").get("mimeType") == "application/vnd.google-apps.folder":
+                    if file_.get("file").get("mimeType") and file_.get("file").get("mimeType") == "application/vnd.google-apps.folder":
                         folders.append(file_)
                 file = random.choice(folders)
             # download_file doesn't work with a folder[]
-            if file.get("file").get("mimeType") == "application/vnd.google-apps.folder":
+            if file.get("file").get("mimeType") and file.get("file").get("mimeType") == "application/vnd.google-apps.folder":
                 file = Google.download_gallery(file.get("file"))
             else:
                 file = Google.download_file(file.get("file"))
@@ -367,14 +367,14 @@ class Snarf:
         settings.remove_local()
         print('1/3 : Testing')
 
-        print('TESTING: Following')
-        response = self.driver.following_get()
+        print('TESTING: Users')
+        response = self.driver.users_get()
         return True
 
 
 
-        print('TESTING: Users')
-        response = self.driver.users_get()
+        print('TESTING: Following')
+        response = self.driver.following_get()
         return True
 
         print('TESTING: Settings - Get')

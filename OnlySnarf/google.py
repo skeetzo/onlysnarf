@@ -427,7 +427,7 @@ def download_message_image(folderName="random"):
         data = download_file(file.get("file"))
     except Exception as e:
         settings.maybePrint(e)
-        return {}
+        return {"file":"","path":""}
     settings.update_value("input",data.get("path"))
     return {"path":data.get("path"), "file":file.get("file")}
 
@@ -503,7 +503,7 @@ def download_performer(folder):
             content_found.append(folder)
     if len(content_found)==0:
         print('Warning: Missing Content Folder')
-        return {}
+        return {"file":"","keywords":""}
     content_found = random.choice(content_found)
     content_title = content_found['title']
     settings.maybePrint("Folder: {}".format(content_title))
@@ -632,7 +632,7 @@ def get_galleries():
     folder_name = None
     if gallery_folders == None:
         print("Error: Unable to Connect to Google Drive")
-        return {}
+        return []
     for folder in gallery_folders:
         if str(settings.VERBOSE) == "True":
             print('checking galleries: {}'.format(folder['title']),end="")
@@ -721,7 +721,7 @@ def get_message_image(folderName):
             settings.maybePrint(" -> empty")
     if len(images_list)==0:
         print('Error: Missing Image File')
-        return {}
+        return {"file":"","keywords":""}
     random_image = random.choice(images_list)
     folder_name = random_image['title'];
     print('Messages Folder: '+random_image['title'])
@@ -741,7 +741,7 @@ def get_random_image():
     folder_name = None
     if random_folders == None:
         print("Error: Unable to Connect to Google Drive")
-        return {}
+        return {"file":"","keywords":""}
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
@@ -759,7 +759,7 @@ def get_random_image():
             settings.maybePrint(" -> empty")
     if len(images_list)==0:
         print('Error: Missing Image File')
-        return {}
+        return {"file":"","path":""}
     random_image = random.choice(images_list)
     folder_name = random_image['title'];
     print('Random Folder: '+random_image['title'])
@@ -779,7 +779,7 @@ def get_random_gallery():
     folder_name = None
     if random_folders == None:
         print("Error: Unable to Connect to Google Drive")
-        return {}
+        return {"file":"","keywords":""}
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
             print('checking galleries: {}'.format(folder['title']),end="")
@@ -810,7 +810,7 @@ def get_random_gallery():
             settings.maybePrint(" -> empty")
     if not random_gallery:
         print('Error: Missing Gallery Folder')
-        return {}
+        return {"file":"","keywords":""}
     print('Random Gallery: '+random_gallery['title'])
     return {"file":random_gallery,"keywords":folder_name}
 
@@ -825,7 +825,7 @@ def get_random_performer():
     # print('random folders: '+str(random_folders))
     if random_folders == None:
         print("Error: Unable to Connect to Google Drive")
-        return {}
+        return {"file":"","keywords":""}
     for folder in random_folders:
         # random_folder_folder = random.choice(random_folders)
         settings.maybePrint('random performer: '+folder['title'])
@@ -844,7 +844,7 @@ def get_random_performer():
             performer_list.append(folder)
     if len(performer_list)==0:
         print('Error: Missing Performer Folder')
-        return {}
+        return {"file":"","keywords":""}
     random_performer = random.choice(performer_list)
     print('Random Performer: '+random_performer['title'])
     return {"file":random_performer}
@@ -860,7 +860,7 @@ def get_random_video():
     folder_name = None
     if random_folders == None:
         print("Error: Unable to Connect to Google Drive")
-        return {}
+        return {"file":"","keywords":""}
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
             print('checking folder: '+folder['title'],end="")
@@ -878,7 +878,7 @@ def get_random_video():
             settings.maybePrint(" -> empty")
     if len(video_list)==0:
         print('Error: Missing Video File')
-        return {}
+        return {"file":"","keywords":""}
     random_video = random.choice(video_list)
     folder_name = random_video['title'];
     print('Random Folder: '+random_video['title'])
@@ -898,7 +898,7 @@ def get_random_scene():
     folder_name = None
     if random_folders == None:
         print("Error: Unable to Connect to Google Drive")
-        return {}
+        return {"file":"","keywords":""}
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
             print('checking scenes: '+folder['title'],end="")
@@ -927,7 +927,7 @@ def get_random_scene():
             settings.maybePrint(" -> empty")
     if not random_scene:
         print('Error: Missing Scene Folders')
-        return {}
+        return {"file":"","keywords":""}
     print('Random Scene: '+random_scene['title'])
     return {"file":random_scene,"keywords":folder_name}
 
@@ -965,10 +965,10 @@ def random_download(fileChoice):
             return print("Error: Missing File Choice")
         if file == None or data == None:
             print("Error: Missing Random File(s)")
-            return {}
+            return {"path":"","file":"","files":[],"keywords":"","performers":[]}
     except Exception as e:
         settings.maybePrint(e)
-        return {}
+        return {"path":"","file":"","files":[],"keywords":"","performers":[]}
     return {"path":data.get("path"), "file":file_ or file.get("file"), "files":data.get("files"), "keywords":keywords or file.get("keywords"), "performers":performers}
 
 ##################

@@ -298,6 +298,9 @@
   
 ----------------------------------------
 
+  **2.16.9**
+  - update: users_get, following_get -> speed +, reliability +
+
   **2.16.**
   - tested: settings get
   - tested: settings set
