@@ -177,7 +177,7 @@ ELEMENTS = [
     # price add
     {
         "name": "priceClick",
-        "classes": ["b-chat__btn-set-price", "button.g-btn.m-rounded"],
+        "classes": ["g-btn.m-rounded"], # "b-chat__btn-set-price", "button.g-btn.m-rounded"
         "text": ["Save"],
         "id": []
     },
@@ -276,20 +276,20 @@ ELEMENTS = [
         "text": [],
         "id": []
     },
-    # messages to user
+
+    ## Users
     {
         "name": "usersUsernames",
         "classes": ["g-user-username"],
         "text": [],
         "id": []
     },
-    ## Users
     # users
     {
         "name": "usersUsers",
-        "classes": ["g-user-name__wrapper"],
+        "classes": ["g-user-name__wrapper", "b-username"],
         "text": [],
-        "id": []
+        "id": ["profileUrl"]
     },
     # users started dates
     {
@@ -301,14 +301,20 @@ ELEMENTS = [
     # users ids
     {
         "name": "usersIds",
-        "classes": ["a.g-btn.m-rounded.m-border.m-sm"],
+        "classes": ["a.g-btn.m-rounded.m-border.m-sm", "a.g-button.m-rounded.m-border.m-profile.m-with-icon.m-message-btn"],
         "text": [],
         "id": []
     },
     # users count
     {
         "name": "usersCount",
-        "classes": ["l-sidebar__user-data__item__count"],
+        "classes": ["l-sidebar__user-data__item__count", "b-tabs__nav__item.m-current"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "followingCount",
+        "classes": ["b-tabs__nav__item.m-current"],
         "text": [],
         "id": []
     },
