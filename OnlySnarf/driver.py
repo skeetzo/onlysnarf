@@ -98,16 +98,16 @@ class Driver:
             months = 12
         try:
             self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
-            end_ = False
-            while True:
+            end_ = True
+            while end_:
                 elements = self.browser.find_elements_by_class_name("m-fans")
                 for ele in elements:
                     username = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
-                    print(username)
-                    print("username: {}".format(username))
-                    if str(user) == str(username): end_ = True
-                if end_: break
-                print_same_line("({}) scrolling...".format(len(elements)))
+                    if str(user) == str(username): 
+                        self.browser.execute_script("arguments[0].scrollIntoView();", ele)
+                        end_ = False
+                if not end_: continue
+                print_same_line("scrolling...")
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
             print()
@@ -115,7 +115,6 @@ class Driver:
             if int(len(users)) == 0:
                 print("Error: Missing Users")
                 return False
-            print(user)
             print("Discounting User: {}".format(user))
             time.sleep(2)
             # get all the users
@@ -186,6 +185,7 @@ class Driver:
                     return True
             settings.devPrint("### Discount Failure ###")
         except Exception as e:
+            print(e)
             Driver.error_checker(e)
             buttons_ = self.find_elements_by_name("discountUserButtons")
             for button in buttons_:
@@ -724,23 +724,16 @@ class Driver:
         try:
             auth_ = self.auth()
             if not auth_: return False
-            userid = user.id
-            if not userid or userid == None or str(userid) == "None":
-                print("Warning: Missing User ID")
-                if not user.username or user.username == None:
-                    print("Error: Missing User ID & Username")
-                    return False
-                userid = str(user.username).replace("@u","").replace("@","")
-                if len(re.findall("[A-Za-z]", userid)) > 0:  
-                    print("Warning: Invalid User ID")
-                    if str(settings.DEBUG) == "False":
-                        return False
-            settings.maybePrint("goto -> /my/chats/chat/{}".format(userid))
-            self.go_to_page("{}/{}".format(ONLYFANS_CHAT_URL, userid))
+            username = str(user.username).replace("@u","").replace("@","")
+            if not username or username == None or str(username) == "None":
+                print("Warning: Missing Username")
+                return False
+            settings.maybePrint("goto -> /my/chats/chat/{}".format(username))
+            self.go_to_page("{}/{}".format(ONLYFANS_CHAT_URL, username))
             return True
         except Exception as e:
             Driver.error_checker(e)
-            print("Error: Failure to Goto User - {}/{}".format(user.id, user.username))
+            print("Error: Failure to Goto User - {}".format(user.username))
             return False
 
     ####################################################################################################
@@ -1320,7 +1313,7 @@ class Driver:
         USER_CACHE_LOCKED = False
 
     def update_chat_log(self, user):
-        print("Updating Chat: {} - {}".format(user.username, user.id))
+        print("Updating Chat: {}".format(user.username))
         if not user:
             return print("Error: Missing User")
         user.readChat()
@@ -1506,7 +1499,7 @@ class Driver:
                 name = re.sub("</.*>", "", name).strip()
                 # print("username: {}".format(username))
                 # print("name: {}".format(name))
-                users.append(User({"name":name, "username":username})) 
+                users.append({"name":name, "username":username}) 
             settings.maybePrint("Found: {}".format(len(users)))
         except Exception as e:
             Driver.error_checker(e)
@@ -1521,7 +1514,7 @@ class Driver:
             count = 0
             while True:
                 elements = self.browser.find_elements_by_class_name("m-fans")
-                if len(elements) == count: break
+                if len(elements) == int(count): break
                 print_same_line("({}/{}) scrolling...".format(count, len(elements)))
                 count = len(elements)
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -1536,7 +1529,7 @@ class Driver:
                 name = re.sub("</.*>", "", name).strip()
                 # print("username: {}".format(username))
                 # print("name: {}".format(name))
-                users.append(User({"name":name, "username":username})) # ,"id":user_id, "started":start})
+                users.append({"name":name, "username":username}) # ,"id":user_id, "started":start})
             settings.maybePrint("Found: {}".format(len(users)))
         except Exception as e:
             Driver.error_checker(e)

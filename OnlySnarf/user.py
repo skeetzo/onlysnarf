@@ -19,9 +19,9 @@ class User:
     def __init__(self, data):
         data = json.loads(json.dumps(data))
         # print(data)
-        self.name = data.get('name')
-        self.username = data.get('username')
-        self.id = data.get('id')
+        self.name = data.get('name') or ""
+        self.username = data.get('username') or ""
+        self.id = data.get('id') or ""
         self.messages_from = data.get('messages_from') or []
         self.messages_to = data.get('messages_to') or []
         self.messages = data.get('messages') or []
@@ -43,6 +43,7 @@ class User:
         try:
             settings.devPrint("User: {} - {} - {}".format(self.name, self.username, self.id))
         except Exception as e:
+            print(e)
             settings.devPrint(e)
             settings.devPrint("User: {}".format(self.id))
 
