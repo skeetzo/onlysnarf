@@ -55,8 +55,8 @@ class Snarf:
             users.append(user)
         for user in users:
             # try:
-            success = self.driver.discount_user(user.id, depth=depth, discount=amount, months=months)
-            if not success: print("Error: There was an error discounting - {}/{}".format(user.id, user.username))
+            success = self.driver.discount_user(user.username, depth=depth, discount=amount, months=months)
+            if not success: print("Error: There was an error discounting - {}".format(user.username))
             # except Exception as e:
                 # settings.maybePrint(e)
             depth = int(depth) + 1

@@ -4,8 +4,7 @@
 echo "[*] Message - Recent & Image"
 sudo onlysnarfpy \
 -debug \
--verbose \
--verboser \
+-$2 \
 -action "message" \
 -method "recent" \
 -type "image" \
@@ -17,8 +16,7 @@ sudo onlysnarfpy \
 echo "[*] Message - User & Gallery"
 sudo onlysnarfpy \
 -debug \
--verbose \
--verboser \
+-$2 \
 -action "message" \
 -method "user" \
 -user "1578380" \

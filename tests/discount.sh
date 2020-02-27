@@ -4,7 +4,7 @@
 echo "[*] Discount - Recent"
 sudo onlysnarfpy \
 -debug \
--verbose \
+-$2 \
 -action "discount" \
 -user "recent" \
 -amount 40 \
