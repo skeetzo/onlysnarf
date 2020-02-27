@@ -4,8 +4,7 @@
 echo "[*] Misc - Schedule"
 sudo onlysnarfpy \
 -debug \
--verbose \
--verboser \
+-$2 \
 -action "upload" -type "image" \
 -skip-download \
 -text "schedule testes" \

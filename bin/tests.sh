@@ -18,13 +18,16 @@ mkdir -p ../onlysnarf/logs
 # schedule
 # post
 # message
-show="blank"
 show="show-window"
+show="blank"
+
+verbose="verbose"
+verbose="verbose -verboser"
+verbose="verbose -verboser -verbosest"
 
 declare -a testing
-testing=("poll")
 testing=("discount" "expiration" "message" "poll" "post" "schedule" "upload")
-testing=("discount" "expiration" "schedule" "message")
+testing=("expiration" "schedule" "message")
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "################## Start #########################" >> ../onlysnarf/logs/tests.txt 2>&1
@@ -33,7 +36,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 function testes() {
 	echo "Running: "$test
 
-	../onlysnarf/tests/$test.sh $show
+	../onlysnarf/tests/$test.sh $show $verbose
 	# ../onlysnarf/tests/$test.sh $show >> ../onlysnarf/logs/tests.txt 2>&1
 
 	echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
