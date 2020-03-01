@@ -87,11 +87,37 @@ ELEMENTS = [
         "text": [],
         "id": []
     },
+    
     # poll
     {
         "name": "poll",
         "classes": ["g-btn.m-flat.b-make-post__voting-btn", "g-btn.m-flat.b-make-post__voting-btn.has-tooltip", "button.g-btn.m-flat.b-make-post__voting-btn", "button.g-btn.m-flat.b-make-post__voting-btn.has-tooltip"],
         "text": ["<svg class=\"g-icon\" aria-hidden=\"true\"><use xlink:href=\"#icon-more\" href=\"#icon-more\"></use></svg>"],
+        "id": []
+    },
+    # expire add
+    {
+        "name": "expiresAdd",
+        "classes": ["b-make-post__expire-period-btn"],
+        "text": ["Save"],
+        "id": []
+    },
+    {
+        "name": "expiresPeriods",
+        "classes": ["b-make-post__expire__label"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "expiresSave",
+        "classes": ["g-btn.m-rounded"],
+        "text": ["Save"],
+        "id": []
+    },
+    {
+        "name": "expiresCancel",
+        "classes": ["g-btn.m-rounded.m-border"],
+        "text": ["Cancel"],
         "id": []
     },
     # poll cancel
