@@ -4,7 +4,9 @@
 echo "[*] Post - Text"
 sudo onlysnarfpy \
 -debug \
--$2 \
+-verbose \
+-verboser \
+-verbosest \
 -action "post" \
 -$1 \
 -text "post testes"

@@ -4,7 +4,9 @@
 echo "[*] Upload - Image"
 sudo onlysnarfpy \
 -debug \
--$2 \
+-verbose \
+-verboser \
+-verbosest \
 -action "upload" -type "image" \
 -text "image testes" \
 -$1 \
@@ -14,7 +16,9 @@ sudo onlysnarfpy \
 echo "[*] Upload - Gallery"
 sudo onlysnarfpy \
 -debug \
--$2 \
+-verbose \
+-verboser \
+-verbosest \
 -action "upload" -type "gallery" \
 -text "gallery testes" \
 -$1 \
@@ -24,7 +28,9 @@ sudo onlysnarfpy \
 echo "[*] Upload - Video"
 sudo onlysnarfpy \
 -debug \
--$2 \
+-verbose \
+-verboser \
+-verbosest \
 -action "upload" -type "video" \
 -text "video testes" \
 -skip-reduce \

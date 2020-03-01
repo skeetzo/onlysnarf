@@ -295,11 +295,11 @@
   **2.16.8**
   - update: go_to_* auths first
   - added: following_get
-  
-----------------------------------------
-
   **2.16.9**
   - update: users_get, following_get -> speed +, reliability +
+  - mostly functional
+  
+----------------------------------------
 
   **2.16.**
   - tested: settings get

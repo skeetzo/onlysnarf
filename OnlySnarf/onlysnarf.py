@@ -100,14 +100,18 @@ class Snarf:
             if str(settings.TYPE) == "gallery":
                 folders = []
                 for file_ in files:
-                    if file_.get("file").get("mimeType") and file_.get("file").get("mimeType") == "application/vnd.google-apps.folder":
-                        folders.append(file_)
+                    try:
+                        if file_.get("mimeType") and file_.get("mimeType") == "application/vnd.google-apps.folder":
+                            folders.append(file_)
+                    except: pass
                 file = random.choice(folders)
             # download_file doesn't work with a folder[]
-            if file.get("file").get("mimeType") and file.get("file").get("mimeType") == "application/vnd.google-apps.folder":
-                file = Google.download_gallery(file.get("file"))
-            else:
-                file = Google.download_file(file.get("file"))
+            try:
+                if file.get("file").get("mimeType") and file.get("file").get("mimeType") == "application/vnd.google-apps.folder":
+                    file = Google.download_gallery(file.get("file"))
+                else:
+                    file = Google.download_file(file.get("file"))
+            except: print("Warning: Unable to Download File")
         successful = False
         if str(choice) == "all":
             print("Messaging: All")
