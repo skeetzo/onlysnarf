@@ -20,6 +20,8 @@ from oauth2client import file, client, tools
 from apiclient.http import MediaFileUpload,MediaIoBaseDownload
 ##
 from .settings import SETTINGS as settings
+from .file import Image, Video
+
 
 ###################
 ##### Globals #####
@@ -46,6 +48,8 @@ OnlyFansFolder_ = None
 MIMETYPES_IMAGES = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"
 MIMETYPES_VIDEOS = "(mimeType contains 'video/mp4' or mimeType contains 'video/quicktime' or mimeType contains 'video/x-ms-wmv' or mimeType contains 'video/x-flv')"
 MIMETYPES_ALL = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or mimeType contains 'video/mp4' or mimeType contains 'video/quicktime')"
+
+authGoogle()
 
 ################
 ##### Auth #####
@@ -85,9 +89,9 @@ def authGoogle():
     except Exception as e:
         # settings.maybePrint(e)
         print('Error: Unable to Authenticate w/ Google')
-        return False
+        # return False
     settings.maybePrint('Authentication Successful') 
-    return True
+    # return True
 
 def checkAuth():
     global AUTH
@@ -100,77 +104,23 @@ def checkAuth():
 
 # Deletes online file
 def delete_file(file):
-    checkAuth()
-    if str(settings.SKIP_DOWNLOAD) == "True":
-        print("Warning: Unable to Delete, skipped download")
-        return
-    if str(settings.FORCE_DELETE) == "True":
-        print("Deleting (Forced): {}".format(fileName))
-    elif str(settings.DEBUG) == "True":
-        print("Skipping Delete (Debug): {}".format(fileName))
-        return
-    elif str(settings.DELETE_GOOGLE) == "False":
-        print('Skipping Delete (Disabled): {}'.format(fileName))
-        return
-    elif str(settings.SKIP_DELETE_GOOGLE) == "True":
-        print('Skipping Delete: {}'.format(file['title']))
-        return
-    else:
-        print('Deleting: {}'.format(fileName))
     file.Trash()
 
-# Archives posted file / folder
-def move_file(file):
-    checkAuth()
-    if str(settings.SKIP_DOWNLOAD) == "True":
-        print("Warning: Unable to Backup, skipped download")
-        return
-    if str(settings.FORCE_BACKUP) == "True":
-        print("Backing Up (forced): {}".format(file['title']))
-    elif str(settings.DEBUG) == "True":
-        print("Skipping Backup (debug): {}".format(file['title']))
-        return
-    elif str(settings.BACKUP) == "False":
-        print('Skipping Backup (disabled): {}'.format(file['title']))
-        return
-    elif str(settings.SKIP_BACKUP) == "True":
-        print('Skipping Backup: {}'.format(file['title']))
-        return
-    else:
-        print('Backing Up (file): {}'.format(file['title']))
-    file['parents'] = [{"kind": "drive#fileLink", "id": str(get_folder_by_name("posted")['id'])}]
-    file.Upload()
-    print('Google File Backed Up: {}'.format(file['title']))
-
-def move_files(fileName, files):
-    checkAuth()
-    if str(settings.SKIP_DOWNLOAD) == "True":
-        print("Warning: Unable to Backup, skipped download")
-        return
-    if str(settings.FORCE_BACKUP) == "True":
-        print("Backing Up (forced): {}".format(fileName))
-    elif str(settings.DEBUG) == "True":
-        print("Skipping Backup (debug): {}".format(fileName))
-        return
-    elif str(settings.BACKUP) == "False":
-        print('Skipping Backup (disabled): {}'.format(fileName))
-        return
-    elif str(settings.SKIP_BACKUP) == "True":
-        print('Skipping Backup: {}'.format(file['title']))
-        return
-    else:
-        print('Backing Up (gallery): {}'.format(fileName))
-    title = fileName+" - "+datetime.datetime.now().strftime("%d-%m@%I-%M")
-    settings.maybePrint('Moving To: '+title)
-    global PYDRIVE
-    tmp_folder = PYDRIVE.CreateFile({'title':str(title), 'parents':[{"kind": "drive#fileLink", "id": str(get_folder_by_name("posted")['id'])}],'mimeType':'application/vnd.google-apps.folder'})
-    tmp_folder.Upload()
-    settings.maybePrint("Backing Up:")
-    for file in files:
-        settings.maybePrint(" - {}".format(file['title']))
-        file['parents'] = [{"kind": "drive#fileLink", "id": tmp_folder['id']}]
+# Archives posted file / folder by updating their parent id
+# posted
+# - [image, gallery, video, performer]
+# -- [file / folders]
+def backup_file(file):
+    try:
+        global PYDRIVE
+        parentFolder = PYDRIVE.CreateFile({'title':str(self.folderName), 'parents':[{"kind": "drive#fileLink", "id": str(get_posted_folder_by_name(self.category)['id'])}],'mimeType':'application/vnd.google-apps.folder'})
+        parentFolder.Upload()
+        settings.devPrint("Moving To: posted/{}/{}".format(self.category, self.folderName))
+        file['parents'] = [{"kind": "drive#fileLink", "id": str(parentFolder['id'])}]
         file.Upload()
-    print('Google Files Backed Up: {}'.format(title))
+        print("File Backed Up: {}".format(file['title']))
+    except Exception as e:
+        settings.maybePrint(e)
 
 ###################
 ##### Folders #####
@@ -231,7 +181,42 @@ def get_folder_by_name(folderName, parent=None):
         settings.maybePrint("Skipping: Create Missing Folder - {}".format(folderName))
         return None
     # create if missing
-    folder = PYDRIVE.CreateFile({"title": str(folderName), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": OnlyFansFolder}]})
+    folder = PYDRIVE.CreateFile({"title": str(folderName), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": parent}]})
+    folder.Upload()
+    settings.maybePrint("Created Folder: {}".format(folderName))
+    return folder
+
+def get_posted_folder_by_name(folderName):
+    checkAuth()
+    settings.maybePrint("Getting Posted Folder: {}".format(folderName))
+    global PYDRIVE
+    if parent is None:
+        parent = get_folder_root()
+    posted = None
+    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent['id'])}).GetList()
+    for folder in file_list:
+        if str(folder['title'])=="posted":
+            settings.maybePrint("Found Folder: posted")
+            posted = folder
+    if posted == None:
+        if str(settings.CREATE_DRIVE) == "False":
+            settings.maybePrint("Skipping: Create Missing Folder - {}".format("posted"))
+            return None        
+        # create if missing
+        posted = PYDRIVE.CreateFile({"title": str("posted"), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": parent}]})
+        posted.Upload()
+        settings.maybePrint("Created Folder: {}".format("posted"))
+    folder= None
+    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(posted['id'])}).GetList()
+    for folder_ in file_list:
+        if str(folder_['title'])==str(folderName):
+            settings.maybePrint("Found Folder: {}".format(folderName))
+            return folder_
+    if str(settings.CREATE_DRIVE) == "False":
+        settings.maybePrint("Skipping: Create Missing Folder - {}".format(folderName))
+        return None
+    # create if missing
+    folder = PYDRIVE.CreateFile({"title": str(folderName), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": posted['id']}]})
     folder.Upload()
     settings.maybePrint("Created Folder: {}".format(folderName))
     return folder
@@ -1056,93 +1041,3 @@ def upload_input(path=None):
         upload_gallery(path=path)
     else:
         upload_file(path=path)
-
-##################
-##### FFMPEG #####
-##################
-
-def repair(path):
-    if str(settings.SKIP_REPAIR) == "True":
-        print("Warning: Skipping Repair")
-        return path
-    repairedPath = str(path).replace(".mp4", "_fixed.mp4")
-    try:
-        print("Repairing: {} <-> {}".format(path, settings.WORKING_VIDEO))
-        if str(settings.VERBOSE) == "True":
-            subprocess.call(['untrunc', str(settings.WORKING_VIDEO), str(path)]).communicate()
-        else:
-            subprocess.Popen(['untrunc', str(settings.WORKING_VIDEO), str(path)],stdin=FNULL,stdout=FNULL)
-    except AttributeError:
-        if os.path.isfile(str(path)+"_fixed.mp4"):
-            shutil.move(str(path)+"_fixed.mp4", repairedPath)
-            print("Repair Complete")
-    except:
-        settings.maybePrint(sys.exc_info()[0])
-        print("Warning: Skipping Repair")
-        return path
-    print("Repair Successful")
-    return str(repairedPath)
-
-def reduce(path):
-    if str(settings.SKIP_REDUCE) == "True":
-        print("Warning: Skipping Reduction")
-        return path
-    reducedPath = str(path).replace(".mp4", "_reduced.mp4")
-    try:
-        settings.maybePrint("Reducing: {}".format(path))
-        try:
-            clip = VideoFileClip(str(path))
-            settings.maybePrint("Length: {}".format(clip.duration))
-            bitrate = 1000000000 / int(clip.duration)
-            settings.maybePrint("Bitrate: {}".format(bitrate))
-        except FileNotFoundError:
-            print("Error: Missing File to Reduce")
-            return path
-        loglevel = "quiet"
-        if str(settings.VERBOSE) == "True":
-            loglevel = "debug"
-        p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-err_detect', 'ignore_err', '-y', '-i', str(path), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', '-crf', '26', '-b:v', str(bitrate), str(reducedPath)])
-        # p.communicate()
-    except FileNotFoundError:
-        print("Warning: Ignoring Fixed Video")
-        return reduce(str(path).replace(".mp4", "_fixed.mp4"))
-    except Exception as e:
-        settings.maybePrint(e)
-        if "Conversion failed!" in str(e):
-            print("Error: Conversion Failure")
-            return path                    
-    print("Reduction Complete")
-    originalSize = os.path.getsize(str(path))
-    newSize = os.path.getsize(str(reducedPath))
-    print("Original Size: {}kb - {}mb".format(originalSize/1000, originalSize/1000000))
-    print("Reduced Size: {}kb - {}mb".format(newSize/1000, newSize/1000000))
-    if int(originalSize) < int(newSize):
-        print("Warning: Original Size Smaller")
-        return path
-    if int(newSize) == 0:
-        print("Error: Missing Reduced File")
-        return path
-    return reducedPath
-
-def thumbnail_fix(path):
-    if str(settings.THUMBNAILING_PREVIEW) == "False":
-        print("Warning: Preview Thumbnailing Disabled")
-        return path
-    try:
-        print("Thumbnailing: {}".format(path))
-        loglevel = "quiet"
-        if str(settings.VERBOSE) == "True":
-            loglevel = "debug"
-        thumbnail_path = os.path.join(os.path.dirname(str(path)), 'thumbnail.png')
-        settings.maybePrint("thumbnail path: {}".format(thumbnail_path))
-        p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-i', str(path),'-ss', '00:00:00.000', '-vframes', '1', str(thumbnail_path)])
-        p.communicate()
-        print("Thumbnailing Complete")
-        return thumbedPath
-    except FileNotFoundError:
-        print("Warning: Ignoring Thumbnail")
-    except AttributeError:
-        print("Thumbnailing: Captured PNG")
-    except:
-        settings.maybePrint(sys.exc_info()[0])
-        print("Error: Thumbnailing Fuckup")    
