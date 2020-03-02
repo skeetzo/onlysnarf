@@ -76,6 +76,11 @@ class Snarf:
     ###################
 
     def message(self, choice, message=None, image=None, price=None, username=None):
+
+
+
+
+
         if image == None and str(settings.METHOD) == "random":
             files = []
             if str(settings.TYPE) == "image" and str(settings.METHOD) == "random":
@@ -108,6 +113,12 @@ class Snarf:
                 file = Google.download_gallery(file.get("file"))
             else:
                 file = Google.download_file(file.get("file"))
+
+
+
+
+
+
         successful = False
         if str(choice) == "all":
             print("Messaging: All")
@@ -221,12 +232,18 @@ class Snarf:
             print("Error: Unable to Upload")
             return False
 
-    def upload_prep(self, opt, methodChoice="random", file=None, folderName=None, parent=None):
+    def upload_prep(self, opt, methodChoice="random", files=None, folderName=None, parent=None):
         try:
             if not opt:
                 print("Error: Missing Option")
                 return False
             print("Uploading: {}".format(opt))
+
+
+
+
+
+
             data = None
             if str(methodChoice) == "input":
                 input_ = settings.getInput()
@@ -236,10 +253,17 @@ class Snarf:
                     input_ = Google.reduce(input_)
                 data = {"path":str(input_),"text":str(settings.TEXT)}
             else:
-                data = Google.download(opt, methodChoice=methodChoice, file=file)
+                data = Google.download(opt, methodChoice=methodChoice, files=files)
+                
             if data == None:
                 print("Error: Missing Data")
                 return False
+
+
+
+
+
+
             text = None
             path = None
             keywords = []
@@ -252,7 +276,7 @@ class Snarf:
             questions = settings.QUESTIONS or []
             if parent: parent = parent.get("title")
             try:
-                if file == None: file = data.get("file") or {}
+                if files == None: files = data.get("file") or {}
                 text = file.get("title") or data.get("text")
                 path = data.get("path")
                 files = data.get("files")
@@ -332,6 +356,11 @@ class Snarf:
                 print("- Schedule: {}".format(schedule))
                 print("- Poll: {}".format(poll))
             successful_upload = self.upload(path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule, poll=poll)
+
+
+
+
+
             if not successful_upload:
                 pass
             elif files:
@@ -341,6 +370,13 @@ class Snarf:
             elif str(methodChoice) == "input":
                 Google.upload_input()
             return successful_upload
+
+
+
+
+
+
+
         except Exception as e:
             settings.maybePrint(e)
             return False
