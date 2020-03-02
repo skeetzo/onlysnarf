@@ -596,7 +596,7 @@ def get_images():
             settings.maybePrint('-> by not keyword')
             continue
         images_list.append([images_folder, folder])
-        settings.maybePrint('checking folder: '+folder['title'])
+        settings.maybePrint("checking folder: {}".format(folder['title']))
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()      
         for image_file in images_list_tmp:
             # images_list.append({"folder":folder['title'],"folder_id":folder['id'],"id":image_file['id'],"image":image_file['title']})
@@ -662,7 +662,7 @@ def get_videos():
         return video_list
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
-            print('checking folder: '+folder['title'],end="")
+            print("checking folder: {}".format(folder['title']),end="")
         video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
         if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
             settings.maybePrint('-> not keyword')
@@ -691,7 +691,7 @@ def get_message_image(folderName):
         if folder['title'] != str(folderName):
             continue
         if str(settings.VERBOSE) == "True":
-            print('checking folder: '+folder['title'],end="")
+            print("checking folder: {}".format(folder['title']),end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()      
         if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
             settings.maybePrint('-> not keyword')
@@ -729,7 +729,7 @@ def get_random_image():
         return {"file":"","keywords":""}
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
-            print('checking folder: '+folder['title'],end="")
+            print("checking folder: {}".format(folder['title']),end="")
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()      
         if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
             settings.maybePrint('-> not keyword')
@@ -848,7 +848,7 @@ def get_random_video():
         return {"file":"","keywords":""}
     for folder in random_folders:
         if str(settings.VERBOSE) == "True":
-            print('checking folder: '+folder['title'],end="")
+            print("checking folder: {}".format(folder['title']),end="")
         video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
         if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
             settings.maybePrint('-> not keyword')

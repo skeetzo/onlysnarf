@@ -18,8 +18,8 @@ mkdir -p ../onlysnarf/logs
 # schedule
 # post
 # message
-show="show-window"
 show="blank"
+show="show-window"
 
 verbose="verbose"
 verbose="verbose -verboser"
@@ -27,7 +27,7 @@ verbose="verbose -verboser -verbosest"
 
 declare -a testing
 testing=("discount" "expiration" "message" "poll" "post" "schedule" "upload")
-testing=("expiration" "schedule" "message")
+testing=("schedule")
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "################## Start #########################" >> ../onlysnarf/logs/tests.txt 2>&1
