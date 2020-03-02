@@ -301,6 +301,9 @@
   
 ----------------------------------------
 
+  **2.17.0**
+  - ffmpeg / file
+
   **2.16.**
   - tested: settings get
   - tested: settings set
