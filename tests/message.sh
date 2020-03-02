@@ -1,22 +1,27 @@
 #!/usr/bin/env bash
 
 # Users Recent - Image
-echo "[*] Message - Recent & Image"
-sudo onlysnarfpy \
--debug \
--$2 \
--action "message" \
--method "recent" \
--type "image" \
--text "message testes" \
--$1 \
--price "2.00"
+# echo "[*] Message - Recent & Image"
+# sudo onlysnarfpy \
+# -debug \
+# -verbose \
+# -verboser \
+# -verbosest \
+# -action "message" \
+# -method "recent" \
+# -force-upload \
+# -type "image" \
+# -text "message testes" \
+# -$1 \
+# -price "2.00"
 
 # User
 echo "[*] Message - User & Gallery"
 sudo onlysnarfpy \
 -debug \
--$2 \
+-verbose \
+-verboser \
+-verbosest \
 -action "message" \
 -method "user" \
 -user "1578380" \
