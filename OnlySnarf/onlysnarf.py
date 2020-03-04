@@ -75,66 +75,29 @@ class Snarf:
     ##### Message #####
     ###################
 
-    def message(self, choice, message=None, image=None, price=None, username=None):
-
-
-
-
-
-        if image == None and str(settings.METHOD) == "random":
-            files = []
-            if str(settings.TYPE) == "image" and str(settings.METHOD) == "random":
-                file = Google.get_random_image()
-                files = [file.get("file"), file.get("keywords")]
-            elif str(settings.TYPE) == "image":
-                files = Google.get_images()
-            elif str(settings.TYPE) == "gallery" and str(settings.METHOD) == "random":
-                file = Google.get_random_gallery()
-                files = [file.get("file"), file.get("keywords")]
-            elif str(settings.TYPE) == "gallery":
-                files = Google.get_galleries()
-            elif str(settings.TYPE) == "video" and str(settings.METHOD) == "random":
-                file = Google.get_random_video()
-                files = [file.get("file"), file.get("keywords")]
-            elif str(settings.TYPE) == "video":
-                files = Google.get_videos()
-            else: 
-                print("Error: Missing Type")
-                return False
-            # if str(settings.TYPE) == "image" or str(settings.TYPE) == "None": 
-            if str(settings.TYPE) == "gallery":
-                folders = []
-                for file_ in files:
-                    try:
-                        if file_.get("mimeType") and file_.get("mimeType") == "application/vnd.google-apps.folder":
-                            folders.append(file_)
-                    except: pass
-                file = random.choice(folders)
-            # download_file doesn't work with a folder[]
-
-            try:
-                if file.get("file").get("mimeType") and file.get("file").get("mimeType") == "application/vnd.google-apps.folder":
-                    file = Google.download_gallery(file.get("file"))
-                else:
-                    file = Google.download_file(file.get("file"))
-            except: print("Warning: Unable to Download File")
-
-
+    def message(self, choice, files=[]):
+        settings.devPrint("Message")
+        if len(files) == 0 and str(settings.METHOD) == "random":
+            files = Google.download_random_files()
         successful = False
-        if str(choice) == "all":
-            print("Messaging: All")
-            successful = User.message(self.driver, "all", message, file, price)
-        elif str(choice) == "recent":
-            print("Messaging: Recent")
-            successful = User.message(self.driver, "recent", message, file, price)
-        elif str(choice) == "favorites":
-            print("Messaging: Recent")
-            successful = User.message(self.driver, "favorite", message, file, price)
+        message = Message()
+        setattr(message, "text", "")
+        setattr(message, "files", [])
+        setattr(message, "price", 3)
+        setattr(message, "keywords", [])
+        setattr(message, "performers", [])
+
+
+
+        
+        if str(choice) != "user":
+            print("Messaging: {}".format(choice))
+            successful = User.message(self.driver, choice, message, file, price)
         elif str(choice) == "user":
             print("Messaging: User - {}".format(username))
             if username is None:
                 print("Error: Missing Username")
-                return
+                return False
             user = User.get_user_by_username(self.driver, str(username))
             if user is None: return False
             settings.maybePrint("User Found: {}".format(username))
@@ -142,7 +105,7 @@ class Snarf:
         else:
             print("Error: Missing Message Option")
             return
-        if successful: Google.upload_input(file)
+        if successful: File.backup_files(files)
         self.exit()
         return successful
                 
@@ -150,7 +113,8 @@ class Snarf:
     ##### Post #####
     ################
 
-    def post(self, text=None, override=False):
+    @staticmethod
+    def get_post_input(text=None):
         expires = settings.EXPIRES or ""
         schedule = settings.getSchedule()
         poll = {"period":None,"questions":None}
@@ -158,22 +122,87 @@ class Snarf:
         questions = settings.QUESTIONS or []
         if not text: text = input("Text: ".format(text))
         else: print("Text: "+text)
-        if not override:
-            print("[Enter] or Text or Cancel")
-            confirm = input()
-            if confirm != "":
-                if str(confirm) == "None" or str(confirm) == "Cancel" or str(confirm) == "C" or str(confirm) == "c":
-                    print("Canceling Post")
-                    return False
+        print("[Enter] or Text or Cancel")
+        confirm = input()
+        if confirm != "":
+            if str(confirm) == "None" or str(confirm) == "Cancel" or str(confirm) == "C" or str(confirm) == "c":
+                print("Canceling Post")
+                return False
+            else:
+                text = confirm
+        print("Expiration [1, 3, 7, 99 or 'No limit']:")
+        expires_ = input("({})>> ".format(expires))
+        if str(expires_) != "":
+            expires = expires_
+        schedule_ = input("Schedule (y/n): ")
+        if str(schedule_) != "" and str(schedule_).lower() != "n":
+            schedule_ = input( "({})>> ".format(schedule))
+            date_ = settings.DATE or ""
+            print("Date [mm/dd/YY]: ")
+            date = input("({})>>".format(date_))
+            time_ = settings.TIME or ""
+            print("Time [HH:MM]: ")
+            time = input("({})>>".format(time_))
+            schedule = "{}:{}".format(date, time)
+        questions_ = input("Poll (y/n): ")
+        if str(questions_) != "" and str(questions_).lower() != "n":
+            print("Duration [1, 3, 7, 99 or 'No limit']:")
+            duration_ = input("({})>> ".format(duration))
+            if str(duration_) != "":
+                duration = duration_
+            print("Questions:\n> {}".format("\n> ".join(questions)))
+            questions_ = input(">> ")
+            if str(questions_) != "":
+                questions = questions_
+        poll = {"period":duration,"questions":questions}
+        return expires, schedule, poll
+
+        text = file.get("title") or data.get("text")
+        path = data.get("path")
+        files = data.get("files")
+        keywords = data.get("keywords") or parent or settings.KEYWORDS
+        performers = data.get("performers") or settings.PERFORMERS
+        # if parent: keywords = parent.split(" ")
+        if isinstance(keywords, str): keywords = keywords.split(" ")
+        if str(opt) == "performer":
+            keywords = folderName or keywords
+            if parent: performers = parent.split(" ")
+        if isinstance(keywords, list): keywords = [n.strip() for n in keywords]
+        if str(methodChoice) == "choose":
+            print("Text: ")
+            text_ = input("({})>> ".format(text))
+            if text_ != "":
+                text = text_
+            print("Keywords: ")
+            keywords_ = input("({})>> ".format(keywords))
+            if keywords_ != "":
+                if str(keywords_) == "None":
+                    keywords = []
+                elif str(keywords_) == "[]":
+                    keywords = []
+                elif str(keywords_) == " ":
+                    keywords = []
                 else:
-                    text = confirm
-            print("Expiration [1, 3, 7, 99 or 'No limit']:")
+                    keywords = keywords_.split(",")
+                    keywords = [n.strip() for n in keywords]
+            print("Performers: ")
+            performers_ = input("({})>> ".format(performers))
+            if performers_ != "":
+                if str(performers_) == "None":
+                    performers = []
+                elif str(performers_) == "[]":
+                    performers = []
+                elif str(performers_) == " ":
+                    performers = []
+                else:
+                    performers = performers_.split(",")
+                    performers = [n.strip() for n in performers]
+            print("Expiration [1, 3, 7, 99 or 'No limit']: ")
             expires_ = input("({})>> ".format(expires))
             if str(expires_) != "":
                 expires = expires_
-            schedule_ = input("Schedule (y/n): ")
-            if str(schedule_) != "" and str(schedule_).lower() != "n":
-                schedule_ = input( "({})>> ".format(schedule))
+            schedule_ = input("Schedule (y/n): ".format(schedule))
+            if str(schedule_) != "" and str(schedule_) != "n":
                 date_ = settings.DATE or ""
                 print("Date [mm/dd/YY]: ")
                 date = input("({})>>".format(date_))
@@ -191,13 +220,25 @@ class Snarf:
                 questions_ = input(">> ")
                 if str(questions_) != "":
                     questions = questions_
-            poll = {"period":duration,"questions":questions}
+            if len(questions) > 0:
+                poll = {"period":duration,"questions":questions}
+            else: poll = None
+            post_ = Post()
+            setattr(post_, "text", text)
+            setattr(post_, "expires", expires)
+            setattr(post_, "schedule", schedule)
+            setattr(post_, "poll", poll)
+            return post
+
+    def post(self):
+        settings.devPrint("Posting")
+        successful = False
         try:
-            successful = self.driver.post(text, expires=expires, schedule=schedule, poll=poll)
+            successful = self.driver.post(Snarf.get_post_input())
             self.exit()
-            return successful
         except Exception as e:
             settings.maybePrint(e)
+        return successful
         
     #####################
     ##### Promotion #####
@@ -221,173 +262,23 @@ class Snarf:
     ##### Upload #####
     ##################
 
-    def upload(self, path, text="", keywords=[], performers=[], expires=None, schedule=None, poll=None):
-        # settings.maybePrint("Uploading: {}".format(path))
+    def upload(self, files):
+        settings.devPrint("Uploading")
+        successful = False
         try:
-            if not schedule: schedule = settings.getSchedule()
-            if not poll: poll = settings.getPoll()
-            successful = self.driver.upload(path=path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule, poll=poll)
-            return successful
-        except Exception as e:
-            settings.maybePrint(e)
-            print("Error: Unable to Upload")
-            return False
-
-    def upload_prep(self, opt, methodChoice="random", files=None, folderName=None, parent=None):
-        try:
-            if not opt:
-                print("Error: Missing Option")
-                return False
-            print("Uploading: {}".format(opt))
-
-
-
-
-
-
-            data = None
-            if str(methodChoice) == "input":
-                input_ = settings.getInput()
-                if not input_: return False
-                global FIFTY_MEGABYTES
-                if int(os.stat(str(input_)).st_size) >= FIFTY_MEGABYTES or settings.FORCE_REDUCTION: # greater than 1GB
-                    input_ = Google.reduce(input_)
-                data = {"path":str(input_),"text":str(settings.TEXT)}
-            else:
-                data = Google.download(opt, methodChoice=methodChoice, files=files)
-                
-            if data == None:
-                print("Error: Missing Data")
-                return False
-
-
-
-
-
-
-            text = None
-            path = None
-            keywords = []
-            performers = []
-            files = None
-            expires = settings.EXPIRES or None
-            schedule = settings.getSchedule()
-            poll = None
-            duration = settings.DURATION or ""
-            questions = settings.QUESTIONS or []
-            if parent: parent = parent.get("title")
-            try:
-                if files == None: files = data.get("file") or {}
-                text = file.get("title") or data.get("text")
-                path = data.get("path")
-                files = data.get("files")
-                keywords = data.get("keywords") or parent or settings.KEYWORDS
-                performers = data.get("performers") or settings.PERFORMERS
-                # if parent: keywords = parent.split(" ")
-                if isinstance(keywords, str): keywords = keywords.split(" ")
-                if str(opt) == "performer":
-                    keywords = folderName or keywords
-                    if parent: performers = parent.split(" ")
-                if isinstance(keywords, list): keywords = [n.strip() for n in keywords]
-                if str(methodChoice) == "choose":
-                    print("Text: ")
-                    text_ = input("({})>> ".format(text))
-                    if text_ != "":
-                        text = text_
-                    print("Keywords: ")
-                    keywords_ = input("({})>> ".format(keywords))
-                    if keywords_ != "":
-                        if str(keywords_) == "None":
-                            keywords = []
-                        elif str(keywords_) == "[]":
-                            keywords = []
-                        elif str(keywords_) == " ":
-                            keywords = []
-                        else:
-                            keywords = keywords_.split(",")
-                            keywords = [n.strip() for n in keywords]
-                    print("Performers: ")
-                    performers_ = input("({})>> ".format(performers))
-                    if performers_ != "":
-                        if str(performers_) == "None":
-                            performers = []
-                        elif str(performers_) == "[]":
-                            performers = []
-                        elif str(performers_) == " ":
-                            performers = []
-                        else:
-                            performers = performers_.split(",")
-                            performers = [n.strip() for n in performers]
-                    print("Expiration [1, 3, 7, 99 or 'No limit']: ")
-                    expires_ = input("({})>> ".format(expires))
-                    if str(expires_) != "":
-                        expires = expires_
-                    schedule_ = input("Schedule (y/n): ".format(schedule))
-                    if str(schedule_) != "" and str(schedule_) != "n":
-                        date_ = settings.DATE or ""
-                        print("Date [mm/dd/YY]: ")
-                        date = input("({})>>".format(date_))
-                        time_ = settings.TIME or ""
-                        print("Time [HH:MM]: ")
-                        time = input("({})>>".format(time_))
-                        schedule = "{}:{}".format(date, time)
-                    questions_ = input("Poll (y/n): ")
-                    if str(questions_) != "" and str(questions_).lower() != "n":
-                        print("Duration [1, 3, 7, 99 or 'No limit']:")
-                        duration_ = input("({})>> ".format(duration))
-                        if str(duration_) != "":
-                            duration = duration_
-                        print("Questions:\n> {}".format("\n> ".join(questions)))
-                        questions_ = input(">> ")
-                        if str(questions_) != "":
-                            questions = questions_
-                    if len(questions) > 0:
-                        poll = {"period":duration,"questions":questions}
-                    else: poll = None
-            except Exception as e:
-                settings.maybePrint(e)
-            if path == None: print("Warning: Missing Content")
-            if str(settings.DEBUG) == "True" and str(settings.VERBOSE) == "True":
-                print("Data:")
-                print("- Text: {}".format(text)) # name of scene
-                print("- Keywords: {}".format(keywords)) # text sent in messages
-                print("- Content: {}".format(path)) # the file(s) to upload
-                print("- Performer(s): {}".format(performers)) # name of performers
-                print("- Expiration: {}".format(expires))
-                print("- Schedule: {}".format(schedule))
-                print("- Poll: {}".format(poll))
-            successful_upload = self.upload(path, text=text, keywords=keywords, performers=performers, expires=expires, schedule=schedule, poll=poll)
-
-
-
-
-
-            if not successful_upload:
-                pass
-            elif files:
-                Google.move_files(text, files)
-            elif str(methodChoice) != "input":
-                Google.move_file(file)
-            elif str(methodChoice) == "input":
-                Google.upload_input()
-            return successful_upload
-
-
-
-
-
-
-
+            successful = self.driver.upload(Snarf.get_post_input(files=files))
+            if successful: File.backup_files(files=files)
         except Exception as e:
             settings.maybePrint(e)
             return False
+        return successful
 
     #################
     ##### Users #####
     #################
 
     def get_users(self):
-        settings.maybePrint("Getting Users")
+        settings.devPrint("Getting Users")
         try:
             return User.get_all_users()
         except Exception as e:
@@ -492,6 +383,30 @@ else:
 
 
 
+class Post:
+    def __init__(self):
+        self.text = ""
+        self.files = []
+        self.keywords = []
+        self.performers = []
+        self.expiration = None
+        self.poll = None
+        self.schedule = None
+        self.expiration = None
+
+class Message:
+    def __init__(self):
+        self.text = ""
+        self.files = []
+        self.keywords = []
+        self.performers = []
+        self.price = None
+        self.recipients = [] # users to send to
+
+
+        self.expiration = None
+        self.poll = None
+        self.schedule = None
 
 
 
