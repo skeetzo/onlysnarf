@@ -916,6 +916,43 @@ def get_random_scene():
     print('Random Scene: '+random_scene['title'])
     return {"file":random_scene,"keywords":folder_name}
 
+def download_random_files():
+    pass
+
+def get_random_files():
+
+            if str(settings.TYPE) == "image" and str(settings.METHOD) == "random":
+                file = Google.get_random_image()
+                files = [file.get("file"), file.get("keywords")]
+            elif str(settings.TYPE) == "image":
+                files = Google.get_images()
+            elif str(settings.TYPE) == "gallery" and str(settings.METHOD) == "random":
+                file = Google.get_random_gallery()
+                files = [file.get("file"), file.get("keywords")]
+            elif str(settings.TYPE) == "gallery":
+                files = Google.get_galleries()
+            elif str(settings.TYPE) == "video" and str(settings.METHOD) == "random":
+                file = Google.get_random_video()
+                files = [file.get("file"), file.get("keywords")]
+            elif str(settings.TYPE) == "video":
+                files = Google.get_videos()
+            else: 
+                print("Error: Missing Type")
+                return False
+            # if str(settings.TYPE) == "image" or str(settings.TYPE) == "None": 
+            if str(settings.TYPE) == "gallery":
+                folders = []
+                for file_ in files:
+                    try:
+                        if file_.get("mimeType") and file_.get("mimeType") == "application/vnd.google-apps.folder":
+                            folders.append(file_)
+                    except: pass
+                file = random.choice(folders)
+
+
+
+
+
 ##################
 ##### Random #####
 ##################

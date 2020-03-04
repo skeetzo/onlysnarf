@@ -242,3 +242,11 @@ class Video:
         self.path = ffmpeg.repair(path)
 
 
+
+
+
+
+        global FIFTY_MEGABYTES
+                if int(os.stat(str(input_)).st_size) >= FIFTY_MEGABYTES or settings.FORCE_REDUCTION: # greater than 1GB
+                    input_ = Google.reduce(input_)
+                data = {"path":str(input_),"text":str(settings.TEXT)}
