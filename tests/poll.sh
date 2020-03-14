@@ -8,6 +8,7 @@ sudo onlysnarfpy \
 -verboser \
 -verbosest \
 -action "upload" -type "image" \
+-bykeyword "pussycats" \
 -skip-download \
 -text "poll testes" \
 -duration 3 \

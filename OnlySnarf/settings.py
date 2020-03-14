@@ -19,10 +19,10 @@ class Settings:
         return setattr(self, key, val)
 
     def initialize(self):
-        # print("Initializing Settings")
+        print("Initializing Settings")
         try:
             if self.INITIALIZED:
-                # print("Already Initialized, Skipping")
+                print("Already Initialized, Skipping")
                 return
         except:
             self.INITIALIZED = False
