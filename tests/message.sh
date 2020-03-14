@@ -23,6 +23,7 @@ sudo onlysnarfpy \
 -verboser \
 -verbosest \
 -action "message" \
+-bykeyword "pussycats" \
 -method "user" \
 -user "1578380" \
 -type "gallery" \
