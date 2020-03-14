@@ -1,7 +1,5 @@
-
-from .ffmpeg import ffmpeg
-from .google import Google
-
+from OnlySnarf import ffmpeg
+from OnlySnarf import google as Google
 
 class File:
     def __init__(self):
@@ -246,7 +244,7 @@ class Video:
 
 
 
-        global FIFTY_MEGABYTES
-                if int(os.stat(str(input_)).st_size) >= FIFTY_MEGABYTES or settings.FORCE_REDUCTION: # greater than 1GB
-                    input_ = Google.reduce(input_)
-                data = {"path":str(input_),"text":str(settings.TEXT)}
+# global FIFTY_MEGABYTES
+# if int(os.stat(str(input_)).st_size) >= FIFTY_MEGABYTES or settings.FORCE_REDUCTION: # greater than 1GB
+#     input_ = Google.reduce(input_)
+# data = {"path":str(input_),"text":str(settings.TEXT)}

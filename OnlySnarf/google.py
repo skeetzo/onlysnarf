@@ -49,8 +49,6 @@ MIMETYPES_IMAGES = "(mimeType contains 'image/jpeg' or mimeType contains 'image/
 MIMETYPES_VIDEOS = "(mimeType contains 'video/mp4' or mimeType contains 'video/quicktime' or mimeType contains 'video/x-ms-wmv' or mimeType contains 'video/x-flv')"
 MIMETYPES_ALL = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or mimeType contains 'video/mp4' or mimeType contains 'video/quicktime')"
 
-authGoogle()
-
 ################
 ##### Auth #####
 ################
@@ -97,6 +95,8 @@ def checkAuth():
     global AUTH
     if not AUTH:
         AUTH = authGoogle()
+
+authGoogle()
 
 ################################
 ##### Archiving / Deleting #####

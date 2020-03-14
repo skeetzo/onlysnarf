@@ -88,10 +88,7 @@ def combine(folderPath):
         return False
     combinePath = str(folderPath).replace(".mp4", "_full.mp4")
     try:    
-        ffmpeg
-        .input(str(folderPath), format='concat', safe=0)
-        .output(combinePath, c='copy')
-        .run()
+        ffmpeg.input(str(folderPath), format='concat', safe=0).output(combinePath, c='copy').run()
     except Exception as e:
         settings.maybePrint(e)
         if "Conversion failed!" in str(e):
@@ -117,6 +114,7 @@ def frames(path):
         except FileNotFoundError:
             print("Error: Missing File to Capture Frames")
             return path
+    except: pass
     screenshots = []
     # ffmpeg -i test.avi -vcodec png -ss 10 -vframes 1 -an -f rawvideo test.png
     for i in range(10):

@@ -8,6 +8,7 @@ sudo onlysnarfpy \
 -verboser \
 -verbosest \
 -action "upload" -type "image" \
+-bykeyword "pussycats" \
 -skip-download \
 -text "schedule testes" \
 -schedule "6/6/2020:6:26" \
