@@ -96,8 +96,6 @@ def checkAuth():
     if not AUTH:
         AUTH = authGoogle()
 
-authGoogle()
-
 ################################
 ##### Archiving / Deleting #####
 ################################
