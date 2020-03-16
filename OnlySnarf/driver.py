@@ -464,6 +464,7 @@ class Driver:
         else:
             settings.maybePrint("goto -> {}".format(page))
             self.browser.get("{}/{}".format(ONLYFANS_HOME_URL, page))
+            time.sleep(1)
 
     def go_to_home(self):
         auth_ = self.auth()
