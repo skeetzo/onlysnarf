@@ -580,6 +580,10 @@ def download_scene(sceneFolder):
 ##### Get #####
 ###############
 
+def get_file(id_):
+    myfile = PYDRIVE.CreateFile({'id': id_})
+    return myfile
+
 # gets all the images in the images folders
 def get_images():
     checkAuth()

@@ -1,46 +1,65 @@
 from OnlySnarf import ffmpeg
 from OnlySnarf import google as Google
 
+
+
+
+class Folder:
+    def __init__(self):
+        self.files = []
+        self.id = None
+        self.parentID = None
+        self.title = ""
+
+    def backup(self):
+        if File.backup_text(self.title): return
+        Google.upload_gallery(path=self.path)
+
 class File:
     def __init__(self):
         self.path = ""
         self.ext = "" 
-        self.parent = "" # google parent file id
-        self.id = "" # google file id
-        self.googleFile = None # google file reference
-
-        self.category = "" # [image, gallery, video, performer]
+        ##
         self.title = ""
-        self.artist = ""
-        self.genre = ""
-        self.albumArtist = ""
-        self.folderName = ""
+        self.category = "" # [image, gallery, video, performer]
+        self.googleID = None # google file id
+        self.folderName = "" # google folder name
+        self.parentID = "" # google parent file id
+
+    ##############################
 
     # move to backup folder in GDrive
     # Google.move_file
     # Google.move_files
     def backup(self):
+        if File.backup_text(self.title): return
+        if str(self.path) == "":
+            print("Error: Missing File Path - {}".format(self.title))
+            return False
+        Google.upload_file(path=self.path)
+        print('File Backed Up: {}'.format(self.title))
+
+    @staticmethod
+    def backup_text(title):
         if str(settings.SKIP_DOWNLOAD) == "True":
             print("Warning: Unable to Backup, skipped download")
-            return
+            return False
         if str(settings.FORCE_BACKUP) == "True":
-            print("Backing Up (forced): {}".format(self.title))
+            print("Backing Up (forced): {}".format(title))
         elif str(settings.DEBUG) == "True":
-            print("Skipping Backup (debug): {}".format(self.title))
-            return
+            print("Skipping Backup (debug): {}".format(title))
+            return False
         elif str(settings.BACKUP) == "False":
-            print('Skipping Backup (disabled): {}'.format(self.title))
-            return
+            print('Skipping Backup (disabled): {}'.format(title))
+            return False
         elif str(settings.SKIP_BACKUP) == "True":
-            print('Skipping Backup: {}'.format(self.title))
-            return
+            print('Skipping Backup: {}'.format(title))
+            return False
         else:
-            print('Backing Up (file): {}'.format(self.title))
-        if self.googleFile != None:
-            Google.backup_file(self.googleFile)
-        if str(self.path) != "":
-            Google.upload_file(self)
-        print('File Backed Up: {}'.format(self.title))
+            print('Backing Up (file): {}'.format(title))
+        return True
+
+    ##############################
 
     @staticmethod
     def backup_files(files=[]):
@@ -84,47 +103,107 @@ class File:
             file.path = "{}/{}".format(combinedPath, self.title)
         self.combined = ffmpeg.combine(combinedPath)
 
+    ##############################
+
     # Deletes online file
     def delete(self):
+        if File.delete_text(self.title): return
+        if str(self.path) == "":
+            print("Error: Missing File Path - {}".format(self.title))
+            return False
+        os.remove(self.path)
+
+    @staticmethod
+    def delete_text(title):
         if str(settings.SKIP_DOWNLOAD) == "True":
             print("Warning: Unable to Delete, skipped download")
-            return
+            return False
         if str(settings.FORCE_DELETE) == "True":
-            print("Deleting (Forced): {}".format(self.title))
+            print("Deleting (Forced): {}".format(title))
         elif str(settings.DEBUG) == "True":
-            print("Skipping Delete (Debug): {}".format(self.title))
-            return
+            print("Skipping Delete (Debug): {}".format(title))
+            return False
         elif str(settings.DELETE_GOOGLE) == "False":
-            print('Skipping Delete (Disabled): {}'.format(self.title))
-            return
+            print('Skipping Delete (Disabled): {}'.format(title))
+            return False
         elif str(settings.SKIP_DELETE_GOOGLE) == "True":
-            print('Skipping Delete: {}'.format(self.title))
-            return
+            print('Skipping Delete: {}'.format(title))
+            return False
         else:
-            print('Deleting: {}'.format(self.title))
-        if self.googleFile != None:
-            Google.delete(self.googleFile)
-        if str(self.path) != "":
-            os.remove(self.path)
+            print('Deleting: {}'.format(title))
+        return True
+
+    ##############################
+
+    # "filename (1).ext"
+    def get_path(self):
+        prefix, ext = os.path.splitext(self.title)
+        settings.devPrint("filename: {}|{}".format(prefix, ext))
+        filename = str(prefix)+"{}."+str(ext)
+        counter = 0
+        while os.path.isfile(filename.format(counter)):
+            counter += 1
+        filename = filename.format(counter)
+        return filename
+
+    @staticmethod
+    def get_tmp(file):
+        # make folder at file.path
+        path = "{}/tmp".format(file.path)
+        os.mkdir(path)
+        return path
+
+    # upload to GDrive
+    # Google.upload_input
+    def upload(self):
+        # basically handled by backup process
+        pass
+
+###################################################################################
+
+class Google_File(File):
+    def __init__(self):
+        self.id = None
+        self.parentID = None
+        self.folderName = ""
+        self.title
+        self.file = None
+
+    def backup(self, arg):
+        if self.backup_text(): return
+        Google.backup_file(path=Google.get_file(self.id))
+
+    def delete(self, arg):
+        if self.delete_text(): return
+        Google.delete(path=Google.get_file(self.id))
+
+    def download_text(title):
+        if str(settings.SKIP_DOWNLOAD) == "True":
+            print("Skipping Download (debug)")
+            return False
+        return True
+
+    @staticmethod
+    def download_files(files=[]):
+        settings.maybePrint('Download limit: '+str(settings.IMAGE_DOWNLOAD_LIMIT))
+        random.shuffle(files)
+        files = files[:int(settings.IMAGE_DOWNLOAD_LIMIT)]
+        print('Downloading Files: {}'.format(len(files)))
+        i = 1
+        for file in sorted(files, key = lambda x: x['title']):
+            print('Downloading: {}/{}'.format(i, settings.IMAGE_DOWNLOAD_LIMIT))
+            file.download()
+        print("Downloaded: {}".format(len(files)))
 
     # Download File
     def download(self):
-        path = self.getPath()
-        if str(path) == "":
-            print("Error: Missing File Path")
-            return
-        if os.path.isfile(str(path)):
-            print("Error: File Already Exists")
-            return
-        if str(settings.SKIP_DOWNLOAD) == "True":
-            print("Skipping Download (debug)")
-            return
+        if Google_File.download_text(self.title): return False
+        path = self.get_path()
         print("Downloading File: {}".format(self.title))
         # download file
         def method_two():
-            if self.googleFile != None:
-                self.googleFile.GetContentFile(path)
-                print("Download Complete: Alternative")
+            self.get_file().GetContentFile(path)
+            print("Download Complete: Alternative")
         def method_one():
             try:
                 with open(str(path), 'w+b') as output:
@@ -153,41 +232,22 @@ class File:
         self.check_size()
         print("Downloaded: {}".format(self.title))
 
-    @staticmethod
-    def download_files(files=[]):
-        settings.maybePrint('Download limit: '+str(settings.IMAGE_DOWNLOAD_LIMIT))
-        random.shuffle(files)
-        files = files[:int(settings.IMAGE_DOWNLOAD_LIMIT)]
-        print('Downloading Files: {}'.format(len(files)))
-        i = 1
-        for file in sorted(files, key = lambda x: x['title']):
-            print('Downloading: {}/{}'.format(i, settings.IMAGE_DOWNLOAD_LIMIT))
-            file.download()
-        print("Downloaded: {}".format(len(files)))
+    def get_file(self):
+        if self.file: return self.file
+        self.file = Google.get_file(self.id)
+        return self.file
 
-    @staticmethod
-    def get_tmp(file):
-        # make folder at file.path
-        path = "{}/tmp".format(file.path)
-        os.mkdir(path)
-        return path
+###################################################################################
 
-    # upload to GDrive
-    # Google.upload_input
-    def upload(self):
-        # basically handled by backup process
-        pass
-
-
-class Image:
-    def __init__(File):
+class Image(File):
+    def __init__(self):
         File.__init__(self)
         self.combined = ""
 
     
 
-class Video:
-    def __init__(File):
+class Video(File):
+    def __init__(self):
         File.__init__(self)
         self.screenshots = []
         self.trimmed = ""
