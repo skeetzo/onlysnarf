@@ -104,6 +104,8 @@ class Settings:
         # -duration
         # poll or post duration
         self.DURATION = None
+        self.DURATION_ALLOWED = ["1","3","7","30","99","no limit"]
+        self.EXPIRATION_ALLOWED = ["1","3","7","30","99","no limit"]
         ##
         # -exit
         # exit upon each action
@@ -192,7 +194,7 @@ class Settings:
         # action: message
         # the price to be set in a message
         self.PRICE = 0
-
+        self.PRICE_MINIMUM = 3
         ##
         # profile settings for the account
         self.PROFILE = None
@@ -423,16 +425,42 @@ class Settings:
             self.maybePrint("Warning: Missing Local Path")
         return self.INPUT
 
-    def getPoll(self):
+    def get_keywords(self):
+        keywords = []
+        if str(settings.KEYWORDS) == "None":
+            keywords = []
+        elif str(settings.KEYWORDS) == "[]":
+            keywords = []
+        elif str(settings.KEYWORDS) == " ":
+            keywords = []
+        else:
+            keywords = settings.KEYWORDS.split(",")
+            keywords = [n.strip() for n in keywords]
+        return keywords
+
+    def get_tags(self):
+        tags = []
+        if str(settings.TAGS) == "None":
+            tags = []
+        elif str(settings.TAGS) == "[]":
+            tags = []
+        elif str(settings.TAGS) == " ":
+            tags = []
+        else:
+            tags = settings.TAGS.split(",")
+            tags = [n.strip() for n in tags]
+        return tags
+
+    def get_poll(self):
         if isinstance(self.QUESTIONS, str): self.QUESTIONS = self.QUESTIONS.split(",")
         poll = None
         duration = self.DURATION or None
         questions = self.QUESTIONS or None
-        poll = {"period":duration,"questions":questions}
+        poll = {"duration":duration,"questions":questions}
         if not duration or not questions: return None
         return poll
 
-    def getSchedule(self):
+    def get_schedule(self):
         if str(self.SCHEDULE) != "None": return self.SCHEDULE
         if  str(self.DATE) != "None":
             if str(self.TIME) != "None":

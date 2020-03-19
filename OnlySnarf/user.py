@@ -12,8 +12,6 @@ from decimal import Decimal
 ##
 from OnlySnarf.settings import SETTINGS as settings
 
-PRICE_MINIMUM = 3
-
 class User:
 
     def __init__(self, data):
@@ -47,6 +45,13 @@ class User:
             settings.devPrint(e)
             settings.devPrint("User: {}".format(self.id))
 
+    def discount(self, discount):
+
+        if not amount: amount = input("Discount: ")
+        if not months: months = input("Months: ")
+                    success = self.driver.discount_user(user.username, discount=amount, months=months)
+
+
     def sendMessage(self, Driver, message="", image=None, price=None):
         try:
             print("Sending Message: {} <- {} - {} - ${}".format(self.id, message, image, price))
@@ -55,10 +60,9 @@ class User:
             if not success:
                 return False
             if price:
-                global PRICE_MINIMUM
-                if image != None and Decimal(sub(r'[^\d.]', '', price)) < PRICE_MINIMUM:
+                if image != None and Decimal(sub(r'[^\d.]', '', price)) < settings.PRICE_MINIMUM:
                     print("Warning: Price Too Low, Free Image")
-                    print("Price Minimum: ${}".format(PRICE_MINIMUM))
+                    print("Price Minimum: ${}".format(settings.PRICE_MINIMUM))
                 else:
                     success = Driver.message_price(price)
                     if not success: return False
@@ -91,10 +95,9 @@ class User:
             success = Driver.message_text(message)
             if not success: return False
             if price:
-                global PRICE_MINIMUM
-                if path != None and Decimal(sub(r'[^\d.]', '', price)) < PRICE_MINIMUM:
+                if path != None and Decimal(sub(r'[^\d.]', '', price)) < settings.PRICE_MINIMUM:
                     print("Warning: Price Too Low, Free Media")
-                    print("Price Minimum: ${}".format(PRICE_MINIMUM))
+                    print("Price Minimum: ${}".format(settings.PRICE_MINIMUM))
                 else:
                     success = Driver.message_price(price)
                     if not success: return False

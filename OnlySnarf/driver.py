@@ -597,25 +597,21 @@ class Driver:
     ##### Messages #####
     ####################
 
-    def message(self, type_):
+    def message(self, user):
         try:
             auth_ = self.auth()
             if not auth_: return False
-            # go to /message
             self.go_to_page(ONLYFANS_NEW_MESSAGE_URL)
-            # settings.devPrint("ready for new message")
-            # click the new message
-            # settings.devPrint("clicking new message")
-            # self.get_element_to_click("newMessage").click()
-            # settings.devPrint("clicked new message")
-            # click the message all
-            type__ = "all" # default
-            if str(type_) == "all": type__ = "messageAll"
-            elif str(type_) == "recent": type__ = "messageRecent"
-            elif str(type_) == "favorite": type__ = "messageFavorite"
-            settings.devPrint("clicking message {}".format(type_))
-            self.get_element_to_click(type__).click()
-            settings.devPrint("Successfully messaged {}".format(type_))
+            type__ = None # default
+            if str(user) == "all": type__ = "messageAll"
+            elif str(user) == "recent": type__ = "messageRecent"
+            elif str(user) == "favorite": type__ = "messageFavorite"
+            if type__ != None:
+                settings.devPrint("clicking message type: {}".format(user))
+                self.get_element_to_click(type__).click()
+            else:
+                self.message_user(user)
+            settings.devPrint("Successfully messaged: {}".format(user))
             return True
         except Exception as e:
             Driver.error_checker(e)
@@ -1318,13 +1314,21 @@ class Driver:
             return print("Error: Missing User")
         user.readChat()
 
-
     ##################
     ##### Upload #####
     ##################
 
     # Uploads a directory with a video file or image files to OnlyFans
-    def upload(self, path=None, text="", keywords=[], performers=[], expires=False, schedule=False, poll=False):
+    def upload(self, message):
+
+        # path = message.get_files()
+        text = message.get_text()
+        keywords = message.get_keywords()
+        tags = message.get_tags()
+        expires = message.get_expiration()
+        schedule = message.get_schedule()
+        poll = message.get_poll()
+
         settings.devPrint("uploading")
         try:
             auth_ = self.auth()
@@ -1337,13 +1341,13 @@ class Driver:
                 print("Warning: Missing Upload Text")
                 text = ""
             text = text.replace(".mp4","").replace(".MP4","").replace(".jpg","").replace(".jpeg","")
-            if isinstance(performers, list) and len(performers) > 0: text += " w/ @"+" @".join(performers)
+            if isinstance(tags, list) and len(tags) > 0: text += " w/ @"+" @".join(tags)
             if isinstance(keywords, list) and len(keywords) > 0: text += " #"+" #".join(keywords)
             text = text.strip()
             print("Uploading:")
             settings.maybePrint("- Path: {}".format(path))
             print("- Keywords: {}".format(keywords))
-            print("- Performers: {}".format(performers))
+            print("- Tags: {}".format(tags))
             print("- Text: {}".format(text))
             print("- Tweeting: {}".format(settings.TWEETING))
             ## Expires, Schedule, Poll
