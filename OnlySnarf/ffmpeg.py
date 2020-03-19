@@ -5,79 +5,6 @@ import datetime
 ##### FFMPEG #####
 ##################
 
-#seconds off front or back
-def trim(path):
-    if str(settings.TRIM) == "False":
-        print("Warning: Skipping Trim")
-        return path
-    if ".mp4" not in str(path):
-        print("Error: Unable to Trim")
-        return path
-    reducedPath = str(path).replace(".mp4", "_trimmed.mp4")
-    try:
-        settings.maybePrint("Trimming: {}".format(path))
-        try:
-            clip = VideoFileClip(str(path))
-            settings.maybePrint("Length: {}".format(clip.duration))
-        except FileNotFoundError:
-            print("Error: Missing File to Reduce")
-            return path
-        start = datetime.timedelta(seconds=60)
-        end = datetime.timedelta(seconds=clip.duration-60)
-        loglevel = "quiet"
-        if str(settings.VERBOSE) == "True":
-            loglevel = "debug"
-        p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-ss', str(start), '-y', '-i', str(path), '-to', str(end), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', str(reducedPath)])
-        # p.communicate()
-    except Exception as e:
-        settings.maybePrint(e)
-        if "Conversion failed!" in str(e):
-            print("Error: Trim Failure")
-            return path                    
-    print("Trim Complete")
-    return reducedPath
-
-# into segments (60 sec, 5 min, 10 min)
-# segment: minutes
-def split(path, segment):
-    if str(settings.TRIM) == "False":
-        print("Warning: Skipping Split")
-        return path
-    if ".mp4" not in str(path):
-        print("Error: Unable to Split")
-        return path
-    splitPaths = []
-    splitPath = str(path).replace(".mp4", "_split$.mp4")
-    try:
-        settings.maybePrint("Splitting: {}".format(path))
-        try:
-            clip = VideoFileClip(str(path))
-            settings.maybePrint("Length: {}".format(clip.duration))
-        except FileNotFoundError:
-            print("Error: Missing File to Split")
-            return path
-        i = 0
-        index = 0
-        loglevel = "quiet"
-        if str(settings.VERBOSE) == "True":
-            loglevel = "debug"
-        while True:
-            start = datetime.timedelta(seconds=index)
-            end = datetime.timedelta(seconds=int(index)+(60*int(segment)))
-            out = splitPath.replace("$",i)
-            p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-ss', str(start), '-y', '-i', str(path), '-to', str(end), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', str(out)])
-            splitPaths.append(out)
-            index += 60*int(segment)
-            i += 1
-        # p.communicate()
-    except Exception as e:
-        settings.maybePrint(e)
-        if "Conversion failed!" in str(e):
-            print("Error: Split Failure")
-            return splitPaths                    
-    print("Split Complete")
-    return splitPaths
-
 # all videos in folder into single mp4
 def combine(folderPath):
     if str(settings.COMBINE) == "False":
@@ -97,12 +24,17 @@ def combine(folderPath):
     print("Combine Complete")
     return combinePath
 
-# unnecessary, handled by onlyfans
-def watermark():
-    pass
-# cleanup & label appropriately (digital watermarking?)
-def metadata():
-    pass
+
+# images from gallery
+def gifify(path):
+    # First convert the images to a video:
+    # ffmpeg -f image2 -i image%d.jpg video.avi
+    loglevel = "quiet"
+    if str(settings.VERBOSE) == "True":
+        loglevel = "debug"
+    # p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-y', '-i', str(path), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', '-crf', '26', '-b:v', str(bitrate), str(reducedPath)])
+    # Then convert the avi to a gif:
+    # ffmpeg -i video.avi -pix_fmt rgb24 -loop_output 0 out.gif
 
 # frames for preview gallery
 def frames(path):
@@ -123,17 +55,6 @@ def frames(path):
         screenshots.append(output)
         if int(i)*10 > int(clip.duration): break
     return screenshots
-
-# images from gallery
-def gifify(path):
-    # First convert the images to a video:
-    # ffmpeg -f image2 -i image%d.jpg video.avi
-    loglevel = "quiet"
-    if str(settings.VERBOSE) == "True":
-        loglevel = "debug"
-    # p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-y', '-i', str(path), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', '-crf', '26', '-b:v', str(bitrate), str(reducedPath)])
-    # Then convert the avi to a gif:
-    # ffmpeg -i video.avi -pix_fmt rgb24 -loop_output 0 out.gif
 
 # this requires a similar video and has no real use so remove?
 # or change to some other repair method for videos
@@ -209,6 +130,48 @@ def reduce(path):
         return path
     return reducedPath
 
+
+# into segments (60 sec, 5 min, 10 min)
+# segment: minutes
+def split(path, segment):
+    if str(settings.TRIM) == "False":
+        print("Warning: Skipping Split")
+        return path
+    if ".mp4" not in str(path):
+        print("Error: Unable to Split")
+        return path
+    splitPaths = []
+    splitPath = str(path).replace(".mp4", "_split$.mp4")
+    try:
+        settings.maybePrint("Splitting: {}".format(path))
+        try:
+            clip = VideoFileClip(str(path))
+            settings.maybePrint("Length: {}".format(clip.duration))
+        except FileNotFoundError:
+            print("Error: Missing File to Split")
+            return path
+        i = 0
+        index = 0
+        loglevel = "quiet"
+        if str(settings.VERBOSE) == "True":
+            loglevel = "debug"
+        while True:
+            start = datetime.timedelta(seconds=index)
+            end = datetime.timedelta(seconds=int(index)+(60*int(segment)))
+            out = splitPath.replace("$",i)
+            p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-ss', str(start), '-y', '-i', str(path), '-to', str(end), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', str(out)])
+            splitPaths.append(out)
+            index += 60*int(segment)
+            i += 1
+        # p.communicate()
+    except Exception as e:
+        settings.maybePrint(e)
+        if "Conversion failed!" in str(e):
+            print("Error: Split Failure")
+            return splitPaths                    
+    print("Split Complete")
+    return splitPaths
+
 def thumbnail_fix(path):
     if str(settings.THUMBNAILING_PREVIEW) == "False":
         print("Warning: Preview Thumbnailing Disabled")
@@ -231,3 +194,42 @@ def thumbnail_fix(path):
     except:
         settings.maybePrint(sys.exc_info()[0])
         print("Error: Thumbnailing Fuckup")    
+
+#seconds off front or back
+def trim(path):
+    if str(settings.TRIM) == "False":
+        print("Warning: Skipping Trim")
+        return path
+    if ".mp4" not in str(path):
+        print("Error: Unable to Trim")
+        return path
+    reducedPath = str(path).replace(".mp4", "_trimmed.mp4")
+    try:
+        settings.maybePrint("Trimming: {}".format(path))
+        try:
+            clip = VideoFileClip(str(path))
+            settings.maybePrint("Length: {}".format(clip.duration))
+        except FileNotFoundError:
+            print("Error: Missing File to Reduce")
+            return path
+        start = datetime.timedelta(seconds=60)
+        end = datetime.timedelta(seconds=clip.duration-60)
+        loglevel = "quiet"
+        if str(settings.VERBOSE) == "True":
+            loglevel = "debug"
+        p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-ss', str(start), '-y', '-i', str(path), '-to', str(end), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', str(reducedPath)])
+        # p.communicate()
+    except Exception as e:
+        settings.maybePrint(e)
+        if "Conversion failed!" in str(e):
+            print("Error: Trim Failure")
+            return path                    
+    print("Trim Complete")
+    return reducedPath
+
+# unnecessary, handled by onlyfans
+def watermark():
+    pass
+# cleanup & label appropriately (digital watermarking?)
+def metadata():
+    pass

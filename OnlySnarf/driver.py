@@ -1321,23 +1321,19 @@ class Driver:
 
     # Uploads a directory with a video file or image files to OnlyFans
     def upload(self, message):
-
-        # path = message.get_files()
-        text = message.get_text()
-        keywords = message.get_keywords()
-        tags = message.get_tags()
-        expires = message.get_expiration()
-        schedule = message.get_schedule()
-        poll = message.get_poll()
-
         settings.devPrint("uploading")
         try:
             auth_ = self.auth()
             if not auth_: return False
             self.go_to_home()
-            if not path:
-                print("Error: Missing Upload Path")
-                return False
+            path = message.get_files()
+            text = message.get_text()
+            keywords = message.get_keywords()
+            tags = message.get_tags()
+            expires = message.get_expiration()
+            schedule = message.get_schedule()
+            poll = message.get_poll()
+
             if not text or text == None or str(text) == "None":
                 print("Warning: Missing Upload Text")
                 text = ""

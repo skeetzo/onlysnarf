@@ -104,11 +104,11 @@ class User:
                 success = Driver.message_confirm()
                 if not success: return False
                 return True
-            if not enter_text(message.text): return False
-            if not enter_price(message.price): return False
+            if not enter_text(message.text): return False # not allowed to fail
+            enter_price(message.price) # allowed to fail
             for file in message.files:
-                if not enter_file(file.get_path()): return False
-            if not confirm(): return False
+                enter_file(file.get_path()) # allowed to fail
+            if not confirm(): return False # not allowed to fail
             print("Message Entered")
             return True
         except Exception as e:
