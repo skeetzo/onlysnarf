@@ -45,68 +45,70 @@ class User:
             settings.devPrint(e)
             settings.devPrint("User: {}".format(self.id))
 
-    def discount(self, discount):
-
+    def discount(self, Driver=None, discount={}):
+        amount = getattr(discount, "amount")
+        months = getattr(discount, "months")
         if not amount: amount = input("Discount: ")
         if not months: months = input("Months: ")
-                    success = self.driver.discount_user(user.username, discount=amount, months=months)
+        discount = {"amount":amount,"months":months}
+        successful = Driver.discount_user(self.username, discount)
+        return successful
 
+    def message(self, Driver=None, message=None):
+        if not Driver: Driver = Driver.get()
+        if str(self.username) == "": return print("User Error: Missing Message Username")
+        print("Messaging: {}".format(self.username))
+        successful = Driver.message(self.username, message)
+        if not successful: return False
+        successful = User.enter_message(Driver, message)
+        if not successful: return False
+        print("Messaged: {}".format(self.username))
 
-    def sendMessage(self, Driver, message="", image=None, price=None):
+    @staticmethod
+    def message(Driver=None, username="", message=None):
+        user = User()
+        setattr(user, "username", username)
+        user.message(Driver=Driver, message=message)
+
+    @staticmethod
+    def enter_message(Driver, message=None):
         try:
-            print("Sending Message: {} <- {} - {} - ${}".format(self.id, message, image, price))
-            Driver.message_user(self)
-            success = Driver.message_text(message)
-            if not success:
-                return False
-            if price:
-                if image != None and Decimal(sub(r'[^\d.]', '', price)) < settings.PRICE_MINIMUM:
+            print("Entering Message: {} - ${}".format(message, price))
+            def enter_text(text):
+                success = Driver.message_text(text)
+                if not success: return False
+                return True
+            def enter_price(price):
+                if path == "": return False
+                if path != None and Decimal(sub(r'[^\d.]', '', price)) < settings.PRICE_MINIMUM:
                     print("Warning: Price Too Low, Free Image")
                     print("Price Minimum: ${}".format(settings.PRICE_MINIMUM))
                 else:
                     success = Driver.message_price(price)
                     if not success: return False
-            if image:
-                image_name = os.path.basename(image)
+                settings.debug_delay_check()
+                return True
+            def enter_file(path):
+                if path == "": return False
+                image_name = os.path.basename(path)
                 if str(image_name) in self.sent_images:
-                    print("Error: Image Already Sent: {} -> {}".format(image, self.id))
+                    print("Error: Image Already Sent: {} -> {}".format(image_name, self.username))
                     return False
-                success = Driver.message_files(image)
-                if not success: return False
-            if str(settings.DEBUG) == "True":
-                self.sent_images.append("DEBUG")
-            else:
-                self.sent_images.append(str(image_name))
-            if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
-                time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
-            success = Driver.message_confirm()
-            if not success: return False
-            if str(settings.DEBUG) == "False":
-                self.last_messaged_on = datetime.now()
-            return True
-        except Exception as e:
-            settings.maybePrint(e)
-            return False
-
-    @staticmethod
-    def enter_message(Driver, message="", path=None, price=None):
-        try:
-            print("Entering Message: {} - ${}".format(message, price))
-            success = Driver.message_text(message)
-            if not success: return False
-            if price:
-                if path != None and Decimal(sub(r'[^\d.]', '', price)) < settings.PRICE_MINIMUM:
-                    print("Warning: Price Too Low, Free Media")
-                    print("Price Minimum: ${}".format(settings.PRICE_MINIMUM))
-                else:
-                    success = Driver.message_price(price)
-                    if not success: return False
-            if path:
                 success = Driver.message_files(path)
                 if not success: return False
-            settings.debug_delay_check()
-            success = Driver.message_confirm()
-            if not success: return False
+                if str(settings.DEBUG) != "True":
+                    self.sent_images.append(str(image_name))
+                settings.debug_delay_check()
+                return True
+            def confirm():
+                success = Driver.message_confirm()
+                if not success: return False
+                return True
+            if not enter_text(message.text): return False
+            if not enter_price(message.price): return False
+            for file in message.files:
+                if not enter_file(file.get_path()): return False
+            if not confirm(): return False
             print("Message Entered")
             return True
         except Exception as e:
@@ -139,7 +141,8 @@ class User:
         if self.last_messaged_on == None:
             return print("Error: User Not New")
         print("Sending User Greeting: {}".format(self.username))
-        self.sendMessage(message=settings.DEFAULT_GREETING)
+        # self.send_message(message=settings.DEFAULT_GREETING)
+        User.enter_message(Driver=None, message=settings.DEFAULT_GREETING)
 
     # send refresher message to user
     def refresh(self):
@@ -149,7 +152,8 @@ class User:
         elif (timedelta(self.last_messaged_on)-timedelta(datetime())).days < 30:
             return print("Error: Refresher Date Too Early - {}".format((timedelta(self.last_messaged_on)-timedelta(datetime())).days))
         print("Sending User Refresher: {}".format(self.username))
-        self.sendMessage(message=settings.user_DEFAULT_REFRESHER)
+        # self.send_message(message=settings.user_DEFAULT_REFRESHER)
+        User.enter_message(Driver=None, message=settings.user_DEFAULT_REFRESHER)
 
     # saves chat log to user
     def readChat(self, Driver):
@@ -175,19 +179,6 @@ class User:
     def unfavor(self):
         print("Unfavoring: {}".format(self.username))
         self.isFavorite = False
-
-    @staticmethod
-    def message(Driver, user=None, message="", path=None, price=None):
-        if not user: return print("User Error: Missing Message User")
-        print("Messaging: {}".format(user))
-        successful = False
-        if isinstance(user, User): successful = Driver.message_user(user)
-        elif user in ["all","recent","favorite"]: successful = Driver.message(user)
-        else: print("User Error: Missing Message Type")
-        if not successful: return False
-        successful = User.enter_message(Driver, message, path, price)
-        if not successful: return False
-        print("Messaged: {}".format(user))
 
     @staticmethod
     def get_all_users(Driver):
@@ -292,6 +283,22 @@ class User:
                 return users_
         return users_
 
+#######################################################################################
+
+def delayForThirty():
+    settings.maybePrint("30...")
+    time.sleep(10)
+    settings.maybePrint("20...")
+    time.sleep(10)
+    settings.maybePrint("10...")
+    time.sleep(7)
+    settings.maybePrint("3...")
+    time.sleep(1)
+    settings.maybePrint("2...")
+    time.sleep(1)
+    settings.maybePrint("1...")
+    time.sleep(1)
+
 # gets a list of all subscribed user_ids from local txt
 def read_users_local():
     settings.maybePrint("Getting Local Users")
@@ -341,18 +348,3 @@ def write_users_local(users=None):
         print("Error: Missing Local Users")
     except OSError:
         print("Error: Missing Local Path")
-
-
-def delayForThirty():
-    settings.maybePrint("30...")
-    time.sleep(10)
-    settings.maybePrint("20...")
-    time.sleep(10)
-    settings.maybePrint("10...")
-    time.sleep(7)
-    settings.maybePrint("3...")
-    time.sleep(1)
-    settings.maybePrint("2...")
-    time.sleep(1)
-    settings.maybePrint("1...")
-    time.sleep(1)

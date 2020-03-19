@@ -70,11 +70,13 @@ class Message():
         return tags
 
     # ensures File references exist and are downloaded
+    # files are File references
+    # file references can be GoogleId references which need to download their source
+    # files exist when checked for size
+    # ?
     def get_files(self):
-        # files are File references
-        # file references can be GoogleId references which need to download their source
-        # files exist when checked for size
-        # ?
+        for file in files:
+            file.prepare() # if Google file, downloads. if file, check size
         return self.files
 
     def get_price(self):
@@ -88,12 +90,16 @@ class Message():
         return price
 
     # ensures listed recipients are users
-    def get_recipients(self):
-        users = []
-        for user in self.recipients:
-            user = User(user)
-            users.append(user)
-        return users
+    # if includes [all, recent, favorite] & usernames it only uses the 1st found of [all,...]
+    # def get_recipients(self):
+    #     users = []
+    #     for user in self.recipients:
+    #         if isinstance(user, str):
+    #             if user in settings.MESSAGE_CHOICES:
+    #                 return [user] 
+    #         user = User(user)
+    #         users.append(user)
+    #     return users
 
     def get_expiration(self):
         if self.expiration: return self.expiration
@@ -165,28 +171,31 @@ class Message():
         self.schedule = schedule
         return schedule
 
-    def get_post_input(self):
+    def get_post(self):
         self.get_text()
         self.get_keywords()
         self.get_tags()
-        # self.get_files()
+        self.get_files()
         self.get_price()
         # self.get_recipients()
         self.get_poll()
         self.get_schedule()
 
     # sends to recipients
-    def send(self, Driver):
+    def send(self, Driver=None):
+        self.get_post()
         successful = False
         try: 
+            # for user in self.get_recipients():
             for user in self.recipients:
-                successful_ = Driver.message(self, user)
+                # if isinstance(user, str): 
+                successful_ = User.message(Driver=Driver, user=user, message=self)
                 if successful_: successful = successful_
+                if self.username in settings.MESSAGE_CHOICES: break
         except Exception as e:
             settings.devPrint(e)
             successful = False
         if successful: self.backup_files()
-
 
         # if str(choice) != "user":
         #     print("Messaging: {}".format(choice))
