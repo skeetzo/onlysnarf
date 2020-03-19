@@ -1,9 +1,6 @@
 from OnlySnarf import ffmpeg
 from OnlySnarf import google as Google
 
-
-
-
 class Folder:
     def __init__(self):
         self.files = []

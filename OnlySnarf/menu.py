@@ -18,7 +18,7 @@ from OnlySnarf.settings import SETTINGS as settings
 # from OnlySnarf import OnlySnarf
 from OnlySnarf import google as Google
 from OnlySnarf import cron as Cron
-from OnlySnarf.onlysnarf import Snarf
+from OnlySnarf.snarf import Snarf
 
 ###################
 ##### Globals #####
