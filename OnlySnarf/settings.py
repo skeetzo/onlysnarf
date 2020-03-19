@@ -227,6 +227,12 @@ class Settings:
         # the maximum number of recent users
         self.RECENT_USER_COUNT = 3
         ##
+        # enables file reduction
+        self.REDUCE = False
+        ##
+        # enables file repair (buggy)
+        self.REPAIR = False
+        ##
         # can be set in profile.conf
         # root Google drive folder
         self.ROOT_FOLDER = "OnlySnarf"
@@ -335,7 +341,7 @@ class Settings:
         while i < len(sys.argv):
             sys.argv[i] = sys.argv[i][1:] # remove - in front
             # truths set the variable True when provided
-            truths_ = ["MANUAL","VERBOSEST","VERSION","VERBOSER","DEBUG_FORCE","SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
+            truths_ = ["MANUAL","VERBOSEST","VERSION","VERBOSER","DEBUG_FORCE","REPAIR","REDUCE","SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
             # falses set the variable False when provided
             falses_ = ["EXIT"]
             # nexts set the variable to the next provided argument input
@@ -472,7 +478,7 @@ class Settings:
                 self.SCHEDULE = "{}:{}".format(self.DATE,"00:00")
         return None
 
-    def getTmp(self):
+    def get_tmp(self):
         # mkdir /tmp
         tmp = os.getcwd()
         if self.MOUNT_PATH != None:
@@ -503,7 +509,7 @@ class Settings:
                 return
             # print('Deleting Local File(s)')
             # delete /tmp
-            tmp = self.getTmp()
+            tmp = self.get_tmp()
             if os.path.exists(tmp):
                 shutil.rmtree(tmp)
                 print('Local File(s) Removed')

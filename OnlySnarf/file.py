@@ -1,6 +1,11 @@
 from OnlySnarf import ffmpeg
 from OnlySnarf import google as Google
 
+ONE_GIGABYTE = 1000000000
+ONE_MEGABYTE = 1000000
+FIFTY_MEGABYTES = 50000000
+ONE_HUNDRED_KILOBYTES = 100000
+
 class Folder:
     def __init__(self):
         self.files = []
@@ -14,7 +19,7 @@ class Folder:
 
 ##########################################################################################
 
-class File:
+class File(Image, Video):
     def __init__(self):
         self.path = ""
         self.ext = "" 
@@ -93,12 +98,13 @@ class File:
             return False
         return True
 
-    @staticmethod
-    def combine(files):
-        if len(files) == 0: return
-        combinedPath = File.get_tmp(files[0])
+    def combine(self):
+        if len(self.files) == 0: return
+        settings.devPrint("combining files: {}".format(len(self.files)))
+        settings.devPrint("combine path: {}".format(combinedPath))
+        combinedPath = os.path.join(File.get_tmp(), "{}-combined".format(self.title))
         for file in files:
-            shutil.move(file.path, "{}/{}".format(combinedPath, self.title))
+            shutil.move(file.get_path(), combinedPath)
             file.path = "{}/{}".format(combinedPath, self.title)
         self.combined = ffmpeg.combine(combinedPath)
 
@@ -107,10 +113,8 @@ class File:
     # Deletes online file
     def delete(self):
         if File.delete_text(self.title): return
-        if str(self.path) == "":
-            print("Error: Missing File Path - {}".format(self.title))
-            return False
-        os.remove(self.path)
+        try: os.remove(self.get_path())
+        except Exception as e: settings.devPrint(e)
 
     @staticmethod
     def delete_text(title):
@@ -136,6 +140,8 @@ class File:
 
     # "filename (1).ext"
     def get_path(self):
+        # if i enable this then it defeats the point of the while loop and might have duplicate filenames
+        # if self.path != "": return self.path
         prefix, ext = os.path.splitext(self.title)
         settings.devPrint("filename: {}|{}".format(prefix, ext))
         filename = str(prefix)+"{}."+str(ext)
@@ -144,14 +150,21 @@ class File:
             counter += 1
         filename = filename.format(counter)
         settings.devPrint("filename: {}".format(filename))
-        return filename
+        tmp = settings.get_tmp()
+        # tmp = File.get_tmp() # i don't think this should be in file over settings
+        self.path = os.path.join(tmp, filename)
+        return self.path
 
     @staticmethod
-    def get_tmp(file):
-        # make folder at file.path
-        path = "{}/tmp".format(file.path)
-        os.mkdir(path)
-        return path
+    def get_tmp():
+        tmp = os.getcwd()
+        if self.MOUNT_PATH != None:
+            tmp = os.path.join(self.MOUNT_PATH, "tmp")
+        else:
+            tmp = os.path.join(tmp, "tmp")
+        if not os.path.exists(str(tmp)):
+            os.mkdir(str(tmp))
+        return tmp
 
     # files are File references
     # file references can be GoogleId references which need to download their source
@@ -253,19 +266,16 @@ class Google_File(File):
             self.download()
         return super()
 
+###################################################################################
+
+class Image():
+    def __init__(self):
+        pass
 
 ###################################################################################
 
-class Image(File):
+class Video():
     def __init__(self):
-        File.__init__(self)
-        self.combined = ""
-
-###################################################################################
-
-class Video(File):
-    def __init__(self):
-        File.__init__(self)
         self.screenshots = []
         self.trimmed = ""
         self.split = ""
@@ -273,17 +283,11 @@ class Video(File):
     #seconds off front or back
     def trim(self):
         path = self.get_path()
-        if str(path) == "":
-            print("Error: Missing Path")
-            return
         self.trimmed = ffmpeg.trim(path) 
 
     # into segments (60 sec, 5 min, 10 min)
     def split(self):
         path = self.get_path()
-        if str(path) == "":
-            print("Error: Missing Path")
-            return
         self.split = ffmpeg.split(path)
 
     # unnecessary, handled by onlyfans
@@ -297,26 +301,23 @@ class Video(File):
     # frames for preview gallery
     def get_frames(self):
         path = self.get_path()
-        if str(path) == "":
-            print("Error: Missing Path")
-            return
         self.screenshots = ffmpeg.frames(path)
+
+    def get_path(self):
+        return settings.get_path()
 
     def reduce(self):
         path = self.get_path()
-        if str(path) == "":
-            print("Error: Missing Path")
+        global FIFTY_MEGABYTES
+        if (int(os.stat(str(path)).st_size) < FIFTY_MEGABYTES or str(settings.REDUCE) == "False") and str(settings.FORCE_REDUCTION) == "False":
+            settings.devPrint("skipping reduce: {}".format(self.title))
             return
         self.path = ffmpeg.reduce(path)
-        # global FIFTY_MEGABYTES
-        # if int(os.stat(str(input_)).st_size) >= FIFTY_MEGABYTES or settings.FORCE_REDUCTION: # greater than 1GB
-        #     input_ = Google.reduce(input_)
-        # data = {"path":str(input_),"text":str(settings.TEXT)}
     
     def repair(self):
         path = self.get_path()
-        if str(path) == "":
-            print("Error: Missing Path")
+        if str(settings.REPAIR) and str(settings.FORCE_REPAIR) == "False":
+            settings.devPrint("skipping repair: {}".format(self.title))
             return
         self.path = ffmpeg.repair(path)
 
