@@ -144,16 +144,22 @@ class File(Image, Video):
         # if self.path != "": return self.path
         prefix, ext = os.path.splitext(self.title)
         settings.devPrint("filename: {}|{}".format(prefix, ext))
-        filename = str(prefix)+"{}."+str(ext)
+        filename = str(prefix)+"{}"+str(ext)
         counter = 0
-        while os.path.isfile(filename.format(counter)):
+        tmp = settings.get_tmp()
+        while os.path.isfile(os.path.join(tmp, filename.format(counter))):
             counter += 1
         filename = filename.format(counter)
         settings.devPrint("filename: {}".format(filename))
-        tmp = settings.get_tmp()
         # tmp = File.get_tmp() # i don't think this should be in file over settings
         self.path = os.path.join(tmp, filename)
         return self.path
+
+    def get_title(self):
+        if self.title != "": return self.title
+        title, ext = os.path.splitext(self.path)
+        title = title.replace(".mp4","").replace(".MP4","").replace(".jpg","").replace(".jpeg","")
+
 
     @staticmethod
     def get_tmp():
@@ -187,7 +193,7 @@ class Google_File(File):
         self.id = None
         self.parentID = None
         self.folderName = ""
-        self.title
+        self.title = ""
         self.file = None
 
     def backup(self, arg):
@@ -257,6 +263,13 @@ class Google_File(File):
         if self.file: return self.file
         self.file = Google.get_file(self.id)
         return self.file
+
+    def get_title(self):
+        ## title would be set when created
+        if self.title != "": return self.title
+        title, ext = os.path.splitext(self.path)
+        title = title.replace(".mp4","").replace(".MP4","").replace(".jpg","").replace(".jpeg","")
+
 
     # files are File references
     # file references can be GoogleId references which need to download their source
