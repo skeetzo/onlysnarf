@@ -215,7 +215,7 @@ class Message():
     # uploads to home
     def post(self, Driver):
         successful = False
-        try: successful = Driver.upload(self)
+        try: successful = Driver.post(self)
         except Exception as e:
             settings.devPrint(e)
             successful = False
