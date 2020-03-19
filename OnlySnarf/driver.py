@@ -858,39 +858,105 @@ class Driver:
     ##### Post #####
     ################
 
-    def post(self, text, expires=None, schedule=False, poll=False):
+    def post(self, message):
+        settings.devPrint("posting")
         try:
             auth_ = self.auth()
             if not auth_: return False
             self.go_to_home()
+            path = message.get_files()
+            text = message.get_text()
+            keywords = message.get_keywords()
+            tags = message.get_tags()
+            expires = message.get_expiration()
+            schedule = message.get_schedule()
+            poll = message.get_poll()
+            if not text or text == None or str(text) == "None":
+                print("Warning: Missing Upload Text")
+                text = ""
+            if isinstance(tags, list) and len(tags) > 0: text += " w/ @"+" @".join(tags)
+            if isinstance(keywords, list) and len(keywords) > 0: text += " #"+" #".join(keywords)
+            text = text.strip()
             print("Posting:")
+            settings.maybePrint("- Path: {}".format(path))
+            print("- Keywords: {}".format(keywords))
+            print("- Tags: {}".format(tags))
             print("- Text: {}".format(text))
+            print("- Tweeting: {}".format(settings.TWEETING))
+            ## Expires, Schedule, Poll
             if expires: self.expires(expires)
             if schedule: self.schedule(schedule)
-            if poll: self.poll(poll)
-            settings.devPrint("entering text")
-            enter_text = self.browser.find_element_by_id(ONLYFANS_POST_TEXT_ID)
-            actionChains = ActionChains(self.browser)
-            actionChains.double_click(enter_text).perform()
-            self.browser.find_element_by_id(ONLYFANS_POST_TEXT_ID).send_keys(str(text))
-            settings.devPrint("entered text")
-            settings.devPrint("finding send")
-            send = self.get_element_to_click("new_post")
-            settings.debug_delay_check()
-            if str(settings.DEBUG) == "True":
-                print('Skipped: OnlyFans Post (debug)')
-                settings.devPrint("### Post Maybe Successful ###")
-                return True
-            settings.devPrint("sending post")
-            send.click()
+            if poll: 
+                self.poll(poll)
+                time.sleep(3)
+            WAIT = WebDriverWait(self.browser, 600, poll_frequency=10)
+            ## Tweeting
+            if str(settings.TWEETING) == "True":
+                settings.devPrint("tweeting")
+                WAIT.until(EC.element_to_be_clickable((By.XPATH, ONLYFANS_TWEET))).click()
+            else:
+                settings.devPrint("not tweeting")
+            ## Images
+            try:
+                settings.devPrint("uploading files")
+                successful_upload = self.upload_image_files("image_upload", path)
+            except Exception as e:
+                Driver.error_checker(e)
+                print("Error: Unable to Upload Images")
+                return False
+            ## Text
+            successful_text = self.enter_text(text)
+            if not successful_text:
+                print("Error: Unable to Enter Text")
+                return False
+            ## Confirm
+            i = 0
+            while True:
+                try:
+                    WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, SEND_BUTTON_CLASS)))
+                    settings.devPrint("upload complete")
+                    break
+                except Exception as e:
+                    # try: 
+                    #     # check for existence of "thumbnail is fucked up" modal and hit ok button
+                    #     # haven't seen in long enough time to properly add
+                    #     self.browser.switchTo().frame("iframe");
+                    #     self.browser.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
+                    #     print("Error: Thumbnail Missing")
+                    #     break
+                    # except Exception as ef:
+                    #     settings.maybePrint(ef)
+                    print('uploading...')
+                    Driver.error_checker(e)
+                    i+=1
+                    if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
+                        print('Error: Max Upload Time Reached')
+                        return False
+            try:
+                send = self.get_element_to_click("new_post")
+                if send:
+                    if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
+                        time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+                    if str(settings.DEBUG) == "True":
+                        print('Skipped: OnlyFans Post (debug)')
+                        settings.devPrint("### Post Maybe Successful ###")
+                        return True
+                    settings.devPrint("confirming upload")
+                    send.click()
+                else:
+                    settings.maybePrint("Error: Unable to locate 'Send Post' button")
+                    return False
+            except Exception as e:
+                print("Error: Unable to Send Post")
+                settings.maybePrint(e)
+                return False
             # send[1].click() # the 0th one is disabled
-            print('OnlyFans Post Complete')
             settings.devPrint("### Post Successful ###")
+            print('OnlyFans Post Complete')
             return True
         except Exception as e:
             Driver.error_checker(e)
             print("Error: OnlyFans Post Failure")
-            settings.devPrint("### Post Failure ###")
             return False
 
     ######################
@@ -1319,110 +1385,6 @@ class Driver:
     ##### Upload #####
     ##################
 
-    # Uploads a directory with a video file or image files to OnlyFans
-    def upload(self, message):
-        settings.devPrint("uploading")
-        try:
-            auth_ = self.auth()
-            if not auth_: return False
-            self.go_to_home()
-            path = message.get_files()
-            text = message.get_text()
-            keywords = message.get_keywords()
-            tags = message.get_tags()
-            expires = message.get_expiration()
-            schedule = message.get_schedule()
-            poll = message.get_poll()
-
-            if not text or text == None or str(text) == "None":
-                print("Warning: Missing Upload Text")
-                text = ""
-            text = text.replace(".mp4","").replace(".MP4","").replace(".jpg","").replace(".jpeg","")
-            if isinstance(tags, list) and len(tags) > 0: text += " w/ @"+" @".join(tags)
-            if isinstance(keywords, list) and len(keywords) > 0: text += " #"+" #".join(keywords)
-            text = text.strip()
-            print("Uploading:")
-            settings.maybePrint("- Path: {}".format(path))
-            print("- Keywords: {}".format(keywords))
-            print("- Tags: {}".format(tags))
-            print("- Text: {}".format(text))
-            print("- Tweeting: {}".format(settings.TWEETING))
-            ## Expires, Schedule, Poll
-            if expires: self.expires(expires)
-            if schedule: self.schedule(schedule)
-            if poll: 
-                self.poll(poll)
-                time.sleep(3)
-            WAIT = WebDriverWait(self.browser, 600, poll_frequency=10)
-            ## Tweeting
-            if str(settings.TWEETING) == "True":
-                settings.devPrint("tweeting")
-                WAIT.until(EC.element_to_be_clickable((By.XPATH, ONLYFANS_TWEET))).click()
-            else:
-                settings.devPrint("not tweeting")
-            ## Images
-            try:
-                settings.devPrint("uploading files")
-                successful_upload = self.upload_image_files("image_upload", path)
-            except Exception as e:
-                Driver.error_checker(e)
-                print("Error: Unable to Upload Images")
-                return False
-            ## Text
-            successful_text = self.enter_text(text)
-            if not successful_text:
-                print("Error: Unable to Enter Text")
-                return False
-            ## Confirm
-            i = 0
-            while True:
-                try:
-                    WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, SEND_BUTTON_CLASS)))
-                    settings.devPrint("upload complete")
-                    break
-                except Exception as e:
-                    # try: 
-                    #     # check for existence of "thumbnail is fucked up" modal and hit ok button
-                    #     # haven't seen in long enough time to properly add
-                    #     self.browser.switchTo().frame("iframe");
-                    #     self.browser.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
-                    #     print("Error: Thumbnail Missing")
-                    #     break
-                    # except Exception as ef:
-                    #     settings.maybePrint(ef)
-                    print('uploading...')
-                    Driver.error_checker(e)
-                    i+=1
-                    if i == int(settings.UPLOAD_MAX_DURATION) and settings.FORCE_UPLOAD is not True:
-                        print('Error: Max Upload Time Reached')
-                        return False
-            try:
-                send = self.get_element_to_click("new_post")
-                if send:
-                    if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
-                        time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
-                    if str(settings.DEBUG) == "True":
-                        print('Skipped: OnlyFans Upload (debug)')
-                        settings.devPrint("### Upload Maybe Successful ###")
-                        return True
-                    settings.devPrint("confirming upload")
-                    send.click()
-                else:
-                    settings.maybePrint("Error: Unable to locate 'Send Post' button")
-                    return False
-            except Exception as e:
-                print("Error: Unable to Send Post")
-                settings.maybePrint(e)
-                return False
-            # send[1].click() # the 0th one is disabled
-            settings.devPrint("### Upload Successful ###")
-            print('OnlyFans Upload Complete')
-            return True
-        except Exception as e:
-            Driver.error_checker(e)
-            print("Error: OnlyFans Upload Failure")
-            return False
-
     # uploads image into post or message
     def upload_image_files(self, name="image_upload", path=None):
         settings.devPrint("uploading image files: {} - {}".format(name, path))
@@ -1542,18 +1504,17 @@ class Driver:
     ################
 
     def exit(self):
+        if self.browser == None: return
         if str(settings.SAVE_USERS) == "True":
             print("Saving and Exiting OnlyFans")
             write_users_local()
         else:
             print("Exiting OnlyFans")
-        if self.browser:
-            self.browser.quit()
+        self.browser.quit()
         self.browser = None
         print("Browser Closed")
-        global logged_in
 
-
+##################################################################################
 
 def parse_users(user_ids, starteds, users, usernames):
     # usernames.pop(0)

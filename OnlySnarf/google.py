@@ -96,8 +96,6 @@ def checkAuth():
     if not AUTH:
         AUTH = authGoogle()
 
-authGoogle()
-
 ################################
 ##### Archiving / Deleting #####
 ################################
@@ -113,9 +111,9 @@ def delete_file(file):
 def backup_file(file):
     try:
         global PYDRIVE
-        parentFolder = PYDRIVE.CreateFile({'title':str(self.folderName), 'parents':[{"kind": "drive#fileLink", "id": str(get_posted_folder_by_name(self.category)['id'])}],'mimeType':'application/vnd.google-apps.folder'})
+        parentFolder = PYDRIVE.CreateFile({'title':str(file.folderName), 'parents':[{"kind": "drive#fileLink", "id": str(get_posted_folder_by_name(file.category)['id'])}],'mimeType':'application/vnd.google-apps.folder'})
         parentFolder.Upload()
-        settings.devPrint("Moving To: posted/{}/{}".format(self.category, self.folderName))
+        settings.devPrint("Moving To: posted/{}/{}".format(file.category, file.folderName))
         file['parents'] = [{"kind": "drive#fileLink", "id": str(parentFolder['id'])}]
         file.Upload()
         print("File Backed Up: {}".format(file['title']))
@@ -147,7 +145,6 @@ def create_folders():
 
 def find_folder(parent, folderName):
     checkAuth()
-    global PYDRIVE
     if str(parent) != "root":
         parent = parent['id']
     settings.maybePrint("Finding Folder: {}/{}".format(parent, folderName))
@@ -160,7 +157,6 @@ def find_folder(parent, folderName):
 
 def get_files_of_folder(folderName, parent=None):
     folder = get_folder_by_name(folderName, parent=parent)
-    global PYDRIVE
     files = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType != 'application/vnd.google-apps.folder'"}).GetList()      
     return files
 
@@ -169,7 +165,6 @@ def get_folder_by_name(folderName, parent=None):
     if str(parent) == "galleries" or str(parent) == "images" or str(parent) == "videos" or str(parent) == "performers":
         parent = get_folder_by_name(parent)
     settings.maybePrint("Getting Folder: {}".format(folderName))
-    global PYDRIVE
     if parent is None:
         parent = get_folder_root()
     file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent['id'])}).GetList()
@@ -189,7 +184,6 @@ def get_folder_by_name(folderName, parent=None):
 def get_posted_folder_by_name(folderName):
     checkAuth()
     settings.maybePrint("Getting Posted Folder: {}".format(folderName))
-    global PYDRIVE
     if parent is None:
         parent = get_folder_root()
     posted = None
@@ -224,7 +218,6 @@ def get_posted_folder_by_name(folderName):
 def get_folders_of_folder(folderName, parent=None):
     checkAuth()
     settings.maybePrint("Getting Folders of: {}".format(folderName))
-    global PYDRIVE
     folders = []
     folder_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name(folderName, parent=parent)['id'])}).GetList()
     for folder in folder_list:
@@ -239,7 +232,6 @@ def get_folders_of_folder(folderName, parent=None):
 # Creates the OnlyFans folder structure
 def get_folder_root():
     checkAuth()
-    global PYDRIVE
     global OnlyFansFolder_
     if OnlyFansFolder_ is not None:
         return OnlyFansFolder_
@@ -423,7 +415,6 @@ def download_content(folder):
     checkAuth()
     print('Downloading Content: {}'.format(folder['title']))
     # mkdir /tmp
-    global PYDRIVE
     content_title = folder['title']
     # download folder
     # file_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and (mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or (mimeType contains 'video/mp4' or mimeType contains 'video/quicktime'))"}).GetList()
@@ -471,7 +462,6 @@ def download_performer(folder):
     print('Downloading Performer: {}'.format(folder['title']))
     # mkdir /tmp
     tmp = settings.get_tmp()
-    global PYDRIVE
     content_folders = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     content_found = []
     random_content = None
@@ -501,7 +491,6 @@ def download_scene(sceneFolder):
     checkAuth()
     print('Downloading Scene')
     tmp = settings.get_tmp()
-    global PYDRIVE
     content = None
     preview = None
     folder_list = PYDRIVE.ListFile({'q': "'"+sceneFolder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
@@ -588,7 +577,6 @@ def get_file(id_):
 def get_images():
     checkAuth()
     print('Getting Images')
-    global PYDRIVE
     images_folder = get_folder_by_name("images")
     random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(images_folder['id'])}).GetList()
     images_list = []
@@ -614,7 +602,6 @@ def get_images():
 def get_galleries():
     checkAuth()
     print('Getting Galleries')
-    global PYDRIVE
     gallery_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("galleries")['id'])}).GetList()
     folder_list = []
     random_gallery = None
@@ -656,7 +643,6 @@ def get_galleries():
 def get_videos():
     checkAuth()
     print('Getting Videos')
-    global PYDRIVE
     random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("videos")['id'])}).GetList()
     video_list = []
     random_video = None
@@ -686,7 +672,6 @@ def get_videos():
 def get_message_image(folderName):
     checkAuth()
     print('Getting Message Image: {}'.format(folderName))
-    global PYDRIVE
     random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("messages")['id'])}).GetList()
     images_list = []
     random_image = None
@@ -723,7 +708,6 @@ def get_message_image(folderName):
 def get_random_image():
     checkAuth()
     print('Getting Random Image')
-    global PYDRIVE
     random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("images")['id'])}).GetList()
     images_list = []
     random_image = None
@@ -761,7 +745,6 @@ def get_random_image():
 def get_random_gallery():
     checkAuth()
     print('Getting Random Gallery')
-    global PYDRIVE
     random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("galleries")['id'])}).GetList()
     folder_list = []
     random_gallery = None
@@ -807,7 +790,6 @@ def get_random_gallery():
 def get_random_performer():
     checkAuth()
     print('Getting Random Performer')
-    global PYDRIVE
     random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("performers")['id'])}).GetList()
     performer_list = []
     random_performer = None
@@ -842,7 +824,6 @@ def get_random_performer():
 def get_random_video():
     checkAuth()
     print('Getting Random Video')
-    global PYDRIVE
     random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("videos")['id'])}).GetList()
     video_list = []
     random_video = None
@@ -880,7 +861,6 @@ def get_random_video():
 def get_random_scene():
     checkAuth()
     print('Getting Random Scene')
-    global PYDRIVE
     random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("scenes")['id'])}).GetList()
     folder_list = []
     random_scene = None
