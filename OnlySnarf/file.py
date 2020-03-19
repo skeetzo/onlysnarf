@@ -12,6 +12,8 @@ class Folder:
         if File.backup_text(self.title): return
         Google.upload_gallery(path=self.path)
 
+##########################################################################################
+
 class File:
     def __init__(self):
         self.path = ""
@@ -56,8 +58,6 @@ class File:
             print('Backing Up (file): {}'.format(title))
         return True
 
-    ##############################
-
     @staticmethod
     def backup_files(files=[]):
         if str(settings.SKIP_DOWNLOAD) == "True":
@@ -81,7 +81,7 @@ class File:
         print('Files Backed Up: {}'.format(len(files)))
 
     def check_size(self):
-        size = os.path.getsize(self.getPath())
+        size = os.path.getsize(self.get_path())
         settings.maybePrint("File Size: {}kb - {}mb".format(size/1000, size/1000000))
         global ONE_MEGABYTE
         if size <= ONE_MEGABYTE:
@@ -90,6 +90,8 @@ class File:
         if size <= ONE_HUNDRED_KILOBYTES:
             settings.maybePrint("Error: File Size Too Small")
             print("Error: Download Failure")
+            return False
+        return True
 
     @staticmethod
     def combine(files):
@@ -141,6 +143,7 @@ class File:
         while os.path.isfile(filename.format(counter)):
             counter += 1
         filename = filename.format(counter)
+        settings.devPrint("filename: {}".format(filename))
         return filename
 
     @staticmethod
@@ -149,6 +152,14 @@ class File:
         path = "{}/tmp".format(file.path)
         os.mkdir(path)
         return path
+
+    # files are File references
+    # file references can be GoogleId references which need to download their source
+    # files exist when checked for size
+    def prepare(self):
+        if not self.check_size():
+            return False
+        return True
 
     # upload to GDrive
     # Google.upload_input
@@ -234,6 +245,15 @@ class Google_File(File):
         self.file = Google.get_file(self.id)
         return self.file
 
+    # files are File references
+    # file references can be GoogleId references which need to download their source
+    # files exist when checked for size
+    def prepare(self):
+        if not self.check_size():
+            self.download()
+        return super()
+
+
 ###################################################################################
 
 class Image(File):
@@ -241,7 +261,7 @@ class Image(File):
         File.__init__(self)
         self.combined = ""
 
-    
+###################################################################################
 
 class Video(File):
     def __init__(self):
@@ -252,7 +272,7 @@ class Video(File):
 
     #seconds off front or back
     def trim(self):
-        path = self.getPath()
+        path = self.get_path()
         if str(path) == "":
             print("Error: Missing Path")
             return
@@ -260,7 +280,7 @@ class Video(File):
 
     # into segments (60 sec, 5 min, 10 min)
     def split(self):
-        path = self.getPath()
+        path = self.get_path()
         if str(path) == "":
             print("Error: Missing Path")
             return
@@ -276,32 +296,28 @@ class Video(File):
 
     # frames for preview gallery
     def get_frames(self):
-        path = self.getPath()
+        path = self.get_path()
         if str(path) == "":
             print("Error: Missing Path")
             return
         self.screenshots = ffmpeg.frames(path)
 
     def reduce(self):
-        path = self.getPath()
+        path = self.get_path()
         if str(path) == "":
             print("Error: Missing Path")
             return
         self.path = ffmpeg.reduce(path)
+        # global FIFTY_MEGABYTES
+        # if int(os.stat(str(input_)).st_size) >= FIFTY_MEGABYTES or settings.FORCE_REDUCTION: # greater than 1GB
+        #     input_ = Google.reduce(input_)
+        # data = {"path":str(input_),"text":str(settings.TEXT)}
     
     def repair(self):
-        path = self.getPath()
+        path = self.get_path()
         if str(path) == "":
             print("Error: Missing Path")
             return
         self.path = ffmpeg.repair(path)
 
 
-
-
-
-
-# global FIFTY_MEGABYTES
-# if int(os.stat(str(input_)).st_size) >= FIFTY_MEGABYTES or settings.FORCE_REDUCTION: # greater than 1GB
-#     input_ = Google.reduce(input_)
-# data = {"path":str(input_),"text":str(settings.TEXT)}
