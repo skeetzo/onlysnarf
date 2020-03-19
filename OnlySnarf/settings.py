@@ -159,6 +159,9 @@ class Settings:
         # posting requires clicking open window
         self.MANUAL = False
         ##
+        # available mass messaging choices
+        self.MESSAGE_CHOICES = ["all", "recent", "favorite"]
+        ##
         # -months
         # action: discount
         # the number of months to discount for

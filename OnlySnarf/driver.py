@@ -597,22 +597,24 @@ class Driver:
     ##### Messages #####
     ####################
 
-    def message(self, user):
+    def message(self, username):
         try:
             auth_ = self.auth()
             if not auth_: return False
-            self.go_to_page(ONLYFANS_NEW_MESSAGE_URL)
             type__ = None # default
-            if str(user) == "all": type__ = "messageAll"
-            elif str(user) == "recent": type__ = "messageRecent"
-            elif str(user) == "favorite": type__ = "messageFavorite"
+            if str(username) == "all": type__ = "messageAll"
+            elif str(username) == "recent": type__ = "messageRecent"
+            elif str(username) == "favorite": type__ = "messageFavorite"
+            successful = False
             if type__ != None:
-                settings.devPrint("clicking message type: {}".format(user))
+                self.go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+                settings.devPrint("clicking message type: {}".format(username))
                 self.get_element_to_click(type__).click()
+                successful = True
             else:
-                self.message_user(user)
-            settings.devPrint("Successfully messaged: {}".format(user))
-            return True
+                successful = self.message_user(username)
+            settings.devPrint("Successfully messaged: {}".format(username))
+            return successful
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failure to Message All")
@@ -638,10 +640,9 @@ class Driver:
             settings.devPrint("getting confirm to click")
             confirm = self.get_element_to_click("new_post")
             if str(settings.DEBUG) == "True":
-                if str(settings.DEBUG_DELAY) == "True":
-                    time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
                 print('OnlyFans Message: Skipped (debug)')
                 settings.devPrint("### Message Successful (debug) ###")
+                settings.debug_delay_check()
                 return True
             settings.devPrint("clicking confirm")
             confirm.click()
@@ -657,12 +658,12 @@ class Driver:
     def message_files(self, path):
         try:
             if not path or path == None or str(path) == "None":
-                print("Error: Missing Image(s)")
+                print("Error: Missing File(s)")
                 return False
-            print("Entering image(s): {}".format(path.get("path")))
+            print("Entering image(s): {}".format(path))
             try:
                 settings.devPrint("uploading file")
-                self.upload_image_files(name="uploadImageMessage", path=path.get("path"))
+                self.upload_image_files(name="uploadImageMessage", path=path)
                 settings.maybePrint("Image(s) Entered")
                 settings.debug_delay_check()
                 return True
@@ -716,15 +717,15 @@ class Driver:
             print("Error: Failure to Enter Message")
             return False
 
-    def message_user(self, user):
+    def message_user(self, username):
         try:
             auth_ = self.auth()
             if not auth_: return False
-            username = str(user.username).replace("@u","").replace("@","")
+            username = str(username).replace("@u","").replace("@","")
             if not username or username == None or str(username) == "None":
                 print("Warning: Missing Username")
                 return False
-            settings.maybePrint("goto -> /my/chats/chat/{}".format(username))
+            # settings.maybePrint("goto -> /my/chats/chat/{}".format(username))
             self.go_to_page("{}/{}".format(ONLYFANS_CHAT_URL, username))
             return True
         except Exception as e:
