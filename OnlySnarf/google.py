@@ -304,7 +304,7 @@ def download_file(file, REPAIR=False):
     if not file:
         print("Error: Missing File")
         return
-    tmp = settings.getTmp()
+    tmp = settings.get_tmp()
     if str(settings.SKIP_DOWNLOAD) == "True":
         print("Skipping Download (debug)")
         settings.update_value("input",tmp)
@@ -375,7 +375,7 @@ def download_gallery(folder):
     if not folder:
         print("Error: Missing Folder")
         return
-    tmp = settings.getTmp()
+    tmp = settings.get_tmp()
     if str(settings.SKIP_DOWNLOAD) == "True":
         print("Skipping Download (debug)")
         settings.update_value("input",tmp)
@@ -470,7 +470,7 @@ def download_performer(folder):
     checkAuth()
     print('Downloading Performer: {}'.format(folder['title']))
     # mkdir /tmp
-    tmp = settings.getTmp()
+    tmp = settings.get_tmp()
     global PYDRIVE
     content_folders = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
     content_found = []
@@ -500,7 +500,7 @@ def download_performer(folder):
 def download_scene(sceneFolder):
     checkAuth()
     print('Downloading Scene')
-    tmp = settings.getTmp()
+    tmp = settings.get_tmp()
     global PYDRIVE
     content = None
     preview = None

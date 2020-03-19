@@ -27,10 +27,10 @@ class Message():
         text = settings.TEXT or ""
         if str(text) != "": return text
         print("Text:")
-        text = input("({})>> ".format(text))
-        if text == None or str(text) == "": return False
-        self.text = text
-        return text
+        text_ = input("({})>> ".format(text))
+        if text_ == None or str(text_) == "": return text
+        self.text = text_
+        return text_
 
     def get_keywords(self):
         if len(self.keywords) > 0: return self.keywords
@@ -56,7 +56,7 @@ class Message():
         if len(tags) > 0: return tags
         print("Tags: ")
         tags = input("({})>> ".format(tags))
-        if tags == "": return None
+        if tags == "": return []
         if str(tags) == "None":
             tags = []
         elif str(tags) == "[]":
@@ -84,10 +84,10 @@ class Message():
         price = settings.PRICE or ""
         if str(price) != "": return price
         print("Price (>{}):".format(settings.PRICE_MINIMUM))
-        price = input("({})>> ".format(price))
-        if price == None or str(price) == "": return False
-        self.price = price
-        return price
+        price_ = input("({})>> ".format(price))
+        if price_ == None or str(price_) == "": return price
+        self.price = price_
+        return price_
 
     # ensures listed recipients are users
     # if includes [all, recent, favorite] & usernames it only uses the 1st found of [all,...]
@@ -106,13 +106,13 @@ class Message():
         expires = settings.EXPIRES or ""
         if str(expires) != "": return expires
         print("Expiration [1, 3, 7, 99 or 'No limit']:")
-        expires = input("({})>> ".format(expires))
-        if expires == None or str(expires) == "": return False
-        if str(expires).lower() not in settings.EXPIRATION_ALLOWED:
+        expires_ = input("({})>> ".format(expires_))
+        if expires_ == None or str(expires_) == "": return expires
+        if str(expires_).lower() not in settings.EXPIRATION_ALLOWED:
             print("Error: Incorrect Expiration")
-            return False
-        self.expiration = expires
-        return expires
+            return expires
+        self.expiration = expires_
+        return expires_
 
     def get_poll(self):
         if self.poll and self.poll.questions and len(self.poll.questions) > 0: return self.poll
@@ -146,20 +146,20 @@ class Message():
         duration = settings.DURATION or ""
         if str(duration) != "": return duration
         print("Duration [1, 3, 7, 99 or 'No limit']:")
-        duration = input("({})>> ".format(duration))
-        if duration == None or str(duration) == "": return False
-        if str(duration).lower() not in settings.DURATION_ALLOWED:
+        duration_ = input("({})>> ".format(duration))
+        if duration_ == None or str(duration_) == "": return duration
+        if str(duration_).lower() not in settings.DURATION_ALLOWED:
             print("Error: Incorrect Duration")
-            return False
-        self.duration = duration
-        return duration
+            return ""
+        self.duration = duration_
+        return duration_
 
     def get_schedule(self):
         if self.schedule: return self.schedule
         schedule = settings.get_schedule()
         if schedule: return schedule
         schedule_ = self.prompt(schedule_, "Schedule (y/n): ")
-        if not schedule_: return None
+        if not schedule_: return schedule
         schedule_ = input( "({})>> ".format(schedule))
         date_ = settings.DATE or ""
         print("Date [mm/dd/YY]: ")
