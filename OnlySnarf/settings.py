@@ -88,6 +88,14 @@ class Settings:
         # default user greeting
         self.DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
         ##
+        ##
+        #
+        self.DISCOuNT_MAX_AMOUNT = 55
+        self.DISCOuNT_MIN_AMOUNT = 10
+        self.DISCOUNT_MAX_MONTHS = 7
+        self.DISCOUNT_MIN_MONTHS = 1
+        self.DISCOUNT = None
+        ##
         # download path
         self.DOWNLOAD_PATH = "/opt/apps/onlysnarf/downloads"
         ##
@@ -157,7 +165,7 @@ class Settings:
         ##
         # -manual
         # posting requires clicking open window
-        self.MANUAL = False
+        # self.MANUAL = False # removed
         ##
         # available mass messaging choices
         self.MESSAGE_CHOICES = ["all", "recent", "favorite"]
@@ -279,6 +287,10 @@ class Settings:
         # shows window
         self.SHOW_WINDOW = False
         ##
+        # -tags
+        # @[tag]
+        self.TAGS = []
+        ##
         # -text
         # text for message or upload
         self.TEXT = None
@@ -305,6 +317,10 @@ class Settings:
         # -user
         # the user to target
         self.USER = None
+        ##
+        # -users
+        # the users to target
+        self.USERS = []
         ##
         # user id found in OnlyFans
         self.USER_ID = None
@@ -341,11 +357,11 @@ class Settings:
         while i < len(sys.argv):
             sys.argv[i] = sys.argv[i][1:] # remove - in front
             # truths set the variable True when provided
-            truths_ = ["MANUAL","VERBOSEST","VERSION","VERBOSER","DEBUG_FORCE","REPAIR","REDUCE","SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
+            truths_ = ["VERBOSEST","VERSION","VERBOSER","DEBUG_FORCE","REPAIR","REDUCE","SKIP_DELETE_GOOGLE","SKIP_BACKUP","BACKUP","CREATE_DRIVE","DEBUG","DEBUG_DELAY","DELETE_GOOGLE","FORCE_DELETE","FORCE_UPLOAD","FORCE_REDUCTION","PREFER_LOCAL","SAVE_USERS","SHOW_WINDOW","SKIP_DELETE","SKIP_DOWNLOAD","SKIP_REDUCE","SKIP_REPAIR","SKIP_UPLOAD","TWEETING","VERBOSE","THUMBNAILING_PREVIEW"]
             # falses set the variable False when provided
             falses_ = ["EXIT"]
             # nexts set the variable to the next provided argument input
-            nexts_ = ["DOWNLOAD_PATH","IMAGE_UPLOAD_LIMIT_MESSAGES","UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_DOWNLOAD_LIMIT","IMAGE_UPLOAD_LIMIT","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
+            nexts_ = ["TAGS","USERS","DOWNLOAD_PATH","IMAGE_UPLOAD_LIMIT_MESSAGES","UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_DOWNLOAD_LIMIT","IMAGE_UPLOAD_LIMIT","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0
             while j < len(truths_):
                 if str(truths_[j]).upper() == str(sys.argv[i]).upper().replace("-","_"):
@@ -381,26 +397,6 @@ class Settings:
             self.GOOGLE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.GOOGLE_PATH)
             self.USERS_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.USERS_PATH)
             self.WORKING_VIDEO = os.path.join(os.path.dirname(os.path.realpath(__file__)), self.WORKING_VIDEO)
-        if self.KEYWORDS != "":
-            if str(self.KEYWORDS) == "None":
-                self.KEYWORDS = []
-            elif str(self.KEYWORDS) == "[]":
-                self.KEYWORDS = []
-            elif str(self.KEYWORDS) == " ":
-                self.KEYWORDS = []
-            else:
-                self.KEYWORDS = self.KEYWORDS.split(",")
-                self.KEYWORDS = [n.strip() for n in self.KEYWORDS]
-        if self.PERFORMERS != "":
-            if str(self.PERFORMERS) == "None":
-                self.PERFORMERS = []
-            elif str(self.PERFORMERS) == "[]":
-                self.PERFORMERS = []
-            elif str(self.PERFORMERS) == " ":
-                self.PERFORMERS = []
-            else:
-                self.PERFORMERS = self.PERFORMERS.split(",")
-                self.PERFORMERS = [n.strip() for n in self.PERFORMERS]
         self.INITIALIZED = True
         # print("Settings Initialized")
     ###################################################
@@ -421,18 +417,31 @@ class Settings:
                 print(colorize(text, "red")) 
             elif str(self.VERBOSEST) == "True":
                 print(colorize(text, "blue"))
-            
-    def getInput(self):
-        if str(self.INPUT) == "None":
-            self.maybePrint("Warning: Missing Local Input")
-            return False
-        if os.path.isdir(str(self.INPUT)):  
-            print("Found: Directory")  
-        elif os.path.isfile(str(self.INPUT)):  
-            print("Found: File")  
-        else:  
-            self.maybePrint("Warning: Missing Local Path")
-        return self.INPUT
+
+    def get_action(self):
+        action = None
+        if str(settings.ACTION) != "discount":
+            action = None
+        elif str(settings.ACTION) != "post":
+            action = []
+        elif str(settings.ACTION) != "message":
+            action = []
+        else:
+
+    def get_discount(self):
+        if settings.DISCOUNT: return settings.DISCOUNT
+        amount = settings.AMOUNT or settings.DISCOuNT_MIN_AMOUNT
+        months = settings.MONTHS or settings.DISCOUNT_MIN_MONTHS
+        discount = {"amount":amount,"months":months}
+        settings.DISCOUNT = discount
+        return discount
+
+    def get_message(self):
+        if settings.MESSAGE: return settings.MESSAGE
+        message = Message()
+        message.get_post()
+        settings.MESSAGE = message
+        return message
 
     def get_keywords(self):
         keywords = []
@@ -446,6 +455,19 @@ class Settings:
             keywords = settings.KEYWORDS.split(",")
             keywords = [n.strip() for n in keywords]
         return keywords
+
+    def get_performers(self):
+        performers = []
+        if str(settings.PERFORMERS) == "None":
+            performers = []
+        elif str(settings.PERFORMERS) == "[]":
+            performers = []
+        elif str(settings.PERFORMERS) == " ":
+            performers = []
+        else:
+            performers = settings.PERFORMERS.split(",")
+            performers = [n.strip() for n in performers]
+        return performers
 
     def get_tags(self):
         tags = []
@@ -478,16 +500,19 @@ class Settings:
                 self.SCHEDULE = "{}:{}".format(self.DATE,"00:00")
         return None
 
-    def get_tmp(self):
-        # mkdir /tmp
-        tmp = os.getcwd()
-        if self.MOUNT_PATH != None:
-            tmp = os.path.join(self.MOUNT_PATH, "tmp")
+    # comma separated string of usernames
+    def get_users(self):
+        users = []
+        if str(settings.USERS) == "None":
+            users = []
+        elif str(settings.USERS) == "[]":
+            users = []
+        elif str(settings.USERS) == " ":
+            users = []
         else:
-            tmp = os.path.join(tmp, "tmp")
-        if not os.path.exists(str(tmp)):
-            os.mkdir(str(tmp))
-        return tmp
+            users = settings.USERS.split(",")
+            users = [n.strip() for n in users]
+        return users
 
     def loginPrompt(self):
         username = input("Twitter Username ({}): ".format(self.USERNAME))
@@ -501,22 +526,19 @@ class Settings:
         if str(self.VERBOSE) == "True":
             print(colorize(text, "teal"))
 
-    # Deletes local file
-    def remove_local(self):
-        try:
-            if str(self.SKIP_DELETE) == "True" or str(self.INPUT) != "None":
-                self.maybePrint("Skipping Local Remove")
-                return
-            # print('Deleting Local File(s)')
-            # delete /tmp
-            tmp = self.get_tmp()
-            if os.path.exists(tmp):
-                shutil.rmtree(tmp)
-                print('Local File(s) Removed')
-            else:
-                print('Local Files Not Found')
-        except Exception as e:
-            self.maybePrint(e)
+    def save_password(self, newPassword):
+        settings.PASSWORD = str(newPassword)
+        # from passlib.context import CryptContext
+        # pwd_context = CryptContext(
+        #         schemes=["pbkdf2_sha256"],
+        #         default="pbkdf2_sha256",
+        #         pbkdf2_sha256__default_rounds=30000
+        # )
+        # def encrypt_password(password):
+        #     return pwd_context.encrypt(password)
+        # def check_encrypted_password(password, hashed):
+        #     return pwd_context.verify(password, hashed)
+        # settings.PASSWORD = encrypt_password(newPassword)
 
     def version_check(self):
         print("OnlySnarf version: {}".format(colorize(pkg_resources.get_distribution("onlysnarf").version,"yellow")))
