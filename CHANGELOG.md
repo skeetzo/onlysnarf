@@ -300,9 +300,13 @@
   - mostly functional
   
 ----------------------------------------
+  - upload -> post
+  - Message, Folder (unused), File, Google_File, Video, Image classes
+  - ffmpeg.py
+  - login function cleaned up / spawn_browser
+  - 
 
   **2.17.0**
-  - ffmpeg / file
 
   **2.16.**
   - tested: settings get

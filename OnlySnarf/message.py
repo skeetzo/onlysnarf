@@ -8,6 +8,7 @@ class Message():
         ##
         self.keywords = []
         self.tags = []
+        self.performers = []
         ## messages
         self.price = None
         self.recipients = [] # users to send to
@@ -50,6 +51,25 @@ class Message():
         self.keywords = keywords
         return keywords
 
+    def get_performers(self):
+        if len(self.performers) > 0: return self.performers
+        performers = settings.get_tags() or []
+        if len(performers) > 0: return performers
+        print("Performers: ")
+        performers = input("({})>> ".format(performers))
+        if performers == "": return []
+        if str(performers) == "None":
+            performers = []
+        elif str(performers) == "[]":
+            performers = []
+        elif str(performers) == " ":
+            performers = []
+        else:
+            performers = performers.split(",")
+            performers = [n.strip() for n in performers]
+        self.performers = performers
+        return performers
+
     def get_tags(self):
         if len(self.tags) > 0: return self.tags
         tags = settings.get_tags() or []
@@ -90,16 +110,18 @@ class Message():
         return price_
 
     # ensures listed recipients are users
+    # settings.USERS and self.recipients should be usernames
     # if includes [all, recent, favorite] & usernames it only uses the 1st found of [all,...]
-    # def get_recipients(self):
-    #     users = []
-    #     for user in self.recipients:
-    #         if isinstance(user, str):
-    #             if user in settings.MESSAGE_CHOICES:
-    #                 return [user] 
-    #         user = User(user)
-    #         users.append(user)
-    #     return users
+    def get_recipients(self):
+        if len(self.recipients) == 0 and len(settings.get_users()) > 0: self.recipients = settings.get_users()
+        users = []
+        for user in self.recipients:
+            if isinstance(user, str):
+                if user in settings.MESSAGE_CHOICES:
+                    return [user] 
+            user = User(user)
+            users.append(user)
+        return users
 
     def get_expiration(self):
         if self.expiration: return self.expiration
@@ -182,38 +204,25 @@ class Message():
         self.get_schedule()
 
     # sends to recipients
-    def send(self, Driver=None):
+    # 'post' as recipient will post message instead
+    def send(self):
         self.get_post()
         successful = False
         try: 
             # for user in self.get_recipients():
-            for user in self.recipients:
+            for user in self.get_recipients():
                 # if isinstance(user, str): 
-                successful_ = User.message(Driver=Driver, user=user, message=self)
+                if str(user) == "post": successful_ = Driver.post(self)
+                else: successful_ = User.message_user(username=user, message=self)
                 if successful_: successful = successful_
-                if self.username in settings.MESSAGE_CHOICES: break
+                # if self.username in settings.MESSAGE_CHOICES: break
         except Exception as e:
             settings.devPrint(e)
             successful = False
         if successful: self.backup_files()
 
-        # if str(choice) != "user":
-        #     print("Messaging: {}".format(choice))
-        #     successful = User.message(self.driver, choice, message, file, price)
-            
-        #     successful = User.message(self.driver, message)
-        # elif str(choice) == "user":
-        #     print("Messaging: User - {}".format(username))
-        #     if username is None:
-        #         print("Error: Missing Username")
-        #         return False
-        #     user = User.get_user_by_username(self.driver, str(username))
-        #     if user is None: return False
-        #     settings.devPrint("User Found: {}".format(username))
-        #     successful = User.message(self.driver, user, message, file, price)
-
-    # uploads to home
-    def post(self, Driver):
+    def post(self):
+        self.get_post()
         successful = False
         try: successful = Driver.post(self)
         except Exception as e:
