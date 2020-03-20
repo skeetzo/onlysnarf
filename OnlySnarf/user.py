@@ -10,6 +10,7 @@ from datetime import datetime
 from re import sub
 from decimal import Decimal
 ##
+from OnlySnarf.driver import Driver
 from OnlySnarf.settings import SETTINGS as settings
 
 class User:
@@ -45,7 +46,7 @@ class User:
             settings.devPrint(e)
             settings.devPrint("User: {}".format(self.id))
 
-    def discount(self, Driver=None, discount={}):
+    def discount(self, discount={}):
         amount = getattr(discount, "amount")
         months = getattr(discount, "months")
         if not amount: amount = input("Discount: ")
@@ -54,24 +55,23 @@ class User:
         successful = Driver.discount_user(self.username, discount)
         return successful
 
-    def message(self, Driver=None, message=None):
-        if not Driver: Driver = Driver.get()
+    def message(self, message=None):
         if str(self.username) == "": return print("User Error: Missing Message Username")
         print("Messaging: {}".format(self.username))
         successful = Driver.message(self.username, message)
         if not successful: return False
-        successful = User.enter_message(Driver, message)
+        successful = User.enter_message(message)
         if not successful: return False
         print("Messaged: {}".format(self.username))
 
     @staticmethod
-    def message(Driver=None, username="", message=None):
+    def message_user(username="", message=None):
         user = User()
         setattr(user, "username", username)
-        user.message(Driver=Driver, message=message)
+        user.message(message=message)    
 
     @staticmethod
-    def enter_message(Driver, message=None):
+    def enter_message(message=None):
         try:
             print("Entering Message: {} - ${}".format(message, price))
             def enter_text(text):
@@ -142,7 +142,7 @@ class User:
             return print("Error: User Not New")
         print("Sending User Greeting: {}".format(self.username))
         # self.send_message(message=settings.DEFAULT_GREETING)
-        User.enter_message(Driver=None, message=settings.DEFAULT_GREETING)
+        User.enter_message(message=settings.DEFAULT_GREETING)
 
     # send refresher message to user
     def refresh(self):
@@ -153,7 +153,7 @@ class User:
             return print("Error: Refresher Date Too Early - {}".format((timedelta(self.last_messaged_on)-timedelta(datetime())).days))
         print("Sending User Refresher: {}".format(self.username))
         # self.send_message(message=settings.user_DEFAULT_REFRESHER)
-        User.enter_message(Driver=None, message=settings.user_DEFAULT_REFRESHER)
+        User.enter_message(message=settings.user_DEFAULT_REFRESHER)
 
     # saves chat log to user
     def readChat(self, Driver):
@@ -166,7 +166,7 @@ class User:
         settings.maybePrint("Chat Read: {} - {}".format(self.username, self.id))
 
     # saves statement / payment history
-    def statementHistory(self, Driver, history):
+    def statementHistory(self, history):
         print("Reading Statement History: {} - {}".format(self.username, self.id))
         Driver.read_statements(user=self.id)
 
@@ -181,12 +181,12 @@ class User:
         self.isFavorite = False
 
     @staticmethod
-    def get_all_users(Driver):
-        return User.get_active_users(Driver)
+    def get_all_users():
+        return User.get_active_users()
 
     # gets users from local or refreshes from onlyfans.com
     @staticmethod
-    def get_active_users(Driver):
+    def get_active_users():
         if str(settings.PREFER_LOCAL) == "True": return read_users_local()
         active_users = []
         users = Driver.users_get()
@@ -205,7 +205,7 @@ class User:
         return active_users
 
     @staticmethod
-    def get_user_by_username(Driver, username):
+    def get_user_by_username(username):
         if not username or username == None:
             print("Error: Missing Username")
             return None
@@ -214,7 +214,7 @@ class User:
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
                 settings.maybePrint("Found User: Local")
                 return user
-        users = User.get_all_users(Driver)
+        users = User.get_all_users()
         for user in users:
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
                 settings.maybePrint("Found User: Members")
@@ -223,9 +223,9 @@ class User:
         return None
 
     @staticmethod
-    def get_favorite_users(Driver):
+    def get_favorite_users():
         settings.maybePrint("Getting Fav Users")
-        users = User.get_all_users(Driver)
+        users = User.get_all_users()
         favUsers = []
         favorites = ",".join(str(settings.USERS_FAVORITE))
         for user in users:
@@ -238,9 +238,9 @@ class User:
 
     # returns users that have no messages sent to them
     @staticmethod
-    def get_new_users(Driver):
+    def get_new_users():
         settings.maybePrint("Getting New Users")
-        users = User.get_all_users(Driver)
+        users = User.get_all_users()
         newUsers = []
         date_ = datetime.today() - timedelta(days=10)
         for user in users:
@@ -254,10 +254,10 @@ class User:
         return newUsers
 
     @staticmethod
-    def get_never_messaged_users(Driver):
+    def get_never_messaged_users():
         settings.maybePrint("Getting New Users")
-        update_chat_logs(Driver)
-        users = User.get_all_users(Driver)
+        update_chat_logs()
+        users = User.get_all_users()
         newUsers = []
         for user in users:
             if len(user.messages_to) == 0:
@@ -268,9 +268,9 @@ class User:
         return newUsers
 
     @staticmethod
-    def get_recent_users(Driver):
+    def get_recent_users():
         settings.maybePrint("Getting Recent Users")
-        users = User.get_all_users(Driver)
+        users = User.get_all_users()
         i = 0
         users_ = []
         for user in users:

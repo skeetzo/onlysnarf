@@ -30,7 +30,7 @@ class File(Image, Video):
         self.folderName = "" # google folder name
         self.parentID = "" # google parent file id
 
-    ##############################
+    ######################################################################################
 
     # move to backup folder in GDrive
     # Google.move_file
@@ -40,7 +40,7 @@ class File(Image, Video):
         if str(self.path) == "":
             print("Error: Missing File Path - {}".format(self.title))
             return False
-        Google.upload_file(path=self.path)
+        Google.upload_file(path=self.path, parent=Google.get_file(self.parentID))
         print('File Backed Up: {}'.format(self.title))
 
     @staticmethod
@@ -146,7 +146,7 @@ class File(Image, Video):
         settings.devPrint("filename: {}|{}".format(prefix, ext))
         filename = str(prefix)+"{}"+str(ext)
         counter = 0
-        tmp = settings.get_tmp()
+        tmp = File.get_tmp()
         while os.path.isfile(os.path.join(tmp, filename.format(counter))):
             counter += 1
         filename = filename.format(counter)
@@ -186,6 +186,23 @@ class File(Image, Video):
         # basically handled by backup process
         pass
 
+    # Deletes all local files
+    def remove_local(self):
+        try:
+            if str(self.SKIP_DELETE) == "True":
+                self.maybePrint("Skipping Local Remove")
+                return
+            # print('Deleting Local File(s)')
+            # delete /tmp
+            tmp = self.get_tmp()
+            if os.path.exists(tmp):
+                shutil.rmtree(tmp)
+                print('Local File(s) Removed')
+            else:
+                print('Local Files Not Found')
+        except Exception as e:
+            self.maybePrint(e)
+
 ###################################################################################
 
 class Google_File(File):
@@ -198,11 +215,11 @@ class Google_File(File):
 
     def backup(self, arg):
         if self.backup_text(): return
-        Google.backup_file(path=Google.get_file(self.id))
+        Google.backup_file(Google.get_file(self.id))
 
     def delete(self, arg):
         if self.delete_text(): return
-        Google.delete(path=Google.get_file(self.id))
+        Google.delete(Google.get_file(self.id))
 
     def download_text(title):
         if str(settings.SKIP_DOWNLOAD) == "True":

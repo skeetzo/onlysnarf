@@ -20,8 +20,7 @@ from oauth2client import file, client, tools
 from apiclient.http import MediaFileUpload,MediaIoBaseDownload
 ##
 from .settings import SETTINGS as settings
-from .file import Image, Video
-
+from .file import Google_File
 
 ###################
 ##### Globals #####
@@ -102,7 +101,8 @@ def checkAuth():
 
 # Deletes online file
 def delete_file(file):
-    file.Trash()
+    try: file.Trash()
+    except Exception as e: settings.devPrint(e)
 
 # Archives posted file / folder by updating their parent id
 # posted
