@@ -6,20 +6,56 @@ ONE_MEGABYTE = 1000000
 FIFTY_MEGABYTES = 50000000
 ONE_HUNDRED_KILOBYTES = 100000
 
-class Folder:
+MIMETYPES_IMAGES = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"
+MIMETYPES_VIDEOS = "(mimeType contains 'video/mp4' or mimeType contains 'video/quicktime' or mimeType contains 'video/x-ms-wmv' or mimeType contains 'video/x-flv')"
+MIMETYPES_ALL = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or mimeType contains 'video/mp4' or mimeType contains 'video/quicktime')"
+
+MIMETYPES_IMAGES_LIST = ["image/jpeg","image/jpg","image/png"]
+MIMETYPES_VIDEOS_LIST = ["video/mp4","video/quicktime","video/x-ms-wmv","video/x-flv"]
+
+def print_same_line(text):
+    sys.stdout.write('\r')
+    sys.stdout.flush()
+    sys.stdout.write(text)
+    sys.stdout.flush()
+
+class Folder(File):
     def __init__(self):
         self.files = []
         self.id = None
         self.parentID = None
         self.title = ""
+        self.path = ""
 
     def backup(self):
         if File.backup_text(self.title): return
-        Google.upload_gallery(path=self.path)
+        Google.upload_gallery(files=self.files)
+
+    def download(self):
+        if not folder:
+            print("Error: Missing Folder")
+            return
+        print("Downloading Folder: {}".format(self.get_title()))
+        file_list = Google.get_folder_by_id(self.get_id())
+        folder_size = len(self.files)
+        settings.maybePrint('Folder size: '+str(folder_size))
+        settings.maybePrint('Upload limit: '+str(settings.IMAGE_UPLOAD_LIMIT))
+        if int(folder_size) == 0:
+            print('Error: Empty Folder')
+            return False
+        random.shuffle(file_list)
+        file_list = file_list[:int(settings.IMAGE_UPLOAD_LIMIT)]
+        i = 1
+        for file in sorted(file_list, key = lambda x: x.get_title()):
+            print_same_line("Downloading: {} ({}/{})".format(file.get_title(), i, folder_size))
+            file.download()
+            i+=1
+        print()
+        print("Downloaded: {}".format(self.get_title()))
 
 ##########################################################################################
 
-class File(Image, Video):
+class File():
     def __init__(self):
         self.path = ""
         self.ext = "" 
@@ -40,7 +76,7 @@ class File(Image, Video):
         if str(self.path) == "":
             print("Error: Missing File Path - {}".format(self.title))
             return False
-        Google.upload_file(path=self.path, parent=Google.get_file(self.parentID))
+        Google.upload_file(file=self)
         print('File Backed Up: {}'.format(self.title))
 
     @staticmethod
@@ -138,11 +174,16 @@ class File(Image, Video):
 
     ##############################
 
+    def get_ext(self):
+        if self.ext != "": return self.ext
+        self.get_title()
+
     # "filename (1).ext"
     def get_path(self):
         # if i enable this then it defeats the point of the while loop and might have duplicate filenames
         # if self.path != "": return self.path
-        prefix, ext = os.path.splitext(self.title)
+        prefix, ext = os.path.splitext(self.get_title())
+        self.ext = ext
         settings.devPrint("filename: {}|{}".format(prefix, ext))
         filename = str(prefix)+"{}"+str(ext)
         counter = 0
@@ -156,10 +197,14 @@ class File(Image, Video):
         return self.path
 
     def get_title(self):
-        if self.title != "": return self.title
+        if str(self.title) != "": return self.title
+        if str(self.path) == "":
+            print("Error: Missing File Path")
+            return  ""
         title, ext = os.path.splitext(self.path)
-        title = title.replace(".mp4","").replace(".MP4","").replace(".jpg","").replace(".jpeg","")
-
+        self.ext = ext
+        self.title = title
+        return self.title
 
     @staticmethod
     def get_tmp():
@@ -212,14 +257,15 @@ class Google_File(File):
         self.folderName = ""
         self.title = ""
         self.file = None
+        self.parent = None
 
     def backup(self, arg):
         if self.backup_text(): return
-        Google.backup_file(Google.get_file(self.id))
+        Google.backup_file(self)
 
     def delete(self, arg):
         if self.delete_text(): return
-        Google.delete(Google.get_file(self.id))
+        Google.delete(self)
 
     def download_text(title):
         if str(settings.SKIP_DOWNLOAD) == "True":
@@ -242,50 +288,80 @@ class Google_File(File):
     # Download File
     def download(self):
         if Google_File.download_text(self.title): return False
-        path = self.get_path()
         print("Downloading File: {}".format(self.title))
         # download file
         def method_two():
-            self.get_file().GetContentFile(path)
-            print("Download Complete: Alternative")
-        def method_one():
-            try:
-                with open(str(path), 'w+b') as output:
-                    # print("8",end="",flush=True)
-                    file_id = self.id
-                    request = DRIVE.files().get_media(fileId=self.id)
-                    downloader = MediaIoBaseDownload(output, request)
-                    # print("=",end="",flush=True)
-                    done = False
-                    while done is False:
-                        # print("=",end="",flush=True)
-                        status, done = downloader.next_chunk()
-                        if str(settings.VERBOSE) == "True":
-                            print("Downloading: %d%%\r" % (status.progress() * 100), end="")
-                    # print("D")
-                    print("Download Complete: Regular")
-            except Exception as e:
-                settings.maybePrint(e)
-                return False
-            return True 
-        successful = method_one() or method_two()
+            self.get_file().GetContentFile(self.get_path())
+            print("Download Complete (2)")
+        # def method_one():
+        #     try:
+        #         with open(str(self.get_path()), 'w+b') as output:
+        #             # print("8",end="",flush=True)
+        #             request = DRIVE.files().get_media(fileId=self.get_id())
+        #             downloader = MediaIoBaseDownload(output, request)
+        #             # print("=",end="",flush=True)
+        #             done = False
+        #             while done is False:
+        #                 # print("=",end="",flush=True)
+        #                 status, done = downloader.next_chunk()
+        #                 if str(settings.VERBOSE) == "True":
+        #                     print("Downloading: %d%%\r" % (status.progress() * 100), end="")
+        #             # print("D")
+        #             print("Download Complete (1)")
+        #     except Exception as e:
+        #         settings.maybePrint(e)
+        #         return False
+        #     return True 
+        # successful = method_one() or method_two()
+        successful = method_two()
         ### Finish ###
-        if not os.path.isfile(str(path)):
+        if not os.path.isfile(str(self.get_path())):
             print("Error: Missing Downloaded File")
             return
         self.check_size()
         print("Downloaded: {}".format(self.title))
 
+    def get_id(self):
+        if self.id != "": return self.id
+        if self.file: self.id = self.file["id"]
+        return self.id
+
     def get_file(self):
         if self.file: return self.file
-        self.file = Google.get_file(self.id)
+        self.file = Google.get_file(self.get_id())
         return self.file
+
+    def get_mimetype(self):
+        if self.mimeType != "": return self.mimeType
+        ext = self.get_ext()
+        for mimeType in MIMETYPES_ALL_LIST:
+            if str(ext) == str(mimeType.split("/")[1]):
+                self.mimeType = mimeType
+                break
+        return self.mimeType
+
+    def get_parent(self):
+        if self.parent: return self.parent 
+        try: 
+            if self.parentID == "": 
+                self.parent = get_folder_by_name("posted")
+                self.parentID = self.parent["id"]
+            else: 
+                self.parent = Google.get_file(self.parentID)
+        except Exception as e: settings.devPrint(e)
+        return self.parent
+
+    def get_parent_id(self):
+        if self.parentID != "": return self.parentID
+        self.parent = get_folder_by_name("posted")
+        self.parentID = self.parent["id"]
+        return self.parentID
 
     def get_title(self):
         ## title would be set when created
         if self.title != "": return self.title
-        title, ext = os.path.splitext(self.path)
-        title = title.replace(".mp4","").replace(".MP4","").replace(".jpg","").replace(".jpeg","")
+        self.title = self.get_file()["title"]
+        return self.title
 
 
     # files are File references
@@ -298,13 +374,13 @@ class Google_File(File):
 
 ###################################################################################
 
-class Image():
+class Image(File):
     def __init__(self):
         pass
 
 ###################################################################################
 
-class Video():
+class Video(File):
     def __init__(self):
         self.screenshots = []
         self.trimmed = ""
@@ -350,5 +426,4 @@ class Video():
             settings.devPrint("skipping repair: {}".format(self.title))
             return
         self.path = ffmpeg.repair(path)
-
 
