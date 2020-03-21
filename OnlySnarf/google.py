@@ -48,6 +48,12 @@ MIMETYPES_IMAGES = "(mimeType contains 'image/jpeg' or mimeType contains 'image/
 MIMETYPES_VIDEOS = "(mimeType contains 'video/mp4' or mimeType contains 'video/quicktime' or mimeType contains 'video/x-ms-wmv' or mimeType contains 'video/x-flv')"
 MIMETYPES_ALL = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or mimeType contains 'video/mp4' or mimeType contains 'video/quicktime')"
 
+def print_same_line(text):
+    sys.stdout.write('\r')
+    sys.stdout.flush()
+    sys.stdout.write(text)
+    sys.stdout.flush()
+
 ################
 ##### Auth #####
 ################
@@ -101,7 +107,7 @@ def checkAuth():
 
 # Deletes online file
 def delete_file(file):
-    try: file.Trash()
+    try: file.get_file().Trash()
     except Exception as e: settings.devPrint(e)
 
 # Archives posted file / folder by updating their parent id
@@ -111,11 +117,11 @@ def delete_file(file):
 def backup_file(file):
     try:
         global PYDRIVE
-        parentFolder = PYDRIVE.CreateFile({'title':str(file.folderName), 'parents':[{"kind": "drive#fileLink", "id": str(get_posted_folder_by_name(file.category)['id'])}],'mimeType':'application/vnd.google-apps.folder'})
+        parentFolder = PYDRIVE.CreateFile({'title':str(file.get_folder_name()), 'parents':[{"kind": "drive#fileLink", "id": str(get_posted_folder_by_name(file.get_category())['id'])}],'mimeType':'application/vnd.google-apps.folder'})
         parentFolder.Upload()
-        settings.devPrint("Moving To: posted/{}/{}".format(file.category, file.folderName))
-        file['parents'] = [{"kind": "drive#fileLink", "id": str(parentFolder['id'])}]
-        file.Upload()
+        settings.devPrint("Moving To: posted/{}/{}".format(file.get_category(), file.get_folder_name()))
+        file.get_file()['parents'] = [{"kind": "drive#fileLink", "id": str(parentFolder['id'])}]
+        file.get_file().Upload()
         print("File Backed Up: {}".format(file['title']))
     except Exception as e:
         settings.maybePrint(e)
@@ -291,109 +297,21 @@ def download(fileChoice, methodChoice="random", file=None):
         print("Error: Unable to Download")
         return None
 
-# Download File
-def download_file(file, REPAIR=False):
-    if not file:
-        print("Error: Missing File")
-        return
-    tmp = settings.get_tmp()
-    if str(settings.SKIP_DOWNLOAD) == "True":
-        print("Skipping Download (debug)")
-        settings.update_value("input",tmp)
-        return {"path":tmp}
-    checkAuth()
-    print('Downloading File: {}'.format(file['title']))
-    # download file
-    name = os.path.splitext(file['title'])[0]
-    ext = os.path.splitext(file['title'])[1].lower()
-    if not ext:
-        ext = '.mp4'
-        settings.maybePrint('ext (default): '+str(ext))
-    else:
-        settings.maybePrint('ext: '+str(ext))
-    name = "{}{}".format(name, ext)
-    tmp = os.path.join(tmp, name)
-    settings.maybePrint("name: {}".format(name))
-    settings.maybePrint('path: '+str(tmp))
-    if str(ext).lower() == ".mp4":
-        try:
-            with open(tmp, 'w+b') as output:
-                # print("8",end="",flush=True)
-                file_id = file['id']
-                request = DRIVE.files().get_media(fileId=file['id'])
-                downloader = MediaIoBaseDownload(output, request)
-                # print("=",end="",flush=True)
-                done = False
-                while done is False:
-                    # print("=",end="",flush=True)
-                    status, done = downloader.next_chunk()
-                    if str(settings.VERBOSE) == "True":
-                        print("Downloading: %d%%\r" % (status.progress() * 100),end="")
-                # print("D")
-                print("Download Complete: Regular")
-        except Exception as e:
-            settings.maybePrint(e)
-            file.GetContentFile(tmp)
-            print("Download Complete: Alternative")
-        if REPAIR:
-            tmp = repair(tmp)
-        global FIFTY_MEGABYTES
-        if int(os.stat(str(tmp)).st_size) >= FIFTY_MEGABYTES or settings.FORCE_REDUCTION: # greater than 1GB
-            tmp = reduce(tmp)
-        tmp = thumbnail_fix(tmp)
-    else:
-        file.GetContentFile(tmp)
-        print("Download Complete: Alt")
-    ### Finish ###
-    if not os.path.isfile(str(tmp)):
-        print("Error: Missing Downloaded File")
-        return False
-    size = os.path.getsize(tmp)
-    settings.maybePrint("File Size: {}kb - {}mb".format(size/1000, size/1000000))
-    global ONE_MEGABYTE
-    if size <= ONE_MEGABYTE:
-        settings.maybePrint("Warning: Small File Size")
-    global ONE_HUNDRED_KILOBYTES
-    if size <= ONE_HUNDRED_KILOBYTES:
-        settings.maybePrint("Error: File Size Too Small")
-        print("Error: Download Failure")
-        return False
-    settings.update_value("input",tmp)
-    print('Downloaded: File')
-    return {"path":tmp}
-
 # Download Gallery
-def download_gallery(folder):
-    if not folder:
-        print("Error: Missing Folder")
+def get_folder_by_id(folderID):
+    if not folderID:
+        print("Error: Missing Folder ID")
         return
-    tmp = settings.get_tmp()
-    if str(settings.SKIP_DOWNLOAD) == "True":
-        print("Skipping Download (debug)")
-        settings.update_value("input",tmp)
-        return {"path":tmp,"files":[]}
     checkAuth()
-    print('Downloading Gallery: {}'.format(folder['title']))
-    # download folder
     global PYDRIVE
-    file_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
-    folder_size = len(file_list)
-    settings.maybePrint('Folder size: '+str(folder_size))
-    settings.maybePrint('Upload limit: '+str(settings.IMAGE_UPLOAD_LIMIT))
-    if int(folder_size) == 0:
-        print('Error: Empty Folder')
-        return False
-    random.shuffle(file_list)
-    file_list = file_list[:int(settings.IMAGE_UPLOAD_LIMIT)]
-    i = 1
-    for file in sorted(file_list, key = lambda x: x['title']):
-        print('Downloading: {} ({}/{})'.format(file['title'], i, folder_size))
-        settings.maybePrint('filePath: '+os.path.join(tmp, str(file['title'])))
-        file.GetContentFile(os.path.join(tmp, str(file['title'])))
-        i+=1
-    print('Downloaded: Gallery')
-    settings.update_value("input",tmp)
-    return {"path":tmp,"files":file_list}
+    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(folderID)}).GetList()
+    files = []
+    for file in file_list:
+        file_ = Google_File()
+        setattr(file_, "id", file["id"])
+        setattr(file_, "file", file)
+        files.append(file_)
+    return files
 
 def download_message_image(folderName="random"):
     print('Fetching Image')
@@ -401,12 +319,12 @@ def download_message_image(folderName="random"):
     data = {}
     try:
         file = get_message_image(folderName)
-        data = download_file(file.get("file"))
+        data = download_file(file)
     except Exception as e:
         settings.maybePrint(e)
         return {"file":"","path":""}
     settings.update_value("input",data.get("path"))
-    return {"path":data.get("path"), "file":file.get("file")}
+    return {"path":data.get("path"), "file":file}
 
 def download_content(folder):
     if not folder:
@@ -592,12 +510,14 @@ def get_images():
         images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()      
         for image_file in images_list_tmp:
             # images_list.append({"folder":folder['title'],"folder_id":folder['id'],"id":image_file['id'],"image":image_file['title']})
-            images_list.append([folder, image_file])
+            file = Google_File()
+            setattr(file, "parent", folder)
+            setattr(file, "file", image_file)
+            images_list.append(file)
     if len(images_list)==0:
         print('Warning: Missing Message Files')
         return []
     return images_list
-
 
 def get_galleries():
     checkAuth()
@@ -634,7 +554,9 @@ def get_galleries():
             if len(gallery_list_tmp_tmp)>0:
                 folder_name = folder['title']
                 settings.maybePrint(" -> found")
-                galleries.append(folder_)
+                folder__ = Folder()
+                setattr(folder__, "files", gallery_list_tmp_tmp)
+                galleries.append(folder__)
             else:
                 settings.maybePrint(" -> empty")
     print('Galleries: '+str(len(galleries)))
@@ -666,7 +588,9 @@ def get_videos():
         else:
             settings.maybePrint(" -> empty")
     if len(video_list)==0: print('Warning: Missing Video File')
-    return video_list
+    folder_ = Folder()
+    setattr(folder_, "files", video_list)
+    return folder_
 
 # gets all the images in the messages folders
 def get_message_image(folderName):
@@ -702,7 +626,10 @@ def get_message_image(folderName):
     random_image = PYDRIVE.ListFile({'q': "'"+random_image['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
     random_image = random.choice(random_image)
     print('Messages Image: '+random_image['title'])
-    return {"file":random_image, "keywords":folder_name}
+    file = Google_File()
+    setattr(file, "file", random_image)
+    setattr(file, "keywords", str(folder_name))
+    return file
 
 # Downloads random image from Google Drive
 def get_random_image():
@@ -739,7 +666,10 @@ def get_random_image():
     random_image = PYDRIVE.ListFile({'q': "'"+random_image['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
     random_image = random.choice(random_image)
     print('Random Image: '+random_image['title'])
-    return {"file":random_image,"keywords":folder_name}
+    file = Google_File()
+    setattr(file, "file", random_image)
+    setattr(file, "keywords", str(folder_name))
+    return file
 
 # Downloads random gallery from Google Drive
 def get_random_gallery():
@@ -775,16 +705,18 @@ def get_random_gallery():
         random_gallery_tmp = random.choice(gallery_list_tmp)
         gallery_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+random_gallery_tmp['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
         if len(gallery_list_tmp_tmp)>0:
-            folder_name = folder['title']
-            random_gallery = random_gallery_tmp
             settings.maybePrint(" -> found")
+            random_gallery = Folder()
+            setattr(random_gallery, "files", gallery_list_tmp_tmp)
+            setattr(random_gallery, "keywords", folder['title'])
         else:
             settings.maybePrint(" -> empty")
     if not random_gallery:
         print('Error: Missing Gallery Folder')
-        return {"file":"","keywords":""}
+        return None
+        # return {"file":"","keywords":""}
     print('Random Gallery: '+random_gallery['title'])
-    return {"file":random_gallery,"keywords":folder_name}
+    return random_gallery
 
 # Downloads random performer from Google Drive
 def get_random_performer():
@@ -817,8 +749,10 @@ def get_random_performer():
         print('Error: Missing Performer Folder')
         return {"file":"","keywords":""}
     random_performer = random.choice(performer_list)
-    print('Random Performer: '+random_performer['title'])
-    return {"file":random_performer}
+    performer = Google_File()
+    setattr(performer, "file", random_performer)
+    print('Random Performer: '+performer['title'])
+    return performer
 
 # Downloads random video from Google Drive
 def get_random_video():
@@ -855,7 +789,10 @@ def get_random_video():
     random_video = PYDRIVE.ListFile({'q': "'"+random_video['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
     random_video = random.choice(random_video)
     print('Random Video: '+random_video['title'])
-    return {"file":random_video,"keywords":folder_name}
+    video = Google_File()
+    setattr(video, "file", random_video)
+    setattr(video, "keywords", folder_name)
+    return video
 
 # Downloads random scene from Google Drive
 def get_random_scene():
@@ -898,44 +835,13 @@ def get_random_scene():
         print('Error: Missing Scene Folders')
         return {"file":"","keywords":""}
     print('Random Scene: '+random_scene['title'])
-    return {"file":random_scene,"keywords":folder_name}
+    scene = Google_File()
+    setattr(scene, "file", random_scene)
+    setattr(scene, "keywords", folder_name)
+    return scene
 
 def download_random_files():
     pass
-
-def get_random_files():
-
-            if str(settings.TYPE) == "image" and str(settings.METHOD) == "random":
-                file = Google.get_random_image()
-                files = [file.get("file"), file.get("keywords")]
-            elif str(settings.TYPE) == "image":
-                files = Google.get_images()
-            elif str(settings.TYPE) == "gallery" and str(settings.METHOD) == "random":
-                file = Google.get_random_gallery()
-                files = [file.get("file"), file.get("keywords")]
-            elif str(settings.TYPE) == "gallery":
-                files = Google.get_galleries()
-            elif str(settings.TYPE) == "video" and str(settings.METHOD) == "random":
-                file = Google.get_random_video()
-                files = [file.get("file"), file.get("keywords")]
-            elif str(settings.TYPE) == "video":
-                files = Google.get_videos()
-            else: 
-                print("Error: Missing Type")
-                return False
-            # if str(settings.TYPE) == "image" or str(settings.TYPE) == "None": 
-            if str(settings.TYPE) == "gallery":
-                folders = []
-                for file_ in files:
-                    try:
-                        if file_.get("mimeType") and file_.get("mimeType") == "application/vnd.google-apps.folder":
-                            folders.append(file_)
-                    except: pass
-                file = random.choice(folders)
-
-
-
-
 
 ##################
 ##### Random #####
@@ -951,22 +857,22 @@ def random_download(fileChoice):
     try:
         if fileChoice == 'image':
             file = get_random_image()
-            data = download_file(file.get("file"))
+            data = download_file(file)
         elif fileChoice == 'gallery':
             file = get_random_gallery()
-            data = download_gallery(file.get("file"))
+            data = download_gallery(file)
         elif fileChoice == 'performer':
             file = get_random_performer()
-            data = download_performer(file.get("file"))
-            performers = file.get("file").get("title").split(" ")
+            data = download_performer(file)
+            performers = file.get("title").split(" ")
             file_ = data.get("file")
             keywords = data.get("keywords")
         elif fileChoice == 'scene':
             file = get_random_scene()
-            return download_scene(file.get("file"))
+            return download_scene(file)
         elif fileChoice == 'video':
             file = get_random_video()
-            data = download_file(file.get("file"))
+            data = download_file(file)
         else:
             return print("Error: Missing File Choice")
         if file == None or data == None:
@@ -975,19 +881,18 @@ def random_download(fileChoice):
     except Exception as e:
         settings.maybePrint(e)
         return {"path":"","file":"","files":[],"keywords":"","performers":[]}
-    return {"path":data.get("path"), "file":file_ or file.get("file"), "files":data.get("files"), "keywords":keywords or file.get("keywords"), "performers":performers}
+    return {"path":data.get("path"), "file":file_ or file, "files":data.get("files"), "keywords":keywords or file.get("keywords"), "performers":performers}
+
 
 ##################
 ##### Upload #####
 ##################
 
-def upload_file(path=None, parent=None):
+def upload_file(file=None):
     checkAuth()
-    file = os.path.basename(path)
-    filename = os.path.splitext(file)[0]
-    ext = os.path.splitext(file)[1].lower()
-    mimetype = None
-    print(settings.SKIP_BACKUP)
+    if not file:
+        print("Error: Missing File")
+        return False
     if str(settings.FORCE_BACKUP) == "True":
         print("Google Upload (forced): {}".format(filename))
     elif str(settings.DEBUG) == "True":
@@ -1001,18 +906,10 @@ def upload_file(path=None, parent=None):
         return
     else:
         print('Google Upload (file): {}'.format(filename))
-    # if "mov" in ext or "mp4" in ext:
-    if "jpg" in ext or "jpeg" in ext:
-        mimetype = "image/jpeg"
-    else:
-        mimetype = "video/mp4"
     # if not mimetype:
     #     print("Error: Missing Mimetype")
     #     return
-    if not parent: parent = get_folder_by_name("posted")
-    if not parent:
-        print("Error: Missing Posted Folder")
-        return
+    
     # file_metadata = {
     #     'name': str(filename),
     #     'mimeType': str(mimetype),
@@ -1020,12 +917,12 @@ def upload_file(path=None, parent=None):
     # }
     # media = MediaFileUpload(path, mimetype=str(mimetype), resumable=True)
     # file = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
-    file = PYDRIVE.CreateFile({'title':str(filename), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':str(mimetype)})
-    file.SetContentFile(path)
-    file.Upload()
+    uploadedFile = PYDRIVE.CreateFile({'title':str(file.get_title()), 'parents':[{"kind": "drive#fileLink", "id": str(file.get_parent_id())}],'mimeType':str(file.get_mimetype())})
+    uploadedFile.SetContentFile(file.get_path())
+    uploadedFile.Upload()
     # print('File ID: {}'.format(file.get('id')))
 
-def upload_gallery(path=None):
+def upload_gallery(files=[]):
     parent = get_folder_by_name("posted")
     if not parent:
         print("Error: Missing Posted Folder")
@@ -1052,9 +949,9 @@ def upload_gallery(path=None):
     # parent = DRIVE.files().create(body=file_metadata, fields='id').execute()
     tmp_folder = PYDRIVE.CreateFile({'title':str(datetime.datetime.now()), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':'application/vnd.google-apps.folder'})
     tmp_folder.Upload()
-    files = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
     for file in files:
-        upload_file(path=file, parent=tmp_folder)
+        setattr(file, "parent", tmp_folder)
+        upload_file(file=file)
 
 def upload_input(path=None):
     if not path: path = settings.INPUT
