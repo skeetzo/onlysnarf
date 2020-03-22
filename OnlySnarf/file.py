@@ -242,21 +242,24 @@ class File():
         pass
 
     # Deletes all local files
+    @staticmethod
     def remove_local(self):
         try:
-            if str(self.SKIP_DELETE) == "True":
-                self.maybePrint("Skipping Local Remove")
+            if str(settings.SKIP_DELETE) == "True":
+                settings.maybePrint("Skipping Local Remove")
                 return
             # print('Deleting Local File(s)')
             # delete /tmp
-            tmp = self.get_tmp()
+            tmp = File.get_tmp()
             if os.path.exists(tmp):
                 shutil.rmtree(tmp)
                 print('Local File(s) Removed')
             else:
                 print('Local Files Not Found')
         except Exception as e:
-            self.maybePrint(e)
+            settings.maybePrint(e)
+
+
 
 ###################################################################################
 

@@ -8,6 +8,39 @@ import pkg_resources
 import shutil
 import time
 
+
+
+
+
+
+
+
+
+
+
+import argparse
+
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('integers', metavar='N', type=int, nargs='+',
+                    help='an integer for the accumulator')
+parser.add_argument('--sum', dest='accumulate', action='store_const',
+                    const=sum, default=max,
+                    help='sum the integers (default: find the max)')
+
+args = parser.parse_args()
+print(args.accumulate(args.integers))
+
+
+
+
+
+
+
+
+
+
+
+
 class Settings:
     def __init__(self):
         pass
@@ -43,6 +76,18 @@ class Settings:
         # -bykeyword
         # the keyword to find in folder selection
         self.BYKEYWORD = None
+        ##
+        # configurable w/ profile.conf
+        # OnlySnarf Drive folder list
+        self.CATEGORIES_DEFAULT = [
+            "images",
+            "galleries",
+            "videos"
+        ]
+        self.CATEGORIES = [
+            "performers",
+            "scenes"
+        ]
         ##
         # -create-drive 
         # creates missing OnlySnarf folders in Google Drive
@@ -98,16 +143,6 @@ class Settings:
         ##
         # download path
         self.DOWNLOAD_PATH = "/opt/apps/onlysnarf/downloads"
-        ##
-        # configurable w/ profile.conf
-        # OnlySnarf Drive folder list
-        self.DRIVE_FOLDERS = [
-            "images",
-            "galleries",
-            "performers",
-            "scenes",
-            "videos"
-        ]
         ##
         # -duration
         # poll or post duration
@@ -361,7 +396,7 @@ class Settings:
             # falses set the variable False when provided
             falses_ = ["EXIT"]
             # nexts set the variable to the next provided argument input
-            nexts_ = ["TAGS","USERS","DOWNLOAD_PATH","IMAGE_UPLOAD_LIMIT_MESSAGES","UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_DOWNLOAD_LIMIT","IMAGE_UPLOAD_LIMIT","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
+            nexts_ = ["CATEGORIES","TAGS","USERS","DOWNLOAD_PATH","IMAGE_UPLOAD_LIMIT_MESSAGES","UPLOAD_MAX_DURATION","NOTKEYWORD","BYKEYWORD","PERFORMERS","KEYWORDS","DURATION","QUESTIONS","DATE","TIME","SCHEDULE","EXPIRES","USERS_FAVORITE","CRON","METHOD","PRICE","AMOUNT","MONTHS","ACTION","CRON_USER","INPUT","IMAGE","IMAGE_DOWNLOAD_LIMIT","IMAGE_UPLOAD_LIMIT","TYPE","TEXT","USER","DRIVE_PATH","GOOGLE_PATH","MOUNT_PATH","USERS_PATH","USERNAME","PASSWORD","USER_ID"]
             j = 0
             while j < len(truths_):
                 if str(truths_[j]).upper() == str(sys.argv[i]).upper().replace("-","_"):
@@ -435,6 +470,9 @@ class Settings:
         discount = {"amount":amount,"months":months}
         settings.DISCOUNT = discount
         return discount
+
+    def get_categories(self):
+        return list(self.CATEGORIES_DEFAULT).extend(list(self.CATEGORIES))
 
     def get_message(self):
         if settings.MESSAGE: return settings.MESSAGE

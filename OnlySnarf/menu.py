@@ -52,7 +52,6 @@ menuItems = []
 actionItems = []
 messageItems = []
 fileItems = []
-locationItems = []
 promotionItems = []
 settingItems = []
 methodItems = []
@@ -116,8 +115,7 @@ def initialize():
     global actionItems
     # Actions Menu
     actionItems = [
-        [ "Upload", "upload_prep" ],
-        [ "Download", "download" ],
+        # [ "Download", "download" ],
         # [ "Promotion", "promotion" ],
         [ "Message", "message" ],
         [ "Discount", "discount" ],
@@ -135,14 +133,12 @@ def initialize():
     # Message Menu
     messageItems = [
         [ "All", "all"],
-        # [ "New", "new"],
         [ "Recent", "recent"],
         # [ "Favorite", "favorite"],
-        [ "User by Username", "user"],
-        [ "Select User", "select"]
+        [ "Enter Username", "user"],
+        [ "Select Username", "select"]
     ]
     if str(settings.DEBUG) == "True":
-        messageItems.append([ "New", "new"])
         messageItems.append([ "Favorite", "favorite"])
     messageItems = sorted(messageItems)
     messageItems.insert(0,[ "Back", "main"])
@@ -156,18 +152,11 @@ def initialize():
         # [ "Scene", "scene"],
         [ "Video", "video"],
     ]
-    if str(settings.DEBUG) == "True":
-        fileItems.append([ "Scene", "scene"])
+    for str(category) in settings.get_categories():
+        fileItems.append([ str(category).capitalize(), str(category).lower()])
+    # if str(settings.DEBUG) == "True":
     fileItems = sorted(fileItems)
     fileItems.insert(0,[ "Back", "main"])
-
-    global locationItems
-    # File Location Menu
-    locationItems = sorted([
-        [ "Local", "local"],
-        [ "Google Drive", "google"]
-    ])
-    locationItems.insert(0,[ "Back", "main"])
 
     global promotionItems
     if str(settings.DEBUG) == "True":
@@ -295,6 +284,534 @@ def initialize():
 ##### Functions #####
 #####################
 
+
+
+from __future__ import print_function, unicode_literals
+from PyInquirer import prompt, print_json
+from __future__ import print_function, unicode_literals
+from PyInquirer import style_from_dict, Token, prompt, print_json
+from PyInquirer import Validator, ValidationError
+from examples import custom_style_2
+from pprint import pprint
+from __future__ import print_function, unicode_literals
+from pprint import pprint
+from PyInquirer import style_from_dict, Token, prompt, Separator
+from examples import custom_style_2
+from __future__ import print_function, unicode_literals
+from PyInquirer import style_from_dict, Token, prompt, print_json
+from examples import custom_style_2
+from __future__ import print_function, unicode_literals
+from PyInquirer import style_from_dict, Token, prompt, print_json
+from examples import custom_style_2
+from __future__ import print_function, unicode_literals
+from pprint import pprint
+from PyInquirer import style_from_dict, Token, prompt, Separator
+from examples import custom_style_2
+from __future__ import print_function
+from pprint import pprint
+from PyInquirer import prompt
+from examples import custom_style_1
+from __future__ import print_function, unicode_literals
+from PyInquirer import style_from_dict, Token, prompt
+from examples import custom_style_2
+from __future__ import print_function, unicode_literals
+import regex
+from pprint import pprint
+from PyInquirer import style_from_dict, Token, prompt
+from PyInquirer import Validator, ValidationError
+from examples import custom_style_3
+from __future__ import print_function, unicode_literals
+from PyInquirer import style_from_dict, Token, prompt, print_json
+from PyInquirer import Validator, ValidationError
+from examples import custom_style_2
+from pprint import pprint
+from __future__ import print_function, unicode_literals
+import regex
+from pprint import pprint
+from PyInquirer import style_from_dict, Token, prompt
+from PyInquirer import Validator, ValidationError
+from examples import custom_style_2
+
+
+
+
+
+
+
+# get all settings from settings.get_etc and argparse
+# confirm settings
+
+# first menu prompt for actions, settings, etc
+# actions prompts actions dialogue tree
+# settings prompts settings dialogue tree
+
+# so make actions dialogue tree
+# - discount, message, post
+
+# make settings dialogue tree
+# - app settings
+
+# make profile settings dialogue tree
+# - profile (synced and unsynced)
+
+
+
+# main menu
+# show header
+# show options
+# - Action
+# - Crons
+# - Profile
+# - Settings
+
+# Action
+# - Discount
+# - Message
+# - Post
+# - Promotion
+
+# Discount
+# - all, recent, etc
+# - by username
+# - select
+# 
+# - user, 
+# - amount (%), duration (months)
+
+# Message
+# - all, recent, etc
+# - by username
+# - select
+
+# Post
+# - text, files
+# - keywords, tags, performers
+# - schedule, poll, expiration
+#
+# - date: day, time
+# - questions, duration (preset 1, 3, 5, ...)
+# - expiration (preset 1, 3, 5, ...)
+
+# Promotion
+# - all, recent, etc
+# - create new
+# - delete [all]
+# - user
+# - from examples
+#
+# - user
+# - amount (preset or incremental %), duration (months)
+
+#####
+
+# Profile
+# - account, [ other page names]
+
+#####
+# Settings
+# - args, [ other options]
+
+
+
+
+
+
+
+def show_header():
+    # os.system('clear')
+    print(colorize(header, 'header'))
+    print(colorize('version '+version+'\n', 'green'))
+    showUser()
+    showSettings()
+
+
+def ask_direction():
+    directions_prompt = {
+        'type': 'list',
+        'name': 'direction',
+        'message': 'Which direction would you like to go?',
+        'choices': ['Forward', 'Right', 'Left', 'Back']
+    }
+    answers = prompt(directions_prompt)
+    return answers['direction']
+
+# TODO better to use while loop than recursion!
+
+
+def main():
+    print('You find yourself in a small room, there is a door in front of you.')
+    exit_house()
+
+def main():
+    show_header()
+    main_menu()
+
+
+def ask_menu():
+    menu_prompt = {
+        'type': 'list',
+        'name': 'menu',
+        'message': 'Please select an option:',
+        'choices': ['Action', 'Profile', 'Settings', 'Exit']
+    }
+    answers = prompt(menu_prompt)
+    return answers['menu']
+
+def main_menu():
+    direction = ask_menu()
+    if (direction == 'Action'): action_menu()
+    elif (direction == 'Profile'): profile_menu()
+    elif (direction == 'Settings'): settings_menu()
+    else: exit()
+
+def ask_action():
+    menu_prompt = {
+        'type': 'list',
+        'name': 'action',
+        'message': 'Please select an action:',
+        'choices': ['Back', 'Discount', 'Message', 'Post', 
+            # 'Promotion'
+        ]
+    }
+    if str(settings.DEBUG) == "True":
+        menu_prompt["choices"].append("Promotion")
+    answers = prompt(menu_prompt)
+    return answers['action']
+
+def action_menu():
+    action = ask_action()
+    if (action == 'Back'):main()
+    elif (action == 'Discount'): discount_menu()
+    elif (action == 'Message'): message_menu()
+    elif (action == 'Post'): post_menu()
+    elif (action == 'Promotion'): promotion_menu()
+    else: main()
+
+def myround(x, base=5):
+    return base * round(x/base)
+
+def discount_menu():
+    user = user_menu()
+    # 5-55% / 5
+    discount_prompt = {
+        'type': 'input',
+        'name': 'amount',
+        'message': 'Amount (increments of 5) in %?',
+        'validate': NumberValidator,
+        'filter': lambda val: int(myround(val))
+    },
+    # 1-12 months
+    {
+        'type': 'input',
+        'name': 'duration',
+        'message': 'Months?',
+        'validate': NumberValidator,
+        'filter': lambda val: int(val)
+
+    }
+    answers = prompt(discount_prompt)
+    Snarf.discount(choice=user, discount={"amount":answers["amount"], "duration":answers["duration"]})
+    main()
+
+# returns the list of usernames to select
+def user_menu():
+    pass
+
+def message_menu():
+    message = Message()
+    Snarf.message(message=message.prompt())
+    main()
+
+def post_menu():
+    pass
+
+def promotion_menu():
+    pass
+
+
+
+def encounter2b():
+    prompt({
+        'type': 'list',
+        'name': 'weapon',
+        'message': 'Pick one',
+        'choices': [
+            'Use the stick',
+            'Grab a large rock',
+            'Try and make a run for it',
+            'Attack the wolf unarmed'
+        ]
+    }, style=custom_style_2)
+    print('The wolf mauls you. You die. The end.')
+
+
+
+class PhoneNumberValidator(Validator):
+    def validate(self, document):
+        ok = regex.match('^([01]{1})?[-.\s]?\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})\s?((?:#|ext\.?\s?|x\.?\s?){1}(?:\d+)?)?$', document.text)
+        if not ok:
+            raise ValidationError(
+                message='Please enter a valid phone number',
+                cursor_position=len(document.text))  # Move cursor to end
+
+
+class NumberValidator(Validator):
+    def validate(self, document):
+        try:
+            int(document.text)
+        except ValueError:
+            raise ValidationError(
+                message='Please enter a number',
+                cursor_position=len(document.text))  # Move cursor to end
+
+
+print('Hi, welcome to Python Pizza')
+
+questions = [
+    {
+        'type': 'confirm',
+        'name': 'toBeDelivered',
+        'message': 'Is this for delivery?',
+        'default': False
+    },
+    {
+        'type': 'input',
+        'name': 'phone',
+        'message': 'What\'s your phone number?',
+        'validate': PhoneNumberValidator
+    },
+    {
+        'type': 'list',
+        'name': 'size',
+        'message': 'What size do you need?',
+        'choices': ['Large', 'Medium', 'Small'],
+        'filter': lambda val: val.lower()
+    },
+    {
+        'type': 'input',
+        'name': 'quantity',
+        'message': 'How many do you need?',
+        'validate': NumberValidator,
+        'filter': lambda val: int(val)
+    },
+    {
+        'type': 'expand',
+        'name': 'toppings',
+        'message': 'What about the toppings?',
+        'choices': [
+            {
+                'key': 'p',
+                'name': 'Pepperoni and cheese',
+                'value': 'PepperoniCheese'
+            },
+            {
+                'key': 'a',
+                'name': 'All dressed',
+                'value': 'alldressed'
+            },
+            {
+                'key': 'w',
+                'name': 'Hawaiian',
+                'value': 'hawaiian'
+            }
+        ]
+    },
+    {
+        'type': 'rawlist',
+        'name': 'beverage',
+        'message': 'You also get a free 2L beverage',
+        'choices': ['Pepsi', '7up', 'Coke']
+    },
+    {
+        'type': 'input',
+        'name': 'comments',
+        'message': 'Any comments on your purchase experience?',
+        'default': 'Nope, all good!'
+    },
+    {
+        'type': 'list',
+        'name': 'prize',
+        'message': 'For leaving a comment, you get a freebie',
+        'choices': ['cake', 'fries'],
+        'when': lambda answers: answers['comments'] != 'Nope, all good!'
+    }
+]
+
+answers = prompt(questions, style=custom_style_3)
+print('Order receipt:')
+pprint(answers)
+
+
+
+
+
+
+questions = [
+    {
+        'type': 'rawlist',
+        'name': 'theme',
+        'message': 'What do you want to do?',
+        'choices': [
+            'Order a pizza',
+            'Make a reservation',
+            Separator(),
+            'Ask opening hours',
+            'Talk to the receptionist'
+        ]
+    },
+    {
+        'type': 'rawlist',
+        'name': 'size',
+        'message': 'What size do you need',
+        'choices': ['Jumbo', 'Large', 'Standard', 'Medium', 'Small', 'Micro'],
+        'filter': lambda val: val.lower()
+    }
+]
+
+answers = prompt(questions, style=custom_style_2)
+print_json(answers)
+
+
+
+
+questions = [
+    {
+        'type': 'input',
+        'name': 'first_name',
+        'message': 'What\'s your first name',
+    }
+]
+
+answers = prompt(questions)
+print_json(answers)  # use the answers as input for your app
+
+
+def get_delivery_options(answers):
+    options = ['bike', 'car', 'truck']
+    if answers['size'] == 'jumbo':
+        options.append('helicopter')
+    return options
+
+
+questions = [
+    {
+        'type': 'list',
+        'name': 'theme',
+        'message': 'What do you want to do?',
+        'choices': [
+            'Order a pizza',
+            'Make a reservation',
+            Separator(),
+            'Ask for opening hours',
+            {
+                'name': 'Contact support',
+                'disabled': 'Unavailable at this time'
+            },
+            'Talk to the receptionist'
+        ]
+    },
+    {
+        'type': 'list',
+        'name': 'size',
+        'message': 'What size do you need?',
+        'choices': ['Jumbo', 'Large', 'Standard', 'Medium', 'Small', 'Micro'],
+        'filter': lambda val: val.lower()
+    },
+    {
+        'type': 'list',
+        'name': 'delivery',
+        'message': 'Which vehicle you want to use for delivery?',
+        'choices': get_delivery_options,
+    },
+]
+
+answers = prompt(questions, style=custom_style_2)
+pprint(answers)
+
+
+
+def get_password_options(answers):
+    return {
+        'type': 'password',
+        'message': 'Enter your Twitter password',
+        'name': 'password'
+    }
+
+
+
+questions = [
+    {
+        'type': 'checkbox',
+        'qmark': '😃',
+        'message': 'Select toppings',
+        'name': 'toppings',
+        'choices': [ 
+            Separator('= The Meats ='),
+            {
+                'name': 'Ham'
+            },
+            {
+                'name': 'Ground Meat'
+            },
+            {
+                'name': 'Bacon'
+            },
+            Separator('= The Cheeses ='),
+            {
+                'name': 'Mozzarella',
+                'checked': True
+            },
+            {
+                'name': 'Cheddar'
+            },
+            {
+                'name': 'Parmesan'
+            }
+        ],
+        'validate': lambda answer: 'You must choose at least one topping.' \
+            if len(answer) == 0 else True
+    }
+]
+questions = [
+    {
+        'type': 'confirm',
+        'message': 'Do you want to continue?',
+        'name': 'continue',
+        'default': True,
+    },
+    {
+        'type': 'confirm',
+        'message': 'Do you want to exit?',
+        'name': 'exit',
+        'default': False,
+    },
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Action Menu - file type
 def action():
     for item in actionItems:
@@ -306,7 +823,7 @@ def action():
             if str(actionItems[int(choice)][1]) == "main":
                 return main()
             elif str(actionItems[int(choice)][1]) == "reset":
-                settings.remove_local()
+                File.remove_local()
             elif str(actionItems[int(choice)][1]) == "message":
                 actionChoice = list(actionItems[int(choice)])[1]
                 return finalizeMessage(actionChoice)
@@ -671,6 +1188,19 @@ def selectPost():
             print(sys.exc_info()[0])
             print("Error: Incorrect Index")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 def finalizeCron(actionChoice):
     for item in cronItems:
         print(colorize("[" + str(cronItems.index(item)) + "] ", 'teal') + list(item)[0])
@@ -727,8 +1257,43 @@ def performCron(actionChoice, cronChoice):
         print("Error: Missing Cron Action")
     mainMenu()    
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def displayBoth(folderName, parent=None):
     files = Google.get_files_of_folder(folderName, parent=parent)
+    # def get_files_by_folder_id(folderID):
     folders = Google.get_folders_of_folder(folderName, parent=parent)
     files_both = []
     for f in files: files_both.append(f)
@@ -741,6 +1306,7 @@ def displayBoth(folderName, parent=None):
     return files_both
 
 def displayFiles(folderName, parent=None):
+    # def get_files_by_folder_id(folderID):
     files = Google.get_files_of_folder(folderName, parent=parent)
     print(colorize("[0] ", 'blue') + "Back")
     i = 1
@@ -783,6 +1349,39 @@ def selectImage(folderName):
 #################################################################################################
 #################################################################################################
 #################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # this pattern needs to be turned into a function
 # it needs to take one of the arrays of settings options and update the ones passed in
 
@@ -885,6 +1484,43 @@ def sync_to_profile_tab(label):
     # syncs profile settings for the specificed tab to onlyfans
     pass
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### OnlySnarf Settings Menu
 def set_settings():
     showHeader()
@@ -948,17 +1584,8 @@ def set_settings():
             settings.maybePrint(e)
             return main()
 
-###########################
+######################################################
 
-def colorize(string, color):
-    if not color in colors: return string
-    return colors[color] + string + '\033[0m'
-  
-def exit():
-    print("Shnarrf?")
-    sys.exit(0)
-
-###########################
 import atexit
 def exit_handler():
     print('Shnnarrrff!')
@@ -970,7 +1597,10 @@ def signal_handler(sig, frame):
     print('Shnnnarf?')
     exit()
 signal.signal(signal.SIGINT, signal_handler)
-###########################
+  
+def exit():
+    print("Shnarrf?")
+    sys.exit(0)
 
 def main():
     showHeader()
@@ -1006,6 +1636,21 @@ def showHeader():
     showUser()
     showSettings()
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def showSettings():
     print('Settings:')
     for setting in settingItems:
@@ -1032,7 +1677,23 @@ def showUser():
     print(" - Password = {}".format(pass_))
     print('\r')
 
-###########################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+######################################################
 
 if __name__ == "__main__":
     try:
