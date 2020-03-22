@@ -64,9 +64,8 @@ class Snarf:
     ###################
 
     @staticmethod
-    def message(messages=[settings.get_message()]):
-        for message in messages:
-            message.send()
+    def message(message=settings.get_message()):
+        message.send()
         Snarf.exit()
                 
     ################
@@ -74,11 +73,10 @@ class Snarf:
     ################
 
     @staticmethod
-    def post(messages=[settings.get_message()]):
+    def post(message=settings.get_message()):
         # if not message: message = Message()
-        for message in messages:
-            try: message.post()
-            except Exception as e: settings.devPrint(e)
+        try: message.post()
+        except Exception as e: settings.devPrint(e)
         Snarf.exit()
         
     #####################

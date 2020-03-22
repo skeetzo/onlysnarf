@@ -1,7 +1,8 @@
 from OnlySnarf.settings import SETTINGS as settings
 from OnlySnarf.user import User
+from PyInquirer
 
-class Message():
+class Message(PyInquirer):
     def __init__(self):
         self.text = ""
         self.files = []
@@ -242,3 +243,22 @@ class Message():
         elif str(text) == "No" or str(text).lower() == "n":
             return False
         return var
+
+        user = user_menu()
+        files = files_menu()
+    
+        message_prompt = {
+            'type': 'input',
+            'name': 'text',
+            'message': 'Text?',
+            # 'validate': NumberValidator,
+            # 'filter': lambda val: int(myround(val))
+        },
+        {
+            'type': 'input',
+            'name': 'price',
+            'message': 'Price?',
+            'validate': NumberValidator,
+            'filter': lambda val: int(val)
+        }
+        answers = super().prompt(message_prompt)
