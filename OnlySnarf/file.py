@@ -36,7 +36,7 @@ class Folder(File):
             print("Error: Missing Folder")
             return
         print("Downloading Folder: {}".format(self.get_title()))
-        file_list = Google.get_folder_by_id(self.get_id())
+        file_list = Google.get_files_by_folder_id(self.get_id())
         folder_size = len(self.files)
         settings.maybePrint('Folder size: '+str(folder_size))
         settings.maybePrint('Upload limit: '+str(settings.IMAGE_UPLOAD_LIMIT))
@@ -58,7 +58,8 @@ class Folder(File):
 class File():
     def __init__(self):
         self.path = ""
-        self.ext = "" 
+        self.ext = ""
+        self.type = ""
         ##
         self.title = ""
         self.category = "" # [image, gallery, video, performer]
@@ -206,6 +207,15 @@ class File():
         self.title = title
         return self.title
 
+    def get_type(self):
+        if str(self.type) != "": return self.type
+        if (self.get_ext()) in MIMETYPES_IMAGES_LIST:
+            self.type = Image()
+        elif (self.get_ext()) in MIMETYPES_VIDEOS_LIST:
+            self.type = Video()
+        setattr(self.type, "path", self.get_path())
+        return self.type
+
     @staticmethod
     def get_tmp():
         tmp = os.getcwd()
@@ -288,38 +298,15 @@ class Google_File(File):
     # Download File
     def download(self):
         if Google_File.download_text(self.title): return False
-        print("Downloading File: {}".format(self.title))
-        # download file
-        def method_two():
-            self.get_file().GetContentFile(self.get_path())
-            print("Download Complete (2)")
-        # def method_one():
-        #     try:
-        #         with open(str(self.get_path()), 'w+b') as output:
-        #             # print("8",end="",flush=True)
-        #             request = DRIVE.files().get_media(fileId=self.get_id())
-        #             downloader = MediaIoBaseDownload(output, request)
-        #             # print("=",end="",flush=True)
-        #             done = False
-        #             while done is False:
-        #                 # print("=",end="",flush=True)
-        #                 status, done = downloader.next_chunk()
-        #                 if str(settings.VERBOSE) == "True":
-        #                     print("Downloading: %d%%\r" % (status.progress() * 100), end="")
-        #             # print("D")
-        #             print("Download Complete (1)")
-        #     except Exception as e:
-        #         settings.maybePrint(e)
-        #         return False
-        #     return True 
-        # successful = method_one() or method_two()
-        successful = method_two()
+        successful = Google.download_file(self.get_id())
+        if not successful: return False
         ### Finish ###
         if not os.path.isfile(str(self.get_path())):
             print("Error: Missing Downloaded File")
-            return
+            return False
         self.check_size()
         print("Downloaded: {}".format(self.title))
+        return True
 
     def get_id(self):
         if self.id != "": return self.id
@@ -408,9 +395,6 @@ class Video(File):
     def get_frames(self):
         path = self.get_path()
         self.screenshots = ffmpeg.frames(path)
-
-    def get_path(self):
-        return settings.get_path()
 
     def reduce(self):
         path = self.get_path()
