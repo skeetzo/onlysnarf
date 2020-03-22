@@ -149,26 +149,21 @@ def create_folders():
             contentFolder = PYDRIVE.CreateFile({"title": str(folder), "parents": [{"id": OnlyFansFolder['id']}], "mimeType": "application/vnd.google-apps.folder"})
             contentFolder.Upload()
 
-def find_folder(parent, folderName):
-    checkAuth()
-    if str(parent) != "root":
-        parent = parent['id']
-    settings.maybePrint("Finding Folder: {}/{}".format(parent, folderName))
-    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent)}).GetList()
-    for folder in file_list:
-        if str(folder['title']) == str(folderName):
-            return folder
-    print("Error: Unable to Find Folder - {}".format(folderName))
-    return None
-
-def get_files_of_folder(folderName, parent=None):
-    folder = get_folder_by_name(folderName, parent=parent)
-    files = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType != 'application/vnd.google-apps.folder'"}).GetList()      
-    return files
+# def find_folder(parent, folderName):
+#     checkAuth()
+#     if str(parent) != "root":
+#         parent = parent['id']
+#     settings.maybePrint("Finding Folder: {}/{}".format(parent, folderName))
+#     file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent)}).GetList()
+#     for folder in file_list:
+#         if str(folder['title']) == str(folderName):
+#             return folder
+#     print("Error: Unable to Find Folder - {}".format(folderName))
+#     return None
 
 def get_folder_by_name(folderName, parent=None):
     checkAuth()
-    if str(parent) == "galleries" or str(parent) == "images" or str(parent) == "videos" or str(parent) == "performers":
+    if str(parent) in str(settings.DRIVE_FOLDERS):
         parent = get_folder_by_name(parent)
     settings.maybePrint("Getting Folder: {}".format(folderName))
     if parent is None:
@@ -247,12 +242,14 @@ def get_folder_root():
         root_folders = settings.DRIVE_PATH.split("/")
         settings.maybePrint("Mount Folders: {}".format("/".join(root_folders)))    
         for folder in root_folders:
-            mount_root = find_folder(mount_root, folder)
+            mount_root = get_folder_by_name(mount_root, parent=folder)
+            # mount_root = find_folder(mount_root, folder)
             if mount_root is None:
                 mount_root = "root"
                 print("Warning: Drive Mount Folder Not Found")
                 break
-        mount_root = find_folder(mount_root, settings.ROOT_FOLDER)
+        mount_root = get_folder_by_name(mount_root, parent=settings.ROOT_FOLDER)
+        # mount_root = find_folder(mount_root, settings.ROOT_FOLDER)
         if mount_root is None:
             mount_root = {"id":"root"}
             print("Warning: Drive Mount Folder Not Found")
@@ -326,6 +323,43 @@ def get_files_by_folder_id(folderID):
 def get_file(id_):
     myfile = PYDRIVE.CreateFile({'id': id_})
     return myfile
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
