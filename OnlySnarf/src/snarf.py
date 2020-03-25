@@ -10,10 +10,9 @@ import sys
 import pathlib
 import time
 ##
-from OnlySnarf import google as Google
 from OnlySnarf import cron as Cron
 from OnlySnarf.driver import Driver
-from OnlySnarf.profile import Profile
+# from OnlySnarf.profile import Profile
 from OnlySnarf.settings import SETTINGS as settings
 from OnlySnarf.user import User
 
@@ -90,6 +89,11 @@ class Snarf:
     #     settings.devPrint("Link: "+str(text))
     #     # settings.send_email(email, text)
 
+    def promotion(promotion=settings.get_promotion()):
+        try: promotion.post()
+        except Exception as e: settings.devPrint(e)
+        Snarf.exit()
+
     #################
     ##### Reset #####
     #################
@@ -140,7 +144,6 @@ class Snarf:
 
 def main():
     try:
-        if str(settings.VERSION) == "True": return settings.version_check()
         action = settings.ACTION
         print("Running - {}".format(action))
         ## Actions

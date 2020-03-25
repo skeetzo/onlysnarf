@@ -2,6 +2,7 @@
 # Profile Settings
 
 # from OnlySnarf.driver import Driver
+from PyInquirer
 
 class Profile:
 
@@ -109,6 +110,24 @@ class Profile:
 
     def set(self, key, value):
         self[key] = value
+
+    def get(self):
+        pass
+
+    # def set(self):
+    #     pass
+
+    def sync_from_profile(self):
+        # syncs profile settings w/ onlyfans
+        pass
+
+    def sync_to_profile(self):
+        # syncs profile settings to onlyfans
+        pass
+
+    def sync_to_profile_tab(self, label):
+        # syncs profile settings for the specificed tab to onlyfans
+        pass
 
     def syncFrom(self):
         # opens every settings page in the browser from pages or all

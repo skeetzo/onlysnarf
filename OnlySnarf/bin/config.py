@@ -9,20 +9,7 @@ import shutil
 from OnlySnarf import google as Google
 from OnlySnarf import driver as OnlySnarf
 from OnlySnarf.settings import SETTINGS as settings
-
-def colorize(string, color):
-    if not color in colors: return string
-    return colors[color] + string + '\033[0m'
-  
-colors = {
-    'menu': '\033[48;1;44m',
-    'blue': '\033[94m',
-    'header': '\033[48;1;34m',
-    'teal': '\033[96m',
-    'pink': '\033[95m',
-    'green': '\033[92m',
-    'yellow': '\033[93m',
-}
+from OnlySnarf import colorize
 
 def checkBothCreds():
     checkGoogle()
@@ -175,7 +162,6 @@ def main():
             print("Error: Incorrect Index")
         finally:
             sys.exit(1)
-
 
 if __name__ == "__main__":
     try:

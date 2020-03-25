@@ -10,8 +10,10 @@ from datetime import datetime
 from re import sub
 from decimal import Decimal
 ##
+from OnlySnarf.colorize import colorize
 from OnlySnarf.driver import Driver
 from OnlySnarf.settings import SETTINGS as settings
+from PyInquirer
 
 class User:
 
@@ -282,6 +284,58 @@ class User:
             if i == settings.RECENT_USER_COUNT:
                 return users_
         return users_
+
+    @staticmethod
+    def select_user():
+        if not settings.prompt("user"): return None
+        question = [
+            {
+                'type': 'list',
+                'name': 'choice',
+                'message': 'User',
+                'choices': ['All', 'Recent', 
+                    # 'Favorite', 
+                    'Enter Username', 'Select Username']
+            }
+        ]
+        answers = PyInquirer.prompt(question)
+        choice = answers["choice"]
+        if not settings.confirm(choice): return None
+        if str(choice) == "Enter Username":
+            username = input("Username: ")
+            return User.get_user_by_username(username)
+        elif str(choice) == "Select Username":
+            return User.select_username()
+        return choice.lower()
+
+    @staticmethod
+    def select_username():
+        # returns the list of usernames to select
+        if not settings.prompt("username"): return None
+        question = [
+            {
+                'type': 'list',
+                'name': 'user',
+                'message': 'User',
+                'choices': User.get_all_users()
+                'filter': lambda user: user.username.lower()
+            }
+        ]
+        answers = PyInquirer.prompt(question)
+        user = answers["user"]
+        if not settings.confirm(user): return None
+        return user
+
+    @staticmethod
+    def select_users():
+        if not settings.prompt("users"): return None
+        users = []
+        while True:
+            user = User.select_user()
+            if not user: break
+            users.append(user)
+        if not settings.confirm(users): return None
+        return users
 
 #######################################################################################
 
