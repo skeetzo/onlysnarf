@@ -300,11 +300,13 @@
   - mostly functional
   
 ----------------------------------------
+  **2.16.10** debugging pre 2.17.0
   - upload -> post
   - Message, Folder (unused), File, Google_File, Video, Image classes
   - ffmpeg.py
   - login function cleaned up / spawn_browser
-  - 
+  - settings -> argsparse
+  - menu cleaned up
 
   **2.17.0**
 

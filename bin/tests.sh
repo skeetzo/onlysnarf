@@ -36,8 +36,8 @@ echo "##################################################" >> ../onlysnarf/logs/t
 function testes() {
 	echo "Running: "$test
 
-	../onlysnarf/tests/$test.sh $show $verbose
-	# ../onlysnarf/tests/$test.sh $show >> ../onlysnarf/logs/tests.txt 2>&1
+	tests/$test.sh $show $verbose
+	# ../onlysnarf/$test.sh $show >> ../onlysnarf/logs/tests.txt 2>&1
 
 	echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 	echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1

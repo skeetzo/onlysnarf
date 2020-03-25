@@ -40,6 +40,8 @@ upload_input
 ---------------
 get_
 
+if str(config.VERSION) == "True": return config.version_check()
+
 
 def download(fileChoice, methodChoice="random", file=None):
     if methodChoice == "random":
@@ -245,6 +247,54 @@ def get_random_files():
                     folders.append(file_)
             except: pass
         file = random.choice(folders)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -521,3 +571,913 @@ def get_random_scene():
     setattr(scene, "file", random_scene)
     setattr(scene, "keywords", folder_name)
     return scene
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def encounter2b():
+    prompt({
+        'type': 'list',
+        'name': 'weapon',
+        'message': 'Pick one',
+        'choices': [
+            'Use the stick',
+            'Grab a large rock',
+            'Try and make a run for it',
+            'Attack the wolf unarmed'
+        ]
+    }, style=custom_style_2)
+    print('The wolf mauls you. You die. The end.')
+
+
+
+class PhoneNumberValidator(Validator):
+    def validate(self, document):
+        ok = regex.match('^([01]{1})?[-.\s]?\(?(\d{3})\)?[-.\s]?(\d{3})[-.\s]?(\d{4})\s?((?:#|ext\.?\s?|x\.?\s?){1}(?:\d+)?)?$', document.text)
+        if not ok:
+            raise ValidationError(
+                message='Please enter a valid phone number',
+                cursor_position=len(document.text))  # Move cursor to end
+
+
+print('Hi, welcome to Python Pizza')
+
+questions = [
+    {
+        'type': 'confirm',
+        'name': 'toBeDelivered',
+        'message': 'Is this for delivery?',
+        'default': False
+    },
+    {
+        'type': 'input',
+        'name': 'phone',
+        'message': 'What\'s your phone number?',
+        'validate': PhoneNumberValidator
+    },
+    {
+        'type': 'list',
+        'name': 'size',
+        'message': 'What size do you need?',
+        'choices': ['Large', 'Medium', 'Small'],
+        'filter': lambda val: val.lower()
+    },
+    {
+        'type': 'input',
+        'name': 'quantity',
+        'message': 'How many do you need?',
+        'validate': NumberValidator,
+        'filter': lambda val: int(val)
+    },
+    {
+        'type': 'expand',
+        'name': 'toppings',
+        'message': 'What about the toppings?',
+        'choices': [
+            {
+                'key': 'p',
+                'name': 'Pepperoni and cheese',
+                'value': 'PepperoniCheese'
+            },
+            {
+                'key': 'a',
+                'name': 'All dressed',
+                'value': 'alldressed'
+            },
+            {
+                'key': 'w',
+                'name': 'Hawaiian',
+                'value': 'hawaiian'
+            }
+        ]
+    },
+    {
+        'type': 'rawlist',
+        'name': 'beverage',
+        'message': 'You also get a free 2L beverage',
+        'choices': ['Pepsi', '7up', 'Coke']
+    },
+    {
+        'type': 'input',
+        'name': 'comments',
+        'message': 'Any comments on your purchase experience?',
+        'default': 'Nope, all good!'
+    },
+    {
+        'type': 'list',
+        'name': 'prize',
+        'message': 'For leaving a comment, you get a freebie',
+        'choices': ['cake', 'fries'],
+        'when': lambda answers: answers['comments'] != 'Nope, all good!'
+    }
+]
+
+answers = prompt(questions, style=custom_style_3)
+print('Order receipt:')
+pprint(answers)
+
+
+
+
+
+
+questions = [
+    {
+        'type': 'rawlist',
+        'name': 'theme',
+        'message': 'What do you want to do?',
+        'choices': [
+            'Order a pizza',
+            'Make a reservation',
+            Separator(),
+            'Ask opening hours',
+            'Talk to the receptionist'
+        ]
+    },
+    {
+        'type': 'rawlist',
+        'name': 'size',
+        'message': 'What size do you need',
+        'choices': ['Jumbo', 'Large', 'Standard', 'Medium', 'Small', 'Micro'],
+        'filter': lambda val: val.lower()
+    }
+]
+
+answers = prompt(questions, style=custom_style_2)
+print_json(answers)
+
+
+
+
+questions = [
+    {
+        'type': 'input',
+        'name': 'first_name',
+        'message': 'What\'s your first name',
+    }
+]
+
+answers = prompt(questions)
+print_json(answers)  # use the answers as input for your app
+
+
+def get_delivery_options(answers):
+    options = ['bike', 'car', 'truck']
+    if answers['size'] == 'jumbo':
+        options.append('helicopter')
+    return options
+
+
+questions = [
+    {
+        'type': 'list',
+        'name': 'theme',
+        'message': 'What do you want to do?',
+        'choices': [
+            'Order a pizza',
+            'Make a reservation',
+            Separator(),
+            'Ask for opening hours',
+            {
+                'name': 'Contact support',
+                'disabled': 'Unavailable at this time'
+            },
+            'Talk to the receptionist'
+        ]
+    },
+    {
+        'type': 'list',
+        'name': 'size',
+        'message': 'What size do you need?',
+        'choices': ['Jumbo', 'Large', 'Standard', 'Medium', 'Small', 'Micro'],
+        'filter': lambda val: val.lower()
+    },
+    {
+        'type': 'list',
+        'name': 'delivery',
+        'message': 'Which vehicle you want to use for delivery?',
+        'choices': get_delivery_options,
+    },
+]
+
+answers = prompt(questions, style=custom_style_2)
+pprint(answers)
+
+
+
+def get_password_options(answers):
+    return {
+        'type': 'password',
+        'message': 'Enter your Twitter password',
+        'name': 'password'
+    }
+
+
+
+questions = [
+    {
+        'type': 'checkbox',
+        'qmark': '😃',
+        'message': 'Select toppings',
+        'name': 'toppings',
+        'choices': [ 
+            Separator('= The Meats ='),
+            {
+                'name': 'Ham'
+            },
+            {
+                'name': 'Ground Meat'
+            },
+            {
+                'name': 'Bacon'
+            },
+            Separator('= The Cheeses ='),
+            {
+                'name': 'Mozzarella',
+                'checked': True
+            },
+            {
+                'name': 'Cheddar'
+            },
+            {
+                'name': 'Parmesan'
+            }
+        ],
+        'validate': lambda answer: 'You must choose at least one topping.' \
+            if len(answer) == 0 else True
+    }
+]
+questions = [
+    {
+        'type': 'confirm',
+        'message': 'Do you want to continue?',
+        'name': 'continue',
+        'default': True,
+    },
+    {
+        'type': 'confirm',
+        'message': 'Do you want to exit?',
+        'name': 'exit',
+        'default': False,
+    },
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Settings Menu
+settingItems = [
+    [ "Verbose", config.VERBOSE, ["True","False"],True],
+    [ "Debug", config.DEBUG, ["True","False"],False],
+    [ "Backup", config.BACKUP, ["True","False"],True],
+    [ "Show Window", config.SHOW_WINDOW, ["True","False"],False],
+    [ "Delete Google", config.DELETE_GOOGLE, ["True","False"],False],
+    [ "Skip Delete", config.SKIP_DELETE, ["True","False"],False],
+    [ "Tweeting", config.TWEETING, ["True","False"],True],
+    [ "Image Limit", config.IMAGE_DOWNLOAD_LIMIT,None,True],
+]
+if str(config.VERBOSE) == "True":
+    settingItems.append([ "Skip Backup", config.SKIP_BACKUP, ["True","False"],False])
+    settingItems.append([ "Mount Path", config.MOUNT_PATH,None,False])
+    settingItems.append([ "Drive Path", config.DRIVE_PATH,None,False])
+    settingItems.append([ "Users Path", config.USERS_PATH,None,False])
+    settingItems.append([ "Google Root", config.ROOT_FOLDER,None,False])
+    settingItems.append([ "Drive Folder", config.DRIVE_FOLDERS,None,False])
+    settingItems.append([ "Create Drive", config.CREATE_DRIVE, ["True","False"],False])
+if str(config.DEBUG) == "True":
+    settingItems.append([ "Skip Upload", config.SKIP_UPLOAD, ["True","False"],False])
+    settingItems.append([ "Force Delete", config.FORCE_DELETE, ["True","False"],False])
+    settingItems.append([ "Force Backup", config.FORCE_BACKUP, ["True","False"],False])
+    settingItems.append([ "Force Upload", config.FORCE_UPLOAD, ["True","False"],False])
+    settingItems.append([ "Skip Download", config.SKIP_DOWNLOAD, ["True","False"],False])
+    settingItems.append([ "Image Max", config.IMAGE_UPLOAD_LIMIT,None,False])
+    settingItems.append([ "Text", config.TEXT,None,False])
+    settingItems.append([ "Local", config.INPUT,None,False])
+    settingItems.append([ "Image", config.IMAGE,None,False])
+    settingItems.append([ "Prefer Local", config.PREFER_LOCAL,["True","False"],True])
+    # settingItems.append([ "Overwrite Local", config.OVERWRITE_LOCAL,["True","False"],True])
+settingItems = sorted(settingItems)
+settingItems.insert(0,[ "Back", "main"])
+
+
+###
+### Cron
+###
+
+cronItems = sorted([
+    [ "Add", "add" ],
+    [ "List", "list" ],
+    [ "Delete", "delete" ],
+    [ "Delete All", "deleteall" ]
+])
+cronItems.insert(0,[ "Back", "main"])
+
+###
+### Settings
+###
+
+settingsItems = sorted([
+    [ "Profile", "profileSettings" ],
+    [ "Account", "accountSettings" ],
+    [ "Notification", "notificationSettings" ],
+    [ "Security", "securitySettings" ],
+    [ "Other", "otherSettings" ],
+    [ "Sync", "sync" ]
+])
+settingsItems.insert(0,[ "Back", "main", "main"])
+
+# text, path, url, price, get, country, ip, or bool
+profileSettingsItems = sorted([
+    [ "Cover Image", "coverImage", "path" ],
+    [ "Profile Photo", "profilePhoto", "path" ],
+    [ "Display Name", "displayName", "text" ],
+    [ "Subscription Price", "subscriptionPrice", "price" ],
+    [ "About", "about", "text" ],
+    [ "Location", "location", "text" ],
+    [ "Website URL", "websiteURL", "url" ]
+])
+profileSettingsItems.insert(0,[ "Back", "main", "main"])
+
+accountSettingsItems = sorted([
+    [ "Username", "username", "text" ],
+    [ "Email", "email", "text" ],
+    [ "Password", "password", "text" ]
+])
+accountSettingsItems.insert(0,[ "Back", "main"])
+
+notificationSettingsItems = sorted([
+    [ "Email Notifications", "emailNotifs", "bool" ],
+    [ "New Referral", "emailNotifsNewReferral", "bool" ],
+    [ "New Stream", "emailNotifsNewStream", "bool" ],
+    [ "New Subscriber", "emailNotifsNewSubscriber", "bool" ],
+    [ "New Tip", "emailNotifsNewTip", "bool" ],
+    [ "Renewal", "emailNotifsRenewal", "bool" ],
+    [ "New Likes Summary", "emailNotifsNewLikes", "bool" ],
+    [ "New Posts Summary", "emailNotifsNewPosts", "bool" ],
+    [ "New Private Message Summary", "emailNotifsNewPrivMessages", "bool" ],
+    [ "Site Notifications", "siteNotifs", "bool" ],
+    [ "New Comment", "siteNotifsNewComment", "bool" ],
+    [ "New Favorite", "siteNotifsNewFavorite", "bool" ],
+    [ "New Discounts", "siteNotifsDiscounts", "bool" ],
+    [ "New Subscriber", "siteNotifsNewSubscriber", "bool" ],
+    [ "New Tip", "siteNotifsNewTip", "bool" ],
+    [ "Toast Notifications", "toastNotifs", "bool" ],
+    [ "New Comment", "toastNotifsNewComment", "bool" ],
+    [ "New Favorite", "toastNotifsNewFavorite", "bool" ],
+    [ "New Subscriber", "toastNotifsNewSubscriber", "bool" ],
+    [ "New Tip", "toastNotifsNewTip", "bool" ]
+])
+notificationSettingsItems.insert(0,[ "Back", "main"])
+
+
+securitySettingsItems = sorted([
+    [ "Fully Private Profile", "fullyPrivate", "bool" ],
+    [ "Enable Comments", "enableComments", "bool" ],
+    [ "Show Fans Count on your Profile", "showFansCount", "bool" ],
+    [ "Show Posts Tips Summary", "showPostsTip", "bool" ],
+    [ "Public Friends List", "publicFriendsList", "bool" ],
+    [ "IP and Geo Blocking - By Country", "ipCountry", "country" ],
+    [ "IP and Geo Blocking - By IP", "ipIP", "ip" ],
+    [ "Watermark - Enabled", "watermark", "bool" ],
+    [ "Watermark - Photos", "watermarkPhoto", "bool" ],
+    [ "Watermark - Videos", "watermarkVideo", "bool" ],
+    [ "Watermark - Custom Text", "watermarkText", "text" ]
+])
+securitySettingsItems.insert(0,[ "Back", "main"])
+
+otherSettingsItems = sorted([
+    [ "Live Server", "liveServer", "get" ],
+    [ "Live Key", "liveServerKey", "get" ]
+])
+otherSettingsItems.insert(0,[ "Back", "main"])
+
+
+
+
+
+
+### OnlySnarf Settings Menu
+def set_settings():
+    showHeader()
+    print(colorize("Set:",'menu'))
+
+
+    for item in settingItems:
+        print(colorize("[" + str(settingItems.index(item)) + "] ", 'blue') + list(item)[0])
+
+
+            if str(settingChoice) == "Back":
+                return main()
+            elif str(settingChoice) == "Local":
+                settingValue = input("Enter the file path: ")
+            elif str(settingChoice) == "Text":
+                settingValue = input("Enter the upload text: ")
+            elif str(settingChoice) == "Mount Path":
+                settingValue = input("Enter the mount path: ")
+            elif str(settingChoice) == "Drive Path":
+                settingValue = input("Enter the drive path (folderName/folderName/...): ")
+            elif str(settingChoice) == "Image":
+                settingValue = input("Enter the image path: ")
+            elif str(settingChoice) == "Google Root":
+                settingValue = input("Enter the Google root folder name: ")
+            # elif str(settingChoice) == "Google: Drive Folders":
+            #     settingValue = input("Enter the Google drive folders (separated by ',', no spaces): ")
+            #     settingValue = settingValue.split(",")
+            elif str(settingChoice) == "Image Limit":
+                settingValue = input("Enter the image upload limit: ")
+            elif str(settingChoice) == "Image Max":
+                settingValue = input("Enter the image upload max: ")
+            else:
+                list_ = list(settingItems[int(choice)][2])
+                print(colorize(str(settingChoice)+" =", 'blue'))
+                for item in list_:
+                    print(colorize("[" + str(list_.index(item)) + "] ", 'pink') + str(item))
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+parser.add_argument('integers', metavar='N', type=int, nargs='+',
+                    help='an integer for the accumulator')
+
+parser.add_argument('--sum', dest='accumulate', action='store_const',
+                    const=sum, default=max,
+                    help='sum the integers (default: find the max)')
+
+parser.add_argument('-v', metavar="verbose", type=str, 
+    help="verbosity level")
+
+parser.add_argument('-n', '--name', dest='names', action='append', 
+    help="provides names to greet")
+required=True
+# number of args
+parser.add_argument('chars', type=str, nargs=2, metavar='c',
+                    help='starting and ending character')
+parser.add_argument('num', type=int, nargs='*')
+
+# limit argument choices
+parser.add_argument('--now', dest='format', choices=['std', 'iso', 'unix', 'tz'],
+                    help="shows datetime in given format")
+
+for c in ['', '-v', '-v -v', '-vv', '-vv -v', '-v -v --verbose -vvvv']:
+    print(parser.parse_args(c.split()))
+
+Namespace(verbose=0)
+Namespace(verbose=1)
+Namespace(verbose=2)
+Namespace(verbose=2)
+Namespace(verbose=3)
+Namespace(verbose=7)
+
+# Add the arguments
+parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+
+
+# store stores the input value to the Namespace object. (This is the default action.)
+# store_const stores a constant value when the corresponding optional arguments are specified.
+# store_true stores the Boolean value True when the corresponding optional argument is specified and stores a False elsewhere.
+# store_false stores the Boolean value False when the corresponding optional argument is specified and stores True elsewhere.
+# append stores a list, appending a value to the list each time the option is provided.
+# append_const stores a list appending a constant value to the list each time the option is provided.
+# count stores an int that is equal to the times the option has been provided.
+# help shows a help text and exits.
+# version shows the version of the program and exits.
+
+parser = argparse.ArgumentParser()
+parser.version = '1.0'
+parser.add_argument('-a', action='store')
+parser.add_argument('-b', action='store_const', const=42)
+parser.add_argument('-c', action='store_true')
+parser.add_argument('-d', action='store_false')
+parser.add_argument('-e', action='append')
+parser.add_argument('-f', action='append_const', const=42)
+parser.add_argument('-g', action='count')
+parser.add_argument('-i', action='help')
+parser.add_argument('-j', action='version')
+
+args = parser.parse_args()
+
+my_group = parser.add_mutually_exclusive_group(required=True)
+
+my_group.add_argument('-v', '--verbose', action='store_true')
+my_group.add_argument('-s', '--silent', action='store_true')
+
+args = parser.parse_args()
+print(args.accumulate(args.integers))
+
+ args = parser.parse_args(['--foo', 'BAR'])
+>>> vars(args)
+{'foo': 'BAR'}
+
+settings = vars(args)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##
+# -exit
+# exit upon each action
+config.EXIT = True
+parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+
+
+##
+    # -force-backup
+    # force Google backup
+    config.FORCE_BACKUP = False
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    ##
+    # -force-delete
+    # force Google file deletion upon upload
+    config.FORCE_DELETE = False
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+
+
+
+    ##
+    # -force-reduce
+    # force mp4 reduction
+    config.FORCE_REDUCTION = False
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+
+
+
+    this is the positional argument
+    ##
+    # -input
+    # path to local file(s) to upload
+    config.INPUT = None
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+
+    ##
+    # -method
+    # random | input
+    config.METHOD = "random"
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+
+    ##
+    # -overwrite-local
+    # config.OVERWRITE_LOCAL = False
+
+
+    ##
+    # -skip-backup
+    # skips file backup if enabled by .conf
+    config.SKIP_BACKUP = False
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    ##
+    # -skip-delete
+    # skip local file deletion before and after upload
+    config.SKIP_DELETE = False
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    ##
+    # -skip-delete-google
+    # skips Google file deltion if enabled by .conf
+    config.SKIP_DELETE_GOOGLE = False
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    ##
+    # -skip-download
+    config.SKIP_DOWNLOAD = False
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    ##
+    # -skip-reduce
+    # skip mp4 reducing
+    config.SKIP_REDUCE = False
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    ##
+    # -skip-repair
+    # skip mp4 repairs
+    config.SKIP_REPAIR = False
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    ##
+    # -skip-upload
+    # skips file upload
+    config.SKIP_UPLOAD = False
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+
+
+
+
+     ##
+    # fixes thumbnail preview
+    config.THUMBNAILING_PREVIEW = False
+    parser.add_argument('-b', '--balls', metavar='path', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+
+
+    # this is the positional
+    ##
+    # -image
+    # path to local image to use for message or upload
+    config.IMAGE = None
+    parser.add_argument('-image', '--image', metavar='image', type=str, help='the path to list')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    parser.add_argument('-l', '--long', action='store_true', help='enable the long listing format')
+    
+
+
+
+    def version_check(self):
+        print("OnlySnarf version: {}".format(colorize(pkg_resources.get_distribution("onlysnarf").version,"yellow")))
+
+

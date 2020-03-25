@@ -139,3 +139,83 @@ def test():
 # - Video
 # - Performer
 # - Scene
+
+
+
+
+
+
+
+
+
+
+
+# def finalizeCron(actionChoice):
+#     for item in cronItems:
+#         print(colorize("[" + str(cronItems.index(item)) + "] ", 'teal') + list(item)[0])
+#     while True:
+#         cronChoice = input(">> ")
+#         try:
+#             if int(cronChoice) < 0 or int(cronChoice) >= len(cronItems): raise ValueError
+#             if str(cronItems[int(cronChoice)][1]) == "main":
+#                 return action()
+#             cronChoice = list(cronItems[int(cronChoice)])[1]
+#             return performCron(actionChoice, cronChoice)
+#         except (ValueError, IndexError):
+#             print("Error: Incorrect Index")
+#         except Exception as e:
+#             settings.maybePrint(e)
+#             print("Error: Missing Method") 
+
+# def performCron(actionChoice, cronChoice):
+#     if str(cronChoice) == "add":
+#         print("Comment:")
+#         comment = input(">> ")
+#         print("Args:")
+#         args = input(">> ")
+#         args = args.split(",")
+#         print("Minute:")
+#         minute = input(">> ")
+#         print("Hours:")
+#         hour = input(">> ")
+#         Cron.create(comment, args=args, minute=minute, hour=hour)
+#     elif str(cronChoice) == "list":
+#         Cron.list()
+#     elif str(cronChoice) == "delete":
+#         jobs = Cron.getAll()
+#         print(colorize("[0] ", 'teal') + "Back")
+#         jobs_ = []
+#         for job in jobs:
+#             jobs_.append(str(job.comment))
+#             print(colorize("[" + str(jobs.index(job)+1) + "] ", 'teal') + str(job))
+#         while True:
+#             choice = input(">> ")
+#             try:
+#                 choice = int(choice)
+#                 if int(choice) < 0 or int(choice) > len(jobs): raise ValueError
+#                 if int(choice) == 0: return finalizeCron(actionChoice)
+#                 Cron.delete(jobs_[int(choice)-1])
+#                 return mainMenu()
+#             except (ValueError, IndexError):
+#                 print(sys.exc_info()[0])
+#                 print("Error: Incorrect Index")
+        
+#     elif str(cronChoice) == "deleteall":
+#         Cron.deleteAll()
+#     else:
+#         print("Error: Missing Cron Action")
+#     mainMenu()    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
