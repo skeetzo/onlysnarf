@@ -21,6 +21,7 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.action_chains import ActionChains
 ##
+from OnlySnarf.colorize import colorize
 from OnlySnarf.settings import SETTINGS as settings
 from OnlySnarf.element import Element
 from OnlySnarf.profile import Profile
@@ -180,8 +181,6 @@ class Driver:
             settings.devPrint("entering discount amount")
             for n in range(11):
                 discount_.send_keys(str(Keys.UP))
-            # if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
-            #     time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
             for n in range(round(int(discount)/5)-1):
                 discount_.send_keys(Keys.DOWN)
             settings.devPrint("entered discount amount")
@@ -462,18 +461,13 @@ class Driver:
         print('Logging into OnlyFans')
         username_ = str(settings.USERNAME)
         password_ = str(settings.PASSWORD)
-        if not username_ or username_ == "":
-            username_ = input("Twitter Username: ")
-        if not password_ or password_ == "":
-            password_ = input("Twitter Password: ")
-            print("Save? y/n")
-            save_ = input(">> ")
-            if str(save_) != "n": settings.save_password(password__)
-        if username_ == "" or password_ == "":
+        if not username_ or username_ == "": username_ = input("Twitter Username: ")
+        if not password_ or password_ == "": password_ = input("Twitter Password: ")
+        if str(username_) == "" or str(password_) == "":
             print("Error: Missing Login Info")
             return False
         if str(settings.USERNAME) == "" or settings.USERNAME == None: settings.USERNAME = username_
-        if str(settings.PASSWORD) == "" or settings.PASSWORD == None: settings.save_password(password_)
+        if str(settings.PASSWORD) == "" or settings.PASSWORD == None: settings.PASSWORD = password_
         try:
             BROWSER.get(ONLYFANS_HOME_URL)
             settings.devPrint("logging in")
@@ -870,8 +864,7 @@ class Driver:
             try:
                 send = Driver.get_element_to_click("new_post")
                 if send:
-                    if str(settings.DEBUG) == "True" and str(settings.DEBUG_DELAY) == "True":
-                        time.sleep(int(settings.DEBUG_DELAY_AMOUNT))
+                    settings.debug_delay_check()
                     if str(settings.DEBUG) == "True":
                         print('Skipped: OnlyFans Post (debug)')
                         settings.devPrint("### Post Maybe Successful ###")
