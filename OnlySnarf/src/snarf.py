@@ -10,11 +10,12 @@ import sys
 import pathlib
 import time
 ##
-from OnlySnarf import cron as Cron
-from OnlySnarf.driver import Driver
+from . import cron as Cron
+from .driver import Driver
 # from OnlySnarf.profile import Profile
-from OnlySnarf.settings import SETTINGS as settings
-from OnlySnarf.user import User
+from .settings import Settings
+from .file import File
+from .user import User
 
 #####################
 ##### OnlySnarf #####
@@ -23,6 +24,7 @@ from OnlySnarf.user import User
 class Snarf:
 
     def __init__(self):
+        pass
         # self.profile = Profile({})
 
     ####################
@@ -30,7 +32,9 @@ class Snarf:
     ####################
 
     @staticmethod
-    def discount(choice=settings.get_user(), discount=settings.get_discount()):
+    def discount(choice=None, discount=None):
+        if not choice: choice = Settings.get_user()
+        if not discount: discount = Settings.get_discount()
         users = []
         if str(choice) == "all":
             users = User.get_all_users()
@@ -46,7 +50,7 @@ class Snarf:
                 users.append(user)
         for user in users:
             try: user.discount(discount)
-            except Exception as e: settings.devPrint(e)
+            except Exception as e: Settings.dev_print(e)
         Snarf.exit()
 
     ################
@@ -55,15 +59,15 @@ class Snarf:
 
     @staticmethod
     def exit():
-        if str(settings.EXIT) == "True":
-            Driver.exit()
+        Driver.exit()
 
     ###################
     ##### Message #####
     ###################
 
     @staticmethod
-    def message(message=settings.get_message()):
+    def message(message=None):
+        if not message: message = Settings.get_message()
         message.send()
         Snarf.exit()
                 
@@ -72,10 +76,11 @@ class Snarf:
     ################
 
     @staticmethod
-    def post(message=settings.get_message()):
+    def post(message=None):
+        if not message: message = Settings.get_message()
         # if not message: message = Message()
         try: message.post()
-        except Exception as e: settings.devPrint(e)
+        except Exception as e: Settings.dev_print(e)
         Snarf.exit()
         
     #####################
@@ -86,12 +91,13 @@ class Snarf:
     #     print("Applying Promotion: "+user)
     #     link = Driver.get_new_trial_link()
     #     text = "Here's your free trial link!\n"+link
-    #     settings.devPrint("Link: "+str(text))
-    #     # settings.send_email(email, text)
+    #     Settings.dev_print("Link: "+str(text))
+    #     # Settings.send_email(email, text)
 
-    def promotion(promotion=settings.get_promotion()):
+    def promotion(promotion=None):
+        if not promotion: promotion = Settings.get_promotion()
         try: promotion.post()
-        except Exception as e: settings.devPrint(e)
+        except Exception as e: Settings.dev_print(e)
         Snarf.exit()
 
     #################
@@ -110,7 +116,7 @@ class Snarf:
     def get_users():
         users = []
         try: users = User.get_all_users()
-        except Exception as e: settings.devPrint(e)
+        except Exception as e: Settings.dev_print(e)
         return users
 
     ###############
@@ -120,7 +126,7 @@ class Snarf:
     @staticmethod
     def test():
         print('0/3 : Deleting Locals')
-        settings.remove_local()
+        File.remove_local()
         print('1/3 : Testing')
         print('TESTING: Users')
         response = Driver.users_get()
@@ -143,36 +149,30 @@ class Snarf:
 ################################################################################################################################################
 
 def main():
-    try:
-        action = settings.ACTION
-        print("Running - {}".format(action))
-        ## Actions
-        success = False
-        if str(action) == "test":
-            success = Snarf.test()
-        elif str(action) == "post":
-            success = Snarf.post()
-        elif str(action) == "message":
-            success = Snarf.message()
-        elif str(action) == "discount":
-            success = Snarf.discount()
-        else:
-            print("Warning: Missing Method")
-        Snarf.exit()
-    except Exception as e:
-        settings.devPrint(e)
-        print("Shnarf!")
-    finally:
-        sys.exit(0)
+    # try:
+    Settings.set_confirm(False)
+    action = Settings.get_action()
+    print("Running - {}".format(action))
+    ## Actions
+    success = False
+    if str(action) == "test":
+        success = Snarf.test()
+    elif str(action) == "post":
+        success = Snarf.post()
+    elif str(action) == "message":
+        success = Snarf.message()
+    elif str(action) == "discount":
+        success = Snarf.discount()
+    else:
+        print("Warning: Missing Method")
+    Snarf.exit()
+    # except Exception as e:
+    #     Settings.dev_print(e)
+    #     print("Shnarf!")
+    # finally:
+    #     sys.exit(0)
 
 ################################################################################################################################################
 
 if __name__ == "__main__":
-    settings.initialize()
     main()
-else:
-    try:
-        settings.initialize()
-    except Exception as e:
-        print(e)
-        print("Shnnarf?")

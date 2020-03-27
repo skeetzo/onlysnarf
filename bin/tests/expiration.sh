@@ -4,14 +4,11 @@
 echo "[*] Misc - Expiration"
 sudo onlysnarfpy \
 -debug \
--verbose \
--verboser \
--verbosest \
--action "upload" -type "image" \
+-$2 \
+-action "post" -category "image" \
 -bykeyword "pussycats" \
 -skip-download \
 -text "expiration testes" \
 -debug-delay \
--debug-force \
 -$1 \
 -expires 3

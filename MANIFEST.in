@@ -1,13 +1,16 @@
 # Config
-include OnlySnarf/config-example.conf
-include OnlySnarf/google_creds_example.txt
-include OnlySnarf/settings.yaml
+include OnlySnarf/src/*
+include OnlySnarf/bin/*
+
+#include OnlySnarf/config-example.conf
+#include OnlySnarf/google_creds_example.txt
+#include OnlySnarf/settings.yaml
 #include OnlySnarf/video.mp4
 
-exclude OnlySnarf/config.conf
-exclude OnlySnarf/google_creds.txt
-exclude OnlySnarf/users.txt
-exclude OnlySnarf/client_secret.json
+#exclude OnlySnarf/config.conf
+#exclude OnlySnarf/google_creds.txt
+#exclude OnlySnarf/users.txt
+#exclude OnlySnarf/client_secret.json
 
 # Include the README
 include *.md
