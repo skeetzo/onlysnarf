@@ -424,14 +424,8 @@ class Driver:
             Settings.maybe_print("at -> {}".format(page))
             BROWSER.execute_script("window.scrollTo(0, 0);")
         else:
-<<<<<<< HEAD:OnlySnarf/driver.py
-            settings.maybePrint("goto -> {}".format(page))
-            self.browser.get("{}/{}".format(ONLYFANS_HOME_URL, page))
-            time.sleep(1)
-=======
             Settings.maybe_print("goto -> {}".format(page))
             BROWSER.get("{}/{}".format(ONLYFANS_HOME_URL, page))
->>>>>>> 7ae4811cfbb6d0c110ac8d1030589dda786e51e4:OnlySnarf/src/driver.py
 
     @staticmethod
     def go_to_home():

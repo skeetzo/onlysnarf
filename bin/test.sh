@@ -10,16 +10,6 @@ echo "##################################################" >> ../onlysnarf/logs/t
 echo "################## Start #########################" >> ../onlysnarf/logs/test.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
-<<<<<<< HEAD
-# sudo onlysnarfpy -debug -verbose -verboser -type gallery -debug-delay -show-window -skip-reduce
-
-# sudo onlysnarf -debug -verbose -show-window -debug-delay -prefer-local
-# sudo onlysnarfpy -debug -verbose -verboser -verbosest -action test -show-window
-sudo onlysnarfpy -debug -verbose -verboser -verbosest -action message -type image -method "all" -text "test pussy" -bykeyword "pussycats" -show-window
-# sudo onlysnarfpy -debug -verbose -verboser -verbosest -action message -method "recent" -text "test pussy" -bykeyword "pussycats" -show-window
-# sudo onlysnarfpy -debug -verbose -verboser -verbosest -action message -method "favorite" -text "test pussy" -bykeyword "pussycats" -show-window
-# sudo onlysnarfpy -verbose -type gallery -notkeyword feet -show-window -debug -debug-delay
-=======
 # sudo onlysnarfpy -debug -verbose -category gallery -debug-delay -show -skip-reduce
 
 # sudo onlysnarf -debug -verbose -show -debug-delay -prefer-local
@@ -28,7 +18,6 @@ sudo onlysnarfpy -debug -verbose -verbose -action test -show
 # sudo onlysnarfpy -debug -verbose -action message -user "recent" -text "test pussy" -bykeyword "pussycats" -show
 # sudo onlysnarfpy -debug -verbose -action message -user "favorite" -text "test pussy" -bykeyword "pussycats" -show
 # sudo onlysnarfpy -verbose -category gallery -notkeyword feet -show -debug -debug-delay
->>>>>>> 7ae4811cfbb6d0c110ac8d1030589dda786e51e4
 # sudo onlysnarf-config
 # sudo onlysnarfpy -debug -verbose -action test
 # sudo onlysnarfpy -debug -verbose -show -category image -bykeyword "pussycats"
