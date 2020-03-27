@@ -4,10 +4,8 @@
 echo "[*] Misc - Poll"
 sudo onlysnarfpy \
 -debug \
--verbose \
--verboser \
--verbosest \
--action "upload" -type "image" \
+-$2 \
+-action "post" -category "image" \
 -bykeyword "pussycats" \
 -skip-download \
 -text "poll testes" \

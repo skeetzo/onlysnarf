@@ -2,7 +2,7 @@
 # Profile Settings
 
 # from OnlySnarf.driver import Driver
-from PyInquirer
+import PyInquirer
 
 class Profile:
 

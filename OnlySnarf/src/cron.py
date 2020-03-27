@@ -1,18 +1,18 @@
 from crontab import CronTab
-from OnlySnarf.settings import SETTINGS as settings
+from .settings import Settings
 
 ################
 ##### Cron #####
 ################
 
 def delete(comment):
-    cron = CronTab(user=str(settings.CRON_USER))
+    cron = CronTab(user=str(Settings.get_cron_user()))
     cron.remove_all(comment=comment)
     cron.write()
     print("Cron Deleted: {}".format(comment))
 
 def deleteAll():
-    cron = CronTab(user=str(settings.CRON_USER))
+    cron = CronTab(user=str(Settings.get_cron_user()))
     cron.remove_all()
     cron.write()
     print("Crons Deleted")
@@ -36,7 +36,7 @@ def create(comment, args=[], minute=None, hour=None):
     print("Creating Cron: {}".format(comment))
     # if find(comment) is not None:
         # print("Warning: Cron Exists")
-    cron = CronTab(user=str(settings.CRON_USER))
+    cron = CronTab(user=str(Settings.get_cron_user()))
     cron.remove_all(comment=comment)
     args = [n.strip() for n in args]
     newCron = cron.new(command="/usr/local/bin/onlysnarfpy -cron {} {} >> /var/log/onlysnarf.log 2>&1".format(comment, " ".join(args)), comment=comment);
@@ -49,20 +49,20 @@ def create(comment, args=[], minute=None, hour=None):
     print("Created Cron: {}".format(comment))
 
 def list():
-    cron = CronTab(user=str(settings.CRON_USER))
+    cron = CronTab(user=str(Settings.get_cron_user()))
     print("Crons:")
     for job in cron:
         print(job)
 
 def find(comment):
-    cron = CronTab(user=str(settings.CRON_USER))
+    cron = CronTab(user=str(Settings.get_cron_user()))
     iter1 = cron.find_comment(str(comment))
     for item in iter1:
         return item
     return False 
 
 def getAll():
-    cron = CronTab(user=str(settings.CRON_USER))
+    cron = CronTab(user=str(Settings.get_cron_user()))
     jobs = []
     for job in cron:
         jobs.append(job)
@@ -145,6 +145,18 @@ def test():
 
 
 
+
+# ###
+# ### Cron
+# ###
+
+# cronItems = sorted([
+#     [ "Add", "add" ],
+#     [ "List", "list" ],
+#     [ "Delete", "delete" ],
+#     [ "Delete All", "deleteall" ]
+# ])
+# cronItems.insert(0,[ "Back", "main"])
 
 
 

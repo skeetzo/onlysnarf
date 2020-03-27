@@ -7,64 +7,50 @@ import json
 import pkg_resources
 import shutil
 import time
-from OnlySnarf import colorize
-from OnlySnarf.args import CONFIG as config
+from .colorize import colorize
+from .args import CONFIG as config
+import PyInquirer
 
 DEBUGGING = [
     ""
 ]
 
+CATEGORIES_DEFAULT = [
+  "images",
+  "galleries",
+  "videos"
+]
+DEFAULT_MESSAGE = ":)"
+DEFAULT_REFRESHER = "hi!"
+DEFAULT_GREETING = "hi! thanks for subscribing :3 do you have any preferences?"
+DISCOUNT_MAX_AMOUNT = 55
+DISCOUNT_MIN_AMOUNT = 10
+DISCOUNT_MAX_MONTHS = 7
+DISCOUNT_MIN_MONTHS = 1
+DURATION_ALLOWED = ["1","3","7","30","99","no limit"]
+EXPIRATION_ALLOWED = ["1","3","7","30","99","no limit"]
+IMAGE_DOWNLOAD_LIMIT = 6
+IMAGE_UPLOAD_LIMIT = 20
+IMAGE_UPLOAD_LIMIT_MESSAGES = 5
+MESSAGE_CHOICES = ["all", "recent", "favorite"]
+PRICE_MINIMUM = 3
+UPLOAD_MAX_DURATION = 12 # 2 hours
+
 class Settings:
-    def __init__(self):
-        DISCOUNT = None
-        MESSAGE = None
-        POLL = None
-        QUESTIONS = None
-        last_updated = False
+    last_updated = False
+    MESSAGE = None
 
-    # def __getitem__(self, key):
-    #     return getattr(self, key)
-
-    # def __setitem__(self, key, val):
-    #     return setattr(self, key, val)
-
-    ###################################################
+    def __init__():
+        pass
 
     #####################
     ##### Functions #####
     #####################
 
-    def debug_delay_check(self):
-        if str(config.DEBUG) == "True" and str(config.DEBUG_DELAY) == "True":
-            time.sleep(int(10))
-
-    def print(self):
-        if int(config.VERBOSE) == 1:
-            print(colorize(text, "teal"))
-
-    def maybe_print(self):
-        if int(config.VERBOSE) == 2:
-            print(colorize(text, "teal"))
-
-    # update for verbosity
-    def dev_print(self, text):
-        if int(config.VERBOSE) == 3:
-            if "successful" in str(text).lower():
-                print(colorize(text, "green"))
-            elif "failure" in str(text).lower():
-                print(colorize(text, "red")) 
-            else:
-                print(colorize(text, "blue"))
-
-    def header(self):
-        if str(self.last_updated) != "False":
-            print('\nUpdated: '+str(self.last_updated)+' -> '+str(self.last_updated))
-        self.last_updated = False
-        print('\r')
-
-
     def confirm(text):
-        import PyInquirer
+        if list(text) == []: return False
+        if str(text) == "": return False
+        if not Settings.is_confirm(): return True
         questions = [
             {
                 'type': 'confirm',
@@ -75,8 +61,272 @@ class Settings:
         ]
         return PyInquirer.prompt(questions)["covfefe"]
 
+    def debug_delay_check():
+        if Settings.is_debug() and Settings.is_debug_delay():
+            time.sleep(int(10))
+
+    def print(text):
+        if int(config.get("VERBOSE")) == 1:
+            print(colorize(text, "teal"))
+
+    def maybe_print(text):
+        if int(config.get("VERBOSE")) == 2:
+            print(colorize(text, "teal"))
+
+    # update for verbosity
+    def dev_print(text):
+        if int(config.get("VERBOSE")) == 3:
+            if "successful" in str(text).lower():
+                print(colorize(text, "green"))
+            elif "failure" in str(text).lower():
+                print(colorize(text, "red")) 
+            else:
+                print(colorize(text, "blue"))
+
+    def header():
+        if str(Settings.last_updated) != "False":
+            print('\nUpdated: '+str(Settings.last_updated)+' -> '+str(Settings.last_updated))
+        Settings.last_updated = False
+        print('\r')
+
+    # Gets
+
+    def get_action():
+        return config.get("ACTION")
+
+    def get_discount():
+        amount = config.get("AMOUNT") or config.get("DISCOUNT_MIN_AMOUNT")
+        months = config.get("MONTHS") or config.get("DISCOUNT_MIN_MONTHS")
+        discount = {"amount":amount,"months":months}
+        return discount
+
+    def get_category():
+        return config.get("CATEGORY") or ""
+
+    def get_categories():
+        return list(CATEGORIES_DEFAULT).extend(list(config.get("CATEGORIES")))
+
+    def get_price_minimum():
+        return PRICE_MINIMUM or 0
+
+    def get_date():
+        return config.get("DATE") or ""
+
+    def get_default_greeting():
+        return DEFAULT_GREETING or ""
+
+    def get_default_refresher():
+        return DEFAULT_REFRESHER or ""
+        
+    def get_discount_max_amount():
+        return DISCOUNT_MAX_AMOUNT or 0
+        
+    def get_discount_min_amount():
+        return DISCOUNT_MIN_AMOUNT or 0
+        
+    def get_discount_max_months():
+        return DISCOUNT_MAX_MONTHS or 0
+        
+    def get_discount_min_months():
+        return DISCOUNT_MIN_MONTHS or 0
+
+    def get_download_max():
+        return config.get("DOWNLOAD_MAX") or IMAGE_DOWNLOAD_LIMIT
+        
+    def get_drive_ignore():
+        return config.get("NOTKEYWORDS") or ""
+        
+    def get_drive_keyword():
+        return config.get("BYKEYWORDS") or ""
+        
+    def get_duration():
+        return config.get("DURATION") or 0
+        
+    def get_duration_allowed():
+        return DURATION_ALLOWED or []
+        
+    def get_expires():
+        return config.get("EXPIRATION") or 0
+        
+    def get_expiration_allowed():
+        return EXPIRATION_ALLOWED or []
+
+    def get_input():
+        return config.get("INPUT") or ""
+
+    def get_keywords():
+        keywords = config.get("KEYWORDS") or []
+        keywords = [n.strip() for n in keywords]
+        return keywords
+        
+    def get_message():
+        if Settings.MESSAGE: return Settings.MESSAGE
+        from .message import Message
+        message = Message()
+        message.get_post()
+        Settings.MESSAGE = message
+        return message
+
+    def get_message_choices():
+        return MESSAGE_CHOICES
+
+    def get_performers():
+        performers = config.get("PERFORMERS") or []
+        performers = [n.strip() for n in performers]
+        return performers
+
+    def get_poll():
+        duration = Settings.get_duration()
+        questions = Settings.get_questions()
+        if duration == "" or len(questions) == 0: return None
+        return {"duration":duration,"questions":questions}
+
+    def get_promotion():
+        return None
+        # if Settings.PROMOTION: return Settings.PROMOTION
+        # from .promotion import Promotion
+        # promotion = Promotion()
+        # promotion.get()
+        # Settings.PROMOTION = promotion
+        # return promotion
+
+    def get_recent_user_count():
+        return config.get("RECENT_USERS_COUNT") or 0
+
+    def get_password():
+        return config.get("PASSWORD") or ""
+
+    def get_download_path():
+        return config.get("DOWNLOAD_PATH") or ""
+
+    def get_drive_path():
+        return config.get("DRIVE_PATH") or ""
+
+    def get_users_path():
+        return config.get("USERS_PATH") or ""
+
+    def get_google_path():
+        print(config.get("GOOGLE_PATH"))
+        return config.get("GOOGLE_PATH") or ""
+
+    def get_secret_path():
+        return config.get("CLIENT_SECRET") or ""
+
+    def get_schedule():
+        if str(config.get("SCHEDULE")) != "None": return config.get("SCHEDULE")
+        if  Settings.get_date() != "":
+            if str(Settings.get_time()) != "":
+                config.set("SCHEDULE", "{}:{}".format(Settings.get_date(), Settings.get_time()))
+            else:
+                config.set("SCHEDULE", "{}:{}".format(Settings.get_date(), "00:00"))
+        return config.get("SCHEDULE")
+
+    def get_tags():
+        tags = config.get("TAGS") or []
+        tags = [n.strip() for n in tags]
+        return tags
+
+    def get_text():
+        return config.get("text")
+
+    def get_time():
+        return config.get("TIME") or ""
+
+    def get_title():
+        return config.get("TITLE") or ""
+        
+    def get_skipped_users():
+        return config.get("SKIPPED_USERS") or []
+        
+    def get_questions():
+        return config.get("QUESTIONS") or []
+        
+    def get_upload_max():
+        return config.get("UPLOAD_MAX") or IMAGE_UPLOAD_LIMIT
+        
+    def get_upload_max_messages():
+        return config.get("UPLOAD_LIMIT_MESSAGES") or 0
+        
+    def get_upload_max_duration():
+        return config.get("UPLOAD_MAX_DURATION") or 12 # 2 hours
+
+    # comma separated string of usernames
+    def get_users():
+        users = config.get("USERS") or []
+        users = [n.strip() for n in users]
+        return users
+
+    def get_user():
+        from .user import User
+        user = User({})
+        setattr(user, "username", config.get("USER"))
+        return user
+
+    def get_username():
+        return config.get("USERNAME") or ""
+
+    def get_users_favorite():
+        return config.get("USERS_FAVORITE") or []
+        
+    def get_verbosity():
+        return config.get("VERBOSE") or 0
+
+    # Bools
+
+    def is_confirm():
+        return config.get("CONFIRM") or True
+
+    def is_debug():
+        return config.get("DEBUG") or False
+
+    def is_debug_delay():
+        return config.get("DEBUG_DELAY") or False
+
+    def is_prefer_local():
+        return config.get("PREFER_LOCAL") or False
+        
+    def is_save_users():
+        return config.get("SAVE_USERS") or False
+        
+    def is_reduce():
+        return config.get("ENABLE_REDUCE") or False
+    
+    def is_show_window():
+        return config.get("SHOW") or False
+
+    def is_split():
+        return config.get("ENABLE_SPLIT") or False
+        
+    def is_trim():
+        return config.get("ENABLE_TRIM") or False
+        
+    def is_tweeting():
+        return config.get("TWEETING") or False
+        
+    def is_backup():
+        return config.get("BACKUP") or False
+        
+    def is_skip_download():
+        return config.get("SKIP_DOWNLOAD") or False
+        
+    def is_skip_upload():
+        return config.get("SKIP_UPLOAD") or False
+
+        ### OnlySnarf Settings Menu
+    def menu():
+        print('Settings')
+        question = {
+            'type': 'list',
+            'name': 'choice',
+            'message': 'Set:',
+            'choices': [key.replace("_"," ").title() for key in config.keys()],
+            'filter': lambda val: val.lower()
+        }
+        answer = prompt(question)["choice"]
+        if not Settings.confirm(answer): return
+        Settings.set_setting(answer)
+
     def prompt(text):
-        import PyInquirer
         confirm = [
             {
                 'type': 'confirm',
@@ -87,457 +337,56 @@ class Settings:
         ]
         return PyInquirer.prompt(confirm)["confirm"]
 
-    def get_action(self):
-        return getattr(config, "action")
+    def set_confirm(value):
+        config["CONFIRM"] = bool(value)
 
-    def get_discount(self):
-        if self.DISCOUNT: return self.DISCOUNT
-        amount = config.AMOUNT or config.DISCOuNT_MIN_AMOUNT
-        months = config.MONTHS or config.DISCOUNT_MIN_MONTHS
-        discount = {"amount":amount,"months":months}
-        self.DISCOUNT = discount
-        return discount
+    def set_username(username):
+        config["USERNAME"] = str(username)
 
-    def get_categories(self):
-        return list(config.CATEGORIES_DEFAULT).extend(list(config.CATEGORIES))
+    def set_password(password):
+        config["PASSWORD"] = str(password)
 
-    def get_keywords(self):
-        keywords = config.KEYWORDS.split(",")
-        keywords = [n.strip() for n in keywords]
-        return keywords
+    def set_setting(key):
+        key = key.replace("_"," ").title()
+        question = {
+            'type': 'input',
+            'name': 'key',
+            'message': key,
+            'default': value
+        }
+        if isinstance(value, bool):
+            question = {
+                'type': 'confirm',
+                'name': 'key',
+                'message': key,
+                'default': value
+            }
+        answer = prompt(question)
+        setattr(config, key, answer["key"])
 
-    def get_message(self):
-        if config.MESSAGE: return config.MESSAGE
-        message = Message()
-        message.get_post()
-        config.MESSAGE = message
-        return message
-
-    def get_performers(self):
-        performers = config.PERFORMERS.split(",")
-        performers = [n.strip() for n in performers]
-        return performers
-
-    def get_poll(self):
-        poll = None
-        duration = config.DURATION or None
-        questions = config.QUESTIONS or None
-        poll = {"duration":duration,"questions":questions}
-        if not duration or not questions: return None
-        return poll
-
-    def get_schedule(self):
-        if str(config.SCHEDULE) != "None": return config.SCHEDULE
-        if  str(config.DATE) != "None":
-            if str(config.TIME) != "None":
-                config.SCHEDULE = "{}:{}".format(config.DATE,config.TIME)
-            else:
-                config.SCHEDULE = "{}:{}".format(config.DATE,"00:00")
-        return None
-
-    def get_tags(self):
-        tags = config.TAGS.split(",")
-        tags = [n.strip() for n in tags]
-        return tags
-
-    def get_text(self):
-        return config.text
-
-    # comma separated string of usernames
-    def get_users(self):
-        users = config.USERS.split(",")
-        users = [n.strip() for n in users]
-        return users
-
-    def get_user(self):
-        user = User()
-        setattr(user, "username", config.USER)
-        return user
-
-    def menu(self):
-        print('Settings:')
-        for key, value in var(self):
-            if str(key).lower() in DEBUGGING and str(config.DEBUG) != "True": continue
-            # limited ints
-            # if certain int
-            # if str(key) == "Image Limit":
-            # print(" - {} = {}/{}".format(setting[0],setting[1],config.IMAGE_UPLOAD_LIMIT))
-
-
-
-            print(" - {} = {}".format(key, value))
 
 ###########################################################################
 
-SETTINGS = Settings()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    def update_value(self, variable, newValue):
-        variable = str(variable).upper().replace(" ","_")
-        try:
-            # print("Updating: {} = {}".format(variable, newValue))
-            setattr(self, variable, newValue)
-            # print("Updated: {} = {}".format(variable, getattr(self, variable)))
-        except Exception as e:
-            maybePrint(e)
-
-# move this behavior to user
-    def update_profile_value(self, variable, newValue):
-        variable = str(variable).upper().replace(" ","_")
-        try:
-            # print("Updating: {} = {}".format(variable, newValue))
-            self.PROFILE.setattr(self, variable, newValue)
-            # print("Updated: {} = {}".format(variable, getattr(self, variable)))
-        except Exception as e:
-            maybePrint(e)
-
-
-
-
-
-
-UPDATED = False
-UPDATED_TO = False
-INITIALIZED = False
-menuItems = []
-actionItems = []
-messageItems = []
-fileItems = []
-promotionItems = []
-settingItems = []
-methodItems = []
-
-
-
-
-
-# Settings Menu
-settingItems = [
-    [ "Verbose", config.VERBOSE, ["True","False"],True],
-    [ "Debug", config.DEBUG, ["True","False"],False],
-    [ "Backup", config.BACKUP, ["True","False"],True],
-    [ "Show Window", config.SHOW_WINDOW, ["True","False"],False],
-    [ "Delete Google", config.DELETE_GOOGLE, ["True","False"],False],
-    [ "Skip Delete", config.SKIP_DELETE, ["True","False"],False],
-    [ "Tweeting", config.TWEETING, ["True","False"],True],
-    [ "Image Limit", config.IMAGE_DOWNLOAD_LIMIT,None,True],
-]
-if str(config.VERBOSE) == "True":
-    settingItems.append([ "Skip Backup", config.SKIP_BACKUP, ["True","False"],False])
-    settingItems.append([ "Mount Path", config.MOUNT_PATH,None,False])
-    settingItems.append([ "Drive Path", config.DRIVE_PATH,None,False])
-    settingItems.append([ "Users Path", config.USERS_PATH,None,False])
-    settingItems.append([ "Google Root", config.ROOT_FOLDER,None,False])
-    settingItems.append([ "Drive Folder", config.DRIVE_FOLDERS,None,False])
-    settingItems.append([ "Create Drive", config.CREATE_DRIVE, ["True","False"],False])
-if str(config.DEBUG) == "True":
-    settingItems.append([ "Skip Upload", config.SKIP_UPLOAD, ["True","False"],False])
-    settingItems.append([ "Force Delete", config.FORCE_DELETE, ["True","False"],False])
-    settingItems.append([ "Force Backup", config.FORCE_BACKUP, ["True","False"],False])
-    settingItems.append([ "Force Upload", config.FORCE_UPLOAD, ["True","False"],False])
-    settingItems.append([ "Skip Download", config.SKIP_DOWNLOAD, ["True","False"],False])
-    settingItems.append([ "Image Max", config.IMAGE_UPLOAD_LIMIT,None,False])
-    settingItems.append([ "Text", config.TEXT,None,False])
-    settingItems.append([ "Local", config.INPUT,None,False])
-    settingItems.append([ "Image", config.IMAGE,None,False])
-    settingItems.append([ "Prefer Local", config.PREFER_LOCAL,["True","False"],True])
-    # settingItems.append([ "Overwrite Local", config.OVERWRITE_LOCAL,["True","False"],True])
-settingItems = sorted(settingItems)
-settingItems.insert(0,[ "Back", "main"])
-
-# Main Menu
-menuItems = [
-    [ "Actions", "action"],
-    [ "Settings", "set_settings"]
-]
-if str(config.DEBUG) == "True":
-    menuItems.append(["Profile", "profile"])
-menuItems = sorted(menuItems)
-menuItems.append([ "Exit", "exit"])
-
-###
-### Cron
-###
-
-cronItems = sorted([
-    [ "Add", "add" ],
-    [ "List", "list" ],
-    [ "Delete", "delete" ],
-    [ "Delete All", "deleteall" ]
-])
-cronItems.insert(0,[ "Back", "main"])
-
-###
-### Settings
-###
-
-settingsItems = sorted([
-    [ "Profile", "profileSettings" ],
-    [ "Account", "accountSettings" ],
-    [ "Notification", "notificationSettings" ],
-    [ "Security", "securitySettings" ],
-    [ "Other", "otherSettings" ],
-    [ "Sync", "sync" ]
-])
-settingsItems.insert(0,[ "Back", "main", "main"])
-
-# text, path, url, price, get, country, ip, or bool
-profileSettingsItems = sorted([
-    [ "Cover Image", "coverImage", "path" ],
-    [ "Profile Photo", "profilePhoto", "path" ],
-    [ "Display Name", "displayName", "text" ],
-    [ "Subscription Price", "subscriptionPrice", "price" ],
-    [ "About", "about", "text" ],
-    [ "Location", "location", "text" ],
-    [ "Website URL", "websiteURL", "url" ]
-])
-profileSettingsItems.insert(0,[ "Back", "main", "main"])
-
-accountSettingsItems = sorted([
-    [ "Username", "username", "text" ],
-    [ "Email", "email", "text" ],
-    [ "Password", "password", "text" ]
-])
-accountSettingsItems.insert(0,[ "Back", "main"])
-
-notificationSettingsItems = sorted([
-    [ "Email Notifications", "emailNotifs", "bool" ],
-    [ "New Referral", "emailNotifsNewReferral", "bool" ],
-    [ "New Stream", "emailNotifsNewStream", "bool" ],
-    [ "New Subscriber", "emailNotifsNewSubscriber", "bool" ],
-    [ "New Tip", "emailNotifsNewTip", "bool" ],
-    [ "Renewal", "emailNotifsRenewal", "bool" ],
-    [ "New Likes Summary", "emailNotifsNewLikes", "bool" ],
-    [ "New Posts Summary", "emailNotifsNewPosts", "bool" ],
-    [ "New Private Message Summary", "emailNotifsNewPrivMessages", "bool" ],
-    [ "Site Notifications", "siteNotifs", "bool" ],
-    [ "New Comment", "siteNotifsNewComment", "bool" ],
-    [ "New Favorite", "siteNotifsNewFavorite", "bool" ],
-    [ "New Discounts", "siteNotifsDiscounts", "bool" ],
-    [ "New Subscriber", "siteNotifsNewSubscriber", "bool" ],
-    [ "New Tip", "siteNotifsNewTip", "bool" ],
-    [ "Toast Notifications", "toastNotifs", "bool" ],
-    [ "New Comment", "toastNotifsNewComment", "bool" ],
-    [ "New Favorite", "toastNotifsNewFavorite", "bool" ],
-    [ "New Subscriber", "toastNotifsNewSubscriber", "bool" ],
-    [ "New Tip", "toastNotifsNewTip", "bool" ]
-])
-notificationSettingsItems.insert(0,[ "Back", "main"])
-
-
-securitySettingsItems = sorted([
-    [ "Fully Private Profile", "fullyPrivate", "bool" ],
-    [ "Enable Comments", "enableComments", "bool" ],
-    [ "Show Fans Count on your Profile", "showFansCount", "bool" ],
-    [ "Show Posts Tips Summary", "showPostsTip", "bool" ],
-    [ "Public Friends List", "publicFriendsList", "bool" ],
-    [ "IP and Geo Blocking - By Country", "ipCountry", "country" ],
-    [ "IP and Geo Blocking - By IP", "ipIP", "ip" ],
-    [ "Watermark - Enabled", "watermark", "bool" ],
-    [ "Watermark - Photos", "watermarkPhoto", "bool" ],
-    [ "Watermark - Videos", "watermarkVideo", "bool" ],
-    [ "Watermark - Custom Text", "watermarkText", "text" ]
-])
-securitySettingsItems.insert(0,[ "Back", "main"])
-
-otherSettingsItems = sorted([
-    [ "Live Server", "liveServer", "get" ],
-    [ "Live Key", "liveServerKey", "get" ]
-])
-otherSettingsItems.insert(0,[ "Back", "main"])
-
-
-
-
-
-
-### OnlySnarf Settings Menu
-def set_settings():
-    showHeader()
-    print(colorize("Set:",'menu'))
-
-
-    for item in settingItems:
-        print(colorize("[" + str(settingItems.index(item)) + "] ", 'blue') + list(item)[0])
-
-
-            if str(settingChoice) == "Back":
-                return main()
-            elif str(settingChoice) == "Local":
-                settingValue = input("Enter the file path: ")
-            elif str(settingChoice) == "Text":
-                settingValue = input("Enter the upload text: ")
-            elif str(settingChoice) == "Mount Path":
-                settingValue = input("Enter the mount path: ")
-            elif str(settingChoice) == "Drive Path":
-                settingValue = input("Enter the drive path (folderName/folderName/...): ")
-            elif str(settingChoice) == "Image":
-                settingValue = input("Enter the image path: ")
-            elif str(settingChoice) == "Google Root":
-                settingValue = input("Enter the Google root folder name: ")
-            # elif str(settingChoice) == "Google: Drive Folders":
-            #     settingValue = input("Enter the Google drive folders (separated by ',', no spaces): ")
-            #     settingValue = settingValue.split(",")
-            elif str(settingChoice) == "Image Limit":
-                settingValue = input("Enter the image upload limit: ")
-            elif str(settingChoice) == "Image Max":
-                settingValue = input("Enter the image upload max: ")
-            else:
-                list_ = list(settingItems[int(choice)][2])
-                print(colorize(str(settingChoice)+" =", 'blue'))
-                for item in list_:
-                    print(colorize("[" + str(list_.index(item)) + "] ", 'pink') + str(item))
-                
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#     def update_value(self, variable, newValue):
+#         variable = str(variable).upper().replace(" ","_")
+#         try:
+#             # print("Updating: {} = {}".format(variable, newValue))
+#             setattr(self, variable, newValue)
+#             # print("Updated: {} = {}".format(variable, getattr(self, variable)))
+#         except Exception as e:
+#             maybePrint(e)
+
+# # move this behavior to user
+#     def update_profile_value(self, variable, newValue):
+#         variable = str(variable).upper().replace(" ","_")
+#         try:
+#             # print("Updating: {} = {}".format(variable, newValue))
+#             Settings.PROFILE.setattr(self, variable, newValue)
+#             # print("Updated: {} = {}".format(variable, getattr(self, variable)))
+#         except Exception as e:
+#             maybePrint(e)
 
 
 

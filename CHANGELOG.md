@@ -307,6 +307,7 @@
   - login function cleaned up / spawn_browser
   - settings -> argsparse
   - menu cleaned up
+  - file system selection cleaned up
 
   **2.17.0**
 

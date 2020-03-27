@@ -18,12 +18,11 @@ mkdir -p ../onlysnarf/logs
 # schedule
 # post
 # message
-show="show-window"
+show="show"
 show="blank"
 
+verbose="blank"
 verbose="verbose"
-verbose="verbose -verboser"
-verbose="verbose -verboser -verbosest"
 
 declare -a testing
 testing=("schedule")
