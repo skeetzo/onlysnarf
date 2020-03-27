@@ -7,7 +7,7 @@ from PyInquirer import Validator, ValidationError
 
 class Message():
     def __init__(self):
-        self.text = None
+        self.text = ""
         self.files = []
         ##
         self.keywords = []
@@ -30,18 +30,16 @@ class Message():
             file.backup()
 
     def get_text(self):
-        if self.text: return self.text
+        if self.text != "": return self.text
         text = Settings.get_text() or None
         if text: return text
-        if not Settings.prompt("text"): return None
-        questions = [
-            {
-                'type': 'input',
-                'name': 'text',
-                'message': 'Text:'
-            }
-        ]
-        answers = PyInquirer.prompt(questions)
+        if not Settings.prompt("text"): return ""
+        question = {
+            'type': 'input',
+            'name': 'text',
+            'message': 'Text:'
+        }
+        answers = PyInquirer.prompt(question)
         text = answers["text"]
         if not Settings.confirm(text): return self.get_text()
         self.text = text
@@ -52,16 +50,14 @@ class Message():
         if len(self.keywords) > 0: return self.keywords
         keywords = Settings.get_keywords() or []
         if len(keywords) > 0: return keywords
-        if not Settings.prompt("keywords"): return None
-        questions = [
-            {
-                'type': 'input',
-                'name': 'keywords',
-                'message': 'Keywords:',
-                'validate': ListValidator
-            }
-        ]
-        answers = PyInquirer.prompt(questions)
+        if not Settings.prompt("keywords"): return []
+        question = {
+            'type': 'input',
+            'name': 'keywords',
+            'message': 'Keywords:',
+            'validate': ListValidator
+        }
+        answers = PyInquirer.prompt(question)
         keywords = answers["keywords"]
         keywords = keywords.split(",")
         keywords = [n.strip() for n in keywords]
@@ -74,16 +70,14 @@ class Message():
         if len(self.performers) > 0: return self.performers
         performers = Settings.get_tags() or []
         if len(performers) > 0: return performers
-        if not Settings.prompt("performers"): return None
-        questions = [
-            {
-                'type': 'input',
-                'name': 'performers',
-                'message': 'Performers:',
-                'validate': ListValidator
-            }
-        ]
-        answers = PyInquirer.prompt(questions)
+        if not Settings.prompt("performers"): return []
+        question = {
+            'type': 'input',
+            'name': 'performers',
+            'message': 'Performers:',
+            'validate': ListValidator
+        }
+        answers = PyInquirer.prompt(question)
         performers = answers["performers"]
         performers = performers.split(",")
         performers = [n.strip() for n in performers]
@@ -96,16 +90,14 @@ class Message():
         if len(self.tags) > 0: return self.tags
         tags = Settings.get_tags() or []
         if len(tags) > 0: return tags
-        if not Settings.prompt("tags"): return None
-        questions = [
-            {
-                'type': 'input',
-                'name': 'tags',
-                'message': 'Tags:',
-                'validate': ListValidator
-            }
-        ]
-        answers = PyInquirer.prompt(questions)
+        if not Settings.prompt("tags"): return []
+        question = {
+            'type': 'input',
+            'name': 'tags',
+            'message': 'Tags:',
+            'validate': ListValidator
+        }
+        answers = PyInquirer.prompt(question)
         tags = answers["tags"]
         tags = tags.split(",")
         tags = [n.strip() for n in tags]
@@ -140,15 +132,15 @@ class Message():
         if self.price: return self.price
         price = Settings.get_price() or None
         if price: return price
-        if not Settings.prompt("price"): return None
-        questions = {
-                'type': 'input',
-                'name': 'price',
-                'message': 'Price',
-                'validate': NumberValidator,
-                'filter': lambda val: int(val)
-            }
-        answers = PyInquirer.prompt(questions)
+        if not Settings.prompt("price"): return ""
+        question = {
+            'type': 'input',
+            'name': 'price',
+            'message': 'Price',
+            'validate': NumberValidator,
+            'filter': lambda val: int(val)
+        }
+        answers = PyInquirer.prompt(question)
         price = answers["price"]
         if not Settings.confirm(price): return self.get_price()
         self.price = price
@@ -159,13 +151,13 @@ class Message():
         expires = Settings.get_expires() or None
         if expires: return expires
         if not Settings.prompt("expiration"): return None
-        questions = {
-                'type': 'input',
-                'name': 'expiration',
-                'message': 'Expiration [1, 3, 7, 99 or \'No Limit\']',
-                'validate': ExpirationValidator
-            }
-        answers = PyInquirer.prompt(questions)
+        question = {
+            'type': 'input',
+            'name': 'expiration',
+            'message': 'Expiration [1, 3, 7, 99 or \'No Limit\']',
+            'validate': ExpirationValidator
+        }
+        answers = PyInquirer.prompt(question)
         expiration = answers["expiration"]
         if not Settings.confirm(expiration): return self.get_expiration()
         self.expiration = expiration
@@ -188,14 +180,14 @@ class Message():
         if len(self.questions) > 0: return self.questions
         questions = Settings.get_questions() or []
         if len(questions) > 0: return questions
-        if not Settings.prompt("questions"): return None
+        if not Settings.prompt("questions"): return []
         print("Enter Questions")
         while True:
             question = {
-                    'type': 'input',
-                    'name': 'question',
-                    'message': 'Question:',
-                }
+                'type': 'input',
+                'name': 'question',
+                'message': 'Question:',
+            }
             answers = PyInquirer.prompt(question)
             question = answers["question"]
             if str(question) == "": break
@@ -210,11 +202,11 @@ class Message():
         if duration: return duration
         if not Settings.prompt("duration"): return None
         question = {
-                'type': 'input',
-                'name': 'duration',
-                'message': 'Duration [1, 3, 7, 99 or \'No Limit\']',
-                'validate': DurationValidator
-            }
+            'type': 'input',
+            'name': 'duration',
+            'message': 'Duration [1, 3, 7, 99 or \'No Limit\']',
+            'validate': DurationValidator
+        }
         answers = PyInquirer.prompt(question)
         duration = answers["duration"]
         if not Settings.confirm(duration): return self.get_duration()

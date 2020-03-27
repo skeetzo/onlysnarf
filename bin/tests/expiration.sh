@@ -6,9 +6,9 @@ sudo onlysnarfpy \
 -debug \
 -$2 \
 -action "post" -category "image" \
--bykeyword "pussycats" \
+-bykeywords "pussycats" \
 -skip-download \
 -text "expiration testes" \
 -debug-delay \
 -$1 \
--expires 3
+-expiration 3

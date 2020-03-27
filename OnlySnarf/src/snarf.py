@@ -32,24 +32,22 @@ class Snarf:
     ####################
 
     @staticmethod
-    def discount(choice=None, discount=None):
-        if not choice: choice = Settings.get_user()
+    def discount(user=None, discount=None):
+        if not user: user = Settings.get_user()
         if not discount: discount = Settings.get_discount()
         users = []
-        if str(choice) == "all":
+        if str(user.username) == "all":
             users = User.get_all_users()
-        elif str(choice) == "new":
+        elif str(user.username) == "new":
             users = User.get_new_users()
-        elif str(choice) == "favorite":
+        elif str(user.username) == "favorite":
             users = User.get_favorite_users()
-        elif str(choice) == "recent":
+        elif str(user.username) == "recent":
             users = User.get_recent_users()
         else:
-            if isinstance(choice, str):
-                user = User.get_user_by_username(choice)
-                users.append(user)
-        for user in users:
-            try: user.discount(discount)
+            users.append(user)
+        for user_ in users:
+            try: user_.discount(discount)
             except Exception as e: Settings.dev_print(e)
         Snarf.exit()
 
@@ -130,10 +128,10 @@ class Snarf:
         print('1/3 : Testing')
         print('TESTING: Users')
         response = Driver.users_get()
-        return True
+        # return True
         print('TESTING: Following')
         response = Driver.following_get()
-        return True
+        # return True
         print('TESTING: Settings - Get')
         response = Driver.settings_get_all()
         return True
@@ -150,6 +148,7 @@ class Snarf:
 
 def main():
     # try:
+    Settings.set_prompt(False)
     Settings.set_confirm(False)
     action = Settings.get_action()
     print("Running - {}".format(action))
