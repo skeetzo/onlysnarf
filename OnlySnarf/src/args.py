@@ -12,8 +12,8 @@ DISCOUNT_MAX_AMOUNT = 55
 DISCOUNT_MIN_AMOUNT = 10
 DISCOUNT_MAX_MONTHS = 7
 DISCOUNT_MIN_MONTHS = 1
-DURATION_ALLOWED = ["1","3","7","30","99","no limit"]
-EXPIRATION_ALLOWED = ["1","3","7","30","99","no limit"]
+DURATION_ALLOWED = ["1","3","7","30","99","No Limit"]
+EXPIRATION_ALLOWED = ["1","3","7","30","99","No Limit"]
 IMAGE_DOWNLOAD_LIMIT = 6
 IMAGE_UPLOAD_LIMIT = 20
 IMAGE_UPLOAD_LIMIT_MESSAGES = 5
@@ -26,7 +26,7 @@ MOUNT_PATH = "/opt/onlysnarf"
 DOWNLOAD_PATH = os.path.join(MOUNT_PATH, "downloads")
 CONFIG_PATH = os.path.join(MOUNT_PATH, "config.conf")
 GOOGLE_PATH = os.path.join(MOUNT_PATH, "google_creds.txt")
-SECRET_PATH = os.path.join(MOUNT_PATH, "client_secret.json")
+SECRET_PATH = os.path.join(MOUNT_PATH, "client_secrets.json")
 USERS_PATH = os.path.join(MOUNT_PATH, "users.json")
 
 class AttrDict(dict):
@@ -84,7 +84,7 @@ def valid_amount(s):
 
 def valid_date(s):
   try:
-    return datetime.strptime(s, "%Y-%m-%d")
+    return datetime.strptime(s, "%Y/%m/%d")
   except ValueError:
     msg = "Not a valid date: '{0}'.".format(s)
     raise argparse.ArgumentTypeError(msg)
@@ -115,7 +115,7 @@ def valid_expiration(s):
 
 def valid_schedule(s):
   try:
-    return datetime.strptime(s, "%Y-%m-%d:%H:%M")
+    return datetime.strptime(s, "%Y/%m/%d:%H:%M")
   except ValueError:
     msg = "Not a valid schedule: '{0}'.".format(s)
     raise argparse.ArgumentTypeError(msg)
@@ -283,9 +283,14 @@ parser.add_argument('-months', '--months', type=valid_month, default=DISCOUNT_MI
 parser.add_argument('-mount-path', '--mount-path', type=str, 
   help='the local path to OnlySnarf processes')
 ##
+# -bykeyword
+# the keyword to search for in folder selection
+parser.add_argument('-bykeywords', '--by-keywords', nargs="*", dest='bykeywords', action='append', default=[], 
+  help="search for folder by keywords")
+##
 # -notkeyword
 # the keyword to skip in folder selection
-parser.add_argument('-notkeywords', '--not-keywords', dest='notkeywords', action='append', default=[], 
+parser.add_argument('-notkeywords', '--not-keywords', nargs="*", dest='notkeywords', action='append', default=[], 
   help="search for folder not by keywords")
 ##
 # -password
@@ -309,18 +314,18 @@ parser.add_argument('-price', '--price', type=valid_price, help='the price', def
 ### PATHS ###
 # -drive-path
 # the folder path within Google Drive for OnlySnarf's root folder
-parser.add_argument('-drive-path', '--drive-path', type=str, 
+parser.add_argument('-drive-path', '--drive-path', dest="drive_path", type=str, 
   help='the folder path within Drive to root OnlySnarf (/OnlySnarf)')
 # -config-path
 # the path to the config.conf file
-parser.add_argument('-config-path', '--config-path', type=str, 
+parser.add_argument('-config-path', '--config-path', dest="config_path", type=str, 
   help='the path to list', default=CONFIG_PATH)
 # -google-path
 # the path to the google_creds.txt
-parser.add_argument('-google-creds', '--google-creds', type=str, 
+parser.add_argument('-google-creds', '--google-creds', dest="google_path", type=str, 
   help='the path to Google credentials', default=GOOGLE_PATH)
 # the path to the client_secret.json
-parser.add_argument('-client-secret', '--client-secret', type=str, 
+parser.add_argument('-client-secret', '--client-secret', dest="client_secret", type=str, 
   help='the path to Google secret credentials', default=SECRET_PATH)
 # -user-path
 # the path to the users.json file
@@ -373,7 +378,7 @@ parser.add_argument('-skip-upload', '--skip-upload', action='store_true',
 parser.add_argument('-skip-users', '--skip-users', dest='skip_users', 
   action='append', help='the users to skip or ignore ')
 ##
-# -show-window
+# -show
 # shows window
 parser.add_argument('-show','-show-window', '--show-window', action='store_true', 
   help='enable displaying the browser window')

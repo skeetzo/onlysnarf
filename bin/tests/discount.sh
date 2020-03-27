@@ -9,5 +9,5 @@ sudo onlysnarfpy \
 -user "recent" \
 -amount 40 \
 -$1 \
--months 3
-# -prefer-local
+-months 3 \
+-prefer-local

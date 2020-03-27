@@ -15,7 +15,7 @@ sudo onlysnarfpy \
 -debug \
 -$2 \
 -action "post" -category "image" \
--bykeyword "pussycats" \
+-bykeywords "pussycats" \
 -text "image testes" \
 -$1 \
 -debug-delay
@@ -26,7 +26,7 @@ sudo onlysnarfpy \
 -debug \
 -$2 \
 -action "post" -category "gallery" \
--bykeyword "pussycats" \
+-bykeywords "pussycats" \
 -text "gallery testes" \
 -$1 \
 -debug-delay
@@ -37,9 +37,7 @@ sudo onlysnarfpy \
 -debug \
 -$2 \
 -action "post" -category "video" \
--bykeyword "pussycats" \
+-bykeywords "pussycats" \
 -text "video testes" \
--skip-reduce \
 -$1 \
--quietdev \
 -debug-delay

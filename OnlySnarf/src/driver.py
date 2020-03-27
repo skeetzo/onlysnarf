@@ -470,8 +470,8 @@ class Driver:
         try:
             BROWSER.get(ONLYFANS_HOME_URL)
             Settings.dev_print("logging in")
-            twitter = BROWSER.find_element_by_xpath(TWITTER_LOGIN3).click()
-            Settings.dev_print("twitter login clicked")
+            # twitter = BROWSER.find_element_by_xpath(TWITTER_LOGIN3).click()
+            # Settings.dev_print("twitter login clicked")
             # rememberMe checkbox doesn't actually cause login to be remembered
             # rememberMe = BROWSER.find_element_by_xpath(REMEMBERME_CHECKBOX_XPATH)
             # if not rememberMe.is_selected():

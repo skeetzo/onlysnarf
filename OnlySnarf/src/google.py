@@ -89,7 +89,8 @@ def authGoogle():
         global DRIVE
         DRIVE = build('drive', 'v3', http=creds.authorize(Http()))
     except Exception as e:
-        # Settings.maybe_print(e)
+        Settings.maybe_print(e)
+        print(e)
         print('Error: Unable to Authenticate w/ Google')
         return False
     Settings.maybe_print('Authentication Successful') 
@@ -149,25 +150,24 @@ def create_folders():
             contentFolder = PYDRIVE.CreateFile({"title": str(folder), "parents": [{"id": OnlyFansFolder['id']}], "mimeType": "application/vnd.google-apps.folder"})
             contentFolder.Upload()
 
-# def find_folder(parent, folderName):
-#     checkAuth()
-#     if str(parent) != "root":
-#         parent = parent['id']
-#     Settings.maybe_print("Finding Folder: {}/{}".format(parent, folderName))
-#     file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent)}).GetList()
-#     for folder in file_list:
-#         if str(folder['title']) == str(folderName):
-#             return folder
-#     print("Error: Unable to Find Folder - {}".format(folderName))
-#     return None
+def find_folder(parent, folderName):
+    checkAuth()
+    if str(parent) != "root":
+        parent = parent['id']
+    Settings.maybe_print("Finding Folder: {}/{}".format(parent, folderName))
+    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent)}).GetList()
+    for folder in file_list:
+        if str(folder['title']) == str(folderName):
+            return folder
+    print("Error: Unable to Find Folder - {}".format(folderName))
+    return None
 
 def get_folder_by_name(folderName, parent=None):
     if not checkAuth(): return
+    if not parent: parent = get_folder_root()
     if str(parent) in str(Settings.get_categories()):
         parent = get_folder_by_name(parent)
     Settings.maybe_print("Getting Folder: {}".format(folderName))
-    if parent is None:
-        parent = get_folder_root()
     file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent['id'])}).GetList()
     for folder in file_list:
         if str(folder['title'])==str(folderName):
@@ -177,7 +177,7 @@ def get_folder_by_name(folderName, parent=None):
         Settings.maybe_print("Skipping: Create Missing Folder - {}".format(folderName))
         return None
     # create if missing
-    folder = PYDRIVE.CreateFile({"title": str(folderName), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": parent}]})
+    folder = PYDRIVE.CreateFile({"title": str(folderName), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": parent["id"]}]})
     folder.Upload()
     Settings.maybe_print("Created Folder: {}".format(folderName))
     return folder
@@ -337,14 +337,14 @@ def get_folder_root():
         root_folders = Settings.get_drive_path().split("/")
         Settings.maybe_print("Mount Folders: {}".format("/".join(root_folders)))    
         for folder in root_folders:
-            mount_root = get_folder_by_name(mount_root, parent=folder)
-            # mount_root = find_folder(mount_root, folder)
+            # mount_root = get_folder_by_name(mount_root, parent=folder)
+            mount_root = find_folder(mount_root, folder)
             if mount_root is None:
                 mount_root = "root"
                 print("Warning: Drive Mount Folder Not Found")
                 break
-        mount_root = get_folder_by_name(mount_root, parent=Settings.get_drive_path())
-        # mount_root = find_folder(mount_root, Settings.get_drive_path())
+        # mount_root = get_folder_by_name(mount_root, parent=Settings.get_drive_path())
+        mount_root = find_folder(mount_root, Settings.get_drive_path())
         if mount_root is None:
             mount_root = {"id":"root"}
             print("Warning: Drive Mount Folder Not Found")

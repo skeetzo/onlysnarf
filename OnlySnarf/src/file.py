@@ -1,4 +1,4 @@
-import os
+import os, shutil
 from . import ffmpeg
 from . import google as Google
 from .settings import Settings

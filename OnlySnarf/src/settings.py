@@ -38,6 +38,8 @@ UPLOAD_MAX_DURATION = 12 # 2 hours
 
 class Settings:
     last_updated = False
+    CONFIRM = True
+    PROMPT = True
     MESSAGE = None
 
     def __init__():
@@ -50,7 +52,7 @@ class Settings:
     def confirm(text):
         if list(text) == []: return False
         if str(text) == "": return False
-        if not Settings.is_confirm(): return True
+        if not Settings.CONFIRM: return True
         questions = [
             {
                 'type': 'confirm',
@@ -66,7 +68,7 @@ class Settings:
             time.sleep(int(10))
 
     def print(text):
-        if int(config.get("VERBOSE")) == 1:
+        if int(config["VERBOSE"]) == 1:
             print(colorize(text, "teal"))
 
     def maybe_print(text):
@@ -95,8 +97,8 @@ class Settings:
         return config.get("ACTION")
 
     def get_discount():
-        amount = config.get("AMOUNT") or config.get("DISCOUNT_MIN_AMOUNT")
-        months = config.get("MONTHS") or config.get("DISCOUNT_MIN_MONTHS")
+        amount = config.get("AMOUNT") or DISCOUNT_MIN_AMOUNT
+        months = config.get("MONTHS") or DISCOUNT_MIN_MONTHS
         discount = {"amount":amount,"months":months}
         return discount
 
@@ -104,7 +106,11 @@ class Settings:
         return config.get("CATEGORY") or ""
 
     def get_categories():
+        print(list(CATEGORIES_DEFAULT).extend(list(config.get("CATEGORIES"))))
         return list(CATEGORIES_DEFAULT).extend(list(config.get("CATEGORIES")))
+
+    def get_price():
+        return config.get("PRICE") or ""
 
     def get_price_minimum():
         return PRICE_MINIMUM or 0
@@ -171,7 +177,7 @@ class Settings:
         return MESSAGE_CHOICES
 
     def get_mount_path():
-        return config["MOUNT_PATH"] or ""
+        return config.get("MOUNT_PATH") or ""
 
     def get_performers():
         performers = config.get("PERFORMERS") or []
@@ -209,7 +215,6 @@ class Settings:
         return config.get("USERS_PATH") or ""
 
     def get_google_path():
-        print(config.get("GOOGLE_PATH"))
         return config.get("GOOGLE_PATH") or ""
 
     def get_secret_path():
@@ -230,7 +235,7 @@ class Settings:
         return tags
 
     def get_text():
-        return config.get("text")
+        return config.get("TEXT") or ""
 
     def get_time():
         return config.get("TIME") or ""
@@ -276,8 +281,14 @@ class Settings:
 
     # Bools
 
-    def is_confirm():
-        return config.get("CONFIRM") or True
+    # def is_confirm():
+    #     return Settings.CONFIRM or False
+
+    # def is_prompt():
+    #     return Settings.PROMPT or False
+
+    def is_create_drive():
+        return config.get("CREATE_DRIVE") or False
 
     def is_debug():
         return config.get("DEBUG") or False
@@ -330,6 +341,9 @@ class Settings:
         Settings.set_setting(answer)
 
     def prompt(text):
+        if list(text) == []: return False
+        if str(text) == "": return False
+        if not Settings.PROMPT: return False
         question = {
             'type': 'confirm',
             'message': '{}?'.format(str(text).capitalize()),
@@ -359,13 +373,19 @@ class Settings:
         return pw
 
     def set_confirm(value):
-        config["CONFIRM"] = bool(value)
+        Settings.CONFIRM = bool(value)
 
     def set_username(username):
         config["USERNAME"] = str(username)
 
     def set_password(password):
         config["PASSWORD"] = str(password)
+
+    def set_prefer_local(buul):
+        config["PREFER_LOCAL"] = bool(buul)
+
+    def set_prompt(value):
+        Settings.PROMPT = bool(value)
 
     def set_setting(key):
         key = key.replace("_"," ").title()
