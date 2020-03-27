@@ -327,15 +327,33 @@ class Settings:
         Settings.set_setting(answer)
 
     def prompt(text):
-        confirm = [
-            {
-                'type': 'confirm',
-                'message': '{}?'.format(str(text).capitalize()),
-                'name': 'confirm',
-                'default': True,
-            }
-        ]
-        return PyInquirer.prompt(confirm)["confirm"]
+        question = {
+            'type': 'confirm',
+            'message': '{}?'.format(str(text).capitalize()),
+            'name': 'confirm',
+            'default': True,
+        }
+        return PyInquirer.prompt(question)["confirm"]
+
+    def prompt_username():
+        question = {
+            'type': 'input',
+            'message': 'Twitter username:',
+            'name': 'username'
+        }
+        username = PyInquirer.prompt(question)["username"]
+        Settings.set_username(username)
+        return username
+
+    def prompt_password():
+        question = {
+            'type': 'password',
+            'message': 'Twitter password:',
+            'name': 'password'
+        }
+        pw = PyInquirer.prompt(question)["password"]
+        Settings.set_password(pw)
+        return pw
 
     def set_confirm(value):
         config["CONFIRM"] = bool(value)

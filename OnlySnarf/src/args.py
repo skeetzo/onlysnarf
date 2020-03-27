@@ -464,6 +464,6 @@ CONFIG = read_config(CONFIG)
 
 #############
 # Debugging #
-# import sys
-# print(CONFIG)
-# sys.exit(0)
+import sys
+print(CONFIG)
+sys.exit(0)
