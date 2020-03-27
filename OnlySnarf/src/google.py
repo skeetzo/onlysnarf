@@ -19,8 +19,7 @@ from httplib2 import Http
 from oauth2client import file, client, tools
 from apiclient.http import MediaFileUpload,MediaIoBaseDownload
 ##
-from .settings import SETTINGS as settings
-from .file import Google_File
+from .settings import Settings
 
 ###################
 ##### Globals #####
@@ -60,13 +59,13 @@ def print_same_line(text):
 
 # Google Auth
 def authGoogle():
-    settings.maybePrint('Authenticating Google')
+    Settings.maybe_print('Authenticating Google')
     try:
         # PyDrive
         gauth = GoogleAuth()
         # Try to load saved client credentials
-        gauth.LoadCredentialsFile(settings.GOOGLE_PATH)
-        settings.maybePrint('Loaded: Google Credentials')
+        gauth.LoadCredentialsFile(Settings.get_google_path())
+        Settings.maybe_print('Loaded: Google Credentials')
         if gauth.credentials is None:
             # Authenticate if they're not there
             gauth.LocalWebserverAuth()
@@ -77,29 +76,30 @@ def authGoogle():
             # Initialize the saved creds
             gauth.Authorize()
         # Save the current credentials to a file
-        gauth.SaveCredentialsFile(settings.GOOGLE_PATH)
+        gauth.SaveCredentialsFile(Settings.get_google_path())
         global PYDRIVE
         PYDRIVE = GoogleDrive(gauth)
         # Drive v3 API
         SCOPES = 'https://www.googleapis.com/auth/drive'
-        store = file.Storage(settings.GOOGLE_PATH)
+        store = file.Storage(Settings.get_google_path())
         creds = store.get()
         if not creds or creds.invalid:
-            flow = client.flow_from_clientsecrets(settings.PATH_SECRET, SCOPES)
+            flow = client.flow_from_clientsecrets(Settings.get_secret_path(), SCOPES)
             creds = tools.run_flow(flow, store)
         global DRIVE
         DRIVE = build('drive', 'v3', http=creds.authorize(Http()))
     except Exception as e:
-        # settings.maybePrint(e)
+        # Settings.maybe_print(e)
         print('Error: Unable to Authenticate w/ Google')
-        # return False
-    settings.maybePrint('Authentication Successful') 
-    # return True
+        return False
+    Settings.maybe_print('Authentication Successful') 
+    return True
 
 def checkAuth():
     global AUTH
     if not AUTH:
         AUTH = authGoogle()
+    return AUTH
 
 ################################
 ##### Archiving / Deleting #####
@@ -108,7 +108,7 @@ def checkAuth():
 # Deletes online file
 def delete_file(file):
     try: file.get_file().Trash()
-    except Exception as e: settings.devPrint(e)
+    except Exception as e: Settings.dev_print(e)
 
 # Archives posted file / folder by updating their parent id
 # posted
@@ -119,33 +119,33 @@ def backup_file(file):
         global PYDRIVE
         parentFolder = PYDRIVE.CreateFile({'title':str(file.get_folder_name()), 'parents':[{"kind": "drive#fileLink", "id": str(get_posted_folder_by_name(file.get_category())['id'])}],'mimeType':'application/vnd.google-apps.folder'})
         parentFolder.Upload()
-        settings.devPrint("Moving To: posted/{}/{}".format(file.get_category(), file.get_folder_name()))
+        Settings.dev_print("Moving To: posted/{}/{}".format(file.get_category(), file.get_folder_name()))
         file.get_file()['parents'] = [{"kind": "drive#fileLink", "id": str(parentFolder['id'])}]
         file.get_file().Upload()
         print("File Backed Up: {}".format(file['title']))
     except Exception as e:
-        settings.maybePrint(e)
+        Settings.maybe_print(e)
 
 ###################
 ##### Folders #####
 ###################
 
 def create_folders():
-    checkAuth()
-    print("Creating Folders: {}".format(settings.ROOT_FOLDER))
+    if not checkAuth(): return
+    print("Creating Folders: {}".format(Settings.get_drive_path()))
     OnlyFansFolder = get_folder_root()
     if OnlyFansFolder is None:
         print("Error: Unable To Create Folders")
         return
     file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(OnlyFansFolder['id'])}).GetList()
-    for folder in settings.DRIVE_FOLDERS:
+    for folder in Settings.get_categories():
         found = False
         for folder_ in file_list:
             if str(folder) == folder_['title']:
-                settings.maybePrint("found: {}".format(folder))
+                Settings.maybe_print("found: {}".format(folder))
                 found = True
         if not found:
-            settings.maybePrint("created: {}".format(folder))
+            Settings.maybe_print("created: {}".format(folder))
             contentFolder = PYDRIVE.CreateFile({"title": str(folder), "parents": [{"id": OnlyFansFolder['id']}], "mimeType": "application/vnd.google-apps.folder"})
             contentFolder.Upload()
 
@@ -153,7 +153,7 @@ def create_folders():
 #     checkAuth()
 #     if str(parent) != "root":
 #         parent = parent['id']
-#     settings.maybePrint("Finding Folder: {}/{}".format(parent, folderName))
+#     Settings.maybe_print("Finding Folder: {}/{}".format(parent, folderName))
 #     file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent)}).GetList()
 #     for folder in file_list:
 #         if str(folder['title']) == str(folderName):
@@ -162,112 +162,26 @@ def create_folders():
 #     return None
 
 def get_folder_by_name(folderName, parent=None):
-    checkAuth()
-    if str(parent) in str(settings.DRIVE_FOLDERS):
+    if not checkAuth(): return
+    if str(parent) in str(Settings.get_categories()):
         parent = get_folder_by_name(parent)
-    settings.maybePrint("Getting Folder: {}".format(folderName))
+    Settings.maybe_print("Getting Folder: {}".format(folderName))
     if parent is None:
         parent = get_folder_root()
     file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent['id'])}).GetList()
     for folder in file_list:
         if str(folder['title'])==str(folderName):
-            settings.maybePrint("Found Folder: {}".format(folderName))
+            Settings.maybe_print("Found Folder: {}".format(folderName))
             return folder
-    if str(settings.CREATE_DRIVE) == "False":
-        settings.maybePrint("Skipping: Create Missing Folder - {}".format(folderName))
+    if not Settings.is_create_drive():
+        Settings.maybe_print("Skipping: Create Missing Folder - {}".format(folderName))
         return None
     # create if missing
     folder = PYDRIVE.CreateFile({"title": str(folderName), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": parent}]})
     folder.Upload()
-    settings.maybePrint("Created Folder: {}".format(folderName))
+    Settings.maybe_print("Created Folder: {}".format(folderName))
     return folder
 
-def get_posted_folder_by_name(folderName):
-    checkAuth()
-    settings.maybePrint("Getting Posted Folder: {}".format(folderName))
-    if parent is None:
-        parent = get_folder_root()
-    posted = None
-    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent['id'])}).GetList()
-    for folder in file_list:
-        if str(folder['title'])=="posted":
-            settings.maybePrint("Found Folder: posted")
-            posted = folder
-    if posted == None:
-        if str(settings.CREATE_DRIVE) == "False":
-            settings.maybePrint("Skipping: Create Missing Folder - {}".format("posted"))
-            return None        
-        # create if missing
-        posted = PYDRIVE.CreateFile({"title": str("posted"), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": parent}]})
-        posted.Upload()
-        settings.maybePrint("Created Folder: {}".format("posted"))
-    folder= None
-    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(posted['id'])}).GetList()
-    for folder_ in file_list:
-        if str(folder_['title'])==str(folderName):
-            settings.maybePrint("Found Folder: {}".format(folderName))
-            return folder_
-    if str(settings.CREATE_DRIVE) == "False":
-        settings.maybePrint("Skipping: Create Missing Folder - {}".format(folderName))
-        return None
-    # create if missing
-    folder = PYDRIVE.CreateFile({"title": str(folderName), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": posted['id']}]})
-    folder.Upload()
-    settings.maybePrint("Created Folder: {}".format(folderName))
-    return folder
-
-def get_folders_of_folder(folderName, parent=None):
-    checkAuth()
-    settings.maybePrint("Getting Folders of: {}".format(folderName))
-    folders = []
-    folder_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name(folderName, parent=parent)['id'])}).GetList()
-    for folder in folder_list:
-        file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(folder['id'])}).GetList()
-        if len(file_list) > 0:
-            settings.maybePrint("Found Folder: {}".format(folder['title']))
-            folders.append(folder)
-        else:
-            settings.maybePrint("Found Folder (empty): {}".format(folder['title']))
-    return folders
-
-# Creates the OnlyFans folder structure
-def get_folder_root():
-    checkAuth()
-    global OnlyFansFolder_
-    if OnlyFansFolder_ is not None:
-        return OnlyFansFolder_
-    OnlyFansFolder = None
-    if settings.DRIVE_PATH is not None:
-        mount_root = "root"
-        root_folders = settings.DRIVE_PATH.split("/")
-        settings.maybePrint("Mount Folders: {}".format("/".join(root_folders)))    
-        for folder in root_folders:
-            mount_root = get_folder_by_name(mount_root, parent=folder)
-            # mount_root = find_folder(mount_root, folder)
-            if mount_root is None:
-                mount_root = "root"
-                print("Warning: Drive Mount Folder Not Found")
-                break
-        mount_root = get_folder_by_name(mount_root, parent=settings.ROOT_FOLDER)
-        # mount_root = find_folder(mount_root, settings.ROOT_FOLDER)
-        if mount_root is None:
-            mount_root = {"id":"root"}
-            print("Warning: Drive Mount Folder Not Found")
-        else:
-            settings.maybePrint("Found Root (alt): {}/{}".format(settings.DRIVE_PATH, settings.ROOT_FOLDER))
-        OnlyFansFolder = mount_root
-    else:
-        file_list = PYDRIVE.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
-        for folder in file_list:
-            if str(folder['title']) == str(settings.ROOT_FOLDER):
-                OnlyFansFolder = folder
-                settings.maybePrint("Found Root: {}".format(settings.ROOT_FOLDER))
-    if OnlyFansFolder is None:
-        print("Creating Root: {}".format(settings.ROOT_FOLDER))
-        OnlyFansFolder = PYDRIVE.CreateFile({"title": str(settings.ROOT_FOLDER), "mimeType": "application/vnd.google-apps.folder"})
-        OnlyFansFolder.Upload()
-    OnlyFansFolder_ = OnlyFansFolder
-    return OnlyFansFolder_
 
 ####################
 ##### Download #####
@@ -290,12 +204,12 @@ def download_file(file):
                 while done is False:
                     # print("=",end="",flush=True)
                     status, done = downloader.next_chunk()
-                    if str(settings.VERBOSE) == "True":
+                    if int(Settings.get_verbosity()) >= 1:
                         print("Downloading: %d%%\r" % (status.progress() * 100), end="")
                 # print("D")
                 print("Download Complete (1)")
         except Exception as e:
-            settings.maybePrint(e)
+            Settings.maybe_print(e)
             return False
         return True 
     successful = method_one() or method_two()
@@ -309,282 +223,162 @@ def get_files_by_folder_id(folderID):
     if not folderID:
         print("Error: Missing Folder ID")
         return
-    checkAuth()
-    global PYDRIVE
-    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(folderID)}).GetList()
-    files = []
-    for file in file_list:
-        file_ = Google_File()
-        setattr(file_, "id", file["id"])
-        setattr(file_, "file", file)
-        files.append(file_)
-    return files
-
+    if not checkAuth(): return []
+    return PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(folderID)}).GetList()
+    
 def get_file(id_):
+    if not checkAuth(): return
     myfile = PYDRIVE.CreateFile({'id': id_})
     return myfile
 
+def get_file_parent(id_):
+    parent = get_file(id_)["parents"][0]
+    parent = PYDRIVE.CreateFile({'id': parent})
+    return parent
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# these need to be combined into this general top category
-# but it also needs to check folder names for bykeyword/notkeyword 
-# needs to return folders of content
-# use def get_folders_of_folder(folderName, parent=None):
-
-
+# returns first layer of files found
 def get_files_by_category(category):
+    if not checkAuth(): return []
     print("Getting: {}".format(category))
-    folder = get_folder_name(category)
-    image_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
-    video_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
-    file_list = []
-    for i in image_list: file_list.append(i)
-    for v in video_list: file_list.append(v)
-    folder_size = len(file_list)
-    settings.maybePrint('Images: {}'.format(len(image_list)))
-    settings.maybePrint('Videos: {}'.format(len(video_list)))
-    settings.maybePrint('Total: {}'.format(folder_size))
+    category = get_folder_by_name(category)
+    # folders of category
+    folders = []
+    folders_ = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(category['id'])}).GetList()
+    for folder_ in folders_:
+        if str(Settings.get_drive_keyword()) != str(folder_['title']):
+            Settings.maybe_print('-> not keyword')
+            continue
+        elif str(Settings.get_drive_ignore()) != str(folder_['title']):
+            Settings.maybe_print('-> by not keyword')
+            continue
+        folders.append(folder_)
     files = []
-    for file in file_list:
-        file_ = File()
-        setattr(file_, "file", file)
-        setattr(file_, "parent", folder)
-        files.append(file_)
+    for folder in folders:
+        image_list = PYDRIVE.ListFile({'q': "'"+category['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
+        video_list = PYDRIVE.ListFile({'q': "'"+category['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
+        file_list = []
+        for i in image_list: file_list.append(i)
+        for v in video_list: file_list.append(v)
+        # folder_size = len(file_list)
+        # Settings.maybe_print('Images: {}'.format(len(image_list)))
+        # Settings.maybe_print('Videos: {}'.format(len(video_list)))
+        # Settings.maybe_print('Total: {}'.format(folder_size))
+        folder_ = Folder()
+        setattr(folder_, "parent", category)
+        files_ = []
+        for file in file_list:
+            file_ = Google_File()
+            setattr(file_, "file", file)
+            setattr(file_, "parent", folder)
+            files_.append(file_)
+        setattr(folder_, "files", files_)
+        setattr(folder_, "id", folder["id"])
+        files.append(folder_)
+        files.extend(files_)
     return files
 
-# gets all the images in the images folders
-def get_images():
-    checkAuth()
-    print('Getting Images')
-    images_folder = get_folder_by_name("images")
-    random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(images_folder['id'])}).GetList()
-    images_list = []
-    for folder in random_folders:
-        if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
-            settings.maybePrint('-> not keyword')
-            continue
-        elif settings.NOTKEYWORD != None and str(settings.NOTKEYWORD) != str(folder['title']):
-            settings.maybePrint('-> by not keyword')
-            continue
-        images_list.append([images_folder, folder])
-        settings.maybePrint("checking folder: {}".format(folder['title']))
-        images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()      
-        for image_file in images_list_tmp:
-            # images_list.append({"folder":folder['title'],"folder_id":folder['id'],"id":image_file['id'],"image":image_file['title']})
-            file = Google_File()
-            setattr(file, "parent", folder)
-            setattr(file, "file", image_file)
-            images_list.append(file)
-    if len(images_list)==0:
-        print('Warning: Missing Message Files')
-        return []
-    return images_list
+def get_posted_folder_by_name(folderName):
+    if not checkAuth(): return
+    Settings.maybe_print("Getting Posted Folder: {}".format(folderName))
+    if parent is None:
+        parent = get_folder_root()
+    posted = None
+    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent['id'])}).GetList()
+    for folder in file_list:
+        if str(folder['title'])=="posted":
+            Settings.maybe_print("Found Folder: posted")
+            posted = folder
+    if posted == None:
+        if not Settings.is_create_drive():
+            Settings.maybe_print("Skipping: Create Missing Folder - {}".format("posted"))
+            return None        
+        # create if missing
+        posted = PYDRIVE.CreateFile({"title": str("posted"), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": parent}]})
+        posted.Upload()
+        Settings.maybe_print("Created Folder: {}".format("posted"))
+    folder= None
+    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(posted['id'])}).GetList()
+    for folder_ in file_list:
+        if str(folder_['title'])==str(folderName):
+            Settings.maybe_print("Found Folder: {}".format(folderName))
+            return folder_
+    if not Settings.is_create_drive():
+        Settings.maybe_print("Skipping: Create Missing Folder - {}".format(folderName))
+        return None
+    # create if missing
+    folder = PYDRIVE.CreateFile({"title": str(folderName), "mimeType": "application/vnd.google-apps.folder", "parents": [{"kind": "drive#fileLink", "id": posted['id']}]})
+    folder.Upload()
+    Settings.maybe_print("Created Folder: {}".format(folderName))
+    return folder
 
-def get_galleries():
-    checkAuth()
-    print('Getting Galleries')
-    gallery_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("galleries")['id'])}).GetList()
-    folder_list = []
-    random_gallery = None
-    folder_name = None
-    if gallery_folders == None:
-        print("Error: Unable to Connect to Google Drive")
-        return []
-    for folder in gallery_folders:
-        if str(settings.VERBOSE) == "True":
-            print('checking galleries: {}'.format(folder['title']),end="")
-        gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
-            settings.maybePrint('-> not keyword')
-            continue
-        elif settings.NOTKEYWORD != None and str(settings.NOTKEYWORD) != str(folder['title']):
-            settings.maybePrint('-> by not keyword')
-            continue
-        if len(gallery_list_tmp)>0:
-            folder_list.append(folder)
-            settings.maybePrint(" -> added")
-        else:
-            settings.maybePrint(" -> empty")
-    galleries = []
+def get_folders_of_folder(folderName, parent=None):
+    if not checkAuth(): return []
+    Settings.maybe_print("Getting Folders of: {}".format(folderName))
+    folders = []
+    folder_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name(folderName, parent=parent)['id'])}).GetList()
     for folder in folder_list:
-        if str(settings.VERBOSE) == "True":
-            print('checking gallery: {}'.format(folder['title']),end="")
-        gallery_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'"}).GetList()
-        for folder_ in gallery_list_tmp:
-            gallery_list_tmp_tmp = PYDRIVE.ListFile({'q': "'"+folder_['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
-            if len(gallery_list_tmp_tmp)>0:
-                folder_name = folder['title']
-                settings.maybePrint(" -> found")
-                folder__ = Folder()
-                setattr(folder__, "files", gallery_list_tmp_tmp)
-                galleries.append(folder__)
-            else:
-                settings.maybePrint(" -> empty")
-    print('Galleries: '+str(len(galleries)))
-    return galleries
-
-def get_videos():
-    checkAuth()
-    print('Getting Videos')
-    random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("videos")['id'])}).GetList()
-    video_list = []
-    random_video = None
-    folder_name = None
-    if random_folders == None:
-        print("Error: Unable to Connect to Google Drive")
-        return video_list
-    for folder in random_folders:
-        if str(settings.VERBOSE) == "True":
-            print("checking folder: {}".format(folder['title']),end="")
-        video_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
-        if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
-            settings.maybePrint('-> not keyword')
-            continue
-        elif settings.NOTKEYWORD != None and str(settings.NOTKEYWORD) != str(folder['title']):
-            settings.maybePrint('-> by not keyword')
-            continue
-        if len(video_list_tmp)>0:
-            video_list.append(folder)
-            settings.maybePrint(" -> added")
+        file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(folder['id'])}).GetList()
+        if len(file_list) > 0:
+            Settings.maybe_print("Found Folder: {}".format(folder['title']))
+            folders.append(folder)
         else:
-            settings.maybePrint(" -> empty")
-    if len(video_list)==0: print('Warning: Missing Video File')
-    folder_ = Folder()
-    setattr(folder_, "files", video_list)
-    return folder_
+            Settings.maybe_print("Found Folder (empty): {}".format(folder['title']))
+    return folders
 
-# gets all the images in the messages folders
-def get_message_image(folderName):
-    checkAuth()
-    print('Getting Message Image: {}'.format(folderName))
-    random_folders = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(get_folder_by_name("messages")['id'])}).GetList()
-    images_list = []
-    random_image = None
-    folder_name = None
-    for folder in random_folders:
-        if folder['title'] != str(folderName):
-            continue
-        if str(settings.VERBOSE) == "True":
-            print("checking folder: {}".format(folder['title']),end="")
-        images_list_tmp = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()      
-        if settings.BYKEYWORD != None and str(settings.BYKEYWORD) != str(folder['title']):
-            settings.maybePrint('-> not keyword')
-            continue
-        elif settings.NOTKEYWORD != None and str(settings.NOTKEYWORD) != str(folder['title']):
-            settings.maybePrint('-> by not keyword')
-            continue
-        if len(images_list_tmp)>0:
-            images_list.append(folder)
-            settings.maybePrint(" -> added")
+# Creates the OnlyFans folder structure
+def get_folder_root():
+    if not checkAuth(): return
+    global OnlyFansFolder_
+    if OnlyFansFolder_ is not None:
+        return OnlyFansFolder_
+    OnlyFansFolder = None
+    if Settings.get_drive_path() != "":
+        mount_root = "root"
+        root_folders = Settings.get_drive_path().split("/")
+        Settings.maybe_print("Mount Folders: {}".format("/".join(root_folders)))    
+        for folder in root_folders:
+            mount_root = get_folder_by_name(mount_root, parent=folder)
+            # mount_root = find_folder(mount_root, folder)
+            if mount_root is None:
+                mount_root = "root"
+                print("Warning: Drive Mount Folder Not Found")
+                break
+        mount_root = get_folder_by_name(mount_root, parent=Settings.get_drive_path())
+        # mount_root = find_folder(mount_root, Settings.get_drive_path())
+        if mount_root is None:
+            mount_root = {"id":"root"}
+            print("Warning: Drive Mount Folder Not Found")
         else:
-            settings.maybePrint(" -> empty")
-    if len(images_list)==0:
-        print('Error: Missing Image File')
-        return {"file":"","keywords":""}
-    random_image = random.choice(images_list)
-    folder_name = random_image['title'];
-    print('Messages Folder: '+random_image['title'])
-    random_image = PYDRIVE.ListFile({'q': "'"+random_image['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
-    random_image = random.choice(random_image)
-    print('Messages Image: '+random_image['title'])
-    file = Google_File()
-    setattr(file, "file", random_image)
-    setattr(file, "keywords", str(folder_name))
-    return file
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            Settings.maybe_print("Found Root (alt): {}/{}".format(Settings.get_drive_path(), Settings.get_drive_path()))
+        OnlyFansFolder = mount_root
+    else:
+        file_list = PYDRIVE.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+        for folder in file_list:
+            if str(folder['title']) == str(Settings.get_drive_path()):
+                OnlyFansFolder = folder
+                Settings.maybe_print("Found Root: {}".format(Settings.get_drive_path()))
+    if OnlyFansFolder is None:
+        print("Creating Root: {}".format(Settings.get_drive_path()))
+        OnlyFansFolder = PYDRIVE.CreateFile({"title": str(Settings.get_drive_path()), "mimeType": "application/vnd.google-apps.folder"})
+        OnlyFansFolder.Upload()
+    OnlyFansFolder_ = OnlyFansFolder
+    return OnlyFansFolder_
 
 ##################
 ##### Upload #####
 ##################
 
 def upload_file(file=None):
-    checkAuth()
+    if not checkAuth(): return False
     if not file:
         print("Error: Missing File")
         return False
-    if str(settings.FORCE_BACKUP) == "True":
-        print("Google Upload (forced): {}".format(filename))
-    elif str(settings.DEBUG) == "True":
+    if Settings.is_debug():
         print("Skipping Google Upload (debug): {}".format(filename))
-        return
-    elif str(settings.BACKUP) == "False":
+        return False
+    elif not Settings.is_backup():
         print('Skipping Google Upload (disabled): {}'.format(filename))
-        return
-    elif str(settings.SKIP_BACKUP) == "True":
-        print('Skipping Backup: {}'.format(filename))
-        return
+        return False
     else:
         print('Google Upload (file): {}'.format(filename))
     # if not mimetype:
@@ -598,27 +392,23 @@ def upload_file(file=None):
     # }
     # media = MediaFileUpload(path, mimetype=str(mimetype), resumable=True)
     # file = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
-    uploadedFile = PYDRIVE.CreateFile({'title':str(file.get_title()), 'parents':[{"kind": "drive#fileLink", "id": str(file.get_parent_id())}],'mimeType':str(file.get_mimetype())})
+    uploadedFile = PYDRIVE.CreateFile({'title':str(file.get_title()), 'parents':[{"kind": "drive#fileLink", "id": str(file.get_parent()["id"])}],'mimeType':str(file.get_mimetype())})
     uploadedFile.SetContentFile(file.get_path())
     uploadedFile.Upload()
     # print('File ID: {}'.format(file.get('id')))
+    return True
 
 def upload_gallery(files=[]):
     parent = get_folder_by_name("posted")
     if not parent:
         print("Error: Missing Posted Folder")
-        return
-    if str(settings.FORCE_BACKUP) == "True":
-        print("Google Upload (forced): {}".format(path))
-    elif str(settings.DEBUG) == "True":
+        return False
+    if Settings.is_debug():
         print("Skipping Google Upload (debug): {}".format(path))
-        return
-    elif str(settings.BACKUP) == "False":
+        return False
+    elif not Settings.is_backup():
         print('Skipping Google Upload (disabled): {}'.format(path))
-        return
-    elif str(settings.SKIP_BACKUP) == "True":
-        print('Skipping Backup (gallery): {}'.format(path))
-        return
+        return False
     else:
         print('Google Upload: {}'.format(path))
     # file_metadata = {
@@ -630,13 +420,8 @@ def upload_gallery(files=[]):
     # parent = DRIVE.files().create(body=file_metadata, fields='id').execute()
     tmp_folder = PYDRIVE.CreateFile({'title':str(datetime.datetime.now()), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':'application/vnd.google-apps.folder'})
     tmp_folder.Upload()
+    successful = False
     for file in files:
         setattr(file, "parent", tmp_folder)
-        upload_file(file=file)
-
-def upload_input(path=None):
-    if not path: path = settings.INPUT
-    if os.path.isdir(path):
-        upload_gallery(path=path)
-    else:
-        upload_file(path=path)
+        successful = upload_file(file=file)
+    return successful

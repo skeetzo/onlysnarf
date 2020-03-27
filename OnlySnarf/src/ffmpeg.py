@@ -1,5 +1,6 @@
 import ffmpeg
 import datetime
+from .settings import Settings
 
 ##################
 ##### FFMPEG #####
@@ -7,9 +8,9 @@ import datetime
 
 # all videos in folder into single mp4
 def combine(folderPath):
-    if str(settings.COMBINE) == "False":
-        print("Warning: Skipping Combine")
-        return False
+    # if str(Settings.COMBINE) == "False":
+    #     print("Warning: Skipping Combine")
+    #     return False
     if ".mp4" not in str(folderPath):
         print("Error: Unable to Combine")
         return False
@@ -17,7 +18,7 @@ def combine(folderPath):
     try:    
         ffmpeg.input(str(folderPath), format='concat', safe=0).output(combinePath, c='copy').run()
     except Exception as e:
-        settings.maybePrint(e)
+        Settings.maybe_print(e)
         if "Conversion failed!" in str(e):
             print("Error: Combine Failure")
             return combinePath                    
@@ -30,8 +31,8 @@ def gifify(path):
     # First convert the images to a video:
     # ffmpeg -f image2 -i image%d.jpg video.avi
     loglevel = "quiet"
-    if str(settings.VERBOSE) == "True":
-        loglevel = "debug"
+    # if Settings.get_debug():
+        # loglevel = "debug"
     # p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-y', '-i', str(path), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', '-crf', '26', '-b:v', str(bitrate), str(reducedPath)])
     # Then convert the avi to a gif:
     # ffmpeg -i video.avi -pix_fmt rgb24 -loop_output 0 out.gif
@@ -39,10 +40,10 @@ def gifify(path):
 # frames for preview gallery
 def frames(path):
     try:
-        settings.maybePrint("Capturing Frames: {}".format(path))
+        Settings.maybe_print("Capturing Frames: {}".format(path))
         try:
             clip = VideoFileClip(str(path))
-            settings.maybePrint("Length: {}".format(clip.duration))
+            Settings.maybe_print("Length: {}".format(clip.duration))
         except FileNotFoundError:
             print("Error: Missing File to Capture Frames")
             return path
@@ -58,36 +59,36 @@ def frames(path):
 
 # this requires a similar video and has no real use so remove?
 # or change to some other repair method for videos
-def repair(path):
-    if str(settings.REPAIR) == "False":
-        print("Warning: Skipping Repair")
-        return path
-    if ".mp4" not in str(path):
-        print("Error: Unable to Repair")
-        return path
-    if not os.path.isfile(str(settings.WORKING_VIDEO)):
-        print("Error: Missing Working Video")
-        return path
-    repairedPath = str(path).replace(".mp4", "_fixed.mp4")
-    try:
-        print("Repairing: {} <-> {}".format(path, settings.WORKING_VIDEO))
-        if str(settings.VERBOSE) == "True":
-            subprocess.call(['untrunc', str(settings.WORKING_VIDEO), str(path)]).communicate()
-        else:
-            subprocess.Popen(['untrunc', str(settings.WORKING_VIDEO), str(path)],stdin=FNULL,stdout=FNULL)
-    except AttributeError:
-        if os.path.isfile(str(path)+"_fixed.mp4"):
-            shutil.move(str(path)+"_fixed.mp4", repairedPath)
-            print("Repair Complete")
-    except:
-        settings.maybePrint(sys.exc_info()[0])
-        print("Warning: Skipping Repair")
-        return path
-    print("Repair Successful")
-    return str(repairedPath)
+# def repair(path):
+#     if str(Settings.get_repair()) == "False":
+#         print("Warning: Skipping Repair")
+#         return path
+#     if ".mp4" not in str(path):
+#         print("Error: Unable to Repair")
+#         return path
+#     if not os.path.isfile(str(Settings.WORKING_VIDEO)):
+#         print("Error: Missing Working Video")
+#         return path
+#     repairedPath = str(path).replace(".mp4", "_fixed.mp4")
+#     try:
+#         print("Repairing: {} <-> {}".format(path, Settings.WORKING_VIDEO))
+#         if Settings.get_debug():
+#             subprocess.call(['untrunc', str(Settings.WORKING_VIDEO), str(path)]).communicate()
+#         else:
+#             subprocess.Popen(['untrunc', str(Settings.WORKING_VIDEO), str(path)],stdin=FNULL,stdout=FNULL)
+#     except AttributeError:
+#         if os.path.isfile(str(path)+"_fixed.mp4"):
+#             shutil.move(str(path)+"_fixed.mp4", repairedPath)
+#             print("Repair Complete")
+#     except:
+#         Settings.maybe_print(sys.exc_info()[0])
+#         print("Warning: Skipping Repair")
+#         return path
+#     print("Repair Successful")
+#     return str(repairedPath)
 
 def reduce(path):
-    if str(settings.REDUCE) == "False":
+    if not Settings.is_reduce():
         print("Warning: Skipping Reduction")
         return path
     if ".mp4" not in str(path):
@@ -95,17 +96,17 @@ def reduce(path):
         return path
     reducedPath = str(path).replace(".mp4", "_reduced.mp4")
     try:
-        settings.maybePrint("Reducing: {}".format(path))
+        Settings.maybe_print("Reducing: {}".format(path))
         try:
             clip = VideoFileClip(str(path))
-            settings.maybePrint("Length: {}".format(clip.duration))
+            Settings.maybe_print("Length: {}".format(clip.duration))
             bitrate = 1000000000 / int(clip.duration)
-            settings.maybePrint("Bitrate: {}".format(bitrate))
+            Settings.maybe_print("Bitrate: {}".format(bitrate))
         except FileNotFoundError:
             print("Error: Missing File to Reduce")
             return path
         loglevel = "quiet"
-        if str(settings.VERBOSE) == "True":
+        if Settings.get_debug():
             loglevel = "debug"
         p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-err_detect', 'ignore_err', '-y', '-i', str(path), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', '-crf', '26', '-b:v', str(bitrate), str(reducedPath)])
         # p.communicate()
@@ -113,7 +114,7 @@ def reduce(path):
         print("Warning: Ignoring Fixed Video")
         return reduce(str(path).replace(".mp4", "_fixed.mp4"))
     except Exception as e:
-        settings.maybePrint(e)
+        Settings.maybe_print(e)
         if "Conversion failed!" in str(e):
             print("Error: Conversion Failure")
             return path                    
@@ -134,7 +135,7 @@ def reduce(path):
 # into segments (60 sec, 5 min, 10 min)
 # segment: minutes
 def split(path, segment):
-    if str(settings.TRIM) == "False":
+    if not Settings.is_split():
         print("Warning: Skipping Split")
         return path
     if ".mp4" not in str(path):
@@ -143,17 +144,17 @@ def split(path, segment):
     splitPaths = []
     splitPath = str(path).replace(".mp4", "_split$.mp4")
     try:
-        settings.maybePrint("Splitting: {}".format(path))
+        Settings.maybe_print("Splitting: {}".format(path))
         try:
             clip = VideoFileClip(str(path))
-            settings.maybePrint("Length: {}".format(clip.duration))
+            Settings.maybe_print("Length: {}".format(clip.duration))
         except FileNotFoundError:
             print("Error: Missing File to Split")
             return path
         i = 0
         index = 0
         loglevel = "quiet"
-        if str(settings.VERBOSE) == "True":
+        if Settings.get_debug():
             loglevel = "debug"
         while True:
             start = datetime.timedelta(seconds=index)
@@ -165,7 +166,7 @@ def split(path, segment):
             i += 1
         # p.communicate()
     except Exception as e:
-        settings.maybePrint(e)
+        Settings.maybe_print(e)
         if "Conversion failed!" in str(e):
             print("Error: Split Failure")
             return splitPaths                    
@@ -173,16 +174,16 @@ def split(path, segment):
     return splitPaths
 
 def thumbnail_fix(path):
-    if str(settings.THUMBNAILING_PREVIEW) == "False":
-        print("Warning: Preview Thumbnailing Disabled")
-        return path
+    # if str(Settings.THUMBNAILING_PREVIEW) == "False":
+    #     print("Warning: Preview Thumbnailing Disabled")
+    #     return path
     try:
         print("Thumbnailing: {}".format(path))
         loglevel = "quiet"
-        if str(settings.VERBOSE) == "True":
+        if Settings.get_debug():
             loglevel = "debug"
         thumbnail_path = os.path.join(os.path.dirname(str(path)), 'thumbnail.png')
-        settings.maybePrint("thumbnail path: {}".format(thumbnail_path))
+        Settings.maybe_print("thumbnail path: {}".format(thumbnail_path))
         p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-i', str(path),'-ss', '00:00:00.000', '-vframes', '1', str(thumbnail_path)])
         p.communicate()
         print("Thumbnailing Complete")
@@ -192,12 +193,12 @@ def thumbnail_fix(path):
     except AttributeError:
         print("Thumbnailing: Captured PNG")
     except:
-        settings.maybePrint(sys.exc_info()[0])
+        Settings.maybe_print(sys.exc_info()[0])
         print("Error: Thumbnailing Fuckup")    
 
 #seconds off front or back
 def trim(path):
-    if str(settings.TRIM) == "False":
+    if not Settings.is_trim():
         print("Warning: Skipping Trim")
         return path
     if ".mp4" not in str(path):
@@ -205,22 +206,22 @@ def trim(path):
         return path
     reducedPath = str(path).replace(".mp4", "_trimmed.mp4")
     try:
-        settings.maybePrint("Trimming: {}".format(path))
+        Settings.maybe_print("Trimming: {}".format(path))
         try:
             clip = VideoFileClip(str(path))
-            settings.maybePrint("Length: {}".format(clip.duration))
+            Settings.maybe_print("Length: {}".format(clip.duration))
         except FileNotFoundError:
             print("Error: Missing File to Reduce")
             return path
         start = datetime.timedelta(seconds=60)
         end = datetime.timedelta(seconds=clip.duration-60)
         loglevel = "quiet"
-        if str(settings.VERBOSE) == "True":
+        if Settings.get_debug():
             loglevel = "debug"
         p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-ss', str(start), '-y', '-i', str(path), '-to', str(end), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', str(reducedPath)])
         # p.communicate()
     except Exception as e:
-        settings.maybePrint(e)
+        Settings.maybe_print(e)
         if "Conversion failed!" in str(e):
             print("Error: Trim Failure")
             return path                    

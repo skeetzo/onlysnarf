@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # for easily interacting with changeable page elements
 
-from OnlySnarf.settings import SETTINGS as settings
-from OnlySnarf.elements.driver import ELEMENTS as driverElements
-from OnlySnarf.elements.profile import ELEMENTS as profileElements
+from .settings import Settings
+from .elements.driver import ELEMENTS as driverElements
+from .elements.profile import ELEMENTS as profileElements
 
 ONLYFANS_ELEMENTS = []
 ONLYFANS_ELEMENTS.extend(driverElements)
@@ -39,15 +39,15 @@ class Element:
 
     @staticmethod
     def get_element_by_name(name):
-        settings.devPrint("getting element: {}".format(name))
+        Settings.dev_print("getting element: {}".format(name))
         if name == None:
-            settings.maybePrint("Error: Missing Element Name")
+            Settings.maybe_print("Error: Missing Element Name")
             return None
         global ONLYFANS_ELEMENTS
         for element in ONLYFANS_ELEMENTS:
             # element = Element(name=element["name"], classes=element["classes"], text=element["text"], id=element["id"])
             if str(element["name"]) == str(name):
-                settings.devPrint("prepped ele: {}".format(element["name"]))
+                Settings.dev_print("prepped ele: {}".format(element["name"]))
                 return Element(name=element["name"], classes=element["classes"], text=element["text"], id=element["id"])
-        settings.devPrint("Warning: Missing Element Fetch - {}".format(name))
+        Settings.dev_print("Warning: Missing Element Fetch - {}".format(name))
         return None

@@ -10,10 +10,10 @@ from datetime import datetime
 from re import sub
 from decimal import Decimal
 ##
-from OnlySnarf.colorize import colorize
-from OnlySnarf.driver import Driver
-from OnlySnarf.settings import SETTINGS as settings
-from PyInquirer
+from .colorize import colorize
+from .driver import Driver
+from .settings import Settings
+import PyInquirer
 
 class User:
 
@@ -42,11 +42,10 @@ class User:
         self.statement_history = ",".join(self.messages_from).split(",")
         #########################
         try:
-            settings.devPrint("User: {} - {} - {}".format(self.name, self.username, self.id))
+            Settings.maybe_print("User: {} - {} - {}".format(self.name, self.username, self.id))
         except Exception as e:
-            print(e)
-            settings.devPrint(e)
-            settings.devPrint("User: {}".format(self.id))
+            Settings.dev_print(e)
+            Settings.maybe_print("User: {}".format(self.id))
 
     def discount(self, discount={}):
         amount = getattr(discount, "amount")
@@ -82,13 +81,13 @@ class User:
                 return True
             def enter_price(price):
                 if path == "": return False
-                if path != None and Decimal(sub(r'[^\d.]', '', price)) < settings.PRICE_MINIMUM:
+                if path != None and Decimal(sub(r'[^\d.]', '', price)) < Settings.get_price_minimum():
                     print("Warning: Price Too Low, Free Image")
-                    print("Price Minimum: ${}".format(settings.PRICE_MINIMUM))
+                    print("Price Minimum: ${}".format(Settings.get_price_minimum()))
                 else:
                     success = Driver.message_price(price)
                     if not success: return False
-                settings.debug_delay_check()
+                Settings.debug_delay_check()
                 return True
             def enter_file(path):
                 if path == "": return False
@@ -98,9 +97,9 @@ class User:
                     return False
                 success = Driver.message_files(path)
                 if not success: return False
-                if str(settings.DEBUG) != "True":
+                if not Settings.is_debug():
                     self.sent_images.append(str(image_name))
-                settings.debug_delay_check()
+                Settings.debug_delay_check()
                 return True
             def confirm():
                 success = Driver.message_confirm()
@@ -114,7 +113,7 @@ class User:
             print("Message Entered")
             return True
         except Exception as e:
-            settings.maybePrint(e)
+            Settings.maybe_print(e)
             return False
 
     def equals(self, user):
@@ -143,8 +142,8 @@ class User:
         if self.last_messaged_on == None:
             return print("Error: User Not New")
         print("Sending User Greeting: {}".format(self.username))
-        # self.send_message(message=settings.DEFAULT_GREETING)
-        User.enter_message(message=settings.DEFAULT_GREETING)
+        # self.send_message(message=Settings.DEFAULT_GREETING)
+        User.enter_message(message=Settings.get_default_greeting())
 
     # send refresher message to user
     def refresh(self):
@@ -154,8 +153,8 @@ class User:
         elif (timedelta(self.last_messaged_on)-timedelta(datetime())).days < 30:
             return print("Error: Refresher Date Too Early - {}".format((timedelta(self.last_messaged_on)-timedelta(datetime())).days))
         print("Sending User Refresher: {}".format(self.username))
-        # self.send_message(message=settings.user_DEFAULT_REFRESHER)
-        User.enter_message(message=settings.user_DEFAULT_REFRESHER)
+        # self.send_message(message=Settings.user_DEFAULT_REFRESHER)
+        User.enter_message(message=Settings.get_default_refresher())
 
     # saves chat log to user
     def readChat(self, Driver):
@@ -165,7 +164,7 @@ class User:
         # self.messages_and_timestamps = messages[1]
         self.messages_to = messages[2]
         self.messages_from = messages[3]
-        settings.maybePrint("Chat Read: {} - {}".format(self.username, self.id))
+        Settings.maybe_print("Chat Read: {} - {}".format(self.username, self.id))
 
     # saves statement / payment history
     def statementHistory(self, history):
@@ -189,21 +188,21 @@ class User:
     # gets users from local or refreshes from onlyfans.com
     @staticmethod
     def get_active_users():
-        if str(settings.PREFER_LOCAL) == "True": return read_users_local()
+        if Settings.is_prefer_local(): return User.read_users_local()
         active_users = []
         users = Driver.users_get()
         for user in users:
             try:
                 user = User(user)
-                user = skipUserCheck(user)
+                user = User.skipUserCheck(user)
                 if user is None: continue
                 active_users.append(user)
             except Exception as e:
-                settings.maybePrint(e)
-        settings.maybePrint("pruning memberlist")
-        settings.maybePrint("users: {}".format(len(active_users)))
-        write_users_local(users=active_users)
-        settings.PREFER_LOCAL = True
+                Settings.maybe_print(e)
+        Settings.maybe_print("pruning memberlist")
+        Settings.maybe_print("users: {}".format(len(active_users)))
+        User.write_users_local(users=active_users)
+        Settings.is_prefer_local(True)
         return active_users
 
     @staticmethod
@@ -211,29 +210,29 @@ class User:
         if not username or username == None:
             print("Error: Missing Username")
             return None
-        users = read_users_local()
+        users = User.read_users_local()
         for user in users:
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
-                settings.maybePrint("Found User: Local")
+                Settings.maybe_print("Found User: Local")
                 return user
         users = User.get_all_users()
         for user in users:
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
-                settings.maybePrint("Found User: Members")
+                Settings.maybe_print("Found User: Members")
                 return user
         print("Error: Missing User by Username - {}".format(username))
         return None
 
     @staticmethod
     def get_favorite_users():
-        settings.maybePrint("Getting Fav Users")
+        Settings.maybe_print("Getting Fav Users")
         users = User.get_all_users()
         favUsers = []
-        favorites = ",".join(str(settings.USERS_FAVORITE))
+        favorites = ",".join(str(Settings.get_users_favorite()))
         for user in users:
             if user in favorites:
-                settings.maybePrint("Fav User: {}".format(user.username))
-                user = skipUserCheck(user)
+                Settings.maybe_print("Fav User: {}".format(user.username))
+                user = User.skipUserCheck(user)
                 if user is None: continue
                 favUsers.append(user)
         return favUsers
@@ -241,164 +240,166 @@ class User:
     # returns users that have no messages sent to them
     @staticmethod
     def get_new_users():
-        settings.maybePrint("Getting New Users")
+        Settings.maybe_print("Getting New Users")
         users = User.get_all_users()
         newUsers = []
         date_ = datetime.today() - timedelta(days=10)
         for user in users:
             started = datetime.strptime(user.started,"%b %d, %Y")
-            # settings.maybePrint("date: "+str(date_)+" - "+str(started))
+            # Settings.maybe_print("date: "+str(date_)+" - "+str(started))
             if started < date_: continue
-            settings.maybePrint("New User: {}".format(user.username))
-            user = skipUserCheck(user)
+            Settings.maybe_print("New User: {}".format(user.username))
+            user = User.skipUserCheck(user)
             if user is None: continue
             newUsers.append(user)
         return newUsers
 
     @staticmethod
     def get_never_messaged_users():
-        settings.maybePrint("Getting New Users")
+        Settings.maybe_print("Getting New Users")
         update_chat_logs()
         users = User.get_all_users()
         newUsers = []
         for user in users:
             if len(user.messages_to) == 0:
-                settings.maybePrint("Never Messaged User: {}".format(user.username))
-                user = skipUserCheck(user)
+                Settings.maybe_print("Never Messaged User: {}".format(user.username))
+                user = User.skipUserCheck(user)
                 if user is None: continue
                 newUsers.append(user)
         return newUsers
 
     @staticmethod
     def get_recent_users():
-        settings.maybePrint("Getting Recent Users")
+        Settings.maybe_print("Getting Recent Users")
         users = User.get_all_users()
         i = 0
         users_ = []
         for user in users:
-            settings.maybePrint("Recent User: {}".format(user.username))
-            user = skipUserCheck(user)
+            Settings.maybe_print("Recent User: {}".format(user.username))
+            user = User.skipUserCheck(user)
             if user is None: continue
             users_.append(user)
             i += 1
-            if i == settings.RECENT_USER_COUNT:
+            if i == int(Settings.get_recent_user_count()):
                 return users_
         return users_
 
     @staticmethod
     def select_user():
-        if not settings.prompt("user"): return None
-        question = [
-            {
-                'type': 'list',
-                'name': 'choice',
-                'message': 'User',
-                'choices': ['All', 'Recent', 
-                    # 'Favorite', 
-                    'Enter Username', 'Select Username']
-            }
-        ]
+        if not Settings.prompt("user"): return None
+        question = {
+            'type': 'list',
+            'name': 'choice',
+            'message': 'User:',
+            'choices': ['All', 'Recent', 
+                # 'Favorite', 
+                'Enter Username', 'Select Username']
+        }
         answers = PyInquirer.prompt(question)
         choice = answers["choice"]
-        if not settings.confirm(choice): return None
+        if not Settings.confirm(choice): return User.select_user()
         if str(choice) == "Enter Username":
             username = input("Username: ")
             return User.get_user_by_username(username)
         elif str(choice) == "Select Username":
             return User.select_username()
-        return choice.lower()
-
-    @staticmethod
-    def select_username():
-        # returns the list of usernames to select
-        if not settings.prompt("username"): return None
-        question = [
-            {
-                'type': 'list',
-                'name': 'user',
-                'message': 'User',
-                'choices': User.get_all_users()
-                'filter': lambda user: user.username.lower()
-            }
-        ]
-        answers = PyInquirer.prompt(question)
-        user = answers["user"]
-        if not settings.confirm(user): return None
-        return user
+        return choice
 
     @staticmethod
     def select_users():
-        if not settings.prompt("users"): return None
+        if not Settings.prompt("users"): return []
         users = []
         while True:
             user = User.select_user()
             if not user: break
             users.append(user)
-        if not settings.confirm(users): return None
+            if str(choice).lower() == "all" or str(choice).lower() == "recent": break
+        if not Settings.confirm(users): return User.select_users()
         return users
+
+    @staticmethod
+    def select_username():
+        # returns the list of usernames to select
+        if not Settings.prompt("username"): return None
+        users = User.get_all_users()
+        for user in users:
+            user["name"] = user["username"]
+            user["value"] = user
+            user["short"] = user["id"]
+        question = {
+            'type': 'list',
+            'name': 'user',
+            'message': 'Username:',
+            'choices': users
+        }
+        answers = PyInquirer.prompt(question)
+        user = answers["user"]
+        if not Settings.confirm(user.username): return User.select_username()
+        return user
+
+    # gets a list of all subscribed user_ids from local txt
+    @staticmethod
+    def read_users_local():
+        Settings.maybe_print("Getting Local Users")
+        users = []
+        users_ = []
+        try:
+            with open(str(Settings.get_users_path())) as json_file:  
+                users = json.load(json_file)['users']
+            Settings.maybe_print("Loaded:")
+            for user in users:
+                try:
+                    users_.append(User(json.loads(user)))
+                except Exception as e:
+                    Settings.maybe_print(e)
+            return users_
+        except Exception as e:
+            Settings.maybe_print(e)
+        return users_
+
+    @staticmethod
+    def skipUserCheck(user):
+        if str(user.id).lower() in Settings.get_skipped_users() or str(user.username).lower() in Settings.get_skipped_users():
+            Settings.maybe_print("skipping: {}".format(user.username))
+            return None
+        return user
+
+    # writes user list to local txt
+    @staticmethod
+    def write_users_local(users=None):
+        if users is None:
+            users = User.get_all_users()
+        if len(users) == 0:
+            Settings.maybe_print("Skipping: Local Users Save - No Users")
+            return
+        print("Saving Users Locally")
+        Settings.maybe_print("local users path: "+str(Settings.get_users_path()))
+        data = {}
+        data['users'] = []
+        for user in users:
+            if Settings.is_debug():
+                Settings.maybe_print("Saving: "+str(user.username))
+            data['users'].append(user.toJSON())
+        try:
+            with open(str(Settings.get_users_path()), 'w') as outfile:  
+                json.dump(data, outfile, indent=4, sort_keys=True)
+        except FileNotFoundError:
+            print("Error: Missing Local Users")
+        except OSError:
+            print("Error: Missing Local Path")
 
 #######################################################################################
 
 def delayForThirty():
-    settings.maybePrint("30...")
+    Settings.maybe_print("30...")
     time.sleep(10)
-    settings.maybePrint("20...")
+    Settings.maybe_print("20...")
     time.sleep(10)
-    settings.maybePrint("10...")
+    Settings.maybe_print("10...")
     time.sleep(7)
-    settings.maybePrint("3...")
+    Settings.maybe_print("3...")
     time.sleep(1)
-    settings.maybePrint("2...")
+    Settings.maybe_print("2...")
     time.sleep(1)
-    settings.maybePrint("1...")
+    Settings.maybe_print("1...")
     time.sleep(1)
-
-# gets a list of all subscribed user_ids from local txt
-def read_users_local():
-    settings.maybePrint("Getting Local Users")
-    users = []
-    users_ = []
-    try:
-        with open(settings.USERS_PATH) as json_file:  
-            users = json.load(json_file)['users']
-        settings.maybePrint("Loaded:")
-        for user in users:
-            try:
-                users_.append(User(json.loads(user)))
-            except Exception as e:
-                settings.maybePrint(e)
-        return users_
-    except Exception as e:
-        settings.maybePrint(e)
-    return users_
-
-def skipUserCheck(user):
-    if str(settings.SKIP_USERS) == "None":
-        settings.SKIP_USERS = []
-    if str(user.id).lower() in settings.SKIP_USERS or str(user.username).lower() in settings.SKIP_USERS:
-        settings.maybePrint("skipping: {}".format(user.username))
-        return None
-    return user
-
-# writes user list to local txt
-def write_users_local(users=None):
-    if users is None:
-        users = User.get_all_users()
-    if len(users) == 0:
-        settings.maybePrint("Skipping: Local Users Save - No Users")
-        return
-    print("Saving Users Locally")
-    settings.maybePrint("local users path: "+str(settings.USERS_PATH))
-    data = {}
-    data['users'] = []
-    for user in users:
-        if str(settings.DEBUG) == "True":
-            settings.maybePrint("Saving: "+str(user.username))
-        data['users'].append(user.toJSON())
-    try:
-        with open(settings.USERS_PATH, 'w') as outfile:  
-            json.dump(data, outfile, indent=4, sort_keys=True)
-    except FileNotFoundError:
-        print("Error: Missing Local Users")
-    except OSError:
-        print("Error: Missing Local Path")
