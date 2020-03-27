@@ -158,8 +158,8 @@ class File():
     @staticmethod
     def get_tmp():
         tmp = os.getcwd()
-        if self.MOUNT_PATH != None:
-            tmp = os.path.join(self.MOUNT_PATH, "tmp")
+        if Settings.get_mount_path() != "":
+            tmp = os.path.join(Settings.get_mount_path(), "tmp")
         else:
             tmp = os.path.join(tmp, "tmp")
         if not os.path.exists(str(tmp)):

@@ -478,13 +478,14 @@ class Driver:
                 # rememberMe.click()
             # if str(Settings.MANUAL) == "True":
                 # print("Please Login")
+            elements = BROWSER.find_elements_by_tag_name("a")
             [elem for elem in elements if '/twitter/auth' in str(elem.get_attribute('href'))][0].click()
             # twitter = BROWSER.find_element_by_xpath("//a[@class='g-btn m-rounded m-flex m-lg m-with-icon']").click()    
             BROWSER.find_element_by_xpath("//input[@id='username_or_email']").send_keys(username)
             Settings.dev_print("username entered")
             # fill in password and hit the login button 
             password_ = BROWSER.find_element_by_xpath("//input[@id='password']")
-            password_.send_keys(self.password)
+            password_.send_keys(password)
             Settings.dev_print("password entered")
             password_.send_keys(Keys.ENTER)
             try:
