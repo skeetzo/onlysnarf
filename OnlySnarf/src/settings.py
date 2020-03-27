@@ -170,6 +170,9 @@ class Settings:
     def get_message_choices():
         return MESSAGE_CHOICES
 
+    def get_mount_path():
+        return config["MOUNT_PATH"] or ""
+
     def get_performers():
         performers = config.get("PERFORMERS") or []
         performers = [n.strip() for n in performers]

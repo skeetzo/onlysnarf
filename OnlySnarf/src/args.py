@@ -434,7 +434,7 @@ parser.add_argument('-username', '--username', type=str, default="",
 ##
 # -verbose
 # v, vv, vvv
-parser.add_argument('-v', '-verbose', '--verbose', action='count', default=0, 
+parser.add_argument('-verbose', '--verbose', action='count', default=0, 
   help="verbosity level (max 3)")
 ##
 # -version
@@ -464,6 +464,6 @@ CONFIG = read_config(CONFIG)
 
 #############
 # Debugging #
-import sys
-print(CONFIG)
-sys.exit(0)
+# import sys
+# print(CONFIG)
+# sys.exit(0)
