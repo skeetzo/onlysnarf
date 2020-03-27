@@ -90,7 +90,6 @@ def authGoogle():
         DRIVE = build('drive', 'v3', http=creds.authorize(Http()))
     except Exception as e:
         Settings.maybe_print(e)
-        print(e)
         print('Error: Unable to Authenticate w/ Google')
         return False
     Settings.maybe_print('Authentication Successful') 
@@ -164,9 +163,9 @@ def find_folder(parent, folderName):
 
 def get_folder_by_name(folderName, parent=None):
     if not checkAuth(): return
+    if str(folderName) in str(Settings.get_categories()) and not parent:
+        parent = get_folder_root()
     if not parent: parent = get_folder_root()
-    if str(parent) in str(Settings.get_categories()):
-        parent = get_folder_by_name(parent)
     Settings.maybe_print("Getting Folder: {}".format(folderName))
     file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent['id'])}).GetList()
     for folder in file_list:
@@ -237,10 +236,15 @@ def get_file_parent(id_):
     return parent
 
 # returns first layer of files found
-def get_files_by_category(category):
+def get_files_by_category(cat):
     if not checkAuth(): return []
-    print("Getting: {}".format(category))
-    category = get_folder_by_name(category)
+    Settings.maybe_print("Getting: {}".format(cat))
+    category = get_folder_by_name(cat)
+    if not category:
+        category = get_folder_by_name(cat+"s") # plural fuzzing
+        if not category:
+            print("Error: Missing Category")
+            return []
     # folders of category
     folders = []
     folders_ = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and mimeType contains 'application/vnd.google-apps.folder'".format(category['id'])}).GetList()
@@ -275,9 +279,10 @@ def get_files_by_category(category):
         setattr(folder_, "id", folder["id"])
         files.append(folder_)
         files.extend(files_)
+    print("files: {}".format(len(files)))
     return files
 
-def get_posted_folder_by_name(folderName):
+def get_posted_folder_by_name(folderName, parent=None):
     if not checkAuth(): return
     Settings.maybe_print("Getting Posted Folder: {}".format(folderName))
     if parent is None:
@@ -334,7 +339,7 @@ def get_folder_root():
     OnlyFansFolder = None
     if Settings.get_drive_path() != "":
         mount_root = "root"
-        root_folders = Settings.get_drive_path().split("/")
+        root_folders = str(Settings.get_drive_path()).split("/")
         Settings.maybe_print("Mount Folders: {}".format("/".join(root_folders)))    
         for folder in root_folders:
             # mount_root = get_folder_by_name(mount_root, parent=folder)
@@ -343,8 +348,8 @@ def get_folder_root():
                 mount_root = "root"
                 print("Warning: Drive Mount Folder Not Found")
                 break
-        # mount_root = get_folder_by_name(mount_root, parent=Settings.get_drive_path())
-        mount_root = find_folder(mount_root, Settings.get_drive_path())
+        # mount_root = get_folder_by_name(mount_root, parent=Settings.get_drive_root())
+        mount_root = find_folder(mount_root, Settings.get_drive_root())
         if mount_root is None:
             mount_root = {"id":"root"}
             print("Warning: Drive Mount Folder Not Found")

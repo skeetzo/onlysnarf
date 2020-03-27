@@ -14,14 +14,15 @@ import json
 import sys
 import pathlib
 import pkg_resources
-from OnlySnarf.colorize import colorize
-from OnlySnarf import cron as Cron
-from OnlySnarf import google as Google
-from OnlySnarf import message as Message
-from OnlySnarf import promotion as Promotion
-from OnlySnarf import settings as Settings
-from OnlySnarf import snarf as Snarf
 from PyInquirer import prompt
+##
+from OnlySnarf.src.colorize import colorize
+# from OnlySnarf.src.cron import Cron
+from OnlySnarf.src.google import Google
+from OnlySnarf.src.message import Message
+# from OnlySnarf.src.promotion import Promotion
+from OnlySnarf.src.settings import Settings
+from OnlySnarf.src.snarf import Snarf
 
 ###################
 ##### Globals #####
@@ -200,7 +201,7 @@ def exit_handler():
 atexit.register(exit_handler)
 
 import signal
-def signal_handler(sig, frame):exit
+def signal_handler(sig, frame):
     print('Shnnnarf?')
     exit()
 signal.signal(signal.SIGINT, signal_handler)
