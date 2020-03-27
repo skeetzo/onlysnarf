@@ -1,0 +1,5 @@
+[console_scripts]
+onlysnarf = OnlySnarf.bin.menu:main
+onlysnarf-config = OnlySnarf.bin.config:main
+onlysnarfpy = OnlySnarf.src.snarf:main
+
