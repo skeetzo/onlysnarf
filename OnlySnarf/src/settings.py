@@ -106,7 +106,6 @@ class Settings:
         return config.get("CATEGORY") or ""
 
     def get_categories():
-        print(list(CATEGORIES_DEFAULT).extend(list(config.get("CATEGORIES"))))
         return list(CATEGORIES_DEFAULT).extend(list(config.get("CATEGORIES")))
 
     def get_price():
@@ -209,7 +208,10 @@ class Settings:
         return config.get("DOWNLOAD_PATH") or ""
 
     def get_drive_path():
-        return config.get("DRIVE_PATH") or ""
+        return config.get("DRIVE_PATH") or "root"
+
+    def get_drive_root():
+        return config.get("DRIVE_ROOT") or "OnlySnarf"
 
     def get_users_path():
         return config.get("USERS_PATH") or ""

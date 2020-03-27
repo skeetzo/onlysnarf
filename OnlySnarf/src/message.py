@@ -330,7 +330,7 @@ class TimeValidator(Validator):
 class DateValidator(Validator):
     def validate(self, document):
         try:
-            datetime.strptime(document.text, '%m/%d/%Y')
+            datetime.strptime(document.text, '%m-%d-%Y')
         except ValueError:
             raise ValidationError(
                 message='Please enter a date (mm/dd/YYYY)',
