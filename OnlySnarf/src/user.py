@@ -202,7 +202,7 @@ class User:
         Settings.maybe_print("pruning memberlist")
         Settings.maybe_print("users: {}".format(len(active_users)))
         User.write_users_local(users=active_users)
-        Settings.is_prefer_local(True)
+        Settings.set_prefer_local(True)
         return active_users
 
     @staticmethod

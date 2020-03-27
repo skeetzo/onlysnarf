@@ -19,7 +19,7 @@ sudo onlysnarfpy \
 -debug \
 -$2 \
 -action "message" \
--bykeyword "pussycats" \
+-bykeywords "pussycats" \
 -user "1578380" \
 -category "gallery" \
 -text "message testes" \
