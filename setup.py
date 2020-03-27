@@ -22,7 +22,8 @@ setuptools.setup(
         'moviepy',
         'google-api-python-client',
         'httplib2',
-        'python-crontab'
+        'python-crontab',
+        'pyinquirer'
         ],
     entry_points={
         'console_scripts' : [

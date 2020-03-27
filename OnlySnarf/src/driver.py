@@ -83,7 +83,7 @@ class Driver:
         logged_in = False
         global LOGGED_IN
         if not LOGGED_IN or LOGGED_IN == None:
-            logged_in = self.login()
+            logged_in = Driver.login()
         else: logged_in = True
         if logged_in == False: print("Error: Failure to Login")
         LOGGED_IN = logged_in
@@ -458,15 +458,15 @@ class Driver:
     @staticmethod
     def login():
         print('Logging into OnlyFans')
-        username_ = str(Settings.get_username())
-        password_ = str(Settings.get_password())
-        if not username_ or username_ == "": username_ = input("Twitter Username: ")
-        if not password_ or password_ == "": password_ = input("Twitter Password: ")
-        if str(username_) == "" or str(password_) == "":
+        username = str(Settings.get_username())
+        password = str(Settings.get_password())
+        if not username or username == "":
+            username = Settings.prompt_username()
+        if not password or password == "":
+            password = Settings.prompt_password()
+        if str(username) == "" or str(password) == "":
             print("Error: Missing Login Info")
             return False
-        if str(Settings.get_username()) == "" or Settings.get_username() == None: Settings.set_username(username_)
-        if str(Settings.get_password()) == "" or Settings.get_password() == None: Settings.set_password(password_)
         try:
             BROWSER.get(ONLYFANS_HOME_URL)
             Settings.dev_print("logging in")
@@ -479,14 +479,14 @@ class Driver:
             # if str(Settings.MANUAL) == "True":
                 # print("Please Login")
             [elem for elem in elements if '/twitter/auth' in str(elem.get_attribute('href'))][0].click()
-            # twitter = self.driver.find_element_by_xpath("//a[@class='g-btn m-rounded m-flex m-lg m-with-icon']").click()    
-            username = self.driver.find_element_by_xpath("//input[@id='username_or_email']").send_keys(username_)
+            # twitter = BROWSER.find_element_by_xpath("//a[@class='g-btn m-rounded m-flex m-lg m-with-icon']").click()    
+            BROWSER.find_element_by_xpath("//input[@id='username_or_email']").send_keys(username)
             Settings.dev_print("username entered")
             # fill in password and hit the login button 
-            password = self.driver.find_element_by_xpath("//input[@id='password']")
-            password.send_keys(self.password)
+            password_ = BROWSER.find_element_by_xpath("//input[@id='password']")
+            password_.send_keys(self.password)
             Settings.dev_print("password entered")
-            password.send_keys(Keys.ENTER)
+            password_.send_keys(Keys.ENTER)
             try:
                 Settings.dev_print("waiting for loginCheck")
                 WebDriverWait(BROWSER, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
