@@ -1,5 +1,6 @@
 import argparse, os, re
 from datetime import datetime
+from .validators import valid_amount, valid_date, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
 
 CATEGORIES_DEFAULT = [
   "images",
@@ -12,8 +13,8 @@ DISCOUNT_MAX_AMOUNT = 55
 DISCOUNT_MIN_AMOUNT = 10
 DISCOUNT_MAX_MONTHS = 7
 DISCOUNT_MIN_MONTHS = 1
-DURATION_ALLOWED = ["1","3","7","30","99","No Limit"]
-EXPIRATION_ALLOWED = ["1","3","7","30","99","No Limit"]
+DURATION_ALLOWED = [1,3,7,30,99]
+EXPIRATION_ALLOWED = [1,3,7,30,99]
 IMAGE_DOWNLOAD_LIMIT = 6
 IMAGE_UPLOAD_LIMIT = 20
 IMAGE_UPLOAD_LIMIT_MESSAGES = 5
@@ -74,77 +75,6 @@ def read_config(args):
   # args.set("POSTS", POSTS)
   args["POSTS"] = POSTS
   return args
-
-# Validators
-
-def valid_amount(s):
- if int(s) < DISCOUNT_MIN_AMOUNT or int(s) > DISCOUNT_MAX_AMOUNT:
-    msg = "Not a valid discount amount: '{0}'.".format(s)
-    raise argparse.ArgumentTypeError(msg)
-
-def valid_date(s):
-  try:
-    return datetime.strptime(s, "%m-%d-%Y")
-  except ValueError:
-    msg = "Not a valid date: '{0}'.".format(s)
-    raise argparse.ArgumentTypeError(msg)
-
-def valid_time(s):
-  try:
-    return datetime.strptime(s, "%H:%M")
-  except ValueError:
-    msg = "Not a valid time: '{0}'.".format(s)
-    raise argparse.ArgumentTypeError(msg)
-
-def valid_price(s):
-  try:
-    "{:.2f}".format(float(s))
-  except ValueError:
-    msg = "Not a valid price: '{0}'.".format(s)
-    raise argparse.ArgumentTypeError(msg)
-
-def valid_duration(s):
-  if str(s) not in DURATION_ALLOWED:
-    msg = "Not a valid duration: '{0}'.".format(s)
-    raise argparse.ArgumentTypeError(msg)
-
-def valid_expiration(s):
-  if str(s) not in EXPIRATION_ALLOWED:
-    msg = "Not a valid expiration: '{0}'.".format(s)
-    raise argparse.ArgumentTypeError(msg)
-
-def valid_schedule(s):
-  try:
-    return datetime.strptime(s, "%m-%d-%Y:%H:%M")
-  except ValueError:
-    msg = "Not a valid schedule: '{0}'.".format(s)
-    raise argparse.ArgumentTypeError(msg)
-
-def valid_month(s):
-  if int(s) < DISCOUNT_MIN_MONTHS or int(s) > DISCOUNT_MAX_MONTHS:
-    msg = "Not a valid month number: '{0}'.".format(s)
-    raise argparse.ArgumentTypeError(msg)
-
-def valid_path(s):
-  try:
-    if isinstance(s, list):
-      for f in s:
-        os.stat(s)
-      return True
-    else:
-      return os.stat(s)
-  except FileNotFoundError:
-    msg = "Not a valid path: '{0}'.".format(s)
-    raise argparse.ArgumentTypeError(msg)
-
-# check against min/max amounts & months
-# def valid_discount(s):
-  # pass
-
-# def valid_category(s):
-#   if str(s) not in CATEGORIES_DEFAULT:
-#     msg = "Not a valid category: '{0}'.".format(s)
-#     raise argparse.ArgumentTypeError(msg)
 
 ##
 # Argument Parser
@@ -238,14 +168,14 @@ parser.add_argument('-download-path', type=str,
   help='the path to download files to locally', default=DOWNLOAD_PATH)
 ##
 # -duration
-# poll or post duration
-durationAndExpiration.add_argument('-duration', 
-  help='the duration', choices=DURATION_ALLOWED, default=None)
+# poll duration
+durationAndExpiration.add_argument('-duration', type=int, dest='duration',
+  help='the duration in days (99 for \'No Limit\') for a poll', choices=DURATION_ALLOWED, default=None)
 ##
 # -expiration
 # date of post or poll expiration
-durationAndExpiration.add_argument('-expiration',
-  help='the expiration', choices=EXPIRATION_ALLOWED, default=None)
+durationAndExpiration.add_argument('-expiration', type=int, dest='expiration',
+  help='the expiration in days (99 for \'No Limit\')', choices=EXPIRATION_ALLOWED, default=None)
 ##
 # -force-upload
 # ignore upload max wait
@@ -271,6 +201,11 @@ parser.add_argument('-message-max', type=int, default=IMAGE_UPLOAD_LIMIT_MESSAGE
 # keywords to # in post
 parser.add_argument('-keywords', dest='keywords', action='append', default=[], 
   help="the keywords (#[keyword])")
+##
+# -limit
+# maximum number of subscribers for a promotion
+parser.add_argument('-limit', type=int, default=1,
+  help='the max number of subscribers allowed for a promotion')
 ##
 # -months
 # action: discount
@@ -439,7 +374,7 @@ parser.add_argument('-username', type=str, default="",
 ##
 # -verbose
 # v, vv, vvv
-parser.add_argument('-v', '-verbose', action='count', default=0, 
+parser.add_argument('-v', '-verbose', dest="verbose", action='count', default=0, 
   help="verbosity level (max 3)")
 ##
 # -version

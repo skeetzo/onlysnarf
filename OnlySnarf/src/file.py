@@ -51,7 +51,7 @@ class File():
         if Settings.is_skip_download():
             print("Warning: Unable to Backup, skipped download")
             return False
-        if Settings.get_debug():
+        if Settings.is_debug():
             print("Skipping Backup (debug): {}".format(title))
             return False
         elif not Settings.is_backup():
@@ -66,7 +66,7 @@ class File():
         if Settings.is_skip_download():
             print("Warning: Unable to Backup, skipped download")
             return
-        if Settings.get_debug():
+        if Settings.is_debug():
             print("Skipping Backup (debug): {}".format(len(files)))
             return
         elif not Settings.is_backup():
@@ -115,7 +115,7 @@ class File():
         if Settings.is_skip_download():
             print("Warning: Unable to Delete, skipped download")
             return False
-        if Settings.get_debug():
+        if Settings.is_debug():
             print("Skipping Delete (Debug): {}".format(title))
             return False
         else:
@@ -207,7 +207,7 @@ class File():
 
     @staticmethod
     def select_file():
-        if not Settings.prompt("file path"): return None
+        # if not Settings.prompt("file path"): return None
         question = {
             'type': 'input',
             'name': 'path',
@@ -229,7 +229,8 @@ class File():
             file = File.select_file()
             if not file: break
             files.append(file)
-        if not Settings.confirm(files): return []
+            if not Settings.prompt("another file"): break
+        if not Settings.confirm([file.get_path() for file in files]): return []
         return files
 
 ###################################################################################

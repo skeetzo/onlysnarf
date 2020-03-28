@@ -179,6 +179,30 @@ class Profile:
         except Exception as e:
             print(e)
 
+
+    # set default values / get from profile online
+    def get():
+        pass
+
+
+    def update():
+        # called by snarf
+        # add the appropriate get conditions to this profile class
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     @staticmethod
     def fill_data():
