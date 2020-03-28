@@ -12,8 +12,8 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 # sudo onlysnarfpy -debug -verbose -category gallery -debug-delay -show -skip-reduce
 
-# sudo onlysnarf -debug -verbose -show -debug-delay -prefer-local
-sudo onlysnarfpy -debug -verbose -verbose -action test -show
+sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local
+# sudo onlysnarfpy -debug -verbose -verbose -action test -show
 # sudo onlysnarfpy -debug -verbose -action message -category image -user "all" -text "test pussy" -bykeyword "pussycats" -show
 # sudo onlysnarfpy -debug -verbose -action message -user "recent" -text "test pussy" -bykeyword "pussycats" -show
 # sudo onlysnarfpy -debug -verbose -action message -user "favorite" -text "test pussy" -bykeyword "pussycats" -show

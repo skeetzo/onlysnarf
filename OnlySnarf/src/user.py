@@ -41,20 +41,17 @@ class User:
         self.sent_images = ",".join(self.messages_from).split(",")
         self.statement_history = ",".join(self.messages_from).split(",")
         #########################
+        self.discount = None
+        self.promotion = None
         try:
             Settings.maybe_print("User: {} - {} - {}".format(self.name, self.username, self.id))
         except Exception as e:
             Settings.dev_print(e)
             Settings.maybe_print("User: {}".format(self.id))
 
-    def discount(self, discount={}):
-        amount = getattr(discount, "amount")
-        months = getattr(discount, "months")
-        if not amount: amount = input("Discount: ")
-        if not months: months = input("Months: ")
-        discount = {"amount":amount,"months":months}
-        successful = Driver.discount_user(self.username, discount)
-        return successful
+    def discount(self, discount=None):
+        if not discount: discount = Settings.get_discount()
+        return Driver.discount_user(discount)
 
     def message(self, message=None):
         if str(self.username) == "": return print("User Error: Missing Message Username")
@@ -206,6 +203,11 @@ class User:
         return active_users
 
     @staticmethod
+    def get_following():
+        # return following Users
+        return []
+
+    @staticmethod
     def get_user_by_username(username):
         if not username or username == None:
             print("Error: Missing Username")
@@ -286,24 +288,24 @@ class User:
 
     @staticmethod
     def select_user():
-        if not Settings.prompt("user"): return None
+        # if not Settings.prompt("user"): return None
         question = {
             'type': 'list',
-            'name': 'choice',
+            'name': 'user',
             'message': 'User:',
             'choices': ['All', 'Recent', 
                 # 'Favorite', 
                 'Enter Username', 'Select Username']
         }
         answers = PyInquirer.prompt(question)
-        choice = answers["choice"]
-        if not Settings.confirm(choice): return User.select_user()
-        if str(choice) == "Enter Username":
+        user = answers["user"]
+        if not Settings.confirm(user): return User.select_user()
+        if str(user) == "Enter Username":
             username = input("Username: ")
             return User.get_user_by_username(username)
-        elif str(choice) == "Select Username":
+        elif str(user) == "Select Username":
             return User.select_username()
-        return choice
+        return user
 
     @staticmethod
     def select_users():
@@ -312,8 +314,9 @@ class User:
         while True:
             user = User.select_user()
             if not user: break
+            if str(user).lower() == "all" or str(user).lower() == "recent": return [user]
             users.append(user)
-            if str(choice).lower() == "all" or str(choice).lower() == "recent": break
+            if not Settings.prompt("another user?"): break
         if not Settings.confirm(users): return User.select_users()
         return users
 

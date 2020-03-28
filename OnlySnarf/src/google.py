@@ -241,7 +241,9 @@ def get_files_by_category(cat):
     Settings.maybe_print("Getting: {}".format(cat))
     category = get_folder_by_name(cat)
     if not category:
-        category = get_folder_by_name(cat+"s") # plural fuzzing
+        if str(cat)[-1] == "y": cat = str(cat).replace("y", "ies")
+        else: cat += "s"
+        category = get_folder_by_name(cat) # plural fuzzing
         if not category:
             print("Error: Missing Category")
             return []
@@ -279,7 +281,6 @@ def get_files_by_category(cat):
         setattr(folder_, "id", folder["id"])
         files.append(folder_)
         files.extend(files_)
-    print("files: {}".format(len(files)))
     return files
 
 def get_posted_folder_by_name(folderName, parent=None):
