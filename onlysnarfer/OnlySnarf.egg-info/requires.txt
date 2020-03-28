@@ -1,9 +1,0 @@
-selenium
-pydrive
-pathlib
-chromedriver-binary
-moviepy
-google-api-python-client
-httplib2
-python-crontab
-pyinquirer

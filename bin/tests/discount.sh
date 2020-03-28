@@ -4,10 +4,12 @@
 echo "[*] Discount - Recent"
 sudo onlysnarfpy \
 -debug \
--$2 \
 -action "discount" \
 -user "recent" \
 -amount 40 \
--$1 \
 -months 3 \
--prefer-local
+-prefer-local \
+-$1 \
+-verbose -verbose -verbose
+# -verbose
+# -verbose -verbose
