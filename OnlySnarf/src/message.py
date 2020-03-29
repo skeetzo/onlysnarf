@@ -1,4 +1,5 @@
 from datetime import datetime
+from .classes import Poll, Schedule
 from .driver import Driver
 from .file import File, Google_File
 from .settings import Settings
@@ -170,6 +171,7 @@ class Message():
         if not Settings.prompt("poll"): return None
         poll = Poll()
         poll.get()
+        if not poll.check(): return None
         self.poll = poll
         return poll
 
@@ -177,44 +179,39 @@ class Message():
     # Settings.USERS and self.recipients should be usernames
     # if includes [all, recent, favorite] & usernames it only uses the 1st found of [all,...]
     def get_recipients(self):
+        recipients = []
+        if len(self.recipients) == 0 and Settings.get_user() != "": 
+            recipients = [Settings.get_user()]
         if len(self.recipients) == 0 and len(Settings.get_users()) > 0: 
-            self.recipients = User.confirm(users=Settings.get_users())
+            recipients = Settings.get_users()
         elif len(self.recipients) == 0:
-            self.recipients = User.select_users()
+            recipients = User.select_users()
         users = []
-        for user in self.recipients:
+        for user in recipients:
             if isinstance(user, str):
-                if user in Settings.get_message_choices():
-                    return [user]
-            user = User(user)
-            users.append(user)
+                if str(user).lower() == "all":
+                    users = User.get_all_users()
+                    break
+                elif str(user).lower() == "recent":
+                    users = User.get_new_users()
+                    break
+                elif str(user).lower() == "favorite":
+                    users = User.get_favorite_users()
+                    break
+            else: users.append(user)
         return users
 
     def get_schedule(self):
         if self.schedule: return self.schedule
-        schedule = Settings.get_schedule()
+        schedule = Settings.get_Schedule()
         if schedule: return schedule
         if not Settings.prompt("schedule"): return None
-        questions = [
-            {
-                'type': 'input',
-                'name': 'date',
-                'message': 'Date (mm/dd/YYYY)',
-                'validate': DateValidator
-            },
-            {
-                'type': 'input',
-                'name': 'time',
-                'message': 'Time (HH:MM)',
-                'validate': TimeValidator
-            }
-        ]
-        answers = PyInquirer.prompt(questions)
-        schedule = "{}:{}".format(answers["date"], answers["time"])
-        if not Settings.confirm(schedule): return self.get_schedule()
+        schedule = Schedule()
+        schedule.get()
+        if not schedule.check(): return None
         self.schedule = schedule
-        return self.schedule
-
+        return schedule
+        
     def get_text(self):
         if self.text != "": return self.text
         text = Settings.get_text() or None
@@ -265,8 +262,8 @@ class Message():
             # for user in self.get_recipients():
             for user in self.get_recipients():
                 # if isinstance(user, str): 
-                if str(user) == "post": successful_ = Driver.post(self)
-                else: successful_ = User.message_user(username=user, message=self)
+                # if str(user) == "post": successful_ = Driver.post(self)
+                successful_ = User.message_user(username=user.username, message=self)
                 if successful_: successful = successful_
                 # if self.username in Settings.get_message_choices(): break
         except Exception as e:

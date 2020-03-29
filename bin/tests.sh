@@ -26,8 +26,9 @@ verbose="verbose -verbose -verbose"
 verbose="v -v -v"
 
 declare -a testing
-testing=("schedule")
-testing=("discount" "expiration" "message" "poll" "post" "schedule")
+# testing=("schedule")
+# testing=("discount" "expiration" "message" "poll" "post" "schedule")
+testing=("discount" "message" "upload")
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "################## Start #########################" >> ../onlysnarf/logs/tests.txt 2>&1

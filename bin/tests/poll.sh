@@ -9,9 +9,11 @@ sudo onlysnarfpy \
 -skip-download \
 -text "poll testes" \
 -duration 3 \
--questions "your mom, some toast, a nice sandwich" \
+-question "your mom" \
+-question "some toast" \
+-question "a nice sandwich" \
 -debug-delay \
--$1 \
+-show \
 -verbose -verbose -verbose
 # -verbose
 # -verbose -verbose

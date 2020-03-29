@@ -6,7 +6,7 @@ import json
 import time
 import os
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 from re import sub
 from decimal import Decimal
 ##
@@ -134,6 +134,9 @@ class User:
             "isFavorite":str(self.isFavorite)
         })
 
+    # def get_username(self):
+    #     return self["username"]
+
     # greet user if new
     def greet(self):
         if self.last_messaged_on == None:
@@ -247,7 +250,8 @@ class User:
         newUsers = []
         date_ = datetime.today() - timedelta(days=10)
         for user in users:
-            started = datetime.strptime(user.started,"%b %d, %Y")
+            if not user.started: continue
+            started = datetime.strptime(str(user.started),"%b %d, %Y")
             # Settings.maybe_print("date: "+str(date_)+" - "+str(started))
             if started < date_: continue
             Settings.maybe_print("New User: {}".format(user.username))
@@ -288,6 +292,8 @@ class User:
 
     @staticmethod
     def select_user():
+        user = Settings.get_user() or None
+        if user: return user
         # if not Settings.prompt("user"): return None
         question = {
             'type': 'list',

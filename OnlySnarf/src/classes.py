@@ -1,5 +1,7 @@
+from datetime import datetime
 from .driver import Driver
 from .settings import Settings
+from .user import User
 import PyInquirer
 from .validators import AmountValidator, MonthValidator, LimitValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, ExpirationValidator, ListValidator
 
@@ -8,11 +10,25 @@ class Discount:
 	def __init__(self):
 		self.amount = None
 		self.months = None
+		self.username = None
 
 	def apply(self):
-		return Driver.discount_user(self)
+		if str(self.get_username()).lower() == "all":
+			users = User.get_all_users()
+		elif str(self.get_username()).lower() == "recent":
+			users = User.get_new_users()
+		elif str(self.get_username()).lower() == "favorite":
+			users = User.get_favorite_users()
+		else: users = [self]
+		successful = False
+		for user in users:
+			self.username = user.username
+			successful_ = Driver.discount_user(self)
+			if successful_: successful = successful_
+		return successful
 
 	def get(self):
+		self.get_username()
 		self.get_amount()
 		self.get_months()
 
@@ -24,8 +40,9 @@ class Discount:
 		question = {
 			'type': 'input',
 			'name': 'amount',
-			'message': 'Months:',
-			'validate': AmountValidator
+			'message': 'Amount:',
+			'validate': AmountValidator,
+			'filter': lambda val: int(myround(val))
 		}
 		answers = PyInquirer.prompt(question)
 		amount = answers["amount"]
@@ -42,13 +59,20 @@ class Discount:
 			'type': 'input',
 			'name': 'months',
 			'message': 'Months:',
-			'validate': MonthValidator
+			'validate': MonthValidator,
+			'filter': lambda val: int(val)
 		}
 		answers = PyInquirer.prompt(question)
 		months = answers["months"]
 		if not Settings.confirm(months): return self.get_months()
 		self.months = months
 		return self.months
+
+	def get_username(self):
+		if self.username: return self.username
+		username = User.select_user().username
+		self.username = username
+		return self.username
 
 class Poll:
 
@@ -59,6 +83,7 @@ class Poll:
 	def check(self):
 		if len(self.get_questions()) > 0: return True
 		if self.get_duration(): return True
+		return False
 
 	def get(self):
 		self.get_duration()
@@ -122,6 +147,7 @@ class Promotion:
 		Driver.promotion_user_directly(self)
 
 	def get():
+		self.get_user()
 		self.get_expiration()
 		self.get_limit()
 		self.get_duration()
@@ -199,3 +225,82 @@ class Promotion:
 		user = User.select_user()
 		self.user = user
 		return self.user
+
+class Schedule:
+
+	def __init__(self):
+		self.date = None
+		self.time = None
+		##
+		self.hour = "00"
+		self.minute = "00"
+		self.year = "0"
+		self.month = "0"
+		self.day = "0"
+
+	def check(self):
+		if self.get_date() and self.get_time(): return True
+		return False
+
+	def get(self):
+		if self.get_date():
+			date = datetime.strptime(str(self.get_date()), "%Y-%d-%m")
+			self.year = date.year
+			self.month = date.strftime("%B")
+			self.day = date.day
+			if self.get_time():
+				self.hour = date.hour
+				self.minute = date.minute
+
+	def get_date(self):
+		if self.date: return self.date
+		date = Settings.get_date() or None
+		if date: return date
+
+		schedule = Settings.get_schedule() or None
+		if schedule:
+			date = datetime.strptime(str(schedule), "%Y-%d-%m %H:%M:%S")
+			self.date = date.date()
+			return self.date
+
+		if not Settings.prompt("date"): return None
+		question = {
+			'type': 'input',
+			'name': 'date',
+			'message': 'Enter a date (MM-DD-YYYY):',
+			'validate': DateValidator
+		}
+		answers = PyInquirer.prompt(question)
+		date = answers["date"]
+		if not Settings.confirm(date): return self.get_date()
+		self.date = date
+		return self.date
+
+	def get_time(self):
+		if self.time: return self.time
+		time = Settings.get_time() or None
+		if time: return time
+
+		schedule = Settings.get_schedule() or None
+		if schedule:
+			time = datetime.strptime(str(schedule), "%Y-%d-%m %H:%M:%S")
+			self.time = time.time()
+			return self.time
+
+		if not Settings.prompt("time"): return None
+		question = {
+			'type': 'input',
+			'name': 'time',
+			'message': 'Enter a time (HH:MM):',
+			'validate': TimeValidator
+		}
+		answers = PyInquirer.prompt(question)
+		time = answers["time"]
+		if not Settings.confirm(time): return self.get_time()
+		self.time = time
+		return self.time
+
+
+# round to 5
+def myround(x, base=5):
+	return base * round(x/base)

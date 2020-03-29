@@ -92,7 +92,7 @@ durationAndExpiration = parser.add_mutually_exclusive_group()
 #
 # -action
 # the action to be performed
-parser.add_argument('-action', type=str, 
+parser.add_argument('-action', type=str, dest='action',
   help='the action to take', choices=['discount','post','message',
   'test'
   ], default='post')
@@ -100,47 +100,47 @@ parser.add_argument('-action', type=str,
 # -amount
 # action: discount
 # the amount to discount a user by
-parser.add_argument('-amount', type=valid_amount, 
+parser.add_argument('-amount', type=valid_amount, dest='amount',
   help='the amount (%%) to discount by', default=DISCOUNT_MIN_AMOUNT)
 ##
 # -backup
 # backup uploaded content to "posted" folder
-parser.add_argument('-backup', action='store_true',
+parser.add_argument('-backup', action='store_true', dest='backup',
   help='enables backup processes')
 ##
 # -category
 # the category of folder to upload from
-parser.add_argument('-category', type=str, default='video',
+parser.add_argument('-category', type=str, default='video', dest='category',
   help='the category of content to post or message')
 ##
 # configurable w/ profile.conf
 # OnlySnarf Drive folder list, appends to defaults
-parser.add_argument('-categories', dest='categories', 
+parser.add_argument('-categories', dest='categories',
   action='append', help='the categories to list in menu (appends to \'{}\''.format("\'".join(CATEGORIES_DEFAULT)), 
   default=CATEGORIES_DEFAULT)
 ##
 # -create-drive 
 # creates missing OnlySnarf folders in Google Drive
-parser.add_argument('-create-drive', action='store_true', 
+parser.add_argument('-create-drive', action='store_true', dest='create_drive',
   help='creates missing OnlySnarf folders in Google Drive')
 ##
 # -cron
 # determines whether script running is a cronjob
-parser.add_argument('-cron', action='store_true', help='toggle cron behavior')
+parser.add_argument('-cron', action='store_true', help='toggle cron behavior', dest='cron')
 ##
 # -cron-user
 # the user to run OnlySnarf as
-parser.add_argument('-cron-user', type=str, 
+parser.add_argument('-cron-user', type=str, dest='cron_user',
   help='the user to run OnlySnarf as', default='root')
 ##
 # -date
 # date in MM-DD-YYYY
-parser.add_argument('-date', type=valid_date, default=None,
+parser.add_argument('-date', type=valid_date, default=None, dest='date',
   help='schedule date (MM-DD-YYYY)')
 ##
 # -debug
 # debugging - skips uploading and deleting unless otherwise forced
-parser.add_argument('-debug', action='store_true', 
+parser.add_argument('-debug', action='store_true', dest='debug',
   help='enable debugging')
 ##
 # -debug-force-save
@@ -150,12 +150,12 @@ parser.add_argument('-debug', action='store_true',
 ##
 # -debug-delay
 # user message delay
-parser.add_argument('-debug-delay', action='store_true', 
+parser.add_argument('-debug-delay', action='store_true', dest='debug_delay',
   help='enable a wait between crucial steps for debugging')
 ##
 # -delete-google
 # delete uploaded content instaed of backing it up
-parser.add_argument('-delete-google', action='store_true', 
+parser.add_argument('-delete-google', action='store_true', dest='delete_google',
   help='delete file instead of backing up')
 ##
 # -discount
@@ -164,7 +164,7 @@ parser.add_argument('-delete-google', action='store_true',
   # help='discount to apply in format [amount]:[duration]')
 ##
 # download path
-parser.add_argument('-download-path', type=str, 
+parser.add_argument('-download-path', type=str, dest='download_path',
   help='the path to download files to locally', default=DOWNLOAD_PATH)
 ##
 # -duration
@@ -179,22 +179,22 @@ durationAndExpiration.add_argument('-expiration', type=int, dest='expiration',
 ##
 # -force-upload
 # ignore upload max wait
-parser.add_argument('-force-upload', action='store_true', 
+parser.add_argument('-force-upload', action='store_true', dest='force_upload',
   help='ignore upload max wait attempts')
 ##
 # -download-max
 # maximum number of images to download
-parser.add_argument('-download-max', type=int, default=IMAGE_DOWNLOAD_LIMIT,
+parser.add_argument('-download-max', type=int, default=IMAGE_DOWNLOAD_LIMIT, dest="download_limit",
   help='the max number of images to download')
 ##
 # -upload-max
 # maximum number of images that can be uploaded
-parser.add_argument('-upload-max', type=int, default=IMAGE_UPLOAD_LIMIT,
+parser.add_argument('-upload-max', type=int, default=IMAGE_UPLOAD_LIMIT, dest='upload_limit',
   help='the max number of images to upload')
 ##
 # -message-max
 # maximum number of images that can be uploaded in a message
-parser.add_argument('-message-max', type=int, default=IMAGE_UPLOAD_LIMIT_MESSAGES,
+parser.add_argument('-message-max', type=int, default=IMAGE_UPLOAD_LIMIT_MESSAGES, dest='upload_limit_messages',
   help='the max number of images to message')
 ##
 # -keywords
@@ -204,18 +204,18 @@ parser.add_argument('-keywords', dest='keywords', action='append', default=[],
 ##
 # -limit
 # maximum number of subscribers for a promotion
-parser.add_argument('-limit', type=int, default=1,
+parser.add_argument('-limit', type=int, default=1, dest='limit',
   help='the max number of subscribers allowed for a promotion')
 ##
 # -months
 # action: discount
 # the number of months to discount for
-parser.add_argument('-months', type=valid_month, default=DISCOUNT_MIN_MONTHS,
+parser.add_argument('-months', type=valid_month, default=DISCOUNT_MIN_MONTHS, dest='months',
   help='the number of months to discount or apply promotion')
 ##
 # -mount-path
 # the mounth path for a local directory of OnlyFans config files
-parser.add_argument('-mount-path', type=str, 
+parser.add_argument('-mount-path', type=str, dest='mount_path',
   help='the local path to OnlySnarf processes')
 ##
 # -bykeyword
@@ -230,7 +230,7 @@ parser.add_argument('-notkeywords', nargs="*", dest='notkeywords', action='appen
 ##
 # -password
 # the password for the OnlyFans / Twitter
-parser.add_argument('-password', type=str, 
+parser.add_argument('-password', type=str, dest='password',
   help='the Twitter password for login')
 ##
 # -performers
@@ -239,12 +239,12 @@ parser.add_argument('-performers', dest='performers', action='append',  default=
   help='the performers to list (w/ @[performer]')
 # -prefer-local
 # prefers local user cache over refreshing first call
-parser.add_argument('-prefer-local', action='store_true', 
+parser.add_argument('-prefer-local', action='store_true', dest='prefer_local',
   help='prefer recently cached data')
 ##
 # -price
 # the price to be set in a message
-parser.add_argument('-price', type=valid_price, help='the price', default=0)
+parser.add_argument('-price', type=valid_price, help='the price', default=0, dest='price')
 ###
 ### PATHS ###
 # -drive-path
@@ -264,49 +264,49 @@ parser.add_argument('-client-secret', dest="client_secret", type=str,
   help='the path to Google secret credentials', default=SECRET_PATH)
 # -user-path
 # the path to the users.json file
-parser.add_argument('-users-path', type=str, 
+parser.add_argument('-users-path', type=str, dest='users_path',
   help='the path to cache users locally', default=USERS_PATH)
 ###
 ##
-# -questions
+# -question
 # poll questions
-parser.add_argument('-questions', metavar='\"Q1, Q2, ...\"', dest='questions', action='append', default=[],
+parser.add_argument('-question', dest='questions', action='append', default=[],
   help='the questions to ask')
 ###
 # the maximum number of recent users
-parser.add_argument('-recent-users-count', default=3,
+parser.add_argument('-recent-users-count', default=3, dest='recent_users_count',
   type=int, help='the number of users to consider recent')
 ##
 # enables file reduction
-parser.add_argument('-enable-reduce', action='store_true', 
+parser.add_argument('-reduce', action='store_true', dest='reduce',
   help='enable reducing files under 50 MB')
 ##
 # enables file repair (buggy)
-parser.add_argument('-enable-repair', action='store_true', 
+parser.add_argument('-repair', action='store_true', dest='repair',
   help='enable repairing videos as appropriate')
 ##
 # can be set in profile.conf
 # root Google drive folder
-parser.add_argument('-drive-root', type=str, default='OnlySnarf',
+parser.add_argument('-drive-root', type=str, default='OnlySnarf', dest='drive_root',
   help='the Google Drive root folder name')
 ##
 # -save-users
 # saves OnlyFans users upon exit
-parser.add_argument('-save-users', action='store_true', 
+parser.add_argument('-save-users', action='store_true', dest='save_users',
   help='enable saving users locally on exit')
 ##
 # -schedule
 # 
-parser.add_argument('-schedule', type=valid_schedule, default=None,
+parser.add_argument('-schedule', type=valid_schedule, default=None, dest='schedule',
   help='the schedule (MM-DD-YYYY:HH:MM)')
 ##
 # -skip-download
-parser.add_argument('-skip-download', action='store_true', 
+parser.add_argument('-skip-download', action='store_true', dest='skip_download',
   help='skip file downloads')
 ##
 # -skip-upload
 # skips file upload
-parser.add_argument('-skip-upload', action='store_true', 
+parser.add_argument('-skip-upload', action='store_true', dest='skip_upload',
   help='skip file uploads')
 ##
 # list of users to skip
@@ -315,7 +315,7 @@ parser.add_argument('-skip-users', dest='skip_users',
 ##
 # -show
 # shows window
-parser.add_argument('-show','-show-window', action='store_true', 
+parser.add_argument('-show','-show-window', dest='show', action='store_true', 
   help='enable displaying the browser window')
 ##
 # -tags
@@ -325,36 +325,36 @@ parser.add_argument('-tags', dest='tags', action='append', default=[],
 ##
 # -text
 # text for message or upload
-parser.add_argument('-text', type=str, default="",
+parser.add_argument('-text', type=str, default="", dest='text',
   help='the text to type')
 ##
 # -time
 # time in HH:MM
-parser.add_argument('-time', type=valid_time, default=None,
+parser.add_argument('-time', type=valid_time, default=None, dest='time',
   help='the time (HH:MM)')
 ##
 # -title
 # the title of a file to search for
-parser.add_argument('-title', type=str, default="",
+parser.add_argument('-title', type=str, default="", dest='title',
   help='the title of the file to search for')
 ##
 # -thumbnail
-parser.add_argument('-thumbnail', action='store_true', 
+parser.add_argument('-thumbnail', action='store_true', dest='thumbnail',
   help='fix thumbnails when necessary')
 ##
 # -tweet
 # enabled tweeting
-parser.add_argument('-tweeting', action='store_true', 
+parser.add_argument('-tweeting', action='store_true', dest='tweeting',
   help='enable tweeting when posting')
 ##
 # -upload-max
 # the max number of 10 minute intervals to upload for
-parser.add_argument('-upload-max-duration',  
+parser.add_argument('-upload-max-duration', dest='upload_max_duration', default=UPLOAD_MAX_DURATION,
   type=int, help='the number of 10 minute intervals to wait while uploading a file')
 ##
 # -user
 # the user to target
-parser.add_argument('-user', type=str,  default="",
+parser.add_argument('-user', type=str,  default="", dest='user',
   help='the user to message')
 ##
 # -users
@@ -364,12 +364,12 @@ parser.add_argument('-users', dest='users', action='append', default=[],
 ##
 # -users-favorite
 # list of favorited users
-parser.add_argument('-users-favorite',  
+parser.add_argument('-users-favorite', default=[],
   dest='users_favorite', action='append', help='supplied list of favorite users')
 ##
 # -username
 # the OnlyFans / Twitter username to use
-parser.add_argument('-username', type=str, default="",
+parser.add_argument('-username', type=str, default="", dest='username',
   help='the Twitter username for login')
 ##
 # -verbose

@@ -45,6 +45,7 @@ class Settings:
     POLL = None
     PROFILE = None
     PROMOTION = None
+    SCHEDULE = None
 
     def __init__():
         pass
@@ -76,12 +77,12 @@ class Settings:
             print(colorize(text, "teal"))
 
     def maybe_print(text):
-        if int(config.get("VERBOSE")) == 2:
+        if int(config["VERBOSE"]) == 2:
             print(colorize(text, "teal"))
 
     # update for verbosity
     def dev_print(text):
-        if int(config.get("VERBOSE")) == 3:
+        if int(config["VERBOSE"]) == 3:
             if "successful" in str(text).lower():
                 print(colorize(text, "green"))
             elif "failure" in str(text).lower():
@@ -98,7 +99,7 @@ class Settings:
     # Gets
 
     def get_action():
-        return config.get("ACTION")
+        return config["ACTION"]
 
     def get_amount():
         return config["AMOUNT"] or DISCOUNT_MIN_AMOUNT
@@ -107,29 +108,27 @@ class Settings:
         return config["MONTHS"] or DISCOUNT_MIN_MONTHS
 
     def get_discount():
-        from .classes import Discount, Poll, Promotion
-
         if Settings.DISCOUNT: return Settings.DISCOUNT
-        from .discount import Discount
+        from .classes import Discount
         discount = Discount()
         discount.get()
         Settings.DISCOUNT = discount
         return discount
 
     def get_category():
-        return config.get("CATEGORY") or ""
+        return config["CATEGORY"] or ""
 
     def get_categories():
-        return list(CATEGORIES_DEFAULT).extend(list(config.get("CATEGORIES")))
+        return list(CATEGORIES_DEFAULT).extend(list(config["CATEGORIES"]))
 
     def get_price():
-        return config.get("PRICE") or ""
+        return config["PRICE"] or ""
 
     def get_price_minimum():
         return PRICE_MINIMUM or 0
 
     def get_date():
-        return config.get("DATE") or ""
+        return config["DATE"] or ""
 
     def get_default_greeting():
         return DEFAULT_GREETING or ""
@@ -150,16 +149,16 @@ class Settings:
         return DISCOUNT_MIN_MONTHS or 0
 
     def get_download_max():
-        return config.get("DOWNLOAD_MAX") or IMAGE_DOWNLOAD_LIMIT
+        return config["DOWNLOAD_MAX"] or IMAGE_DOWNLOAD_LIMIT
         
     def get_drive_ignore():
-        return config.get("NOTKEYWORDS") or ""
+        return config["NOTKEYWORDS"] or ""
         
     def get_drive_keyword():
-        return config.get("BYKEYWORDS") or ""
+        return config["BYKEYWORDS"] or ""
         
     def get_duration():
-        return config.get("DURATION") or 0
+        return config["DURATION"] or 0
         
     def get_duration_allowed():
         return DURATION_ALLOWED or []
@@ -171,10 +170,10 @@ class Settings:
         return EXPIRATION_ALLOWED or []
 
     def get_input():
-        return config.get("INPUT") or ""
+        return config["INPUT"] or ""
 
     def get_keywords():
-        keywords = config.get("KEYWORDS") or []
+        keywords = config["KEYWORDS"] or []
         keywords = [n.strip() for n in keywords]
         return keywords
 
@@ -193,10 +192,10 @@ class Settings:
         return MESSAGE_CHOICES
 
     def get_mount_path():
-        return config.get("MOUNT_PATH") or ""
+        return config["MOUNT_PATH"] or ""
 
     def get_performers():
-        performers = config.get("PERFORMERS") or []
+        performers = config["PERFORMERS"] or []
         performers = [n.strip() for n in performers]
         return performers
 
@@ -213,6 +212,7 @@ class Settings:
         from .classes import Poll
         poll = Poll()
         poll.get()
+        if not poll.check(): return None
         Settings.POLL = poll
         return poll
 
@@ -225,87 +225,102 @@ class Settings:
         return promotion
 
     def get_recent_user_count():
-        return config.get("RECENT_USERS_COUNT") or 0
+        return config["RECENT_USERS_COUNT"] or 0
 
     def get_password():
-        return config.get("PASSWORD") or ""
+        return config["PASSWORD"] or ""
 
     def get_download_path():
-        return config.get("DOWNLOAD_PATH") or ""
+        return config["DOWNLOAD_PATH"] or ""
 
     def get_drive_path():
-        return config.get("DRIVE_PATH") or "root"
+        return config["DRIVE_PATH"] or "root"
 
     def get_drive_root():
-        return config.get("DRIVE_ROOT") or "OnlySnarf"
+        return config["DRIVE_ROOT"] or "OnlySnarf"
 
     def get_users_path():
-        return config.get("USERS_PATH") or ""
+        return config["USERS_PATH"] or ""
 
     def get_google_path():
-        return config.get("GOOGLE_PATH") or ""
+        return config["GOOGLE_PATH"] or ""
 
     def get_secret_path():
-        return config.get("CLIENT_SECRET") or ""
+        return config["CLIENT_SECRET"] or ""
+
+    def get_Schedule():
+        if Settings.SCHEDULE: return Settings.SCHEDULE
+        from .classes import Schedule
+        schedule = Schedule()
+        schedule.get()
+        if not schedule.check(): return None
+        Settings.SCHEDULE = schedule
+        return schedule
 
     def get_schedule():
-        if str(config.get("SCHEDULE")) != "None": return config.get("SCHEDULE")
-        if  Settings.get_date() != "":
+        if str(config["SCHEDULE"]) != "None": return config["SCHEDULE"]
+        if Settings.get_date() != "":
             if str(Settings.get_time()) != "":
-                config.set("SCHEDULE", "{}:{}".format(Settings.get_date(), Settings.get_time()))
+                config.set("SCHEDULE", "{} {}".format(Settings.get_date(), Settings.get_time()))
             else:
-                config.set("SCHEDULE", "{}:{}".format(Settings.get_date(), "00:00"))
-        return config.get("SCHEDULE")
+                config.set("SCHEDULE", "{} {}".format(Settings.get_date(), "00:00"))
+        return config["SCHEDULE"]
 
     def get_tags():
-        tags = config.get("TAGS") or []
+        tags = config["TAGS"] or []
         tags = [n.strip() for n in tags]
         return tags
 
     def get_text():
-        return config.get("TEXT") or ""
+        return config["TEXT"] or ""
 
     def get_time():
-        return config.get("TIME") or ""
+        return config["TIME"] or None
 
     def get_title():
-        return config.get("TITLE") or ""
+        return config["TITLE"] or ""
         
     def get_skipped_users():
-        return config.get("SKIPPED_USERS") or []
+        return config["SKIPPED_USERS"] or []
         
     def get_questions():
-        return config.get("QUESTIONS") or []
+        return config["QUESTIONS"] or []
         
     def get_upload_max():
-        return config.get("UPLOAD_MAX") or IMAGE_UPLOAD_LIMIT
+        return config["UPLOAD_MAX"] or IMAGE_UPLOAD_LIMIT
         
     def get_upload_max_messages():
-        return config.get("UPLOAD_LIMIT_MESSAGES") or 0
+        return config["UPLOAD_LIMIT_MESSAGES"] or 0
         
     def get_upload_max_duration():
-        return config.get("UPLOAD_MAX_DURATION") or 12 # 2 hours
+        return config["UPLOAD_MAX_DURATION"] or 12 # 2 hours
 
     # comma separated string of usernames
     def get_users():
-        users = config.get("USERS") or []
+        users = config["USERS"] or []
         users = [n.strip() for n in users]
-        return users
+        from .user import User
+        users_ = []
+        for user in users:
+            user = User({})
+            setattr(user, "username", config["USER"])
+            users_.append(user)
+        return users_
 
     def get_user():
         from .user import User
         user = User({})
-        setattr(user, "username", config.get("USER"))
+        setattr(user, "username", config["USER"])
         return user
 
     def get_username():
-        return config.get("USERNAME") or ""
+        return config["USERNAME"] or ""
 
     def get_users_favorite():
-        return config.get("USERS_FAVORITE") or []
+        return config["USERS_FAVORITE"] or []
         
     def get_verbosity():
-        return config.get("VERBOSE") or 0
+        return config["VERBOSE"] or 0
 
     # Bools
 
@@ -316,43 +331,43 @@ class Settings:
     #     return Settings.PROMPT or False
 
     def is_create_drive():
-        return config.get("CREATE_DRIVE") or False
+        return config["CREATE_DRIVE"] or False
 
     def is_debug():
-        return config.get("DEBUG") or False
+        return config["DEBUG"] or False
 
     def is_debug_delay():
-        return config.get("DEBUG_DELAY") or False
+        return config["DEBUG_DELAY"] or False
 
     def is_prefer_local():
-        return config.get("PREFER_LOCAL") or False
+        return config["PREFER_LOCAL"] or False
         
     def is_save_users():
-        return config.get("SAVE_USERS") or False
+        return config["SAVE_USERS"] or False
         
     def is_reduce():
-        return config.get("ENABLE_REDUCE") or False
+        return config["ENABLE_REDUCE"] or False
     
     def is_show_window():
-        return config.get("SHOW") or False
+        return config["SHOW"] or False
 
     def is_split():
-        return config.get("ENABLE_SPLIT") or False
+        return config["ENABLE_SPLIT"] or False
         
     def is_trim():
-        return config.get("ENABLE_TRIM") or False
+        return config["ENABLE_TRIM"] or False
         
     def is_tweeting():
-        return config.get("TWEETING") or False
+        return config["TWEETING"] or False
         
     def is_backup():
-        return config.get("BACKUP") or False
+        return config["BACKUP"] or False
         
     def is_skip_download():
-        return config.get("SKIP_DOWNLOAD") or False
+        return config["SKIP_DOWNLOAD"] or False
         
     def is_skip_upload():
-        return config.get("SKIP_UPLOAD") or False
+        return config["SKIP_UPLOAD"] or False
 
         ### OnlySnarf Settings Menu
     def menu():

@@ -18,6 +18,7 @@ from PyInquirer import prompt
 ##
 from OnlySnarf.src.colorize import colorize
 # from OnlySnarf.src.cron import Cron
+from OnlySnarf.src.classes import Discount, Promotion
 from OnlySnarf.src.message import Message
 from OnlySnarf.src import google as Google
 # from OnlySnarf.src.promotion import Promotion
@@ -69,27 +70,8 @@ def action_menu():
 # Discount
 
 def discount_menu():
-    if not Settings.get_user(): user = User.select_user()
-    if not Settings.prompt("discount"): return None
-    # 5-55% / 5
-    question = {
-        'type': 'input',
-        'name': 'amount',
-        'message': 'Amount (increments of 5) in %?',
-        'validate': NumberValidator,
-        'filter': lambda val: int(myround(val))
-    },
-    # 1-12 months
-    {
-        'type': 'input',
-        'name': 'duration',
-        'message': 'Months?',
-        'validate': NumberValidator,
-        'filter': lambda val: int(val)
-
-    }
-    answers = prompt(question)
-    Snarf.discount(choice=user, discount={"amount":answers["amount"], "duration":answers["duration"]})
+    discount = Discount()
+    discount.apply()
     main()
 
 # Message
@@ -120,8 +102,9 @@ def profile_menu():
 def promotion_menu():
     print("### Not Available ###")
     # promotion = Promotion()
-    # promotion.prompt()
-    # promotion.apply()
+    # add menu in promotion that asks for which kind
+    # promotion.create_trial_link()
+    # promotion.apply_to_user()
     main()
 
 # Settings
@@ -173,24 +156,6 @@ def main():
     header()
     settings_header()
     main_menu()
-
-#################################################################################################
-#################################################################################################
-#################################################################################################
-from PyInquirer import Validator, ValidationError
-
-class NumberValidator(Validator):
-    def validate(self, document):
-        try:
-            int(document.text)
-        except ValueError:
-            raise ValidationError(
-                message='Please enter a number',
-                cursor_position=len(document.text))  # Move cursor to end
-
-# round to 5
-def myround(x, base=5):
-    return base * round(x/base)
 
 #################################################################################################
 
