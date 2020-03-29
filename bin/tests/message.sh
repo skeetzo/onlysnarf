@@ -10,7 +10,7 @@ sudo onlysnarfpy \
 -category "image" \
 -text "message testes" \
 -price "2.00" \
--$1 \
+-show \
 -verbose -verbose -verbose
 # -verbose
 # -verbose -verbose
@@ -26,7 +26,7 @@ sudo onlysnarfpy \
 -text "message testes" \
 -price "2.00" \
 -prefer-local \
--$1 \
+-show \
 -verbose -verbose -verbose
 # -verbose
 # -verbose -verbose

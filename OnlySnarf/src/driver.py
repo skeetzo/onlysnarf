@@ -112,6 +112,7 @@ class Driver:
         if not auth_: return False
         months = discount.get_months()
         amount = discount.get_amount()
+        user = discount.get_username()
         if int(months) > int(Settings.get_discount_max_months()):
             print("Warning: Months Too High, Max -> {} days".format(Settings.get_discount_max_months()))
             months = Settings.get_discount_max_months()
@@ -235,6 +236,7 @@ class Driver:
             sendText.send_keys(str(text))
             return True
         except Exception as e:
+            print(e)
             Settings.maybe_print(e)
             return False
 
@@ -804,7 +806,7 @@ class Driver:
             poll = message.get_poll()
             if str(text) == "": print("Warning: Missing Upload Text")
             print("Posting:")
-            Settings.maybe_print("- Files: {}".format(len(files)))
+            print("- Files: {}".format(len(files)))
             print("- Keywords: {}".format(keywords))
             print("- Performers: {}".format(performers))
             print("- Tags: {}".format(tags))
@@ -1140,6 +1142,89 @@ class Driver:
             return False
 
     ####################
+    ##### Schedule #####
+    ####################
+
+    @staticmethod
+    def schedule(theSchedule=None):
+        if not theSchedule:
+            print("Error: Missing Schedule")
+            return False
+        auth_ = Driver.auth()
+        if not auth_: return False
+        try:
+            theSchedule.get()
+            month_ = theSchedule.month
+            day_ = theSchedule.day
+            year_ = theSchedule.year
+            hour_ = theSchedule.hour
+            minute_ = theSchedule.minute
+            today = datetime.now()
+            Settings.dev_print("today: {} {}".format(today.strftime("%B"), today.strftime("%Y")))
+            date__ = datetime.strptime(str(theSchedule.get_date()), "%Y-%d-%m")
+            if date__ < today:
+                print("Error: Unable to Schedule Earlier Date")
+                return False
+            print("Schedule:")
+            print("- Date: {}".format(theSchedule.get_date()))
+            print("- Time: {}".format(theSchedule.get_time()))
+            Driver.open_more_options()
+            # click schedule
+            Settings.dev_print("adding schedule")
+            Driver.get_element_to_click("scheduleAdd").click()
+            # find and click month w/ correct date
+            while True:
+                Settings.dev_print("getting date")
+                existingDate = Driver.find_element_by_name("scheduleDate").get_attribute("innerHTML")
+                Settings.dev_print("date: {} - {} {}".format(existingDate, month_, year_))
+                if str(month_) in str(existingDate) and str(year_) in str(existingDate): break
+                else: Driver.get_element_to_click("scheduleNextMonth").click()
+            # set day in month
+            Settings.dev_print("setting days")
+            days = Driver.find_elements_by_name("scheduleDays")
+            for day in days:
+                inner = day.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>","")
+                if str(day_) == str(inner):
+                    day.click()
+                    Settings.dev_print("clicked day")
+            Settings.debug_delay_check()
+            # save schedule date
+            saves = Driver.get_element_to_click("scheduleSave").click()
+            # set hours
+            Settings.dev_print("setting hours")
+            hours = Driver.find_elements_by_name("scheduleHours")
+            for hour in hours:
+                inner = hour.get_attribute("innerHTML")
+                if str(hour_) in str(inner) and hour.is_enabled():
+                    hour.click()
+                    Settings.dev_print("hours set")
+            # set minutes
+            Settings.dev_print("setting minutes")
+            minutes = Driver.find_elements_by_name("scheduleMinutes")
+            for minute in minutes:
+                inner = minute.get_attribute("innerHTML")
+                if str(minute_) in str(inner) and minute.is_enabled():
+                    minute.click()
+                    Settings.dev_print("minutes set")
+            # save time
+            Settings.dev_print("saving schedule")
+            Settings.debug_delay_check()
+            if Settings.is_debug():
+                print("Skipping: Schedule (debug)")
+                Driver.get_element_to_click("scheduleCancel").click()
+                Settings.dev_print("canceled schedule")
+            else:
+                Driver.get_element_to_click("scheduleSave").click()
+                Settings.dev_print("saved schedule")
+                print("Schedule Entered")
+            Settings.dev_print("### Schedule Successful ###")
+            return True
+        except Exception as e:
+            Driver.error_checker(e)
+            print("Error: Failed to Enter Schedule")
+            return False
+
+    ####################
     ##### Settings #####
     ####################
 
@@ -1285,91 +1370,6 @@ class Driver:
         except Exception as e:
             Driver.error_checker(e)
 
-    ####################
-    ##### Schedule #####
-    ####################
-
-    @staticmethod
-    def schedule(theSchedule=None):
-        if not theSchedule:
-            print("Error: Missing Schedule")
-            return False
-        auth_ = Driver.auth()
-        if not auth_: return False
-        try:
-            tehdate = datetime.strptime(theSchedule, "%m-%d-%Y:%H:%M")
-            theDate = datetime.strptime(theSchedule, "%m-%d-%Y:%H:%M").date()
-            month_ = tehdate.strftime("%B")
-            day_ = tehdate.day
-            year_ = tehdate.year
-            theTime = datetime.strptime(theSchedule, "%m-%d-%Y:%H:%M").time()
-            hour_ = datetime.strptime(theSchedule, "%m-%d-%Y:%H:%M").hour
-            minute_ = datetime.strptime(theSchedule, "%m-%d-%Y:%H:%M").minute
-           # add check for if date is before today
-            today = datetime.now()
-            Settings.dev_print("today: {} {}".format(today.strftime("%B"), today.strftime("%Y")))
-            if tehdate < today:
-                print("Error: Unable to Schedule Earlier Date")
-                return False
-            print("Schedule:")
-            print("- Date: {}".format(theDate))
-            print("- Time: {}".format(theTime))
-            Driver.open_more_options()
-            # click schedule
-            Settings.dev_print("adding schedule")
-            Driver.get_element_to_click("scheduleAdd").click()
-            # find and click month w/ correct date
-            while True:
-                Settings.dev_print("getting date")
-                existingDate = Driver.find_element_by_name("scheduleDate").get_attribute("innerHTML")
-                Settings.dev_print("date: {} - {} {}".format(existingDate, month_, year_))
-                if str(month_) in str(existingDate) and str(year_) in str(existingDate): break
-                else: Driver.get_element_to_click("scheduleNextMonth").click()
-            # set day in month
-            Settings.dev_print("setting days")
-            days = Driver.find_elements_by_name("scheduleDays")
-            for day in days:
-                inner = day.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>","")
-                if str(day_) == str(inner):
-                    day.click()
-                    Settings.dev_print("clicked day")
-            Settings.debug_delay_check()
-            # save schedule date
-            saves = Driver.get_element_to_click("scheduleSave").click()
-            # set hours
-            Settings.dev_print("setting hours")
-            hours = Driver.find_elements_by_name("scheduleHours")
-            for hour in hours:
-                inner = hour.get_attribute("innerHTML")
-                if str(hour_) in str(inner) and hour.is_enabled():
-                    hour.click()
-                    Settings.dev_print("hours set")
-            # set minutes
-            Settings.dev_print("setting minutes")
-            minutes = Driver.find_elements_by_name("scheduleMinutes")
-            for minute in minutes:
-                inner = minute.get_attribute("innerHTML")
-                if str(minute_) in str(inner) and minute.is_enabled():
-                    minute.click()
-                    Settings.dev_print("minutes set")
-            # save time
-            Settings.dev_print("saving schedule")
-            Settings.debug_delay_check()
-            if Settings.is_debug():
-                print("Skipping: Schedule (debug)")
-                Driver.get_element_to_click("scheduleCancel").click()
-                Settings.dev_print("canceled schedule")
-            else:
-                Driver.get_element_to_click("scheduleSave").click()
-                Settings.dev_print("saved schedule")
-                print("Schedule Entered")
-            Settings.dev_print("### Schedule Successful ###")
-            return True
-        except Exception as e:
-            Driver.error_checker(e)
-            print("Error: Failed to Enter Schedule")
-            return False
-
     @staticmethod
     def spawn_browser():      
         global BROWSER
@@ -1379,7 +1379,7 @@ class Driver:
         options = webdriver.ChromeOptions()
         # options.setExperimentalOption('useAutomationExtension', false);
         # options.binary_location = chromedriver_binary.chromedriver_filename
-        if Settings.is_show_window():
+        if not Settings.is_show_window():
             options.add_argument('--headless')
             #
             options.add_argument('--disable-smooth-scrolling')
@@ -1442,7 +1442,7 @@ class Driver:
     def upload_image_files(name="image_upload", files=[]):
         Settings.dev_print("uploading image files: {} - {}".format(name, len(files)))
         if len(files) == 0:
-            print("Error: Missing Videos")
+            print("Error: Missing Files")
             return False
         if Settings.is_skip_upload():
             print("Skipping Upload: Disabled")

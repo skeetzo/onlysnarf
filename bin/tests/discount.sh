@@ -9,7 +9,7 @@ sudo onlysnarfpy \
 -amount 40 \
 -months 3 \
 -prefer-local \
--$1 \
+-show \
 -verbose -verbose -verbose
 # -verbose
 # -verbose -verbose

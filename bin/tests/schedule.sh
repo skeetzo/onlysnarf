@@ -8,9 +8,9 @@ sudo onlysnarfpy \
 -bykeywords "pussycats" \
 -skip-download \
 -text "schedule testes" \
--schedule "6-6-2020:6:26" \
+-schedule "6-7-2020:6:26" \
 -debug-delay \
--$1 \
+-show \
 -verbose -verbose -verbose
 # -verbose
 # -verbose -verbose
