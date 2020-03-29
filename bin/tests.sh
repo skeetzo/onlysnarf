@@ -23,6 +23,7 @@ show="show"
 
 verbose="blank"
 verbose="verbose -verbose -verbose"
+verbose="v -v -v"
 
 declare -a testing
 testing=("schedule")

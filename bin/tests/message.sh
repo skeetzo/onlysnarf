@@ -4,25 +4,29 @@
 echo "[*] Message - Recent & Image"
 sudo onlysnarfpy \
 -debug \
--$2 \
 -action "message" \
 -user "all" \
 -force-upload \
 -category "image" \
 -text "message testes" \
+-price "2.00" \
 -$1 \
--price "2.00"
+-verbose -verbose -verbose
+# -verbose
+# -verbose -verbose
 
 # User
 echo "[*] Message - User & Gallery"
 sudo onlysnarfpy \
 -debug \
--$2 \
 -action "message" \
 -bykeywords "pussycats" \
 -user "1578380" \
 -category "gallery" \
 -text "message testes" \
 -price "2.00" \
+-prefer-local \
 -$1 \
--prefer-local
+-verbose -verbose -verbose
+# -verbose
+# -verbose -verbose
