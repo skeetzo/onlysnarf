@@ -31,7 +31,7 @@ def gifify(path):
     # First convert the images to a video:
     # ffmpeg -f image2 -i image%d.jpg video.avi
     loglevel = "quiet"
-    # if Settings.get_debug():
+    # if Settings.is_debug():
         # loglevel = "debug"
     # p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-y', '-i', str(path), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', '-crf', '26', '-b:v', str(bitrate), str(reducedPath)])
     # Then convert the avi to a gif:
@@ -72,7 +72,7 @@ def frames(path):
 #     repairedPath = str(path).replace(".mp4", "_fixed.mp4")
 #     try:
 #         print("Repairing: {} <-> {}".format(path, Settings.WORKING_VIDEO))
-#         if Settings.get_debug():
+#         if Settings.is_debug():
 #             subprocess.call(['untrunc', str(Settings.WORKING_VIDEO), str(path)]).communicate()
 #         else:
 #             subprocess.Popen(['untrunc', str(Settings.WORKING_VIDEO), str(path)],stdin=FNULL,stdout=FNULL)
@@ -106,7 +106,7 @@ def reduce(path):
             print("Error: Missing File to Reduce")
             return path
         loglevel = "quiet"
-        if Settings.get_debug():
+        if Settings.is_debug():
             loglevel = "debug"
         p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-err_detect', 'ignore_err', '-y', '-i', str(path), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', '-crf', '26', '-b:v', str(bitrate), str(reducedPath)])
         # p.communicate()
@@ -154,7 +154,7 @@ def split(path, segment):
         i = 0
         index = 0
         loglevel = "quiet"
-        if Settings.get_debug():
+        if Settings.is_debug():
             loglevel = "debug"
         while True:
             start = datetime.timedelta(seconds=index)
@@ -180,7 +180,7 @@ def thumbnail_fix(path):
     try:
         print("Thumbnailing: {}".format(path))
         loglevel = "quiet"
-        if Settings.get_debug():
+        if Settings.is_debug():
             loglevel = "debug"
         thumbnail_path = os.path.join(os.path.dirname(str(path)), 'thumbnail.png')
         Settings.maybe_print("thumbnail path: {}".format(thumbnail_path))
@@ -216,7 +216,7 @@ def trim(path):
         start = datetime.timedelta(seconds=60)
         end = datetime.timedelta(seconds=clip.duration-60)
         loglevel = "quiet"
-        if Settings.get_debug():
+        if Settings.is_debug():
             loglevel = "debug"
         p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-ss', str(start), '-y', '-i', str(path), '-to', str(end), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', str(reducedPath)])
         # p.communicate()

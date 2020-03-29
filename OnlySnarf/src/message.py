@@ -1,7 +1,9 @@
 from datetime import datetime
+from .driver import Driver
 from .file import File, Google_File
 from .settings import Settings
 from .user import User
+from .validators import NumberValidator, TimeValidator, DateValidator, DurationValidator, ExpirationValidator, ListValidator
 import PyInquirer
 from PyInquirer import Validator, ValidationError
 
@@ -19,8 +21,6 @@ class Message():
         ## posts
         self.expiration = None
         self.poll = None
-        self.questions = []
-        self.duration = None
         self.schedule = None
 
     ###########################################################################
@@ -29,21 +29,21 @@ class Message():
         for file in self.files:
             file.backup()
 
-    def get_text(self):
-        if self.text != "": return self.text
-        text = Settings.get_text() or None
-        if text: return text
-        if not Settings.prompt("text"): return ""
-        question = {
-            'type': 'input',
-            'name': 'text',
-            'message': 'Text:'
-        }
-        answers = PyInquirer.prompt(question)
-        text = answers["text"]
-        if not Settings.confirm(text): return self.get_text()
-        self.text = text
-        return self.text
+    @staticmethod
+    def format_keywords(keywords):
+        if len(keywords) > 0: return "#{}".format(" #".join(self.get_performers()))
+
+    @staticmethod
+    def format_performers(performers):
+        if len(performers) > 0: return "w/ @{}".format(" @".join(self.get_performers()))
+            
+    @staticmethod
+    def format_tags(tags):
+        if len(tags) > 0: return "@{}".format(" @".join(self.get_tags()))
+
+    def format_text(self):
+        "{} {} {} {}".format(self.get_text(), Message.format_performers(self.get_performers()), Message.format_tags(self.get_tags()),
+            Message.format_keywords(self.get_keywords()))
 
     def get_keywords(self):
         # if self.keywords: return self.keywords
@@ -148,13 +148,13 @@ class Message():
 
     def get_expiration(self):
         if self.expiration: return self.expiration
-        expires = Settings.get_expires() or None
+        expires = Settings.get_expiration() or None
         if expires: return expires
         if not Settings.prompt("expiration"): return None
         question = {
             'type': 'input',
             'name': 'expiration',
-            'message': 'Expiration [1, 3, 7, 99 or \'No Limit\']',
+            'message': 'Expiration [1, 3, 7, 99 (\'No Limit\')]',
             'validate': ExpirationValidator
         }
         answers = PyInquirer.prompt(question)
@@ -164,54 +164,14 @@ class Message():
         return self.expiration
 
     def get_poll(self):
-        if self.poll and self.poll.questions and len(self.poll.questions) > 0: return self.poll
+        if self.poll and self.poll.check(): return self.poll
         poll = Settings.get_poll() or None
         if poll: return poll
-        # if not Settings.prompt("poll"): return None
-        duration = self.get_duration()
-        if not duration: return None
-        questions = self.get_questions()
-        if not questions or len(questions) == 0: return None
-        poll = {"duration":duration,"questions":questions}
+        if not Settings.prompt("poll"): return None
+        poll = Poll()
+        poll.get()
         self.poll = poll
         return poll
-
-    def get_questions(self):
-        if len(self.questions) > 0: return self.questions
-        questions = Settings.get_questions() or []
-        if len(questions) > 0: return questions
-        if not Settings.prompt("questions"): return []
-        print("Enter Questions")
-        while True:
-            question = {
-                'type': 'input',
-                'name': 'question',
-                'message': 'Question:',
-            }
-            answers = PyInquirer.prompt(question)
-            question = answers["question"]
-            if str(question) == "": break
-            questions.append(question)
-        if not Settings.confirm(questions): return self.get_questions()
-        self.questions = questions
-        return self.questions
-    
-    def get_duration(self):
-        if self.duration: return self.duration
-        duration = Settings.get_duration() or None
-        if duration: return duration
-        if not Settings.prompt("duration"): return None
-        question = {
-            'type': 'input',
-            'name': 'duration',
-            'message': 'Duration [1, 3, 7, 99 or \'No Limit\']',
-            'validate': DurationValidator
-        }
-        answers = PyInquirer.prompt(question)
-        duration = answers["duration"]
-        if not Settings.confirm(duration): return self.get_duration()
-        self.duration = duration
-        return self.duration
 
     # ensures listed recipients are users
     # Settings.USERS and self.recipients should be usernames
@@ -254,6 +214,22 @@ class Message():
         if not Settings.confirm(schedule): return self.get_schedule()
         self.schedule = schedule
         return self.schedule
+
+    def get_text(self):
+        if self.text != "": return self.text
+        text = Settings.get_text() or None
+        if text: return text
+        if not Settings.prompt("text"): return ""
+        question = {
+            'type': 'input',
+            'name': 'text',
+            'message': 'Text:'
+        }
+        answers = PyInquirer.prompt(question)
+        text = answers["text"]
+        if not Settings.confirm(text): return self.get_text()
+        self.text = text
+        return self.text
 
     def get_all(self):
         self.get_text()
@@ -306,61 +282,3 @@ class Message():
             Settings.dev_print(e)
             successful = False
         if successful: self.backup_files()
-
-########################################################################################
-
-class NumberValidator(Validator):
-    def validate(self, document):
-        try:
-            int(document.text)
-        except ValueError:
-            raise ValidationError(
-                message='Please enter a number',
-                cursor_position=len(document.text))  # Move cursor to end
-
-class TimeValidator(Validator):
-    def validate(self, document):
-        try:
-            datetime.strptime(document.text, '%H:%M')
-        except ValueError:
-            raise ValidationError(
-                message='Please enter a time (HH:mm)',
-                cursor_position=len(document.text))  # Move cursor to end
-
-class DateValidator(Validator):
-    def validate(self, document):
-        try:
-            datetime.strptime(document.text, '%m-%d-%Y')
-        except ValueError:
-            raise ValidationError(
-                message='Please enter a date (mm/dd/YYYY)',
-                cursor_position=len(document.text))  # Move cursor to end
-
-class DurationValidator(Validator):
-    def validate(self, document):
-        if str(document.text).lower() not in str(Settings.get_duration_allowed()).lower():
-            raise ValidationError(
-                message='Please enter a duration ({})'.format(", ".join(Settings.get_duration_allowed())),
-                cursor_position=len(document.text))  # Move cursor to end
-
-class ExpirationValidator(Validator):
-    def validate(self, document):
-        try:
-            int(document.text)
-        except ValueError:
-            raise ValidationError(
-                message='Please enter an expiration ({})'.format(", ".join(Settings.get_expiration_allowed())),
-                cursor_position=len(document.text))  # Move cursor to end
-
-class ListValidator(Validator):
-    def validate(self, document):
-        return True
-        try:
-            pass
-            # import ast
-            # ast.literal_eval(document.text)
-        except Exception as e:
-            raise ValidationError(
-                message='Please enter a comma separated list of values',
-                cursor_position=len(document.text))  # Move cursor to end
-

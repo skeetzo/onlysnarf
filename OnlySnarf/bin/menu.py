@@ -18,8 +18,8 @@ from PyInquirer import prompt
 ##
 from OnlySnarf.src.colorize import colorize
 # from OnlySnarf.src.cron import Cron
-from OnlySnarf.src.google import Google
 from OnlySnarf.src.message import Message
+from OnlySnarf.src import google as Google
 # from OnlySnarf.src.promotion import Promotion
 from OnlySnarf.src.settings import Settings
 from OnlySnarf.src.snarf import Snarf
@@ -28,7 +28,7 @@ from OnlySnarf.src.snarf import Snarf
 ##### Globals #####
 ###################
 
-header = "\n ________         .__          _________                     _____ \n \
+ASCII = "\n ________         .__          _________                     _____ \n \
 \\_____  \\   ____ |  | ___.__./   _____/ ____ _____ ________/ ____\\\n \
  /   |   \\ /    \\|  |<   |  |\\_____  \\ /    \\\\__  \\\\_   _ \\   __\\ \n \
 /    |    \\   |  \\  |_\\___  |/        \\   |  \\/ __ \\ |  |\\/| |   \n \
@@ -52,7 +52,7 @@ def ask_action():
             # 'Promotion'
         ]
     }
-    if str(Settings.get_debug()) == "True":
+    if str(Settings.is_debug()) == "True":
         menu_prompt["choices"].append("Promotion")
     answers = prompt(menu_prompt)
     return answers['action']
@@ -96,7 +96,7 @@ def discount_menu():
 
 def message_menu():
     message = Message()
-    message.prompt_message()
+    message.get_message()
     message.send()
     main()
 
@@ -104,7 +104,7 @@ def message_menu():
 
 def post_menu():
     message = Message()
-    message.prompt_post()
+    message.get_post()
     message.post()
     main()
 
@@ -134,7 +134,7 @@ def settings_menu():
 
 def header():
     # os.system('clear')
-    print(colorize(header, 'header'))
+    print(colorize(ASCII, 'header'))
     print(colorize('version '+version+'\n', 'green'))
     user_header()
     settings_header()
