@@ -104,21 +104,26 @@ class Driver:
     ####################
 
     @staticmethod
-    def discount_user(user, discount=10, months=1):
+    def discount_user(discount=None):
+        if not discount:
+            print("Error: Missing Discount")
+            return False
         auth_ = Driver.auth()
         if not auth_: return False
-        if int(expiration) > int(Settings.get_discount_max_amount()):
-            print("Warning: Discount Too High, Max -> {}%".format(Settings.get_discount_max_amount()))
-            discount = Settings.get_discount_max_amount()
-        elif int(expiration) > int(Settings.get_discount_min_amount()):
-            print("Warning: Discount Too Low, Min -> {}%".format(Settings.get_discount_min_amount()))
-            discount = Settings.get_discount_min_amount()
+        months = discount.get_months()
+        amount = discount.get_amount()
         if int(months) > int(Settings.get_discount_max_months()):
-            print("Warning: Duration Too High, Max -> {} days".format(Settings.get_discount_max_months()))
+            print("Warning: Months Too High, Max -> {} days".format(Settings.get_discount_max_months()))
             months = Settings.get_discount_max_months()
         elif int(months) < int(Settings.get_discount_min_months()):
-            print("Warning: Duration Too Low, Min -> {} days".format(Settings.get_discount_min_months()))
+            print("Warning: Months Too Low, Min -> {} days".format(Settings.get_discount_min_months()))
             months = Settings.get_discount_min_months()
+        if int(amount) > int(Settings.get_discount_max_amount()):
+            print("Warning: Amount Too High, Max -> {} days".format(Settings.get_discount_max_months()))
+            amount = Settings.get_discount_max_amount()
+        elif int(amount) < int(Settings.get_discount_min_amount()):
+            print("Warning: Amount Too Low, Min -> {} days".format(Settings.get_discount_min_months()))
+            amount = Settings.get_discount_min_amount()
         try:
             print("Discounting User: {}".format(user))
             Driver.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
@@ -168,8 +173,8 @@ class Driver:
                         break
                     except Exception as e:
                         Driver.error_checker(e)
-                        print("Warning: Unable To Find User, retrying")
-                        return Driver.discount_user(user, discount=discount, months=months)
+                        print("Warning: Unable To Find User")
+                        return False
             time.sleep(1)
             Settings.dev_print("finding months and discount amount btns")
             (months_, discount_) = BROWSER.find_elements_by_class_name(DISCOUNT_INPUT)
@@ -182,7 +187,7 @@ class Driver:
             Settings.dev_print("entering discount amount")
             for n in range(11):
                 discount_.send_keys(str(Keys.UP))
-            for n in range(round(int(discount)/5)-1):
+            for n in range(round(int(amount)/5)-1):
                 discount_.send_keys(Keys.DOWN)
             Settings.dev_print("entered discount amount")
             Settings.dev_print("entering discount months")
@@ -263,19 +268,17 @@ class Driver:
     ######################
 
     @staticmethod
-    def expires(period):
+    def expires(expiration=None):
+        if not expiration:
+            print("Error: Missing Expiration")
+            return False
         auth_ = Driver.auth()
         if not auth_: return False
         Settings.dev_print("expires")
-        if period == None or str(period) == "": return False
-        if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99 and str(period) != "No limit":
-            print("Error: Missing Expiration")
-            return False
         try:
             # go_to_home() # this should be run only from upload anyways
-            if isinstance(period,str) and str(period) == "No limit": period = 99
             print("Expiration:")
-            print("- Period: {}".format(period))
+            print("- Period: {}".format(expiration))
             Driver.open_more_options()
             # open expires window
             Settings.dev_print("adding expires")
@@ -292,11 +295,11 @@ class Driver:
                 # <span><span class="g-first-letter">N</span>o limit</span>
                 ##
                 inner = num.get_attribute("innerHTML")
-                if ">1<" in str(inner) and int(period) == 1: num.click()
-                if ">3<" in str(inner) and int(period) == 3: num.click()
-                if ">7<" in str(inner) and int(period) == 7: num.click()
-                if ">30<" in str(inner) and int(period) == 30: num.click()
-                if ">o limit<" in str(inner) and int(period) == 99: num.click()
+                if ">1<" in str(inner) and int(expiration) == 1: num.click()
+                if ">3<" in str(inner) and int(expiration) == 3: num.click()
+                if ">7<" in str(inner) and int(expiration) == 7: num.click()
+                if ">30<" in str(inner) and int(expiration) == 30: num.click()
+                if ">o limit<" in str(inner) and int(expiration) == 99: num.click()
             Settings.dev_print("selected expires")
             Settings.debug_delay_check()
             # save
@@ -512,7 +515,10 @@ class Driver:
     ####################
 
     @staticmethod
-    def message(username):
+    def message(username=None):
+        if not username:
+            print("Error: Missing Username")
+            return False
         auth_ = Driver.auth()
         if not auth_: return False
         try:
@@ -640,7 +646,10 @@ class Driver:
             return False
 
     @staticmethod
-    def message_user(username):
+    def message_user(username=None):
+        if not username:
+            print("Error: Missing Username")
+            return False
         try:
             auth_ = Driver.auth()
             if not auth_: return False
@@ -692,28 +701,18 @@ class Driver:
     ################
 
     @staticmethod
-    def poll(poll):
+    def poll(poll=None):
+        if not poll:
+            print("Error: Missing Poll")
+            return False
         auth_ = Driver.auth()
         if not auth_: return False
         Settings.dev_print("poll")
-        period = poll.get("period")
-        questions = poll.get("questions")
-        if period == None or str(period) == "": return False
-        if isinstance(questions, str): questions = questions.split(",\"*\"")
-        questions = [n.strip() for n in questions]
-        if int(period) != 1 and int(period) != 3 and int(period) != 7 and int(period) != 30 and int(period) != 99:
-            try:
-                if str(period) != "No limit":
-                    print("Error: Missing Duration")
-                    return False
-            except Exception as e:
-                return False
-        if not questions or len(questions) == 0:
-            print("Error: Missing Questions")
-            return False
+        duration = poll.get_duration()
+        questions = poll.get_questions()
         try:
             print("Poll:")
-            print("- Duration: {}".format(period))
+            print("- Duration: {}".format(duration))
             print("- Questions:\n> {}".format("\n> ".join(questions)))
             # make sure the extra options are shown
             Driver.open_more_options()
@@ -736,11 +735,11 @@ class Driver:
                 # <span><span class="g-first-letter">N</span>o limit</span>
                 ##
                 inner = num.get_attribute("innerHTML")
-                if ">1<" in str(inner) and int(period) == 1: num.click()
-                if ">3<" in str(inner) and int(period) == 3: num.click()
-                if ">7<" in str(inner) and int(period) == 7: num.click()
-                if ">30<" in str(inner) and int(period) == 30: num.click()
-                if ">o limit<" in str(inner) and int(period) == 99: num.click()
+                if ">1<" in str(inner) and int(duration) == 1: num.click()
+                if ">3<" in str(inner) and int(duration) == 3: num.click()
+                if ">7<" in str(inner) and int(duration) == 7: num.click()
+                if ">30<" in str(inner) and int(duration) == 30: num.click()
+                if ">o limit<" in str(inner) and int(duration) == 99: num.click()
             # save the duration
             Settings.dev_print("saving duration")
             Driver.get_element_to_click("pollSave").click()
@@ -773,6 +772,7 @@ class Driver:
             else:
                 print("Poll Entered")
             Settings.dev_print("### Poll Successful ###")
+            time.sleep(3)
             return True
         except Exception as e:
             Driver.error_checker(e)
@@ -784,13 +784,17 @@ class Driver:
     ################
 
     @staticmethod
-    def post(message):
+    def post(message=None):
+        if not message:
+            print("Error: Missing Message")
+            return False
         auth_ = Driver.auth()
         if not auth_: return False
         Settings.dev_print("posting")
         try:
             Driver.go_to_home()
-            path = message.get_files()
+            files = message.get_files()
+            # files = 
             text = message.get_text()
             keywords = message.get_keywords()
             performers = message.get_performers()
@@ -798,15 +802,9 @@ class Driver:
             expires = message.get_expiration()
             schedule = message.get_schedule()
             poll = message.get_poll()
-            if not text or text == None or str(text) == "None":
-                print("Warning: Missing Upload Text")
-                text = ""
-            # if isinstance(performers, list) and len(performers) > 0: text += " w/ @"+" @".join(performers)
-            if isinstance(tags, list) and len(tags) > 0: text += " @"+" @".join(tags)
-            if isinstance(keywords, list) and len(keywords) > 0: text += " #"+" #".join(keywords)
-            text = text.strip()
+            if str(text) == "": print("Warning: Missing Upload Text")
             print("Posting:")
-            Settings.maybe_print("- Path: {}".format(path))
+            Settings.maybe_print("- Files: {}".format(len(files)))
             print("- Keywords: {}".format(keywords))
             print("- Performers: {}".format(performers))
             print("- Tags: {}".format(tags))
@@ -815,9 +813,7 @@ class Driver:
             ## Expires, Schedule, Poll
             if expires: Driver.expires(expires)
             if schedule: Driver.schedule(schedule)
-            if poll: 
-                Driver.poll(poll)
-                time.sleep(3)
+            if poll: Driver.poll(poll)
             WAIT = WebDriverWait(BROWSER, 600, poll_frequency=10)
             ## Tweeting
             if Settings.is_tweeting():
@@ -825,10 +821,11 @@ class Driver:
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, ONLYFANS_TWEET))).click()
             else:
                 Settings.dev_print("not tweeting")
-            ## Images
+            ## Files
+            successful_upload = False
             try:
                 Settings.dev_print("uploading files")
-                successful_upload = Driver.upload_image_files("image_upload", path)
+                successful_upload = Driver.upload_image_files("image_upload", files)
             except Exception as e:
                 Driver.error_checker(e)
                 print("Error: Unable to Upload Images")
@@ -840,7 +837,7 @@ class Driver:
                 return False
             ## Confirm
             i = 0
-            while True:
+            while successful_upload:
                 try:
                     WebDriverWait(BROWSER, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, SEND_BUTTON_CLASS)))
                     Settings.dev_print("upload complete")
@@ -893,11 +890,18 @@ class Driver:
 
     # or email
     @staticmethod
-    def promotional_trial_link(user, depth=0, limit=1, expiration=1, duration=1, tryAll=False):
+    def promotional_trial_link(promotion=None):
+        if not promotion:
+            print("Error: Missing Promotion")
+            return False
         auth_ = Driver.auth()
         if not auth_: return False
         # go to onlyfans.com/my/subscribers/active
         try:
+            limit = promotion.get_limit()
+            expiration = promotion.get_expiration()
+            months = promotion.get_months()
+            user = promotion.get_user()
             Settings.maybe_print("goto -> /my/promotions")
             BROWSER.get(('https://onlyfans.com/my/promotions'))
             Settings.dev_print("creating promotional trial")
@@ -922,14 +926,14 @@ class Driver:
             for n in range(int(expiration)-1):
                 expirationDropdown.send_keys(Keys.DOWN)
             Settings.debug_delay_check()
-            # duration dropdown
-            Settings.dev_print("settings trial duration")
+            # months dropdown
+            Settings.dev_print("settings trial months")
             durationDropwdown = Driver.find_element_by_name("promotionalTrialDuration")
-            for n in range(11): # 32 max duration
+            for n in range(11): # 32 max months
                 durationDropwdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
-            if int(duration) == 99: duration = 1
-            for n in range(int(duration)-1):
+            if int(months) == 99: months = 1
+            for n in range(int(months)-1):
                 durationDropwdown.send_keys(Keys.DOWN)
             Settings.debug_delay_check()
             # find and click promotionalTrialConfirm
@@ -971,9 +975,17 @@ class Driver:
             return None
 
     @staticmethod
-    def promotion_user_directly(user, expiration=10, months=1, message=""):
+    def promotion_user_directly(promotion=None):
+        if not promotion:
+            print("Error: Missing Promotion")
+            return False
         auth_ = Driver.auth()
         if not auth_: return False
+        # go to onlyfans.com/my/subscribers/active
+        expiration = promotion.get_expiration()
+        months = promotion.get_months()
+        user = promotion.get_user()
+        message = promotion.get_message()
         if int(expiration) > int(Settings.get_discount_max_amount()):
             print("Warning: Discount Too High, Max -> {}%".format(Settings.get_discount_max_amount()))
             discount = Settings.get_discount_max_amount()
@@ -1278,32 +1290,30 @@ class Driver:
     ####################
 
     @staticmethod
-    def schedule(schedule_):
+    def schedule(theSchedule=None):
+        if not theSchedule:
+            print("Error: Missing Schedule")
+            return False
         auth_ = Driver.auth()
         if not auth_: return False
         try:
-            if not schedule_:
-                print("Error: Missing Schedule")
-                return False
-            tehdate = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M")
-            date = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").date()
+            tehdate = datetime.strptime(theSchedule, "%m-%d-%Y:%H:%M")
+            theDate = datetime.strptime(theSchedule, "%m-%d-%Y:%H:%M").date()
             month_ = tehdate.strftime("%B")
             day_ = tehdate.day
             year_ = tehdate.year
-            time_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").time()
-            hour_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").hour
-            minute_ = datetime.strptime(schedule_, "%m/%d/%Y:%H:%M").minute
-            # add check for if date is before today
+            theTime = datetime.strptime(theSchedule, "%m-%d-%Y:%H:%M").time()
+            hour_ = datetime.strptime(theSchedule, "%m-%d-%Y:%H:%M").hour
+            minute_ = datetime.strptime(theSchedule, "%m-%d-%Y:%H:%M").minute
+           # add check for if date is before today
             today = datetime.now()
-            todaysMonth = today.strftime("%B")
-            todaysYear = today.strftime("%Y")
-            Settings.dev_print("today: {} {}".format(todaysMonth, todaysYear))
+            Settings.dev_print("today: {} {}".format(today.strftime("%B"), today.strftime("%Y")))
             if tehdate < today:
                 print("Error: Unable to Schedule Earlier Date")
                 return False
             print("Schedule:")
-            print("- Date: {}".format(date))
-            print("- Time: {}".format(time_))
+            print("- Date: {}".format(theDate))
+            print("- Time: {}".format(theTime))
             Driver.open_more_options()
             # click schedule
             Settings.dev_print("adding schedule")
@@ -1429,47 +1439,37 @@ class Driver:
 
     # uploads image into post or message
     @staticmethod
-    def upload_image_files(name="image_upload", path=None):
-        Settings.dev_print("uploading image files: {} - {}".format(name, path))
-        if path == None:
-            print("Error: Missing Upload Path")
+    def upload_image_files(name="image_upload", files=[]):
+        Settings.dev_print("uploading image files: {} - {}".format(name, len(files)))
+        if len(files) == 0:
+            print("Error: Missing Videos")
             return False
         if Settings.is_skip_upload():
             print("Skipping Upload: Disabled")
             return True
-        files = []
-        if os.path.isfile(str(path)):
-            files = [str(path)]
-        elif os.path.isdir(str(path)):
-            for file in os.listdir(str(path)):
-                files.append(os.path.join(os.path.abspath(str(path)),file))
-        else:
-            print("Error: Missing Image File(s)")
-            return False
-        if len(files) == 0:
-            print("Warning: Empty File Path")
-            return False
         files = files[:int(Settings.get_upload_limit_messages())]
+        i = 0
         for file in files:  
-            print('Uploading: '+str(file))
+            print('Uploading: {} - {}/{}'.format(file.get_title(), i, len(files)))
             enter_file = BROWSER.find_element_by_id(Element.get_element_by_name(str(name)).getId())
-            enter_file.send_keys(str(file))
+            enter_file.send_keys(str(file.get_path()))
             time.sleep(1)
             Driver.error_window_upload()
             ###
             def fix_filename(file):
                 # move file to change its name
-                filename = os.path.basename(file)
+                filename = os.path.basename(file.get_path())
                 filename = os.path.splitext(filename)[0]
                 if "_fixed" in str(filename): return
                 Settings.dev_print("fixing filename...")
                 filename += "_fixed"
                 ext = os.path.splitext(filename)[1].lower()
-                Settings.dev_print("{} -> {}.{}".format(os.path.dirname(file), filename, ext))
+                Settings.dev_print("{} -> {}.{}".format(os.path.dirname(file.get_path()), filename, ext))
                 dst = "{}/{}.{}".format(os.path.dirname(file), filename, ext)
-                shutil.move(file, dst)
+                shutil.move(file.get_path(), dst)
+                file.path = dst
                 # add file to end of list so it gets retried
-                files.append(dst)
+                files.append(file)
                 # if this doesn't force it then it'll loop forever without a stopper
             ###
         # one last final check

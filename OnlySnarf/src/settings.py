@@ -27,8 +27,8 @@ DISCOUNT_MAX_AMOUNT = 55
 DISCOUNT_MIN_AMOUNT = 10
 DISCOUNT_MAX_MONTHS = 7
 DISCOUNT_MIN_MONTHS = 1
-DURATION_ALLOWED = ["1","3","7","30","99","no limit"]
-EXPIRATION_ALLOWED = ["1","3","7","30","99","no limit"]
+DURATION_ALLOWED = [1,3,7,30,99]
+EXPIRATION_ALLOWED = [1,3,7,30,99]
 IMAGE_DOWNLOAD_LIMIT = 6
 IMAGE_UPLOAD_LIMIT = 20
 IMAGE_UPLOAD_LIMIT_MESSAGES = 5
@@ -39,8 +39,12 @@ UPLOAD_MAX_DURATION = 12 # 2 hours
 class Settings:
     last_updated = False
     CONFIRM = True
+    DISCOUNT = None
     PROMPT = True
     MESSAGE = None
+    POLL = None
+    PROFILE = None
+    PROMOTION = None
 
     def __init__():
         pass
@@ -96,10 +100,20 @@ class Settings:
     def get_action():
         return config.get("ACTION")
 
+    def get_amount():
+        return config["AMOUNT"] or DISCOUNT_MIN_AMOUNT
+
+    def get_months():
+        return config["MONTHS"] or DISCOUNT_MIN_MONTHS
+
     def get_discount():
-        amount = config.get("AMOUNT") or DISCOUNT_MIN_AMOUNT
-        months = config.get("MONTHS") or DISCOUNT_MIN_MONTHS
-        discount = {"amount":amount,"months":months}
+        from .classes import Discount, Poll, Promotion
+
+        if Settings.DISCOUNT: return Settings.DISCOUNT
+        from .discount import Discount
+        discount = Discount()
+        discount.get()
+        Settings.DISCOUNT = discount
         return discount
 
     def get_category():
@@ -150,8 +164,8 @@ class Settings:
     def get_duration_allowed():
         return DURATION_ALLOWED or []
         
-    def get_expires():
-        return config.get("EXPIRATION") or 0
+    def get_expiration():
+        return config["EXPIRATION"] or 0
         
     def get_expiration_allowed():
         return EXPIRATION_ALLOWED or []
@@ -163,6 +177,9 @@ class Settings:
         keywords = config.get("KEYWORDS") or []
         keywords = [n.strip() for n in keywords]
         return keywords
+
+    def get_limit():
+        return config["LIMIT"] or 1
         
     def get_message():
         if Settings.MESSAGE: return Settings.MESSAGE
@@ -183,20 +200,29 @@ class Settings:
         performers = [n.strip() for n in performers]
         return performers
 
+    def get_profile():
+        if Settings.PROFILE: return Settings.PROFILE
+        from .profile import Profile
+        profile = Profile()
+        profile.get()
+        Settings.PROFILE = profile
+        return profile
+
     def get_poll():
-        duration = Settings.get_duration()
-        questions = Settings.get_questions()
-        if duration == "" or len(questions) == 0: return None
-        return {"duration":duration,"questions":questions}
+        if Settings.POLL: return Settings.POLL
+        from .classes import Poll
+        poll = Poll()
+        poll.get()
+        Settings.POLL = poll
+        return poll
 
     def get_promotion():
-        return None
-        # if Settings.PROMOTION: return Settings.PROMOTION
-        # from .promotion import Promotion
-        # promotion = Promotion()
-        # promotion.get()
-        # Settings.PROMOTION = promotion
-        # return promotion
+        if Settings.PROMOTION: return Settings.PROMOTION
+        from .classes import Promotion
+        promotion = Promotion()
+        promotion.get()
+        Settings.PROMOTION = promotion
+        return promotion
 
     def get_recent_user_count():
         return config.get("RECENT_USERS_COUNT") or 0
