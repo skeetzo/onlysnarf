@@ -10,7 +10,7 @@ sudo onlysnarfpy \
 -text "expiration testes" \
 -debug-delay \
 -expiration 3 \
--$1 \
+-show \
 -verbose -verbose -verbose
 # -verbose
 # -verbose -verbose
