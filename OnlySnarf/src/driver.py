@@ -797,7 +797,7 @@ class Driver:
             Driver.go_to_home()
             files = message.get_files()
             # files = 
-            text = message.get_text()
+            text = message.format_text()
             keywords = message.get_keywords()
             performers = message.get_performers()
             tags = message.get_tags()

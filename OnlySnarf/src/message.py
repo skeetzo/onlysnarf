@@ -122,6 +122,7 @@ class Message():
             self.files = Google_File.select_files()
         elif len(self.files) == 0:
             self.files = File.select_files()
+        print(1)
         files = []
         for file in self.files:
             if Settings.confirm(file.get_path()):

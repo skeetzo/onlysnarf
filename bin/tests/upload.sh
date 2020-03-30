@@ -5,7 +5,7 @@ echo "[*] Upload - Image"
 sudo onlysnarfpy \
 -debug \
 -action "post" -category "image" \
--bykeywords "pussycats" \
+-bykeyword "pussycats" \
 -text "image testes" \
 -debug-delay \
 -show \
@@ -18,7 +18,7 @@ echo "[*] Upload - Gallery"
 sudo onlysnarfpy \
 -debug \
 -action "post" -category "gallery" \
--bykeywords "pussycats" \
+-bykeyword "pussycats" \
 -text "gallery testes" \
 -debug-delay \
 -show \
@@ -31,7 +31,7 @@ echo "[*] Upload - Video"
 sudo onlysnarfpy \
 -debug \
 -action "post" -category "video" \
--bykeywords "pussycats" \
+-bykeyword "pussycats" \
 -text "video testes" \
 -debug-delay \
 -show \

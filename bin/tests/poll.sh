@@ -5,7 +5,7 @@ echo "[*] Misc - Poll"
 sudo onlysnarfpy \
 -debug \
 -action "post" -category "image" \
--bykeywords "pussycats" \
+-bykeyword "pussycats" \
 -skip-download \
 -text "poll testes" \
 -duration 3 \

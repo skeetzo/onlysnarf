@@ -73,16 +73,16 @@ class Settings:
             time.sleep(int(10))
 
     def print(text):
-        if int(config["VERBOSE"]) == 1:
+        if int(config["VERBOSE"]) >= 1:
             print(colorize(text, "teal"))
 
     def maybe_print(text):
-        if int(config["VERBOSE"]) == 2:
+        if int(config["VERBOSE"]) >= 2:
             print(colorize(text, "teal"))
 
     # update for verbosity
     def dev_print(text):
-        if int(config["VERBOSE"]) == 3:
+        if int(config["VERBOSE"]) >= 3:
             if "successful" in str(text).lower():
                 print(colorize(text, "green"))
             elif "failure" in str(text).lower():
@@ -152,10 +152,10 @@ class Settings:
         return config["DOWNLOAD_MAX"] or IMAGE_DOWNLOAD_LIMIT
         
     def get_drive_ignore():
-        return config["NOTKEYWORDS"] or ""
+        return config["NOTKEYWORD"] or ""
         
     def get_drive_keyword():
-        return config["BYKEYWORDS"] or ""
+        return config["BYKEYWORD"] or ""
         
     def get_duration():
         return config["DURATION"] or 0

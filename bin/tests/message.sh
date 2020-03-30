@@ -20,7 +20,7 @@ echo "[*] Message - User & Gallery"
 sudo onlysnarfpy \
 -debug \
 -action "message" \
--bykeywords "pussycats" \
+-bykeyword "pussycats" \
 -user "1578380" \
 -category "gallery" \
 -text "message testes" \
