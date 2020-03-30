@@ -5,7 +5,7 @@ echo "[*] Misc - Schedule"
 sudo onlysnarfpy \
 -debug \
 -action "post" -category "image" \
--bykeywords "pussycats" \
+-bykeyword "pussycats" \
 -skip-download \
 -text "schedule testes" \
 -schedule "6-7-2020:6:26" \
