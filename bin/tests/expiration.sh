@@ -5,7 +5,7 @@ echo "[*] Misc - Expiration"
 sudo onlysnarfpy \
 -debug \
 -action "post" -category "image" \
--bykeywords "pussycats" \
+-bykeyword "pussycats" \
 -skip-download \
 -text "expiration testes" \
 -debug-delay \

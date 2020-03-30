@@ -220,13 +220,13 @@ parser.add_argument('-mount-path', type=str, dest='mount_path',
 ##
 # -bykeyword
 # the keyword to search for in folder selection
-parser.add_argument('-bykeywords', nargs="*", dest='bykeywords', action='append', default=[], 
-  help="search for folder by keywords")
+parser.add_argument('-bykeyword', dest='bykeyword', default="", 
+  help="search for folder by keyword")
 ##
 # -notkeyword
 # the keyword to skip in folder selection
-parser.add_argument('-notkeywords', nargs="*", dest='notkeywords', action='append', default=[], 
-  help="search for folder not by keywords")
+parser.add_argument('-notkeyword', dest='notkeyword', default="", 
+  help="search for folder not by keyword")
 ##
 # -password
 # the password for the OnlyFans / Twitter

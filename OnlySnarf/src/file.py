@@ -1,5 +1,5 @@
 import os, shutil
-from . import ffmpeg
+from .ffmpeg import ffmpeg
 from . import google as Google
 from .settings import Settings
 import PyInquirer
@@ -359,7 +359,7 @@ class Google_File(File):
 
     @staticmethod
     def select_file(category):
-        if not Settings.prompt("google file"): return None
+        if not Settings.prompt("google file"): return Google_File.get_files()
         # this is a list of google files to select from
         files = Google.get_files_by_category(category)
         for file in files:
