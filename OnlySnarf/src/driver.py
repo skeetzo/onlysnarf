@@ -1447,7 +1447,7 @@ class Driver:
         if Settings.is_skip_upload():
             print("Skipping Upload: Disabled")
             return True
-        files = files[:int(Settings.get_upload_limit_messages())]
+        files = files[:int(Settings.get_upload_max_messages())]
         i = 0
         for file in files:  
             print('Uploading: {} - {}/{}'.format(file.get_title(), i, len(files)))
