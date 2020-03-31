@@ -28,7 +28,7 @@ class User:
         self.messages = data.get('messages') or []
         self.preferences = data.get('preferences') or []
         self.last_messaged_on = data.get('last_messaged_on')
-        self.sent_images = data.get('sent_images') or []
+        self.sent_files = data.get('sent_files') or []
         self.subscribed_on = data.get('subscribed_on')
         self.isFavorite = data.get('isFavorite') or False
         self.statement_history = data.get('statement_history') or []
@@ -38,7 +38,7 @@ class User:
         self.messages_to = ",".join(self.messages_from).split(",")
         self.messages = ",".join(self.messages_from).split(",")
         self.preferences = ",".join(self.messages_from).split(",")
-        self.sent_images = ",".join(self.messages_from).split(",")
+        self.sent_files = ",".join(self.messages_from).split(",")
         self.statement_history = ",".join(self.messages_from).split(",")
         #########################
         self.discount = None
@@ -56,7 +56,7 @@ class User:
     def message(self, message=None):
         if str(self.username) == "": return print("User Error: Missing Message Username")
         print("Messaging: {}".format(self.username))
-        successful = Driver.message(self.username, message)
+        successful = Driver.message(self.username)
         if not successful: return False
         successful = User.enter_message(message)
         if not successful: return False
@@ -64,14 +64,14 @@ class User:
 
     @staticmethod
     def message_user(username="", message=None):
-        user = User()
-        setattr(user, "username", username)
+        user = User({"username":username})
+        # setattr(user, "username", username)
         user.message(message=message)    
 
     @staticmethod
     def enter_message(message=None):
         try:
-            print("Entering Message: {} - ${}".format(message, price))
+            print("Entering Message: {} - ${}".format(message.get_text(), message.get_price()))
             def enter_text(text):
                 success = Driver.message_text(text)
                 if not success: return False
@@ -88,23 +88,23 @@ class User:
                 return True
             def enter_file(path):
                 if path == "": return False
-                image_name = os.path.basename(path)
-                if str(image_name) in self.sent_images:
-                    print("Error: Image Already Sent: {} -> {}".format(image_name, self.username))
+                file_name = os.path.basename(path)
+                if str(file_name) in self.sent_files:
+                    print("Error: File Already Sent: {} -> {}".format(file_name, self.username))
                     return False
                 success = Driver.message_files(path)
                 if not success: return False
                 if not Settings.is_debug():
-                    self.sent_images.append(str(image_name))
+                    self.sent_files.append(str(file_name))
                 Settings.debug_delay_check()
                 return True
             def confirm():
                 success = Driver.message_confirm()
                 if not success: return False
                 return True
-            if not enter_text(message.text): return False # not allowed to fail
-            enter_price(message.price) # allowed to fail
-            for file in message.files:
+            if not enter_text(message.get_text()): return False # not allowed to fail
+            enter_price(message.get_price()) # allowed to fail
+            for file in message.get_files():
                 enter_file(file.get_path()) # allowed to fail
             if not confirm(): return False # not allowed to fail
             print("Message Entered")
@@ -129,7 +129,7 @@ class User:
             "messages":str(self.messages),
             "preferences":str(self.preferences),
             "last_messaged_on":str(self.last_messaged_on),
-            "sent_images":str(self.sent_images),
+            "sent_files":str(self.sent_files),
             "subscribed_on":str(self.subscribed_on),
             "isFavorite":str(self.isFavorite)
         })

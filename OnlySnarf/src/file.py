@@ -1,4 +1,4 @@
-import os, shutil
+import os, shutil, random, sys
 from .ffmpeg import ffmpeg
 from . import google as Google
 from .settings import Settings
@@ -15,6 +15,9 @@ MIMETYPES_ALL = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg
 
 MIMETYPES_IMAGES_LIST = ["image/jpeg","image/jpg","image/png"]
 MIMETYPES_VIDEOS_LIST = ["video/mp4","video/quicktime","video/x-ms-wmv","video/x-flv"]
+MIMETYPES_ALL_LIST = []
+MIMETYPES_ALL_LIST.extend(MIMETYPES_IMAGES_LIST)
+MIMETYPES_ALL_LIST.extend(MIMETYPES_VIDEOS_LIST)
 
 def print_same_line(text):
     sys.stdout.write('\r')
@@ -26,12 +29,12 @@ def print_same_line(text):
 
 class File():
     def __init__(self):
-        self.path = ""
-        self.ext = ""
-        self.type = ""
+        self.path = None
+        self.ext = None
+        self.type = None
         ##
-        self.title = ""
-        self.category = "" # [image, gallery, video, performer]
+        self.title = None
+        self.category = None # [image, gallery, video, performer]
 
     ######################################################################################
 
@@ -40,9 +43,6 @@ class File():
     # Google.move_files
     def backup(self):
         if File.backup_text(self.title): return
-        if str(self.path) == "":
-            print("Error: Missing File Path - {}".format(self.title))
-            return False
         Google.upload_file(file=self)
         print('File Backed Up: {}'.format(self.title))
 
@@ -92,15 +92,15 @@ class File():
             return False
         return True
 
-    def combine(self):
-        if len(self.files) == 0: return
-        Settings.dev_print("combining files: {}".format(len(self.files)))
-        Settings.dev_print("combine path: {}".format(combinedPath))
-        combinedPath = os.path.join(File.get_tmp(), "{}-combined".format(self.title))
-        for file in files:
-            shutil.move(file.get_path(), combinedPath)
-            file.path = "{}/{}".format(combinedPath, self.title)
-        self.combined = ffmpeg.combine(combinedPath)
+    # def combine(self):
+    #     if len(self.files) == 0: return
+    #     Settings.dev_print("combining files: {}".format(len(self.files)))
+    #     Settings.dev_print("combine path: {}".format(combinedPath))
+    #     combinedPath = os.path.join(File.get_tmp(), "{}-combined".format(self.title))
+    #     for file in files:
+    #         shutil.move(file.get_path(), combinedPath)
+    #         file.path = "{}/{}".format(combinedPath, self.title)
+    #     self.combined = ffmpeg.combine(combinedPath)
 
     ##############################
 
@@ -125,12 +125,11 @@ class File():
     ##############################
 
     def get_ext(self):
-        if self.ext != "": return self.ext
+        if self.ext: return self.ext
         self.get_title()
 
     def get_path(self):
-        if self.path == "": return ""
-        if str(self.path) == "":
+        if not self.path:
             Settings.maybe_print("Error: Missing File Path")
             return  ""
         return self.path
@@ -236,9 +235,11 @@ class File():
 ###################################################################################
 
 class Google_File(File):
+
     def __init__(self):
+        File.__init__(self)
         self.id = None
-        self.title = ""
+        self.title = None
         self.file = None
         self.parent = None
         self.mimeType = None
@@ -251,6 +252,7 @@ class Google_File(File):
         if self.delete_text(): return
         Google.delete(self)
 
+    @staticmethod
     def download_text(title):
         if Settings.is_skip_download():
             print("Skipping Download (debug)")
@@ -271,8 +273,8 @@ class Google_File(File):
 
     # Download File
     def download(self):
-        if Google_File.download_text(self.title): return False
-        successful = Google.download_file(self.get_id())
+        if not Google_File.download_text(self.title): return False
+        successful = Google.download_file(self)
         if not successful: return False
         ### Finish ###
         if not os.path.isfile(str(self.get_path())):
@@ -283,12 +285,14 @@ class Google_File(File):
         return True
 
     def get_ext(self):
-        if self.ext != "": return self.ext
-        self.ext = self.get_mimetype().split("/")[0]
+        if self.ext: return self.ext
+        title, ext = os.path.splitext(self.get_file()["title"])
+        self.ext = ext
+        self.title = title
         return self.ext
 
     def get_id(self):
-        if self.id != "": return self.id
+        if self.id: return self.id
         if self.file: self.id = self.file["id"]
         return self.id
 
@@ -303,20 +307,20 @@ class Google_File(File):
             print("Warning: Missing Category")
             return []
         files = Google.get_files_by_category(Settings.get_category())
-        if Settings.get_title() != "":
+        if Settings.get_title():
             for file in files:
                 if str(Settings.get_title()) == str(file.get_title()):
                     return [file]
         return files
 
+    @staticmethod
+    def get_random_files():
+        files = Google_File.get_files()
+        return [random.choice(files)]
+
     def get_mimetype(self):
-        if self.mimeType != "": return self.mimeType
-        mimeType_ = self.get_file()["mimeType"]
-        for mimeType in MIMETYPES_ALL_LIST:
-            # if str(ext) == str(mimeType.split("/")[1]):
-            if str(mimeType) == str(mimeType_):
-                self.mimeType = mimeType
-                break
+        if self.mimeType: return self.mimeType
+        mimeType = self.get_file()["mimeType"]
         return self.mimeType
 
     def get_parent(self):
@@ -331,22 +335,30 @@ class Google_File(File):
         return self.parent
 
     def get_path(self):
+        if self.path: return self.path
         # downloads to /tmp/downloads or whatever
         # if exists, adds 1 to end of name
-        filename = str(self.get_title())+"{}"+str(self.get_ext())
-        counter = 0
         tmp = File.get_tmp()
-        while os.path.isfile(os.path.join(tmp, filename.format(counter))):
-            counter += 1
-        filename = filename.format(counter)
-        Settings.dev_print("filename: {}".format(filename))
+        def counterfy():
+            filename_ = str(self.get_title())+"{}"+str(self.get_ext())
+            counter = 0
+            while os.path.isfile(os.path.join(tmp, filename_.format(counter))):
+                counter += 1
+            filename_ = filename_.format(counter)
+            Settings.dev_print("filename: {}".format(filename_))
+            return filename_
+        filename = os.path.join(tmp, "{}{}".format(self.get_title(), self.get_ext()))
+        if os.path.isfile(filename):
+            filename = counterfy()
         # tmp = File.get_tmp() # i don't think this should be in file over settings
-        self.path = os.path.join(tmp, filename)
+        self.path = filename
 
     def get_title(self):
         ## title would be set when created
-        if self.title != "": return self.title
-        self.title = self.get_file()["title"]
+        if self.title: return self.title
+        title, ext = os.path.splitext(self.get_file()["title"])
+        self.ext = ext
+        self.title = title
         return self.title
 
     # files are File references
@@ -359,7 +371,7 @@ class Google_File(File):
 
     @staticmethod
     def select_file(category):
-        if not Settings.prompt("google file"): return Google_File.get_files()
+        if not Settings.prompt("google file"): return random.choice(Google_File.get_random_files())
         # this is a list of google files to select from
         files = Google.get_files_by_category(category)
         for file in files:
@@ -375,14 +387,14 @@ class Google_File(File):
         }
         answer = PyInquirer.prompt(question)
         file = answer["file"]
-        if not Settings.confirm(file): return File.select_file(category)
+        if not Settings.confirm(file): return Google_File.select_file(category)
         file_ = Google_File()
         setattr(file_, "file", file)
         return file
 
     @staticmethod
     def select_files():
-        if not Settings.prompt("select google files"): return []
+        if not Settings.prompt("select google files"): return Google_File.get_random_files()
         print("Select a folder category")
         question = {
             'type': 'list',
@@ -393,25 +405,25 @@ class Google_File(File):
         }
         answer = PyInquirer.prompt(question)
         category = answer["category"]
-        if not Settings.confirm(category): return File.select_files()
+        if not Settings.confirm(category): return Google_File.select_files()
         print("Select Google Files or a Folder")
         files = []
         while True:
             file = Google_File.select_file(category)
             if not file: break
             files.append(file)
-        if not Settings.confirm(files): return File.select_files()
+        if not Settings.confirm(files): return Google_File.select_files()
         return files
 
 ##########################################################################################
 
-class Folder(File):
+class Google_Folder(Google_File):
     def __init__(self):
+        Google_File.__init__(self)
         self.files = []
         self.id = None
-        self.parentID = None
-        self.title = ""
-        self.path = ""
+        self.title = None
+        self.path = None
         self.parent = None
 
     def backup(self):
@@ -419,9 +431,6 @@ class Folder(File):
         Google.upload_gallery(files=self.files)
 
     def download(self):
-        if not folder:
-            print("Error: Missing Folder")
-            return
         print("Downloading Folder: {}".format(self.get_title()))
         if len(self.files) == 0:
             file_list = Google.get_files_by_folder_id(self.get_id())
@@ -432,17 +441,20 @@ class Folder(File):
                 setattr(file_, "file", file)
                 self.files.append(file_)
         folder_size = len(self.files)
-        Settings.maybe_print('Folder size: '+str(folder_size))
-        Settings.maybe_print('Upload limit: '+str(Settings.get_image_upload_limit()))
+        Settings.maybe_print('Folder size: {}'.format(folder_size))
+        Settings.maybe_print('Upload limit: {}'.format(Settings.get_upload_max()))
         if int(folder_size) == 0:
             print('Error: Empty Folder')
             return False
+        file_list = self.files
         random.shuffle(file_list)
-        file_list = file_list[:int(Settings.get_image_upload_limit())]
+        file_list = file_list[:int(Settings.get_upload_max())]
         i = 1
         for file in sorted(file_list, key = lambda x: x.get_title()):
-            print_same_line("Downloading: {} ({}/{})".format(file.get_title(), i, folder_size))
+            # print_same_line("Downloading: {} ({}/{})".format(file.get_title(), i, folder_size))
+            print("Downloading: {} ({}/{})".format(file.get_title(), i, folder_size))
             file.download()
+            time.sleep(10)
             i+=1
         print()
         print("Downloaded: {}".format(self.get_title()))
