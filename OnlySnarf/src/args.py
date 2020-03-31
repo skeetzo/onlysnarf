@@ -189,12 +189,12 @@ parser.add_argument('-download-max', type=int, default=IMAGE_DOWNLOAD_LIMIT, des
 ##
 # -upload-max
 # maximum number of images that can be uploaded
-parser.add_argument('-upload-max', type=int, default=IMAGE_UPLOAD_LIMIT, dest='upload_limit',
+parser.add_argument('-upload-max', type=int, default=IMAGE_UPLOAD_LIMIT, dest='upload_max',
   help='the max number of images to upload')
 ##
 # -message-max
 # maximum number of images that can be uploaded in a message
-parser.add_argument('-message-max', type=int, default=IMAGE_UPLOAD_LIMIT_MESSAGES, dest='upload_limit_messages',
+parser.add_argument('-message-max', type=int, default=IMAGE_UPLOAD_LIMIT_MESSAGES, dest='upload_max_messages',
   help='the max number of images to message')
 ##
 # -keywords
@@ -335,7 +335,7 @@ parser.add_argument('-time', type=valid_time, default=None, dest='time',
 ##
 # -title
 # the title of a file to search for
-parser.add_argument('-title', type=str, default="", dest='title',
+parser.add_argument('-title', default=None, dest='title',
   help='the title of the file to search for')
 ##
 # -thumbnail
@@ -354,7 +354,7 @@ parser.add_argument('-upload-max-duration', dest='upload_max_duration', default=
 ##
 # -user
 # the user to target
-parser.add_argument('-user', type=str,  default="", dest='user',
+parser.add_argument('-user', type=str,  default=None, dest='user',
   help='the user to message')
 ##
 # -users

@@ -189,16 +189,16 @@ def get_folder_by_name(folderName, parent=None):
 ####################
 
 def download_file(file):
-    print("Downloading File: {}".format(file["title"]))
+    Settings.maybe_print("Downloading File: {}".format(file.get_title()))
     # download file
     def method_two():
-        file.GetContentFile(self.get_path())
-        print("Download Complete (2)")
+        file.get_file().GetContentFile(file.get_path())
+        Settings.maybe_print("Download Complete (2)")
     def method_one():
         try:
-            with open(str(self.get_path()), 'w+b') as output:
+            with open(str(file.get_path()), 'w+b') as output:
                 # print("8",end="",flush=True)
-                request = DRIVE.files().get_media(fileId=file["id"])
+                request = DRIVE.files().get_media(fileId=file.get_id())
                 downloader = MediaIoBaseDownload(output, request)
                 # print("=",end="",flush=True)
                 done = False
@@ -208,7 +208,7 @@ def download_file(file):
                     if int(Settings.get_verbosity()) >= 1:
                         print("Downloading: %d%%\r" % (status.progress() * 100), end="")
                 # print("D")
-                print("Download Complete (1)")
+                Settings.maybe_print("Download Complete (1)")
         except Exception as e:
             Settings.maybe_print(e)
             return False
@@ -244,11 +244,8 @@ def get_files_by_category(cat):
     auth = checkAuth()
     if not auth: return []
     Settings.maybe_print("Getting: {}".format(cat))
-    if str(cat) == "image": cat = "images"
-    if str(cat) == "gallery": cat = "galleries"
-    if str(cat) == "video": cat = "videos"
-    if str(cat) == "performer": cat = "performers"
     category = get_folder_by_name(cat)
+    # plural check
     if not category:
         if str(cat)[-1] == "y": cat = str(cat).replace("y", "ies")
         else: cat += "s"
@@ -266,9 +263,11 @@ def get_files_by_category(cat):
         elif str(Settings.get_drive_ignore()) != "" and str(folder_['title']) == str(Settings.get_drive_ignore()):
             Settings.maybe_print('{} -> by not keyword'.format(folder_['title']))
             continue
+        else:
+            Settings.maybe_print("{}".format(folder_['title']))
         folders.append(folder_)
     files = []
-    from .file import File, Google_File, Folder
+    from .file import Google_File, Google_Folder
     for folder in folders:
         image_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_IMAGES)}).GetList()
         video_list = PYDRIVE.ListFile({'q': "'"+folder['id']+"' in parents and trashed=false and {}".format(MIMETYPES_VIDEOS)}).GetList()
@@ -279,7 +278,7 @@ def get_files_by_category(cat):
         # Settings.maybe_print('Images: {}'.format(len(image_list)))
         # Settings.maybe_print('Videos: {}'.format(len(video_list)))
         # Settings.maybe_print('Total: {}'.format(folder_size))
-        folder_ = Folder()
+        folder_ = Google_Folder()
         setattr(folder_, "parent", category)
         files_ = []
         for file in file_list:
@@ -368,7 +367,7 @@ def get_folder_root():
             mount_root = {"id":"root"}
             print("Warning: Drive Mount Folder Not Found")
         else:
-            Settings.maybe_print("Found Root (alt): {}/{}".format(Settings.get_drive_path(), Settings.get_drive_path()))
+            Settings.maybe_print("Found Root (alt): {}/{}".format(Settings.get_drive_path(), Settings.get_drive_root()))
         OnlyFansFolder = mount_root
     else:
         file_list = PYDRIVE.ListFile({'q': "'root' in parents and trashed=false"}).GetList()

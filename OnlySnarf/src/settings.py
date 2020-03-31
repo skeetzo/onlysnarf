@@ -55,6 +55,7 @@ class Settings:
     #####################
 
     def confirm(text):
+        if text == None: return False
         if list(text) == []: return False
         if str(text) == "": return False
         if not Settings.CONFIRM: return True
@@ -116,7 +117,12 @@ class Settings:
         return discount
 
     def get_category():
-        return config["CATEGORY"] or ""
+        cat = config["CATEGORY"]
+        if str(cat) == "image": cat = "images"
+        if str(cat) == "gallery": cat = "galleries"
+        if str(cat) == "video": cat = "videos"
+        if str(cat) == "performer": cat = "performers"
+        return cat or ""
 
     def get_categories():
         return list(CATEGORIES_DEFAULT).extend(list(config["CATEGORIES"]))
@@ -192,7 +198,8 @@ class Settings:
         return MESSAGE_CHOICES
 
     def get_mount_path():
-        return config["MOUNT_PATH"] or ""
+        return "/opt/onlysnarf"
+        # return config["MOUNT_PATH"] or ""
 
     def get_performers():
         performers = config["PERFORMERS"] or []
@@ -278,7 +285,7 @@ class Settings:
         return config["TIME"] or None
 
     def get_title():
-        return config["TITLE"] or ""
+        return config["TITLE"] or None
         
     def get_skipped_users():
         return config["SKIPPED_USERS"] or []
@@ -290,7 +297,7 @@ class Settings:
         return config["UPLOAD_MAX"] or IMAGE_UPLOAD_LIMIT
         
     def get_upload_max_messages():
-        return config["UPLOAD_LIMIT_MESSAGES"] or 0
+        return config["UPLOAD_MAX_MESSAGES"] or 0
         
     def get_upload_max_duration():
         return config["UPLOAD_MAX_DURATION"] or 12 # 2 hours
@@ -302,15 +309,17 @@ class Settings:
         from .user import User
         users_ = []
         for user in users:
-            user = User({})
-            setattr(user, "username", config["USER"])
+            # user = User({})
+            user = User({"username":config["USER"]})
+            # setattr(user, "username", config["USER"])
             users_.append(user)
         return users_
 
     def get_user():
+        if not config["USER"]: return None
         from .user import User
-        user = User({})
-        setattr(user, "username", config["USER"])
+        user = User({"username":config["USER"]})
+        # setattr(user, "username", config["USER"])
         return user
 
     def get_username():

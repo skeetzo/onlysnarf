@@ -122,7 +122,6 @@ class Message():
             self.files = Google_File.select_files()
         elif len(self.files) == 0:
             self.files = File.select_files()
-        print(1)
         files = []
         for file in self.files:
             if Settings.confirm(file.get_path()):
@@ -181,24 +180,23 @@ class Message():
     # if includes [all, recent, favorite] & usernames it only uses the 1st found of [all,...]
     def get_recipients(self):
         recipients = []
-        if len(self.recipients) == 0 and Settings.get_user() != "": 
-            recipients = [Settings.get_user()]
         if len(self.recipients) == 0 and len(Settings.get_users()) > 0: 
             recipients = Settings.get_users()
+        elif len(self.recipients) == 0 and Settings.get_user(): 
+            recipients = [Settings.get_user()]
         elif len(self.recipients) == 0:
             recipients = User.select_users()
         users = []
         for user in recipients:
-            if isinstance(user, str):
-                if str(user).lower() == "all":
-                    users = User.get_all_users()
-                    break
-                elif str(user).lower() == "recent":
-                    users = User.get_new_users()
-                    break
-                elif str(user).lower() == "favorite":
-                    users = User.get_favorite_users()
-                    break
+            if str(user.username).lower() == "all":
+                users = User.get_all_users()
+                break
+            elif str(user.username).lower() == "recent":
+                users = User.get_new_users()
+                break
+            elif str(user.username).lower() == "favorite":
+                users = User.get_favorite_users()
+                break
             else: users.append(user)
         return users
 
@@ -262,11 +260,11 @@ class Message():
         try: 
             # for user in self.get_recipients():
             for user in self.get_recipients():
-                # if isinstance(user, str): 
-                # if str(user) == "post": successful_ = Driver.post(self)
-                successful_ = User.message_user(username=user.username, message=self)
-                if successful_: successful = successful_
-                # if self.username in Settings.get_message_choices(): break
+                # if isinstance(user, str) and str(user) == "post": successful_ = Driver.post(self)
+                print("Messaging: {}".format(user.username))
+                successful_ = User.message_user(user.username, self)
+                if not successful_: continue
+                successful_ = Driver.message(user.username)
         except Exception as e:
             Settings.dev_print(e)
             successful = False
