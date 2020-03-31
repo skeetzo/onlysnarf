@@ -42,7 +42,7 @@ class File():
     # Google.move_file
     # Google.move_files
     def backup(self):
-        if File.backup_text(self.title): return
+        if not File.backup_text(self.title): return
         Google.upload_file(file=self)
         print('File Backed Up: {}'.format(self.title))
 
@@ -106,7 +106,7 @@ class File():
 
     # Deletes online file
     def delete(self):
-        if File.delete_text(self.title): return
+        if not File.delete_text(self.title): return
         try: os.remove(self.get_path())
         except Exception as e: Settings.dev_print(e)
 
@@ -249,7 +249,7 @@ class Google_File(File):
         Google.backup_file(self)
 
     def delete(self, arg):
-        if self.delete_text(): return
+        if not self.delete_text(): return
         Google.delete(self)
 
     @staticmethod
@@ -351,6 +351,7 @@ class Google_File(File):
         if os.path.isfile(filename):
             filename = counterfy()
         # tmp = File.get_tmp() # i don't think this should be in file over settings
+        filename = filename.strip('\'').strip('\"').strip()
         self.path = filename
 
     def get_title(self):
@@ -454,7 +455,6 @@ class Google_Folder(Google_File):
             # print_same_line("Downloading: {} ({}/{})".format(file.get_title(), i, folder_size))
             print("Downloading: {} ({}/{})".format(file.get_title(), i, folder_size))
             file.download()
-            time.sleep(10)
             i+=1
         print()
         print("Downloaded: {}".format(self.get_title()))

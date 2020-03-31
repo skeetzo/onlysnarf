@@ -431,6 +431,7 @@ class Driver:
         else:
             Settings.maybe_print("goto -> {}".format(page))
             BROWSER.get("{}/{}".format(ONLYFANS_HOME_URL, page))
+        time.sleep(2)
 
     @staticmethod
     def go_to_home():
@@ -442,6 +443,7 @@ class Driver:
             Settings.maybe_print("goto -> onlyfans.com")
             BROWSER.get(ONLYFANS_HOME_URL)
             WebDriverWait(BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, LIVE_BUTTON_CLASS)))
+        time.sleep(2)
 
     # onlyfans.com/my/settings
     @staticmethod
@@ -455,6 +457,7 @@ class Driver:
             Settings.maybe_print("goto -> onlyfans.com/settings/{}".format(settingsTab))
             BROWSER.get("{}/{}".format(ONLYFANS_SETTINGS_URL, settingsTab))
             # fix above with correct element to locate
+        time.sleep(2)
 
     ##################
     ###### Login #####
@@ -580,16 +583,13 @@ class Driver:
             return False
 
     @staticmethod
-    def message_files(path):
+    def message_files(files=[]):
         try:
-            if not path or path == None or str(path) == "None":
-                print("Error: Missing File(s)")
-                return False
-            print("Entering image(s): {}".format(path))
+            print("Uploading file(s): {}".format(len(files)))
             try:
-                Settings.dev_print("uploading file")
-                Driver.upload_image_files(name="uploadImageMessage", path=path)
-                Settings.maybe_print("Image(s) Entered")
+                Settings.dev_print("uploading files")
+                Driver.upload_image_files(files=files)
+                Settings.maybe_print("file(s) Entered")
                 Settings.debug_delay_check()
                 return True
             except Exception as e:
@@ -598,7 +598,7 @@ class Driver:
                 return False
         except Exception as e:
             Driver.error_checker(e)
-            print("Error: Failure to Enter Image(s)")
+            print("Error: Failure to Upload File(s)")
             return False
 
     @staticmethod
@@ -824,14 +824,8 @@ class Driver:
             else:
                 Settings.dev_print("not tweeting")
             ## Files
-            successful_upload = False
-            try:
-                Settings.dev_print("uploading files")
-                successful_upload = Driver.upload_image_files("image_upload", files)
-            except Exception as e:
-                Driver.error_checker(e)
-                print("Error: Unable to Upload Images")
-                return False
+            Settings.dev_print("uploading files")
+            successful_upload = Driver.upload_image_files(files) or False
             ## Text
             successful_text = Driver.enter_text(text)
             if not successful_text:
@@ -1439,19 +1433,17 @@ class Driver:
 
     # uploads image into post or message
     @staticmethod
-    def upload_image_files(name="image_upload", files=[]):
-        Settings.dev_print("uploading image files: {} - {}".format(name, len(files)))
-        if len(files) == 0:
-            print("Error: Missing Files")
-            return False
+    def upload_image_files(files=[]):
+        Settings.dev_print("uploading image files: {}".format(len(files)))
+        if len(files) == 0: return False
         if Settings.is_skip_upload():
             print("Skipping Upload: Disabled")
-            return True
+            return False
         files = files[:int(Settings.get_upload_max_messages())]
         i = 0
         for file in files:  
             print('Uploading: {} - {}/{}'.format(file.get_title(), i, len(files)))
-            enter_file = BROWSER.find_element_by_id(Element.get_element_by_name(str(name)).getId())
+            enter_file = BROWSER.find_element_by_id("fileupload_photo")
             enter_file.send_keys(str(file.get_path()))
             time.sleep(1)
             Driver.error_window_upload()
@@ -1541,12 +1533,35 @@ class Driver:
                 name = re.sub("</.*>", "", name).strip()
                 # print("username: {}".format(username))
                 # print("name: {}".format(name))
+                # start = datetime.strptime(str(datetime.now()), "%m-%d-%Y:%H:%M")
                 users.append({"name":name, "username":username}) # ,"id":user_id, "started":start})
             Settings.maybe_print("Found: {}".format(len(users)))
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to Find Users")
         return users
+
+    @staticmethod
+    def user_get_id(username):
+        auth_ = Driver.auth()
+        if not auth_: return None
+        user_id = None
+        try:
+            Driver.go_to_page(username)
+            elements = BROWSER.find_elements_by_tag_name("a")
+            ele = [ele.get_attribute("href") for ele in elements
+                    if "/my/chats/chat/" in str(ele.get_attribute("href"))]
+            if len(ele) == 0: 
+                print("missing eles")
+                return None
+            ele = ele[0]
+            ele = ele.replace("https://onlyfans.com/my/chats/chat/", "")
+            user_id = ele
+            print("found user id: {}".format(user_id))
+        except Exception as e:
+            Driver.error_checker(e)
+            print("Error: Failed to Find User ID")
+        return user_id
 
     ################
     ##### Exit #####

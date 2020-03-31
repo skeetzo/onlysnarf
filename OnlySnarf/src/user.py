@@ -22,7 +22,7 @@ class User:
         # print(data)
         self.name = data.get('name') or ""
         self.username = data.get('username') or ""
-        self.id = data.get('id') or ""
+        self.id = data.get('id') or None
         self.messages_from = data.get('messages_from') or []
         self.messages_to = data.get('messages_to') or []
         self.messages = data.get('messages') or []
@@ -53,10 +53,19 @@ class User:
         if not discount: discount = Settings.get_discount()
         return Driver.discount_user(discount)
 
+    def get_id(self):
+        if self.id: return self.id
+        id_ = Driver.user_get_id(self.get_username())
+        self.id = id_
+        return self.id
+
+    def get_username(self):
+        return self.username.replace("@", "")
+
     def message(self, message=None):
         if str(self.username) == "": return print("User Error: Missing Message Username")
-        print("Messaging: {}".format(self.username))
-        successful = Driver.message(self.username)
+        print("Messaging: {} - {}".format(self.username, self.id))
+        successful = Driver.message(username=self.get_id())
         if not successful: return False
         successful = User.enter_message(message)
         if not successful: return False
@@ -77,8 +86,8 @@ class User:
                 if not success: return False
                 return True
             def enter_price(price):
-                if path == "": return False
-                if path != None and Decimal(sub(r'[^\d.]', '', price)) < Settings.get_price_minimum():
+                if price == "": return False
+                if price != None and Decimal(sub(r'[^\d.]', '', price)) < Settings.get_price_minimum():
                     print("Warning: Price Too Low, Free Image")
                     print("Price Minimum: ${}".format(Settings.get_price_minimum()))
                 else:
@@ -86,16 +95,15 @@ class User:
                     if not success: return False
                 Settings.debug_delay_check()
                 return True
-            def enter_file(path):
-                if path == "": return False
-                file_name = os.path.basename(path)
-                if str(file_name) in self.sent_files:
-                    print("Error: File Already Sent: {} -> {}".format(file_name, self.username))
-                    return False
-                success = Driver.message_files(path)
+            def enter_files(files):
+                # file_name = os.path.basename(path)
+                # if str(file_name) in self.sent_files:
+                    # print("Error: File Already Sent: {} -> {}".format(file_name, self.username))
+                    # return False
+                success = Driver.message_files(files)
                 if not success: return False
-                if not Settings.is_debug():
-                    self.sent_files.append(str(file_name))
+                # if not Settings.is_debug():
+                    # self.sent_files.append(str(file_name))
                 Settings.debug_delay_check()
                 return True
             def confirm():
@@ -104,8 +112,9 @@ class User:
                 return True
             if not enter_text(message.get_text()): return False # not allowed to fail
             enter_price(message.get_price()) # allowed to fail
-            for file in message.get_files():
-                enter_file(file.get_path()) # allowed to fail
+            enter_files(message.get_files())
+            # for file in message.get_files():
+                # enter_file(file.get_path()) # allowed to fail
             if not confirm(): return False # not allowed to fail
             print("Message Entered")
             return True

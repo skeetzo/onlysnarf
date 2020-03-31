@@ -310,7 +310,7 @@ parser.add_argument('-skip-upload', action='store_true', dest='skip_upload',
   help='skip file uploads')
 ##
 # list of users to skip
-parser.add_argument('-skip-users', dest='skip_users', 
+parser.add_argument('-skip-users', dest='skipped_users', 
   action='append', help='the users to skip or ignore ')
 ##
 # -show

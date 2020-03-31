@@ -30,6 +30,7 @@ declare -a testing
 # testing=("discount" "expiration" "message" "poll" "post" "schedule")
 testing=("discount" "message" "upload")
 testing=("message")
+testing=("upload")
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
 echo "################## Start #########################" >> ../onlysnarf/logs/tests.txt 2>&1

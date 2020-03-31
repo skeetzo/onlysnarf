@@ -278,7 +278,7 @@ ELEMENTS = [
         "name": "uploadImageMessage",
         "classes": ["g-btn.m-rounded.b-chat__btn-submit"],
         "text": [],
-        "id": ["cm_fileupload_photo"]
+        "id": ["fileupload_photo"]
     },
     # upload error window close
     # tab probably closes error windows...

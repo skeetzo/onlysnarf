@@ -10,7 +10,7 @@ from PyInquirer import Validator, ValidationError
 
 class Message():
     def __init__(self):
-        self.text = ""
+        self.text = None
         self.files = []
         ##
         self.keywords = []
@@ -192,7 +192,7 @@ class Message():
                 users = User.get_all_users()
                 break
             elif str(user.username).lower() == "recent":
-                users = User.get_new_users()
+                users = User.get_recent_users()
                 break
             elif str(user.username).lower() == "favorite":
                 users = User.get_favorite_users()
@@ -212,7 +212,7 @@ class Message():
         return schedule
         
     def get_text(self):
-        if self.text != "": return self.text
+        if self.text: return self.text
         text = Settings.get_text() or None
         if text: return text
         if not Settings.prompt("text"): return ""
@@ -261,7 +261,7 @@ class Message():
             # for user in self.get_recipients():
             for user in self.get_recipients():
                 # if isinstance(user, str) and str(user) == "post": successful_ = Driver.post(self)
-                print("Messaging: {}".format(user.username))
+                # print("Messaging: {}".format(user.username))
                 successful_ = User.message_user(user.username, self)
                 if not successful_: continue
                 successful_ = Driver.message(user.username)
