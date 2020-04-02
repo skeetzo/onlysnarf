@@ -28,6 +28,8 @@ def print_same_line(text):
 ###############################################################
 
 class File():
+    FILES = None
+
     def __init__(self):
         self.path = None
         self.ext = None
@@ -49,13 +51,13 @@ class File():
     @staticmethod
     def backup_text(title):
         if Settings.is_skip_download():
-            print("Warning: Unable to Backup, skipped download")
+            Settings.maybe_print("Warning: Unable to Backup, skipped download")
             return False
         if Settings.is_debug():
-            print("Skipping Backup (debug): {}".format(title))
+            Settings.maybe_print("Skipping Backup (debug): {}".format(title))
             return False
         elif not Settings.is_backup():
-            print('Skipping Backup (disabled): {}'.format(title))
+            Settings.maybe_print('Skipping Backup (disabled): {}'.format(title))
             return False
         else:
             print('Backing Up (file): {}'.format(title))
@@ -65,18 +67,18 @@ class File():
     def backup_files(files=[]):
         if Settings.is_skip_download():
             print("Warning: Unable to Backup, skipped download")
-            return
+            return False
         if Settings.is_debug():
-            print("Skipping Backup (debug): {}".format(len(files)))
-            return
+            Settings.maybe_print("Skipping Backup (debug): {}".format(len(files)))
+            return False
         elif not Settings.is_backup():
-            print('Skipping Backup (disabled): {}'.format(len(files)))
-            return
+            Settings.maybe_print('Skipping Backup (disabled): {}'.format(len(files)))
+            return False
         else:
             print('Backing Up (files): {}'.format(len(files)))
         for file in files:
             file.backup()
-        print('Files Backed Up: {}'.format(len(files)))
+        return True
 
     def check_size(self):
         if not os.path.exists(self.get_path()): return False
@@ -87,8 +89,9 @@ class File():
             Settings.maybe_print("Warning: Small File Size")
         global ONE_HUNDRED_KILOBYTES
         if size <= ONE_HUNDRED_KILOBYTES:
-            Settings.maybe_print("Error: File Size Too Small")
-            print("Error: Download Failure")
+            Settings.maybe_print("Warning: Tiny File Size")
+        if size == 0:
+            Settings.maybe_print("Error: Empty File Size")
             return False
         return True
 
@@ -202,7 +205,7 @@ class File():
             else:
                 print('Local Files Not Found')
         except Exception as e:
-            Settings.maybe_print(e)
+            Settings.dev_print(e)
 
     @staticmethod
     def select_file():
@@ -277,10 +280,9 @@ class Google_File(File):
         successful = Google.download_file(self)
         if not successful: return False
         ### Finish ###
-        if not os.path.isfile(str(self.get_path())):
+        if not self.check_size():
             print("Error: Missing Downloaded File")
             return False
-        self.check_size()
         print("Downloaded: {}".format(self.title))
         return True
 
@@ -299,28 +301,63 @@ class Google_File(File):
     def get_file(self):
         if self.file: return self.file
         self.file = Google.get_file(self.get_id())
+        # if not self.check_size(): self.download()
         return self.file
 
     @staticmethod
     def get_files():
-        if Settings.get_category() == "":
+        if File.FILES: return File.FILES
+        if not Settings.get_category():
             print("Warning: Missing Category")
             return []
-        files = Google.get_files_by_category(Settings.get_category())
+        files = Google_File.get_files_by_category(Settings.get_category())
         if Settings.get_title():
             for file in files:
                 if str(Settings.get_title()) == str(file.get_title()):
-                    return [file]
+                    files = [file]
+                    break
+        File.FILES = files
         return files
 
     @staticmethod
-    def get_random_files():
-        files = Google_File.get_files()
-        return [random.choice(files)]
+    def get_files_by_category(category):
+        files = []
+        if "image" in str(Settings.get_category()):
+            categoryFolder = Google.get_folder_by_name(Settings.get_category())
+            for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                for image in Google.get_images_of_folder(folder):
+                    file = Google_File()
+                    setattr(file, "file", image)
+                    setattr(file, "parent", folder)
+                    files.append(file)
+            # files = [random.choice(files)]
+        elif "video" in str(Settings.get_category()):
+            categoryFolder = Google.get_folder_by_name(Settings.get_category())
+            for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                for video in Google.get_videos_of_folder(folder):
+                    file = Google_File()
+                    setattr(file, "file", video)
+                    setattr(file, "parent", folder)
+                    files.append(file)
+            # files = [random.choice(files)]
+        elif "galler" in str(Settings.get_category()):
+            categoryFolder = Google.get_folder_by_name(Settings.get_category())
+            for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                for gallery in Google.get_folders_of_folder(folder):
+                    file = Google_Folder()
+                    setattr(file, "file", gallery)
+                    setattr(file, "parent", folder)
+                    files.append(file)
+            # files = [random.choice(files)]
+        return files
+
+    @staticmethod
+    def get_random_file():
+        return random.choice(Google_File.get_files())
 
     def get_mimetype(self):
         if self.mimeType: return self.mimeType
-        mimeType = self.get_file()["mimeType"]
+        self.mimeType = self.get_file()["mimeType"]
         return self.mimeType
 
     def get_parent(self):
@@ -345,21 +382,23 @@ class Google_File(File):
             while os.path.isfile(os.path.join(tmp, filename_.format(counter))):
                 counter += 1
             filename_ = filename_.format(counter)
-            Settings.dev_print("filename: {}".format(filename_))
+            Settings.maybe_print("filename: {}".format(filename_))
+            filename_ = os.path.join(tmp, filename_.format(counter))
             return filename_
         filename = os.path.join(tmp, "{}{}".format(self.get_title(), self.get_ext()))
-        if os.path.isfile(filename):
+        if os.path.isfile(filename) and not Settings.is_prefer_local():
             filename = counterfy()
         # tmp = File.get_tmp() # i don't think this should be in file over settings
         filename = filename.strip('\'').strip('\"').strip()
         self.path = filename
+        return self.path
 
     def get_title(self):
         ## title would be set when created
         if self.title: return self.title
         title, ext = os.path.splitext(self.get_file()["title"])
         self.ext = ext
-        self.title = title
+        self.title = title.replace(" ","_")
         return self.title
 
     # files are File references
@@ -372,7 +411,7 @@ class Google_File(File):
 
     @staticmethod
     def select_file(category):
-        if not Settings.prompt("google file"): return random.choice(Google_File.get_random_files())
+        if not Settings.prompt("google file"): return Google_File.get_random_file()
         # this is a list of google files to select from
         files = Google.get_files_by_category(category)
         for file in files:
@@ -395,7 +434,7 @@ class Google_File(File):
 
     @staticmethod
     def select_files():
-        if not Settings.prompt("select google files"): return Google_File.get_random_files()
+        if not Settings.prompt("select google files"): return [Google_File.get_random_file()]
         print("Select a folder category")
         question = {
             'type': 'list',
@@ -431,6 +470,12 @@ class Google_Folder(Google_File):
         if File.backup_text(self.title): return
         Google.upload_gallery(files=self.files)
 
+    def check_size(self):
+        for file in self.get_files():
+            exists = file.check_size()
+            if not exists: return False
+        return True
+
     def download(self):
         print("Downloading Folder: {}".format(self.get_title()))
         if len(self.files) == 0:
@@ -450,6 +495,13 @@ class Google_Folder(Google_File):
         file_list = self.files
         random.shuffle(file_list)
         file_list = file_list[:int(Settings.get_upload_max())]
+        ## video preference
+        videos = []
+        for file in file_list:
+            if str(file.get_mimetype()) in MIMETYPES_VIDEOS_LIST:
+                videos.append(file)
+        if len(videos) > 0: file_list = [random.choice(videos)]
+        ##
         i = 1
         for file in sorted(file_list, key = lambda x: x.get_title()):
             # print_same_line("Downloading: {} ({}/{})".format(file.get_title(), i, folder_size))
@@ -457,7 +509,18 @@ class Google_Folder(Google_File):
             file.download()
             i+=1
         print()
-        print("Downloaded: {}".format(self.get_title()))
+        print("Downloaded Folder: {}".format(self.get_title()))
+
+    def get_files(self):
+        if self.files: return self.files
+        if Settings.get_title():
+            for file in self.files:
+                if str(Settings.get_title()) == str(file.get_title()):
+                    self.files = [file]
+                    break
+        if Settings.get_category() == "image" or Settings.get_category() == "video":
+            self.files = [random.choice(self.files)]
+        return self.files
 
 ###################################################################################
 

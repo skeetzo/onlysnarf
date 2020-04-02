@@ -12,5 +12,5 @@ sudo onlysnarfpy \
 -debug-delay \
 -show \
 -verbose -verbose -verbose
-# -verbose
 # -verbose -verbose
+# -verbose

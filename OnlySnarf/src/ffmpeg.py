@@ -18,7 +18,7 @@ def combine(folderPath):
     try:    
         ffmpeg.input(str(folderPath), format='concat', safe=0).output(combinePath, c='copy').run()
     except Exception as e:
-        Settings.maybe_print(e)
+        Settings.dev_print(e)
         if "Conversion failed!" in str(e):
             print("Error: Combine Failure")
             return combinePath                    
@@ -114,7 +114,7 @@ def reduce(path):
         print("Warning: Ignoring Fixed Video")
         return reduce(str(path).replace(".mp4", "_fixed.mp4"))
     except Exception as e:
-        Settings.maybe_print(e)
+        Settings.dev_print(e)
         if "Conversion failed!" in str(e):
             print("Error: Conversion Failure")
             return path                    
@@ -166,7 +166,7 @@ def split(path, segment):
             i += 1
         # p.communicate()
     except Exception as e:
-        Settings.maybe_print(e)
+        Settings.dev_print(e)
         if "Conversion failed!" in str(e):
             print("Error: Split Failure")
             return splitPaths                    
@@ -221,7 +221,7 @@ def trim(path):
         p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-ss', str(start), '-y', '-i', str(path), '-to', str(end), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', str(reducedPath)])
         # p.communicate()
     except Exception as e:
-        Settings.maybe_print(e)
+        Settings.dev_print(e)
         if "Conversion failed!" in str(e):
             print("Error: Trim Failure")
             return path                    

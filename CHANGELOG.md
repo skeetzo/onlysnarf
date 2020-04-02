@@ -302,12 +302,13 @@
 ----------------------------------------
   **2.16.10** debugging pre 2.17.0
   - upload -> post
-  - Message, Folder (unused), File, Google_File, Video, Image classes
+  - Message, File, Google_File, Google_Folder, Video, Image classes
   - ffmpeg.py
   - login function cleaned up / spawn_browser
   - settings -> argsparse
   - menu cleaned up
   - file system selection cleaned up
+  - category 
 
   **2.17.0**
 

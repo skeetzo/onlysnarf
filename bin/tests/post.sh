@@ -8,5 +8,5 @@ sudo onlysnarfpy \
 -text "post testes" \
 -show \
 -verbose -verbose -verbose
-# -verbose
 # -verbose -verbose
+# -verbose
