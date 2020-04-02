@@ -1,7 +1,7 @@
 from datetime import datetime
 from .classes import Poll, Schedule
 from .driver import Driver
-from .file import File, Google_File
+from .file import File, Google_File, Google_Folder
 from .settings import Settings
 from .user import User
 from .validators import NumberValidator, TimeValidator, DateValidator, DurationValidator, ExpirationValidator, ListValidator
@@ -33,18 +33,21 @@ class Message():
     @staticmethod
     def format_keywords(keywords):
         if len(keywords) > 0: return "#{}".format(" #".join(self.get_performers()))
+        return ""
 
     @staticmethod
     def format_performers(performers):
         if len(performers) > 0: return "w/ @{}".format(" @".join(self.get_performers()))
+        return ""
             
     @staticmethod
     def format_tags(tags):
         if len(tags) > 0: return "@{}".format(" @".join(self.get_tags()))
+        return ""
 
     def format_text(self):
-        "{} {} {} {}".format(self.get_text(), Message.format_performers(self.get_performers()), Message.format_tags(self.get_tags()),
-            Message.format_keywords(self.get_keywords()))
+        return "{} {} {} {}".format(self.get_text(), Message.format_performers(self.get_performers()), Message.format_tags(self.get_tags()),
+            Message.format_keywords(self.get_keywords())).strip()
 
     def get_keywords(self):
         # if self.keywords: return self.keywords
@@ -112,22 +115,19 @@ class Message():
     # files exist when checked for size
     # ?
     def get_files(self):
-        if len(self.files) == 0 and Settings.get_input():
-            files = Settings.get_input()
-            for file in files:
-                file_ = File()
-                setattr(file_, "path", file)
-                self.files.append(file_)
+        if len(self.files) > 0: return self.files
+        if len(self.files) == 0 and len(Settings.get_input()) > 0:
+            self.files.append(Settings.get_input_as_files())
         elif len(self.files) == 0 and len(Google_File.get_files()) > 0:
             self.files = Google_File.select_files()
         elif len(self.files) == 0:
             self.files = File.select_files()
         files = []
         for file in self.files:
-            if Settings.confirm(file.get_path()):
-                file.prepare() # if Google file, downloads. if file, check size
-                files.append(file)
-        return files
+            if isinstance(file, Google_Folder): files.extend(file.get_files())
+            else: files.append(file)
+        self.files = files
+        return self.files
 
     def get_price(self):
         if self.price: return self.price
@@ -215,7 +215,7 @@ class Message():
         if self.text: return self.text
         text = Settings.get_text() or None
         if text: return text
-        if not Settings.prompt("text"): return ""
+        if not Settings.prompt("text"): return None
         question = {
             'type': 'input',
             'name': 'text',

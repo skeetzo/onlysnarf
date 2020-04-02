@@ -237,7 +237,7 @@ class Driver:
             return True
         except Exception as e:
             print(e)
-            Settings.maybe_print(e)
+            Settings.dev_print(e)
             return False
 
     @staticmethod
@@ -246,7 +246,7 @@ class Driver:
             print("Warning: OnlySnarf may require an update")
         if "Message: " in str(e): return
         Settings.dev_print(e)
-        Settings.maybe_print(e)
+        Settings.dev_print(e)
 
     @staticmethod
     def error_window_upload():
@@ -421,6 +421,14 @@ class Driver:
 
     ######################################################################
 
+    ##############
+    ### Go Tos ###
+    ##############
+
+    # waits for page load
+    def get_page_load():
+        time.sleep(5)
+
     @staticmethod
     def go_to_page(page):
         auth_ = Driver.auth()
@@ -431,7 +439,7 @@ class Driver:
         else:
             Settings.maybe_print("goto -> {}".format(page))
             BROWSER.get("{}/{}".format(ONLYFANS_HOME_URL, page))
-        time.sleep(2)
+        Driver.get_page_load()
 
     @staticmethod
     def go_to_home():
@@ -443,7 +451,7 @@ class Driver:
             Settings.maybe_print("goto -> onlyfans.com")
             BROWSER.get(ONLYFANS_HOME_URL)
             WebDriverWait(BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, LIVE_BUTTON_CLASS)))
-        time.sleep(2)
+        Driver.get_page_load()
 
     # onlyfans.com/my/settings
     @staticmethod
@@ -457,7 +465,7 @@ class Driver:
             Settings.maybe_print("goto -> onlyfans.com/settings/{}".format(settingsTab))
             BROWSER.get("{}/{}".format(ONLYFANS_SETTINGS_URL, settingsTab))
             # fix above with correct element to locate
-        time.sleep(2)
+        Driver.get_page_load()
 
     ##################
     ###### Login #####
@@ -543,7 +551,7 @@ class Driver:
             return successful
         except Exception as e:
             Driver.error_checker(e)
-            print("Error: Failure to Message All")
+            print("Error: Failure to Message - {}".format(username))
             return False
      
     @staticmethod
@@ -586,17 +594,13 @@ class Driver:
     def message_files(files=[]):
         try:
             print("Uploading file(s): {}".format(len(files)))
-            try:
-                Settings.dev_print("uploading files")
-                Driver.upload_image_files(files=files)
-                Settings.maybe_print("file(s) Entered")
-                Settings.debug_delay_check()
-                return True
-            except Exception as e:
-                Driver.error_checker(e)
-                print("Error: Unable to Upload Images")
-                return False
+            Settings.dev_print("uploading files")
+            Driver.upload_image_files(files=files)
+            Settings.maybe_print("file(s) Entered")
+            Settings.debug_delay_check()
+            return True
         except Exception as e:
+            print(e)
             Driver.error_checker(e)
             print("Error: Failure to Upload File(s)")
             return False
@@ -648,17 +652,14 @@ class Driver:
             return False
 
     @staticmethod
-    def message_user(username=None):
-        if not username:
-            print("Error: Missing Username")
+    def message_user(user_id=None):
+        user_id = str(user_id).replace("@u","").replace("@","")
+        if not user_id or user_id == None or str(user_id) == "None":
+            print("Warning: Missing User ID")
             return False
         try:
             auth_ = Driver.auth()
             if not auth_: return False
-            username = str(username).replace("@u","").replace("@","")
-            if not username or username == None or str(username) == "None":
-                print("Warning: Missing Username")
-                return False
             # Settings.maybe_print("goto -> /my/chats/chat/{}".format(username))
             Driver.go_to_page("{}/{}".format(ONLYFANS_CHAT_URL, username))
             return True
@@ -869,7 +870,7 @@ class Driver:
                     return False
             except Exception as e:
                 print("Error: Unable to Send Post")
-                Settings.maybe_print(e)
+                Settings.dev_print(e)
                 return False
             # send[1].click() # the 0th one is disabled
             Settings.dev_print("### Post Successful ###")
@@ -1440,8 +1441,9 @@ class Driver:
             print("Skipping Upload: Disabled")
             return False
         files = files[:int(Settings.get_upload_max_messages())]
-        i = 0
-        for file in files:  
+        i = 1
+        for file in files:
+            file.prepare() # downloads if Google_File
             print('Uploading: {} - {}/{}'.format(file.get_title(), i, len(files)))
             enter_file = BROWSER.find_element_by_id("fileupload_photo")
             enter_file.send_keys(str(file.get_path()))
@@ -1552,12 +1554,12 @@ class Driver:
             ele = [ele.get_attribute("href") for ele in elements
                     if "/my/chats/chat/" in str(ele.get_attribute("href"))]
             if len(ele) == 0: 
-                print("missing eles")
+                print("Warning: User Cannot Be Messaged")
                 return None
             ele = ele[0]
             ele = ele.replace("https://onlyfans.com/my/chats/chat/", "")
             user_id = ele
-            print("found user id: {}".format(user_id))
+            Settings.maybe_print("found user id: {}".format(user_id))
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to Find User ID")
@@ -1673,7 +1675,7 @@ def parse_users(user_ids, starteds, users, usernames):
                 #     Settings.USER_ID = username
                 # else:
                 users_.append({"name":name, "username":username, "id":user_id, "started":start})
-            except Exception as e: Settings.maybe_print(e)
+            except Exception as e: Settings.dev_print(e)
     except Exception as e: Driver.error_checker(e)
     return users_
 

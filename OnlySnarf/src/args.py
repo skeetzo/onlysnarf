@@ -110,7 +110,7 @@ parser.add_argument('-backup', action='store_true', dest='backup',
 ##
 # -category
 # the category of folder to upload from
-parser.add_argument('-category', type=str, default='video', dest='category',
+parser.add_argument('-category', default=None, dest='category',
   help='the category of content to post or message')
 ##
 # configurable w/ profile.conf
@@ -215,17 +215,17 @@ parser.add_argument('-months', type=valid_month, default=DISCOUNT_MIN_MONTHS, de
 ##
 # -mount-path
 # the mounth path for a local directory of OnlyFans config files
-parser.add_argument('-mount-path', type=str, dest='mount_path',
+parser.add_argument('-mount-path', dest='mount_path',
   help='the local path to OnlySnarf processes')
 ##
 # -bykeyword
 # the keyword to search for in folder selection
-parser.add_argument('-bykeyword', dest='bykeyword', default="", 
+parser.add_argument('-bykeyword', dest='bykeyword', default=None, 
   help="search for folder by keyword")
 ##
 # -notkeyword
 # the keyword to skip in folder selection
-parser.add_argument('-notkeyword', dest='notkeyword', default="", 
+parser.add_argument('-notkeyword', dest='notkeyword', default=None,
   help="search for folder not by keyword")
 ##
 # -password
@@ -325,7 +325,7 @@ parser.add_argument('-tags', dest='tags', action='append', default=[],
 ##
 # -text
 # text for message or upload
-parser.add_argument('-text', type=str, default="", dest='text',
+parser.add_argument('-text', default=None, dest='text',
   help='the text to type')
 ##
 # -time
@@ -386,7 +386,8 @@ parser.add_argument('-v', '-verbose', dest="verbose", action='count', default=0,
 
 ##
 # input
-parser.add_argument('input', nargs=argparse.REMAINDER, default=None, type=valid_path, help='file input to post or message')
+parser.add_argument('input', default=[], nargs=argparse.REMAINDER, 
+  type=valid_path, help='file input to post or message')
 
 ##
 import pkg_resources

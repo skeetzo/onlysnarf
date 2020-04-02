@@ -12,5 +12,5 @@ sudo onlysnarfpy \
 -expiration 3 \
 -show \
 -verbose -verbose -verbose
-# -verbose
 # -verbose -verbose
+# -verbose

@@ -80,7 +80,7 @@ def valid_path(s):
 	try:
 		if isinstance(s, list):
 			for f in s: os.stat(s)
-			return True
+			return s
 		else: return os.stat(s)
 	except FileNotFoundError:
 		msg = "Not a valid path: '{0}'.".format(s)

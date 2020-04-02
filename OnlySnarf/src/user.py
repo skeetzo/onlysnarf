@@ -44,10 +44,10 @@ class User:
         self.discount = None
         self.promotion = None
         try:
-            Settings.maybe_print("User: {} - {} - {}".format(self.name, self.username, self.id))
+            Settings.dev_print("User: {} - {} - {}".format(self.name, self.username, self.id))
         except Exception as e:
             Settings.dev_print(e)
-            Settings.maybe_print("User: {}".format(self.id))
+            Settings.dev_print("User: {}".format(self.id))
 
     def discount(self, discount=None):
         if not discount: discount = Settings.get_discount()
@@ -119,7 +119,7 @@ class User:
             print("Message Entered")
             return True
         except Exception as e:
-            Settings.maybe_print(e)
+            Settings.dev_print(e)
             return False
 
     def equals(self, user):
@@ -207,7 +207,7 @@ class User:
                 if user is None: continue
                 active_users.append(user)
             except Exception as e:
-                Settings.maybe_print(e)
+                Settings.dev_print(e)
         Settings.maybe_print("pruning memberlist")
         Settings.maybe_print("users: {}".format(len(active_users)))
         User.write_users_local(users=active_users)
@@ -369,10 +369,10 @@ class User:
                 try:
                     users_.append(User(json.loads(user)))
                 except Exception as e:
-                    Settings.maybe_print(e)
+                    Settings.dev_print(e)
             return users_
         except Exception as e:
-            Settings.maybe_print(e)
+            Settings.dev_print(e)
         return users_
 
     @staticmethod

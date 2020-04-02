@@ -40,6 +40,7 @@ class Settings:
     last_updated = False
     CONFIRM = True
     DISCOUNT = None
+    FILES = None
     PROMPT = True
     MESSAGE = None
     POLL = None
@@ -122,7 +123,7 @@ class Settings:
         if str(cat) == "gallery": cat = "galleries"
         if str(cat) == "video": cat = "videos"
         if str(cat) == "performer": cat = "performers"
-        return cat or ""
+        return cat or None
 
     def get_categories():
         return list(CATEGORIES_DEFAULT).extend(list(config["CATEGORIES"]))
@@ -158,10 +159,10 @@ class Settings:
         return config["DOWNLOAD_MAX"] or IMAGE_DOWNLOAD_LIMIT
         
     def get_drive_ignore():
-        return config["NOTKEYWORD"] or ""
+        return config["NOTKEYWORD"] or None
         
     def get_drive_keyword():
-        return config["BYKEYWORD"] or ""
+        return config["BYKEYWORD"] or None
         
     def get_duration():
         return config["DURATION"] or 0
@@ -176,7 +177,17 @@ class Settings:
         return EXPIRATION_ALLOWED or []
 
     def get_input():
-        return config["INPUT"] or ""
+        return config["INPUT"] or []
+
+    def get_input_as_files():
+        if Settings.FILES: return Settings.FILES
+        from .file import File
+        files = []
+        for file_path in config["INPUT"]:
+            file = File()
+            files.append(file)
+        Settings.FILES = files
+        return files
 
     def get_keywords():
         keywords = config["KEYWORDS"] or []
@@ -198,8 +209,7 @@ class Settings:
         return MESSAGE_CHOICES
 
     def get_mount_path():
-        return "/opt/onlysnarf"
-        # return config["MOUNT_PATH"] or ""
+        return config["MOUNT_PATH"] or "/opt/onlysnarf"
 
     def get_performers():
         performers = config["PERFORMERS"] or []
@@ -279,7 +289,7 @@ class Settings:
         return tags
 
     def get_text():
-        return config["TEXT"] or ""
+        return config["TEXT"] or None
 
     def get_time():
         return config["TIME"] or None
