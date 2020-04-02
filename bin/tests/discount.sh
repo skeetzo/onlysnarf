@@ -11,5 +11,5 @@ sudo onlysnarfpy \
 -prefer-local \
 -show \
 -verbose -verbose -verbose
-# -verbose
 # -verbose -verbose
+# -verbose

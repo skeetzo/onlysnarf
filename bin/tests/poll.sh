@@ -8,12 +8,12 @@ sudo onlysnarfpy \
 -bykeyword "pussycats" \
 -skip-download \
 -text "poll testes" \
--duration 3 \
+-duration 7 \
 -question "your mom" \
 -question "some toast" \
 -question "a nice sandwich" \
 -debug-delay \
 -show \
 -verbose -verbose -verbose
-# -verbose
 # -verbose -verbose
+# -verbose
