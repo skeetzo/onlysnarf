@@ -6,7 +6,7 @@ sudo onlysnarfpy \
 -debug \
 -action "post" \
 -text "post testes" \
--show \
--verbose -verbose -verbose
+-verbose
+# -verbose -verbose -verbose
+# -show \
 # -verbose -verbose
-# -verbose

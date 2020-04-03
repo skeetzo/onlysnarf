@@ -65,7 +65,7 @@ class User:
     def message(self, message=None):
         if str(self.username) == "": return print("User Error: Missing Message Username")
         print("Messaging: {} - {}".format(self.username, self.id))
-        successful = Driver.message(username=self.get_id())
+        successful = Driver.message(username=self.get_username(), user_id=self.id)
         if not successful: return False
         successful = User.enter_message(message)
         if not successful: return False

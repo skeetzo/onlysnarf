@@ -30,6 +30,14 @@ class Message():
         for file in self.get_files():
             file.backup()
 
+    def delete_files(self):
+        for file in self.get_files():
+            file.delete()
+
+    def cleanup_files(self):
+        self.backup_files()
+        self.delete_files()
+
     @staticmethod
     def format_keywords(keywords):
         if len(keywords) > 0: return "#{}".format(" #".join(self.get_performers()))
@@ -269,7 +277,7 @@ class Message():
         except Exception as e:
             Settings.dev_print(e)
             successful = False
-        if successful: self.backup_files()
+        if successful: self.cleanup_files()
 
     def post(self):
         self.get_post()
@@ -278,4 +286,4 @@ class Message():
         except Exception as e:
             Settings.dev_print(e)
             successful = False
-        if successful: self.backup_files()
+        if successful: self.cleanup_files()

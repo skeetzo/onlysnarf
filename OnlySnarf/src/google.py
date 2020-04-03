@@ -120,10 +120,15 @@ def delete_file(file):
 def backup_file(file):
     try:
         global PYDRIVE
-        parentFolder = PYDRIVE.CreateFile({'title':str(file.get_folder_name()), 'parents':[{"kind": "drive#fileLink", "id": str(get_posted_folder_by_name(file.get_category())['id'])}],'mimeType':'application/vnd.google-apps.folder'})
+        backupTo = get_folder_by_name("posted")
+        stri = "posted"
+        if Settings.get_category():
+            backupTo = get_posted_folder_by_name(Settings.get_category())
+            stri = "posted/{}".format(backupTo["title"])
+        parentFolder = PYDRIVE.CreateFile({'title':str(file.get_parent()["title"]), 'parents':[{"kind": "drive#fileLink", "id": str(backupTo['id'])}], 'mimeType':'application/vnd.google-apps.folder'})
         parentFolder.Upload()
-        Settings.dev_print("Moving To: posted/{}/{}".format(file.get_category(), file.get_folder_name()))
-        file.get_file()['parents'] = [{"kind": "drive#fileLink", "id": str(parentFolder['id'])}]
+        Settings.dev_print("Moving To: {}/{}".format(stri, backupTo["title"]))
+        file.get_file()['parents'] = [{"kind": "drive#fileLink", "id": str(backupTo['id'])}]
         file.get_file().Upload()
         print("File Backed Up: {}".format(file['title']))
     except Exception as e:
