@@ -298,8 +298,6 @@
   **2.16.9**
   - update: users_get, following_get -> speed +, reliability +
   - mostly functional
-  
-----------------------------------------
   **2.16.10** debugging pre 2.17.0
   - upload -> post
   - Message, File, Google_File, Google_Folder, Video, Image classes
@@ -308,9 +306,11 @@
   - settings -> argsparse
   - menu cleaned up
   - file system selection cleaned up
-  - category 
-
+  - category
   **2.17.0**
+  - massive spaghetti -> api overhaul
+  
+----------------------------------------
 
   **2.16.**
   - tested: settings get
