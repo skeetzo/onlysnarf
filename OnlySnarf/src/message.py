@@ -40,17 +40,17 @@ class Message():
 
     @staticmethod
     def format_keywords(keywords):
-        if len(keywords) > 0: return "#{}".format(" #".join(self.get_performers()))
+        if len(keywords) > 0: return "#{}".format(" #".join(keywords))
         return ""
 
     @staticmethod
     def format_performers(performers):
-        if len(performers) > 0: return "w/ @{}".format(" @".join(self.get_performers()))
+        if len(performers) > 0: return "w/ @{}".format(" @".join(performers))
         return ""
             
     @staticmethod
     def format_tags(tags):
-        if len(tags) > 0: return "@{}".format(" @".join(self.get_tags()))
+        if len(tags) > 0: return "@{}".format(" @".join(tags))
         return ""
 
     def format_text(self):
