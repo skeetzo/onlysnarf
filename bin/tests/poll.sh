@@ -13,7 +13,7 @@ sudo onlysnarfpy \
 -question "some toast" \
 -question "a nice sandwich" \
 -debug-delay \
--show \
--verbose -verbose -verbose
+-verbose
+# -verbose -verbose -verbose
+# -show \
 # -verbose -verbose
-# -verbose

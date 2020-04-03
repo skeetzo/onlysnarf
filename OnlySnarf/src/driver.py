@@ -428,6 +428,8 @@ class Driver:
     # waits for page load
     def get_page_load():
         time.sleep(5)
+        # try: WebDriverWait(BROWSER, 120, poll_frequency=10).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
+        # except Exception as e: pass
 
     @staticmethod
     def go_to_page(page):
@@ -447,10 +449,10 @@ class Driver:
         if not auth_: return False
         if str(BROWSER.current_url) == str(ONLYFANS_HOME_URL):
             Settings.maybe_print("at -> onlyfans.com")
+            BROWSER.execute_script("window.scrollTo(0, 0);")
         else:
             Settings.maybe_print("goto -> onlyfans.com")
             BROWSER.get(ONLYFANS_HOME_URL)
-            WebDriverWait(BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, LIVE_BUTTON_CLASS)))
         Driver.get_page_load()
 
     # onlyfans.com/my/settings
@@ -460,6 +462,7 @@ class Driver:
         if not auth_: return False
         if str(BROWSER.current_url) == str(ONLYFANS_SETTINGS_URL) and str(settingsTab) == "profile":
             Settings.maybe_print("at -> onlyfans.com/settings/{}".format(settingsTab))
+            BROWSER.execute_script("window.scrollTo(0, 0);")
         else:
             if str(settingsTab) == "profile": settingsTab = ""
             Settings.maybe_print("goto -> onlyfans.com/settings/{}".format(settingsTab))
@@ -528,9 +531,9 @@ class Driver:
     ####################
 
     @staticmethod
-    def message(username=None):
-        if not username:
-            print("Error: Missing Username")
+    def message(username=None, user_id=None):
+        if not username and not user_id:
+            print("Error: Missing User to Message")
             return False
         auth_ = Driver.auth()
         if not auth_: return False
@@ -546,7 +549,7 @@ class Driver:
                 Driver.get_element_to_click(type__).click()
                 successful = True
             else:
-                successful = Driver.message_user(username)
+                successful = Driver.message_user(username=username, user_id=user_id)
             Settings.dev_print("successfully started message: {}".format(username))
             return successful
         except Exception as e:
@@ -595,7 +598,7 @@ class Driver:
         try:
             print("Uploading file(s): {}".format(len(files)))
             Settings.dev_print("uploading files")
-            Driver.upload_image_files(files=files)
+            Driver.upload_files(files=files)
             Settings.maybe_print("file(s) Entered")
             Settings.debug_delay_check()
             return True
@@ -652,7 +655,7 @@ class Driver:
             return False
 
     @staticmethod
-    def message_user(user_id=None):
+    def message_user_by_id(user_id=None):
         user_id = str(user_id).replace("@u","").replace("@","")
         if not user_id or user_id == None or str(user_id) == "None":
             print("Warning: Missing User ID")
@@ -666,6 +669,33 @@ class Driver:
             Driver.error_checker(e)
             print("Error: Failure to Goto User - {}".format(user_id))
             return False
+
+    @staticmethod
+    def message_user(username=None, user_id=None):
+        auth_ = Driver.auth()
+        if not auth_: return None
+        if user_id: return Driver.message_user_by_id(user_id=user_id)
+        if not username:
+            print("Error: Missing Username to Message")
+            return False
+        try:
+            Driver.go_to_page(username)
+            elements = BROWSER.find_elements_by_tag_name("a")
+            ele = [ele for ele in elements
+                    if "/my/chats/chat/" in str(ele.get_attribute("href"))]
+            if len(ele) == 0: 
+                print("Warning: User Cannot Be Messaged")
+                return False
+            ele = ele[0]
+            Settings.dev_print("clicking send message")
+            ele.click()
+            Settings.dev_print("messaging username: {}".format(username))
+        except Exception as e:
+            print(e)
+            Driver.error_checker(e)
+            print("Error: Failed to Message User")
+            return False
+        return True
 
     ####################################################################################################
     ####################################################################################################
@@ -827,7 +857,7 @@ class Driver:
             successful_upload = False
             try:
                 Settings.dev_print("uploading files")
-                successful_upload = Driver.upload_image_files(files) or False
+                successful_upload = Driver.upload_files(files) or False
             except Exception as e:
                 print(e)
             ## Text
@@ -1187,7 +1217,10 @@ class Driver:
                     Settings.dev_print("clicked day")
             Settings.debug_delay_check()
             # save schedule date
-            saves = Driver.get_element_to_click("scheduleSave").click()
+            saves = Driver.get_element_to_click("scheduleSave")
+            Settings.dev_print("found save button, clicking")
+            saves.click()
+            Settings.dev_print("clicked save button")
             # set hours
             Settings.dev_print("setting hours")
             hours = Driver.find_elements_by_name("scheduleHours")
@@ -1437,22 +1470,31 @@ class Driver:
 
     # uploads image into post or message
     @staticmethod
-    def upload_image_files(files=[]):
-        Settings.dev_print("uploading image files: {}".format(len(files)))
+    def upload_files(files=[]):
+        if Settings.is_skip_download(): 
+            print("Skipping Upload (download)")
+            return True
+        elif Settings.is_skip_upload(): 
+            print("Skipping Upload (upload)")
+            return True
         if len(files) == 0: return False
         if Settings.is_skip_upload():
             print("Skipping Upload: Disabled")
             return False
         files = files[:int(Settings.get_upload_max_messages())]
+        Settings.dev_print("uploading image files: {}".format(len(files)))
         i = 1
         for file in files:
-            file.prepare() # downloads if Google_File
             print('Uploading: {} - {}/{}'.format(file.get_title(), i, len(files)))
+            i += 1
+            uploadable = file.prepare() # downloads if Google_File
+            if not uploadable:
+                print("Error: Unable to Upload - {}".format(file.get_title()))
+                continue
             enter_file = BROWSER.find_element_by_id("fileupload_photo")
             enter_file.send_keys(str(file.get_path()))
             time.sleep(1)
             Driver.error_window_upload()
-            i += 1
             ###
             def fix_filename(file):
                 # move file to change its name
@@ -1554,6 +1596,7 @@ class Driver:
         user_id = None
         try:
             Driver.go_to_page(username)
+            time.sleep(3) # this should realistically only fail if they're no longer subscribed but it fails often from loading
             elements = BROWSER.find_elements_by_tag_name("a")
             ele = [ele.get_attribute("href") for ele in elements
                     if "/my/chats/chat/" in str(ele.get_attribute("href"))]

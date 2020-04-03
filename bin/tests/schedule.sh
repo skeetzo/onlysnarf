@@ -10,7 +10,7 @@ sudo onlysnarfpy \
 -text "schedule testes" \
 -schedule "6-7-2020:6:26" \
 -debug-delay \
--show \
--verbose -verbose -verbose
+-verbose
+# -verbose -verbose -verbose
+# -show \
 # -verbose -verbose
-# -verbose

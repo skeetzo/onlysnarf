@@ -153,6 +153,8 @@ class Snarf:
 
 def main():
     # try:
+    from .file import File
+    File.remove_local()
     Settings.set_prompt(False)
     Settings.set_confirm(False)
     action = Settings.get_action()

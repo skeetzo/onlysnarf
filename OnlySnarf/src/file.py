@@ -53,11 +53,11 @@ class File():
         if Settings.is_skip_download():
             Settings.maybe_print("Warning: Unable to Backup, skipped download")
             return False
-        if Settings.is_debug():
-            Settings.maybe_print("Skipping Backup (debug): {}".format(title))
-            return False
-        elif not Settings.is_backup():
+        if not Settings.is_backup():
             Settings.maybe_print('Skipping Backup (disabled): {}'.format(title))
+            return False
+        elif Settings.is_debug():
+            Settings.maybe_print("Skipping Backup (debug): {}".format(title))
             return False
         else:
             print('Backing Up (file): {}'.format(title))
@@ -68,11 +68,11 @@ class File():
         if Settings.is_skip_download():
             print("Warning: Unable to Backup, skipped download")
             return False
-        if Settings.is_debug():
-            Settings.maybe_print("Skipping Backup (debug): {}".format(len(files)))
-            return False
-        elif not Settings.is_backup():
+        if not Settings.is_backup():
             Settings.maybe_print('Skipping Backup (disabled): {}'.format(len(files)))
+            return False
+        elif Settings.is_debug():
+            Settings.maybe_print("Skipping Backup (debug): {}".format(len(files)))
             return False
         else:
             print('Backing Up (files): {}'.format(len(files)))
@@ -116,10 +116,10 @@ class File():
     @staticmethod
     def delete_text(title):
         if Settings.is_skip_download():
-            print("Warning: Unable to Delete, skipped download")
+            Settings.maybe_print("Warning: Unable to Delete, skipped download")
             return False
         if Settings.is_debug():
-            print("Skipping Delete (Debug): {}".format(title))
+            Settings.maybe_print("Skipping Delete (debug): {}".format(title))
             return False
         else:
             print('Deleting: {}'.format(title))
@@ -183,12 +183,6 @@ class File():
             return False
         self.path = path
 
-    # upload to GDrive
-    # Google.upload_input
-    def upload(self):
-        # basically handled by backup process
-        pass
-
     # Deletes all local files
     @staticmethod
     def remove_local():
@@ -235,6 +229,14 @@ class File():
         if not Settings.confirm([file.get_path() for file in files]): return []
         return files
 
+    def upload(self):
+        if not self.prepare():  
+            print("Error: Unable to Upload File - {}".format(self.get_title()))
+            return False
+        self.backup()
+        self.delete()
+        return True
+
 ###################################################################################
 
 class Google_File(File):
@@ -248,7 +250,7 @@ class Google_File(File):
         self.mimeType = None
 
     def backup(self):
-        if self.backup_text(self.title): return
+        if not self.backup_text(self.title): return
         Google.backup_file(self)
 
     def delete(self):
@@ -276,7 +278,7 @@ class Google_File(File):
 
     # Download File
     def download(self):
-        if not Google_File.download_text(self.title): return True
+        if not Google_File.download_text(self.title): return False
         successful = Google.download_file(self)
         if not successful: return False
         ### Finish ###
@@ -391,6 +393,7 @@ class Google_File(File):
         # tmp = File.get_tmp() # i don't think this should be in file over settings
         filename = filename.strip('\'').strip('\"').strip()
         self.path = filename
+        Settings.dev_print(self.path)
         return self.path
 
     def get_title(self):
