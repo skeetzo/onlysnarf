@@ -188,25 +188,25 @@ class Message():
     # Settings.USERS and self.recipients should be usernames
     # if includes [all, recent, favorite] & usernames it only uses the 1st found of [all,...]
     def get_recipients(self):
-        recipients = []
-        if len(self.recipients) == 0 and len(Settings.get_users()) > 0: 
-            recipients = Settings.get_users()
-        elif len(self.recipients) == 0 and Settings.get_user(): 
-            recipients = [Settings.get_user()]
-        elif len(self.recipients) == 0:
-            recipients = User.select_users()
         users = []
-        for user in recipients:
-            if str(user.username).lower() == "all":
-                users = User.get_all_users()
-                break
-            elif str(user.username).lower() == "recent":
-                users = User.get_recent_users()
-                break
-            elif str(user.username).lower() == "favorite":
-                users = User.get_favorite_users()
-                break
-            else: users.append(user)
+        if len(self.recipients) == 0 and len(Settings.get_users()) > 0: 
+            users = Settings.get_users()
+        elif len(self.recipients) == 0 and Settings.get_user(): 
+            users = [Settings.get_user()]
+        elif len(self.recipients) == 0:
+            users = User.select_users()
+        # users = []
+        # for user in recipients:
+        #     if str(user.username).lower() == "all":
+        #         users = User.get_all_users()
+        #         break
+        #     elif str(user.username).lower() == "recent":
+        #         users = User.get_recent_users()
+        #         break
+        #     elif str(user.username).lower() == "favorite":
+        #         users = User.get_favorite_users()
+        #         break
+        #     else: users.append(user)
         return users
 
     def get_schedule(self):

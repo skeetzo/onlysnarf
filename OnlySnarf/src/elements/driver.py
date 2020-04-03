@@ -361,13 +361,13 @@ ELEMENTS = [
     {
         "name": "messageAll",
         "classes": ["g-btn__text"],
-        "text": ["ALL"],
+        "text": ["Fans"],
         "id": [],
     },
     {
         "name": "messageRecent",
         "classes": ["g-btn__text"],
-        "text": ["RECENT"],
+        "text": ["Recent"],
         "id": [],
     },
     {
