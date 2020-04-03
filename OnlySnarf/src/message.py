@@ -245,6 +245,10 @@ class Message():
         self.get_schedule()
         self.get_files()
         self.get_recipients()
+        if not self.get_text():
+            files = self.get_files()
+            if len(files) > 0:
+                self.text = files[0].get_title()
 
     def get_post(self):
         self.get_text()
@@ -254,12 +258,20 @@ class Message():
         self.get_schedule()
         self.get_files()
         self.get_recipients()
+        if not self.get_text():
+            files = self.get_files()
+            if len(files) > 0:
+                self.text = files[0].get_title()
 
     def get_message(self):
         self.get_text()
         self.get_price()
         self.get_files()
         self.get_recipients()
+        if not self.get_text():
+            files = self.get_files()
+            if len(files) > 0:
+                self.text = files[0].get_title()
 
     # sends to recipients
     # 'post' as recipient will post message instead
