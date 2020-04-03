@@ -660,12 +660,11 @@ class Driver:
         try:
             auth_ = Driver.auth()
             if not auth_: return False
-            # Settings.maybe_print("goto -> /my/chats/chat/{}".format(username))
-            Driver.go_to_page("{}/{}".format(ONLYFANS_CHAT_URL, username))
+            Driver.go_to_page("{}/{}".format(ONLYFANS_CHAT_URL, user_id))
             return True
         except Exception as e:
             Driver.error_checker(e)
-            print("Error: Failure to Goto User - {}".format(user.username))
+            print("Error: Failure to Goto User - {}".format(user_id))
             return False
 
     ####################################################################################################
@@ -825,8 +824,12 @@ class Driver:
             else:
                 Settings.dev_print("not tweeting")
             ## Files
-            Settings.dev_print("uploading files")
-            successful_upload = Driver.upload_image_files(files) or False
+            successful_upload = False
+            try:
+                Settings.dev_print("uploading files")
+                successful_upload = Driver.upload_image_files(files) or False
+            except Exception as e:
+                print(e)
             ## Text
             successful_text = Driver.enter_text(text)
             if not successful_text:
@@ -1449,6 +1452,7 @@ class Driver:
             enter_file.send_keys(str(file.get_path()))
             time.sleep(1)
             Driver.error_window_upload()
+            i += 1
             ###
             def fix_filename(file):
                 # move file to change its name
@@ -1469,7 +1473,7 @@ class Driver:
         # one last final check
         Driver.error_window_upload()
         Settings.debug_delay_check()
-        Settings.dev_print("files uploaded")
+        Settings.dev_print("### Files Upload Successful ###")
         return True
 
     #################

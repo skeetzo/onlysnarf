@@ -27,7 +27,7 @@ class Message():
     ###########################################################################
 
     def backup_files(self):
-        for file in self.files:
+        for file in self.get_files():
             file.backup()
 
     @staticmethod
@@ -116,17 +116,18 @@ class Message():
     # ?
     def get_files(self):
         if len(self.files) > 0: return self.files
-        if len(self.files) == 0 and len(Settings.get_input()) > 0:
-            self.files.append(Settings.get_input_as_files())
-        elif len(self.files) == 0 and len(Google_File.get_files()) > 0:
-            self.files = Google_File.select_files()
-        elif len(self.files) == 0:
-            self.files = File.select_files()
         files = []
-        for file in self.files:
-            if isinstance(file, Google_Folder): files.extend(file.get_files())
-            else: files.append(file)
-        self.files = files
+        if len(self.files) == 0 and len(Settings.get_input()) > 0:
+            files.append(Settings.get_input_as_files())
+        elif len(self.files) == 0 and len(Google_File.get_files()) > 0:
+            files = Google_File.select_files()
+        elif len(self.files) == 0:
+            files = File.select_files()
+        filed = []
+        for file in files:
+            if isinstance(file, Google_Folder): filed.extend(file.get_files())
+            else: filed.append(file)
+        self.files = filed
         return self.files
 
     def get_price(self):
