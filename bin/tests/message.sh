@@ -10,10 +10,10 @@ sudo onlysnarfpy \
 -price "4.00" \
 -prefer-local \
 -recent-users-count 1 \
+-show \
 -verbose -verbose -verbose
 # -verbose -verbose
 # -verbose
-# -show \
 
 echo "[*] Message - Recent & Gallery"
 sudo onlysnarfpy \
@@ -26,22 +26,22 @@ sudo onlysnarfpy \
 -price "6.00" \
 -prefer-local \
 -recent-users-count 1 \
+-show \
 -verbose -verbose -verbose
 # -verbose -verbose
 # -verbose
-# -show \
 
 echo "[*] Message - All & Video"
 sudo onlysnarfpy \
 -debug \
 -action "message" \
 -user "all" \
--category "gallery" \
+-category "video" \
 -notkeyword "stroke" \
 -text "message testes" \
 -price "10.00" \
 -prefer-local \
+-show \
 -verbose -verbose -verbose
 # -verbose -verbose
 # -verbose
-# -show \

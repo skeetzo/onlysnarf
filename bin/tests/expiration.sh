@@ -10,10 +10,10 @@ sudo onlysnarfpy \
 -text "expiration testes" \
 -debug-delay \
 -expiration 3 \
--verbose -verbose
+-show \
+-verbose -verbose -verbose
+# -verbose -verbose
 # -verbose
-# -verbose -verbose -verbose
-# -show \
 
 echo "[*] Misc - Expiration"
 sudo onlysnarfpy \
@@ -23,7 +23,7 @@ sudo onlysnarfpy \
 -skip-upload \
 -debug-delay \
 -expiration 3 \
--verbose -verbose
-# -verbose -verbose -verbose
+-show \
+-verbose -verbose -verbose
+# -verbose -verbose
 # -verbose
-# -show \

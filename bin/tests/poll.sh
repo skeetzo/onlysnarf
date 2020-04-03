@@ -13,9 +13,9 @@ sudo onlysnarfpy \
 -question "some toast" \
 -question "a nice sandwich" \
 -debug-delay \
+-show \
 -verbose -verbose -verbose
 # -verbose
-# -show \
 # -verbose -verbose
 
 echo "[*] Misc - Poll 2"
@@ -32,7 +32,7 @@ sudo onlysnarfpy \
 -question "a nice sandwich4" \
 -question "a nice sandwich5" \
 -debug-delay \
+-show \
 -verbose -verbose -verbose
 # -verbose
-# -show \
 # -verbose -verbose

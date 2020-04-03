@@ -10,9 +10,9 @@ sudo onlysnarfpy \
 -text "schedule testes" \
 -schedule "6-7-2020:6:26" \
 -debug-delay \
+-show \
 -verbose -verbose -verbose
 # -verbose
-# -show \
 # -verbose -verbose
 
 echo "[*] Misc - Schedule (Date & Time)"
@@ -25,9 +25,9 @@ sudo onlysnarfpy \
 -date "6-7-2020" \
 -time "6:26" \
 -debug-delay \
+-show \
 -verbose -verbose -verbose
 # -verbose
-# -show \
 # -verbose -verbose
 
 echo "[*] Misc - Schedule (Date)"
@@ -39,7 +39,7 @@ sudo onlysnarfpy \
 -text "schedule testes" \
 -date "6-7-2020" \
 -debug-delay \
+-show \
 -verbose -verbose -verbose
 # -verbose
-# -show \
 # -verbose -verbose
