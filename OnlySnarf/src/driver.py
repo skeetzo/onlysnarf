@@ -644,12 +644,14 @@ class Driver:
                 return False
             print("Enter text: {}".format(text))
             Settings.dev_print("finding text area")
-            message = Driver.find_element_by_name("messageText")     
+            # message = Driver.find_element_by_name("messageText")     
+            message = BROWSER.find_element_by_name("message")     
             Settings.dev_print("entering text")
             message.send_keys(str(text))
             Settings.dev_print("entered text")
             return True
         except Exception as e:
+            print(e)
             Driver.error_checker(e)
             print("Error: Failure to Enter Message")
             return False
