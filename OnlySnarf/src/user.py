@@ -43,11 +43,11 @@ class User:
         #########################
         self.discount = None
         self.promotion = None
-        try:
-            Settings.dev_print("User: {} - {} - {}".format(self.name, self.username, self.id))
-        except Exception as e:
-            Settings.dev_print(e)
-            Settings.dev_print("User: {}".format(self.id))
+        # try:
+            # Settings.dev_print("User: {} - {} - {}".format(self.name, self.username, self.id))
+        # except Exception as e:
+            # Settings.dev_print(e)
+            # Settings.dev_print("User: {}".format(self.id))
 
     def discount(self, discount=None):
         if not discount: discount = Settings.get_discount()

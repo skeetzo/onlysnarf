@@ -247,12 +247,12 @@ class Google_File(File):
         self.parent = None
         self.mimeType = None
 
-    def backup(self, arg):
-        if self.backup_text(): return
+    def backup(self):
+        if self.backup_text(self.title): return
         Google.backup_file(self)
 
-    def delete(self, arg):
-        if not self.delete_text(): return
+    def delete(self):
+        if not self.delete_text(self.title): return
         Google.delete(self)
 
     @staticmethod
@@ -276,7 +276,7 @@ class Google_File(File):
 
     # Download File
     def download(self):
-        if not Google_File.download_text(self.title): return False
+        if not Google_File.download_text(self.title): return True
         successful = Google.download_file(self)
         if not successful: return False
         ### Finish ###
@@ -460,11 +460,7 @@ class Google_File(File):
 class Google_Folder(Google_File):
     def __init__(self):
         Google_File.__init__(self)
-        self.files = []
-        self.id = None
-        self.title = None
-        self.path = None
-        self.parent = None
+        self.files = None
 
     def backup(self):
         if File.backup_text(self.title): return
@@ -512,14 +508,18 @@ class Google_Folder(Google_File):
         print("Downloaded Folder: {}".format(self.get_title()))
 
     def get_files(self):
-        if self.files: return self.files
+        if not self.files:
+            self.files = []
+            files = Google.get_files_by_folder_id(self.get_id())
+            for file in files:
+                file_ = Google_File()
+                setattr(file_, "file", file)
+                self.files.append(file_)
         if Settings.get_title():
             for file in self.files:
                 if str(Settings.get_title()) == str(file.get_title()):
                     self.files = [file]
                     break
-        if Settings.get_category() == "image" or Settings.get_category() == "video":
-            self.files = [random.choice(self.files)]
         return self.files
 
 ###################################################################################
