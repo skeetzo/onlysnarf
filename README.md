@@ -6,7 +6,7 @@ or
 
 ## Description
 
-OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans. OnlySnarf is capable of downloading and uploading a file (image or video) or gallery of files (images) from a Google Drive folder as specified by run time arguments to an OnlyFans account.
+OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans. OnlySnarf is capable of downloading and uploading a file (image or video) or gallery of files (images) locally or from a Google Drive folder as specified by run time arguments to an OnlyFans account.
 
 ## Menu
 [Menu](https://github.com/skeetzo/onlysnarf/blob/master/menu.md)
@@ -23,8 +23,8 @@ First run:
   * `(sudo) onlysnarf-config`
 Then from within project's OnlySnarf directory either:  
   * `(sudo) onlysnarf [args]`
-  * `(sudo) onlysnarfpy (-debug) -type image|gallery|video`
-  * or directly via `python3 onlysnarf.py (-debug) -type image|gallery|video`
+  * `(sudo) onlysnarfpy (-debug) -category image|gallery|video`
+  * or directly via `python3 onlysnarf.py (-debug) -category image|gallery|video`
 
 ## args
 
@@ -32,29 +32,29 @@ Then from within project's OnlySnarf directory either:
   `python3 onlysnarf.py -debug`  
 Tests configuration. Does not upload or remove from Google Drive.
 
--type image  
-  `python3 onlysnarf.py -type image`  
+-category image  
+  `python3 onlysnarf.py -category image`  
 Uploads an image labeled: 'imageName - %d%m%y'  
 
--type gallery  
-  `python3 onlysnarf.py -type gallery`  
+-category gallery  
+  `python3 onlysnarf.py -category gallery`  
 Uploads a gallery labeled: 'folderName - %d%m%y'  
 
--type video  
-  `python3 onlysnarf.py -type video`  
+-category video  
+  `python3 onlysnarf.py -category video`  
 Uploads a video labeled: 'folderName - %d%m%y'  
 
 -text  
-  `python3 onlysnarf.py -type video -text "your mom"`  
-Uploads a video labeled: 'your mom - %d%m%y'  
+  `python3 onlysnarf.py -category video -text "your mom"`  
+Uploads a video labeled: 'your mom'  
 
--show-window
-  `python3 onlysnarf.py -show-window`
+-show
+  `python3 onlysnarf.py -show`
 Shows the Chromium browser
 
 **more available in menu**
 
-Or include a 'config.conf' file located at '/etc/onlysnarf/config.conf' to set variables at runtime without using arguments. An example file has been provided. Please be sure to follow the key:value pattern. A starting # denotes a comment.
+Or include a 'config.conf' file located at '/opt/onlysnarf/config.conf' to set variables at runtime without using arguments. An example file has been provided. Please be sure to follow the key:value pattern. A starting # denotes a comment.
 
 ## Authentication  
 --------------
@@ -78,7 +78,7 @@ To update your installation with the new file, run `onlysnarf-config`, select 'U
 
 ## Config
 ##### config.conf  
-Path: /etc/onlysnarf/config.conf
+Path: /opt/onlysnarf/config.conf (previously /etc/onlysnarf/config.conf)
 Create or update the "config.conf" file with the following values:
   * username -> the Twitter connected to your OnlyFans's username  
   * password -> the Twitter conencted to your OnlyFans's password  
@@ -95,16 +95,16 @@ Used to facilitate Google Drive's python authentication. Requires generating an 
 ## Example Crons  
 
 Upload a random image once a day at noon:  
-  `* 12 * * * onlysnarfpy -type image`
+  `* 12 * * * onlysnarfpy -category image`
 
 Upload a random gallery of images every Wednesday at 2:30pm:  
-  `30 14 * * 3 onlysnarfpy -type gallery`
+  `30 14 * * 3 onlysnarfpy -category gallery`
 
 Upload a random video every Friday in the month of June at 6:00pm:  
-  `00 18 * 6 5 onlysnarfpy -type video`
+  `00 18 * 6 5 onlysnarfpy -category video`
 
 Text will be generated if not provided with `-text`
-  `* 12 * * * onlysnarfpy -type image -text "Your mother is a dirty whore"`
+  `* 12 * * * onlysnarfpy -category image -text "Your mother is a dirty whore"`
 
 ## Dependencies
   ### Google Chrome -> `sudo apt install -y google-chrome-beta`

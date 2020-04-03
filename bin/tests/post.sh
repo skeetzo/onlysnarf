@@ -10,3 +10,12 @@ sudo onlysnarfpy \
 # -verbose -verbose -verbose
 # -show \
 # -verbose -verbose
+
+echo "[*] Post - Text"
+sudo onlysnarfpy \
+-debug \
+-action "post" \
+-verbose
+# -verbose -verbose -verbose
+# -show \
+# -verbose -verbose

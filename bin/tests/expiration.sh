@@ -10,7 +10,20 @@ sudo onlysnarfpy \
 -text "expiration testes" \
 -debug-delay \
 -expiration 3 \
--verbose
+-verbose -verbose
+# -verbose
 # -verbose -verbose -verbose
 # -show \
-# -verbose -verbose
+
+echo "[*] Misc - Expiration"
+sudo onlysnarfpy \
+-debug \
+-action "post" -category "image" \
+-bykeyword "pussycats" \
+-skip-upload \
+-debug-delay \
+-expiration 3 \
+-verbose -verbose
+# -verbose -verbose -verbose
+# -verbose
+# -show \
