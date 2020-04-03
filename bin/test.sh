@@ -28,7 +28,7 @@ sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local
 
 # sudo onlysnarfpy -debug -verbose -action "message" -user "all" -category "image" -bykeyword "dailydick" -text "daily dick" -price "3.69" -show
 
-
+sudo onlysnarfpy -category video -date "12/25/2019" -expires 7
 
 # # Message
 # sudo onlysnarfpy \

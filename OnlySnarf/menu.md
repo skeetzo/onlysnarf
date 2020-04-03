@@ -42,50 +42,51 @@ Upload $type of content by $method as post with $text and tag $performer. Adds h
 
 ## args
 
--method [input|random]
-  `onlysnarfpy -method input -input '/path/to/fileOrDirector'`  
-The specific method to upload or provide input.
+-action [discount|message|post|promotion]
+  `onlysnarfpy -action message -text 'hello fans' '/path/to/fileOrDirector'`  
+The action to take.
 
 -backup
 Backup content to Google Drive via upload or moving original file
 
--type image  
-  `onlysnarfpy -type image`  
+-category image  
+  `onlysnarfpy -category image`  
 Uploads a random image labeled: 'imageName - %d%m%y'  
 
--type gallery  
-  `onlysnarfpy -type gallery`  
+-category gallery  
+  `onlysnarfpy -category gallery`  
 Uploads a random gallery labeled: 'folderName - %d%m%y'  
 
--type video  
-  `onlysnarfpy -type video`  
+-category video  
+  `onlysnarfpy -category video`  
 Uploads a random video labeled: 'folderName - %d%m%y'  
 
 -text  
-  `onlysnarfpy -type video -text "your mom"`  
+  `onlysnarfpy -category video -text "your mom"`  
 Uploads a random video labeled: 'your mom - %d%m%y'  
 
 -tweeting
   `onlysnarfpy -tweeting -action post -text 'hi mom'`  
 Enables tweeting upon posting
 
--input /path/to/fileOrDirectory
-  `onlysnarfpy -input /path/to/fileOrDirectory`  
-Uploads a file or directory of files at path.  
-
 -username
-  `onlysnarfpy -username 'dontdothis'`  
+  `onlysnarfpy -username 'beepbeep'`  
 Twitter username for login
+
 -password
-  `onlysnarfpy -username 'usetheconfigfile' -password 'reallypls'`  
+  `onlysnarfpy -username 'usetheconfigfile' -password 'beepitybeep'`  
 Twitter password for login
 
--skip-reduce
-  `onlysnarfpy -skip-reduce -input /path/to/fileOrDirectory`  
-Skip reduction of mp4s before uploading
+-reduce
+  `onlysnarfpy -reduce /path/to/mp4file`  
+Reduce mp4s before uploading
 
-- ?
-  `onlysnarfpy -type video -date "12/25/2019" -expires 7`  
+/path/to/fileOrDirectory
+  `onlysnarfpy /path/to/fileOrDirectory`  
+Uploads a file or directory of files at path.  
+
+Example:
+  `onlysnarfpy -category video -date "12/25/2019" -expires 7`  
 Uploads a random video, schedules it to release at midnight on Christmas, and sets the post to expire after 7 days.  
 
 ## Debugging
@@ -98,23 +99,17 @@ Tests configuration. Does not upload or remove from Google Drive.
   `onlysnarfpy -debug -debug-delay`
 Delays certain portions for visual monitoring.
 
--show-window
-  `onlysnarfpy -show-window`
+-show
+  `onlysnarfpy -show`
 Shows the Chromium browser
 
 -verbose
-  `onlysnarfpy -verbose`
-Shows additional log output
--verboser
-  `onlysnarfpy -verboser`
-Shows additionaler log output
--verbosest
-  `onlysnarfpy -verbosest`
-Shows additionalest log output
+  `onlysnarfpy -verbose -verbose -verbose`
+Shows additional log output (up to 3)
 
 -version
   `onlysnarfpy -version`
 Prints the version
 
 Complete Debugging:
-  `onlysnarfpy -debug -verbose -verboser -verbosest -show-window -debug-delay`
+  `onlysnarfpy -debug -verbose -verboser -verbosest -show -debug-delay`
