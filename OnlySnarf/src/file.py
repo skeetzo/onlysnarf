@@ -51,7 +51,7 @@ class File():
     @staticmethod
     def backup_text(title):
         if Settings.is_skip_download():
-            Settings.maybe_print("Warning: Unable to Backup, skipped download")
+            Settings.maybe_print("Warning: Skipping Backup, skipped download")
             return False
         if not Settings.is_backup():
             Settings.maybe_print('Skipping Backup (disabled): {}'.format(title))
@@ -65,17 +65,6 @@ class File():
 
     @staticmethod
     def backup_files(files=[]):
-        if Settings.is_skip_download():
-            print("Warning: Unable to Backup, skipped download")
-            return False
-        if not Settings.is_backup():
-            Settings.maybe_print('Skipping Backup (disabled): {}'.format(len(files)))
-            return False
-        elif Settings.is_debug():
-            Settings.maybe_print("Skipping Backup (debug): {}".format(len(files)))
-            return False
-        else:
-            print('Backing Up (files): {}'.format(len(files)))
         for file in files:
             file.backup()
         return True
@@ -116,9 +105,12 @@ class File():
     @staticmethod
     def delete_text(title):
         if Settings.is_skip_download():
-            Settings.maybe_print("Warning: Unable to Delete, skipped download")
+            Settings.maybe_print("Warning: Skipping Delete, skipped download")
             return False
-        if Settings.is_debug():
+        if not Settings.is_delete():
+            Settings.maybe_print('Skipping Backup (disabled): {}'.format(title))
+            return False
+        elif Settings.is_debug():
             Settings.maybe_print("Skipping Delete (debug): {}".format(title))
             return False
         else:
@@ -168,10 +160,20 @@ class File():
             os.mkdir(str(tmp))
         return tmp
 
+    def get_type(self):
+        if self.type: return self.type
+        if str(self.get_ext()) in str(MIMETYPES_VIDEOS_LIST):
+            self.type = Video()
+        elif str(self.get_ext()) in str(MIMETYPES_IMAGES_LIST):
+            self.type = Image()
+        else: print("Warning: Unable to Parse File Type")
+        return self.type
+
     # files are File references
     # file references can be GoogleId references which need to download their source
     # files exist when checked for size
     def prepare(self):
+        self.get_type().prepare()
         if not self.check_size():
             return False
         return True
@@ -310,7 +312,7 @@ class Google_File(File):
     def get_files():
         if File.FILES: return File.FILES
         if not Settings.get_category():
-            settings.maybe_print("Warning: Missing Category")
+            settings.dev_print("Warning: Missing Category")
             return []
         files = Google_File.get_files_by_category(Settings.get_category())
         if Settings.get_title():
@@ -531,6 +533,9 @@ class Image(File):
     def __init__(self):
         pass
 
+    def prepare(self):
+        pass
+
 ###################################################################################
 
 class Video(File):
@@ -550,6 +555,7 @@ class Video(File):
         self.split = ffmpeg.split(path)
 
     # unnecessary, handled by onlyfans
+    # unless this somehow adds like more metadata
     def watermark(self):
         pass
 
@@ -562,7 +568,15 @@ class Video(File):
         path = self.get_path()
         self.screenshots = ffmpeg.frames(path)
 
+    def prepare(self):
+        self.reduce()
+        self.repair()
+        self.watermark()
+
     def reduce(self):
+        if not Settings.is_reduce(): 
+            settings.maybe_print("Skipping: Video Reduction")
+            return
         path = self.get_path()
         global FIFTY_MEGABYTES
         if (int(os.stat(str(path)).st_size) < FIFTY_MEGABYTES or str(Settings.is_reduce()) == "False"):
@@ -570,10 +584,14 @@ class Video(File):
         Settings.dev_print("reduce: {}".format(self.title))
         self.path = ffmpeg.reduce(path)
     
-    # def repair(self):
-    #     path = self.get_path()
-    #     if Settings.is_repair():
-    #         return
-    #     Settings.dev_print("repair: {}".format(self.title))
-    #     self.path = ffmpeg.repair(path)
+    # unnecessary
+    def repair(self):
+        if not Settings.is_repair():
+            settings.dev_print("Skipping: Video Repair")
+            return
+        path = self.get_path()
+        if Settings.is_repair():
+            return
+        Settings.dev_print("repair: {}".format(self.title))
+        self.path = ffmpeg.repair(path)
 
