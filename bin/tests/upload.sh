@@ -24,7 +24,7 @@ sudo onlysnarfpy \
 -bykeyword "pussycats" \
 -debug-delay \
 -show \
--verbose -verbose
+-verbose -verbose -verbose
 
 # Gallery
 echo "[*] Upload - Gallery"

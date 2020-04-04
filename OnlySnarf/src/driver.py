@@ -836,7 +836,7 @@ class Driver:
             expires = message.get_expiration()
             schedule = message.get_schedule()
             poll = message.get_poll()
-            if str(text) == "": print("Warning: Missing Upload Text")
+            if str(text) == "None": text = ""
             print("Posting:")
             print("- Files: {}".format(len(files)))
             print("- Keywords: {}".format(keywords))
