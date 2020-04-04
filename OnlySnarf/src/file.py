@@ -310,7 +310,7 @@ class Google_File(File):
     def get_files():
         if File.FILES: return File.FILES
         if not Settings.get_category():
-            print("Warning: Missing Category")
+            settings.maybe_print("Warning: Missing Category")
             return []
         files = Google_File.get_files_by_category(Settings.get_category())
         if Settings.get_title():
