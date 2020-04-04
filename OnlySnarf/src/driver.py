@@ -1191,7 +1191,7 @@ class Driver:
             minute_ = theSchedule.minute
             today = datetime.now()
             Settings.dev_print("today: {} {}".format(today.strftime("%B"), today.strftime("%Y")))
-            date__ = datetime.strptime(str(theSchedule.get_date()), "%Y-%d-%m")
+            date__ = datetime.strptime(str(theSchedule.get_date()), "%Y-%m-%d %H:%M:%S")
             if date__ < today:
                 print("Error: Unable to Schedule Earlier Date")
                 return False
