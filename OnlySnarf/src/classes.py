@@ -244,7 +244,7 @@ class Schedule:
 
 	def get(self):
 		if self.get_date():
-			date = datetime.strptime(str(self.get_date()), "%Y-%d-%m")
+			date = datetime.strptime(str(self.get_date()), "%Y-%m-%d %H:%M:%S")
 			self.year = date.year
 			self.month = date.strftime("%B")
 			self.day = date.day
@@ -259,7 +259,7 @@ class Schedule:
 
 		schedule = Settings.get_schedule() or None
 		if schedule:
-			date = datetime.strptime(str(schedule), "%Y-%d-%m %H:%M:%S")
+			date = datetime.strptime(str(schedule), "%Y-%m-%d %H:%M:%S")
 			self.date = date.date()
 			return self.date
 
@@ -283,7 +283,7 @@ class Schedule:
 
 		schedule = Settings.get_schedule() or None
 		if schedule:
-			time = datetime.strptime(str(schedule), "%Y-%d-%m %H:%M:%S")
+			time = datetime.strptime(str(schedule), "%Y-%m-%d %H:%M:%S")
 			self.time = time.time()
 			return self.time
 

@@ -135,7 +135,7 @@ class Settings:
         return PRICE_MINIMUM or 0
 
     def get_date():
-        return config["DATE"] or ""
+        return config["DATE"] or None
 
     def get_default_greeting():
         return DEFAULT_GREETING or ""
@@ -276,11 +276,11 @@ class Settings:
 
     def get_schedule():
         if str(config["SCHEDULE"]) != "None": return config["SCHEDULE"]
-        if Settings.get_date() != "":
-            if str(Settings.get_time()) != "":
-                config.set("SCHEDULE", "{} {}".format(Settings.get_date(), Settings.get_time()))
+        if Settings.get_date():
+            if Settings.get_time():
+                config["SCHEDULE"] = "{} {}".format(Settings.get_date(), Settings.get_time())
             else:
-                config.set("SCHEDULE", "{} {}".format(Settings.get_date(), "00:00"))
+                config["SCHEDULE"] = "{}".format(Settings.get_date())
         return config["SCHEDULE"]
 
     def get_tags():
@@ -357,6 +357,9 @@ class Settings:
 
     def is_debug_delay():
         return config["DEBUG_DELAY"] or False
+
+    def is_delete():
+        return config["DELETE_GOOGLE"] or False
 
     def is_prefer_local():
         return config["PREFER_LOCAL"] or False

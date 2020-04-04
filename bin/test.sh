@@ -12,7 +12,8 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 # sudo onlysnarfpy -debug -verbose -category gallery -debug-delay -show -skip-reduce
 
-sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local
+# sudo onlysnarfpy -category video -date "2020-12-25" -skip-download -debug -verbose -verbose -verbose
+# sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local
 # sudo onlysnarfpy -debug -verbose -verbose -action test -show
 # sudo onlysnarfpy -debug -verbose -action message -category image -user "all" -text "test pussy" -bykeyword "pussycats" -show
 # sudo onlysnarfpy -debug -verbose -action message -user "recent" -text "test pussy" -bykeyword "pussycats" -show
@@ -28,7 +29,6 @@ sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local
 
 # sudo onlysnarfpy -debug -verbose -action "message" -user "all" -category "image" -bykeyword "dailydick" -text "daily dick" -price "3.69" -show
 
-sudo onlysnarfpy -category video -date "12/25/2019" -expires 7
 
 # # Message
 # sudo onlysnarfpy \
