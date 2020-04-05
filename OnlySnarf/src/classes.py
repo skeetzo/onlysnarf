@@ -14,6 +14,9 @@ class Discount:
 		self.gotten = False
 
 	def apply(self):
+		self.get()
+		if not self.gotten: return
+		if not Settings.prompt("Discount"): return
 		if str(self.get_username()).lower() == "all":
 			users = User.get_all_users()
 		elif str(self.get_username()).lower() == "recent":
@@ -30,14 +33,18 @@ class Discount:
 
 	def get(self):
 		if self.gotten: return
-		self.get_username()
-		self.get_amount()
-		self.get_months()
+		gotten = self.get_username()
+		if not gotten: return
+		gotten = self.get_amount()
+		if not gotten: return
+		gotten = self.get_months()
+		if not gotten: return
 		self.gotten = True
 
 	def get_amount(self):
 		if self.amount: return self.amount
 		amount = Settings.get_amount() or None
+		print(amount)
 		if amount: return amount
 		if not Settings.prompt("amount"): return None
 		question = {
@@ -45,7 +52,7 @@ class Discount:
 			'name': 'amount',
 			'message': 'Amount:',
 			'validate': AmountValidator,
-			'filter': lambda val: int(myround(val))
+			'filter': lambda val: int(myround(int(val)))
 		}
 		answers = PyInquirer.prompt(question)
 		amount = answers["amount"]
@@ -84,6 +91,12 @@ class Poll:
 		self.questions = []
 		self.gotten = False
 
+	def apply(self):
+		self.get()
+		if not self.gotten: return
+		if not Settings.prompt("Poll"): return
+		return True
+
 	def check(self):
 		if len(self.get_questions()) > 0: return True
 		if self.get_duration(): return True
@@ -91,8 +104,10 @@ class Poll:
 
 	def get(self):
 		if self.gotten: return
-		self.get_duration()
-		self.get_questions()
+		gotten = self.get_duration()
+		if not gotten: return
+		gotten = self.get_questions()
+		if not gotten: return
 		self.gotten = True
 
 	def get_questions(self):
@@ -144,21 +159,32 @@ class Promotion:
 
 	# requires the copy/paste and email steps
 	def create_trial_link(self):
+		self.get()
+		if not self.gotten: return
+		if not Settings.prompt("Promotion"): return
 		# limit, expiration, months, user
 		Driver.create_trial_link(self)
 
 	# apply discount directly to user on user's profile page
 	def apply_to_user():
+		self.get()
+		if not self.gotten: return
+		if not Settings.prompt("Promotion"): return
 		# user, expiration, months, message
 		Driver.promotion_user_directly(self)
 
 	def get():
 		if self.gotten: return
-		self.get_user()
-		self.get_expiration()
-		self.get_limit()
-		self.get_duration()
-		self.get_message()
+		gotten = self.get_user()
+		if not gotten: return
+		gotten = self.get_expiration()
+		if not gotten: return
+		gotten = self.get_limit()
+		if not gotten: return
+		gotten = self.get_duration()
+		if not gotten: return
+		gotten = self.get_message()
+		if not gotten: return
 		self.gotten = True
 
 	def get_expiration(self):
@@ -248,6 +274,11 @@ class Schedule:
 		##
 		self.gotten = False
 
+	def apply(self):
+		self.get()
+		if not self.gotten: return
+		if not Settings.prompt("Schedule"): return
+
 	def check(self):
 		if self.get_date() and self.get_time(): return True
 		return False
@@ -268,13 +299,11 @@ class Schedule:
 		if self.date: return self.date
 		date = Settings.get_date() or None
 		if date: return date
-
 		schedule = Settings.get_schedule() or None
 		if schedule:
 			date = datetime.strptime(str(schedule), "%Y-%m-%d %H:%M:%S")
 			self.date = date.date()
 			return self.date
-
 		if not Settings.prompt("date"): return None
 		question = {
 			'type': 'input',
@@ -292,13 +321,11 @@ class Schedule:
 		if self.time: return self.time
 		time = Settings.get_time() or None
 		if time: return time
-
 		schedule = Settings.get_schedule() or None
 		if schedule:
 			time = datetime.strptime(str(schedule), "%Y-%m-%d %H:%M:%S")
 			self.time = time.time()
 			return self.time
-
 		if not Settings.prompt("time"): return None
 		question = {
 			'type': 'input',
@@ -311,7 +338,6 @@ class Schedule:
 		if not Settings.confirm(time): return self.get_time()
 		self.time = time
 		return self.time
-
 
 # round to 5
 def myround(x, base=5):

@@ -284,6 +284,7 @@ class Message():
 
     def post(self):
         self.get_post()
+        if not Settings.prompt("Post"): return
         successful = False
         try: successful = Driver.post(self)
         except Exception as e:
@@ -295,6 +296,7 @@ class Message():
     # 'post' as recipient will post message instead
     def send(self):
         self.get_message()
+        if not Settings.prompt("Send"): return
         successful = False
         try: 
             # for user in self.get_recipients():

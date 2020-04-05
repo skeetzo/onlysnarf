@@ -101,7 +101,7 @@ parser.add_argument('-action', type=str, dest='action',
 # action: discount
 # the amount to discount a user by
 parser.add_argument('-amount', type=valid_amount, dest='amount',
-  help='the amount (%%) to discount by', default=DISCOUNT_MIN_AMOUNT)
+  help='the amount (%%) to discount by', default=None)
 ##
 # -backup
 # backup uploaded content to "posted" folder
@@ -210,7 +210,7 @@ parser.add_argument('-limit', type=int, default=1, dest='limit',
 # -months
 # action: discount
 # the number of months to discount for
-parser.add_argument('-months', type=valid_month, default=DISCOUNT_MIN_MONTHS, dest='months',
+parser.add_argument('-months', type=valid_month, default=None, dest='months',
   help='the number of months to discount or apply promotion')
 ##
 # -mount-path
