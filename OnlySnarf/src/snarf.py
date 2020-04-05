@@ -44,6 +44,9 @@ class Snarf:
 
     @staticmethod
     def exit():
+        if Settings.is_show_window():
+            Settings.maybe_print("Skipping: Window Close")
+            return
         Driver.exit()
 
     ###################

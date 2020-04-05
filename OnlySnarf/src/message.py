@@ -19,19 +19,22 @@ class Message():
         ## messages
         self.price = None
         self.recipients = [] # users to send to
+        self.users = [] # prepared recipients
         ## posts
         self.expiration = None
         self.poll = None
         self.schedule = None
+        ##
+        self.gotten = False
 
     ###########################################################################
 
     def backup_files(self):
-        for file in self.get_files():
+        for file in self.files:
             file.backup()
 
     def delete_files(self):
-        for file in self.get_files():
+        for file in self.files:
             file.delete()
 
     def cleanup_files(self):
@@ -40,22 +43,22 @@ class Message():
 
     @staticmethod
     def format_keywords(keywords):
-        if len(keywords) > 0: return "#{}".format(" #".join(keywords))
+        if len(keywords) > 0: return " #{}".format(" #".join(keywords))
         return ""
 
     @staticmethod
     def format_performers(performers):
-        if len(performers) > 0: return "w/ @{}".format(" @".join(performers))
+        if len(performers) > 0: return " w/ @{}".format(" @".join(performers))
         return ""
             
     @staticmethod
     def format_tags(tags):
-        if len(tags) > 0: return "@{}".format(" @".join(tags))
+        if len(tags) > 0: return " @{}".format(" @".join(tags))
         return ""
 
     def format_text(self):
-        return "{} {} {} {}".format(self.get_text(), Message.format_performers(self.get_performers()), Message.format_tags(self.get_tags()),
-            Message.format_keywords(self.get_keywords())).strip()
+        return "{}{}{}{}".format(self.text, Message.format_performers(self.performers), Message.format_tags(self.tags),
+            Message.format_keywords(self.keywords)).strip()
 
     def get_keywords(self):
         # if self.keywords: return self.keywords
@@ -138,24 +141,6 @@ class Message():
         self.files = filed
         return self.files
 
-    def get_price(self):
-        if self.price: return self.price
-        price = Settings.get_price() or None
-        if price: return price
-        if not Settings.prompt("price"): return ""
-        question = {
-            'type': 'input',
-            'name': 'price',
-            'message': 'Price',
-            'validate': NumberValidator,
-            'filter': lambda val: int(val)
-        }
-        answers = PyInquirer.prompt(question)
-        price = answers["price"]
-        if not Settings.confirm(price): return self.get_price()
-        self.price = price
-        return self.price
-
     def get_expiration(self):
         if self.expiration: return self.expiration
         expires = Settings.get_expiration() or None
@@ -185,10 +170,29 @@ class Message():
         self.poll = poll
         return poll
 
+    def get_price(self):
+        if self.price: return self.price
+        price = Settings.get_price() or None
+        if price: return price
+        if not Settings.prompt("price"): return ""
+        question = {
+            'type': 'input',
+            'name': 'price',
+            'message': 'Price',
+            'validate': NumberValidator,
+            'filter': lambda val: int(val)
+        }
+        answers = PyInquirer.prompt(question)
+        price = answers["price"]
+        if not Settings.confirm(price): return self.get_price()
+        self.price = price
+        return self.price
+
     # ensures listed recipients are users
     # Settings.USERS and self.recipients should be usernames
     # if includes [all, recent, favorite] & usernames it only uses the 1st found of [all,...]
     def get_recipients(self):
+        if len(self.users) > 0: return self.users
         users = []
         if len(self.recipients) == 0 and len(Settings.get_users()) > 0: 
             users = Settings.get_users()
@@ -208,7 +212,8 @@ class Message():
         #         users = User.get_favorite_users()
         #         break
         #     else: users.append(user)
-        return users
+        self.users = users
+        return self.users
 
     def get_schedule(self):
         if self.schedule: return self.schedule
@@ -238,7 +243,8 @@ class Message():
         self.text = text
         return self.text
 
-    def get_all(self):
+    def get(self):
+        if self.gotten: return
         self.get_text()
         self.get_keywords()
         self.get_tags()
@@ -247,33 +253,43 @@ class Message():
         self.get_schedule()
         self.get_files()
         self.get_recipients()
-        if not self.get_text():
-            files = self.get_files()
-            if len(files) > 0:
-                self.text = files[0].get_title()
+        if not self.text:
+            if len(self.files) > 0:
+                self.text = self.files[0].get_title()
+        self.gotten = True
 
     def get_post(self):
+        if self.gotten: return
         self.get_text()
         self.get_keywords()
         self.get_tags()
         self.get_poll()
         self.get_schedule()
         self.get_files()
-        self.get_recipients()
-        if not self.get_text():
-            files = self.get_files()
-            if len(files) > 0:
-                self.text = files[0].get_title()
+        if not self.text:
+            if len(self.files) > 0:
+                self.text = self.files[0].get_title()
+        self.gotten = True
 
     def get_message(self):
+        if self.gotten: return
         self.get_text()
         self.get_price()
         self.get_files()
         self.get_recipients()
-        if not self.get_text():
-            files = self.get_files()
-            if len(files) > 0:
-                self.text = files[0].get_title()
+        if not self.text:
+            if len(self.files) > 0:
+                self.text = self.files[0].get_title()
+        self.gotten = True
+
+    def post(self):
+        self.get_post()
+        successful = False
+        try: successful = Driver.post(self)
+        except Exception as e:
+            Settings.dev_print(e)
+            successful = False
+        if successful: self.cleanup_files()
 
     # sends to recipients
     # 'post' as recipient will post message instead
@@ -282,21 +298,12 @@ class Message():
         successful = False
         try: 
             # for user in self.get_recipients():
-            for user in self.get_recipients():
+            for user in self.users:
                 # if isinstance(user, str) and str(user) == "post": successful_ = Driver.post(self)
                 # print("Messaging: {}".format(user.username))
                 successful_ = User.message_user(user.username, self)
                 if not successful_: continue
                 successful_ = Driver.message(user.username)
-        except Exception as e:
-            Settings.dev_print(e)
-            successful = False
-        if successful: self.cleanup_files()
-
-    def post(self):
-        self.get_post()
-        successful = False
-        try: successful = Driver.post(self)
         except Exception as e:
             Settings.dev_print(e)
             successful = False
