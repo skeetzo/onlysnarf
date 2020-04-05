@@ -312,7 +312,7 @@ class Google_File(File):
     def get_files():
         if File.FILES: return File.FILES
         if not Settings.get_category():
-            settings.dev_print("Warning: Missing Category")
+            Settings.dev_print("Warning: Missing Category")
             return []
         files = Google_File.get_files_by_category(Settings.get_category())
         if Settings.get_title():
@@ -575,7 +575,7 @@ class Video(File):
 
     def reduce(self):
         if not Settings.is_reduce(): 
-            settings.maybe_print("Skipping: Video Reduction")
+            Settings.maybe_print("Skipping: Video Reduction")
             return
         path = self.get_path()
         global FIFTY_MEGABYTES
@@ -587,7 +587,7 @@ class Video(File):
     # unnecessary
     def repair(self):
         if not Settings.is_repair():
-            settings.dev_print("Skipping: Video Repair")
+            Settings.dev_print("Skipping: Video Repair")
             return
         path = self.get_path()
         if Settings.is_repair():
