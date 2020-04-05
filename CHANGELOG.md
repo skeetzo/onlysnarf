@@ -376,3 +376,10 @@ d) 'new account': tweeting behavior - tweet to advertise new account, tweet to a
 
 Referral Code
 https://onlyfans.com/?ref=409408
+
+
+
+
+- getters are called repeatedly even when provided with a no
+- unsure if window is closed after menu calls message.post/send
+- when not show-window the window should remain open in the background between menu uses
