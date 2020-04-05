@@ -73,7 +73,7 @@ class Discount:
 
 	def get_username(self):
 		if self.username: return self.username
-		username = User.select_user().username
+		username = User.select_user()
 		self.username = username
 		return self.username
 
