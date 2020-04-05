@@ -80,7 +80,7 @@ class User:
     @staticmethod
     def enter_message(message=None):
         try:
-            print("Entering Message: {} - ${}".format(message.get_text(), message.get_price()))
+            print("Entering Message: {} - ${}".format(message.text, message.price))
             def enter_text(text):
                 success = Driver.message_text(text)
                 if not success: return False
@@ -110,9 +110,9 @@ class User:
                 success = Driver.message_confirm()
                 if not success: return False
                 return True
-            if not enter_text(message.get_text()): return False # not allowed to fail
-            enter_price(message.get_price()) # allowed to fail
-            enter_files(message.get_files())
+            if not enter_text(message.text): return False # not allowed to fail
+            enter_price(message.price) # allowed to fail
+            enter_files(message.files)
             # for file in message.get_files():
                 # enter_file(file.get_path()) # allowed to fail
             if not confirm(): return False # not allowed to fail

@@ -36,7 +36,7 @@ ASCII = "\n ________         .__          _________                     _____ \n
 \\_______  /___|  /____/ ____/_______  /___|  (____  \\\\__|  |_|   \n \
         \\/     \\/     \\/            \\/     \\/     \\/              \n"
 snarf = Snarf()
-version = str(pkg_resources.get_distribution("onlysnarf").version)
+VERSION = str(pkg_resources.get_distribution("onlysnarf").version)
 
 #####################
 ##### Functions #####
@@ -78,7 +78,6 @@ def discount_menu():
 
 def message_menu():
     message = Message()
-    message.get_message()
     message.send()
     main()
 
@@ -86,7 +85,6 @@ def message_menu():
 
 def post_menu():
     message = Message()
-    message.get_post()
     message.post()
     main()
 
@@ -116,9 +114,9 @@ def settings_menu():
 # Main
 
 def header():
-    # os.system('clear')
+    if not Settings.is_debug(): os.system('clear')
     print(colorize(ASCII, 'header'))
-    print(colorize('version '+version+'\n', 'green'))
+    print(colorize('version {}\n'.format(VERSION), 'green'))
     user_header()
     settings_header()
 
@@ -153,15 +151,17 @@ def main_menu():
 
 def main():
     time.sleep(1)
-    header()
-    settings_header()
-    main_menu()
+    try:
+        header()
+        settings_header()
+        main_menu()
+    except Exception as e:
+        print(e)
 
 #################################################################################################
 
 import atexit
 def exit_handler():
-    print('Shnnarrrff!')
     exit()
 atexit.register(exit_handler)
 
@@ -173,14 +173,14 @@ signal.signal(signal.SIGINT, signal_handler)
   
 def exit():
     print("Shnarrf?")
-    sys.exit(0)
+    # sys.exit(1)
 
 ######################################################
 
 if __name__ == "__main__":
     try:
         main()
-    except:
+    except Exception as e:
         print("Shhhhhnnnnnarf!")
     finally:
         exit()

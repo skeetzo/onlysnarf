@@ -110,9 +110,10 @@ class Driver:
             return False
         auth_ = Driver.auth()
         if not auth_: return False
-        months = discount.get_months()
-        amount = discount.get_amount()
-        user = discount.get_username()
+        discount.get()
+        months = discount.months
+        amount = discount.amount
+        user = discount.username
         if int(months) > int(Settings.get_discount_max_months()):
             print("Warning: Months Too High, Max -> {} days".format(Settings.get_discount_max_months()))
             months = Settings.get_discount_max_months()
@@ -742,8 +743,9 @@ class Driver:
         auth_ = Driver.auth()
         if not auth_: return False
         Settings.dev_print("poll")
-        duration = poll.get_duration()
-        questions = poll.get_questions()
+        poll.get()
+        duration = poll.duration
+        questions = poll.questions
         try:
             print("Poll:")
             print("- Duration: {}".format(duration))
@@ -827,15 +829,16 @@ class Driver:
         Settings.dev_print("posting")
         try:
             Driver.go_to_home()
-            files = message.get_files()
+            message.get_post()
+            files = message.files
             # files = 
             text = message.format_text()
-            keywords = message.get_keywords()
-            performers = message.get_performers()
-            tags = message.get_tags()
-            expires = message.get_expiration()
-            schedule = message.get_schedule()
-            poll = message.get_poll()
+            keywords = message.keywords
+            performers = message.performers
+            tags = message.tags
+            expires = message.expiration
+            schedule = message.schedule
+            poll = message.poll
             if str(text) == "None": text = ""
             print("Posting:")
             print("- Files: {}".format(len(files)))
@@ -930,10 +933,11 @@ class Driver:
         if not auth_: return False
         # go to onlyfans.com/my/subscribers/active
         try:
-            limit = promotion.get_limit()
-            expiration = promotion.get_expiration()
-            months = promotion.get_months()
-            user = promotion.get_user()
+            promotion.get()
+            limit = promotion.limit
+            expiration = promotion.expiration
+            months = promotion.months
+            user = promotion.user
             Settings.maybe_print("goto -> /my/promotions")
             BROWSER.get(('https://onlyfans.com/my/promotions'))
             Settings.dev_print("creating promotional trial")
@@ -1014,10 +1018,11 @@ class Driver:
         auth_ = Driver.auth()
         if not auth_: return False
         # go to onlyfans.com/my/subscribers/active
-        expiration = promotion.get_expiration()
-        months = promotion.get_months()
-        user = promotion.get_user()
-        message = promotion.get_message()
+        promotion.get()
+        expiration = promotion.expiration
+        months = promotion.months
+        user = promotion.user
+        message = promotion.message
         if int(expiration) > int(Settings.get_discount_max_amount()):
             print("Warning: Discount Too High, Max -> {}%".format(Settings.get_discount_max_amount()))
             discount = Settings.get_discount_max_amount()
@@ -1191,13 +1196,13 @@ class Driver:
             minute_ = theSchedule.minute
             today = datetime.now()
             Settings.dev_print("today: {} {}".format(today.strftime("%B"), today.strftime("%Y")))
-            date__ = datetime.strptime(str(theSchedule.get_date()), "%Y-%m-%d %H:%M:%S")
+            date__ = datetime.strptime(str(theSchedule.date), "%Y-%m-%d %H:%M:%S")
             if date__ < today:
                 print("Error: Unable to Schedule Earlier Date")
                 return False
             print("Schedule:")
-            print("- Date: {}".format(theSchedule.get_date()))
-            print("- Time: {}".format(theSchedule.get_time()))
+            print("- Date: {}".format(theSchedule.date))
+            print("- Time: {}".format(theSchedule.time))
             Driver.open_more_options()
             # click schedule
             Settings.dev_print("adding schedule")
