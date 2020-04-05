@@ -56,19 +56,21 @@ class Settings:
     #####################
 
     def confirm(text):
-        if text == None: return False
-        if list(text) == []: return False
-        if str(text) == "": return False
-        if not Settings.CONFIRM: return True
+        try:
+            if text == None: return False
+            if list(text) == []: return False
+            if str(text) == "": return False
+            if not Settings.CONFIRM: return True
+        except: pass
         questions = [
             {
                 'type': 'confirm',
                 'message': 'Is this correct? -> {}'.format(text),
-                'name': 'covfefe',
+                'name': 'confirm',
                 'default': True,
             }
         ]
-        return PyInquirer.prompt(questions)["covfefe"]
+        return PyInquirer.prompt(questions)["confirm"]
 
     def debug_delay_check():
         if Settings.is_debug() and Settings.is_debug_delay():
@@ -201,7 +203,7 @@ class Settings:
         if Settings.MESSAGE: return Settings.MESSAGE
         from .message import Message
         message = Message()
-        message.get_post()
+        # message.get_post()
         Settings.MESSAGE = message
         return message
 

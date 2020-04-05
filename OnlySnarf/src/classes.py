@@ -11,6 +11,7 @@ class Discount:
 		self.amount = None
 		self.months = None
 		self.username = None
+		self.gotten = False
 
 	def apply(self):
 		if str(self.get_username()).lower() == "all":
@@ -28,9 +29,11 @@ class Discount:
 		return successful
 
 	def get(self):
+		if self.gotten: return
 		self.get_username()
 		self.get_amount()
 		self.get_months()
+		self.gotten = True
 
 	def get_amount(self):
 		if self.amount: return self.amount
@@ -79,6 +82,7 @@ class Poll:
 	def __init__(self):
 		self.duration = None
 		self.questions = []
+		self.gotten = False
 
 	def check(self):
 		if len(self.get_questions()) > 0: return True
@@ -86,8 +90,10 @@ class Poll:
 		return False
 
 	def get(self):
+		if self.gotten: return
 		self.get_duration()
 		self.get_questions()
+		self.gotten = True
 
 	def get_questions(self):
 		if len(self.questions) > 0: return self.questions
@@ -126,7 +132,6 @@ class Poll:
 		self.duration = duration
 		return self.duration
 
-
 class Promotion:
 
 	def __init__(self):
@@ -135,6 +140,7 @@ class Promotion:
 		self.duration = None
 		self.user = None
 		self.message = None
+		self.gotten = False
 
 	# requires the copy/paste and email steps
 	def create_trial_link(self):
@@ -147,11 +153,13 @@ class Promotion:
 		Driver.promotion_user_directly(self)
 
 	def get():
+		if self.gotten: return
 		self.get_user()
 		self.get_expiration()
 		self.get_limit()
 		self.get_duration()
 		self.get_message()
+		self.gotten = True
 
 	def get_expiration(self):
 		if self.expiration: return self.expiration
@@ -237,12 +245,15 @@ class Schedule:
 		self.year = "0"
 		self.month = "0"
 		self.day = "0"
+		##
+		self.gotten = False
 
 	def check(self):
 		if self.get_date() and self.get_time(): return True
 		return False
 
 	def get(self):
+		if self.gotten: return
 		if self.get_date():
 			date = datetime.strptime(str(self.get_date()), "%Y-%m-%d %H:%M:%S")
 			self.year = date.year
@@ -251,6 +262,7 @@ class Schedule:
 			if self.get_time():
 				self.hour = date.hour
 				self.minute = date.minute
+		self.gotten = True
 
 	def get_date(self):
 		if self.date: return self.date

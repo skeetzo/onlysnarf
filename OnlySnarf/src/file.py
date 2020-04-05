@@ -178,13 +178,6 @@ class File():
             return False
         return True
 
-    def set_path(self, path):
-        # check if path exists
-        if not os.path.exists(path):
-            print("Error: File Does Not Exist")
-            return False
-        self.path = path
-
     # Deletes all local files
     @staticmethod
     def remove_local():
@@ -214,8 +207,11 @@ class File():
         answer = PyInquirer.prompt(question)
         path = answer["path"]
         if not Settings.confirm(path): return None
+        if not os.path.exists(path):
+            print("Error: File Does Not Exist")
+            return True
         file = File()
-        file.set_path(path)
+        setattr(file, "path", path)
         return file
 
     @staticmethod
@@ -226,7 +222,7 @@ class File():
         while True:
             file = File.select_file()
             if not file: break
-            files.append(file)
+            if isinstance(file, File): files.append(file)
             if not Settings.prompt("another file"): break
         if not Settings.confirm([file.get_path() for file in files]): return []
         return files
