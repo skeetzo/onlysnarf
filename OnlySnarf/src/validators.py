@@ -100,14 +100,14 @@ def valid_path(s):
 
 class MonthValidator(Validator):
 	def validate(self, document):
-		if int(s) < DISCOUNT_MIN_MONTHS or int(s) > DISCOUNT_MAX_MONTHS:
+		if int(document.text) < DISCOUNT_MIN_MONTHS or int(document.text) > DISCOUNT_MAX_MONTHS:
 			raise ValidationError(
 				message='Please enter a month number (1-12)',
 				cursor_position=len(document.text))
 
 class AmountValidator(Validator):
 	def validate(self, document):
-		if int(s) < DISCOUNT_MIN_AMOUNT or int(s) > DISCOUNT_MAX_AMOUNT:
+		if int(document.text) < DISCOUNT_MIN_AMOUNT or int(document.text) > DISCOUNT_MAX_AMOUNT:
 			raise ValidationError(
 				message='Please enter an amount as a multiple of 5 between {} and {}'.format(DISCOUNT_MIN_AMOUNT, DISCOUNT_MAX_AMOUNT),
 				cursor_position=len(document.text))
