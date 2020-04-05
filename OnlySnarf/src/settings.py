@@ -106,10 +106,10 @@ class Settings:
         return config["ACTION"]
 
     def get_amount():
-        return config["AMOUNT"] or DISCOUNT_MIN_AMOUNT
+        return config["AMOUNT"]
 
     def get_months():
-        return config["MONTHS"] or DISCOUNT_MIN_MONTHS
+        return config["MONTHS"]
 
     def get_discount():
         if Settings.DISCOUNT: return Settings.DISCOUNT
@@ -395,16 +395,19 @@ class Settings:
 
         ### OnlySnarf Settings Menu
     def menu():
+        skipList = ["action", "category", "categories", "cron", "input", "messages", "posts", "date", "duration", "expiration", "keywords", "limit", "months", "bykeyword", "notkeyword", "price", "config_path", "google_path", "client_secret", "questions", "schedule", "skipped_users", "tags", "text", "time", "title", "user", "users", "username", "password", "users_favorite"]
         print('Settings')
+        keys = [key.replace("_"," ").title() for key in config.keys() if key.lower() not in skipList and "categories" not in str(key).lower() and "messages" not in str(key).lower()]
+        keys.insert(0, "Back")
         question = {
             'type': 'list',
             'name': 'choice',
             'message': 'Set:',
-            'choices': [key.replace("_"," ").title() for key in config.keys()],
+            'choices': keys,
             'filter': lambda val: val.lower()
         }
-        answer = prompt(question)["choice"]
-        if not Settings.confirm(answer): return
+        answer = PyInquirer.prompt(question)["choice"]
+        if str(answer).lower() == "back": return
         Settings.set_setting(answer)
 
     def prompt(text):
@@ -455,23 +458,31 @@ class Settings:
         Settings.PROMPT = bool(value)
 
     def set_setting(key):
+        value = config[key.upper()]
         key = key.replace("_"," ").title()
-        question = {
-            'type': 'input',
-            'name': 'key',
-            'message': key,
-            'default': value
-        }
+        print("Current: {}".format(value))
         if isinstance(value, bool):
+            toggle = True
             question = {
                 'type': 'confirm',
-                'name': 'key',
-                'message': key,
-                'default': value
+                'name': 'setting',
+                'message': "Toggle value?",
+                # 'default': int(value)
             }
-        answer = prompt(question)
-        setattr(config, key, answer["key"])
-
+            answer = PyInquirer.prompt(question)["setting"]
+            if not answer: return
+            if value: config[key.upper()] = False
+            else: config[key.upper()] = True
+        else:
+            question = {
+                'type': 'input',
+                'name': 'setting',
+                'message': "New value:",
+                # 'default': int(value)
+            }
+            answer = PyInquirer.prompt(question)["setting"]
+            if not Settings.confirm(answer): return
+            config[key.upper()] = answer
 
 ###########################################################################
 

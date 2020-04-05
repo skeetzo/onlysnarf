@@ -156,7 +156,7 @@ def main():
         settings_header()
         main_menu()
     except Exception as e:
-        print(e)
+        Settings.dev_print(e)
 
 #################################################################################################
 

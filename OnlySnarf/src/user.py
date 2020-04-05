@@ -338,20 +338,22 @@ class User:
     @staticmethod
     def select_username():
         # returns the list of usernames to select
-        if not Settings.prompt("username"): return None
+        if not Settings.prompt("select username"): return None
         users = User.get_all_users()
         for user in users:
-            user["name"] = user["username"]
-            user["value"] = user
-            user["short"] = user["id"]
+            # user["name"] = user["username"]
+            setattr(user, "name", getattr(user, "username"))
+            # user["value"] = user
+            setattr(user, "value", user)
+            # user["short"] = user["id"]
+            setattr(user, "short", getattr(user, "id"))
         question = {
             'type': 'list',
             'name': 'user',
             'message': 'Username:',
             'choices': users
         }
-        answers = PyInquirer.prompt(question)
-        user = answers["user"]
+        user = PyInquirer.prompt(question)['user']
         if not Settings.confirm(user.username): return User.select_username()
         return user
 
@@ -364,7 +366,7 @@ class User:
         try:
             with open(str(Settings.get_users_path())) as json_file:  
                 users = json.load(json_file)['users']
-            Settings.maybe_print("Loaded:")
+            Settings.maybe_print("Loaded Local Users")
             for user in users:
                 try:
                     users_.append(User(json.loads(user)))
@@ -395,8 +397,6 @@ class User:
         data = {}
         data['users'] = []
         for user in users:
-            if Settings.is_debug():
-                Settings.maybe_print("Saving: "+str(user.username))
             data['users'].append(user.toJSON())
         try:
             with open(str(Settings.get_users_path()), 'w') as outfile:  
