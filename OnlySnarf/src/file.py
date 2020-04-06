@@ -307,10 +307,10 @@ class Google_File(File):
     @staticmethod
     def get_files():
         if File.FILES: return File.FILES
-        if not Settings.get_category():
-            Settings.dev_print("Warning: Missing Category")
-            return []
-        files = Google_File.get_files_by_category(Settings.get_category())
+        category = Settings.get_category()
+        if not category: category = Settings.select_category()
+        if not category: Settings.dev_print("Warning: Missing Category")
+        files = Google_File.get_files_by_category(category)
         if Settings.get_title():
             for file in files:
                 if str(Settings.get_title()) == str(file.get_title()):
@@ -322,8 +322,8 @@ class Google_File(File):
     @staticmethod
     def get_files_by_category(category):
         files = []
-        if "image" in str(Settings.get_category()):
-            categoryFolder = Google.get_folder_by_name(Settings.get_category())
+        if "image" in str(category):
+            categoryFolder = Google.get_folder_by_name(category)
             for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
                 for image in Google.get_images_of_folder(folder):
                     file = Google_File()
@@ -331,8 +331,8 @@ class Google_File(File):
                     setattr(file, "parent", folder)
                     files.append(file)
             # files = [random.choice(files)]
-        elif "video" in str(Settings.get_category()):
-            categoryFolder = Google.get_folder_by_name(Settings.get_category())
+        elif "video" in str(category):
+            categoryFolder = Google.get_folder_by_name(category)
             for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
                 for video in Google.get_videos_of_folder(folder):
                     file = Google_File()
@@ -340,8 +340,8 @@ class Google_File(File):
                     setattr(file, "parent", folder)
                     files.append(file)
             # files = [random.choice(files)]
-        elif "galler" in str(Settings.get_category()):
-            categoryFolder = Google.get_folder_by_name(Settings.get_category())
+        elif "galler" in str(category):
+            categoryFolder = Google.get_folder_by_name(category)
             for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
                 for gallery in Google.get_folders_of_folder(folder):
                     file = Google_Folder()

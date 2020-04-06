@@ -426,11 +426,23 @@ class Driver:
     ### Go Tos ###
     ##############
 
+
     # waits for page load
     def get_page_load():
         time.sleep(5)
         # try: WebDriverWait(BROWSER, 120, poll_frequency=10).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
         # except Exception as e: pass
+
+    def handle_alert():
+        try:
+            alert_obj = BROWSER.switch_to.alert or None
+            if alert_obj:
+                alert_obj.accept()
+        except: pass
+        # alert = WebDriverWait(s.mydriver, 3).until(EC.alert_is_present(),"Enter Party Name")
+        # alert.send_keys() – used to enter a value in the Alert text box.
+        # alert.accept()
+        # Settings.dev_print("alert accepted")
 
     @staticmethod
     def go_to_page(page):
@@ -442,6 +454,7 @@ class Driver:
         else:
             Settings.maybe_print("goto -> {}".format(page))
             BROWSER.get("{}/{}".format(ONLYFANS_HOME_URL, page))
+        Driver.handle_alert()
         Driver.get_page_load()
 
     @staticmethod
@@ -540,9 +553,9 @@ class Driver:
         if not auth_: return False
         try:
             type__ = None # default
-            if str(username) == "all": type__ = "messageAll"
-            elif str(username) == "recent": type__ = "messageRecent"
-            elif str(username) == "favorite": type__ = "messageFavorite"
+            if str(username).lower() == "all": type__ = "messageAll"
+            elif str(username).lower() == "recent": type__ = "messageRecent"
+            elif str(username).lower() == "favorite": type__ = "messageFavorite"
             successful = False
             if type__ != None:
                 Driver.go_to_page(ONLYFANS_NEW_MESSAGE_URL)
@@ -596,6 +609,7 @@ class Driver:
 
     @staticmethod
     def message_files(files=[]):
+        if len(files) == 0: return True
         try:
             print("Uploading file(s): {}".format(len(files)))
             Settings.dev_print("uploading files")
@@ -645,8 +659,8 @@ class Driver:
                 return False
             print("Enter text: {}".format(text))
             Settings.dev_print("finding text area")
-            # message = Driver.find_element_by_name("messageText")     
-            message = BROWSER.find_element_by_name("message")     
+            message = Driver.find_element_by_name("messageText")     
+            # message = BROWSER.find_element_by_name("message")     
             Settings.dev_print("entering text")
             message.send_keys(str(text))
             Settings.dev_print("entered text")
