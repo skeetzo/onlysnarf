@@ -97,6 +97,7 @@ class Settings:
     def header():
         if Settings.last_updated:
             print("Updated: {} = {}".format(Settings.last_updated, config[Settings.last_updated.replace(" ","_").upper()]))
+            print('\r')
         Settings.last_updated = None
 
     # Gets
@@ -130,7 +131,7 @@ class Settings:
         cats = []
         cats.extend(list(CATEGORIES_DEFAULT))
         cats.extend(list(config["CATEGORIES"]))
-        return list(set(cats))
+        return list(set(cats)).sort()
 
     def get_price():
         return config["PRICE"] or ""
@@ -347,11 +348,11 @@ class Settings:
 
     # Bools
 
-    # def is_confirm():
-    #     return Settings.CONFIRM or False
+    def is_confirm():
+        return Settings.CONFIRM or False
 
-    # def is_prompt():
-    #     return Settings.PROMPT or False
+    def is_prompt():
+        return Settings.PROMPT or False
 
     def is_create_drive():
         return config["CREATE_DRIVE"] or False
@@ -397,7 +398,7 @@ class Settings:
 
         ### OnlySnarf Settings Menu
     def menu():
-        skipList = ["action", "category", "categories", "cron", "input", "messages", "posts", "date", "duration", "expiration", "keywords", "limit", "months", "bykeyword", "notkeyword", "price", "config_path", "google_path", "client_secret", "questions", "schedule", "skipped_users", "tags", "text", "time", "title", "user", "users", "username", "password", "users_favorite"]
+        skipList = ["action", "amount", "category", "categories", "cron", "input", "messages", "posts", "date", "duration", "expiration", "keywords", "limit", "months", "bykeyword", "notkeyword", "price", "config_path", "google_path", "client_secret", "questions", "schedule", "skipped_users", "tags", "text", "time", "title", "user", "users", "username", "password", "users_favorite"]
         print('Settings')
         keys = [key.replace("_"," ").title() for key in config.keys() if key.lower() not in skipList and "categories" not in str(key).lower() and "messages" not in str(key).lower()]
         keys.insert(0, "Back")

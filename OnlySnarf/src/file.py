@@ -44,9 +44,8 @@ class File():
     # Google.move_file
     # Google.move_files
     def backup(self):
-        if not File.backup_text(self.title): return
+        if not File.backup_text(self.get_title()): return
         Google.upload_file(file=self)
-        print('File Backed Up: {}'.format(self.title))
 
     @staticmethod
     def backup_text(title):
@@ -60,7 +59,7 @@ class File():
             Settings.maybe_print("Skipping Backup (debug): {}".format(title))
             return False
         else:
-            print('Backing Up (file): {}'.format(title))
+            Settings.maybe_print('Backing Up: {}'.format(title))
         return True
 
     @staticmethod
@@ -98,8 +97,10 @@ class File():
 
     # Deletes online file
     def delete(self):
-        if not File.delete_text(self.title): return
-        try: os.remove(self.get_path())
+        if not File.delete_text(self.get_title()): return
+        try: 
+            os.remove(self.get_path())
+            print('File Deleted: {}'.format(self.get_title()))
         except Exception as e: Settings.dev_print(e)
 
     @staticmethod
@@ -108,13 +109,13 @@ class File():
             Settings.maybe_print("Warning: Skipping Delete, skipped download")
             return False
         if not Settings.is_delete():
-            Settings.maybe_print('Skipping Backup (disabled): {}'.format(title))
+            Settings.maybe_print('Skipping Delete (disabled): {}'.format(title))
             return False
         elif Settings.is_debug():
             Settings.maybe_print("Skipping Delete (debug): {}".format(title))
             return False
         else:
-            print('Deleting: {}'.format(title))
+            Settings.maybe_print('Deleting: {}'.format(title))
         return True
 
     ##############################
@@ -227,6 +228,22 @@ class File():
         if not Settings.confirm([file.get_path() for file in files]): return []
         return files
 
+    @staticmethod
+    def select_file_upload_method():
+        if not Settings.prompt("upload files"): return []
+        print("Select an upload source")
+        question = {
+            'type': 'list',
+            'name': 'upload',
+            'message': 'Upload:',
+            'choices': ["Local", "Google"]
+        }
+        upload = PyInquirer.prompt(question)["upload"]
+        if not Settings.confirm(upload): return File.select_file_upload_method()
+        if str(upload) == "Google":
+            return Google_File.select_files()
+        return File.select_files()
+
     def upload(self):
         if not self.prepare():  
             print("Error: Unable to Upload File - {}".format(self.get_title()))
@@ -321,6 +338,7 @@ class Google_File(File):
 
     @staticmethod
     def get_files_by_category(category):
+        print("Loading Google Files...")
         files = []
         if "image" in str(category):
             categoryFolder = Google.get_folder_by_name(category)
@@ -412,30 +430,32 @@ class Google_File(File):
 
     @staticmethod
     def select_file(category):
-        if not Settings.prompt("google file"): return Google_File.get_random_file()
+        if not Settings.is_prompt(): return Google_File.get_random_file()
         # this is a list of google files to select from
-        files = Google.get_files_by_category(category)
+        files = Google_File.get_files_by_category(category)
+        files_ = []
         for file in files:
-            file["name"] = file["title"]
-            file["value"] = file
-            file["short"] = file["id"]
+            file.category = category
+            file_ = {
+                "name": file.file['title'],
+                "value": file,
+                "short": file.file['id']
+            }
+            files_.append(file_)
         question = {
             'type': 'list',
             'name': 'file',
             'message': 'Google Files:',
-            'choices': files,
+            'choices': files_,
             # 'filter': lambda file: file.lower()
         }
-        answer = PyInquirer.prompt(question)
-        file = answer["file"]
-        if not Settings.confirm(file): return Google_File.select_file(category)
-        file_ = Google_File()
-        setattr(file_, "file", file)
+        file = PyInquirer.prompt(question)["file"]
+        if not Settings.confirm(file.get_title()): return Google_File.select_file(category)
         return file
 
     @staticmethod
     def select_files():
-        if not Settings.prompt("select google files"): return [Google_File.get_random_file()]
+        if not Settings.is_prompt(): return [Google_File.get_random_file()]
         print("Select a folder category")
         question = {
             'type': 'list',
@@ -453,8 +473,11 @@ class Google_File(File):
             file = Google_File.select_file(category)
             if not file: break
             files.append(file)
-        if not Settings.confirm(files): return Google_File.select_files()
+            if "image" in str(category) or "video" in str(category): break
+        if not Settings.confirm([file.file['title'] for file in files]): return Google_File.select_files()
         return files
+
+    
 
 ##########################################################################################
 

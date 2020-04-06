@@ -130,10 +130,10 @@ class Message():
         files = []
         if len(self.files) == 0 and len(Settings.get_input()) > 0:
             files.append(Settings.get_input_as_files())
-        elif len(self.files) == 0 and len(Google_File.get_files()) > 0:
-            files = Google_File.select_files()
+        # elif len(self.files) == 0 and len(Google_File.get_files()) > 0:
+            # files = Google_File.select_files()
         elif len(self.files) == 0:
-            files = File.select_files()
+            files = File.select_file_upload_method()
         filed = []
         for file in files:
             if isinstance(file, Google_Folder): filed.extend(file.get_files())
