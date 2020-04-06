@@ -128,7 +128,6 @@ def header():
 
 def settings_header():
     Settings.header()
-    print('\r')
 
 def user_header():
     print("User:")
@@ -169,6 +168,7 @@ def main():
 
 import atexit
 def exit_handler():
+    print("Shnarrf?")
     exit()
 atexit.register(exit_handler)
 
@@ -179,8 +179,7 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
   
 def exit():
-    print("Shnarrf?")
-    # sys.exit(1)
+    sys.exit(0)
 
 ######################################################
 

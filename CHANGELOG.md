@@ -307,12 +307,11 @@
   - menu cleaned up
   - file system selection cleaned up
   - category
-  
-----------------------------------------
-
   **2.17.0**
   - massive spaghetti -> api overhaul
   - new menu
+  
+----------------------------------------
 
   **2.17.x**
   - debug discount
@@ -387,3 +386,4 @@ https://onlyfans.com/?ref=409408
 
 - unsure if window is closed after menu calls message.post/send
 - when not show-window the window should remain open in the background between menu uses
+- add seperators in google file selection w/ folder names
