@@ -95,10 +95,9 @@ class Settings:
                 print(colorize(text, "blue"))
 
     def header():
-        if str(Settings.last_updated) != "False":
-            print('\nUpdated: '+str(Settings.last_updated)+' -> '+str(Settings.last_updated))
-        Settings.last_updated = False
-        print('\r')
+        if Settings.last_updated:
+            print("Updated: {} = {}".format(Settings.last_updated, config[Settings.last_updated.replace(" ","_").upper()]))
+        Settings.last_updated = None
 
     # Gets
 
@@ -128,7 +127,10 @@ class Settings:
         return cat or None
 
     def get_categories():
-        return list(CATEGORIES_DEFAULT).extend(list(config["CATEGORIES"]))
+        cats = []
+        cats.extend(list(CATEGORIES_DEFAULT))
+        cats.extend(list(config["CATEGORIES"]))
+        return list(set(cats))
 
     def get_price():
         return config["PRICE"] or ""
@@ -408,6 +410,7 @@ class Settings:
         }
         answer = PyInquirer.prompt(question)["choice"]
         if str(answer).lower() == "back": return
+        answer = answer.replace(" ", "_").upper()
         Settings.set_setting(answer)
 
     def prompt(text):
@@ -442,6 +445,17 @@ class Settings:
         Settings.set_password(pw)
         return pw
 
+    def select_category():
+        question = {
+            'type': 'list',
+            'message': 'Category?',
+            'name': 'category',
+            'choices': Settings.get_categories(),
+        }
+        cat = PyInquirer.prompt(question)["category"]
+        if not Settings.confirm(cat): return Settings.select_category()
+        return cat
+
     def set_confirm(value):
         Settings.CONFIRM = bool(value)
 
@@ -458,11 +472,10 @@ class Settings:
         Settings.PROMPT = bool(value)
 
     def set_setting(key):
-        value = config[key.upper()]
+        value = config[key]
         key = key.replace("_"," ").title()
         print("Current: {}".format(value))
-        if isinstance(value, bool):
-            toggle = True
+        if str(value) == "True" or str(value) == "False":
             question = {
                 'type': 'confirm',
                 'name': 'setting',
@@ -470,7 +483,7 @@ class Settings:
                 # 'default': int(value)
             }
             answer = PyInquirer.prompt(question)["setting"]
-            if not answer: return
+            if not answer: return Settings.menu()
             if value: config[key.upper()] = False
             else: config[key.upper()] = True
         else:
@@ -481,8 +494,10 @@ class Settings:
                 # 'default': int(value)
             }
             answer = PyInquirer.prompt(question)["setting"]
-            if not Settings.confirm(answer): return
+            if not Settings.confirm(answer): return Settings.menu()
             config[key.upper()] = answer
+        Settings.last_updated = key
+        # return Settings.menu()
 
 ###########################################################################
 

@@ -10,10 +10,12 @@ echo "##################################################" >> ../onlysnarf/logs/t
 echo "################## Start #########################" >> ../onlysnarf/logs/test.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
+# sudo onlysnarf -verbose -verbose -verbose -prefer-local
+sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local
+
 # sudo onlysnarfpy -debug -verbose -category gallery -debug-delay -show -skip-reduce
 
 # sudo onlysnarfpy -category video -date "2020-12-25" -skip-download -debug -verbose -verbose -verbose
-sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local
 # sudo onlysnarfpy -debug -verbose -verbose -action test -show
 # sudo onlysnarfpy -debug -verbose -action message -category image -user "all" -text "test pussy" -bykeyword "pussycats" -show
 # sudo onlysnarfpy -debug -verbose -action message -user "recent" -text "test pussy" -bykeyword "pussycats" -show

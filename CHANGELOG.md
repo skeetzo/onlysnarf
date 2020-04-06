@@ -307,17 +307,22 @@
   - menu cleaned up
   - file system selection cleaned up
   - category
-  **2.17.0**
-  - massive spaghetti -> api overhaul
   
 ----------------------------------------
 
-  **2.16.**
+  **2.17.0**
+  - massive spaghetti -> api overhaul
+  - new menu
+
+  **2.17.x**
+  - debug discount
+  - debug promotion
+
+  **2.*.**
   - tested: settings get
   - tested: settings set
   - Settings options functional
-
-  **2.17.0**
+  **2.*.**
   - added: Settings options
 
 ----------------------------------------
@@ -380,6 +385,5 @@ https://onlyfans.com/?ref=409408
 
 
 
-- getters are called repeatedly even when provided with a no
 - unsure if window is closed after menu calls message.post/send
 - when not show-window the window should remain open in the background between menu uses

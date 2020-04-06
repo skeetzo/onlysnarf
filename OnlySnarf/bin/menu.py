@@ -70,6 +70,9 @@ def action_menu():
 # Discount
 
 def discount_menu():
+    if not Settings.is_debug():
+        print("### Not Available ###")
+        return
     discount = Discount()
     discount.apply()
     main()
@@ -98,11 +101,13 @@ def profile_menu():
 # Promotion
 
 def promotion_menu():
-    print("### Not Available ###")
-    # promotion = Promotion()
+    if not Settings.is_debug():
+        print("### Not Available ###")
+        return
+    promotion = Promotion()
     # add menu in promotion that asks for which kind
     # promotion.create_trial_link()
-    # promotion.apply_to_user()
+    promotion.apply_to_user()
     main()
 
 # Settings
@@ -120,8 +125,10 @@ def header():
     user_header()
     settings_header()
 
+
 def settings_header():
     Settings.header()
+    print('\r')
 
 def user_header():
     print("User:")
