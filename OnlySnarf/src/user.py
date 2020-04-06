@@ -80,7 +80,7 @@ class User:
     @staticmethod
     def enter_message(message=None):
         try:
-            print("Entering Message: {} - ${}".format(message.text, message.price))
+            print("Entering Message: {} - ${}".format(message.text, message.price or 0))
             def enter_text(text):
                 success = Driver.message_text(text)
                 if not success: return False
@@ -112,9 +112,7 @@ class User:
                 return True
             if not enter_text(message.text): return False # not allowed to fail
             enter_price(message.price) # allowed to fail
-            enter_files(message.files)
-            # for file in message.get_files():
-                # enter_file(file.get_path()) # allowed to fail
+            enter_files(message.files) # allowed to fail
             if not confirm(): return False # not allowed to fail
             print("Message Entered")
             return True
@@ -314,44 +312,45 @@ class User:
         }
         answers = PyInquirer.prompt(question)
         user = answers["user"]
-        if not Settings.confirm(user): return User.select_user()
         if str(user) == "Enter Username":
             username = input("Username: ")
             return User.get_user_by_username(username)
         elif str(user) == "Select Username":
             return User.select_username()
+        if not Settings.confirm(user): return User.select_user()
         return user
 
     @staticmethod
     def select_users():
-        if not Settings.prompt("users"): return []
+        # if not Settings.prompt("users"): return []
         users = []
         while True:
             user = User.select_user()
             if not user: break
             if str(user).lower() == "all" or str(user).lower() == "recent": return [user]
             users.append(user)
-            if not Settings.prompt("another user?"): break
-        if not Settings.confirm(users): return User.select_users()
+            if not Settings.prompt("another user"): break
+        if not Settings.confirm([user.username for user in users]): return User.select_users()
         return users
 
     @staticmethod
     def select_username():
         # returns the list of usernames to select
-        if not Settings.prompt("select username"): return None
+        # if not Settings.prompt("select username"): return None
         users = User.get_all_users()
+        users_ = []
         for user in users:
-            # user["name"] = user["username"]
-            setattr(user, "name", getattr(user, "username"))
-            # user["value"] = user
-            setattr(user, "value", user)
-            # user["short"] = user["id"]
-            setattr(user, "short", getattr(user, "id"))
+            user_ = {
+                "name":user.username.replace("@",""),
+                "value":user,
+                "short":user.id
+            }
+            users_.append(user_)
         question = {
             'type': 'list',
             'name': 'user',
             'message': 'Username:',
-            'choices': users
+            'choices': users_
         }
         user = PyInquirer.prompt(question)['user']
         if not Settings.confirm(user.username): return User.select_username()

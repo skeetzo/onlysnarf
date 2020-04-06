@@ -273,10 +273,10 @@ class Message():
 
     def get_message(self):
         if self.gotten: return
+        self.get_recipients()
         self.get_text()
         self.get_price()
         self.get_files()
-        self.get_recipients()
         if not self.text:
             if len(self.files) > 0:
                 self.text = self.files[0].get_title()
@@ -303,7 +303,8 @@ class Message():
             for user in self.users:
                 # if isinstance(user, str) and str(user) == "post": successful_ = Driver.post(self)
                 # print("Messaging: {}".format(user.username))
-                successful_ = User.message_user(user.username, self)
+                if isinstance(user, User): successful_ = User.message_user(user.username, self)
+                else: successful_ = User.message_user(user, self)
                 if not successful_: continue
                 successful_ = Driver.message(user.username)
         except Exception as e:
