@@ -206,7 +206,6 @@ class Settings:
         if Settings.MESSAGE: return Settings.MESSAGE
         from .message import Message
         message = Message()
-        # message.get_post()
         Settings.MESSAGE = message
         return message
 
