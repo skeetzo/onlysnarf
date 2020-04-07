@@ -312,6 +312,8 @@
   - new menu
   **2.17.1**
   - fixed packaging
+  **2.17.2**
+  - fixed post/message w/o prompt
   
 ----------------------------------------
 
