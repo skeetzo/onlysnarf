@@ -10,7 +10,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 echo "################## Start #########################" >> ../onlysnarf/logs/test.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
-sudo onlysnarfpy -verbose -debug -category gallery -bykeyword pussycats -verbose -verbose
+sudo onlysnarfpy -verbose -debug -category gallery -bykeyword feet -verbose -verbose
 
 # sudo onlysnarf -verbose -verbose -verbose -prefer-local
 # sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local -show
