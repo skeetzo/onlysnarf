@@ -16,7 +16,8 @@ class Discount:
 	def apply(self):
 		self.get()
 		if not self.gotten: return
-		if not Settings.prompt("Discount"): return
+        if Settings.is_prompt():
+			if not Settings.prompt("Discount"): return
 		if str(self.get_username()).lower() == "all":
 			users = User.get_all_users()
 		elif str(self.get_username()).lower() == "recent":
