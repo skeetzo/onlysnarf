@@ -310,6 +310,8 @@
   **2.17.0**
   - massive spaghetti -> api overhaul
   - new menu
+  **2.17.1**
+  - fixed packaging
   
 ----------------------------------------
 
