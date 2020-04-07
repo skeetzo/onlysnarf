@@ -316,6 +316,8 @@
   - fixed post/message w/o prompt
   **2.17.3**
   - fucking a
+  **2.17.4**
+  - fixed google uploads w/o prompt
   
 ----------------------------------------
 
