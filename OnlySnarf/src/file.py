@@ -306,6 +306,10 @@ class Google_File(File):
     def get_ext(self):
         if self.ext: return self.ext
         title, ext = os.path.splitext(self.get_file()["title"])
+        if str(ext) == "":
+            ext = self.get_file()["mimeType"]
+            mime, ext = str(ext).split("/")
+            ext = "."+str(ext)
         self.ext = ext
         self.title = title
         return self.ext
