@@ -318,7 +318,9 @@
   - fucking a
   **2.17.4**
   - fixed google uploads w/o prompt
-  
+  **2.17.5**
+  - fixed video extensions
+
 ----------------------------------------
 
   **2.17.x**
