@@ -10,8 +10,8 @@ echo "##################################################" >> ../onlysnarf/logs/t
 echo "################## Start #########################" >> ../onlysnarf/logs/test.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
-sudo onlysnarfpy -category video -notkeyword stroke -verbose -verbose -debug
-
+# sudo onlysnarfpy -category video -notkeyword stroke -verbose -verbose -debug
+sudo onlysnarfpy -show -debug -verbose -verbose -verbose -category post -text "**New** Weekly Requests Post\n\nComment below what you\'d like to see more of! 8=======D~~ O:"
 # sudo onlysnarf -verbose -verbose -verbose -prefer-local
 # sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local -show
 
