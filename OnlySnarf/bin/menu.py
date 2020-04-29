@@ -25,18 +25,7 @@ from OnlySnarf.src import google as Google
 from OnlySnarf.src.settings import Settings
 from OnlySnarf.src.snarf import Snarf
 
-###################
-##### Globals #####
-###################
-
-ASCII = "\n ________         .__          _________                     _____ \n \
-\\_____  \\   ____ |  | ___.__./   _____/ ____ _____ ________/ ____\\\n \
- /   |   \\ /    \\|  |<   |  |\\_____  \\ /    \\\\__  \\\\_   _ \\   __\\ \n \
-/    |    \\   |  \\  |_\\___  |/        \\   |  \\/ __ \\ |  |\\/| |   \n \
-\\_______  /___|  /____/ ____/_______  /___|  (____  \\\\__|  |_|   \n \
-        \\/     \\/     \\/            \\/     \\/     \\/              \n"
 snarf = Snarf()
-VERSION = str(pkg_resources.get_distribution("onlysnarf").version)
 
 #####################
 ##### Functions #####
@@ -120,8 +109,8 @@ def settings_menu():
 
 def header():
     if not Settings.is_debug(): os.system('clear')
-    print(colorize(ASCII, 'header'))
-    print(colorize('version {}\n'.format(VERSION), 'green'))
+    print(colorize(Settings.ASCII, 'header'))
+    print(colorize('version {}\n'.format(pkg_resources.get_distribution("onlysnarf").version), 'green'))
     user_header()
     settings_header()
 
