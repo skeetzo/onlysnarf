@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-VERSION="81.0.4044.69"
-VERSION="81.0.4044.129"
-VERSION="83.0.4103.14"
-VERSION="83.0.4103.23"
+# VERSION1="81.0.4044.69"
+# VERSION2="81.0.4044.129"
+# VERSION="83.0.4103.14"
+# VERSION="83.0.4103.23"
 
 sudo apt-get remove google-chrome-stable --purge -y
 sudo apt-get remove google-chrome-beta --purge -y
@@ -15,8 +15,8 @@ sudo apt-get update
 sudo apt-get install -y google-chrome-beta
 sudo -H pip3 install chromedriver-binary --force --upgrade
 
-# sudo apt-get install google-chrome-beta=$VERSION -y
-# sudo -H pip3 install chromedriver-binary==$VERSION --force --upgrade
+# sudo apt-get install google-chrome-beta=$VERSION2 -y
+# sudo -H pip3 install chromedriver-binary==$VERSION1 --force --upgrade
 
 echo "
 "
