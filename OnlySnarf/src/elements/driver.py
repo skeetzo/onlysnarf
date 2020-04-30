@@ -377,6 +377,12 @@ ELEMENTS = [
         "id": [],
     },
     {
+        "name": "messageRenewers",
+        "classes": ["g-btn__text"],
+        "text": ["Renew"],
+        "id": [],
+    },
+    {
         "name": "promotionalTrial",
         "classes": ["g.btn.m-rounded.m-sm"],
         "text": ["Create new trial link"],

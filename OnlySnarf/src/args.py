@@ -29,6 +29,8 @@ CONFIG_PATH = os.path.join(MOUNT_PATH, "config.conf")
 GOOGLE_PATH = os.path.join(MOUNT_PATH, "google_creds.txt")
 SECRET_PATH = os.path.join(MOUNT_PATH, "client_secrets.json")
 USERS_PATH = os.path.join(MOUNT_PATH, "users.json")
+from pathlib import Path
+Path(MOUNT_PATH).mkdir(parents=True, exist_ok=True)
 
 class AttrDict(dict):
   def __init__(self):
@@ -117,7 +119,7 @@ parser.add_argument('-category', default=None, dest='category',
 # OnlySnarf Drive folder list, appends to defaults
 parser.add_argument('-categories', dest='categories',
   action='append', help='the categories to list in menu (appends to \'{}\''.format("\'".join(CATEGORIES_DEFAULT)), 
-  default=CATEGORIES_DEFAULT)
+  default=[])
 ##
 # -create-drive 
 # creates missing OnlySnarf folders in Google Drive

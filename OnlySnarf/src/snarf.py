@@ -49,6 +49,17 @@ class Snarf:
             return
         Driver.exit()
 
+    #################
+    ##### Login #####
+    #################
+
+    @staticmethod
+    def login():
+        loggedIn = False
+        try: loggedIn = Driver.auth()
+        except Exception as e: Settings.dev_print(e)
+        return loggedIn
+
     ###################
     ##### Message #####
     ###################
