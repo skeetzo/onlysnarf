@@ -28,9 +28,8 @@ verbose="v -v -v"
 declare -a testing
 # testing=("schedule")
 # testing=("discount" "expiration" "message" "poll" "post" "schedule" "upload")
-testing=("schedule")
-testing=("message" "schedule" "upload")
 testing=("upload")
+testing=("message" "schedule" "upload")
 testing=("expiration" "message" "poll" "post" "schedule" "upload")
 
 echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
