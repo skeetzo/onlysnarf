@@ -320,8 +320,12 @@
   - fixed google uploads w/o prompt
   **2.17.5**
   - fixed video extensions
+  **2.17.6**
+  - increased UPLOAD_MAX_DURATION to 6 hrs
+  - minor fixes to menu input
 
 ----------------------------------------
+  - need a way for Discount to select users that are "Renew On"; click "Renew On" and get selected users? or grab from users w/ similar matching criteria?
 
   **2.17.x**
   - debug discount

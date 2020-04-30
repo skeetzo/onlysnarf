@@ -477,11 +477,9 @@ class Google_File(File):
             file = Google_File.select_file(category)
             if not file: break
             files.append(file)
-            if "image" in str(category) or "video" in str(category): break
+            if "galler" in str(category) or "video" in str(category): break
         if not Settings.confirm([file.file['title'] for file in files]): return Google_File.select_files()
         return files
-
-    
 
 ##########################################################################################
 

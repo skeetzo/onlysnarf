@@ -57,8 +57,8 @@ class Message():
 		return ""
 
 	def format_text(self):
-		return "{}{}{}{}".format(self.text, Message.format_performers(self.performers), Message.format_tags(self.tags),
-			Message.format_keywords(self.keywords)).strip()
+		return "{}{}{}{}".format(self.get_text(), Message.format_performers(self.get_performers()), Message.format_tags(self.get_tags()),
+			Message.format_keywords(self.get_keywords())).strip()
 
 	def get_keywords(self):
 		# if self.keywords: return self.keywords
@@ -230,7 +230,9 @@ class Message():
 	def get_text(self):
 		if self.text: return self.text
 		text = Settings.get_text() or None
-		if text: return text
+		if text: 
+			self.text = text
+			return text
 		if not Settings.prompt("text"): return None
 		question = {
 			'type': 'input',

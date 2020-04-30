@@ -80,7 +80,7 @@ class User:
     @staticmethod
     def enter_message(message=None):
         try:
-            print("Entering Message: {} - ${}".format(message.text, message.price or 0))
+            print("Entering Message: {} - ${}".format(message.text, message.get_price() or 0))
             def enter_text(text):
                 success = Driver.message_text(text)
                 if not success: return False
@@ -110,9 +110,9 @@ class User:
                 success = Driver.message_confirm()
                 if not success: return False
                 return True
-            if not enter_text(message.text): return False # not allowed to fail
-            enter_price(message.price) # allowed to fail
-            enter_files(message.files) # allowed to fail
+            if not enter_text(message.get_text()): return False # not allowed to fail
+            enter_price(message.get_price()) # allowed to fail
+            enter_files(message.get_files()) # allowed to fail
             if not confirm(): return False # not allowed to fail
             print("Message Entered")
             return True
@@ -237,7 +237,7 @@ class User:
 
     @staticmethod
     def get_favorite_users():
-        Settings.maybe_print("Getting Fav Users")
+        Settings.maybe_print("Getting Favorite Users")
         users = User.get_all_users()
         favUsers = []
         favorites = ",".join(str(Settings.get_users_favorite()))
@@ -302,21 +302,26 @@ class User:
         user = Settings.get_user() or None
         if user: return user
         # if not Settings.prompt("user"): return None
+        choices = Settings.get_message_choices()
+        choices.append("enter username")
+        choices.append("select username")
+        choices = [str(choice).title() for choice in choices]
         question = {
             'type': 'list',
             'name': 'user',
             'message': 'User:',
-            'choices': ['All', 'Recent', 
-                # 'Favorite', 
-                'Enter Username', 'Select Username']
+            'choices': choices,
+            'filter': lambda val: str(val).lower()
         }
         answers = PyInquirer.prompt(question)
         user = answers["user"]
-        if str(user) == "Enter Username":
+        if str(user) == "enter username":
             username = input("Username: ")
             return User.get_user_by_username(username)
-        elif str(user) == "Select Username":
+        elif str(user) == "select username":
             return User.select_username()
+        elif str(user) == "favorites":
+            return User.get_favorite_users()
         if not Settings.confirm(user): return User.select_user()
         return user
 

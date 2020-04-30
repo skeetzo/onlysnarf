@@ -151,7 +151,7 @@ class Poll:
 class Promotion:
 
 	def __init__(self):
-		self.subscriptionLimit = None
+		self.limit = None
 		self.expiration = None
 		self.duration = None
 		self.user = None
@@ -174,7 +174,7 @@ class Promotion:
 		# user, expiration, months, message
 		Driver.promotion_user_directly(self)
 
-	def get():
+	def get(self):
 		if self.gotten: return
 		gotten = self.get_user()
 		if not gotten: return
@@ -205,7 +205,7 @@ class Promotion:
 		self.expiration = expiration
 		return self.expiration
 
-	def get_limit():
+	def get_limit(self):
 		if self.limit: return self.limit
 		limit = Settings.get_limit() or None
 		if limit: return limit
@@ -255,7 +255,7 @@ class Promotion:
 		self.duration = duration
 		return self.duration
 
-	def get_user():
+	def get_user(self):
 		if self.user: return self.user
 		user = User.select_user()
 		self.user = user
