@@ -18,9 +18,9 @@ EXPIRATION_ALLOWED = [1,3,7,30,99]
 IMAGE_DOWNLOAD_LIMIT = 6
 IMAGE_UPLOAD_LIMIT = 20
 IMAGE_UPLOAD_LIMIT_MESSAGES = 5
-MESSAGE_CHOICES = ["all", "recent", "favorite"]
+MESSAGE_CHOICES = ["all", "recent", "favorite", "renew on"]
 PRICE_MINIMUM = 3
-UPLOAD_MAX_DURATION = 12 # 2 hours
+UPLOAD_MAX_DURATION = 6*6 # increments of 10 minutes; 6 = 1 hr
 
 # Paths
 MOUNT_PATH = "/opt/onlysnarf"

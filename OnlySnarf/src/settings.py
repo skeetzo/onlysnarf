@@ -315,10 +315,10 @@ class Settings:
         return config["UPLOAD_MAX"] or IMAGE_UPLOAD_LIMIT
         
     def get_upload_max_messages():
-        return config["UPLOAD_MAX_MESSAGES"] or 0
+        return config["UPLOAD_MAX_MESSAGES"] or UPLOAD_MAX_MESSAGES
         
     def get_upload_max_duration():
-        return config["UPLOAD_MAX_DURATION"] or 12 # 2 hours
+        return config["UPLOAD_MAX_DURATION"] or UPLOAD_MAX_DURATION # 6 hours
 
     # comma separated string of usernames
     def get_users():
