@@ -16,8 +16,7 @@ DISCOUNT_MIN_MONTHS = 1
 DURATION_ALLOWED = [1,3,7,30,99]
 EXPIRATION_ALLOWED = [1,3,7,30,99]
 IMAGE_DOWNLOAD_LIMIT = 6
-IMAGE_UPLOAD_LIMIT = 20
-IMAGE_UPLOAD_LIMIT_MESSAGES = 5
+IMAGE_UPLOAD_LIMIT = 5
 MESSAGE_CHOICES = ["all", "recent", "favorite", "renew on"]
 PRICE_MINIMUM = 3
 UPLOAD_MAX_DURATION = 6*6 # increments of 10 minutes; 6 = 1 hr
@@ -29,8 +28,8 @@ CONFIG_PATH = os.path.join(MOUNT_PATH, "config.conf")
 GOOGLE_PATH = os.path.join(MOUNT_PATH, "google_creds.txt")
 SECRET_PATH = os.path.join(MOUNT_PATH, "client_secrets.json")
 USERS_PATH = os.path.join(MOUNT_PATH, "users.json")
-from pathlib import Path
-Path(MOUNT_PATH).mkdir(parents=True, exist_ok=True)
+# from pathlib import Path
+# Path(MOUNT_PATH).mkdir(parents=True)
 
 class AttrDict(dict):
   def __init__(self):
@@ -179,6 +178,11 @@ durationAndExpiration.add_argument('-duration', type=int, dest='duration',
 durationAndExpiration.add_argument('-expiration', type=int, dest='expiration',
   help='the expiration in days (99 for \'No Limit\')', choices=EXPIRATION_ALLOWED, default=None)
 ##
+# -force-backup
+# force backup during debugging
+parser.add_argument('-force-backup', action='store_true', dest='force_backup',
+  help='force backup when debugging')
+##
 # -force-upload
 # ignore upload max wait
 parser.add_argument('-force-upload', action='store_true', dest='force_upload',
@@ -193,11 +197,6 @@ parser.add_argument('-download-max', type=int, default=IMAGE_DOWNLOAD_LIMIT, des
 # maximum number of images that can be uploaded
 parser.add_argument('-upload-max', type=int, default=IMAGE_UPLOAD_LIMIT, dest='upload_max',
   help='the max number of images to upload')
-##
-# -message-max
-# maximum number of images that can be uploaded in a message
-parser.add_argument('-message-max', type=int, default=IMAGE_UPLOAD_LIMIT_MESSAGES, dest='upload_max_messages',
-  help='the max number of images to message')
 ##
 # -keywords
 # keywords to # in post

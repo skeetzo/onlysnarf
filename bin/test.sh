@@ -2,9 +2,9 @@
 # sudo cp ../onlysnarf/OnlySnarf/config.conf /etc/onlysnarf
 sudo python3 ../onlysnarf/setup.py install
 wait
+mkdir -p ../onlysnarf/logs
 echo "-----------------------------------------------------"
 echo "Testing OnlySnarf"
-# mkdir ../onlysnarf/logs
 
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 echo "################## Start #########################" >> ../onlysnarf/logs/test.txt 2>&1
@@ -25,8 +25,9 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 #############
 
-sudo onlysnarfpy -action post -text "gumby & shampoo + dick" -category gallery -bykeyword challenge -upload-max 10 -debug -verbose -verbose -verbose -force-backup
+sudo onlysnarfpy -bykeyword challenge -text "more gumby fun" -category gallery -debug -verbose -verbose -verbose -force-backup
 
+# sudo onlysnarfpy -action post -text "gumby & shampoo + dick" -category gallery -bykeyword challenge -upload-max 10
 
 # sudo onlysnarfpy -debug -verbose -category gallery -debug-delay -show -skip-reduce
 # sudo onlysnarfpy -debug -verbose -action message -category image -user "all" -text "test pussy" -bykeyword "pussycats" -show
