@@ -323,6 +323,9 @@
   **2.17.6**
   - increased UPLOAD_MAX_DURATION to 6 hrs
   - minor fixes to menu input
+  **2.17.7**
+  - fixed backup pathing
+  - fixed file upload max
 
 ----------------------------------------
   - need a way for Discount to select users that are "Renew On"; click "Renew On" and get selected users? or grab from users w/ similar matching criteria?

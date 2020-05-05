@@ -24,7 +24,7 @@ DISCOUNT_MIN_MONTHS = 1
 DURATION_ALLOWED = [1,3,7,30,99]
 EXPIRATION_ALLOWED = [1,3,7,30,99]
 IMAGE_DOWNLOAD_LIMIT = 6
-IMAGE_UPLOAD_LIMIT = 20
+IMAGE_UPLOAD_LIMIT = 5
 IMAGE_UPLOAD_LIMIT_MESSAGES = 5
 MESSAGE_CHOICES = ["all", "recent", "favorite", "renew on"]
 PRICE_MINIMUM = 3
@@ -314,8 +314,8 @@ class Settings:
     def get_upload_max():
         return config["UPLOAD_MAX"] or IMAGE_UPLOAD_LIMIT
         
-    def get_upload_max_messages():
-        return config["UPLOAD_MAX_MESSAGES"] or UPLOAD_MAX_MESSAGES
+    # def get_upload_max_messages():
+        # return config["UPLOAD_MAX_MESSAGES"] or UPLOAD_MAX_MESSAGES
         
     def get_upload_max_duration():
         return config["UPLOAD_MAX_DURATION"] or UPLOAD_MAX_DURATION # 6 hours
@@ -371,6 +371,12 @@ class Settings:
 
     def is_delete():
         return config["DELETE_GOOGLE"] or False
+
+    def is_force_backup():
+        return config["FORCE_BACKUP"] or False
+
+    def is_force_upload():
+        return config["FORCE_UPLOAD"] or False
 
     def is_prefer_local():
         return config["PREFER_LOCAL"] or False

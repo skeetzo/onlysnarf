@@ -843,14 +843,14 @@ class Driver:
         try:
             Driver.go_to_home()
             # message.get_post()
-            files = message.files
+            files = message.get_files()
             text = message.format_text()
-            keywords = message.keywords
-            performers = message.performers
-            tags = message.tags
-            expires = message.expiration
-            schedule = message.schedule
-            poll = message.poll
+            keywords = message.get_keywords()
+            performers = message.get_performers()
+            tags = message.get_tags()
+            expires = message.get_expiration()
+            schedule = message.get_schedule()
+            poll = message.get_poll()
             if str(text) == "None": text = ""
             print("Posting:")
             print("- Files: {}".format(len(files)))
@@ -902,7 +902,7 @@ class Driver:
                     print('uploading...')
                     Driver.error_checker(e)
                     i+=1
-                    if i == int(Settings.get_upload_max_duration()):
+                    if i == int(Settings.get_upload_max_duration()) and not Settings.is_force_upload():
                         print('Error: Max Upload Time Reached')
                         return False
             try:
@@ -1526,7 +1526,7 @@ class Driver:
         if Settings.is_skip_upload():
             print("Skipping Upload: Disabled")
             return False
-        files = files[:int(Settings.get_upload_max_messages())]
+        files = files[:int(Settings.get_upload_max())]
         Settings.dev_print("uploading image files: {}".format(len(files)))
         i = 1
         for file in files:
