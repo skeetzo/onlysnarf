@@ -902,7 +902,7 @@ class Driver:
                     print('uploading...')
                     Driver.error_checker(e)
                     i+=1
-                    if i == int(Settings.get_upload_max_duration()):
+                    if i == int(Settings.get_upload_max_duration()) and not Settings.is_force_upload():
                         print('Error: Max Upload Time Reached')
                         return False
             try:
