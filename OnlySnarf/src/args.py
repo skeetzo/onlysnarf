@@ -29,8 +29,8 @@ CONFIG_PATH = os.path.join(MOUNT_PATH, "config.conf")
 GOOGLE_PATH = os.path.join(MOUNT_PATH, "google_creds.txt")
 SECRET_PATH = os.path.join(MOUNT_PATH, "client_secrets.json")
 USERS_PATH = os.path.join(MOUNT_PATH, "users.json")
-from pathlib import Path
-Path(MOUNT_PATH).mkdir(parents=True, exist_ok=True)
+# from pathlib import Path
+# Path(MOUNT_PATH).mkdir(parents=True)
 
 class AttrDict(dict):
   def __init__(self):
@@ -178,6 +178,11 @@ durationAndExpiration.add_argument('-duration', type=int, dest='duration',
 # date of post or poll expiration
 durationAndExpiration.add_argument('-expiration', type=int, dest='expiration',
   help='the expiration in days (99 for \'No Limit\')', choices=EXPIRATION_ALLOWED, default=None)
+##
+# -force-backup
+# force backup during debugging
+parser.add_argument('-force-backup', action='store_true', dest='force_backup',
+  help='force backup when debugging')
 ##
 # -force-upload
 # ignore upload max wait

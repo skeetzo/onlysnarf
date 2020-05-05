@@ -52,7 +52,9 @@ class File():
         if Settings.is_skip_download():
             Settings.maybe_print("Warning: Skipping Backup, skipped download")
             return False
-        if not Settings.is_backup():
+        if Settings.is_force_backup():
+            Settings.maybe_print("Backing Up (forced): {}".format(title))
+        elif not Settings.is_backup():
             Settings.maybe_print('Skipping Backup (disabled): {}'.format(title))
             return False
         elif Settings.is_debug():
@@ -265,11 +267,11 @@ class Google_File(File):
         self.mimeType = None
 
     def backup(self):
-        if not self.backup_text(self.title): return
+        if not File.backup_text(self.title): return
         Google.backup_file(self)
 
     def delete(self):
-        if not self.delete_text(self.title): return
+        if not File.delete_text(self.title): return
         Google.delete(self)
 
     @staticmethod
