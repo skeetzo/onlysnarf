@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 sudo python3 setup.py install
 wait
+mkdir -p ../onlysnarf/logs
 echo "-----------------------------------------------------"
 echo "Testing OnlySnarf"
-mkdir -p ../onlysnarf/logs
 
 ## Add
 # read messages

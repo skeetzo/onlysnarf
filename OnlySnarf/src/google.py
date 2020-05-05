@@ -122,14 +122,19 @@ def backup_file(file):
         global PYDRIVE
         backupTo = get_folder_by_name("posted")
         stri = "posted/{}".format(backupTo["title"])
-        if Settings.get_category() or file.category:
-            category = Settings.get_category() or file.category
+        if file.category or Settings.get_category():
+            category = file.category or Settings.get_category()
             backupTo = get_posted_folder_by_name(category)
             stri = "posted/{}".format(backupTo["title"])
-        parentFolder = PYDRIVE.CreateFile({'title':str(file.get_parent()["title"]), 'parents':[{"kind": "drive#fileLink", "id": str(backupTo['id'])}], 'mimeType':'application/vnd.google-apps.folder'})
+        # check posted for folder of existing parent name
+        file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and title='{}'".format(backupTo['id'], str(file.get_parent()["title"]))}).GetList()
+        if len(file_list) == 0:
+            parentFolder = PYDRIVE.CreateFile({'title':str(file.get_parent()["title"]), 'parents':[{"kind": "drive#fileLink", "id": str(backupTo['id'])}], 'mimeType':'application/vnd.google-apps.folder'})
+        else:
+            parentFolder = file_list[0]
         parentFolder.Upload()
         Settings.dev_print("Moving To: {}".format(stri))
-        file.get_file()['parents'] = [{"kind": "drive#fileLink", "id": str(backupTo['id'])}]
+        file.get_file()['parents'] = [{"kind": "drive#fileLink", "id": str(parentFolder['id'])}]
         file.get_file().Upload()
         print("File Backed Up: {}".format(file.get_title()))
     except Exception as e:
@@ -244,11 +249,13 @@ def get_file(id_):
     auth = checkAuth()
     if not auth: return
     myfile = PYDRIVE.CreateFile({'id': id_})
+    # myfile.FetchMetadata()
     return myfile
 
 def get_file_parent(id_):
+    # Settings.dev_print("getting file parent: {}".format(id_))
     parent = get_file(id_)["parents"][0]
-    parent = PYDRIVE.CreateFile({'id': parent})
+    parent = PYDRIVE.CreateFile({'id': parent["id"]})
     return parent
 
 def get_images_of_folder(folder):

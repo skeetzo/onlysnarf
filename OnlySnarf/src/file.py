@@ -52,7 +52,9 @@ class File():
         if Settings.is_skip_download():
             Settings.maybe_print("Warning: Skipping Backup, skipped download")
             return False
-        if not Settings.is_backup():
+        if Settings.is_force_backup():
+            Settings.maybe_print("Backing Up (forced): {}".format(title))
+        elif not Settings.is_backup():
             Settings.maybe_print('Skipping Backup (disabled): {}'.format(title))
             return False
         elif Settings.is_debug():
@@ -265,11 +267,11 @@ class Google_File(File):
         self.mimeType = None
 
     def backup(self):
-        if not self.backup_text(self.title): return
+        if not File.backup_text(self.get_title()): return
         Google.backup_file(self)
 
     def delete(self):
-        if not self.delete_text(self.title): return
+        if not File.delete_text(self.get_title()): return
         Google.delete(self)
 
     @staticmethod
@@ -384,13 +386,7 @@ class Google_File(File):
 
     def get_parent(self):
         if self.parent: return self.parent 
-        try: 
-            if self.id == "": 
-                self.parent = get_folder_by_name("posted")
-                self.id = self.parent["id"]
-            else: 
-                self.parent = Google.get_file_parent(self.get_id())
-        except Exception as e: Settings.dev_print(e)
+        self.parent = Google.get_file_parent(self.get_id())
         return self.parent
 
     def get_path(self):
@@ -489,7 +485,7 @@ class Google_Folder(Google_File):
         self.files = None
 
     def backup(self):
-        if File.backup_text(self.title): return
+        if File.backup_text(self.get_title()): return
         Google.upload_gallery(files=self.files)
 
     def check_size(self):

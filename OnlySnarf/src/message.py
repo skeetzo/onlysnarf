@@ -126,7 +126,7 @@ class Message():
 	# files exist when checked for size
 	# ?
 	def get_files(self):
-		if len(self.files) > 0: return self.files
+		if len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
 		files = []
 		if len(self.files) == 0 and len(Settings.get_input()) > 0:
 			files.append(Settings.get_input_as_files())
@@ -138,7 +138,7 @@ class Message():
 		for file in files:
 			if isinstance(file, Google_Folder): filed.extend(file.get_files())
 			else: filed.append(file)
-		self.files = filed
+		self.files = filed[:int(Settings.get_upload_max())]
 		return self.files
 
 	def get_expiration(self):
