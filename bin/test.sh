@@ -25,7 +25,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 #############
 
-# sudo onlysnarfpy -action post -text "gumby & shampoo + dick" -category gallery -bykeyword challenge -upload-max 10
+sudo onlysnarfpy -action post -text "gumby & shampoo + dick" -category gallery -bykeyword challenge -upload-max 10 -debug -verbose -verbose -verbose -force-backup
 
 
 # sudo onlysnarfpy -debug -verbose -category gallery -debug-delay -show -skip-reduce
