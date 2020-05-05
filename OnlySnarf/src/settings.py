@@ -372,6 +372,12 @@ class Settings:
     def is_delete():
         return config["DELETE_GOOGLE"] or False
 
+    def is_force_backup():
+        return config["FORCE_BACKUP"] or False
+
+    def is_force_upload():
+        return config["FORCE_UPLOAD"] or False
+
     def is_prefer_local():
         return config["PREFER_LOCAL"] or False
         
