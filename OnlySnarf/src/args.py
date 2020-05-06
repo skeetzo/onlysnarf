@@ -1,6 +1,12 @@
 import argparse, os, re
 from datetime import datetime
-from .validators import valid_amount, valid_date, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
+from .validators import valid_action, valid_amount, valid_date, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
+
+ACTIONS = ['discount','post','message','backup',
+  # 'promotion',
+  # 'profile',
+  'test'
+]
 
 CATEGORIES_DEFAULT = [
   "images",
@@ -93,10 +99,8 @@ durationAndExpiration = parser.add_mutually_exclusive_group()
 #
 # -action
 # the action to be performed
-parser.add_argument('-action', type=str, dest='action',
-  help='the action to take', choices=['discount','post','message',
-  'test'
-  ], default='post')
+parser.add_argument('-action', type=valid_action, dest='action',
+  help='the action to take', choices=ACTIONS, default='post')
 ##
 # -amount
 # action: discount

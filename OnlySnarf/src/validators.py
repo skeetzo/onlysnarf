@@ -2,6 +2,7 @@ import argparse, os
 from datetime import datetime
 from PyInquirer import Validator, ValidationError
 
+ACTIONS = ['discount','post','message','test','backup']
 CATEGORIES_DEFAULT = [
   "images",
   "galleries",
@@ -20,6 +21,14 @@ LIMIT_MAX = 10
 
 #
 # Args
+
+def valid_action(s):
+	try:
+		if str(s) in ACTIONS:
+			return str(s)
+	except ValueError:
+		msg = "Not a valid action: '{0}'.".format(s)
+		raise argparse.ArgumentTypeError(msg)
 
 def valid_amount(s):
 	try:
