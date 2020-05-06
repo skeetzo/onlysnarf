@@ -21,11 +21,11 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # sudo onlysnarfpy -show -debug -verbose -verbose -verbose -action message -category video -bykeyword stroke -user all -text 'stroking away boredom' -price '6.69'
 
 # menu
-# sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local -show
+sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local
 
 #############
 
-sudo onlysnarfpy -bykeyword challenge -text "more gumby fun" -category gallery -debug -verbose -verbose -verbose -force-backup
+# sudo onlysnarfpy -bykeyword challenge -text "more gumby fun" -category gallery -debug -verbose -verbose -verbose -force-backup
 
 # sudo onlysnarfpy -action post -text "gumby & shampoo + dick" -category gallery -bykeyword challenge -upload-max 10
 

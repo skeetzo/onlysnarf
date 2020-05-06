@@ -1283,112 +1283,139 @@ class Driver:
     # probably just way easier and resourceful to do it all at once
     # though it would be ideal to also be able to update individual settings without risking other settings
 
-    # goes through the settings and get all the values
     @staticmethod
-    def settings_get_all():
+    def sync_from_settings_page(page=None):
         auth_ = Driver.auth()
         if not auth_: return False
-        print("Getting All Settings")
+        print("Getting Settings: {}".format(page))
         try:
-            pages = Profile.get_pages()
-            for page in pages:
-                variables = Profile.get_variables_for_page(page)
-                Settings.dev_print("going to settings page: {}".format(page))
-                Driver.go_to_settings(page)
-                Settings.dev_print("reached settings: {}".format(page))
-                data = Profile({})
-                for var in variables:
-                    name = var[0]
-                    page_ = var[1]
-                    type_ = var[2]
-                    status = None
-                    Settings.dev_print("searching: {} - {}".format(name, type_))
-                    try:
-                        element = Driver.find_element_by_name(name)
-                        Settings.dev_print("Successful ele: {}".format(name))
-                    except Exception as e:
-                        Driver.error_checker(e)
-                        continue
-                    if str(type_) == "text":
-                        # get attr text
-                        status = element.get_attribute("innerHTML").strip() or None
-                        status2 = element.get_attribute("value").strip() or None
-                        print("{} - {}".format(status, status2))
-                        if not status and status2: status = status2
-                    elif str(type_) == "toggle":
-                        # get state true|false
-                        status = element.is_selected()
-                    elif str(type_) == "dropdown":
-                        ele = Driver.find_element_by_name(name)
-                        Select(driver.find_element_by_id(ele.getId()))
-                        status = element.first_selected_option
-                    elif str(type_) == "list":
-                        status = element.get_attribute("innerHTML")
-                    elif str(type_) == "file":
-                        # can get file from image above
-                        # can set once found
-                        # status = element.get_attribute("innerHTML")
-                        pass
-                    elif str(type_) == "checkbox":
-                        status = element.is_selected()
-                    if status is not None: Settings.dev_print("Successful value: {}".format(status))
-                    Settings.maybe_print("{} : {}".format(name, status))
-                    data.set(name, status)
-            Settings.dev_print("Successfully got settings")
-            print("Settings Retrieved")
+            variables = Profile.get_variables_for_page(page)
+            Settings.dev_print("going to settings page: {}".format(page))
+            Driver.go_to_settings(page)
+            Settings.dev_print("reached settings: {}".format(page))
+            data = Profile({})
+            for var in variables:
+                name = var[0]
+                page_ = var[1]
+                type_ = var[2]
+                status = None
+                Settings.dev_print("searching: {} - {}".format(name, type_))
+                try:
+                    element = Driver.find_element_by_name(name)
+                    Settings.dev_print("Successful ele: {}".format(name))
+                except Exception as e:
+                    Driver.error_checker(e)
+                    continue
+                if str(type_) == "text":
+                    # get attr text
+                    status = element.get_attribute("innerHTML").strip() or None
+                    status2 = element.get_attribute("value").strip() or None
+                    print("{} - {}".format(status, status2))
+                    if not status and status2: status = status2
+                elif str(type_) == "toggle":
+                    # get state true|false
+                    status = element.is_selected()
+                elif str(type_) == "dropdown":
+                    ele = Driver.find_element_by_name(name)
+                    Select(driver.find_element_by_id(ele.getId()))
+                    status = element.first_selected_option
+                elif str(type_) == "list":
+                    status = element.get_attribute("innerHTML")
+                elif str(type_) == "file":
+                    # can get file from image above
+                    # can set once found
+                    # status = element.get_attribute("innerHTML")
+                    pass
+                elif str(type_) == "checkbox":
+                    status = element.is_selected()
+                if status is not None: Settings.dev_print("Successful value: {}".format(status))
+                Settings.maybe_print("{} : {}".format(name, status))
+                data[name] = status
+            Settings.dev_print("Successfully got settings page: {}".format(page))
+            print("Settings Page Retrieved: {}".format(page))
             return data
         except Exception as e:
             Driver.error_checker(e)
 
+    # goes through the settings and get all the values
+    # @staticmethod
+    # def settings_get_all():
+    #     auth_ = Driver.auth()
+    #     if not auth_: return False
+    #     print("Getting All Settings")
+    #     profile = Profile({})
+    #     try:
+    #         pages = Profile.get_pages()
+    #         for page in pages:
+    #             data = Driver.sync_from_settings_page(page)
+    #             for key, value in data:
+    #                 profile[key] = value
+    #         Settings.dev_print("Successfully got settings")
+    #         print("Settings Retrieved")
+    #     except Exception as e:
+    #         Driver.error_checker(e)
+    #     return profile
+
     # goes through each page and sets all the values
     @staticmethod
-    def settings_set_all(data):
+    def sync_to_settings_page(Profile, page):
         auth_ = Driver.auth()
         if not auth_: return False
-        print("Updating All Settings")
+        print("Updating Page Settings: {}".format(page))
         try:
-            # Driver.go_to_home()
-            pages = Profile.get_pages()
-            for page in pages:
-                variables = Profile.get_variables_for_page(page)
-                Settings.dev_print("going to settings page: {}".format(page))
-                Driver.go_to_settings(page)
-                Settings.dev_print("reached settings: {}".format(page))
-                for var in variables:
-                    name = var[0]
-                    page_ = var[1]
-                    type_ = var[2]
-                    status = None
-                    Settings.dev_print("searching: {} - {}".format(name, type_))
-                    try:
-                        element = Driver.find_element_by_name(name)
-                        Settings.dev_print("Successful ele: {}".format(name))
-                    except Exception as e:
-                        Driver.error_checker(e)
-                        continue
-                    if str(type_) == "text":
-                        element.send_keys(data.get(name))
-                    elif str(type_) == "toggle":
-                        # somehow set the other toggle state
-                        pass
-                    elif str(type_) == "dropdown":
-                        ele = Driver.find_element_by_name(name)
-                        Select(driver.find_element_by_id(ele.getId()))
-                        # go to top
-                        # then go to matching value
-                        pass
-                    elif str(type_) == "list":
-                        element.send_keys(data.get(name))
-                    elif str(type_) == "file":
-                        element.send_keys(data.get(name))
-                    elif str(type_) == "checkbox":
-                        element.click()
-                    # Settings.dev_print("Successful value: {}".format(status))
-                Driver.settings_save(page=page)
-            Settings.dev_print("Successfully set settings")
-            print("Settings Updated")
+            variables = Profile.get_variables_for_page(page)
+            Settings.dev_print("going to settings page: {}".format(page))
+            Driver.go_to_settings(page)
+            Settings.dev_print("reached settings: {}".format(page))
+            for var in variables:
+                name = var[0]
+                page_ = var[1]
+                type_ = var[2]
+                status = None
+                Settings.dev_print("searching: {} - {}".format(name, type_))
+                try:
+                    element = Driver.find_element_by_name(name)
+                    Settings.dev_print("Successful ele: {}".format(name))
+                except Exception as e:
+                    Driver.error_checker(e)
+                    continue
+                if str(type_) == "text":
+                    element.send_keys(Profile.get(name))
+                elif str(type_) == "toggle":
+                    # somehow set the other toggle state
+                    pass
+                elif str(type_) == "dropdown":
+                    ele = Driver.find_element_by_name(name)
+                    Select(driver.find_element_by_id(ele.getId()))
+                    # go to top
+                    # then go to matching value
+                    pass
+                elif str(type_) == "list":
+                    element.send_keys(Profile.get(name))
+                elif str(type_) == "file":
+                    element.send_keys(Profile.get(name))
+                elif str(type_) == "checkbox":
+                    element.click()
+                # Settings.dev_print("Successful value: {}".format(status))
+            Driver.settings_save(page=page)
+            Settings.dev_print("Successfully set settings page: {}".format(page))
+            print("Settings Page Updated: {}".format(page))
         except Exception as e:
             Driver.error_checker(e)
+
+    # @staticmethod
+    # def settings_set_all(Profile):
+    #     auth_ = Driver.auth()
+    #     if not auth_: return False
+    #     print("Updating All Settings")
+    #     try:
+    #         pages = Profile.TABS
+    #         for page in pages:
+    #             Driver.sync_to_settings_page(Profile, page)
+    #         Settings.dev_print("Successfully set settings")
+    #         print("Settings Updated")
+    #     except Exception as e:
+    #         Driver.error_checker(e)
 
     # saves the settings page if it is a page that needs to be saved
         # has save:

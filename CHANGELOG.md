@@ -328,6 +328,13 @@
   - fixed file upload max
 
 ----------------------------------------
+
+  **2.18.0**
+  - menu updates
+  - profile / settings updates
+
+
+
   - need a way for Discount to select users that are "Renew On"; click "Renew On" and get selected users? or grab from users w/ similar matching criteria?
 
   **2.17.x**

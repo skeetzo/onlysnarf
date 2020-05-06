@@ -284,6 +284,11 @@ class Message():
 				self.text = self.files[0].get_title()
 		self.gotten = True
 
+	@staticmethod
+	def post():
+		message = Message()
+		message.post()
+
 	def post(self):
 		self.get_post()
 		if Settings.is_prompt():
@@ -294,6 +299,11 @@ class Message():
 			Settings.dev_print(e)
 			successful = False
 		if successful: self.cleanup_files()
+
+	@staticmethod
+	def send():
+		message = Message()
+		message.send()
 
 	# sends to recipients
 	# 'post' as recipient will post message instead
