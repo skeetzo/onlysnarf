@@ -5,6 +5,7 @@
 import PyInquirer
 
 class Profile:
+    TABS = ["profile", "advanced", "messaging", "notifications", "security", "story", "other"]
 
     # profile settings are either:
     #   enabled or disabled
@@ -108,52 +109,113 @@ class Profile:
     def __setitem__(self, key, val):
         return setattr(self, key, val)
 
-    def set(self, key, value):
-        self[key] = value
+    # Backup
 
-    def get(self):
+    def ask_backup():
+        options = ["back"]
+        menu_prompt = {
+            'type': 'list',
+            'name': 'action',
+            'message': 'Please select an action:',
+            'choices': ['Content', 'Messages', 'Profile'],
+            'filter': lambda val: str(val).lower()
+        }
+        answers = prompt(menu_prompt)
+        return answers['action']
+
+    def backup_menu():
+        if not Settings.is_debug():
+            print("### Not Available ###")
+            return
+        backup = Profile.ask_backup()
+        if (backup == 'back'): pass
+        # content
+        elif (backup == 'content'): Profile.backup_content()
+        # messages
+        elif (backup == 'messages'): Profile.backup_messages()
+        # profile settings
+        elif (backup == 'profile'): Profile.backup_profile()
+
+    @staticmethod
+    def backup_content():
+        # prompt if backing up home page content only
+        # or if also backing up all message content
         pass
 
-    # def set(self):
-    #     pass
-
-    def sync_from_profile(self):
-        # syncs profile settings w/ onlyfans
+    @staticmethod
+    def backup_messages():
+        # prompt if include backing up content
         pass
 
-    def sync_to_profile(self):
-        # syncs profile settings to onlyfans
+    @staticmethod
+    def backup_profile():
         pass
 
-    def sync_to_profile_tab(self, label):
-        # syncs profile settings for the specificed tab to onlyfans
+    @staticmethod
+    def menu():
+        if not Settings.is_debug():
+            print("### Not Available ###")
+            return
+        action = Profile.ask_action()
+        if (action == 'Back'): pass
+        elif (action == 'backup'): Profile.backup_menu()
+        elif (action == 'sync from'): Profile.sync_from_profile()
+        elif (action == 'sync to'): Profile.sync_to_profile()
+
+    def ask_action():
+        options = ["back"]
+        menu_prompt = {
+            'type': 'list',
+            'name': 'action',
+            'message': 'Please select a profile action:',
+            'choices': ['Backup','Sync From', 'Sync To'],
+            'filter': lambda val: str(val).lower()
+        }
+        answers = prompt(menu_prompt)
+        return answers['action']
+
+    @staticmethod
+    def create():
+        # checks settings / config for profile settings config file
+        # asks for missing options
+
+        # returns a local copy / expectation of the Profile settings
         pass
 
-    def syncFrom(self):
-        # opens every settings page in the browser from pages or all
+    @staticmethod
+    def sync_from_profile():
+        # opens every settings tab in the browser from pages or all
         # gets necessary variables from browser
-        variables = Profile.get_setting_variables()
-        pages = []
-        for var in variables:
-            if var[1] not in pages:
-                pages.append(var[1])
-        for page in pages:
-            pass
-            # Driver.go_to_settings_page(page)
-        pass            
+        # variables = get_settings_variables()
+        print("Syncing from Profile")
+        profile = Profile(Profile.fill_data())
+        for tab in Profile.TABS:
+            self.sync_from_tab(tab)
+        print("Synced from Profile")
 
-    def syncTo(self):
-        # opens every settings page in the browser from pages or all
-        # updates necessary variables in browser
-        pass
+    @staticmethod
+    def sync_to_profile(profile=None):
+        # syncs profile settings to onlyfans
+        print("Syncing to Profile")
+        if not profile:
+            profile = Profile.create()
+        for tab in Profile.TABS:
+            self.sync_to_tab(tab)
+        print("Synced to Profile")
+
+    def sync_from_tab(self, tab):
+        # syncs profile settings from the specificed tab
+        data = Driver.sync_from_settings_page(tab)
+        for key, value in data:
+            self[key] = value
+
+    def sync_to_tab(self, tab):
+        # syncs profile settings to the specificed tab
+        Driver.sync_to_settings_page(self, tab)
 
     @staticmethod
     def get_country_list():
         return ["USA","Canada"]
-
-    @staticmethod
-    def get_pages():
-        return ["profile", "advanced", "messaging", "notifications", "security", "story", "other"]
 
     @staticmethod
     def get_variables_for_page(page):
@@ -164,46 +226,6 @@ class Profile:
                 vars_.append(var)
         return vars_
 
-    @staticmethod
-    def get_setting_variable(key):
-        variables = get_setting_variables()
-        for var in variables:
-            if str(var[0]) == str(key):
-                return var
-        return None
-
-    def update_value(self, key, value):
-        try:
-            if key == None or str(key) == "" or str(key) == "None": return
-            self[key] = value
-        except Exception as e:
-            print(e)
-
-
-    # set default values / get from profile online
-    def get():
-        pass
-
-
-    def update():
-        # called by snarf
-        # add the appropriate get conditions to this profile class
-        pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
     @staticmethod
     def fill_data():
         prof = {

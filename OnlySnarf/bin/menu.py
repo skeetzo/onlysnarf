@@ -23,6 +23,8 @@ from OnlySnarf.src import google as Google
 # from OnlySnarf.src.promotion import Promotion
 from OnlySnarf.src.settings import Settings
 
+from OnlySnarf.src import args
+
 #####################
 ##### Functions #####
 #####################
@@ -35,75 +37,29 @@ class Menu:
     # Action
 
     def ask_action():
+        options = ["back"]
+        options.extend(args.ACTIONS)
         menu_prompt = {
             'type': 'list',
             'name': 'action',
             'message': 'Please select an action:',
-            'choices': ['Back', 'Discount', 'Message', 'Post', 
-                # 'Promotion'
-            ]
+            'choices': [str(option).title() for option in options],
+            'filter': lambda val: str(val).lower()
         }
         if str(Settings.is_debug()) == "True":
             menu_prompt["choices"].append("Promotion")
+        menu_prompt["choices"].sort()
         answers = prompt(menu_prompt)
         return answers['action']
 
     def action_menu():
         action = Menu.ask_action()
         if (action == 'Back'): Menu.main()
-        elif (action == 'Discount'): Menu.discount_menu()
-        elif (action == 'Message'): Menu.message_menu()
-        elif (action == 'Post'): Menu.post_menu()
-        elif (action == 'Promotion'): Menu.promotion_menu()
-        else: Menu.main()
-
-    # Discount
-
-    def discount_menu():
-        if not Settings.is_debug():
-            print("### Not Available ###")
-            return
-        discount = Discount()
-        discount.apply()
-        Menu.main()
-
-    # Message
-
-    def message_menu():
-        message = Message()
-        message.send()
-        Menu.main()
-
-    # Post
-
-    def post_menu():
-        message = Message()
-        message.post()
-        Menu.main()
-
-    # Profile
-
-    def profile_menu():
-        print("### Not Available ###")
-        # Profile.menu(snarf)
-        Menu.main()
-
-    # Promotion
-
-    def promotion_menu():
-        if not Settings.is_debug():
-            print("### Not Available ###")
-            return
-        promotion = Promotion()
-        # add menu in promotion that asks for which kind
-        # promotion.create_trial_link()
-        promotion.apply_to_user()
-        Menu.main()
-
-    # Settings
-
-    def settings_menu():
-        Settings.menu()
+        elif (action == 'Discount'): Discount.create()
+        elif (action == 'Message'): Message.send()
+        elif (action == 'Post'): Message.post()
+        elif (action == 'Promotion'): Promotion.menu()
+        else: print("Missing Action: {}".format(colorize(action,"red")))
         Menu.main()
         
     # Main
@@ -140,8 +96,8 @@ class Menu:
     def main_menu():
         action = Menu.menu()
         if (action == 'Action'): Menu.action_menu()
-        elif (action == 'Profile'): Menu.profile_menu()
-        elif (action == 'Settings'): Menu.settings_menu()
+        elif (action == 'Profile'): Profile.menu()
+        elif (action == 'Settings'): Settings.menu()
         else: Menu.exit()
 
     def main():
