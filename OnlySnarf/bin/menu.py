@@ -19,6 +19,7 @@ from OnlySnarf.src.colorize import colorize
 # from OnlySnarf.src.cron import Cron
 from OnlySnarf.src.classes import Discount, Promotion
 from OnlySnarf.src.message import Message
+from OnlySnarf.src.profile import Profile
 from OnlySnarf.src import google as Google
 # from OnlySnarf.src.promotion import Promotion
 from OnlySnarf.src.settings import Settings
@@ -54,11 +55,11 @@ class Menu:
 
     def action_menu():
         action = Menu.ask_action()
-        if (action == 'Back'): Menu.main()
-        elif (action == 'Discount'): Discount.create()
-        elif (action == 'Message'): Message.send()
-        elif (action == 'Post'): Message.post()
-        elif (action == 'Promotion'): Promotion.menu()
+        if (action == 'back'): Menu.main()
+        elif (action == 'discount'): Discount.create()
+        elif (action == 'message'): Message.send()
+        elif (action == 'post'): Message.post()
+        elif (action == 'promotion'): Promotion.menu()
         else: print("Missing Action: {}".format(colorize(action,"red")))
         Menu.main()
         
