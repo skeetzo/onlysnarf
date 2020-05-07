@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 # Profile Settings
+from .driver import Driver
+from .settings import Settings
+# from .driver import Driver
 
-# from OnlySnarf.driver import Driver
-import PyInquirer
+from PyInquirer import prompt
 
 class Profile:
     TABS = ["profile", "advanced", "messaging", "notifications", "security", "story", "other"]
@@ -104,10 +106,10 @@ class Profile:
         self.liveServerKey = data.get("liveServerKey") or ""
 
     def __getitem__(self, key):
-        return getattr(self, key)
+        return getattr(self, str(key))
 
     def __setitem__(self, key, val):
-        return setattr(self, key, val)
+        return setattr(self, str(key), val)
 
     # Backup
 
@@ -116,7 +118,7 @@ class Profile:
         menu_prompt = {
             'type': 'list',
             'name': 'action',
-            'message': 'Please select an action:',
+            'message': 'Please select a backup action:',
             'choices': ['Content', 'Messages', 'Profile'],
             'filter': lambda val: str(val).lower()
         }
@@ -163,12 +165,11 @@ class Profile:
         elif (action == 'sync to'): Profile.sync_to_profile()
 
     def ask_action():
-        options = ["back"]
         menu_prompt = {
             'type': 'list',
             'name': 'action',
             'message': 'Please select a profile action:',
-            'choices': ['Backup','Sync From', 'Sync To'],
+            'choices': ['Back', 'Backup','Sync From', 'Sync To'],
             'filter': lambda val: str(val).lower()
         }
         answers = prompt(menu_prompt)
@@ -190,7 +191,7 @@ class Profile:
         print("Syncing from Profile")
         profile = Profile(Profile.fill_data())
         for tab in Profile.TABS:
-            self.sync_from_tab(tab)
+            profile.sync_from_tab(tab)
         print("Synced from Profile")
 
     @staticmethod
@@ -200,14 +201,15 @@ class Profile:
         if not profile:
             profile = Profile.create()
         for tab in Profile.TABS:
-            self.sync_to_tab(tab)
+            profile.sync_to_tab(tab)
         print("Synced to Profile")
 
     def sync_from_tab(self, tab):
         # syncs profile settings from the specificed tab
         data = Driver.sync_from_settings_page(tab)
         for key, value in data:
-            self[key] = value
+            print("{} - {}".format(key, value))
+            self[str(key)] = value
 
     def sync_to_tab(self, tab):
         # syncs profile settings to the specificed tab
