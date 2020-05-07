@@ -24,7 +24,6 @@ from selenium.webdriver.common.action_chains import ActionChains
 from .colorize import colorize
 from .settings import Settings
 from .element import Element
-from .profile import Profile
 
 ###################
 ##### Globals #####
@@ -478,7 +477,7 @@ class Driver:
         else:
             if str(settingsTab) == "profile": settingsTab = ""
             Settings.maybe_print("goto -> onlyfans.com/settings/{}".format(settingsTab))
-            Driver.BROWSER.get("{}/{}".format(ONLYFANS_SETTINGS_URL, settingsTab))
+            Driver.go_to_page("{}/{}".format(ONLYFANS_SETTINGS_URL, settingsTab))
             # fix above with correct element to locate
         Driver.get_page_load()
 
@@ -1288,6 +1287,7 @@ class Driver:
         auth_ = Driver.auth()
         if not auth_: return False
         print("Getting Settings: {}".format(page))
+        from .profile import Profile
         try:
             variables = Profile.get_variables_for_page(page)
             Settings.dev_print("going to settings page: {}".format(page))
@@ -1362,6 +1362,7 @@ class Driver:
         auth_ = Driver.auth()
         if not auth_: return False
         print("Updating Page Settings: {}".format(page))
+        from .profile import Profile
         try:
             variables = Profile.get_variables_for_page(page)
             Settings.dev_print("going to settings page: {}".format(page))

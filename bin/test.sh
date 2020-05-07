@@ -21,7 +21,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # sudo onlysnarfpy -show -debug -verbose -verbose -verbose -action message -category video -bykeyword stroke -user all -text 'stroking away boredom' -price '6.69'
 
 # menu
-sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local
+sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local -show
 
 #############
 
