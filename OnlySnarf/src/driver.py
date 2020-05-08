@@ -1556,14 +1556,29 @@ class Driver:
             return False
         files = files[:int(Settings.get_upload_max())]
         Settings.dev_print("uploading image files: {}".format(len(files)))
-        i = 1
-        for file in files:
-            print('Uploading: {} - {}/{}'.format(file.get_title(), i, len(files)))
-            i += 1
+
+        ####
+
+        import threading
+        import concurrent.futures
+
+        files_ = []
+
+        def prepare(file):
             uploadable = file.prepare() # downloads if Google_File
             if not uploadable:
                 print("Error: Unable to Upload - {}".format(file.get_title()))
-                continue
+            else: files_.append(file)    
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            executor.map(prepare, files)
+
+        ####
+
+        i = 1
+        for file in files_:
+            print('Uploading: {} - {}/{}'.format(file.get_title(), i, len(files)))
+            i += 1
             enter_file = Driver.BROWSER.find_element_by_id("fileupload_photo")
             enter_file.send_keys(str(file.get_path()))
             time.sleep(1)
