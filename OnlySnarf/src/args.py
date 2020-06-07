@@ -4,7 +4,7 @@ from .validators import valid_action, valid_amount, valid_date, valid_time, vali
 
 ACTIONS = ['discount','post','message','backup',
   # 'promotion',
-  # 'profile',
+  'profile',
   'test'
 ]
 
@@ -34,6 +34,8 @@ CONFIG_PATH = os.path.join(MOUNT_PATH, "config.conf")
 GOOGLE_PATH = os.path.join(MOUNT_PATH, "google_creds.txt")
 SECRET_PATH = os.path.join(MOUNT_PATH, "client_secrets.json")
 USERS_PATH = os.path.join(MOUNT_PATH, "users.json")
+PROFILE_PATH = os.path.join(MOUNT_PATH, "profile.json")
+
 # from pathlib import Path
 # Path(MOUNT_PATH).mkdir(parents=True)
 
@@ -112,6 +114,10 @@ parser.add_argument('-amount', type=valid_amount, dest='amount',
 # backup uploaded content to "posted" folder
 parser.add_argument('-backup', action='store_true', dest='backup',
   help='enables backup processes')
+##
+# -browser
+parser.add_argument('-browser', type=str, default="auto", choices=["auto","google","firefox","remote"], dest='browser',
+  help='the browser to use')
 ##
 # -category
 # the category of folder to upload from
@@ -271,6 +277,20 @@ parser.add_argument('-client-secret', dest="client_secret", type=str,
 # the path to the users.json file
 parser.add_argument('-users-path', type=str, dest='users_path',
   help='the path to cache users locally', default=USERS_PATH)
+# -profile-path
+# the path to the profile.json file
+parser.add_argument('-profile-path', type=str, dest='profile_path',
+  help='the path to cache profile locally', default=PROFILE_PATH)
+##
+# -remote-host
+# the remote host to connect to
+parser.add_argument('-remote-host', type=str, dest='remote_host',
+  help='the remote host to connect to', default="127.0.0.1")
+##
+# -remote-port
+# the remote port to connect to
+parser.add_argument('-remote-port', type=int, dest='remote_port',
+  help='the remote port to connect to', default=4444)
 ###
 ##
 # -question
@@ -381,9 +401,25 @@ parser.add_argument('-username', type=str, default="", dest='username',
 # v, vv, vvv
 parser.add_argument('-v', '-verbose', dest="verbose", action='count', default=0, 
   help="verbosity level (max 3)")
-##
-# -version
-# prints version
+
+## Profile Methods
+# -profile-backup
+parser.add_argument('-profile-backup', dest="profile_backup", action='store_true', 
+  help="uses backup method when combined with action=profile")
+# -profile-syncto
+parser.add_argument('-profile-syncto', dest="profile_syncto", action='store_true', 
+  help="uses sync to method when combined with action=profile")
+# -profile-syncfrom
+parser.add_argument('-profile-syncfrom', dest="profile_syncfrom", action='store_true', 
+  help="uses sync from method when combined with action=profile")
+
+## Promotion Methods
+# -promotion-user
+parser.add_argument('-promotion-user', dest="promotion_user", action='store_true', 
+  help="uses user method when combined with action=promotion")
+# -promotion-trial
+parser.add_argument('-promotion-trial', dest="promotion_trial", action='store_true', 
+  help="uses trial method when combined with action=promotion")
 
 ##
 # Positional

@@ -23,7 +23,6 @@ from OnlySnarf.src.profile import Profile
 from OnlySnarf.src import google as Google
 # from OnlySnarf.src.promotion import Promotion
 from OnlySnarf.src.settings import Settings
-
 from OnlySnarf.src import args
 
 #####################

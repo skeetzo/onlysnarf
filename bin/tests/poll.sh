@@ -2,7 +2,7 @@
 
 # Image & Poll
 echo "[*] Misc - Poll 1"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" -category "image" \
 -bykeyword "pussycats" \
@@ -19,7 +19,7 @@ sudo onlysnarfpy \
 # -verbose -verbose
 
 echo "[*] Misc - Poll 2"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" -category "image" \
 -bykeyword "pussycats" \

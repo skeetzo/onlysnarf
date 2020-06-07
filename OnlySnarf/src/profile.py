@@ -1,10 +1,8 @@
 #!/usr/bin/python3
 # Profile Settings
+from PyInquirer import prompt
 from .driver import Driver
 from .settings import Settings
-# from .driver import Driver
-
-from PyInquirer import prompt
 
 class Profile:
     TABS = ["profile", "advanced", "messaging", "notifications", "security", "story", "other"]
@@ -12,104 +10,16 @@ class Profile:
     # profile settings are either:
     #   enabled or disabled
     #   display text, variable type, variable name in settings
-    # this is the absolute worst way to do this
-    def __init__(self, data):
-        if not data: data = Profile.fill_data()
-        # url path or file upload
-        self.coverImage = data.get("coverImage") or None
-        # url path or file upload
-        self.profilePhoto = data.get("profilePhoto") or None
-        # text
-        self.displayName = data.get("displayName") or ""
-        # text in $
-        # minimum $4.99 or free
-        self.subscriptionPrice = data.get("subscriptionPrice") or "4.99"
-        # text
-        self.about = data.get("about") or ""
-        # text
-        self.location = data.get("location") or ""
-        # text as url
-        self.websiteURL = data.get("websiteURL") or None
-        # text
-        self.username = data.get("username") or ""
-        # text, can't be changed
-        self.email = data.get("email") or ""
-        # text
-        self.password = data.get("password") or ""
-        # enabled or disabled
-        self.emailNotifs = data.get("emailNotifs") or False
-        # enabled or disabled
-        self.emailNotifsNewReferral = data.get("emailNotifsNewReferral") or False
-        # enabled or disabled
-        self.emailNotifsNewStream = data.get("emailNotifsNewStream") or False
-        # enabled or disabled
-        self.emailNotifsNewSubscriber = data.get("emailNotifsNewSubscriber") or False
-        # enabled or disabled
-        self.emailNotifsNewTip = data.get("emailNotifsNewTip") or False
-        # enabled or disabled
-        self.emailNotifsRenewal = data.get("emailNotifsRenewal") or False
-        # enabled or disabled
-        self.emailNotifsNewLikes = data.get("emailNotifsNewLikes") or False
-        # enabled or disabled
-        self.emailNotifsNewPosts = data.get("emailNotifsNewPosts") or False
-        # enabled or disabled
-        self.emailNotifsNewPrivMessages = data.get("emailNotifsNewPrivMessages") or False
-        # enabled or disabled
-        self.siteNotifs = data.get("siteNotifs") or False
-        # enabled or disabled
-        self.siteNotifsNewComment = data.get("siteNotifsNewComment") or False
-        # enabled or disabled
-        self.siteNotifsNewFavorite = data.get("siteNotifsNewFavorite") or False
-        # enabled or disabled
-        self.siteNotifsDiscounts = data.get("siteNotifsDiscounts") or False
-        # enabled or disabled
-        self.siteNotifsNewSubscriber = data.get("siteNotifsNewSubscriber") or False
-        # enabled or disabled
-        self.siteNotifsNewTip = data.get("siteNotifsNewTip") or False
-        # enabled or disabled
-        self.toastNotifs = data.get("toastNotifs") or False
-        # enabled or disabled
-        self.toastNotifsNewComment = data.get("toastNotifsNewComment") or False
-        # enabled or disabled
-        self.toastNotifsNewFavorite = data.get("toastNotifsNewFavorite") or False
-        # enabled or disabled
-        self.toastNotifsNewSubscriber = data.get("toastNotifsNewSubscriber") or False
-        # enabled or disabled
-        self.toastNotifsNewTip = data.get("toastNotifsNewTip") or False
-        # enabled or disabled
-        self.fullyPrivate = data.get("fullyPrivate") or False
-        # enabled or disabled
-        self.enableComments = data.get("enableComments") or False
-        # enabled or disabled
-        self.showFansCount = data.get("showFansCount") or False
-        # enabled or disabled
-        self.showPostsTip = data.get("showPostsTip") or False
-        # enabled or disabled
-        self.publicFriendsList = data.get("publicFriendsList") or False
-        # selection of countries
-        self.ipCountry = data.get("ipCountry") or Profile.get_country_list()
-        # text of ip ranges
-        self.ipIP = data.get("ipIP") or ""
-        # enabled or disabled
-        self.watermark = data.get("watermark") or True
-        # enabled or disabled
-        self.watermarkPhoto = data.get("watermarkPhoto") or False
-        # enabled or disabled
-        self.watermarkVideo = data.get("watermarkVideo") or False
-        # the custom watermark text
-        self.watermarkText = data.get("watermarkText") or ""
-        if self.username and str(self.username) != "" and self.watermarkText == "":
-            self.watermarkText = "OnlyFans.com/{}".format(self.username)
-        # the obs live server
-        self.liveServer = data.get("liveServer") or ""
-        # the obs live server key
-        self.liveServerKey = data.get("liveServerKey") or ""
+    def __init__(self):
+        profile = Profile.fill_data()
+        for key, value in profile.items():
+            setattr(self, str(key), value)
 
-    def __getitem__(self, key):
-        return getattr(self, str(key))
+    # def __getitem__(self, key):
+    #     return getattr(self, str(key))
 
-    def __setitem__(self, key, val):
-        return setattr(self, str(key), val)
+    # def __setitem__(self, key, val):
+    #     return setattr(self, str(key), val)
 
     # Backup
 
@@ -119,7 +29,7 @@ class Profile:
             'type': 'list',
             'name': 'action',
             'message': 'Please select a backup action:',
-            'choices': ['Content', 'Messages', 'Profile'],
+            'choices': ['All', 'Content', 'Messages', 'Content & Messages', 'Profile'],
             'filter': lambda val: str(val).lower()
         }
         answers = prompt(menu_prompt)
@@ -131,27 +41,34 @@ class Profile:
             return
         backup = Profile.ask_backup()
         if (backup == 'back'): pass
-        # content
-        elif (backup == 'content'): Profile.backup_content()
-        # messages
-        elif (backup == 'messages'): Profile.backup_messages()
-        # profile settings
-        elif (backup == 'profile'): Profile.backup_profile()
+        elif (backup == 'content'):
+            Profile.backup_content()
+        elif (backup == 'messages'):
+            Profile.backup_messages()
+        elif (backup == 'profile'):
+            Profile.backup_profile()
+        elif (backup == 'content & messages'):
+            Profile.backup_content()
+            Profile.backup_messages()
+        elif (backup == 'all'):
+            Profile.backup_content()
+            Profile.backup_messages()
+            Profile.backup_profile()
 
     @staticmethod
     def backup_content():
-        # prompt if backing up home page content only
-        # or if also backing up all message content
-        pass
+        print("Backing Up: Content")
+        print("Backed Up: Content")
 
     @staticmethod
     def backup_messages():
-        # prompt if include backing up content
-        pass
+        print("Backing Up: Messages")
+        print("Backed Up: Messages")
 
     @staticmethod
     def backup_profile():
-        pass
+        print("Backing Up: Profile")
+        print("Backed Up: Profile")
 
     @staticmethod
     def menu():
@@ -189,10 +106,12 @@ class Profile:
         # gets necessary variables from browser
         # variables = get_settings_variables()
         print("Syncing from Profile")
-        profile = Profile(Profile.fill_data())
+        profile = Profile()
         for tab in Profile.TABS:
             profile.sync_from_tab(tab)
         print("Synced from Profile")
+        Profile.write_local(profile)
+        return profile
 
     @staticmethod
     def sync_to_profile(profile=None):
@@ -209,7 +128,7 @@ class Profile:
         data = Driver.sync_from_settings_page(tab)
         for key, value in data:
             print("{} - {}".format(key, value))
-            self[str(key)] = value
+            setattr(self, str(key), value)
 
     def sync_to_tab(self, tab):
         # syncs profile settings to the specificed tab
@@ -279,7 +198,34 @@ class Profile:
             prof.set("watermarkText", "OnlyFans.com/{}".format(prof.get("username")))
         return prof
 
+    @staticmethod
+    def read_local():
+        Settings.maybe_print("Getting Local Profile")
+        profile_ = {}
+        try:
+            with open(str(Settings.get_profile_path())) as json_file:  
+                profile_ = json.load(json_file)['profile']
+            Settings.maybe_print("Loaded Local Profile")
+            profile = Profile()
+            for key, value in profile_:
+                setattr(profile, str(key), value)
+        except Exception as e:
+            Settings.dev_print(e)
+        return profile
 
+    @staticmethod
+    def write_local(profile=None):
+        if profile is None:
+            profile = Profile.sync_from_profile()
+        print("Saving Profile Locally")
+        Settings.maybe_print("local profile path: "+str(Settings.get_profile_path()))
+        try:
+            with open(str(Settings.get_profile_path()), 'w') as outfile:  
+                json.dump({"profile":profile}, outfile, indent=4, sort_keys=True)
+        except FileNotFoundError:
+            print("Error: Missing Profile File")
+        except OSError:
+            print("Error: Missing Profile Path")
 
     # returns list of settings and their classes
     # ["settingVariableName","pageProfile","inputType-text"]
