@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "[*] Message - Recent & Image"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "message" \
 -user "all" \
@@ -16,7 +16,7 @@ sudo onlysnarfpy \
 # -verbose
 
 echo "[*] Message - Recent & Gallery"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "message" \
 -user "recent" \
@@ -32,7 +32,7 @@ sudo onlysnarfpy \
 # -verbose
 
 echo "[*] Message - All & Video"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "message" \
 -user "all" \

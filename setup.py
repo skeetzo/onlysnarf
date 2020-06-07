@@ -19,6 +19,7 @@ setuptools.setup(
         'pydrive',
         'pathlib', 
         'chromedriver-binary',
+        'geckodriver-autoinstaller',
         'moviepy',
         'google-api-python-client',
         'httplib2',

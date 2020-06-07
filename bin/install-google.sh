@@ -15,7 +15,7 @@ sudo apt-get update
 
 # sudo apt-get install -y google-chrome-stable
 sudo apt-get install -y google-chrome-beta
-sudo -H pip3 install chromedriver-binary -y
+sudo -H pip3 install chromedriver-binary
 
 # sudo apt-get install google-chrome-stable=$VERSION2-1 -y
 # sudo apt-get install google-chrome-beta=$VERSION2-1 -y

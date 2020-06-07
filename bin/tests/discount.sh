@@ -2,7 +2,7 @@
 
 # Discount
 echo "[*] Discount - Recent"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "discount" \
 -user "recent" \
