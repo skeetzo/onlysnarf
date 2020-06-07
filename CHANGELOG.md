@@ -329,11 +329,19 @@
 
 ----------------------------------------
 
+  **2.17.8**
+  - added remote webdriver operations
+  - added firefox
+
+
+  - debugged remote webdriver
+  - debugged firefox
+
   **2.18.0**
   - menu updates
   - profile / settings updates
-
-
+  - updated profile: sync from, sync to, backup
+  
 
   - need a way for Discount to select users that are "Renew On"; click "Renew On" and get selected users? or grab from users w/ similar matching criteria?
 

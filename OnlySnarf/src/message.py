@@ -161,9 +161,6 @@ class Message():
 	def get_poll(self):
 		if self.poll and self.poll.check(): return self.poll
 		if not Settings.prompt("poll"): return None
-		poll = Settings.get_poll() or None
-		if poll: return poll
-		if not Settings.prompt("poll"): return None
 		poll = Poll()
 		poll.get()
 		if not poll.check(): return None
@@ -217,9 +214,6 @@ class Message():
 
 	def get_schedule(self):
 		if self.schedule: return self.schedule
-		if not Settings.prompt("schedule"): return None
-		schedule = Settings.get_Schedule()
-		if schedule: return schedule
 		if not Settings.prompt("schedule"): return None
 		schedule = Schedule()
 		schedule.get()

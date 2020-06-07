@@ -42,14 +42,8 @@ class Settings:
 
     last_updated = False
     CONFIRM = True
-    DISCOUNT = None
     FILES = None
     PROMPT = True
-    MESSAGE = None
-    POLL = None
-    PROFILE = None
-    PROMOTION = None
-    SCHEDULE = None
     VERSION = pkg_resources.get_distribution("onlysnarf").version
 
     def __init__():
@@ -112,16 +106,11 @@ class Settings:
     def get_amount():
         return config["AMOUNT"]
 
+    def get_browser_type():
+        return config["BROWSER"]
+
     def get_months():
         return config["MONTHS"]
-
-    def get_discount():
-        if Settings.DISCOUNT: return Settings.DISCOUNT
-        from .classes import Discount
-        discount = Discount()
-        discount.get()
-        Settings.DISCOUNT = discount
-        return discount
 
     def get_category():
         cat = config["CATEGORY"]
@@ -205,13 +194,6 @@ class Settings:
 
     def get_limit():
         return config["LIMIT"] or 1
-        
-    def get_message():
-        if Settings.MESSAGE: return Settings.MESSAGE
-        from .message import Message
-        message = Message()
-        Settings.MESSAGE = message
-        return message
 
     def get_message_choices():
         return MESSAGE_CHOICES
@@ -224,30 +206,8 @@ class Settings:
         performers = [n.strip() for n in performers]
         return performers
 
-    def get_profile():
-        if Settings.PROFILE: return Settings.PROFILE
-        from .profile import Profile
-        profile = Profile()
-        profile.get()
-        Settings.PROFILE = profile
-        return profile
-
-    def get_poll():
-        if Settings.POLL: return Settings.POLL
-        from .classes import Poll
-        poll = Poll()
-        poll.get()
-        if not poll.check(): return None
-        Settings.POLL = poll
-        return poll
-
-    def get_promotion():
-        if Settings.PROMOTION: return Settings.PROMOTION
-        from .classes import Promotion
-        promotion = Promotion()
-        promotion.get()
-        Settings.PROMOTION = promotion
-        return promotion
+    def get_profile_path():
+        return config["PROFILE_PATH"] or "/opt/onlysnarf/profile.json"
 
     def get_recent_user_count():
         return config["RECENT_USERS_COUNT"] or 0
@@ -265,7 +225,7 @@ class Settings:
         return config["DRIVE_ROOT"] or "OnlySnarf"
 
     def get_users_path():
-        return config["USERS_PATH"] or ""
+        return config["USERS_PATH"] or "/opt/onlysnarf/users.json"
 
     def get_google_path():
         return config["GOOGLE_PATH"] or ""
@@ -273,14 +233,17 @@ class Settings:
     def get_secret_path():
         return config["CLIENT_SECRET"] or ""
 
-    def get_Schedule():
-        if Settings.SCHEDULE: return Settings.SCHEDULE
-        from .classes import Schedule
-        schedule = Schedule()
-        schedule.get()
-        if not schedule.check(): return None
-        Settings.SCHEDULE = schedule
-        return schedule
+    def get_profile_method():
+        if config["PROFILE_BACKUP"]: return "backup"
+        elif config["PROFILE_SYNCFROM"]: return "syncfrom"
+        elif config["PROFILE_SYNCTO"]: return "syncto"
+        return ""
+
+    def get_promotion_method():
+        if config["PROMOTION_USER"]: return "user"
+        elif config["PROMOTION_TRIAL"]: return "trial"
+        return ""
+
 
     def get_schedule():
         if str(config["SCHEDULE"]) != "None": return config["SCHEDULE"]

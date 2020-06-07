@@ -2,7 +2,7 @@
 
 # Schedule
 echo "[*] Misc - Schedule"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" -category "image" \
 -bykeyword "pussycats" \
@@ -16,7 +16,7 @@ sudo onlysnarfpy \
 # -verbose -verbose
 
 echo "[*] Misc - Schedule (Date & Time)"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" -category "image" \
 -bykeyword "pussycats" \
@@ -31,7 +31,7 @@ sudo onlysnarfpy \
 # -verbose -verbose
 
 echo "[*] Misc - Schedule (Date)"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" -category "image" \
 -bykeyword "pussycats" \

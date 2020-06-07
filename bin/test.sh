@@ -11,7 +11,7 @@ echo "################## Start #########################" >> ../onlysnarf/logs/t
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
 # video
-# sudo onlysnarfpy -category video -notkeyword stroke -verbose -verbose -debug
+onlysnarfpy -category video -notkeyword stroke -verbose -verbose -debug -browser firefox
 
 # post request
 # sudo onlysnarfpy -show -debug -verbose -verbose -verbose -action post -text "Weekly Requests Post                                                                                                            Comment below what you'd like to see more of! 8=======D~~ O:"
@@ -21,7 +21,14 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # sudo onlysnarfpy -show -debug -verbose -verbose -verbose -action message -category video -bykeyword stroke -user all -text 'stroking away boredom' -price '6.69'
 
 # menu
-sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local -show
+# sudo onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local -show
+
+# profile
+# sudo onlysnarfpy -debug -verbose -verbose -verbose -debug-delay -prefer-local -show -action profile -profile-backup
+# sudo onlysnarfpy -debug -verbose -verbose -verbose -debug-delay -prefer-local -show -action profile -profile-syncto
+# sudo onlysnarfpy -debug -verbose -verbose -verbose -debug-delay -prefer-local -show -action profile -profile-syncfrom
+# sudo onlysnarfpy -debug -verbose -verbose -verbose -debug-delay -prefer-local -show -action promotion -promotion-user
+# sudo onlysnarfpy -debug -verbose -verbose -verbose -debug-delay -prefer-local -show -action promotion -promotion-trial
 
 #############
 
