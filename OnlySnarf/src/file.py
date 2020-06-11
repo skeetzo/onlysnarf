@@ -343,37 +343,57 @@ class Google_File(File):
         return files
 
     @staticmethod
-    def get_files_by_category(category):
-        print("Loading Google Files...")
+    def get_files_by_category(cat, performer=None):
+        Settings.maybe_print("Loading Google Files...")
         files = []
-        if "image" in str(category):
-            categoryFolder = Google.get_folder_by_name(category)
-            for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
-                for image in Google.get_images_of_folder(folder):
-                    file = Google_File()
-                    setattr(file, "file", image)
-                    setattr(file, "parent", folder)
-                    files.append(file)
-            # files = [random.choice(files)]
-        elif "video" in str(category):
-            categoryFolder = Google.get_folder_by_name(category)
-            for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
-                for video in Google.get_videos_of_folder(folder):
-                    file = Google_File()
-                    setattr(file, "file", video)
-                    setattr(file, "parent", folder)
-                    files.append(file)
-            # files = [random.choice(files)]
-        elif "galler" in str(category):
-            categoryFolder = Google.get_folder_by_name(category)
-            for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
-                for gallery in Google.get_folders_of_folder(folder):
-                    file = Google_Folder()
-                    setattr(file, "file", gallery)
-                    setattr(file, "parent", folder)
-                    files.append(file)
-            # files = [random.choice(files)]
-        return files
+        ##
+        def parse_categories(category, categoryFolder=None):
+            files = []
+            # return Google_File.get_files_by_category(cat)
+            if "image" in str(category):
+                if not categoryFolder:
+                    categoryFolder = Google.get_folder_by_name(category)
+                for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                    for image in Google.get_images_of_folder(folder):
+                        file = Google_File()
+                        setattr(file, "file", image)
+                        setattr(file, "parent", folder)
+                        files.append(file)
+            elif "video" in str(category):
+                if not categoryFolder:
+                    categoryFolder = Google.get_folder_by_name(category)
+                for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                    for video in Google.get_videos_of_folder(folder):
+                        file = Google_File()
+                        setattr(file, "file", video)
+                        setattr(file, "parent", folder)
+                        files.append(file)
+            elif "galler" in str(category):
+                if not categoryFolder:
+                    categoryFolder = Google.get_folder_by_name(category)
+                for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                    for gallery in Google.get_folders_of_folder(folder):
+                        file = Google_Folder()
+                        setattr(file, "file", gallery)
+                        setattr(file, "parent", folder)
+                        files.append(file)
+            elif "performer" in str(category):
+                if not categoryFolder:
+                    categoryFolder = Google.get_folder_by_name(category)
+                for performer in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                    # for performer in Google.get_folders_of_folder(folder):
+                    p = Google_Folder()
+                    setattr(p, "file", performer)
+                    setattr(p, "parent", categoryFolder)
+                    files.append(p)
+            return files
+        ##
+        if performer:
+            categoryFolder = Google.get_folder_by_name("performers")
+            for performerFolder in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                if str(performer) == str(performerFolder['title']):
+                    return parse_categories(cat, categoryFolder=performerFolder)
+        return parse_categories(cat)
 
     @staticmethod
     def get_random_file():
@@ -429,10 +449,10 @@ class Google_File(File):
         return super()
 
     @staticmethod
-    def select_file(category):
+    def select_file(category, performer=None):
         if not Settings.is_prompt(): return Google_File.get_random_file()
         # this is a list of google files to select from
-        files = Google_File.get_files_by_category(category)
+        files = Google_File.get_files_by_category(category, performer=performer)
         files_ = []
         for file in files:
             file.category = category
@@ -442,6 +462,9 @@ class Google_File(File):
                 "short": file.file['id']
             }
             files_.append(file_)
+        if len(files_) == 0:
+            print("Missing Files")
+            return Google_File.select_files()
         question = {
             'type': 'list',
             'name': 'file',
@@ -472,6 +495,14 @@ class Google_File(File):
         while True:
             file = Google_File.select_file(category)
             if not file: break
+            ##
+            if "performer" in str(category):
+                cat = Settings.select_category([cat for cat in Settings.get_categories() if "performer" not in cat])
+                file = Google_File.select_file(cat, performer=file.get_title())
+                if not file: break
+                files.append(file)
+                if "galler" in str(cat) or "video" in str(cat): break
+            ##
             files.append(file)
             if "galler" in str(category) or "video" in str(category): break
         if not Settings.confirm([file.file['title'] for file in files]): return Google_File.select_files()

@@ -326,12 +326,12 @@
   **2.17.7**
   - fixed backup pathing
   - fixed file upload max
-
-----------------------------------------
-
   **2.17.8**
   - added remote webdriver operations
   - added firefox
+  - add performers; debugging
+
+----------------------------------------
 
 
   - debugged remote webdriver

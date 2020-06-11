@@ -252,6 +252,8 @@ class Message():
 		if not self.text:
 			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
+		if Settings.get_performer_category():
+			self.get_performers()
 		self.gotten = True
 
 	def get_post(self):
@@ -265,6 +267,8 @@ class Message():
 		if not self.text:
 			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
+		if Settings.get_performer_category():
+			self.get_performers()
 		self.gotten = True
 
 	def get_message(self):
@@ -276,10 +280,12 @@ class Message():
 		if not self.text:
 			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
+		if Settings.get_performer_category():
+			self.get_performers()
 		self.gotten = True
 
 	@staticmethod
-	def post():
+	def Post():
 		message = Message()
 		message.post()
 
@@ -295,7 +301,7 @@ class Message():
 		if successful: self.cleanup_files()
 
 	@staticmethod
-	def send():
+	def Send():
 		message = Message()
 		message.send()
 

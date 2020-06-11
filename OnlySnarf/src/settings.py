@@ -12,7 +12,8 @@ DEBUGGING = [
 CATEGORIES_DEFAULT = [
   "images",
   "galleries",
-  "videos"
+  "videos",
+  "performers"
 ]
 DEFAULT_MESSAGE = ":)"
 DEFAULT_REFRESHER = "hi!"
@@ -45,6 +46,7 @@ class Settings:
     FILES = None
     PROMPT = True
     VERSION = pkg_resources.get_distribution("onlysnarf").version
+    PERFORMER_CATEGORY = None
 
     def __init__():
         pass
@@ -315,6 +317,12 @@ class Settings:
     def get_version():
         return Settings.VERSION
 
+    def get_performer_category():
+        return Settings.PERFORMER_CATEGORY
+
+    def set_performer_category(category):
+        Settings.PERFORMER_CATEGORY = category
+
     # Bools
 
     def is_confirm():
@@ -421,12 +429,13 @@ class Settings:
         Settings.set_password(pw)
         return pw
 
-    def select_category():
+    def select_category(categories=None):
+        if not categories: categories = Settings.get_categories()
         question = {
             'type': 'list',
             'message': 'Category?',
             'name': 'category',
-            'choices': Settings.get_categories(),
+            'choices': categories,
         }
         cat = PyInquirer.prompt(question)["category"]
         if not Settings.confirm(cat): return Settings.select_category()
