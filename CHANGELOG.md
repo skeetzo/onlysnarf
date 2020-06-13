@@ -330,6 +330,8 @@
   - added remote webdriver operations
   - added firefox
   - add performers; debugging
+  **2.17.9**
+  - debugged 2.17.8
 
 ----------------------------------------
 
