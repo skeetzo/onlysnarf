@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 if [ -z "$1" ]; then
-	set "upload"
+	set "master"
 fi
 bin/save.sh $1
 wait
