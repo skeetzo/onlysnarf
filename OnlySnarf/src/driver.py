@@ -1570,13 +1570,13 @@ class Driver:
             driver = google()
             if not driver:
                 driver = firefox()
-            if not driver:
-                print("Warning: connecting to remote driver automatically")
-                driver = remote()
+            # if not driver:
+            #     print("Warning: connecting to remote driver automatically")
+            #     driver = remote()
 
         if not driver: 
             print("Error: Unable to spawn browser")
-            return
+            sys.exit(1)
 
         driver.implicitly_wait(30) # seconds
         driver.set_page_load_timeout(1200)
