@@ -14,5 +14,4 @@ if __name__ == "__main__":
         print(sys.exc_info()[0])
         print("Shnarf!")
     finally:
-        # sys.exit(0)
-        pass
+        sys.exit(0)

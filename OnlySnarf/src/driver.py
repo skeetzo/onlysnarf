@@ -1576,7 +1576,8 @@ class Driver:
 
         if not driver: 
             print("Error: Unable to spawn browser")
-            sys.exit(1)
+            # sys.exit(1)
+            os._exit(1)
 
         driver.implicitly_wait(30) # seconds
         driver.set_page_load_timeout(1200)
