@@ -332,6 +332,9 @@
   - add performers; debugging
   **2.17.9**
   - debugged 2.17.8
+  **2.17.10**
+  - removed moviepy
+  - exit(1) when missing driver
 
 ----------------------------------------
 
