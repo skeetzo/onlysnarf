@@ -337,6 +337,7 @@
   - exit(1) when missing driver
   **2.17.11**
   - fixed messaging a user
+  - fixed performer operations
 
 ----------------------------------------
 

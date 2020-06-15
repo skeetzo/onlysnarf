@@ -441,6 +441,9 @@ class Settings:
         if not Settings.confirm(cat): return Settings.select_category()
         return cat
 
+    def set_category(cat):
+        config["CATEGORY"] = cat
+
     def set_confirm(value):
         Settings.CONFIRM = bool(value)
 
