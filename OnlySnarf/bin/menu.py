@@ -55,7 +55,7 @@ class Menu:
 
     def action_menu():
         action = Menu.ask_action()
-        if (action == 'back'): Menu.main()
+        if (action == 'back'): return Menu.main()
         elif (action == 'discount'): Discount.create()
         elif (action == 'message'): Message.send()
         elif (action == 'post'): Message.post()
