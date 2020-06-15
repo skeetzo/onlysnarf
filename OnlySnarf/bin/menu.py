@@ -23,7 +23,6 @@ from OnlySnarf.src.profile import Profile
 from OnlySnarf.src import google as Google
 # from OnlySnarf.src.promotion import Promotion
 from OnlySnarf.src.settings import Settings
-
 from OnlySnarf.src import args
 
 #####################
@@ -57,8 +56,8 @@ class Menu:
         action = Menu.ask_action()
         if (action == 'back'): return Menu.main()
         elif (action == 'discount'): Discount.create()
-        elif (action == 'message'): Message.send()
-        elif (action == 'post'): Message.post()
+        elif (action == 'message'): Message.Send()
+        elif (action == 'post'): Message.Post()
         elif (action == 'promotion'): Promotion.menu()
         else: print("Missing Action: {}".format(colorize(action,"red")))
         Menu.main()

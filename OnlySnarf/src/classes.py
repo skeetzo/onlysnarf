@@ -165,14 +165,20 @@ class Promotion:
 
     # requires the copy/paste and email steps
     def create_trial_link(self):
+        print("Promotion - Creating Trial Link")
         self.get()
         if not self.gotten: return
         if not Settings.prompt("Promotion"): return
         # limit, expiration, months, user
-        Driver.create_trial_link(self)
+        Driver.promotional_trial_link(self)
+        # link = Driver.promotional_trial_link()
+        # text = "Here's your free trial link!\n"+link
+        # Settings.dev_print("Link: "+str(text))
+        # Settings.send_email(email, text)
 
     # apply discount directly to user on user's profile page
     def apply_to_user():
+        print("Promotion - Apply To User: {}".format(self.user.username))
         self.get()
         if not self.gotten: return
         if not Settings.prompt("Promotion"): return

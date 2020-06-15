@@ -2,7 +2,7 @@
 
 # Post
 echo "[*] Post - Text"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" \
 -text "post testes" \
@@ -12,7 +12,7 @@ sudo onlysnarfpy \
 # -verbose -verbose
 
 echo "[*] Post - Text"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" \
 -show \

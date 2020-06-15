@@ -326,14 +326,27 @@
   **2.17.7**
   - fixed backup pathing
   - fixed file upload max
+  **2.17.8**
+  - added remote webdriver operations
+  - added firefox
+  - add performers; debugging
+  **2.17.9**
+  - debugged 2.17.8
+  **2.17.10**
+  - removed moviepy
+  - exit(1) when missing driver
 
 ----------------------------------------
+
+
+  - debugged remote webdriver
+  - debugged firefox
 
   **2.18.0**
   - menu updates
   - profile / settings updates
-
-
+  - updated profile: sync from, sync to, backup
+  
 
   - need a way for Discount to select users that are "Renew On"; click "Renew On" and get selected users? or grab from users w/ similar matching criteria?
 

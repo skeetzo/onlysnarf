@@ -2,7 +2,7 @@
 
 # Image & Expiration
 echo "[*] Misc - Expiration"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" -category "image" \
 -bykeyword "pussycats" \
@@ -10,20 +10,20 @@ sudo onlysnarfpy \
 -text "expiration testes" \
 -debug-delay \
 -expiration 3 \
--show \
 -verbose -verbose -verbose
+# -show \
 # -verbose -verbose
 # -verbose
 
 echo "[*] Misc - Expiration"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" -category "image" \
 -bykeyword "pussycats" \
 -skip-upload \
 -debug-delay \
 -expiration 3 \
--show \
 -verbose -verbose -verbose
+# -show \
 # -verbose -verbose
 # -verbose
