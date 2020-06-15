@@ -161,9 +161,6 @@ class Message():
 	def get_poll(self):
 		if self.poll and self.poll.check(): return self.poll
 		if not Settings.prompt("poll"): return None
-		poll = Settings.get_poll() or None
-		if poll: return poll
-		if not Settings.prompt("poll"): return None
 		poll = Poll()
 		poll.get()
 		if not poll.check(): return None
@@ -218,9 +215,6 @@ class Message():
 	def get_schedule(self):
 		if self.schedule: return self.schedule
 		if not Settings.prompt("schedule"): return None
-		schedule = Settings.get_Schedule()
-		if schedule: return schedule
-		if not Settings.prompt("schedule"): return None
 		schedule = Schedule()
 		schedule.get()
 		if not schedule.check(): return None
@@ -258,6 +252,8 @@ class Message():
 		if not self.text:
 			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
+		if Settings.get_performer_category():
+			self.get_performers()
 		self.gotten = True
 
 	def get_post(self):
@@ -271,6 +267,8 @@ class Message():
 		if not self.text:
 			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
+		if Settings.get_performer_category():
+			self.get_performers()
 		self.gotten = True
 
 	def get_message(self):
@@ -282,10 +280,12 @@ class Message():
 		if not self.text:
 			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
+		if Settings.get_performer_category():
+			self.get_performers()
 		self.gotten = True
 
 	@staticmethod
-	def post():
+	def Post():
 		message = Message()
 		message.post()
 
@@ -301,7 +301,7 @@ class Message():
 		if successful: self.cleanup_files()
 
 	@staticmethod
-	def send():
+	def Send():
 		message = Message()
 		message.send()
 

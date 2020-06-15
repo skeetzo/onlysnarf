@@ -1451,68 +1451,134 @@ class Driver:
     @staticmethod
     def spawn_browser():      
         if Driver.BROWSER: return True
+        # driver = None
         print("Spawning Browser")
-        options = webdriver.ChromeOptions()
-        options.add_argument("--no-sandbox") # Bypass OS security model
-        options.add_argument("--disable-setuid-sandbox")
-        options.add_argument("--disable-dev-shm-usage") # overcome limited resource problems
-        options.add_argument("--disable-gpu") # applicable to windows os only
-        if not Settings.is_show_window():
-            options.add_argument('--headless')
-            # options.add_argument('--disable-smooth-scrolling')
-            # options.add_argument('--disable-software-rasterizer')
-        #
-        # options.add_argument("--disable-extensions") # disabling extensions
-        # options.add_argument("--disable-infobars") # disabling infobars
-        # options.add_argument("--start-maximized")
-        # options.add_argument("--window-size=1920,1080")
-        # options.add_argument("--user-data-dir=/tmp/");
-        # options.add_argument('--disable-login-animations')
-        # options.add_argument('--disable-modal-animations')
-        # options.add_argument('--disable-sync')
-        # options.add_argument('--disable-background-networking')
-        # options.add_argument('--disable-web-resources')
-        # options.add_argument('--ignore-certificate-errors')
-        # options.add_argument('--disable-logging')
-        # options.add_argument('--no-experiments')
-        # options.add_argument('--incognito')
-        # options.add_argument('--user-agent=MozillaYerMomFox')
-        # options.add_argument("--remote-debugging-address=localhost")
-        # options.add_argument("--remote-debugging-port=9222")
-        service_args = []
-        if Settings.is_debug():
-            service_args = ["--verbose", "--log-path=/var/log/onlysnarf/debug.txt"]
-        #
-        # options.add_experimental_option("prefs", {
-          # "download.default_directory": str(DOWNLOAD_PATH),
-          # "download.prompt_for_download": False,
-          # "download.directory_upgrade": True,
-          # "safebrowsing.enabled": True
-        # })
-        # capabilities = {
-          # 'browserName': 'chrome',
-          # 'chromeOptions':  {
-            # 'useAutomationExtension': False,
-            # 'forceDevToolsScreenshot': True,
-            # 'args': ['--start-maximized', '--disable-infobars']
-          # }
-        # }  
-        driver = None
-        try:
-            # desired_capabilities=capabilities
-            Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
-            # options.binary_location = chromedriver_binary.chromedriver_filename
-            driver = webdriver.Chrome(executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
-        except Exception as e:
-            print(e)
-            print("Warning: Missing Chromedriver")
-        # try:
-        #     options.binary_location = "/usr/local/bin/geckodriver"
-        #     driver = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver")
-        # except Exception as e:
-        #     print(e)
-        #     print("Warning: Missing Geckodriver")
-        #     return False
+
+        def google():
+            try:
+                options = webdriver.ChromeOptions()
+                options.add_argument("--no-sandbox") # Bypass OS security model
+                # options.add_argument("--disable-setuid-sandbox")
+                # options.add_argument("--disable-dev-shm-usage") # overcome limited resource problems
+                options.add_argument("--disable-gpu") # applicable to windows os only
+                options.add_argument('--disable-software-rasterizer')
+                if not Settings.is_show_window():
+                    options.add_argument('--headless')
+                    # options.add_argument('--disable-smooth-scrolling')
+                #
+                # options.add_argument("--disable-extensions") # disabling extensions
+                # options.add_argument("--disable-infobars") # disabling infobars
+                # options.add_argument("--start-maximized")
+                # options.add_argument("--window-size=1920,1080")
+                # options.add_argument("--user-data-dir=/tmp/");
+                # options.add_argument('--disable-login-animations')
+                # options.add_argument('--disable-modal-animations')
+                # options.add_argument('--disable-sync')
+                # options.add_argument('--disable-background-networking')
+                # options.add_argument('--disable-web-resources')
+                # options.add_argument('--ignore-certificate-errors')
+                # options.add_argument('--disable-logging')
+                # options.add_argument('--no-experiments')
+                # options.add_argument('--incognito')
+                # options.add_argument('--user-agent=MozillaYerMomFox')
+                options.add_argument("--remote-debugging-address=localhost")
+                options.add_argument("--remote-debugging-port=9223")
+                #
+                # options.add_experimental_option("prefs", {
+                  # "download.default_directory": str(DOWNLOAD_PATH),
+                  # "download.prompt_for_download": False,
+                  # "download.directory_upgrade": True,
+                  # "safebrowsing.enabled": True
+                # })
+                # capabilities = {
+                #   'browserName': 'chrome',
+                #   'chromeOptions':  {
+                #     'useAutomationExtension': False,
+                #     'forceDevToolsScreenshot': True,
+                #     'args': ['--start-maximized', '--disable-infobars']
+                #   }
+                # }  
+                service_args = []
+                if Settings.is_debug():
+                    service_args = ["--verbose", "--log-path=/var/log/onlysnarf/chromedriver.log"]
+                # desired_capabilities = capabilities
+                Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
+                # options.binary_location = chromedriver_binary.chromedriver_filename
+                driver = webdriver.Chrome(executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
+                print("Spawned Browser - Google")
+                return driver
+            except Exception as e:
+                Settings.maybe_print(e)
+                print("Warning: Missing Chromedriver")
+                return False
+
+        def firefox():
+            try:
+                import geckodriver_autoinstaller
+                geckodriver_autoinstaller.install()
+                # options = webdriver.FirefoxOptions()
+                # options.binary_location = "/usr/local/bin/geckodriver"
+                from selenium.webdriver.firefox.options import Options
+                from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+                # enable browser logging
+                d = DesiredCapabilities.FIREFOX
+                d['loggingPrefs'] = {'browser': 'ALL'}
+                opts = Options()
+                opts.log.level = "trace"
+                if not Settings.is_show_window():
+                    opts.add_argument("--headless")
+                driver = webdriver.Firefox(options=opts, capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
+                # driver = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
+                print("Spawned Browser - Firefox")
+                return driver
+            except Exception as e:
+                Settings.maybe_print(e)
+                print("Warning: Missing Geckodriver")
+                return False
+
+        def remote():
+            try:
+                from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+                host = Settings.get_remote_host()
+                port = Settings.get_remote_port()
+                link = 'http://{}:{}/wd/hub'.format(host, port)
+
+                driver = webdriver.Remote(
+                   command_executor=link,
+                   desired_capabilities=DesiredCapabilities.CHROME)
+
+                # driver = webdriver.Remote(
+                #    command_executor=link,
+                #    desired_capabilities=DesiredCapabilities.FIREFOX)
+
+                return driver
+            except:
+                Settings.maybe_print(e)
+                print("Warning: Unable to connect remotely")
+                return False
+
+        BROWSER_TYPE = Settings.get_browser_type()
+
+        if BROWSER_TYPE == "remote":
+            driver = remote()
+        elif BROWSER_TYPE == "google":
+            driver = google()
+        elif BROWSER_TYPE == "firefox":
+            driver = firefox()
+        elif BROWSER_TYPE == "auto":
+            driver = google()
+            if not driver:
+                driver = firefox()
+            # if not driver:
+            #     print("Warning: connecting to remote driver automatically")
+            #     driver = remote()
+
+        if not driver: 
+            print("Error: Unable to spawn browser")
+            # sys.exit(1)
+            os._exit(1)
+
         driver.implicitly_wait(30) # seconds
         driver.set_page_load_timeout(1200)
         print("Browser Spawned")

@@ -2,7 +2,7 @@
 
 # Image
 echo "[*] Upload - Image"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" -category "image" \
 -bykeyword "pussycats" \
@@ -17,7 +17,7 @@ sudo onlysnarfpy \
 # -verbose
 
 echo "[*] Upload - Image"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" -category "image" \
 -keywords "ball" -keywords "sacks" \
@@ -28,7 +28,7 @@ sudo onlysnarfpy \
 
 # Gallery
 echo "[*] Upload - Gallery"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" -category "gallery" \
 -bykeyword "bored dick" \
@@ -42,7 +42,7 @@ sudo onlysnarfpy \
 
 # Video
 echo "[*] Upload - Video"
-sudo onlysnarfpy \
+onlysnarfpy \
 -debug \
 -action "post" -category "video" \
 -bykeyword "stroke" \
