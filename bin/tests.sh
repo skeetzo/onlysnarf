@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 sudo python3 setup.py install
 wait
-mkdir -p ../onlysnarf/logs
+sudo mkdir -p /var/log/onlysnarf
+sudo chown -R $USER /var/log/onlysnarf
 echo "-----------------------------------------------------"
 echo "Testing OnlySnarf"
 
