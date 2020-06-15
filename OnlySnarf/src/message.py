@@ -48,8 +48,8 @@ class Message():
 		return ""
 
 	@staticmethod
-	def format_performers(performers):
-		if len(performers) > 0: return " w/ @{}".format(" @".join(performers))
+	def format_performers(performers): # spaced added after @ to close performer search modal
+		if len(performers) > 0: return " w/ @{} ".format(" @".join(performers))
 		return ""
 			
 	@staticmethod
