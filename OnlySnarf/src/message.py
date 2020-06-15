@@ -16,6 +16,7 @@ class Message():
 		self.keywords = []
 		self.tags = []
 		self.performers = []
+		self.hasPerformers = False
 		## messages
 		self.price = None
 		self.recipients = [] # users to send to
@@ -61,11 +62,14 @@ class Message():
 			Message.format_keywords(self.get_keywords())).strip()
 
 	def get_keywords(self):
+		if str(self.keywords) == "unset": return []
 		# if self.keywords: return self.keywords
 		if len(self.keywords) > 0: return self.keywords
 		keywords = Settings.get_keywords() or []
 		if len(keywords) > 0: return keywords
-		if not Settings.prompt("keywords"): return []
+		if not Settings.prompt("keywords"):
+			self.keywords = "unset"
+			return []
 		question = {
 			'type': 'input',
 			'name': 'keywords',
@@ -81,11 +85,25 @@ class Message():
 		return self.keywords
 
 	def get_performers(self):
+		if str(self.performers) == "unset": return []
 		# if self.performers: return self.performers
 		if len(self.performers) > 0: return self.performers
-		performers = Settings.get_tags() or []
+		performers = Settings.get_performers() or []
 		if len(performers) > 0: return performers
-		if not Settings.prompt("performers"): return []
+
+		if len(self.files) > 0:
+			for file in self.files:
+				if hasattr(file, "performer"):
+					p = getattr(file, "performer")
+					if p not in performers:
+						performers.append(p)
+			if len(performers) > 0:
+				self.performers = performers
+				return performers
+
+		if not Settings.prompt("performers"):
+			self.performers = "unset"
+			return []
 		question = {
 			'type': 'input',
 			'name': 'performers',
@@ -101,11 +119,14 @@ class Message():
 		return self.performers
 
 	def get_tags(self):
+		if str(self.tags) == "unset": return []
 		# if self.tags: return self.tags
 		if len(self.tags) > 0: return self.tags
 		tags = Settings.get_tags() or []
 		if len(tags) > 0: return tags
-		if not Settings.prompt("tags"): return []
+		if not Settings.prompt("tags"):
+			self.tags = "unset"
+			return []
 		question = {
 			'type': 'input',
 			'name': 'tags',
@@ -137,15 +158,21 @@ class Message():
 		filed = []
 		for file in files:
 			if isinstance(file, Google_Folder): filed.extend(file.get_files())
-			else: filed.append(file)
+			else:
+				if hasattr(file, "performer"):
+					self.hasPerformers = True
+				filed.append(file)
 		self.files = filed[:int(Settings.get_upload_max())]
 		return self.files
 
 	def get_expiration(self):
+		if str(self.expiration) == "unset": return None
 		if self.expiration: return self.expiration
 		expires = Settings.get_expiration() or None
 		if expires: return expires
-		if not Settings.prompt("expiration"): return None
+		if not Settings.prompt("expiration"):
+			self.expiration = "unset"
+			return None
 		question = {
 			'type': 'input',
 			'name': 'expiration',
@@ -159,8 +186,11 @@ class Message():
 		return self.expiration
 
 	def get_poll(self):
+		if str(self.poll) == "unset": return None
 		if self.poll and self.poll.check(): return self.poll
-		if not Settings.prompt("poll"): return None
+		if not Settings.prompt("poll"):
+			self.poll = "unset"
+			return None
 		poll = Poll()
 		poll.get()
 		if not poll.check(): return None
@@ -213,8 +243,11 @@ class Message():
 		return self.users
 
 	def get_schedule(self):
+		if str(self.schedule) == "unset": return None
 		if self.schedule: return self.schedule
-		if not Settings.prompt("schedule"): return None
+		if not Settings.prompt("schedule"):
+			self.schedule = "unset"
+			return None
 		schedule = Schedule()
 		schedule.get()
 		if not schedule.check(): return None
@@ -247,12 +280,13 @@ class Message():
 		self.get_price()
 		self.get_poll()
 		self.get_schedule()
+		self.get_expiration()
 		self.get_files()
 		self.get_recipients()
 		if not self.text:
 			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
-		if Settings.get_performer_category():
+		if Settings.get_performer_category() or self.hasPerformers:
 			self.get_performers()
 		self.gotten = True
 
@@ -263,11 +297,12 @@ class Message():
 		self.get_tags()
 		self.get_poll()
 		self.get_schedule()
+		self.get_expiration()
 		self.get_files()
 		if not self.text:
 			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
-		if Settings.get_performer_category():
+		if Settings.get_performer_category() or self.hasPerformers:
 			self.get_performers()
 		self.gotten = True
 
@@ -280,7 +315,7 @@ class Message():
 		if not self.text:
 			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
-		if Settings.get_performer_category():
+		if Settings.get_performer_category() or self.hasPerformers:
 			self.get_performers()
 		self.gotten = True
 
