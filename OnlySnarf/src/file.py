@@ -351,8 +351,7 @@ class Google_File(File):
             files = []
             # return Google_File.get_files_by_category(cat)
             if "image" in str(category):
-                if not categoryFolder:
-                    categoryFolder = Google.get_folder_by_name(category)
+                categoryFolder = Google.get_folder_by_name(category, parent=categoryFolder)
                 for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
                     for image in Google.get_images_of_folder(folder):
                         file = Google_File()
@@ -360,26 +359,29 @@ class Google_File(File):
                         setattr(file, "parent", folder)
                         files.append(file)
             elif "video" in str(category):
-                if not categoryFolder:
-                    categoryFolder = Google.get_folder_by_name(category)
+                categoryFolder = Google.get_folder_by_name(category, parent=categoryFolder)
                 for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
-                    for video in Google.get_videos_of_folder(folder):
+                    videos = Google.get_videos_of_folder(folder)
+                    if len(videos) > 0:
+                        files.append(folder["title"])
+                    for video in videos:
                         file = Google_File()
                         setattr(file, "file", video)
                         setattr(file, "parent", folder)
                         files.append(file)
             elif "galler" in str(category):
-                if not categoryFolder:
-                    categoryFolder = Google.get_folder_by_name(category)
+                categoryFolder = Google.get_folder_by_name(category, parent=categoryFolder)
                 for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
-                    for gallery in Google.get_folders_of_folder(folder):
+                    galleries = Google.get_folders_of_folder(folder)
+                    if len(galleries) > 0:
+                        files.append(folder["title"])
+                    for gallery in galleries:
                         file = Google_Folder()
                         setattr(file, "file", gallery)
                         setattr(file, "parent", folder)
                         files.append(file)
             elif "performer" in str(category):
-                if not categoryFolder:
-                    categoryFolder = Google.get_folder_by_name(category)
+                categoryFolder = Google.get_folder_by_name(category, parent=categoryFolder)
                 for performer in Google.get_folders_of_folder_by_keywords(categoryFolder):
                     # for performer in Google.get_folders_of_folder(folder):
                     p = Google_Folder()
@@ -455,6 +457,9 @@ class Google_File(File):
         files = Google_File.get_files_by_category(category, performer=performer)
         files_ = []
         for file in files:
+            if isinstance(file, str):
+                files_.append(PyInquirer.Separator())
+                continue
             file.category = category
             file_ = {
                 "name": file.file['title'],
@@ -498,8 +503,10 @@ class Google_File(File):
             ##
             if "performer" in str(category):
                 cat = Settings.select_category([cat for cat in Settings.get_categories() if "performer" not in cat])
-                file = Google_File.select_file(cat, performer=file.get_title())
+                performerName = file.get_title()
+                file = Google_File.select_file(cat, performer=performerName)
                 if not file: break
+                setattr(file, "performer", performerName)
                 files.append(file)
                 if "galler" in str(cat) or "video" in str(cat): break
             ##
