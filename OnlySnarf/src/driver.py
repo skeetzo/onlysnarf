@@ -1464,14 +1464,14 @@ class Driver:
                 options.add_argument("--no-sandbox") # Bypass OS security model
                 # options.add_argument("--disable-setuid-sandbox")
                 # options.add_argument("--disable-dev-shm-usage") # overcome limited resource problems
-                options.add_argument("--disable-gpu") # applicable to windows os only
+                # options.add_argument("--disable-gpu") # applicable to windows os only
                 options.add_argument('--disable-software-rasterizer')
                 if not Settings.is_show_window():
                     options.add_argument('--headless')
                     # options.add_argument('--disable-smooth-scrolling')
                 #
-                # options.add_argument("--disable-extensions") # disabling extensions
-                # options.add_argument("--disable-infobars") # disabling infobars
+                options.add_argument("--disable-extensions") # disabling extensions
+                options.add_argument("--disable-infobars") # disabling infobars
                 # options.add_argument("--start-maximized")
                 # options.add_argument("--window-size=1920,1080")
                 # options.add_argument("--user-data-dir=/tmp/");
@@ -1480,13 +1480,15 @@ class Driver:
                 # options.add_argument('--disable-sync')
                 # options.add_argument('--disable-background-networking')
                 # options.add_argument('--disable-web-resources')
-                # options.add_argument('--ignore-certificate-errors')
+                options.add_argument('--ignore-certificate-errors')
                 # options.add_argument('--disable-logging')
                 # options.add_argument('--no-experiments')
                 # options.add_argument('--incognito')
                 # options.add_argument('--user-agent=MozillaYerMomFox')
                 options.add_argument("--remote-debugging-address=localhost")
                 options.add_argument("--remote-debugging-port=9223")
+                options.add_argument("--allow-insecure-localhost")
+                # options.add_argument("--acceptInsecureCerts")
                 #
                 # options.add_experimental_option("prefs", {
                   # "download.default_directory": str(DOWNLOAD_PATH),
@@ -1494,21 +1496,23 @@ class Driver:
                   # "download.directory_upgrade": True,
                   # "safebrowsing.enabled": True
                 # })
-                # capabilities = {
-                #   'browserName': 'chrome',
-                #   'chromeOptions':  {
-                #     'useAutomationExtension': False,
-                #     'forceDevToolsScreenshot': True,
-                #     'args': ['--start-maximized', '--disable-infobars']
-                #   }
-                # }  
+                capabilities = {
+                  'browserName': 'chrome',
+                  'platform': 'LINUX',
+                  'chromeOptions':  {
+                    'acceptInsecureCerts': True,
+                    'useAutomationExtension': False,
+                    'forceDevToolsScreenshot': True,
+                    'args': ['--start-maximized', '--disable-infobars']
+                  }
+                }  
                 service_args = []
                 if Settings.is_debug():
                     service_args = ["--verbose", "--log-path=/var/log/onlysnarf/chromedriver.log"]
                 # desired_capabilities = capabilities
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
-                driver = webdriver.Chrome(executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
+                driver = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
                 print("Spawned Browser - Google")
                 return driver
             except Exception as e:
