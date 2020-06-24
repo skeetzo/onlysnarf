@@ -335,6 +335,16 @@ class Message():
 			successful = False
 		if successful: self.cleanup_files()
 
+		# this should all be here instead of Driver.post
+		# print("Posting:")
+  #       print("- Files: {}".format(len(files)))
+  #       print("- Keywords: {}".format(keywords))
+  #       print("- Performers: {}".format(performers))
+  #       print("- Tags: {}".format(tags))
+  #       print("- Text: {}".format(text))
+  #       print("- Tweeting: {}".format(Settings.is_tweeting()))
+
+
 	@staticmethod
 	def Send():
 		message = Message()
