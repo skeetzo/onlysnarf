@@ -9,7 +9,5 @@ onlysnarfpy \
 -amount 40 \
 -months 3 \
 -prefer-local \
--verbose -verbose -verbose
-# -show \
-# -verbose -verbose
-# -verbose
+"$1" \
+"$2"

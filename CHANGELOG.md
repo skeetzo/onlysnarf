@@ -338,6 +338,8 @@
   **2.17.11**
   - fixed messaging a user
   - fixed performer operations
+  **2.17.12**
+  - minor fixes to launching firefox
 
 ----------------------------------------
 
