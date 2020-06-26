@@ -19,33 +19,35 @@ echo "Testing OnlySnarf"
 # schedule
 # post
 # message
-show="blank"
 show="show"
+show=""
 
 verbose="blank"
-verbose="verbose -verbose -verbose"
 verbose="v -v -v"
+verbose="verbose -verbose -verbose"
+verbose="-verbose -verbose"
 
 declare -a testing
 # testing=("schedule")
 # testing=("discount" "expiration" "message" "poll" "post" "schedule" "upload")
-testing=("upload")
 testing=("message" "schedule" "upload")
 testing=("expiration" "message" "poll" "post" "schedule" "upload")
+testing=("upload")
+testing=("post")
 
-echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
-echo "################## Start #########################" >> ../onlysnarf/logs/tests.txt 2>&1
-echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+echo "##################################################" >> /var/log/onlysnarf/tests.txt 2>&1
+echo "################## Start #########################" >> /var/log/onlysnarf/tests.txt 2>&1
+echo "##################################################" >> /var/log/onlysnarf/tests.txt 2>&1
 
 function testes() {
 	# echo "Running: "$test
 
 	bin/tests/$test.sh $show $verbose
-	# ../onlysnarf/$test.sh $show >> ../onlysnarf/logs/tests.txt 2>&1
+	# bin/tests/$test.sh $show $verbose >> /var/log/onlysnarf/tests.txt
 
-	echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
-	echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
-	echo "##################################################" >> ../onlysnarf/logs/tests.txt 2>&1
+	echo "##################################################" >> /var/log/onlysnarf/tests.txt 2>&1
+	echo "##################################################" >> /var/log/onlysnarf/tests.txt 2>&1
+	echo "##################################################" >> /var/log/onlysnarf/tests.txt 2>&1
 
 	sleep 2
 }
