@@ -21,7 +21,7 @@ class User:
         data = json.loads(json.dumps(data))
         # print(data)
         self.name = data.get('name') or ""
-        self.username = data.get('username') or ""
+        self.username = data.get('username').replace("@","") or ""
         self.id = data.get('id') or None
         self.messages_from = data.get('messages_from') or []
         self.messages_to = data.get('messages_to') or []
