@@ -13,7 +13,7 @@ onlysnarfpy \
 # -verbose -verbose -verbose
 # -verbose -verbose
 
-echo "[*] Post - Text"
+echo "[*] Post - No Text"
 onlysnarfpy \
 -debug \
 -action "post" \

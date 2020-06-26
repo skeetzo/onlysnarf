@@ -10,10 +10,8 @@ onlysnarfpy \
 -text "expiration testes" \
 -debug-delay \
 -expiration 3 \
--verbose -verbose -verbose
-# -show \
-# -verbose -verbose
-# -verbose
+"$1" \
+"$2"
 
 echo "[*] Misc - Expiration"
 onlysnarfpy \
@@ -23,7 +21,5 @@ onlysnarfpy \
 -skip-upload \
 -debug-delay \
 -expiration 3 \
--verbose -verbose -verbose
-# -show \
-# -verbose -verbose
-# -verbose
+"$1" \
+"$2"
