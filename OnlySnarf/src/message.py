@@ -147,6 +147,10 @@ class Message():
 	# files exist when checked for size
 	# ?
 	def get_files(self):
+		if str(self.files) == "unset": return []
+		if not Settings.prompt("get files"):
+			self.files = "unset"
+			return []
 		if len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
 		files = []
 		if len(self.files) == 0 and len(Settings.get_input()) > 0:
