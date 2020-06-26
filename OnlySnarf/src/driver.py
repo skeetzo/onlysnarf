@@ -11,15 +11,18 @@ import chromedriver_binary
 import time
 from datetime import datetime, timedelta
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.common.action_chains import ActionChains
+                
 ##
 from .colorize import colorize
 from .settings import Settings
@@ -1522,16 +1525,14 @@ class Driver:
 
         def firefox():
             try:
-                import geckodriver_autoinstaller
-                geckodriver_autoinstaller.install()
+                # import geckodriver_autoinstaller
+                # geckodriver_autoinstaller.install()
                 # options = webdriver.FirefoxOptions()
                 # options.binary_location = "/usr/local/bin/geckodriver"
-                from selenium.webdriver.firefox.options import Options
-                from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
                 # enable browser logging
                 d = DesiredCapabilities.FIREFOX
                 d['loggingPrefs'] = {'browser': 'ALL'}
-                opts = Options()
+                opts = FirefoxOptions()
                 opts.log.level = "trace"
                 if not Settings.is_show_window():
                     opts.add_argument("--headless")
@@ -1546,7 +1547,6 @@ class Driver:
 
         def remote():
             try:
-                from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
                 host = Settings.get_remote_host()
                 port = Settings.get_remote_port()
