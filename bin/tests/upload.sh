@@ -10,11 +10,9 @@ onlysnarfpy \
 -keywords "ballsacks" -keywords "tits" \
 -tags "sexy" \
 -performers "justalexxxd" \
--debug-delay
-# -verbose -verbose -verbose
-# -show \
-# -verbose -verbose
-# -verbose
+-debug-delay \
+"$1" \
+"$2"
 
 echo "[*] Upload - Image"
 onlysnarfpy \
@@ -22,9 +20,9 @@ onlysnarfpy \
 -action "post" -category "image" \
 -keywords "ball" -keywords "sacks" \
 -bykeyword "pussycats" \
--debug-delay
-# -show \
-# -verbose -verbose -verbose
+-debug-delay \
+"$1" \
+"$2"
 
 # Gallery
 echo "[*] Upload - Gallery"
@@ -34,11 +32,9 @@ onlysnarfpy \
 -bykeyword "bored dick" \
 -text "gallery testes" \
 -performers "balls" -performers "sacks" \
--debug-delay
-# -show \
-# -verbose -verbose -verbose
-# -verbose -verbose
-# -verbose
+-debug-delay \
+"$1" \
+"$2"
 
 # Video
 echo "[*] Upload - Video"
@@ -48,8 +44,6 @@ onlysnarfpy \
 -bykeyword "stroke" \
 -text "fuck my upload speeds in the face" \
 -debug-delay \
--skip-download
-# -show \
-# -verbose -verbose -verbose
-# -verbose -verbose
-# -verbose
+-skip-download \
+"$1" \
+"$2"

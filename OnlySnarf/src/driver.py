@@ -22,7 +22,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
-                
+
 ##
 from .colorize import colorize
 from .settings import Settings
@@ -1525,11 +1525,6 @@ class Driver:
 
         def firefox():
             try:
-                # import geckodriver_autoinstaller
-                # geckodriver_autoinstaller.install()
-                # options = webdriver.FirefoxOptions()
-                # options.binary_location = "/usr/local/bin/geckodriver"
-                # enable browser logging
                 d = DesiredCapabilities.FIREFOX
                 d['loggingPrefs'] = {'browser': 'ALL'}
                 opts = FirefoxOptions()
