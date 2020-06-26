@@ -132,7 +132,7 @@ class Driver:
                 elements = Driver.BROWSER.find_elements_by_class_name("m-fans")
                 for ele in elements:
                     username = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
-                    if str(user) == str(username): 
+                    if str(user) == str(username):
                         Driver.BROWSER.execute_script("arguments[0].scrollIntoView();", ele)
                         end_ = False
                 if not end_: continue
@@ -698,13 +698,17 @@ class Driver:
             elements = Driver.BROWSER.find_elements_by_tag_name("a")
             ele = [ele for ele in elements
                     if "/my/chats/chat/" in str(ele.get_attribute("href"))]
-            if len(ele) == 0: 
+            if len(ele) == 0:
                 print("Warning: User Cannot Be Messaged")
                 return False
             ele = ele[0]
-            Settings.dev_print("clicking send message")
-            ele.click()
+            ele = ele.get_attribute("href").replace("https://onlyfans.com", "")
+            # clicking no longer works? just open href in browser
+            # Settings.dev_print("clicking send message")
+            # ele.click()
             Settings.dev_print("messaging username: {}".format(username))
+            # print(ele.get_attribute("href"))
+            Driver.go_to_page(ele)
         except Exception as e:
             print(e)
             Driver.error_checker(e)
@@ -1460,14 +1464,14 @@ class Driver:
                 options.add_argument("--no-sandbox") # Bypass OS security model
                 # options.add_argument("--disable-setuid-sandbox")
                 # options.add_argument("--disable-dev-shm-usage") # overcome limited resource problems
-                options.add_argument("--disable-gpu") # applicable to windows os only
+                # options.add_argument("--disable-gpu") # applicable to windows os only
                 options.add_argument('--disable-software-rasterizer')
                 if not Settings.is_show_window():
                     options.add_argument('--headless')
                     # options.add_argument('--disable-smooth-scrolling')
                 #
-                # options.add_argument("--disable-extensions") # disabling extensions
-                # options.add_argument("--disable-infobars") # disabling infobars
+                options.add_argument("--disable-extensions") # disabling extensions
+                options.add_argument("--disable-infobars") # disabling infobars
                 # options.add_argument("--start-maximized")
                 # options.add_argument("--window-size=1920,1080")
                 # options.add_argument("--user-data-dir=/tmp/");
@@ -1476,13 +1480,15 @@ class Driver:
                 # options.add_argument('--disable-sync')
                 # options.add_argument('--disable-background-networking')
                 # options.add_argument('--disable-web-resources')
-                # options.add_argument('--ignore-certificate-errors')
+                options.add_argument('--ignore-certificate-errors')
                 # options.add_argument('--disable-logging')
                 # options.add_argument('--no-experiments')
                 # options.add_argument('--incognito')
                 # options.add_argument('--user-agent=MozillaYerMomFox')
                 options.add_argument("--remote-debugging-address=localhost")
                 options.add_argument("--remote-debugging-port=9223")
+                options.add_argument("--allow-insecure-localhost")
+                # options.add_argument("--acceptInsecureCerts")
                 #
                 # options.add_experimental_option("prefs", {
                   # "download.default_directory": str(DOWNLOAD_PATH),
@@ -1490,21 +1496,23 @@ class Driver:
                   # "download.directory_upgrade": True,
                   # "safebrowsing.enabled": True
                 # })
-                # capabilities = {
-                #   'browserName': 'chrome',
-                #   'chromeOptions':  {
-                #     'useAutomationExtension': False,
-                #     'forceDevToolsScreenshot': True,
-                #     'args': ['--start-maximized', '--disable-infobars']
-                #   }
-                # }  
+                capabilities = {
+                  'browserName': 'chrome',
+                  'platform': 'LINUX',
+                  'chromeOptions':  {
+                    'acceptInsecureCerts': True,
+                    'useAutomationExtension': False,
+                    'forceDevToolsScreenshot': True,
+                    'args': ['--start-maximized', '--disable-infobars']
+                  }
+                }  
                 service_args = []
                 if Settings.is_debug():
                     service_args = ["--verbose", "--log-path=/var/log/onlysnarf/chromedriver.log"]
                 # desired_capabilities = capabilities
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
-                driver = webdriver.Chrome(executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
+                driver = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
                 print("Spawned Browser - Google")
                 return driver
             except Exception as e:
@@ -1527,7 +1535,7 @@ class Driver:
                 opts.log.level = "trace"
                 if not Settings.is_show_window():
                     opts.add_argument("--headless")
-                driver = webdriver.Firefox(options=opts, capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
+                driver = webdriver.Firefox(options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
                 # driver = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
                 print("Spawned Browser - Firefox")
                 return driver
@@ -1702,7 +1710,7 @@ class Driver:
                 name = re.sub("</.*>", "", name).strip()
                 # print("username: {}".format(username))
                 # print("name: {}".format(name))
-                users.append({"name":name, "username":username}) 
+                users.append({"name":name, "username":username.replace("@","")}) 
             Settings.maybe_print("Found: {}".format(len(users)))
         except Exception as e:
             Driver.error_checker(e)
@@ -1736,7 +1744,7 @@ class Driver:
                 # print("username: {}".format(username))
                 # print("name: {}".format(name))
                 # start = datetime.strptime(str(datetime.now()), "%m-%d-%Y:%H:%M")
-                users.append({"name":name, "username":username}) # ,"id":user_id, "started":start})
+                users.append({"name":name, "username":username.replace("@","")}) # ,"id":user_id, "started":start})
             Settings.maybe_print("Found: {}".format(len(users)))
         except Exception as e:
             Driver.error_checker(e)
