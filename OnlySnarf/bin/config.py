@@ -41,12 +41,13 @@ def checkOnlyFans():
 
 # function that creates the missing config
 def createConfig():
-    print("Preparing Config")
+    print("Preparing OnlySnarf Config")
     # ensure /opt/onlysnarf exists
     if not os.path.exists("/opt/onlysnarf"):
         print("Creating Missing Config Dir")
         try:
             os.makedirs("/opt/onlysnarf")
+            print("Created OnlySnarf Root")
         except Exception as e:
             print(e)
             main()
@@ -55,10 +56,11 @@ def createConfig():
         try:
             shutil.copyfile(os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../config.conf")), Settings.get_config_path())
             shutil.chown(Settings.get_config_path(), user=os.environ['USER'], group=os.environ['USER'])
+            print("Created OnlySnarf Config")
         except Exception as e:
             print(e)
             main()
-    print("Config Prepared")
+    else: print("OnlySnarf Config Exists")
     # print()
     # main()
 
@@ -138,10 +140,9 @@ def updateConfig():
 # ) a function for checking the google creds
 # when ran in it should check for the .conf file and google_creds
 def main():
-    print("-- Preparing OnlySnarf --")
     createConfig()
-
     return
+    print("-- Preparing OnlySnarf --")
     print("------------------------------")
     if os.path.isfile(Settings.get_config_path()):
         print(colorize("[*] Config File", 'conf')+": "+colorize("True", 'green'))
