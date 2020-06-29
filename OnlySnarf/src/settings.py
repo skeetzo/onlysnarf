@@ -229,6 +229,9 @@ class Settings:
     def get_users_path():
         return config["USERS_PATH"] or "/opt/onlysnarf/users.json"
 
+    def get_config_path():
+        return config["CONFIG_PATH"] or ""    
+
     def get_google_path():
         return config["GOOGLE_PATH"] or ""
 
