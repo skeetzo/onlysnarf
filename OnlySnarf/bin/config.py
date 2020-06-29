@@ -1,6 +1,4 @@
 #!/usr/bin/python
-# 2/7/2019 - Skeetzo
-# 4/22/2019 - Skeetzo
 # setup & update script for config
 import os
 import sys
@@ -18,42 +16,64 @@ def checkBothCreds():
 # checks Google creds access
 def checkGoogle():
     print("Checking Google Creds")
-    if not os.path.exists(settings.GOOGLE_PATH):
+    if not os.path.exists(Settings.get_google_path()):
         print("Missing Google Creds")
-        return
-    Google.checkAuth()
+        print()
+        return main()
+    authed = Google.checkAuth()
+    if authed:
+        print("Google Auth Successful")
+    else: 
+        print("Google Auth Failure")
+    print()
+    main()
 
 # checks OnlyFans login process
 def checkOnlyFans():
-    print("Checking OnlyFans Login (Twitter Creds)")
-    if not os.path.exists(settings.CONFIG_PATH):
+    print("Checking Twitter Creds (OnlyFans Login)")
+    if not os.path.exists(Settings.get_config_path()):
         print("Missing Config Path")
-        return
+        return main()
     OnlySnarf.auth()
     OnlySnarf.exit()
+    print()
+    main()
 
 # function that creates the missing config
 def createConfig():
-    print("Creating Config")
-    # ensure /etc/onlysnarf exists
-    if not os.path.exists("/etc/onlysnarf"):
+    print("Preparing Config")
+    # ensure /opt/onlysnarf exists
+    if not os.path.exists("/opt/onlysnarf"):
         print("Creating Missing Config Dir")
-        os.makedirs("/etc/onlysnarf")
-    # copy config-example.conf to /etc/onlysnarf/config.conf
-    print("Copying Default Config")
-    shutil.copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), "config-example.conf"), settings.CONFIG_PATH)
-    print("user: "+str(os.environ['USER']))
-    shutil.chown(settings.CONFIG_PATH, user=os.environ['USER'], group=os.environ['USER'])
+        try:
+            os.makedirs("/opt/onlysnarf")
+        except Exception as e:
+            print(e)
+            main()
+    if not os.path.exists("/opt/onlysnarf/config.conf"):
+        print("Copying Default Config")
+        try:
+            shutil.copyfile(os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../config.conf")), Settings.get_config_path())
+            shutil.chown(Settings.get_config_path(), user=os.environ['USER'], group=os.environ['USER'])
+        except Exception as e:
+            print(e)
+            main()
+    print("Config Prepared")
+    # print()
+    # main()
 
 # provides instructions for creating or refreshing google creds
 def googleInstructions():
-    print("[Google Instructions Go Here]")
-    pass
+    print("[Google Instructions From README Go Here]")
+    print()
+    main()
 
 # creates the config then prompts for missing credentials
 def setupConfig():
     createConfig()
-    updateTwitter()
+    updateConfig()
+    print()
+    main()
 
 # receives input for Twitter login
 def receiveTwitter():
@@ -68,26 +88,32 @@ def refreshAll():
     setupConfig()
     removeGoogle()
     googleInstructions()
+    print()
+    main()
 
 # removes config.conf
 def removeConfig():
     print("Removing Config")
-    # ensure /etc/onlysnarf exists
-    if os.path.exists(settings.CONFIG_PATH):
-        os.remove(settings.CONFIG_PATH)
+    # ensure /opt/onlysnarf exists
+    if os.path.exists(Settings.get_config_path()):
+        os.remove(Settings.get_config_path())
         print("Removed Config")
     else:
-        print("Error: Failed to Remove Config")
+        print("Error: Failed to Find Config")
+    print()
+    main()
 
 # removes google creds
 def removeGoogle():
     print("Removing Google Creds")
-    # ensure /etc/onlysnarf exists
-    if os.path.exists(settings.GOOGLE_PATH):
-        os.remove(settings.GOOGLE_PATH)
+    # ensure /opt/onlysnarf exists
+    if os.path.exists(Settings.get_google_path()):
+        os.remove(Settings.get_google_path())
         print("Removed Google Creds")
     else:
-        print("Error: Failed to Remove Google Creds")
+        print("Error: Failed to Find Google Creds")
+    print()
+    main()
 
 # receives input for twitter login and saves to config.conf
 def updateConfig():
@@ -97,10 +123,13 @@ def updateConfig():
     import fileinput
     # Does a list of files, and
     # redirects STDOUT to the file in question
-    for line in fileinput.input(settings.CONFIG_PATH, inplace = 1): 
+    for line in fileinput.input(Settings.get_config_path(), inplace = 1): 
         line.replace("username None", "username {}".format(data['username']))
         line.replace("password None", "password {}".format(data['password']))
         print(line)
+    print("Config Updated")
+    print()
+    main()
 
 # this script is supposed to have menu options for 
 # ) creating the .conf file
@@ -109,65 +138,69 @@ def updateConfig():
 # ) a function for checking the google creds
 # when ran in it should check for the .conf file and google_creds
 def main():
-    if os.path.isfile(settings.CONFIG_PATH):
-        print(colorize("[*] Config File", 'conf')+":"+colorize("True", 'blue'))
-        if str(settings.USERNAME) != "None":
-            print(colorize("[-] Twitter Username", 'conf')+":"+colorize(settings.USERNAME, 'blue'))
+    print("-- Preparing OnlySnarf --")
+    createConfig()
+
+    return
+    print("------------------------------")
+    if os.path.isfile(Settings.get_config_path()):
+        print(colorize("[*] Config File", 'conf')+": "+colorize("True", 'green'))
+        if str(Settings.get_username()) != "None":
+            print(colorize("[-] Twitter Username", 'conf')+": "+colorize(Settings.get_username(), 'green'))
         else:
-            print(colorize("[-] Twitter Username", 'conf')+":"+colorize("", 'pink'))
-        if str(settings.USERNAME) != "None":
-            print(colorize("[-] Twitter Password", 'conf')+":"+colorize("******", 'blue'))
+            print(colorize("[-] Twitter Username", 'conf')+": "+colorize("", 'red'))
+        if str(Settings.get_username()) != "None":
+            print(colorize("[-] Twitter Password", 'conf')+": "+colorize("******", 'green'))
         else:
-            print(colorize("[-] Twitter Password", 'conf')+":"+colorize("", 'pink'))
+            print(colorize("[-] Twitter Password", 'conf')+": "+colorize("", 'red'))
     else:
-        print(colorize("[*] Config File", 'conf')+":"+colorize("False", 'pink'))
-    if os.path.isfile(settings.GOOGLE_PATH):
-        print(colorize("[*] Google Creds", 'conf')+":"+colorize("True", 'blue'))
+        print(colorize("[*] Config File", 'conf')+": "+colorize("False", 'red'))
+    if os.path.isfile(Settings.get_google_path()):
+        print(colorize("[*] Google Creds", 'conf')+": "+colorize("True", 'green'))
     else:
-        print(colorize("[*] Google Creds", 'conf')+":"+colorize("False", 'pink'))
+        print(colorize("[*] Google Creds", 'conf')+": "+colorize("False", 'red'))
     print("------------------------------")
     print(colorize("Menu:", 'menu'))
-    print(colorize("[ 0 ] ", 'menu') + "Check Credentials - Google")
-    print(colorize("[ 1 ] ", 'menu') + "Check Credentials - Twitter")
-    print(colorize("[ 2 ] ", 'menu') + "Check Credentials - Both")
-    print(colorize("[ 3 ] ", 'menu') + "Config - Create")
-    print(colorize("[ 4 ] ", 'menu') + "Config - Update")
-    print(colorize("[ 5 ] ", 'menu') + "Config - Remove")
-    print(colorize("[ 6 ] ", 'menu') + "Google Creds - Instructions")
-    print(colorize("[ 7 ] ", 'menu') + "Google Creds - Remove")
-    print(colorize("[ 8 ] ", 'menu') + "Refresh All")
+    print(colorize("[ 0 ]", 'menu') + " Check Credentials - Google")
+    print(colorize("[ 1 ]", 'menu') + " Check Credentials - Twitter")
+    # print(colorize("[ 2 ]", 'menu') + " Check Credentials - Both")
+    print(colorize("[ 2 ]", 'menu') + " Config - Create")
+    print(colorize("[ 3 ]", 'menu') + " Config - Update")
+    print(colorize("[ 4 ]", 'menu') + " Config - Remove")
+    print(colorize("[ 5 ]", 'menu') + " Google Creds - Instructions")
+    print(colorize("[ 6 ]", 'menu') + " Google Creds - Remove")
+    # print(colorize("[ 8 ]", 'menu') + " Refresh All")
     while True:
         choice = input(">> ")
         try:
-            if int(choice) < 0 or int(choice) >= 2: raise ValueError
+            if int(choice) < 0 or int(choice) >= 9: raise ValueError
             if int(choice) == 0:
                 checkGoogle()
             elif int(choice) == 1:
                 checkOnlyFans()
+            # elif int(choice) == 2:
+            #     checkBothCreds()
             elif int(choice) == 2:
-                checkBothCreds()
-            elif int(choice) == 3:
                 setupConfig()
-            elif int(choice) == 4:
+            elif int(choice) == 3:
                 updateConfig()
-            elif int(choice) == 5:
+            elif int(choice) == 4:
                 removeConfig()
-            elif int(choice) == 6:
+            elif int(choice) == 5:
                 googleInstructions()
-            elif int(choice) == 7:
+            elif int(choice) == 6:
                 removeGoogle()
-            elif int(choice) == 8:
-                refreshAll()
+            # elif int(choice) == 8:
+            #     refreshAll()
         except (ValueError, IndexError, KeyboardInterrupt):
             print("Error: Incorrect Index")
-        finally:
-            sys.exit(1)
+
+###########################
 
 if __name__ == "__main__":
     try:
-        settings.initialize()
+        Settings.initialize()
         main()
     except Exception as e:
-        settings.maybePrint(e)
+        Settings.maybePrint(e)
         print(e)
-        print("Shnarf?")
