@@ -10,6 +10,8 @@ echo "##################################################" >> ../onlysnarf/logs/t
 echo "################## Start #########################" >> ../onlysnarf/logs/test.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
+onlysnarf-config
+
 # video
 # onlysnarfpy -category video -notkeyword stroke -verbose -verbose -debug -browser firefox
 
@@ -21,7 +23,9 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # sudo onlysnarfpy -show -debug -verbose -verbose -verbose -action message -category video -bykeyword stroke -user all -text 'stroking away boredom' -price '6.69'
 
 # menu
-onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local -show
+# onlysnarf -debug -verbose -verbose -verbose -debug-delay -prefer-local -show
+
+# onlysnarfpy -category gallery -bykeyword run -debug -verbose
 
 # profile
 # sudo onlysnarfpy -debug -verbose -verbose -verbose -debug-delay -prefer-local -show -action profile -profile-backup

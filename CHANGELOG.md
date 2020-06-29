@@ -340,6 +340,9 @@
   - fixed performer operations
   **2.17.12**
   - minor fixes to launching firefox
+  **2.17.13**
+  - fixed post uploads with random content
+  - updated onlysnarf-config
 
 ----------------------------------------
 
