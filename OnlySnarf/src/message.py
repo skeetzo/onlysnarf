@@ -148,10 +148,10 @@ class Message():
 	# ?
 	def get_files(self):
 		if str(self.files) == "unset": return []
+		if len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
 		if (Settings.is_prompt() and not Settings.prompt("get files")) or (not Settings.is_prompt() and Settings.get_category() == None):
 			self.files = "unset"
 			return []
-		if len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
 		files = []
 		if len(self.files) == 0 and len(Settings.get_input()) > 0:
 			files.append(Settings.get_input_as_files())
@@ -292,6 +292,8 @@ class Message():
 				self.text = self.files[0].get_title()
 		if Settings.get_performer_category() or self.hasPerformers:
 			self.get_performers()
+		else: # might as well skip asking if not pulling from performer category
+			self.performers = "unset"
 		self.gotten = True
 
 	def get_post(self):
@@ -308,6 +310,8 @@ class Message():
 				self.text = self.files[0].get_title()
 		if Settings.get_performer_category() or self.hasPerformers:
 			self.get_performers()
+		else:
+			self.performers = "unset"
 		self.gotten = True
 
 	def get_message(self):
@@ -321,6 +325,8 @@ class Message():
 				self.text = self.files[0].get_title()
 		if Settings.get_performer_category() or self.hasPerformers:
 			self.get_performers()
+		else:
+			self.performers = "unset"
 		self.gotten = True
 
 	@staticmethod

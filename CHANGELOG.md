@@ -348,6 +348,9 @@
   **2.17.15**
   - herpaderpaderp
   - fixedfixed uploading
+  **2.17.16**
+  - herpaderpaderpa
+  - fixed more uploading prompts
 
 ----------------------------------------
 
