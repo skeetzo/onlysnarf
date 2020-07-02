@@ -148,7 +148,7 @@ class Message():
 	# ?
 	def get_files(self):
 		if str(self.files) == "unset": return []
-		if Settings.is_prompt() and not Settings.prompt("get files") or Settings.get_category() == None:
+		if (Settings.is_prompt() and not Settings.prompt("get files")) or (not Settings.is_prompt() and Settings.get_category() == None):
 			self.files = "unset"
 			return []
 		if len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]

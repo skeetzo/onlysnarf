@@ -21,6 +21,10 @@ from apiclient.http import MediaFileUpload,MediaIoBaseDownload
 ##
 from .settings import Settings
 
+import logging
+
+logging.getLogger('googleapicliet.discovery_cache').setLevel(logging.ERROR)
+
 ###################
 ##### Globals #####
 ###################
