@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 # Profile Settings
+import json
 from PyInquirer import prompt
 from .driver import Driver
 from .settings import Settings
+from .user import User
 
 class Profile:
     TABS = ["profile", "advanced", "messaging", "notifications", "security", "story", "other"]
@@ -14,12 +16,6 @@ class Profile:
         profile = Profile.fill_data()
         for key, value in profile.items():
             setattr(self, str(key), value)
-
-    # def __getitem__(self, key):
-    #     return getattr(self, str(key))
-
-    # def __setitem__(self, key, val):
-    #     return setattr(self, str(key), val)
 
     # Backup
 
@@ -54,20 +50,28 @@ class Profile:
             Profile.backup_content()
             Profile.backup_messages()
             Profile.backup_profile()
+        Profile.menu()
 
     @staticmethod
     def backup_content():
         print("Backing Up: Content")
+        Driver.download_content()
         print("Backed Up: Content")
 
     @staticmethod
     def backup_messages():
         print("Backing Up: Messages")
+        # select user
+        user = "all"
+        if Settings.prompt("select user"):
+            user = User.select_user()
+        Driver.download_messages(user)
         print("Backed Up: Messages")
 
     @staticmethod
     def backup_profile():
         print("Backing Up: Profile")
+        Profile.sync_from_profile()
         print("Backed Up: Profile")
 
     @staticmethod
@@ -76,7 +80,9 @@ class Profile:
             print("### Not Available ###")
             return
         action = Profile.ask_action()
-        if (action == 'Back'): pass
+        if (action == 'Back'): 
+            from OnlySnarf.bin.menu import Menu
+            Menu.main_menu()
         elif (action == 'backup'): Profile.backup_menu()
         elif (action == 'sync from'): Profile.sync_from_profile()
         elif (action == 'sync to'): Profile.sync_to_profile()
@@ -98,6 +104,29 @@ class Profile:
         # asks for missing options
 
         # returns a local copy / expectation of the Profile settings
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         pass
 
     @staticmethod
@@ -125,14 +154,11 @@ class Profile:
 
     def sync_from_tab(self, tab):
         # syncs profile settings from the specificed tab
-        data = Driver.sync_from_settings_page(tab)
-        for key, value in data:
-            print("{} - {}".format(key, value))
-            setattr(self, str(key), value)
+        Driver.sync_from_settings_page(profile=self, page=tab)
 
     def sync_to_tab(self, tab):
         # syncs profile settings to the specificed tab
-        Driver.sync_to_settings_page(self, tab)
+        Driver.sync_to_settings_page(profile=self, page=tab)
 
     @staticmethod
     def get_country_list():

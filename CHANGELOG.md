@@ -354,8 +354,15 @@
 
 ----------------------------------------
 
-  - debugged remote webdriver
+  **2.17.17**
   - debugged firefox
+  - debugged Profile
+  - debugged backup content
+  - args: added username_account
+
+
+--------------------
+  - debugged remote webdriver
 
   **2.18.0**
   - menu updates
@@ -439,3 +446,10 @@ https://onlyfans.com/?ref=409408
 - unsure if window is closed after menu calls message.post/send
 - when not show-window the window should remain open in the background between menu uses
 - add seperators in google file selection w/ folder names
+
+
+
+
+
+
+automatically heart / send <3 hearts to random tips in messages / campaign contributions

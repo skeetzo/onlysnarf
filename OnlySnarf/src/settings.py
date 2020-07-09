@@ -311,6 +311,9 @@ class Settings:
     def get_username():
         return config["USERNAME"] or ""
 
+    def get_username_account():
+        return config["USERNAME_ACCOUNT"] or ""
+
     def get_users_favorite():
         return config["USERS_FAVORITE"] or []
         

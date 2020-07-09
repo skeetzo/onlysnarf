@@ -393,9 +393,14 @@ parser.add_argument('-users-favorite', default=[],
   dest='users_favorite', action='append', help='supplied list of favorite users')
 ##
 # -username
-# the OnlyFans / Twitter username to use
+# the Twitter username to use
 parser.add_argument('-username', type=str, default="", dest='username',
   help='the Twitter username for login')
+# ##
+# # -username-account
+# # the OnlyFans username to use
+parser.add_argument('-username-account', type=str, default="", dest='username_account',
+  help='the OnlyFans username')
 ##
 # -verbose
 # v, vv, vvv

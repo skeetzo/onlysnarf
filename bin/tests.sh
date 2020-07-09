@@ -23,7 +23,6 @@ show="show"
 show=""
 
 verbose="blank"
-verbose="v -v -v"
 verbose="verbose -verbose -verbose"
 verbose="-verbose -verbose"
 
@@ -31,9 +30,9 @@ declare -a testing
 # testing=("schedule")
 # testing=("discount" "expiration" "message" "poll" "post" "schedule" "upload")
 testing=("message" "schedule" "upload")
-testing=("expiration" "message" "poll" "post" "schedule" "upload")
 testing=("upload")
 testing=("post")
+testing=("expiration" "message" "poll" "post" "schedule" "upload")
 
 echo "##################################################" >> /var/log/onlysnarf/tests.txt 2>&1
 echo "################## Start #########################" >> /var/log/onlysnarf/tests.txt 2>&1

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="2.17.16",
+    version="2.17.17",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
@@ -25,7 +25,8 @@ setuptools.setup(
         'httplib2',
         'python-crontab',
         'pyinquirer',
-        'ffmpeg'
+        'ffmpeg',
+        'wget'
         ],
     entry_points={
         'console_scripts' : [

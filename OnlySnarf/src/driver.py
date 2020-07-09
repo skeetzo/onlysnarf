@@ -9,6 +9,7 @@ import sys
 import pathlib
 import chromedriver_binary
 import time
+import wget
 from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
@@ -22,6 +23,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
+from pathlib import Path
 
 ##
 from .colorize import colorize
@@ -32,6 +34,10 @@ from .element import Element
 ##### Globals #####
 ###################
 
+DOWNLOADING = True
+DOWNLOADING_MAX = False
+DOWNLOAD_MAX_IMAGES = 1000
+DOWNLOAD_MAX_VIDEOS = 1000
 # Urls
 ONLYFANS_HOME_URL = 'https://onlyfans.com'
 ONLYFANS_MESSAGES_URL = "/my/chats/"
@@ -225,6 +231,119 @@ class Driver:
                     return False
             Settings.dev_print("### Discount Failure ###")
             return False
+
+    @staticmethod
+    def download_content():
+        print("Downloading Content")
+        def scroll_to_bottom():
+            try:
+                # go to home page and scroll to bottom
+                # Driver.go_to_home()
+                Driver.go_to_profile()
+                # count number of video elements to scroll to bottom
+                num = Driver.BROWSER.find_element_by_class_name("b-profile__sections__count").get_attribute("innerHTML")
+                Settings.maybe_print("Content count: {}".format(num))
+                for n in range(int(int(int(num)/5)+1)):
+                    print_same_line("({}/{}) scrolling...".format(n,int(int(int(num)/5)+1)))
+                    Driver.BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    time.sleep(1)
+                print()
+            except Exception as e:
+                print(e)
+                print("Error: Failed to Find Content to Scroll")
+        scroll_to_bottom()
+        imagesDownloaded = Driver.download_images()
+        videosDownloaded = Driver.download_videos()
+        print("Downloaded Content")
+        print("Count: {}".format(len(imagesDownloaded)+len(videosDownloaded)))
+
+    ### Images
+    # downloads all images on the page
+    @staticmethod
+    def download_images():
+        imagesDownloaded = []
+        try:
+            images = Driver.BROWSER.find_elements_by_tag_name("img")
+            downloadPath = os.path.join(Settings.get_download_path(), "images")
+            Path(downloadPath).mkdir(parents=True, exist_ok=True)
+            i=1
+            for image in images:
+                if DOWNLOADING_MAX and i > DOWNLOAD_MAX_IMAGES: break
+                src = str(image.get_attribute("src"))
+                if not src or src == "" or src == "None" or "/thumbs/" in src or "_frame_" in src or "http" not in src: continue
+                print_same_line("Downloading Image: {}/{}".format(i, len(images)))
+                # print("Image: {}".format(src[:src.find(".jpg")+4]))
+                # print("Image: {}".format(src))
+                if DOWNLOADING:
+                    try:
+                        while os.path.isfile("{}/{}.jpg".format(downloadPath, i)):
+                            i+=1
+                        wget.download(src, "{}/{}.jpg".format(downloadPath, i), False)
+                        imagesDownloaded.append(i)
+                    except Exception as e: print(e)
+                i+=1
+            print()
+        except Exception as e:
+            print(e)
+        return imagesDownloaded
+
+    def download_messages(user="all"):
+        print("Downloading Messages: {}".format(user))
+        try:
+            if str(user) == "all":
+                user = random.choice(User.get_all_users())
+            Driver.message_user(username=user.username)
+            contentCount = 0
+            while True:
+                Driver.BROWSER.execute_script("document.querySelector('div[id=chatslist]').scrollTop=1e100")
+                time.sleep(1)
+                Driver.BROWSER.execute_script("document.querySelector('div[id=chatslist]').scrollTop=1e100")
+                time.sleep(1)
+                Driver.BROWSER.execute_script("document.querySelector('div[id=chatslist]').scrollTop=1e100")
+                time.sleep(1)
+                images = Driver.BROWSER.find_elements_by_tag_name("img")
+                videos = Driver.BROWSER.find_elements_by_tag_name("video")
+                # print((len(images)+len(videos)))
+                if contentCount == len(images)+len(videos): break
+                contentCount = len(images)+len(videos)
+            # download all images and videos
+            imagesDownloaded = Driver.download_images()
+            videosDownloaded = Driver.download_videos()
+            print("Downloaded Messages")
+            print("Count: {}".format(len(imagesDownloaded)+len(videosDownloaded)))
+        except Exception as e:
+            Settings.maybe_print(e)
+
+    ### Videos
+    # downloads all videos on the page
+    def download_videos():
+        videosDownloaded = []
+        try:
+            # find all video elements on page
+            videos = Driver.BROWSER.find_elements_by_tag_name("video")
+            downloadPath = os.path.join(Settings.get_download_path(), "videos")
+            Path(downloadPath).mkdir(parents=True, exist_ok=True)
+            i=1
+            # download all video.src -> /arrrg/$username/videos            
+            for video in videos:
+                if DOWNLOADING_MAX and i > DOWNLOAD_MAX_VIDEOS: break
+                src = str(video.get_attribute("src"))
+                if not src or src == "" or src == "None" or "http" not in src: continue
+                print_same_line("Downloading Video: {}/{}".format(i, len(videos)))
+                # print("Video: {}".format(src[:src.find(".mp4")+4]))
+                # print("Video: {}".format(src))
+                if DOWNLOADING:
+                    try:
+                        while os.path.isfile("{}/{}.mp4".format(downloadPath, i)):
+                            i+=1
+                        wget.download(src, "{}/{}.mp4".format(downloadPath, i), False)
+                        videosDownloaded.append(i)
+                    except Exception as e: print(e)
+                i+=1
+            print()
+        except Exception as e:
+            print(e)
+        return videosDownloaded
 
     @staticmethod
     def enter_text(text):
@@ -445,6 +564,18 @@ class Driver:
         # Settings.dev_print("alert accepted")
 
     @staticmethod
+    def go_to_home():
+        auth_ = Driver.auth()
+        if not auth_: return False
+        if str(Driver.BROWSER.current_url) == str(ONLYFANS_HOME_URL):
+            Settings.maybe_print("at -> onlyfans.com")
+            Driver.BROWSER.execute_script("window.scrollTo(0, 0);")
+        else:
+            Settings.maybe_print("goto -> onlyfans.com")
+            Driver.BROWSER.get(ONLYFANS_HOME_URL)
+        Driver.get_page_load()
+
+    @staticmethod
     def go_to_page(page):
         auth_ = Driver.auth()
         if not auth_: return False
@@ -458,15 +589,19 @@ class Driver:
         Driver.get_page_load()
 
     @staticmethod
-    def go_to_home():
+    def go_to_profile():
         auth_ = Driver.auth()
         if not auth_: return False
-        if str(Driver.BROWSER.current_url) == str(ONLYFANS_HOME_URL):
-            Settings.maybe_print("at -> onlyfans.com")
-            Driver.BROWSER.execute_script("window.scrollTo(0, 0);")
-        else:
-            Settings.maybe_print("goto -> onlyfans.com")
-            Driver.BROWSER.get(ONLYFANS_HOME_URL)
+        username = Settings.get_username_account()
+        if str(username) == "":
+            username = Driver.get_username()
+        # if str(username) in str(Driver.BROWSER.current_url):
+        #     Settings.maybe_print("at -> {}".format(page))
+        #     Driver.BROWSER.execute_script("window.scrollTo(0, 0);")
+        # else:
+        Settings.maybe_print("goto -> {}".format(username))
+        Driver.BROWSER.get("{}/{}".format(ONLYFANS_HOME_URL, username))
+        Driver.handle_alert()
         Driver.get_page_load()
 
     # onlyfans.com/my/settings
@@ -1289,8 +1424,25 @@ class Driver:
     # probably just way easier and resourceful to do it all at once
     # though it would be ideal to also be able to update individual settings without risking other settings
 
+    # goes through the settings and get all the values
+    # @staticmethod
+    # def settings_get_all():
+    #     print("Getting All Settings")
+    #     profile = Profile()
+    #     try:
+    #         pages = Profile.get_pages()
+    #         for page in pages:
+    #             data = Driver.sync_from_settings_page(page)
+    #             for key, value in data:
+    #                 profile[key] = value
+    #         Settings.dev_print("Successfully got settings")
+    #         print("Settings Retrieved")
+    #     except Exception as e:
+    #         Driver.error_checker(e)
+    #     return profile
+
     @staticmethod
-    def sync_from_settings_page(page=None):
+    def sync_from_settings_page(profile=None, page=None):
         auth_ = Driver.auth()
         if not auth_: return False
         print("Getting Settings: {}".format(page))
@@ -1300,7 +1452,8 @@ class Driver:
             Settings.dev_print("going to settings page: {}".format(page))
             Driver.go_to_settings(page)
             Settings.dev_print("reached settings: {}".format(page))
-            data = Profile({})
+            if profile == None:
+                profile = Profile()
             for var in variables:
                 name = var[0]
                 page_ = var[1]
@@ -1337,35 +1490,15 @@ class Driver:
                     status = element.is_selected()
                 if status is not None: Settings.dev_print("Successful value: {}".format(status))
                 Settings.maybe_print("{} : {}".format(name, status))
-                data[name] = status
+                setattr(profile, str(name), status)
             Settings.dev_print("Successfully got settings page: {}".format(page))
             print("Settings Page Retrieved: {}".format(page))
-            return data
         except Exception as e:
             Driver.error_checker(e)
 
-    # goes through the settings and get all the values
-    # @staticmethod
-    # def settings_get_all():
-    #     auth_ = Driver.auth()
-    #     if not auth_: return False
-    #     print("Getting All Settings")
-    #     profile = Profile({})
-    #     try:
-    #         pages = Profile.get_pages()
-    #         for page in pages:
-    #             data = Driver.sync_from_settings_page(page)
-    #             for key, value in data:
-    #                 profile[key] = value
-    #         Settings.dev_print("Successfully got settings")
-    #         print("Settings Retrieved")
-    #     except Exception as e:
-    #         Driver.error_checker(e)
-    #     return profile
-
     # goes through each page and sets all the values
     @staticmethod
-    def sync_to_settings_page(Profile, page):
+    def sync_to_settings_page(profile=None, page=None):
         auth_ = Driver.auth()
         if not auth_: return False
         print("Updating Page Settings: {}".format(page))
@@ -1375,6 +1508,8 @@ class Driver:
             Settings.dev_print("going to settings page: {}".format(page))
             Driver.go_to_settings(page)
             Settings.dev_print("reached settings: {}".format(page))
+            if profile == None:
+                profile = Profile()
             for var in variables:
                 name = var[0]
                 page_ = var[1]
@@ -1388,7 +1523,7 @@ class Driver:
                     Driver.error_checker(e)
                     continue
                 if str(type_) == "text":
-                    element.send_keys(Profile.get(name))
+                    element.send_keys(getattr(profile, str(name)))
                 elif str(type_) == "toggle":
                     # somehow set the other toggle state
                     pass
@@ -1399,9 +1534,9 @@ class Driver:
                     # then go to matching value
                     pass
                 elif str(type_) == "list":
-                    element.send_keys(Profile.get(name))
+                    element.send_keys(getattr(profile, str(name)))
                 elif str(type_) == "file":
-                    element.send_keys(Profile.get(name))
+                    element.send_keys(getattr(profile, str(name)))
                 elif str(type_) == "checkbox":
                     element.click()
                 # Settings.dev_print("Successful value: {}".format(status))
@@ -1524,6 +1659,12 @@ class Driver:
                 return False
 
         def firefox():
+            # firefox needs non root
+            if os.geteuid() == 0:
+                print("You must run `onlysnarf` as non-root for Firefox to work correctly!")
+                return False
+               # sys.exit("You need root permissions to do this, laterz!")
+
             try:
                 d = DesiredCapabilities.FIREFOX
                 d['loggingPrefs'] = {'browser': 'ALL'}
@@ -1679,6 +1820,29 @@ class Driver:
     ##### Users #####
     #################
 
+    @staticmethod
+    def get_username():
+        auth_ = Driver.auth()
+        if not auth_: return False
+        username = None
+        try:
+            Driver.go_to_home()
+            eles = Driver.BROWSER.find_elements_by_tag_name("a")
+            eles = [ele for ele in eles 
+                    if "@" in str(ele.get_attribute("innerHTML"))
+                    and "onlyfans" not in str(ele.get_attribute("innerHTML"))
+                    ]
+            # for ele in eles:
+                # print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+            if len(eles) == 0:
+                print("Error: Unable to find username")
+                return None
+            username = str(eles[0].get_attribute("href")).replace("https://onlyfans.com/","") 
+        except Exception as e:
+            Driver.error_checker(e)
+            print("Error: Failed to find username")
+        return username
+
     # returns list of accounts you follow
     @staticmethod
     def following_get():
@@ -1707,6 +1871,8 @@ class Driver:
                 # print("name: {}".format(name))
                 users.append({"name":name, "username":username.replace("@","")}) 
             Settings.maybe_print("Found: {}".format(len(users)))
+            for user in users:
+                Settings.dev_print(user)
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to Find Subscriptions")
@@ -1727,7 +1893,32 @@ class Driver:
                 print_same_line("({}/{}) scrolling...".format(count, len(elements)))
                 count = len(elements)
                 Driver.BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(2)
+                print_same_line(" scrolled")
+                print("sleeping 2")
+                time.sleep(1)
+                print("sleeping 1")
+                time.sleep(1)
+                print("sleeping 0")
+
+
+                # so if it sleeps for every ~50 elements,
+                # for 500 elements it will take 20 seconds
+
+
+                # yet at 240 elements we are at 5+ minutes
+                # 10 seconds take 1-2+ minutes
+
+                # is it the search for elements?
+                # or the scroll? unlikely
+                # probably the search? all i compare is the count so i'm not doing anything heavy
+                # selenium is doing the heaviest part by counting the num of elements and providing it
+
+                # scroll down & load is taking the longest
+                # i can spam scroll down and
+                # : only stop after maybe x seconds when no new sum
+                # : 
+
+
             print()
             elements = Driver.BROWSER.find_elements_by_class_name("m-fans")
             for ele in elements:
@@ -1741,6 +1932,8 @@ class Driver:
                 # start = datetime.strptime(str(datetime.now()), "%m-%d-%Y:%H:%M")
                 users.append({"name":name, "username":username.replace("@","")}) # ,"id":user_id, "started":start})
             Settings.maybe_print("Found: {}".format(len(users)))
+            for user in users:
+                Settings.dev_print(user)
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to Find Users")

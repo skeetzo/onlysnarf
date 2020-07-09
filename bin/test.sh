@@ -10,7 +10,12 @@ echo "##################################################" >> ../onlysnarf/logs/t
 echo "################## Start #########################" >> ../onlysnarf/logs/test.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
-onlysnarf-config
+
+onlysnarf -debug -verbose -verbose -verbose -browser firefox
+
+# onlysnarfpy -action test -debug -verbose -verbose -verbose
+
+# onlysnarf-config
 
 # video
 # onlysnarfpy -category video -notkeyword stroke -verbose -verbose -debug -browser firefox
