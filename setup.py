@@ -26,7 +26,9 @@ setuptools.setup(
         'python-crontab',
         'pyinquirer',
         'ffmpeg',
-        'wget'
+        'wget',
+        'pysftp',
+        'moviepy'
         ],
     entry_points={
         'console_scripts' : [

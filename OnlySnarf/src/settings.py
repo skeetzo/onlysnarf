@@ -5,6 +5,7 @@ import time
 from .colorize import colorize
 from .args import CONFIG as config
 import PyInquirer
+import os
 
 DEBUGGING = [
     ""
@@ -232,8 +233,43 @@ class Settings:
     def get_config_path():
         return config["CONFIG_PATH"] or ""    
 
+    def get_local_path():
+        return os.path.join(Settings.get_mount_path(), Settings.get_username_account())
+
     def get_google_path():
         return config["GOOGLE_PATH"] or ""
+
+    def get_destination():
+        return config["DESTINATION"] or ""
+
+    def get_source():
+        return config["SOURCE"] or ""
+
+    def get_source_options():
+        return [
+            "local",
+            "google",
+            "dropbox",
+            "remote"
+        ]
+
+    def get_remote_host():
+        return config["REMOTE_HOST"] or ""
+
+    def get_remote_port():
+        return config["REMOTE_PORT"] or ""
+
+    def get_remote_username():
+        return config["REMOTE_USERNAME"] or ""
+
+    def get_remote_password():
+        return config["REMOTE_PASSWORD"] or ""
+
+    def get_remote_browser_host():
+        return config["REMOTE_BROWSER_HOST"] or ""
+
+    def get_remote_browser_port():
+        return config["REMOTE_BROWSER_PORT"] or ""
 
     def get_secret_path():
         return config["CLIENT_SECRET"] or ""

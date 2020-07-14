@@ -358,7 +358,13 @@
   - debugged firefox
   - debugged Profile
   - debugged backup content
-  - args: added username_account
+  - args: added username_account to differentiate from twitter username for login
+
+  - args: addedsource & destination
+  - added remote ssh dir
+
+
+need to add 'create' to Profile for asking for profile settings when syncing to
 
 
 --------------------

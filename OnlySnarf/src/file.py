@@ -3,6 +3,9 @@ from .ffmpeg import ffmpeg
 from . import google as Google
 from .settings import Settings
 import PyInquirer
+from . import remote as Remote
+from PIL import Image
+from os import walk
 
 ONE_GIGABYTE = 1000000000
 ONE_MEGABYTE = 1000000
@@ -37,6 +40,8 @@ class File():
         ##
         self.title = None
         self.category = None # [image, gallery, video, performer]
+        ##
+        self.remote_path = None
 
     ######################################################################################
 
@@ -45,7 +50,17 @@ class File():
     # Google.move_files
     def backup(self):
         if not File.backup_text(self.get_title()): return
-        Google.upload_file(file=self)
+        if Settings.get_destination() == "remote":
+            Remote.backup_file(self)
+        elif Settings.get_destination() == "google":
+            Google.upload_file(file=self)
+        # elif Settings.get_destination() == "dropbox":
+            # Dropbox.upload_file(file=self)
+        else:
+            # move file to local backup location
+            backupPath = os.path.join(Settings.get_local_path(), "posted")
+            backupPath = os.path.join(backupPath, file.category, file.title)
+            shutil.move(file.get_path(), backupPath)
 
     @staticmethod
     def backup_text(title):
@@ -66,8 +81,11 @@ class File():
 
     @staticmethod
     def backup_files(files=[]):
-        for file in files:
-            file.backup()
+        if files[0] and files[0].remote_path:
+            Remote.backup_files(files)
+        else:
+            for file in files:
+                file.backup()
         return True
 
     def check_size(self):
@@ -100,10 +118,13 @@ class File():
     # Deletes online file
     def delete(self):
         if not File.delete_text(self.get_title()): return
-        try: 
-            os.remove(self.get_path())
-            print('File Deleted: {}'.format(self.get_title()))
-        except Exception as e: Settings.dev_print(e)
+        if self.remote_path:
+            Remote.delete_file(self)
+        else:
+            try: 
+                os.remove(self.get_path())
+                print('File Deleted: {}'.format(self.get_title()))
+            except Exception as e: Settings.dev_print(e)
 
     @staticmethod
     def delete_text(title):
@@ -121,6 +142,10 @@ class File():
         return True
 
     ##############################
+
+    def get_files():
+        pass
+        # return all local files from Settings.mount_path or whatever
 
     def get_ext(self):
         if self.ext: return self.ext
@@ -200,50 +225,229 @@ class File():
             Settings.dev_print(e)
 
     @staticmethod
-    def select_file():
-        # if not Settings.prompt("file path"): return None
+    def get_files_by_folder(path):
+        f = []
+        for (dirpath, dirnames, filenames) in walk(path):
+            f.extend(filenames)
+            break
+        return f
+
+    def get_folder_by_name(category, parent=None):
+        if not parent:
+            parent = Settings.get_local_path()
+        f = []
+        for (dirpath, dirnames, filenames) in walk(parent):
+            for dir_ in dirnames:
+                if str(dir_) == str(category):
+                    return dir_
+            break
+        return None
+
+    @staticmethod
+    def get_folders_of_folder_by_keywords(categoryFolder):
+        if categoryFolder == None: return []
+        folders = File.get_folders_of_folder(categoryFolder)
+        folders_ = []
+        for folder in folders:
+            if Settings.get_drive_keyword() and str(folder.get_title()) != str(Settings.get_drive_keyword()):
+                Settings.dev_print('{} -> not keyword'.format(folder.get_title()))
+                continue
+            elif Settings.get_drive_ignore() and str(folder.get_title()) == str(Settings.get_drive_ignore()):
+                Settings.dev_print('{} -> by not keyword'.format(folder.get_title()))
+                continue
+            elif str(folder.get_title()) == str(Settings.get_drive_keyword):
+                Settings.dev_print('{} -> by keyword'.format(folder.get_title()))
+            else:
+                Settings.dev_print("{}".format(folder.get_title()))
+            folders_.append(folder)
+        return folders_
+
+    @staticmethod
+    def get_images_of_folder(folder):
+        imgs = []
+        files = []
+        path = folder.get_path()
+        valid_images = [".jpg",".gif",".png",".tga",".jpeg"]
+        for f in os.listdir(path):
+            ext = os.path.splitext(f)[1]
+            if ext.lower() not in valid_images:
+                continue
+            file = File()
+            setattr(file, "path", os.path.join(path,f))
+            files.append(file)
+        return files
+
+    @staticmethod
+    def get_videos_of_folder(folder):
+        videos = []
+        files = []
+        path = folder.get_path()
+        valid_videos = [".mp4",".mov"]
+        for f in os.listdir(path):
+            ext = os.path.splitext(f)[1]
+            if ext.lower() not in valid_videos:
+                continue
+            file = File()
+            setattr(file, "path", os.path.join(path,f))
+            files.append(file)
+        return files
+
+    @staticmethod
+    def get_folders_of_folder(folder):
+        # os.walk(directory)
+        # will yield a tuple for each subdirectory. Ths first entry in the 3-tuple is a directory name, so
+        # [x[0] for x in os.walk(directory)]
+        # should give you all of the subdirectories, recursively.
+        # Note that the second entry in the tuple is the list of child directories of the entry in the first position, so you could use this instead, but it's not likely to save you much.
+        # However, you could use it just to give you the immediate child directories:
+        folders = []
+        for folder in (os.walk(folder.get_path()))[1]:
+            fol = Folder()
+            setattr(fol, "path", folder)
+            folders.append(fol)
+        return folders
+
+    @staticmethod
+    def get_files_by_category(cat, performer=None):
+        Settings.maybe_print("Loading Local Files...")
+        files = []
+        ##
+        def parse_categories(category, categoryFolder=None):
+            files = []
+            # return File.get_files_by_category(cat)
+            if "image" in str(category):
+                categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
+                for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
+                    for image in File.get_images_of_folder(folder):
+                        file = File()
+                        setattr(file, "path", image)
+                        setattr(file, "category", folder)
+                        files.append(file)
+            elif "video" in str(category):
+                categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
+                for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
+                    videos = File.get_videos_of_folder(folder)
+                    if len(videos) > 0:
+                        files.append(folder.get_title())
+                    for video in videos:
+                        file = File()
+                        setattr(file, "path", video)
+                        setattr(file, "category", folder)
+                        files.append(file)
+            elif "galler" in str(category):
+                categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
+                for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
+                    galleries = File.get_folders_of_folder(folder)
+                    if len(galleries) > 0:
+                        files.append(folder.get_title())
+                    for gallery in galleries:
+                        file = Folder()
+                        setattr(file, "path", gallery)
+                        setattr(file, "category", folder)
+                        files.append(file)
+            elif "performer" in str(category):
+                categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
+                for performer in File.get_folders_of_folder_by_keywords(categoryFolder):
+                    # for performer in File.get_folders_of_folder(folder):
+                    p = Folder()
+                    setattr(p, "path", performer)
+                    setattr(p, "category", categoryFolder)
+                    files.append(p)
+            return files
+        ##
+        if performer:
+            categoryFolder = File.get_folder_by_name("performers")
+            for performerFolder in File.get_folders_of_folder_by_keywords(categoryFolder):
+                if str(performer) == str(performerFolder.get_title()):
+                    return parse_categories(cat, categoryFolder=performerFolder)
+        return parse_categories(cat)
+
+    @staticmethod
+    def select_file(category, performer=None):
+        files = File.get_files_by_category(category, performer=performer)
+        files_ = []
+        for file in files:
+            if isinstance(file, str):
+                files_.append(PyInquirer.Separator())
+                continue
+            file.category = category
+            file_ = {
+                "name": file.get_title(),
+                "value": file,
+            }
+            files_.append(file_)
+        if len(files_) == 0:
+            print("Missing Files")
+            return File.select_files()
         question = {
-            'type': 'input',
-            'name': 'path',
+            'type': 'list',
+            'name': 'file',
             'message': 'File Path:',
+            'choices': files_,
+            # 'filter': lambda file: file.lower()
         }
         answer = PyInquirer.prompt(question)
-        path = answer["path"]
-        if not Settings.confirm(path): return None
-        if not os.path.exists(path):
-            print("Error: File Does Not Exist")
-            return True
-        file = File()
-        setattr(file, "path", path)
+        file = answer["file"]
+        if not Settings.confirm(file.get_path()): return None
         return file
 
     @staticmethod
     def select_files():
-        if not Settings.prompt("enter files"): return []
-        print("Enter File Paths")
+        if not Settings.is_prompt(): return [File.get_random_file()]
+        print("Select a folder category")
+        question = {
+            'type': 'list',
+            'name': 'category',
+            'message': 'Categories:',
+            'choices': Settings.get_categories(),
+            'filter': lambda cat: cat.lower()
+        }
+        answer = PyInquirer.prompt(question)
+        category = answer["category"]
+        if not Settings.confirm(category): return File.select_files()
+        print("Select Files or a Folder")
         files = []
         while True:
-            file = File.select_file()
+            file = File.select_file(category)
             if not file: break
-            if isinstance(file, File): files.append(file)
-            if not Settings.prompt("another file"): break
-        if not Settings.confirm([file.get_path() for file in files]): return []
+            ##
+            if "performer" in str(category):
+                cat = Settings.select_category([cat for cat in Settings.get_categories() if "performer" not in cat])
+                performerName = file.get_title()
+                file = File.select_file(cat, performer=performerName)
+                if not file: break
+                setattr(file, "performer", performerName)
+                files.append(file)
+                if "galler" in str(cat) or "video" in str(cat): break
+            ##
+            files.append(file)
+            if "galler" in str(category) or "video" in str(category): break
+        if not Settings.confirm([file.get_title() for file in files]): return File.select_files()
         return files
+
+
+
+
 
     @staticmethod
     def select_file_upload_method():
         if not Settings.prompt("upload files"): return []
         print("Select an upload source")
+        sources = Settings.get_source_options()
         question = {
             'type': 'list',
             'name': 'upload',
             'message': 'Upload:',
-            'choices': ["Local", "Google"]
+            'choices': [src.title() for src in sources]
         }
         upload = PyInquirer.prompt(question)["upload"]
         if not Settings.confirm(upload): return File.select_file_upload_method()
         if str(upload) == "Google":
             return Google_File.select_files()
+        # elif str(upload) == "Dropbox":
+            # return Dropbox.select_files()
+        elif str(upload) == "Remote":
+            return Remote.select_files()
         return File.select_files()
 
     def upload(self):
@@ -253,6 +457,73 @@ class File():
         self.backup()
         self.delete()
         return True
+
+
+class Folder(File):
+    def __init__(self):
+        File.__init__(self)
+        self.files = None
+
+    def backup(self):
+        if File.backup_text(self.get_title()): return
+        # Google.upload_gallery(files=self.files)
+
+    def check_size(self):
+        for file in self.get_files():
+            exists = file.check_size()
+            if not exists: return False
+        return True
+
+    def download(self):
+        print("Downloading Folder: {}".format(self.get_title()))
+        if len(self.files) == 0:
+            file_list = Google.get_files_by_folder_id(self.get_id())
+            self.files = []
+            for file in file_list:
+                file_ = Google_File()
+                setattr(file_, "id", file["id"])
+                setattr(file_, "file", file)
+                self.files.append(file_)
+        folder_size = len(self.files)
+        Settings.maybe_print('Folder size: {}'.format(folder_size))
+        Settings.maybe_print('Upload limit: {}'.format(Settings.get_upload_max()))
+        if int(folder_size) == 0:
+            print('Error: Empty Folder')
+            return False
+        file_list = self.files
+        random.shuffle(file_list)
+        file_list = file_list[:int(Settings.get_upload_max())]
+        ## video preference
+        videos = []
+        for file in file_list:
+            if str(file.get_mimetype()) in MIMETYPES_VIDEOS_LIST:
+                videos.append(file)
+        if len(videos) > 0: file_list = [random.choice(videos)]
+        ##
+        i = 1
+        for file in sorted(file_list, key = lambda x: x.get_title()):
+            # print_same_line("Downloading: {} ({}/{})".format(file.get_title(), i, folder_size))
+            print("Downloading: {} ({}/{})".format(file.get_title(), i, folder_size))
+            file.download()
+            i+=1
+        print()
+        print("Downloaded Folder: {}".format(self.get_title()))
+
+    def get_files(self):
+        if not self.files and self.path:
+            self.files = []
+            files = File.get_files_by_folder(self.get_path())
+            for file in files:
+                file_ = Google_File()
+                setattr(file_, "file", file)
+                self.files.append(file_)
+        if Settings.get_title():
+            for file in self.files:
+                if str(Settings.get_title()) == str(file.get_title()):
+                    self.files = [file]
+                    break
+        return self.files
+
 
 ###################################################################################
 
@@ -649,4 +920,5 @@ class Video(File):
             return
         Settings.dev_print("repair: {}".format(self.title))
         self.path = ffmpeg.repair(path)
+
 

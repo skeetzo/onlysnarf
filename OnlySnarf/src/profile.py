@@ -76,13 +76,10 @@ class Profile:
 
     @staticmethod
     def menu():
-        if not Settings.is_debug():
-            print("### Not Available ###")
-            return
         action = Profile.ask_action()
         if (action == 'Back'): 
             from OnlySnarf.bin.menu import Menu
-            Menu.main_menu()
+            return Menu.main_menu()
         elif (action == 'backup'): Profile.backup_menu()
         elif (action == 'sync from'): Profile.sync_from_profile()
         elif (action == 'sync to'): Profile.sync_to_profile()
@@ -98,36 +95,38 @@ class Profile:
         answers = prompt(menu_prompt)
         return answers['action']
 
+
+
+
+
+
+
+
+
+
+
+
     @staticmethod
     def create():
         # checks settings / config for profile settings config file
         # asks for missing options
 
-        # returns a local copy / expectation of the Profile settings
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
         pass
+
+
+
+
+
+
+
+
+
+
+
+
 
     @staticmethod
     def sync_from_profile():

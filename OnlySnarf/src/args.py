@@ -281,6 +281,27 @@ parser.add_argument('-users-path', type=str, dest='users_path',
 # the path to the profile.json file
 parser.add_argument('-profile-path', type=str, dest='profile_path',
   help='the path to cache profile locally', default=PROFILE_PATH)
+
+
+
+
+##
+# -source
+# the source to use when searching for content
+parser.add_argument('-source', dest='source', default="local", choices=["google","dropbox","remote","local"],
+  help='file host location')
+
+##
+# -destination
+# the destination to use when backing up content
+parser.add_argument('-destination', dest='destination', default="local", choices=["google","dropbox","remote","local"],
+  help='file backup location')
+
+
+
+
+
+
 ##
 # -remote-host
 # the remote host to connect to
@@ -290,7 +311,27 @@ parser.add_argument('-remote-host', type=str, dest='remote_host',
 # -remote-port
 # the remote port to connect to
 parser.add_argument('-remote-port', type=int, dest='remote_port',
-  help='the remote port to connect to', default=4444)
+  help='the remote port to connect to', default=4446)
+##
+# -remote-username
+# the remote username to use
+parser.add_argument('-remote-username', type=str, dest='remote_username',
+  help='the remote username to use', default=None)
+##
+# -remote-password
+# the remote password to use
+parser.add_argument('-remote-password', type=int, dest='remote_password',
+  help='the remote password to use', default=None)
+##
+# -remote-browser-host
+# the remote browser host to connect to
+parser.add_argument('-remote-browser-host', type=str, dest='remote_browser_host',
+  help='the remote browser host to connect to', default="127.0.0.1")
+##
+# -remote-browser-port
+# the remote browser port to connect to
+parser.add_argument('-remote-browser-port', type=int, dest='remote_browser_port',
+  help='the remote browser port to connect to', default=4444)
 ###
 ##
 # -question

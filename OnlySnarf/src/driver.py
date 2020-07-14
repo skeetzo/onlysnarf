@@ -291,6 +291,7 @@ class Driver:
         print("Downloading Messages: {}".format(user))
         try:
             if str(user) == "all":
+                from .user import User
                 user = random.choice(User.get_all_users())
             Driver.message_user(username=user.username)
             contentCount = 0
@@ -1684,8 +1685,8 @@ class Driver:
         def remote():
             try:
 
-                host = Settings.get_remote_host()
-                port = Settings.get_remote_port()
+                host = Settings.get_remote_browser_host()
+                port = Settings.get_remote_browser_port()
                 link = 'http://{}:{}/wd/hub'.format(host, port)
 
                 driver = webdriver.Remote(
@@ -1893,32 +1894,7 @@ class Driver:
                 print_same_line("({}/{}) scrolling...".format(count, len(elements)))
                 count = len(elements)
                 Driver.BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                print_same_line(" scrolled")
-                print("sleeping 2")
-                time.sleep(1)
-                print("sleeping 1")
-                time.sleep(1)
-                print("sleeping 0")
-
-
-                # so if it sleeps for every ~50 elements,
-                # for 500 elements it will take 20 seconds
-
-
-                # yet at 240 elements we are at 5+ minutes
-                # 10 seconds take 1-2+ minutes
-
-                # is it the search for elements?
-                # or the scroll? unlikely
-                # probably the search? all i compare is the count so i'm not doing anything heavy
-                # selenium is doing the heaviest part by counting the num of elements and providing it
-
-                # scroll down & load is taking the longest
-                # i can spam scroll down and
-                # : only stop after maybe x seconds when no new sum
-                # : 
-
-
+                time.sleep(2)
             print()
             elements = Driver.BROWSER.find_elements_by_class_name("m-fans")
             for ele in elements:
@@ -1971,6 +1947,7 @@ class Driver:
         if Driver.BROWSER == None: return
         if Settings.is_save_users():
             print("Saving and Exiting OnlyFans")
+            from .user import User
             User.write_users_local()
         else:
             print("Exiting OnlyFans")

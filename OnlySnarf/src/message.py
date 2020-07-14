@@ -157,8 +157,15 @@ class Message():
 			files.append(Settings.get_input_as_files())
 		elif len(self.files) == 0:
 			files = File.select_file_upload_method()
-		if len(files) == 0 and len(Google_File.get_files()) > 0:
+		if files == None: files = []
+		if Settings.get_source() == "google" and len(files) == 0 and len(Google_File.get_files()) > 0:
 			files = Google_File.select_files()
+		# elif Settings.get_source() == "dropbox" and len(files) == 0 and len(Dropbox.get_files()) > 0:
+		# 	files = Dropbox.select_files()
+		elif Settings.get_source() == "remote" and len(files) == 0 and len(Remote.get_files()) > 0:
+			files = Remote.select_files()
+		elif Settings.get_source() == "local" and len(files) == 0 and len(File.get_files()) > 0:
+			files = File.select_files()
 		filed = []
 		for file in files:
 			if isinstance(file, Google_Folder): filed.extend(file.get_files())
@@ -288,7 +295,7 @@ class Message():
 		self.get_files()
 		self.get_recipients()
 		if not self.text:
-			if len(self.files) > 0:
+			if self.files and len(self.files) > 0:
 				self.text = self.files[0].get_title()
 		if Settings.get_performer_category() or self.hasPerformers:
 			self.get_performers()
@@ -306,7 +313,7 @@ class Message():
 		self.get_expiration()
 		self.get_files()
 		if not self.text:
-			if len(self.files) > 0:
+			if self.files and len(self.files) > 0:
 				self.text = self.files[0].get_title()
 		if Settings.get_performer_category() or self.hasPerformers:
 			self.get_performers()
@@ -321,7 +328,7 @@ class Message():
 		self.get_price()
 		self.get_files()
 		if not self.text:
-			if len(self.files) > 0:
+			if self.files and len(self.files) > 0:
 				self.text = self.files[0].get_title()
 		if Settings.get_performer_category() or self.hasPerformers:
 			self.get_performers()
