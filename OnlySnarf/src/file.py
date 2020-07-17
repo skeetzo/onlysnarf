@@ -394,17 +394,9 @@ class File():
     @staticmethod
     def select_files():
         if not Settings.is_prompt(): return [File.get_random_file()]
-        print("Select a folder category")
-        question = {
-            'type': 'list',
-            'name': 'category',
-            'message': 'Categories:',
-            'choices': Settings.get_categories(),
-            'filter': lambda cat: cat.lower()
-        }
-        answer = PyInquirer.prompt(question)
-        category = answer["category"]
-        if not Settings.confirm(category): return File.select_files()
+        category = Settings.select_category()
+        if not category: return File.select_file_upload_method()
+        # if not Settings.confirm(category): return File.select_files()
         print("Select Files or a Folder")
         files = []
         while True:
@@ -425,13 +417,9 @@ class File():
         if not Settings.confirm([file.get_title() for file in files]): return File.select_files()
         return files
 
-
-
-
-
     @staticmethod
     def select_file_upload_method():
-        if not Settings.prompt("upload files"): return []
+        # if not Settings.prompt("upload files"): return []
         print("Select an upload source")
         sources = Settings.get_source_options()
         question = {
@@ -441,7 +429,7 @@ class File():
             'choices': [src.title() for src in sources]
         }
         upload = PyInquirer.prompt(question)["upload"]
-        if not Settings.confirm(upload): return File.select_file_upload_method()
+        # if not Settings.confirm(upload): return File.select_file_upload_method()
         if str(upload) == "Google":
             return Google_File.select_files()
         # elif str(upload) == "Dropbox":
@@ -451,7 +439,7 @@ class File():
         return File.select_files()
 
     def upload(self):
-        if not self.prepare():  
+        if not self.prepare():
             print("Error: Unable to Upload File - {}".format(self.get_title()))
             return False
         self.backup()
@@ -755,17 +743,9 @@ class Google_File(File):
     @staticmethod
     def select_files():
         if not Settings.is_prompt(): return [Google_File.get_random_file()]
-        print("Select a folder category")
-        question = {
-            'type': 'list',
-            'name': 'category',
-            'message': 'Categories:',
-            'choices': Settings.get_categories(),
-            'filter': lambda cat: cat.lower()
-        }
-        answer = PyInquirer.prompt(question)
-        category = answer["category"]
-        if not Settings.confirm(category): return Google_File.select_files()
+        category = Settings.select_category()
+        if not category: return File.select_file_upload_method()
+        # if not Settings.confirm(category): return Google_File.select_files()
         print("Select Google Files or a Folder")
         files = []
         while True:

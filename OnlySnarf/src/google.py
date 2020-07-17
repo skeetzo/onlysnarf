@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 # 3/28/2019: Skeetzo
+import logging
+logging.getLogger('googleapicliet.discovery_cache').setLevel(logging.ERROR)
 
 import random
 import os
@@ -20,10 +22,6 @@ from oauth2client import file, client, tools
 from apiclient.http import MediaFileUpload,MediaIoBaseDownload
 ##
 from .settings import Settings
-
-import logging
-
-logging.getLogger('googleapicliet.discovery_cache').setLevel(logging.ERROR)
 
 ###################
 ##### Globals #####
@@ -70,6 +68,8 @@ def authGoogle():
     try:
         # PyDrive
         gauth = GoogleAuth()
+        if os.path.exists("/opt/onlysnarf/settings.yaml"):
+            gauth = GoogleAuth(settings_file="/opt/onlysnarf/settings.yaml")
         # Try to load saved client credentials
         gauth.LoadCredentialsFile(Settings.get_google_path())
         Settings.dev_print('Loaded: Google Credentials')

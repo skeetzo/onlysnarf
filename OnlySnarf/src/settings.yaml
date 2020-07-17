@@ -11,5 +11,5 @@ oauth_scope:
   - https://www.googleapis.com/auth/drive
 
 # client_config:
-#   client_id: 
-#   client_secret: 
+  # client_id: 
+  # client_secret: 

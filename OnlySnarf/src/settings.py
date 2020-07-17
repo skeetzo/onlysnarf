@@ -473,13 +473,17 @@ class Settings:
 
     def select_category(categories=None):
         if not categories: categories = Settings.get_categories()
+        print("Select a Category")
+        categories.insert(0, "Back")
         question = {
             'type': 'list',
-            'message': 'Category?',
+            'message': 'Category:',
             'name': 'category',
             'choices': categories,
+            'filter': lambda cat: cat.lower()
         }
         cat = PyInquirer.prompt(question)["category"]
+        if str(cat) == "back": return None
         if not Settings.confirm(cat): return Settings.select_category()
         return cat
 
