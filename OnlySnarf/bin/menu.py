@@ -76,11 +76,19 @@ class Menu:
 
     def user_header():
         print("User:")
+        if Settings.get_email() != "":
+            print(" - Email = {}".format(Settings.get_email()))
         print(" - Username = {}".format(Settings.get_username()))
         pass_ = ""
         if str(Settings.get_password()) != "":
             pass_ = "******"
         print(" - Password = {}".format(pass_))
+        if str(Settings.get_username_twitter()) != "":
+            print(" - Twitter = {}".format(Settings.get_username_twitter()))
+            pass_ = ""
+            if str(Settings.get_password_twitter()) != "":
+                pass_ = "******"
+            print(" - Password = {}".format(pass_))
         print('\r')
 
     def menu():
@@ -99,6 +107,7 @@ class Menu:
         elif (action == 'Profile'): Profile.menu()
         elif (action == 'Settings'): Settings.menu()
         else: Menu.exit()
+        Menu.main_menu()
 
     def main():
         time.sleep(1)

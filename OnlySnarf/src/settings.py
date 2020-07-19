@@ -218,6 +218,9 @@ class Settings:
     def get_password():
         return config["PASSWORD"] or ""
 
+    def get_password_twitter():
+        return config["PASSWORD_TWITTER"] or ""
+
     def get_download_path():
         return config["DOWNLOAD_PATH"] or ""
 
@@ -234,7 +237,7 @@ class Settings:
         return config["CONFIG_PATH"] or ""    
 
     def get_local_path():
-        return os.path.join(Settings.get_mount_path(), Settings.get_username_account())
+        return os.path.join(Settings.get_mount_path(), Settings.get_username())
 
     def get_google_path():
         return config["GOOGLE_PATH"] or ""
@@ -320,6 +323,8 @@ class Settings:
         
     # def get_upload_max_messages():
         # return config["UPLOAD_MAX_MESSAGES"] or UPLOAD_MAX_MESSAGES
+    def get_login_method():
+        return config["LOGIN"] or ""
         
     def get_upload_max_duration():
         return config["UPLOAD_MAX_DURATION"] or UPLOAD_MAX_DURATION # 6 hours
@@ -344,11 +349,14 @@ class Settings:
         # setattr(user, "username", config["USER"])
         return user
 
+    def get_email():
+        return config["EMAIL"] or ""
+
     def get_username():
         return config["USERNAME"] or ""
 
-    def get_username_account():
-        return config["USERNAME_ACCOUNT"] or ""
+    def get_username_twitter():
+        return config["USERNAME_TWITTER"] or ""
 
     def get_users_favorite():
         return config["USERS_FAVORITE"] or []
@@ -451,10 +459,20 @@ class Settings:
         }
         return PyInquirer.prompt(question)["confirm"]
 
+    def prompt_email():
+        question = {
+            'type': 'input',
+            'message': 'Email:',
+            'name': 'email'
+        }
+        email = PyInquirer.prompt(question)["email"]
+        Settings.set_email(email)
+        return email
+
     def prompt_username():
         question = {
             'type': 'input',
-            'message': 'Twitter username:',
+            'message': 'Username:',
             'name': 'username'
         }
         username = PyInquirer.prompt(question)["username"]
@@ -464,11 +482,31 @@ class Settings:
     def prompt_password():
         question = {
             'type': 'password',
-            'message': 'Twitter password:',
+            'message': 'Password:',
             'name': 'password'
         }
         pw = PyInquirer.prompt(question)["password"]
         Settings.set_password(pw)
+        return pw
+
+    def prompt_username_twitter():
+        question = {
+            'type': 'input',
+            'message': 'Twitter username:',
+            'name': 'username'
+        }
+        username = PyInquirer.prompt(question)["username"]
+        Settings.set_username_twitter(username)
+        return username
+
+    def prompt_password_twitter():
+        question = {
+            'type': 'password',
+            'message': 'Twitter password:',
+            'name': 'password'
+        }
+        pw = PyInquirer.prompt(question)["password"]
+        Settings.set_password_twitter(pw)
         return pw
 
     def select_category(categories=None):
@@ -493,11 +531,20 @@ class Settings:
     def set_confirm(value):
         Settings.CONFIRM = bool(value)
 
+    def set_email(email):
+        config["EMAIL"] = str(email)
+
     def set_username(username):
         config["USERNAME"] = str(username)
 
     def set_password(password):
         config["PASSWORD"] = str(password)
+
+    def set_username_twitter(username):
+        config["USERNAME_TWITTER"] = str(username)
+
+    def set_password_twitter(password):
+        config["PASSWORD_TWITTER"] = str(password)
 
     def set_prefer_local(buul):
         config["PREFER_LOCAL"] = bool(buul)

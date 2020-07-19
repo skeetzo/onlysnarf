@@ -147,10 +147,19 @@ def main():
     if os.path.isfile(Settings.get_config_path()):
         print(colorize("[*] Config File", 'conf')+": "+colorize("True", 'green'))
         if str(Settings.get_username()) != "None":
-            print(colorize("[-] Twitter Username", 'conf')+": "+colorize(Settings.get_username(), 'green'))
+            print(colorize("[-] OnlyFans Username", 'conf')+": "+colorize(Settings.get_username(), 'green'))
+        else:
+            print(colorize("[-] OnlyFans Username", 'conf')+": "+colorize("", 'red'))
+        if str(Settings.get_password()) != "None":
+            print(colorize("[-] OnlyFans Password", 'conf')+": "+colorize("******", 'green'))
+        else:
+            print(colorize("[-] OnlyFans Password", 'conf')+": "+colorize("", 'red'))
+
+        if str(Settings.get_username_twitter()) != "None":
+            print(colorize("[-] Twitter Username", 'conf')+": "+colorize(Settings.get_username_twitter(), 'green'))
         else:
             print(colorize("[-] Twitter Username", 'conf')+": "+colorize("", 'red'))
-        if str(Settings.get_username()) != "None":
+        if str(Settings.get_password_twitter()) != "None":
             print(colorize("[-] Twitter Password", 'conf')+": "+colorize("******", 'green'))
         else:
             print(colorize("[-] Twitter Password", 'conf')+": "+colorize("", 'red'))

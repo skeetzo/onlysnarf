@@ -11,7 +11,7 @@ echo "################## Start #########################" >> ../onlysnarf/logs/t
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
 
-onlysnarf -debug -verbose -verbose -verbose -browser firefox -prefer-local -remote-host 192.168.1.66
+onlysnarf -debug -verbose -verbose -verbose -browser firefox -prefer-local -remote-host 192.168.1.66 -login onlyfans
 
 # onlysnarfpy -action test -debug -verbose -verbose -verbose
 

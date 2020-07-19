@@ -183,6 +183,11 @@ parser.add_argument('-download-path', type=str, dest='download_path',
 durationAndExpiration.add_argument('-duration', type=int, dest='duration',
   help='the duration in days (99 for \'No Limit\') for a poll', choices=DURATION_ALLOWED, default=None)
 ##
+# -email
+# the OnlyFans email to use for login
+parser.add_argument('-email', type=str, default="", dest='email',
+  help='the OnlyFans email')
+##
 # -expiration
 # date of post or poll expiration
 durationAndExpiration.add_argument('-expiration', type=int, dest='expiration',
@@ -218,6 +223,11 @@ parser.add_argument('-keywords', dest='keywords', action='append', default=[],
 parser.add_argument('-limit', type=int, default=1, dest='limit',
   help='the max number of subscribers allowed for a promotion')
 ##
+# -login
+# the method to prefer when logging in
+parser.add_argument('-login', dest='login', default="onlyfans", choices=["onlyfans","twitter"],
+  help='the method of login to prefer')
+##
 # -months
 # action: discount
 # the number of months to discount for
@@ -240,8 +250,13 @@ parser.add_argument('-notkeyword', dest='notkeyword', default=None,
   help="search for folder not by keyword")
 ##
 # -password
-# the password for the OnlyFans / Twitter
+# the password for OnlyFans
 parser.add_argument('-password', type=str, dest='password',
+  help='the OnlyFans password for login')
+##
+# -password
+# the password for Twitter
+parser.add_argument('-password-twitter', type=str, dest='password_twitter',
   help='the Twitter password for login')
 ##
 # -performers
@@ -434,14 +449,14 @@ parser.add_argument('-users-favorite', default=[],
   dest='users_favorite', action='append', help='supplied list of favorite users')
 ##
 # -username
-# the Twitter username to use
+# the OnlyFans username to use
 parser.add_argument('-username', type=str, default="", dest='username',
-  help='the Twitter username for login')
-# ##
-# # -username-account
-# # the OnlyFans username to use
-parser.add_argument('-username-account', type=str, default="", dest='username_account',
   help='the OnlyFans username')
+##
+# -username-twitter
+# the Twitter username to use
+parser.add_argument('-username-twitter', type=str, default="", dest='username_twitter',
+  help='the Twitter username for login')
 ##
 # -verbose
 # v, vv, vvv
