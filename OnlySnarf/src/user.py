@@ -444,7 +444,7 @@ class User:
         return users_
 
     @staticmethod
-    def write_following_local(users=[])
+    def write_following_local(users=[]):
         if users is None:
             users = User.get_following()
         if len(users) == 0:
