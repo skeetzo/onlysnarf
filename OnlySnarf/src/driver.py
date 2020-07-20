@@ -1665,7 +1665,6 @@ class Driver:
                 print("You must run `onlysnarf` as non-root for Firefox to work correctly!")
                 return False
                # sys.exit("You need root permissions to do this, laterz!")
-
             try:
                 d = DesiredCapabilities.FIREFOX
                 d['loggingPrefs'] = {'browser': 'ALL'}
@@ -1673,7 +1672,7 @@ class Driver:
                 opts.log.level = "trace"
                 if not Settings.is_show_window():
                     opts.add_argument("--headless")
-                driver = webdriver.Firefox(options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
+                driver = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
                 # driver = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
                 print("Spawned Browser - Firefox")
                 return driver
