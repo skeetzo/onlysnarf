@@ -295,7 +295,7 @@ class Message():
 		self.get_files()
 		self.get_recipients()
 		if not self.text:
-			if self.files and len(self.files) > 0:
+			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
 		if Settings.get_performer_category() or self.hasPerformers:
 			self.get_performers()
@@ -313,7 +313,7 @@ class Message():
 		self.get_expiration()
 		self.get_files()
 		if not self.text:
-			if self.files and len(self.files) > 0:
+			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
 		if Settings.get_performer_category() or self.hasPerformers:
 			self.get_performers()
@@ -328,7 +328,7 @@ class Message():
 		self.get_price()
 		self.get_files()
 		if not self.text:
-			if self.files and len(self.files) > 0:
+			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
 		if Settings.get_performer_category() or self.hasPerformers:
 			self.get_performers()

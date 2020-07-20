@@ -19,8 +19,8 @@ echo "Testing OnlySnarf"
 # schedule
 # post
 # message
-show="show"
 show=""
+show="-show"
 
 verbose="blank"
 verbose="verbose -verbose -verbose"
