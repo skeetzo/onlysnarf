@@ -225,7 +225,7 @@ parser.add_argument('-limit', type=int, default=1, dest='limit',
 ##
 # -login
 # the method to prefer when logging in
-parser.add_argument('-login', dest='login', default="onlyfans", choices=["onlyfans","twitter"],
+parser.add_argument('-login', dest='login', default="auto", choices=["auto","onlyfans","twitter"],
   help='the method of login to prefer')
 ##
 # -months

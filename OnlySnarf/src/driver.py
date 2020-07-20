@@ -760,9 +760,13 @@ class Driver:
             return False
             
         try:
-            if Settings.get_login_method() == "onlyfans":
+            if Settings.get_login_method() == "auto":
                 successful = via_form()
-            if Settings.get_login_method() == "twitter" or not successful:
+                if not successful:
+                    successful = via_twitter()
+            elif Settings.get_login_method() == "onlyfans":
+                successful = via_form()
+            elif Settings.get_login_method() == "twitter":
                 successful = via_twitter()
             if not successful:
                 print("OnlyFans Login Failed")
