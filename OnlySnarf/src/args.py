@@ -267,6 +267,10 @@ parser.add_argument('-performers', dest='performers', action='append',  default=
 # prefers local user cache over refreshing first call
 parser.add_argument('-prefer-local', action='store_true', dest='prefer_local',
   help='prefer recently cached data')
+# -prefer-local-following
+# prefers local user cache over refreshing first call for following
+# parser.add_argument('-prefer-local-following', action='store_true', dest='prefer_local_following',
+#   help='prefer recently cached data for following')
 ##
 # -price
 # the price to be set in a message

@@ -402,6 +402,9 @@ class Settings:
     def is_prefer_local():
         return config["PREFER_LOCAL"] or False
         
+    def is_prefer_local_following():
+        return config["PREFER_LOCAL_FOLLOWING"] or False
+
     def is_save_users():
         return config["SAVE_USERS"] or False
         

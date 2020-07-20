@@ -106,7 +106,7 @@ class Menu:
         if (action == 'Action'): Menu.action_menu()
         elif (action == 'Profile'): Profile.menu()
         elif (action == 'Settings'): Settings.menu()
-        else: Menu.exit()
+        else: exit()
         Menu.main_menu()
 
     def main():
@@ -132,8 +132,8 @@ class Menu:
 #     exit()
 # signal.signal(signal.SIGINT, signal_handler)
   
-# def exit():
-#     sys.exit(0)
+def exit():
+    sys.exit(0)
 
 ######################################################
 

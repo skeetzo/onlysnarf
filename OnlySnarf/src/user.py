@@ -215,7 +215,7 @@ class User:
     @staticmethod
     # return following Users
     def get_following():
-        if Settings.is_prefer_local(): return User.read_following_local()
+        if Settings.is_prefer_local_following(): return User.read_following_local()
         active_users = []
         users = Driver.following_get()
         for user in users:
@@ -227,8 +227,8 @@ class User:
             except Exception as e:
                 Settings.dev_print(e)
         Settings.maybe_print("following: {}".format(len(active_users)))
-        User.write_following_local(users=active_users)
-        Settings.set_prefer_local(True)
+        # User.write_following_local(users=active_users)
+        Settings.set_prefer_local_following(True)
         return active_users
 
     @staticmethod
@@ -444,7 +444,7 @@ class User:
         return users_
 
     @staticmethod
-    def write_following_local(users=[]):
+    def write_following_local(users=None):
         if users is None:
             users = User.get_following()
         if len(users) == 0:
