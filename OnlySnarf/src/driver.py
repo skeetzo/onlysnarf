@@ -680,7 +680,8 @@ class Driver:
                         elif sub and not sub.is_enabled():
                             print("Error: Unable to login via form - captcha")
                     except Exception as e:
-                        print(e)
+                        if "Unable to locate element: [name=\"password\"]" not in str(e):
+                            Settings.dev_print(e)
 
                 try:
                     check_captcha()

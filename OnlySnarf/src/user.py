@@ -213,9 +213,23 @@ class User:
         return active_users
 
     @staticmethod
+    # return following Users
     def get_following():
-        # return following Users
-        return []
+        if Settings.is_prefer_local(): return User.read_following_local()
+        active_users = []
+        users = Driver.following_get()
+        for user in users:
+            try:
+                user = User(user)
+                user = User.skipUserCheck(user)
+                if user is None: continue
+                active_users.append(user)
+            except Exception as e:
+                Settings.dev_print(e)
+        Settings.maybe_print("following: {}".format(len(active_users)))
+        User.write_following_local(users=active_users)
+        Settings.set_prefer_local(True)
+        return active_users
 
     @staticmethod
     def get_user_by_username(username):
@@ -407,6 +421,46 @@ class User:
                 json.dump(data, outfile, indent=4, sort_keys=True)
         except FileNotFoundError:
             print("Error: Missing Local Users")
+        except OSError:
+            print("Error: Missing Local Path")
+
+    @staticmethod
+    def read_following_local():
+        Settings.maybe_print("Getting Local Following")
+        users = []
+        users_ = []
+        try:
+            with open(str(Settings.get_users_path().replace("users.json", "following.json"))) as json_file:  
+                users = json.load(json_file)['users']
+            Settings.maybe_print("Loaded Local Following")
+            for user in users:
+                try:
+                    users_.append(User(json.loads(user)))
+                except Exception as e:
+                    Settings.dev_print(e)
+            return users_
+        except Exception as e:
+            Settings.dev_print(e)
+        return users_
+
+    @staticmethod
+    def write_following_local(users=[])
+        if users is None:
+            users = User.get_following()
+        if len(users) == 0:
+            Settings.maybe_print("Skipping: Local Following Save - No Following")
+            return
+        print("Saving Following Users Locally")
+        Settings.maybe_print("local users path: "+str(Settings.get_users_path().replace("users.json", "following.json")))
+        data = {}
+        data['users'] = []
+        for user in users:
+            data['users'].append(user.toJSON())
+        try:
+            with open(str(Settings.get_users_path().replace("users.json", "following.json")), 'w') as outfile:  
+                json.dump(data, outfile, indent=4, sort_keys=True)
+        except FileNotFoundError:
+            print("Error: Missing Local Following")
         except OSError:
             print("Error: Missing Local Path")
 

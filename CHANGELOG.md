@@ -362,7 +362,10 @@
   **2.17.18**
   - oops; fixed firefox "binary"
 
+
 ----------------------------------------
+  **2.17.19**
+  - following_get, following_write
 
   need to add 'create' to Profile for asking for profile settings when syncing to
   - debugged remote webdriver
