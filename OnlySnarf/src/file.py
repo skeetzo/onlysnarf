@@ -419,7 +419,7 @@ class File():
 
     @staticmethod
     def select_file_upload_method():
-        if str(Settings.get_source()) != "": return Settings.get_source()
+        if str(Settings.get_source()) != "": return []
         if not Settings.prompt("upload files"): return []
         print("Select an upload source")
         sources = Settings.get_source_options()

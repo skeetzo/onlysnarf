@@ -351,24 +351,21 @@
   **2.17.16**
   - herpaderpaderpa
   - fixed more uploading prompts
+  **2.17.17**
+  - debugged firefox
+  - debugged Profile (a bit)
+  - debugged backup content
+  - args: added username_account to differentiate from twitter username for login
+  - args: added source & destination
+  - added remote ssh dir
+  - added: login source [onlyfans|twitter]
 
 ----------------------------------------
 
-  **2.17.17**
-  - debugged firefox
-  - debugged Profile
-  - debugged backup content
-  - args: added username_account to differentiate from twitter username for login
-
-  - args: addedsource & destination
-  - added remote ssh dir
-
-
-need to add 'create' to Profile for asking for profile settings when syncing to
-
+  need to add 'create' to Profile for asking for profile settings when syncing to
+  - debugged remote webdriver
 
 --------------------
-  - debugged remote webdriver
 
   **2.18.0**
   - menu updates

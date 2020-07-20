@@ -566,8 +566,8 @@ class Driver:
 
     @staticmethod
     def go_to_home():
-        auth_ = Driver.auth()
-        if not auth_: return False
+        # auth_ = Driver.auth()
+        # if not auth_: return False
         if str(Driver.BROWSER.current_url) == str(ONLYFANS_HOME_URL):
             Settings.maybe_print("at -> onlyfans.com")
             Driver.BROWSER.execute_script("window.scrollTo(0, 0);")
@@ -640,18 +640,68 @@ class Driver:
                 if str(username) == "" or str(password) == "":
                     print("Error: Missing Login Info")
                     return False
-                Driver.BROWSER.get(ONLYFANS_HOME_URL)
-                Driver.BROWSER.find_element_by_xpath("//input[@name='username']").send_keys(username)
+                Driver.go_to_home()
+                # Driver.BROWSER.find_element_by_xpath("//input[@id='username']").send_keys(username)
+                Settings.dev_print("finding username")
+                Driver.BROWSER.find_element_by_name("email").send_keys(username)
                 Settings.dev_print("username entered")
                 # fill in password and hit the login button 
-                password_ = Driver.BROWSER.find_element_by_xpath("//input[@name='password']")
+                # password_ = Driver.BROWSER.find_element_by_xpath("//input[@id='password']")
+                Settings.dev_print("finding password")
+                password_ = Driver.BROWSER.find_element_by_name("password")
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
+                time.sleep(10) # wait for potential captcha
+
+                # captcha = Driver.BROWSER.find_elements_by_id("recaptcha-anchor")
+                # captcha2 = Driver.BROWSER.find_elements_by_class_name("recaptcha-checkbox")
+                # print(captcha)
+                # print(captcha2)
+
+                def check_captcha():
+                    Settings.dev_print("attempting captcha")
+                    try:
+                        time.sleep(10) # wait extra long to make sure it doesn't verify obnoxiously
+                        el=Driver.BROWSER.find_element_by_name("password")
+                        if not el: return # likely logged in without captcha
+                        action = webdriver.common.action_chains.ActionChains(Driver.BROWSER)
+                        action.move_to_element_with_offset(el, 40, 100)
+                        action.click()
+                        action.perform()
+                        time.sleep(10)
+                        sub = None
+                        submit = Driver.BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-flex.m-lg")
+                        for ele in submit:
+                            if str(ele.get_attribute("innerHTML")) == "Login":
+                                sub = ele
+                        if sub and sub.is_enabled():
+                            submit.click()
+                        elif sub and not sub.is_enabled():
+                            print("Error: Unable to login via form - captcha")
+                    except Exception as e:
+                        print(e)
+
+                try:
+                    check_captcha()
+                    Settings.dev_print("waiting for loginCheck")
+                    WebDriverWait(Driver.BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
+                    print("OnlyFans Login Successful")
+                    return True
+                except TimeoutException as te:
+                    Settings.dev_print(str(te))
+                    print("Login Failure: Timed Out! Please check your OnlyFans credentials.")
+                    print(": If the problem persists, OnlySnarf may require an update.")
+                    return False
+                except Exception as e:
+                    Driver.error_checker(e)
+                    print("Form Login Failure: OnlySnarf may require an update")
+                    return False
                 return True
             except Exception as e:
                 Settings.dev_print("form login failure")
                 Driver.error_checker(e)
+                print(e)
             return False
 
         def via_twitter():
@@ -666,7 +716,7 @@ class Driver:
                 if str(username) == "" or str(password) == "":
                     print("Error: Missing Login Info")
                     return False
-                Driver.BROWSER.get(ONLYFANS_HOME_URL)
+                Driver.go_to_home()
                 # twitter = Driver.BROWSER.find_element_by_xpath(TWITTER_LOGIN3).click()
                 # Settings.dev_print("twitter login clicked")
                 # rememberMe checkbox doesn't actually cause login to be remembered
@@ -678,10 +728,14 @@ class Driver:
                 elements = Driver.BROWSER.find_elements_by_tag_name("a")
                 [elem for elem in elements if '/twitter/auth' in str(elem.get_attribute('href'))][0].click()
                 # twitter = Driver.BROWSER.find_element_by_xpath("//a[@class='g-btn m-rounded m-flex m-lg m-with-icon']").click()    
-                Driver.BROWSER.find_element_by_xpath("//input[@id='username_or_email']").send_keys(username)
+
+
+                # Driver.BROWSER.find_element_by_xpath("//input[@id='username_or_email']").send_keys(username)
+                Driver.BROWSER.find_element_by_name("session[username_or_email]").send_keys(username)
                 Settings.dev_print("username entered")
                 # fill in password and hit the login button 
-                password_ = Driver.BROWSER.find_element_by_xpath("//input[@id='password']")
+                # password_ = Driver.BROWSER.find_element_by_xpath("//input[@id='password']")
+                password_ = Driver.BROWSER.find_element_by_name("session[password]")
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
@@ -694,9 +748,11 @@ class Driver:
                     Settings.dev_print(str(te))
                     print("Login Failure: Timed Out! Please check your Twitter credentials.")
                     print(": If the problem persists, OnlySnarf may require an update.")
+                    return False
                 except Exception as e:
                     Driver.error_checker(e)
-                    print("Login Failure: OnlySnarf may require an update")
+                    print("Twitter Login Failure: OnlySnarf may require an update")
+                    return False
                 return True
             except Exception as e:
                 Settings.dev_print("twitter login failure")
