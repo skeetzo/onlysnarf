@@ -359,6 +359,8 @@
   - args: added source & destination
   - added remote ssh dir
   - added: login source [onlyfans|twitter]
+  **2.17.18**
+  - oops; fixed firefox "binary"
 
 ----------------------------------------
 

@@ -1773,8 +1773,9 @@ class Driver:
                 opts.log.level = "trace"
                 if not Settings.is_show_window():
                     opts.add_argument("--headless")
-                driver = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
+                # driver = webdriver.Firefox(options=opts, log_path='/var/log/onlysnarf/geckodriver.log')
                 # driver = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
+                driver = webdriver.Firefox(options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
                 print("Spawned Browser - Firefox")
                 return driver
             except Exception as e:
