@@ -227,7 +227,7 @@ class User:
             except Exception as e:
                 Settings.dev_print(e)
         Settings.maybe_print("following: {}".format(len(active_users)))
-        # User.write_following_local(users=active_users)
+        User.write_following_local(users=active_users)
         Settings.set_prefer_local_following(True)
         return active_users
 
