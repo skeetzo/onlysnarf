@@ -366,6 +366,8 @@
 ----------------------------------------
   **2.17.19**
   - User: following_get, following_write
+  - remote: updated connection priorities
+  - login: google; needs debugging
 
   need to add 'create' to Profile for asking for profile settings when syncing to
   - debugged remote webdriver

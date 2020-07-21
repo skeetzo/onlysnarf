@@ -225,7 +225,7 @@ parser.add_argument('-limit', type=int, default=1, dest='limit',
 ##
 # -login
 # the method to prefer when logging in
-parser.add_argument('-login', dest='login', default="auto", choices=["auto","onlyfans","twitter"],
+parser.add_argument('-login', dest='login', default="auto", choices=["auto","onlyfans","twitter","google"],
   help='the method of login to prefer')
 ##
 # -months
@@ -253,6 +253,11 @@ parser.add_argument('-notkeyword', dest='notkeyword', default=None,
 # the password for OnlyFans
 parser.add_argument('-password', type=str, dest='password',
   help='the OnlyFans password for login')
+##
+# -password
+# the password for Google
+parser.add_argument('-password-google', type=str, dest='password_google',
+  help='the Google password for login')
 ##
 # -password
 # the password for Twitter
@@ -456,6 +461,11 @@ parser.add_argument('-users-favorite', default=[],
 # the OnlyFans username to use
 parser.add_argument('-username', type=str, default="", dest='username',
   help='the OnlyFans username')
+##
+# -username-google
+# the Google username to use
+parser.add_argument('-username-google', type=str, default="", dest='google_username',
+  help='the Google username for login')
 ##
 # -username-twitter
 # the Twitter username to use

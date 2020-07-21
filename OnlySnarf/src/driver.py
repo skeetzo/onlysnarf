@@ -17,6 +17,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.remote.file_detector import LocalFileDetector
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -627,6 +628,23 @@ class Driver:
     @staticmethod
     def login():
         print('Logging into OnlyFans')
+
+        def login_check():
+            try:
+                Settings.dev_print("waiting for loginCheck")
+                WebDriverWait(Driver.BROWSER, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
+                print("OnlyFans Login Successful")
+                return True
+            except TimeoutException as te:
+                Settings.dev_print(str(te))
+                print("Login Failure: Timed Out! Please check your Google credentials.")
+                print(": If the problem persists, OnlySnarf may require an update.")
+                return False
+            except Exception as e:
+                Driver.error_checker(e)
+                print("Google Login Failure: OnlySnarf may require an update")
+                return False
+            return True
         
         def via_form():
             try:
@@ -638,7 +656,7 @@ class Driver:
                 if not password or password == "":
                     password = Settings.prompt_password()
                 if str(username) == "" or str(password) == "":
-                    print("Error: Missing Login Info")
+                    print("Error: Missing OnlyFans Login Info")
                     return False
                 Driver.go_to_home()
                 # Driver.BROWSER.find_element_by_xpath("//input[@id='username']").send_keys(username)
@@ -683,26 +701,62 @@ class Driver:
                         if "Unable to locate element: [name=\"password\"]" not in str(e):
                             Settings.dev_print(e)
 
-                try:
-                    check_captcha()
-                    Settings.dev_print("waiting for loginCheck")
-                    WebDriverWait(Driver.BROWSER, 60, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
-                    print("OnlyFans Login Successful")
-                    return True
-                except TimeoutException as te:
-                    Settings.dev_print(str(te))
-                    print("Login Failure: Timed Out! Please check your OnlyFans credentials.")
-                    print(": If the problem persists, OnlySnarf may require an update.")
-                    return False
-                except Exception as e:
-                    Driver.error_checker(e)
-                    print("Form Login Failure: OnlySnarf may require an update")
-                    return False
-                return True
+                check_captcha()
+                return login_check()
             except Exception as e:
                 Settings.dev_print("form login failure")
                 Driver.error_checker(e)
                 print(e)
+            return False
+
+        def via_google():
+            try:
+                Settings.maybe_print("logging in via google")
+                username = str(Settings.get_username_google())
+                password = str(Settings.get_password_google())
+                if not username or username == "":
+                    username = Settings.prompt_username_google()
+                if not password or password == "":
+                    password = Settings.prompt_password_google()
+                if str(username) == "" or str(password) == "":
+                    print("Error: Missing Google Login Info")
+                    return False
+                Driver.go_to_home()
+                # twitter = Driver.BROWSER.find_element_by_xpath(TWITTER_LOGIN3).click()
+                # Settings.dev_print("twitter login clicked")
+                # rememberMe checkbox doesn't actually cause login to be remembered
+                # rememberMe = Driver.BROWSER.find_element_by_xpath(REMEMBERME_CHECKBOX_XPATH)
+                # if not rememberMe.is_selected():
+                    # rememberMe.click()
+                # if str(Settings.MANUAL) == "True":
+                    # print("Please Login")
+                elements = Driver.BROWSER.find_elements_by_tag_name("a")
+                [elem for elem in elements if '/auth/google' in str(elem.get_attribute('href'))][0].click()
+                # twitter = Driver.BROWSER.find_element_by_xpath("//a[@class='g-btn m-rounded m-flex m-lg m-with-icon']").click()    
+
+                time.sleep(5)
+                # find part on page with connected user email
+                # Settings.get_email()
+                usernames = Driver.BROWSER.find_elements_by_xpath("//*[contains(text(), '{}')]".format(Settings.get_email()))
+                # 2nd mention should be correct place
+                if len(usernames) == 0:
+                    print("Error: Missing Google Usernames")
+                    return False
+                username = usernames[1]
+                # Driver.BROWSER.find("session[username_or_email]").send_keys(username)
+                # then click username spot
+                username.click()
+                Settings.dev_print("username clicked")
+                # fill in password and hit the login button 
+                # password_ = Driver.BROWSER.find_element_by_xpath("//input[@id='password']")
+                password_ = Driver.BROWSER.find_element_by_name("session[password]")
+                password_.send_keys(password)
+                Settings.dev_print("password entered")
+                password_.send_keys(Keys.ENTER)
+                return login_check()
+            except Exception as e:
+                Settings.dev_print("google login failure")
+                Driver.error_checker(e)
             return False
 
         def via_twitter():
@@ -715,7 +769,7 @@ class Driver:
                 if not password or password == "":
                     password = Settings.prompt_password_twitter()
                 if str(username) == "" or str(password) == "":
-                    print("Error: Missing Login Info")
+                    print("Error: Missing Twitter Login Info")
                     return False
                 Driver.go_to_home()
                 # twitter = Driver.BROWSER.find_element_by_xpath(TWITTER_LOGIN3).click()
@@ -740,21 +794,7 @@ class Driver:
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
-                try:
-                    Settings.dev_print("waiting for loginCheck")
-                    WebDriverWait(Driver.BROWSER, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
-                    print("OnlyFans Login Successful")
-                    return True
-                except TimeoutException as te:
-                    Settings.dev_print(str(te))
-                    print("Login Failure: Timed Out! Please check your Twitter credentials.")
-                    print(": If the problem persists, OnlySnarf may require an update.")
-                    return False
-                except Exception as e:
-                    Driver.error_checker(e)
-                    print("Twitter Login Failure: OnlySnarf may require an update")
-                    return False
-                return True
+                return login_check()
             except Exception as e:
                 Settings.dev_print("twitter login failure")
                 Driver.error_checker(e)
@@ -769,6 +809,8 @@ class Driver:
                 successful = via_form()
             elif Settings.get_login_method() == "twitter":
                 successful = via_twitter()
+            elif Settings.get_login_method() == "google":
+                successful = via_google()
             if not successful:
                 print("OnlyFans Login Failed")
             return successful
@@ -1785,24 +1827,41 @@ class Driver:
                 return False
 
         def remote():
+            def attempt_firefox():
+                try:
+                    firefox_options = webdriver.FirefoxOptions()
+                    dC = DesiredCapabilities.FIREFOX
+                    driver = webdriver.Remote(
+                       command_executor=link,
+                       desired_capabilities=dC,
+                       options=firefox_options)
+                    return driver
+                except Exception as e:
+                    Settings.dev_print(e)
+            def attempt_chrome():
+                try:
+                    chrome_options = webdriver.ChromeOptions()
+                    dC = DesiredCapabilities.CHROME
+                    driver = webdriver.Remote(
+                       command_executor=link,
+                       desired_capabilities=dC,
+                       options=chrome_options)
+                    return driver
+                except Exception as e:
+                    Settings.dev_print(e)
             try:
-
                 host = Settings.get_remote_browser_host()
                 port = Settings.get_remote_browser_port()
                 link = 'http://{}:{}/wd/hub'.format(host, port)
-
-                driver = webdriver.Remote(
-                   command_executor=link,
-                   desired_capabilities=DesiredCapabilities.CHROME)
-
-                # driver = webdriver.Remote(
-                #    command_executor=link,
-                #    desired_capabilities=DesiredCapabilities.FIREFOX)
-
-                return driver
+                successful = attempt_firefox()
+                if not successful or successful == None:
+                    successful = attempt_chrome()
+                if not successful or successful == None:
+                    print("Error; Unable to connect remotely")
+                return successful
             except:
                 Settings.maybe_print(e)
-                print("Warning: Unable to connect remotely")
+                print("Error: Unable to connect remotely")
                 return False
 
         BROWSER_TYPE = Settings.get_browser_type()
@@ -1828,6 +1887,7 @@ class Driver:
 
         driver.implicitly_wait(30) # seconds
         driver.set_page_load_timeout(1200)
+        driver.file_detector = LocalFileDetector()
         print("Browser Spawned")
         Driver.BROWSER = driver
         return True

@@ -218,6 +218,9 @@ class Settings:
     def get_password():
         return config["PASSWORD"] or ""
 
+    def get_password_google():
+        return config["PASSWORD_GOOGLE"] or ""
+
     def get_password_twitter():
         return config["PASSWORD_TWITTER"] or ""
 
@@ -354,6 +357,9 @@ class Settings:
 
     def get_username():
         return config["USERNAME"] or ""
+
+    def get_username_google():
+        return config["USERNAME_GOOGLE"] or ""
 
     def get_username_twitter():
         return config["USERNAME_TWITTER"] or ""
@@ -492,6 +498,26 @@ class Settings:
         Settings.set_password(pw)
         return pw
 
+    def prompt_username_google():
+        question = {
+            'type': 'input',
+            'message': 'Google username:',
+            'name': 'username'
+        }
+        username = PyInquirer.prompt(question)["username"]
+        Settings.set_username_google(username)
+        return username
+
+    def prompt_password_google():
+        question = {
+            'type': 'password',
+            'message': 'Google password:',
+            'name': 'password'
+        }
+        pw = PyInquirer.prompt(question)["password"]
+        Settings.set_password_google(pw)
+        return pw
+
     def prompt_username_twitter():
         question = {
             'type': 'input',
@@ -545,6 +571,9 @@ class Settings:
 
     def set_username_twitter(username):
         config["USERNAME_TWITTER"] = str(username)
+
+    def set_password_google(password):
+        config["PASSWORD_GOOGLE"] = str(password)
 
     def set_password_twitter(password):
         config["PASSWORD_TWITTER"] = str(password)
