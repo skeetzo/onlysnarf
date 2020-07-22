@@ -225,6 +225,21 @@ class File():
             Settings.dev_print(e)
 
     @staticmethod
+    def get_files():
+        if File.FILES: return File.FILES
+        category = Settings.get_category()
+        if not category: category = Settings.select_category()
+        if not category: Settings.dev_print("Warning: Missing Category")
+        files = File.get_files_by_category(category)
+        if Settings.get_title():
+            for file in files:
+                if str(Settings.get_title()) == str(file.get_title()):
+                    files = [file]
+                    break
+        File.FILES = files
+        return files
+
+    @staticmethod
     def get_files_by_folder(path):
         f = []
         for (dirpath, dirnames, filenames) in walk(path):
@@ -261,6 +276,10 @@ class File():
                 Settings.dev_print("{}".format(folder.get_title()))
             folders_.append(folder)
         return folders_
+
+    @staticmethod
+    def get_random_file():
+        return random.choice(Google_File.get_files())
 
     @staticmethod
     def get_images_of_folder(folder):

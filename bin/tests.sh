@@ -22,9 +22,11 @@ echo "Testing OnlySnarf"
 show=""
 show="-show"
 
-verbose="blank"
-verbose="verbose -verbose -verbose"
+verbose=""
 verbose="-verbose -verbose"
+verbose="-verbose -verbose -verbose"
+
+source="google"
 
 declare -a testing
 # testing=("schedule")
@@ -41,7 +43,7 @@ echo "##################################################" >> /var/log/onlysnarf/
 function testes() {
 	# echo "Running: "$test
 
-	bin/tests/$test.sh $show $verbose
+	bin/tests/$test.sh $show $source $verbose
 	# bin/tests/$test.sh $show $verbose >> /var/log/onlysnarf/tests.txt
 
 	echo "##################################################" >> /var/log/onlysnarf/tests.txt 2>&1

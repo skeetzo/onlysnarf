@@ -9,5 +9,6 @@ onlysnarfpy \
 -amount 40 \
 -months 3 \
 -prefer-local \
+-source "$2" \
 "$1" \
-"$2"
+"$3"

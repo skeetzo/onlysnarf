@@ -783,8 +783,6 @@ class Driver:
                 elements = Driver.BROWSER.find_elements_by_tag_name("a")
                 [elem for elem in elements if '/twitter/auth' in str(elem.get_attribute('href'))][0].click()
                 # twitter = Driver.BROWSER.find_element_by_xpath("//a[@class='g-btn m-rounded m-flex m-lg m-with-icon']").click()    
-
-
                 # Driver.BROWSER.find_element_by_xpath("//input[@id='username_or_email']").send_keys(username)
                 Driver.BROWSER.find_element_by_name("session[username_or_email]").send_keys(username)
                 Settings.dev_print("username entered")
@@ -805,6 +803,8 @@ class Driver:
                 successful = via_form()
                 if not successful:
                     successful = via_twitter()
+                if not successful:
+                    successful = via_google()
             elif Settings.get_login_method() == "onlyfans":
                 successful = via_form()
             elif Settings.get_login_method() == "twitter":
@@ -1863,6 +1863,24 @@ class Driver:
                 Settings.maybe_print(e)
                 print("Error: Unable to connect remotely")
                 return False
+
+        def attempt_reconnect(id, url):
+            if Settings.get_reconnect_id() and Settings.get_reconnect_url():
+                driver = webdriver.Remote(command_executor=Settings.get_reconnect_url(),desired_capabilities={})
+                driver.close()   # this prevents the dummy browser
+                driver.session_id = session_id
+                return driver
+            else:
+                return None
+
+        driver = attempt_reconnect()
+        if driver: 
+            driver.implicitly_wait(30) # seconds
+            driver.set_page_load_timeout(1200)
+            driver.file_detector = LocalFileDetector()
+            print("Browser Spawned")
+            Driver.BROWSER = driver
+            return True
 
         BROWSER_TYPE = Settings.get_browser_type()
 

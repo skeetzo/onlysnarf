@@ -259,6 +259,12 @@ class Settings:
             "remote"
         ]
 
+    def get_reconnect_id():
+        return config["SESSION_ID"] or ""
+
+    def get_reconnect_url():
+        return config["SESSION_URL"] or ""
+
     def get_remote_host():
         return config["REMOTE_HOST"] or ""
 

@@ -13,8 +13,9 @@ onlysnarfpy \
 -question "some toast" \
 -question "a nice sandwich" \
 -debug-delay \
+-source "$2" \
 "$1" \
-"$2"
+"$3"
 
 echo "[*] Misc - Poll 2"
 onlysnarfpy \
@@ -30,5 +31,6 @@ onlysnarfpy \
 -question "a nice sandwich4" \
 -question "a nice sandwich5" \
 -debug-delay \
+-source "$2" \
 "$1" \
-"$2"
+"$3"

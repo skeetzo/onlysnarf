@@ -361,55 +361,61 @@
   - added: login source [onlyfans|twitter]
   **2.17.18**
   - oops; fixed firefox "binary"
+  **2.17.19**
+  - User: following_get, following_write (still needs debugging)
+  - remote: updated connection priorities; auto -> form -> twitter -> google
+  - login: google; needs debugging
 
 
 ----------------------------------------
-  **2.17.19**
-  - User: following_get, following_write
-  - remote: updated connection priorities
-  - login: google; needs debugging
+
+  - debugged: following_write
+  - debugged: login: google
+
 
   need to add 'create' to Profile for asking for profile settings when syncing to
   - debugged remote webdriver
 
+
+  - need a way for Discount to select users that are "Renew On"; click "Renew On" and get selected users? or grab from users w/ similar matching criteria?
+  -- what the fuck did I mean here???
 --------------------
+  - added: session_id, session_url for reconnecting to existing browser sessions
+  -> session_id, session_url requires debugging
 
   **2.18.0**
   - menu updates
   - profile / settings updates
   - updated profile: sync from, sync to, backup
-  
-
-  - need a way for Discount to select users that are "Renew On"; click "Renew On" and get selected users? or grab from users w/ similar matching criteria?
+  - updated login methods
 
   **2.17.x**
-  - debug discount
-  - debug promotion
+  - properly debug discount
+  - properly debug promotions
 
   **2.*.**
-  - tested: settings get
-  - tested: settings set
-  - Settings options functional
+  - properly tested: settings get
+  - properly tested: settings set
   **2.*.**
+  - Settings options "functional"
   - added: Settings options
 
 ----------------------------------------
 
 ## ToDo
-  - properly remove empty folders that all images have been removed from when backing up / moving files
-  - functionality to scan profiles to estimate their posts-to-fan income ratios
+  
 
 ### Low Priority
+  -> Cron
+  - bot functionality that checks user messages for bot commands
+  - ability to download images to upload / send later
+  --
   - add: read messages html for emojis
   - update: backup function to include original folder name -> posted/galleries/$file
   - [MESSAGES] layout in config for preset message formats
   - bot functionality to check posts for quiz answers
   - fix literally everything
-
-### Medium Priority
-
-  -> Promotions
-  - add email|Twitter functionality for sending trial link; add clipboard function to copy link
+  - automatically heart / send <3 hearts to random tips in messages / campaign contributions
 
   -> Scenes - FIX
   - update: data.txt for scenes with trailer
@@ -422,11 +428,16 @@
   - prepare: a scene for release
   |_ requires: scene cron feature
 
-### High Priority  
+  -> Promotions
+  - add email|Twitter functionality for sending trial link; add clipboard function to copy link
 
-  -> Cron
-  - bot functionality that checks user messages for bot commands
-  - ability to download images to upload / send later
+  - functionality to scan profiles to estimate their posts-to-fan income ratios
+
+### Medium Priority
+
+
+### High Priority  
+  - properly remove empty folders that all images have been removed from when backing up / moving files
 
   -> Twitter
   - tweet reminders
@@ -453,13 +464,5 @@ https://onlyfans.com/?ref=409408
 
 
 
-- unsure if window is closed after menu calls message.post/send
-- when not show-window the window should remain open in the background between menu uses
-- add seperators in google file selection w/ folder names
 
 
-
-
-
-
-automatically heart / send <3 hearts to random tips in messages / campaign contributions

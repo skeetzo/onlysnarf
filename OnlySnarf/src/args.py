@@ -169,6 +169,11 @@ parser.add_argument('-debug-delay', action='store_true', dest='debug_delay',
 parser.add_argument('-delete-google', action='store_true', dest='delete_google',
   help='delete file instead of backing up')
 ##
+# -destination
+# the destination to use when backing up content
+parser.add_argument('-destination', dest='destination', default="local", choices=["google","dropbox","remote","local"],
+  help='file backup location')
+##
 # -discount
 # create a format validator for discount where its "[amount]:[duration]"
 # parser.add_argument('-discount', metavar='discount', type=valid_discount, default=None,
@@ -289,7 +294,7 @@ parser.add_argument('-drive-path', dest="drive_path", type=str,
 # -config-path
 # the path to the config.conf file
 parser.add_argument('-config-path', dest="config_path", type=str, 
-  help='the path to list', default=CONFIG_PATH)
+  help='the path to the config.conf', default=CONFIG_PATH)
 # -google-path
 # the path to the google_creds.txt
 parser.add_argument('-google-creds', dest="google_path", type=str, 
@@ -305,27 +310,6 @@ parser.add_argument('-users-path', type=str, dest='users_path',
 # the path to the profile.json file
 parser.add_argument('-profile-path', type=str, dest='profile_path',
   help='the path to cache profile locally', default=PROFILE_PATH)
-
-
-
-
-##
-# -source
-# the source to use when searching for content
-parser.add_argument('-source', dest='source', default="local", choices=["google","dropbox","remote","local"],
-  help='file host location')
-
-##
-# -destination
-# the destination to use when backing up content
-parser.add_argument('-destination', dest='destination', default="local", choices=["google","dropbox","remote","local"],
-  help='file backup location')
-
-
-
-
-
-
 ##
 # -remote-host
 # the remote host to connect to
@@ -390,6 +374,13 @@ parser.add_argument('-save-users', action='store_true', dest='save_users',
 parser.add_argument('-schedule', type=valid_schedule, default=None, dest='schedule',
   help='the schedule (MM-DD-YYYY:HH:MM)')
 ##
+# -session-id
+parser.add_argument('-session-id', default=None, dest='session_id',
+  help='the session id to use')
+# -session-url
+parser.add_argument('-session-url', default=None, dest='session_url',
+  help='the session url to use')
+##
 # -skip-download
 parser.add_argument('-skip-download', action='store_true', dest='skip_download',
   help='skip file downloads')
@@ -407,6 +398,11 @@ parser.add_argument('-skip-users', dest='skipped_users',
 # shows window
 parser.add_argument('-show','-show-window', dest='show', action='store_true', 
   help='enable displaying the browser window')
+##
+# -source
+# the source to use when searching for content
+parser.add_argument('-source', dest='source', default="local", choices=["google","dropbox","remote","local"],
+  help='file host location')
 ##
 # -tags
 # @[tag]

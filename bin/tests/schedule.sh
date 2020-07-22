@@ -10,8 +10,9 @@ onlysnarfpy \
 -text "schedule testes" \
 -schedule "6-7-2020:6:26" \
 -debug-delay \
+-source "$2" \
 "$1" \
-"$2"
+"$3"
 
 echo "[*] Misc - Schedule (Date & Time)"
 onlysnarfpy \
@@ -23,8 +24,9 @@ onlysnarfpy \
 -date "6-7-2020" \
 -time "6:26" \
 -debug-delay \
+-source "$2" \
 "$1" \
-"$2"
+"$3"
 
 echo "[*] Misc - Schedule (Date)"
 onlysnarfpy \
@@ -35,5 +37,6 @@ onlysnarfpy \
 -text "schedule testes" \
 -date "6-7-2020" \
 -debug-delay \
+-source "$2" \
 "$1" \
-"$2"
+"$3"

@@ -10,8 +10,9 @@ onlysnarfpy \
 -price "4.00" \
 -prefer-local \
 -recent-users-count 1 \
+-source "$2" \
 "$1" \
-"$2"
+"$3"
 
 echo "[*] Message - Recent & Gallery"
 onlysnarfpy \
@@ -24,8 +25,9 @@ onlysnarfpy \
 -price "6.00" \
 -prefer-local \
 -recent-users-count 1 \
+-source "$2" \
 "$1" \
-"$2"
+"$3"
 
 echo "[*] Message - All & Video"
 onlysnarfpy \
@@ -37,5 +39,6 @@ onlysnarfpy \
 -text "message testes" \
 -price "10.00" \
 -prefer-local \
+-source "$2" \
 "$1" \
-"$2"
+"$3"
