@@ -366,7 +366,6 @@
   - remote: updated connection priorities; auto -> form -> twitter -> google
   - login: google; needs debugging
 
-
 ----------------------------------------
 
   - debugged: following_write
