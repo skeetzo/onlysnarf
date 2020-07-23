@@ -365,6 +365,8 @@
   - User: following_get, following_write (still needs debugging)
   - remote: updated connection priorities; auto -> form -> twitter -> google
   - login: google; needs debugging
+  **2.17.20**
+  - oops, disabled auto_reconnect until debugging
 
 ----------------------------------------
 
