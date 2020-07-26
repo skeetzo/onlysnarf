@@ -46,8 +46,6 @@ class Menu:
             'choices': [str(option).title() for option in options],
             'filter': lambda val: str(val).lower()
         }
-        if str(Settings.is_debug()) == "True":
-            menu_prompt["choices"].append("Promotion")
         menu_prompt["choices"].sort()
         answers = prompt(menu_prompt)
         return answers['action']

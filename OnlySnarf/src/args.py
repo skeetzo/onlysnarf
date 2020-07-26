@@ -2,11 +2,7 @@ import argparse, os, re
 from datetime import datetime
 from .validators import valid_action, valid_amount, valid_date, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
 
-ACTIONS = ['discount','post','message','backup',
-  # 'promotion',
-  'profile',
-  'test'
-]
+ACTIONS = ['discount','post','message']
 
 CATEGORIES_DEFAULT = [
   "images",
@@ -509,11 +505,14 @@ parser.add_argument('-version', action='version')
 ############################################################################################
 
 args = vars(parser.parse_args())
+if args["debug"]: ACTIONS.append("promotion")
+if args["debug"]: ACTIONS.append("test")
 # print(args)
 CONFIG = {}
 for key in args:
   CONFIG[key.upper()] = args.get(key)
 CONFIG = read_config(CONFIG)
+
 
 #############
 # Debugging #

@@ -11,7 +11,7 @@ echo "################## Start #########################" >> ../onlysnarf/logs/t
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
 
-# onlysnarf -debug -verbose -verbose -verbose -browser firefox -prefer-local -remote-host 192.168.1.66 -login onlyfans
+onlysnarf -debug -verbose -verbose -verbose -browser firefox -prefer-local -remote-host 192.168.1.66 -login onlyfans
 
 # onlysnarfpy -action test -debug -verbose -verbose -verbose
 
@@ -19,7 +19,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 # video
 # onlysnarfpy -category video -notkeyword stroke -verbose -verbose -debug -browser firefox
-onlysnarfpy -category gallery -source google -notkeyword stroke -verbose -verbose -verbose -debug -browser firefox -login onlyfans -show
+# onlysnarfpy -category gallery -source google -notkeyword stroke -verbose -verbose -verbose -debug -browser firefox -login onlyfans -show
 
 # post request
 # sudo onlysnarfpy -show -debug -verbose -verbose -verbose -action post -text "Weekly Requests Post                                                                                                            Comment below what you'd like to see more of! 8=======D~~ O:"
