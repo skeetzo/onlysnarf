@@ -4,7 +4,7 @@ Hi all, I'm Skeetzo / Alex D.
 
 I've been working on OnlySnarf for ~2 years now and I guess a write up is pretty overdue.
 -
-OnlySnarf is an automation tool written in Python (3). I personally use it every week (that it works) to upload content to my OnlyFans account, [alexdicksdown](https://onlyfans.com/alexdicksdown). Well at least every week that I it is in a working state as it has required constant maintenance to ensure scraping accuracy as well as adding features that OnlyFans provides or hasn't provided as-of-yet. 
+OnlySnarf is an automation tool written in Python (3). I personally use it every week (that it works) to upload content to my OnlyFans account, [alexdicksdown](https://onlyfans.com/alexdicksdown). Well at least every week that it is in a working state as it has required constant maintenance to ensure scraping accuracy as well as adding features that OnlyFans provides or hasn't provided as-of-yet. 
 
 The aim of this tool is to provide a means for me to easily provide content to my fans.
 
@@ -18,10 +18,13 @@ Though I am in doubt it will work at all, the Google auth requires more debuggin
 
 ## Content
 
-I initially coded this tool to upload content from my Google Drive account. I setup my folders and the tool theresuch to find them so that I could organize my photos/videos in the the basic categories of: images, galleries, videos. This is a reflection of the purpose the content will be expressed with in OnlyFans- as images, galleries, and video uploads. It is rarer that the images folder is used, though it exists to specifically upload single images as messages to users more than as single file uploads. Galleries are the most common uploads to exist as content with videos being a likely close second.
+I initially coded this tool to upload content from my Google Drive account. I setup my folders to organize my uploads in a basic layout of: images, galleries, videos. This is a reflection of the purpose the content will be expressed with in OnlyFans- as images, galleries, and video uploads. It is rarer that the images folder is used, though it exists to specifically upload single images as messages to users more than as single file uploads. Galleries are the most common uploads to exist as content with videos being a likely close second.
 
-All 'sources' which is how the tool recognizes locations to search for files [Google, Local, Dropbox, Remote], should follow the set out layout as described to properly utilize the way the OnlySnarf tool searches for files. However, it wouldn't be impossible to sort/search for files however you wish and simply utilize OnlySnarf to upload those files afterwards by specifying their input locations. So while this method works best for me, I hope it can work at all for others.
+I've since begun adding methods to upload / host content in other locations such as a remote server or Dropbox.
 
+## Menu
 
+The menu system via `onlysnarf` exists to provide a means for selecting content for upload without the burden of logging in, uploading the files and text, and closing the browser hours later when its finished. 
 
-## Goals
+## Script
+I typically skip the menu system via `onlysnarfpy` to run the package as an unprompted script. This was extremely useful for me when I was suffering from incredibly slow upload speeds and didn't want to wait around to hit the post button hours later.

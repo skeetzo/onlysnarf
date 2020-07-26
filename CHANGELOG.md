@@ -367,6 +367,8 @@
   - login: google; needs debugging
   **2.17.20**
   - oops, disabled auto_reconnect until debugging
+  **2.17.21**
+  - minor fixes to menu
 
 ----------------------------------------
 
@@ -390,14 +392,14 @@
   - updated profile: sync from, sync to, backup
   - updated login methods
 
-  **2.17.x**
+  **2.x.x**
   - properly debug discount
   - properly debug promotions
-
-  **2.*.**
+  **2.x.x**
   - properly tested: settings get
   - properly tested: settings set
-  **2.*.**
+  
+  **3.x.x**
   - Settings options "functional"
   - added: Settings options
 

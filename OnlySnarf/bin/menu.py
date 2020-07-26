@@ -1,10 +1,5 @@
 #!/usr/bin/python3
-# 3/28/2019 Skeetzo
-# OnlySnarf.py menu system
-
-### doesn't work:
-# upload & backup (requires upload via local added to main script)
-# settings menu -> "Incorrect Index"
+# Snarf.py menu system
 import time
 import random
 import os
@@ -15,14 +10,13 @@ import sys
 import pathlib
 from PyInquirer import prompt
 ##
-from OnlySnarf.src.colorize import colorize
 # from OnlySnarf.src.cron import Cron
+from OnlySnarf.src.colorize import colorize
 from OnlySnarf.src.classes import Discount, Promotion
 from OnlySnarf.src.message import Message
 from OnlySnarf.src.profile import Profile
-from OnlySnarf.src import google as Google
-# from OnlySnarf.src.promotion import Promotion
 from OnlySnarf.src.settings import Settings
+from OnlySnarf.src import google as Google
 from OnlySnarf.src import args
 
 #####################

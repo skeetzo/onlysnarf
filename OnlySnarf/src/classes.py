@@ -2,7 +2,7 @@ from datetime import datetime
 from .driver import Driver
 from .settings import Settings
 from .user import User
-import PyInquirer
+from PyInquirer import prompt
 from .validators import AmountValidator, MonthValidator, LimitValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, ExpirationValidator, ListValidator
 
 class Discount:
@@ -60,7 +60,7 @@ class Discount:
             'validate': AmountValidator,
             'filter': lambda val: int(myround(int(val)))
         }
-        answers = PyInquirer.prompt(question)
+        answers = prompt(question)
         amount = answers["amount"]
         if not Settings.confirm(amount): return self.get_amount()
         self.amount = amount
@@ -78,7 +78,7 @@ class Discount:
             'validate': MonthValidator,
             'filter': lambda val: int(val)
         }
-        answers = PyInquirer.prompt(question)
+        answers = prompt(question)
         months = answers["months"]
         if not Settings.confirm(months): return self.get_months()
         self.months = months
@@ -128,7 +128,7 @@ class Poll:
                 'name': 'question',
                 'message': 'Question:',
             }
-            answers = PyInquirer.prompt(question)
+            answers = prompt(question)
             question = answers["question"]
             if str(question) == "": break
             questions.append(question)
@@ -147,7 +147,7 @@ class Poll:
             'message': 'Duration [1, 3, 7, 99 (\'No Limit\')]',
             'validate': DurationValidator
         }
-        answers = PyInquirer.prompt(question)
+        answers = prompt(question)
         duration = answers["duration"]
         if not Settings.confirm(duration): return self.get_duration()
         self.duration = duration
@@ -210,7 +210,7 @@ class Promotion:
             'message': 'Expiration [1, 3, 7, 99 (\'No Limit\')]',
             'validate': ExpirationValidator
         }
-        answers = PyInquirer.prompt(question)
+        answers = prompt(question)
         expiration = answers["expiration"]
         if not Settings.confirm(expiration): return self.get_expiration()
         self.expiration = expiration
@@ -227,7 +227,7 @@ class Promotion:
             'message': 'Expiration [1, 3, 7, 99 (\'No Limit\')]',
             'validate': LimitValidator
         }
-        answers = PyInquirer.prompt(question)
+        answers = prompt(question)
         limit = answers["limit"]
         if not Settings.confirm(limit): return self.get_limit()
         self.limit = limit
@@ -243,7 +243,7 @@ class Promotion:
             'name': 'message',
             'message': 'Message:'
         }
-        answers = PyInquirer.prompt(question)
+        answers = prompt(question)
         message = answers["message"]
         if not Settings.confirm(message): return self.get_text()
         self.message = message
@@ -260,7 +260,7 @@ class Promotion:
             'message': 'Duration [1, 3, 7, 99 (\'No Limit\')]',
             'validate': DurationValidator
         }
-        answers = PyInquirer.prompt(question)
+        answers = prompt(question)
         duration = answers["duration"]
         if not Settings.confirm(duration): return self.get_duration()
         self.duration = duration
@@ -346,7 +346,7 @@ class Schedule:
             'message': 'Enter a date (MM-DD-YYYY):',
             'validate': DateValidator
         }
-        answers = PyInquirer.prompt(question)
+        answers = prompt(question)
         date = answers["date"]
         if not Settings.confirm(date): return self.get_date()
         self.date = date
@@ -368,7 +368,7 @@ class Schedule:
             'message': 'Enter a time (HH:MM):',
             'validate': TimeValidator
         }
-        answers = PyInquirer.prompt(question)
+        answers = prompt(question)
         time = answers["time"]
         if not Settings.confirm(time): return self.get_time()
         self.time = time

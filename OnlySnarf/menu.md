@@ -1,6 +1,8 @@
 # Menu
 
-## Actions
+`onlysnarf *args`
+
+## Action
 
 ### Discount
 user: all | recent | new | select | username   
@@ -16,6 +18,7 @@ price ($): "0.00"
 Message [all, recent, new, username] users $message with $image for $price.
 
 ### Post
+category: **image** | **gallery** | **video** | **performer**  
 text: ""  
 schedule: "mm/dd/YYYY:HH:MM"  
 date: "mm/dd/YYYY"  
@@ -23,6 +26,10 @@ time: "HH:MM"
 questions: "your mom", "is very hot", "today"  
 duration (poll): 1, 3, 7, 99 or "No limit"  
 expires: 1, 3, 7, 99 or "No limit"  
+keywords: key, words -> #key #words  
+performers: performerName1, performerName2 -> w/ @performerName1 @performerName2  
+
+Upload $category of content from $source as a post with $text, $keywords, and tagged $performers.
   
 ### User
 **All**: all users  
@@ -31,16 +38,22 @@ expires: 1, 3, 7, 99 or "No limit"
 **Select**: selects User from list  
 **Username**: enter User by username  
 
-### Upload
-type: **image** | **gallery** | **video** | **performer**  
-text: ""  
-method: "random" | "input" | "choose"  
-keywords: key, words -> #key #words  
-performers: performerName1, performerName2 -> @performerName1 @performerName2  
 
-Upload $type of content by $method as post with $text and tag $performer. Adds hashtagged $keywords.
+## Profile
+
+### Backup
+**Content**: Downloads all posted content
+**Messages**: Downloads (roughly) all messaged content
+**Content & Messages**: both of above
+
+### Sync From
+Gets / reads settings from OnlyFans profile and saves locally.
+### Sync To
+Updates / writes settings to OnlyFans profile from local save.
 
 ## args
+OnlySnarf can be run as a promptless script via:
+`onlysnarfpy *args`
 
 -action [discount|message|post|promotion]
   `onlysnarfpy -action message -text 'hello fans' '/path/to/fileOrDirector'`  
@@ -51,19 +64,19 @@ Backup content to Google Drive via upload or moving original file
 
 -category image  
   `onlysnarfpy -category image`  
-Uploads a random image labeled: 'imageName - %d%m%y'  
+Uploads a random image labeled: 'fileName'  
 
 -category gallery  
   `onlysnarfpy -category gallery`  
-Uploads a random gallery labeled: 'folderName - %d%m%y'  
+Uploads a random gallery labeled: 'folderName'  
 
 -category video  
   `onlysnarfpy -category video`  
-Uploads a random video labeled: 'folderName - %d%m%y'  
+Uploads a random video labeled: 'fileName'  
 
 -text  
   `onlysnarfpy -category video -text "your mom"`  
-Uploads a random video labeled: 'your mom - %d%m%y'  
+Uploads a random video labeled: 'your mom'  
 
 -tweeting
   `onlysnarfpy -tweeting -action post -text 'hi mom'`  
@@ -71,15 +84,27 @@ Enables tweeting upon posting
 
 -username
   `onlysnarfpy -username 'beepbeep'`  
-Twitter username for login
+OnlyFans username for login
 
 -password
   `onlysnarfpy -username 'usetheconfigfile' -password 'beepitybeep'`  
+OnlyFans password for login
+
+-username_twitter
+  `onlysnarfpy -username_twitter 'beepbeep'`  
+Twitter username for login
+
+-password_twitter
+  `onlysnarfpy -username_twitter 'usetheconfigfile' -password_twitter 'beepitybeep'`  
 Twitter password for login
 
 -reduce
   `onlysnarfpy -reduce /path/to/mp4file`  
 Reduce mp4s before uploading
+
+-source [local, google]
+  `onlysnarfpy -source google -category image`
+Uses the provided source to search for files.
 
 /path/to/fileOrDirectory
   `onlysnarfpy /path/to/fileOrDirectory`  
@@ -112,4 +137,4 @@ Shows additional log output (up to 3)
 Prints the version
 
 Complete Debugging:
-  `onlysnarfpy -debug -verbose -verboser -verbosest -show -debug-delay`
+  `onlysnarfpy -debug -verbose -verbose -verbose -show -debug-delay`

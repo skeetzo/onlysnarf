@@ -20,12 +20,11 @@ class Profile:
     # Backup
 
     def ask_backup():
-        options = ["back"]
         menu_prompt = {
             'type': 'list',
             'name': 'action',
             'message': 'Please select a backup action:',
-            'choices': ['All', 'Content', 'Messages', 'Content & Messages', 'Profile'],
+            'choices': ['Back', 'Content', 'Messages', 'Content & Messages'],
             'filter': lambda val: str(val).lower()
         }
         answers = prompt(menu_prompt)
@@ -36,20 +35,14 @@ class Profile:
             print("### Not Available ###")
             return
         backup = Profile.ask_backup()
-        if (backup == 'back'): pass
+        if (backup == 'back'): return Profile.menu()
         elif (backup == 'content'):
             Profile.backup_content()
         elif (backup == 'messages'):
             Profile.backup_messages()
-        elif (backup == 'profile'):
-            Profile.backup_profile()
         elif (backup == 'content & messages'):
             Profile.backup_content()
             Profile.backup_messages()
-        elif (backup == 'all'):
-            Profile.backup_content()
-            Profile.backup_messages()
-            Profile.backup_profile()
         Profile.menu()
 
     @staticmethod
@@ -67,12 +60,6 @@ class Profile:
             user = User.select_user()
         Driver.download_messages(user)
         print("Backed Up: Messages")
-
-    @staticmethod
-    def backup_profile():
-        print("Backing Up: Profile")
-        Profile.sync_from_profile()
-        print("Backed Up: Profile")
 
     @staticmethod
     def menu():
