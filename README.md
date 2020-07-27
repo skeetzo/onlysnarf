@@ -6,7 +6,7 @@ or
 
 ## Description
 
-OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans. OnlySnarf is capable of downloading and uploading a file (image or video) or gallery of files (images) locally or from a Google Drive folder as specified by run time arguments to an OnlyFans account.
+OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans. OnlySnarf is capable of downloading a file (image or video) or gallery of files (images) locally or from a remote location such as a [local or remote file system, Google Drive, ...] to upload to an OnlyFans account.
 
 ## Menu
 [Menu](https://github.com/skeetzo/onlysnarf/blob/master/menu.md)
@@ -58,7 +58,7 @@ Or include a 'config.conf' file located at '/opt/onlysnarf/config.conf' to set v
 
 ## Authentication  
 --------------
-The use of this package requires configuring a Google App with *PyDrive* for access to your Google Drive. The Drive API requires OAuth2.0 for authentication.
+When downloading/uploading from a Google Drive account this package requires configuring a Google App with *PyDrive* for access to your Google Drive. The Drive API requires OAuth2.0 for authentication.
 ###### from [Auth Quickstart](https://raw.githubusercontent.com/gsuitedevs/PyDrive/master/docs/quickstart.rst)
 1. Go to `APIs Console`_ and make your own project.
 2. Search for 'Google Drive API', select the entry, and click 'Enable'.

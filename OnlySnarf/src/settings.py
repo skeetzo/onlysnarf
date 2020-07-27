@@ -5,7 +5,7 @@ import time
 from .colorize import colorize
 from .args import CONFIG as config
 import PyInquirer
-import os
+import os, json
 
 DEBUGGING = [
     ""
@@ -278,10 +278,10 @@ class Settings:
         return config["REMOTE_PASSWORD"] or ""
 
     def get_remote_browser_host():
-        return config["REMOTE_BROWSER_HOST"] or ""
+        return config["REMOTE_HOST"] or ""
 
     def get_remote_browser_port():
-        return config["REMOTE_BROWSER_PORT"] or ""
+        return config["REMOTE_PORT"] or ""
 
     def get_secret_path():
         return config["CLIENT_SECRET"] or ""
@@ -410,6 +410,9 @@ class Settings:
 
     def is_force_upload():
         return config["FORCE_UPLOAD"] or False
+
+    def is_keep():
+        return config["KEEP"] or False
 
     def is_prefer_local():
         return config["PREFER_LOCAL"] or False
@@ -543,6 +546,39 @@ class Settings:
         pw = PyInquirer.prompt(question)["password"]
         Settings.set_password_twitter(pw)
         return pw
+
+    def read_session_data():
+        Settings.maybe_print("reading local session")
+        path_ = os.path.join(Settings.get_mount_path(), "session.json")
+        Settings.dev_print("local session path: "+str(path_))
+        id_ = None
+        url = None
+        try:
+            with open(str(path_)) as json_file:  
+                data = json.load(json_file)
+                id_ = data['id']
+                url = data['url']
+            Settings.maybe_print("loaded local users")
+        except Exception as e:
+            Settings.dev_print(e)
+        return (id_, url)
+
+    def write_session_data(id_, url):
+        Settings.maybe_print("writing local session")
+        Settings.dev_print("saving session id: {}".format(id_))        
+        Settings.dev_print("saving session url: {}".format(url))
+        path_ = os.path.join(Settings.get_mount_path(), "session.json")
+        Settings.dev_print("local session path: "+str(path_))
+        data = {}
+        data['id'] = id_
+        data['url'] = url
+        try:
+            with open(str(path_), 'w') as outfile:  
+                json.dump(data, outfile, indent=4, sort_keys=True)
+        except FileNotFoundError:
+            print("Error: Missing Session File")
+        except OSError:
+            print("Error: Missing Session Path")
 
     def select_category(categories=None):
         if not categories: categories = Settings.get_categories()

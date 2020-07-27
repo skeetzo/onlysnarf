@@ -112,7 +112,7 @@ parser.add_argument('-backup', action='store_true', dest='backup',
   help='enables backup processes')
 ##
 # -browser
-parser.add_argument('-browser', type=str, default="auto", choices=["auto","google","firefox","remote"], dest='browser',
+parser.add_argument('-browser', type=str, default="auto", choices=["auto","google","firefox","remote","reconnect"], dest='browser',
   help='the browser to use')
 ##
 # -category
@@ -213,6 +213,11 @@ parser.add_argument('-download-max', type=int, default=IMAGE_DOWNLOAD_LIMIT, des
 # maximum number of images that can be uploaded
 parser.add_argument('-upload-max', type=int, default=IMAGE_UPLOAD_LIMIT, dest='upload_max',
   help='the max number of images to upload')
+##
+# -keep
+# keep the browser window open
+parser.add_argument('-keep', action='store_true', dest='keep',
+  help='keep the browser window open after script ends')
 ##
 # -keywords
 # keywords to # in post
@@ -315,7 +320,7 @@ parser.add_argument('-remote-host', type=str, dest='remote_host',
 # -remote-port
 # the remote port to connect to
 parser.add_argument('-remote-port', type=int, dest='remote_port',
-  help='the remote port to connect to', default=4446)
+  help='the remote port to connect to', default=4444)
 ##
 # -remote-username
 # the remote username to use
@@ -326,16 +331,6 @@ parser.add_argument('-remote-username', type=str, dest='remote_username',
 # the remote password to use
 parser.add_argument('-remote-password', type=int, dest='remote_password',
   help='the remote password to use', default=None)
-##
-# -remote-browser-host
-# the remote browser host to connect to
-parser.add_argument('-remote-browser-host', type=str, dest='remote_browser_host',
-  help='the remote browser host to connect to', default="127.0.0.1")
-##
-# -remote-browser-port
-# the remote browser port to connect to
-parser.add_argument('-remote-browser-port', type=int, dest='remote_browser_port',
-  help='the remote browser port to connect to', default=4444)
 ###
 ##
 # -question

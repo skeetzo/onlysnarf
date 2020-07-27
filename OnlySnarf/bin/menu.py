@@ -112,19 +112,21 @@ class Menu:
 
 #################################################################################################
 
-# import atexit
-# def exit_handler():
-#     print("Shnarrf?")
-#     exit()
-# atexit.register(exit_handler)
+import atexit
+def exit_handler():
+    print("Shnarrf?")
+    exit()
+atexit.register(exit_handler)
 
-# import signal
-# def signal_handler(sig, frame):
-#     print('Shnnnarf?')
-#     exit()
-# signal.signal(signal.SIGINT, signal_handler)
+import signal
+def signal_handler(sig, frame):
+    print('Shnnnarf?')
+    exit()
+signal.signal(signal.SIGINT, signal_handler)
   
 def exit():
+    from OnlySnarf.src.driver import Driver
+    Driver.exit()
     sys.exit(0)
 
 ######################################################

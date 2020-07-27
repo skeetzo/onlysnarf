@@ -378,13 +378,13 @@ class User:
     # gets a list of all subscribed user_ids from local txt
     @staticmethod
     def read_users_local():
-        Settings.maybe_print("Getting Local Users")
+        Settings.maybe_print("getting local users")
         users = []
         users_ = []
         try:
             with open(str(Settings.get_users_path())) as json_file:  
                 users = json.load(json_file)['users']
-            Settings.maybe_print("Loaded Local Users")
+            Settings.maybe_print("loaded local users")
             for user in users:
                 try:
                     users_.append(User(json.loads(user)))
