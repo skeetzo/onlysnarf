@@ -81,6 +81,7 @@ def print_same_line(text):
 class Driver:
     BROWSER = None
     LOGGED_IN = False
+    NOT_INFORMED_KEPT = False # whether or not "Keep"ing the browser session has been printed once upon exit
 
     def __init__():
         pass
@@ -1741,6 +1742,7 @@ class Driver:
         if Driver.BROWSER: return True
         # driver = None
         print("Spawning Browser")
+        type_ = None
 
         def google():
             try:
@@ -2163,6 +2165,9 @@ class Driver:
             User.write_users_local()
         if Settings.is_keep():
             Settings.maybe_print("Keeping Browser Open")
+            if Driver.NOT_INFORMED_KEPT:
+                print("Kept Browser Open")
+            Driver.NOT_INFORMED_KEPT = True
             return
         else:
             print("Exiting OnlyFans")

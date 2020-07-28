@@ -608,11 +608,14 @@ class Settings:
     def set_username(username):
         config["USERNAME"] = str(username)
 
-    def set_password(password):
-        config["PASSWORD"] = str(password)
+    def set_username_google(username):
+        config["USERNAME_GOOGLE"] = str(username)
 
     def set_username_twitter(username):
         config["USERNAME_TWITTER"] = str(username)
+
+    def set_password(password):
+        config["PASSWORD"] = str(password)
 
     def set_password_google(password):
         config["PASSWORD_GOOGLE"] = str(password)

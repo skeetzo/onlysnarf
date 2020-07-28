@@ -451,7 +451,7 @@ parser.add_argument('-username', type=str, default="", dest='username',
 ##
 # -username-google
 # the Google username to use
-parser.add_argument('-username-google', type=str, default="", dest='google_username',
+parser.add_argument('-username-google', type=str, default="", dest='username_google',
   help='the Google username for login')
 ##
 # -username-twitter

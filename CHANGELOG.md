@@ -370,7 +370,7 @@
   **2.17.21**
   - minor fixes to menu
   **2.18.0**
-  - debugged remote connections; added reconnect
+  - debugged remote webdriver connections; added reconnect
   - cleaned up menu.md
 
 ----------------------------------------
