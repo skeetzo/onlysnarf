@@ -61,6 +61,43 @@ class Profile:
         Driver.download_messages(user)
         print("Backed Up: Messages")
 
+    # new - advertise - tweet to advertise new account, tweet to ask about what you should post
+    def advertise():
+        pass
+
+    # new - posts - , etc; recommend what to post
+    def posts():
+        pass
+
+    # new - setup - Twitter -> profile, banner; Price and Settings
+    def setup():
+        pass
+
+    def new_menu():
+        if not Settings.is_debug():
+            print("### Not Available ###")
+            return
+        action = Profile.ask_new()
+        if (action == 'back'): return Profile.menu()
+        elif (action == 'advertise'):
+            Profile.advertise()
+        elif (action == 'posts'):
+            Profile.posts()
+        elif (action == 'setup'):
+            Profile.setup()
+        Profile.menu()
+
+    def ask_new():
+        menu_prompt = {
+            'type': 'list',
+            'name': 'action',
+            'message': 'Please select a backup action:',
+            'choices': ['Back', 'Setup', 'Advertise', 'Posts'],
+            'filter': lambda val: str(val).lower()
+        }
+        answers = prompt(menu_prompt)
+        return answers['action']
+
     @staticmethod
     def menu():
         action = Profile.ask_action()
@@ -70,13 +107,16 @@ class Profile:
         elif (action == 'backup'): Profile.backup_menu()
         elif (action == 'sync from'): Profile.sync_from_profile()
         elif (action == 'sync to'): Profile.sync_to_profile()
-
+        elif (action == 'new'): Profile.new_menu()
+        
     def ask_action():
         menu_prompt = {
             'type': 'list',
             'name': 'action',
             'message': 'Please select a profile action:',
-            'choices': ['Back', 'Backup','Sync From', 'Sync To'],
+            'choices': ['Back', 'Backup','Sync From', 'Sync To',
+                # 'New'
+            ],
             'filter': lambda val: str(val).lower()
         }
         answers = prompt(menu_prompt)

@@ -370,8 +370,15 @@
   **2.17.21**
   - minor fixes to menu
   **2.18.0**
+  - menu updates
+  - profile / settings updates
   - debugged remote webdriver connections; added reconnect
+  - added: session_id & session_url -> session.json for reconnecting to existing browser sessions
   - cleaned up menu.md
+  - updated profile: sync from, sync to, backup
+  - updated login methods
+  - added: delete-empty folders; properly remove empty folders that all images have been removed from when backing up / moving files
+  - debugged remote webdriver
 
 ----------------------------------------
 
@@ -379,21 +386,13 @@
   - debugged: login: google
 
 
-  need to add 'create' to Profile for asking for profile settings when syncing to
-  - debugged remote webdriver
+  - need to add 'create' to Profile for asking for profile settings when syncing to
 
 
   - need a way for Discount to select users that are "Renew On"; click "Renew On" and get selected users? or grab from users w/ similar matching criteria?
-  -- what the fuck did I mean here???
---------------------
-  - added: session_id, session_url for reconnecting to existing browser sessions
-  -> session_id, session_url requires debugging
 
-  **2.18.0**
-  - menu updates
-  - profile / settings updates
-  - updated profile: sync from, sync to, backup
-  - updated login methods
+--------------------
+  -> session_id, session_url requires debugging
 
   **2.x.x**
   - properly debug discount
@@ -403,14 +402,12 @@
   - properly tested: settings set
   
   **3.x.x**
-  - Settings options "functional"
-  - added: Settings options
+  - Profile options completely "functional"
 
 ----------------------------------------
 
 ## ToDo
   
-
 ### Low Priority
   -> Cron
   - bot functionality that checks user messages for bot commands
@@ -423,27 +420,20 @@
   - fix literally everything
   - automatically heart / send <3 hearts to random tips in messages / campaign contributions
 
-  -> Scenes - FIX
-  - update: data.txt for scenes with trailer
-  - update: scene to include trailer
-  - update: upload trailer same time as previews instead of content
-  - add: feature for if missing scene previews to capture thumbnail from content/trailer
-  - rewrite scene release to NOT upload until releaseDate days after
-  -- requires daily check or cron job
-  - add: scene feature to check data.txts for content to release n days after trailer/preview
-  - prepare: a scene for release
-  |_ requires: scene cron feature
-
   -> Promotions
   - add email|Twitter functionality for sending trial link; add clipboard function to copy link
 
   - functionality to scan profiles to estimate their posts-to-fan income ratios
 
-### Medium Priority
+  - Profile:
+    new - setup - Twitter -> profile, banner; Price and Settings
+    new - advertise
+    new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
 
+### Medium Priority
+  - autorespond behavior
 
 ### High Priority  
-  - properly remove empty folders that all images have been removed from when backing up / moving files
 
   -> Twitter
   - tweet reminders
@@ -454,21 +444,6 @@
 
 
 
-3) setup features
-a) 'new account': setup - Twitter -> profile, banner; Price and Settings
-- profile settings
-b) 'new account': first post
-- check posts
-c) 'new account': response behavior - configure how/if you want to auto respond to messages
-- revisit bot ideas
-d) 'new account': tweeting behavior - tweet to advertise new account, tweet to ask about what you should post, etc
-- posts that are meant to be tweeted; skips requiring app creds for Twitter
 
 Referral Code
 https://onlyfans.com/?ref=409408
-
-
-
-
-
-

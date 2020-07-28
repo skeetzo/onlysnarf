@@ -24,7 +24,8 @@ I've since begun adding methods to upload / host content in other locations such
 
 ## Menu
 
-The menu system via `onlysnarf` exists to provide a means for selecting content for upload without the burden of logging in, uploading the files and text, and closing the browser hours later when its finished. 
+The menu system via `onlysnarf` exists to provide a means for selecting content for upload without the burden of logging in, uploading the files and text, and closing the browser hours later when its finished. I try to maintain the menu system to allow for any possible upload / message combination.
 
 ## Script
-I typically skip the menu system via `onlysnarfpy` to run the package as an unprompted script. This was extremely useful for me when I was suffering from incredibly slow upload speeds and didn't want to wait around to hit the post button hours later.
+
+I typically skip the menu system and run the package as an unprompted script via `onlysnarfpy`. This was extremely useful for me when I was suffering from incredibly slow upload speeds and didn't want to wait around to hit the post button hours later at my desktop or on my phone.

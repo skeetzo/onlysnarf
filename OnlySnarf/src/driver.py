@@ -1869,7 +1869,7 @@ class Driver:
                 if not successful_driver or successful_driver == None:
                     print("Error; Unable to connect remotely")
                 return successful_driver
-            except:
+            except Exception as e:
                 Settings.maybe_print(e)
                 print("Error: Unable to connect remotely")
                 return False

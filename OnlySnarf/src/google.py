@@ -112,10 +112,13 @@ def checkAuth():
 ##### Archiving / Deleting #####
 ################################
 
-# Deletes online file
-def delete_file(file):
-    try: file.get_file().Trash()
-    except Exception as e: Settings.dev_print(e)
+# Deletes folder
+def delete_folder(folder):
+    if Settings.is_delete() and Settings.is_delete_empty():
+        try:
+            print("Deleting empty folder: {}".format(folder["title"]))
+            folder.Trash()
+        except Exception as e: Settings.dev_print(e)
 
 # Archives posted file / folder by updating their parent id
 # posted
@@ -264,12 +267,20 @@ def get_file_parent(id_):
 
 def get_images_of_folder(folder):
     image_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and {}".format(folder['id'], MIMETYPES_IMAGES)}).GetList()
-    Settings.dev_print('Images: {}'.format(len(image_list)))
+    if len(video_list) > 0:
+        Settings.dev_print('Images: {}'.format(len(image_list)))
+    else:
+        Settings.maybe_print("Images Folder (empty): {}".format(folder['title']))
+        delete_folder(folder)
     return image_list
 
 def get_videos_of_folder(folder):
     video_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and {}".format(folder['id'], MIMETYPES_VIDEOS)}).GetList()
-    Settings.dev_print('Videos: {}'.format(len(video_list)))
+    if len(video_list) > 0:
+        Settings.dev_print('Videos: {}'.format(len(video_list)))
+    else:
+        Settings.maybe_print("Video Folder (empty): {}".format(folder['title']))
+        delete_folder(folder)
     return video_list
 
 # returns first layer of files found
@@ -348,6 +359,7 @@ def get_folders_of_folder(folder):
             folders.append(folder)
         else:
             Settings.maybe_print("Found Folder (empty): {}".format(folder['title']))
+            delete_folder(folder)
     cache_add(folders)
     return folders
 

@@ -79,6 +79,8 @@ Flags the script as a cron operation.
 The user to run cron script as.
 -date
 The date required for a scheduled post.
+-delete-empty
+Delete empty folders when searching for content.
 -delete-google
 Enable deleting Google files after upload (after backup if enabled).
 -destination

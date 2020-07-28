@@ -390,6 +390,9 @@ class Settings:
     def is_confirm():
         return Settings.CONFIRM or False
 
+    def is_delete_empty():
+        return config["DELETE_EMPTY"] or False
+
     def is_prompt():
         return Settings.PROMPT or False
 

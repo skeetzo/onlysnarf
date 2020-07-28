@@ -160,6 +160,11 @@ parser.add_argument('-debug', action='store_true', dest='debug',
 parser.add_argument('-debug-delay', action='store_true', dest='debug_delay',
   help='enable a wait between crucial steps for debugging')
 ##
+# -delete-empty
+# delete empty content folders
+parser.add_argument('-delete-empty', action='store_true', dest='delete_empty',
+  help='delete empty content folders')
+##
 # -delete-google
 # delete uploaded content instaed of backing it up
 parser.add_argument('-delete-google', action='store_true', dest='delete_google',
