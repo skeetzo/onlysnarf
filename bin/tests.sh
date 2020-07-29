@@ -22,11 +22,11 @@ echo "Testing OnlySnarf"
 show=""
 show="-show"
 
-verbose=""
-verbose="-verbose -verbose"
-verbose="-verbose -verbose -verbose"
+declare -a browsers
+browsers=("auto" "firefox" "google" "remote" "remote-chrome" "remote-firefox" "reconnect")
 
-source="google"
+declare -a sources
+sources=("local" "dropbox" "google" "remote")
 
 declare -a testing
 # testing=("schedule")
@@ -36,16 +36,27 @@ testing=("upload")
 testing=("post")
 testing=("expiration" "message" "poll" "post" "schedule" "upload")
 
+verbose=""
+verbose="-verbose -verbose"
+verbose="-verbose -verbose -verbose"
+
 echo "##################################################" >> /var/log/onlysnarf/tests.txt 2>&1
 echo "################## Start #########################" >> /var/log/onlysnarf/tests.txt 2>&1
 echo "##################################################" >> /var/log/onlysnarf/tests.txt 2>&1
 
 function testes() {
-	# echo "Running: "$test
 
-	bin/tests/$test.sh $show $source $verbose
-	# bin/tests/$test.sh $show $verbose >> /var/log/onlysnarf/tests.txt
+	for browser in ${browsers[@]}; do
 
+		for source in ${sources[@]}; do
+
+			options="-browser $browser -source $source $show $verbose"
+			bin/tests/$test.sh $options
+			# bin/tests/$test.sh $options >> /var/log/onlysnarf/tests.txt
+
+		done
+	done
+	
 	echo "##################################################" >> /var/log/onlysnarf/tests.txt 2>&1
 	echo "##################################################" >> /var/log/onlysnarf/tests.txt 2>&1
 	echo "##################################################" >> /var/log/onlysnarf/tests.txt 2>&1

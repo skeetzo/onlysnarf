@@ -379,6 +379,7 @@
   - updated login methods
   - added: delete-empty folders; properly remove empty folders that all images have been removed from when backing up / moving files
   - debugged remote webdriver
+  - added: remote-chrome, remote-firefox
 
 ----------------------------------------
 
