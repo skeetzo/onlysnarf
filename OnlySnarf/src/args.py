@@ -112,7 +112,7 @@ parser.add_argument('-backup', action='store_true', dest='backup',
   help='enables backup processes')
 ##
 # -browser
-parser.add_argument('-browser', type=str, default="auto", choices=["auto","google","firefox","remote","reconnect"], dest='browser',
+parser.add_argument('-browser', type=str, default="auto", choices=["auto","google","firefox","remote","remote-chrome","remote-firefox","reconnect"], dest='browser',
   help='the browser to use')
 ##
 # -category

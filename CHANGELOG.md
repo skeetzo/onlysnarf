@@ -385,13 +385,12 @@
   - debugged: following_write
   - debugged: login: google
 
-
   - need to add 'create' to Profile for asking for profile settings when syncing to
-
 
   - need a way for Discount to select users that are "Renew On"; click "Renew On" and get selected users? or grab from users w/ similar matching criteria?
 
 --------------------
+
   -> session_id, session_url requires debugging
 
   **2.x.x**
@@ -402,7 +401,7 @@
   - properly tested: settings set
   
   **3.x.x**
-  - Profile options completely "functional"
+  - Profile options completely "functional" / debugged
 
 ----------------------------------------
 
@@ -431,15 +430,18 @@
     new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
 
 ### Medium Priority
-  - autorespond behavior
-
-### High Priority  
 
   -> Twitter
   - tweet reminders
   - can enter text that is tweeted
   - any links to include (counts against text limit) of content or images
   -- check for previously existing tweet
+
+### High Priority  
+  -> remote webserver behavior
+  - refresh to stay open
+  - easy reconnect for message parsing
+  - autorespond behavior
 
 
 

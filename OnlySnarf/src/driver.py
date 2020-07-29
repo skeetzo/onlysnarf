@@ -1863,11 +1863,16 @@ class Driver:
                 port = Settings.get_remote_browser_port()
                 link = 'http://{}:{}/wd/hub'.format(host, port)
                 Settings.dev_print(link)
-                successful_driver = attempt_firefox()
-                if not successful_driver or successful_driver == None:
+                if Settings.get_browser_type() == "remote-firefox":
+                    successful_driver = attempt_firefox()
+                elif Settings.get_browser_type() == "remote-chrome":
                     successful_driver = attempt_chrome()
+                else:
+                    successful_driver = attempt_firefox()
+                    if not successful_driver or successful_driver == None:
+                        successful_driver = attempt_chrome()
                 if not successful_driver or successful_driver == None:
-                    print("Error; Unable to connect remotely")
+                    print("Error: Unable to connect remotely")
                 return successful_driver
             except Exception as e:
                 Settings.maybe_print(e)
@@ -1913,7 +1918,7 @@ class Driver:
 
         BROWSER_TYPE = Settings.get_browser_type()
 
-        if BROWSER_TYPE == "remote":
+        if "remote" in str(BROWSER_TYPE):
             driver = remote()
         elif BROWSER_TYPE == "reconnect":
             driver = reconnect()
