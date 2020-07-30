@@ -143,10 +143,6 @@ class File():
 
     ##############################
 
-    def get_files():
-        pass
-        # return all local files from Settings.mount_path or whatever
-
     def get_ext(self):
         if self.ext: return self.ext
         self.get_title()
@@ -158,7 +154,7 @@ class File():
         return self.path
 
     def get_title(self):
-        if str(self.title) != "": return self.title
+        if self.title: return self.title
         path = self.get_path()
         if str(path) == "": 
             Settings.maybe_print("Error: Missing File Title")
@@ -250,16 +246,20 @@ class File():
     def get_folder_by_name(category, parent=None):
         if not parent:
             parent = Settings.get_local_path()
+        Settings.maybe_print("parent: {}".format(parent))
         f = []
         for (dirpath, dirnames, filenames) in walk(parent):
+            Settings.dev_print("dirpath: {}".format(dirpath))
             for dir_ in dirnames:
+                Settings.dev_print("dir: {} = {} :category".format(dir_, category))
                 if str(dir_) == str(category):
-                    return dir_
+                    return os.path.join(parent, dir_)
             break
         return None
 
     @staticmethod
     def get_folders_of_folder_by_keywords(categoryFolder):
+        Settings.dev_print("getting keywords of folder: {}".format(categoryFolder))
         if categoryFolder == None: return []
         folders = File.get_folders_of_folder(categoryFolder)
         folders_ = []
@@ -279,56 +279,61 @@ class File():
 
     @staticmethod
     def get_random_file():
-        return random.choice(Google_File.get_files())
+        return random.choice(File.get_files())
 
     @staticmethod
     def get_images_of_folder(folder):
+        Settings.dev_print("getting images of folder: {}".format(folder.get_title()))
+        if not folder: return []
         imgs = []
         files = []
-        path = folder.get_path()
         valid_images = [".jpg",".gif",".png",".tga",".jpeg"]
-        for f in os.listdir(path):
+        for f in os.listdir(folder.get_path()):
             ext = os.path.splitext(f)[1]
             if ext.lower() not in valid_images:
                 continue
             file = File()
-            setattr(file, "path", os.path.join(path,f))
+            setattr(file, "path", os.path.join(folder.get_path(),f))
             files.append(file)
         return files
 
     @staticmethod
     def get_videos_of_folder(folder):
+        Settings.dev_print("getting videos of folder: {}".format(folder.get_title()))
+        if not folder: return []
         videos = []
         files = []
-        path = folder.get_path()
         valid_videos = [".mp4",".mov"]
-        for f in os.listdir(path):
+        for f in os.listdir(folder.get_path()):
             ext = os.path.splitext(f)[1]
             if ext.lower() not in valid_videos:
                 continue
             file = File()
-            setattr(file, "path", os.path.join(path,f))
+            setattr(file, "path", os.path.join(folder.get_path(),f))
             files.append(file)
         return files
 
     @staticmethod
-    def get_folders_of_folder(folder):
+    def get_folders_of_folder(folderPath):
         # os.walk(directory)
         # will yield a tuple for each subdirectory. Ths first entry in the 3-tuple is a directory name, so
         # [x[0] for x in os.walk(directory)]
         # should give you all of the subdirectories, recursively.
         # Note that the second entry in the tuple is the list of child directories of the entry in the first position, so you could use this instead, but it's not likely to save you much.
         # However, you could use it just to give you the immediate child directories:
+        Settings.maybe_print("local walk: {}".format(folderPath))
         folders = []
-        for folder in (os.walk(folder.get_path()))[1]:
+        # print(os.walk(folderPath))
+        for folder in next(os.walk(folderPath))[1]:
+            Settings.maybe_print("folder: {}".format(folder))
             fol = Folder()
-            setattr(fol, "path", folder)
+            setattr(fol, "path", os.path.join(folderPath, folder))
             folders.append(fol)
         return folders
 
     @staticmethod
     def get_files_by_category(cat, performer=None):
-        Settings.maybe_print("Loading Local Files...")
+        Settings.maybe_print("loading local files...")
         files = []
         ##
         def parse_categories(category, categoryFolder=None):
@@ -337,6 +342,7 @@ class File():
             if "image" in str(category):
                 categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
                 for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
+                    if not folder: continue
                     for image in File.get_images_of_folder(folder):
                         file = File()
                         setattr(file, "path", image)
@@ -345,9 +351,10 @@ class File():
             elif "video" in str(category):
                 categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
                 for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
+                    if not folder: continue
                     videos = File.get_videos_of_folder(folder)
                     if len(videos) > 0:
-                        files.append(folder.get_title())
+                        files.append(folder)
                     for video in videos:
                         file = File()
                         setattr(file, "path", video)
@@ -356,9 +363,10 @@ class File():
             elif "galler" in str(category):
                 categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
                 for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
+                    if not folder: continue
                     galleries = File.get_folders_of_folder(folder)
                     if len(galleries) > 0:
-                        files.append(folder.get_title())
+                        files.append(folder)
                     for gallery in galleries:
                         file = Folder()
                         setattr(file, "path", gallery)
@@ -368,6 +376,7 @@ class File():
                 categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
                 for performer in File.get_folders_of_folder_by_keywords(categoryFolder):
                     # for performer in File.get_folders_of_folder(folder):
+                    if not performer: continue
                     p = Folder()
                     setattr(p, "path", performer)
                     setattr(p, "category", categoryFolder)
@@ -450,7 +459,9 @@ class File():
         }
         upload = PyInquirer.prompt(question)["upload"]
         # if not Settings.confirm(upload): return File.select_file_upload_method()
-        if str(upload) == "Google":
+        if str(upload) == "Local":
+            return File.select_files()
+        elif str(upload) == "Google":
             return Google_File.select_files()
         # elif str(upload) == "Dropbox":
             # return Dropbox.select_files()
@@ -522,7 +533,7 @@ class Folder(File):
             self.files = []
             files = File.get_files_by_folder(self.get_path())
             for file in files:
-                file_ = Google_File()
+                file_ = File()
                 setattr(file_, "file", file)
                 self.files.append(file_)
         if Settings.get_title():
@@ -532,6 +543,15 @@ class Folder(File):
                     break
         return self.files
 
+    def get_title(self):
+        if self.title: return self.title
+        path = self.get_path()
+        if str(path) == "": 
+            Settings.maybe_print("Error: Missing File Title")
+            return ""
+        title = os.path.basename(path)
+        self.title = title
+        return self.title
 
 ###################################################################################
 
