@@ -420,6 +420,8 @@
 
 ## ToDo
   
+  - add to upload: greatest & least (folder sizes)
+
 ### Low Priority
 
   -> Bot
