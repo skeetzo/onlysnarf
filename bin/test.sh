@@ -11,14 +11,14 @@ echo "################## Start #########################" >> ../onlysnarf/logs/t
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
 # onlysnarfpy -debug -verbose -verbose -verbose -browser remote -prefer-local -remote-host 192.168.1.99 -source google -category video
-onlysnarfpy -debug -verbose -verbose -verbose -browser remote-chrome -prefer-local -remote-host 47.156.172.175 -remote-port 8888 -source google -category video -keep
-# onlysnarfpy -debug -verbose -verbose -verbose -browser reconnect -prefer-local -source google -category video -keep
+# onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -prefer-local -remote-host 47.156.172.175 -remote-port 8888 -source google -category video -keep -show -login google -skip-download
+onlysnarfpy -debug -verbose -verbose -verbose -browser auto-remote -source google -category video -keep -skip-download -login google -remote-host 47.156.172.175 -remote-port 8888
 
 
 
 # onlysnarf -debug -verbose -verbose -verbose -browser firefox -prefer-local -remote-host 192.168.1.66 -login onlyfans
 
-# onlysnarfpy -action test -debug -verbose -verbose -verbose
+# onlysnarfpy -action test -debug -verbose -verbose -verbose -browser auto-remote -keep -remote-host 47.156.172.175 -remote-port 8888 -login google
 
 # onlysnarf-config
 

@@ -372,43 +372,51 @@
   **2.18.0**
   - menu updates
   - profile / settings updates
-  - debugged remote webdriver connections; added reconnect
-  - added: session_id & session_url -> session.json for reconnecting to existing browser sessions
   - cleaned up menu.md
   - updated profile: sync from, sync to, backup
   - updated login methods
   - added: delete-empty folders; properly remove empty folders that all images have been removed from when backing up / moving files
-  - debugged remote webdriver
-  - added: remote-chrome, remote-firefox
+  - debugged: google login
+  - debugged: following_write
+  -> remote webserver behavior
+  - added: session_id, session_url
+  - added: remote-chrome, remote-firefox, auto-remote
+  - added: reconnect
+  - added: session_id & session_url -> session.json for reconnecting to existing browser sessions
 
 ----------------------------------------
 
-  - debugged: following_write
-  - debugged: login: google
-
-  - need to add 'create' to Profile for asking for profile settings when syncing to
-
-  - need a way for Discount to select users that are "Renew On"; click "Renew On" and get selected users? or grab from users w/ similar matching criteria?
-
---------------------
-
-  -> session_id, session_url requires debugging
-
   **2.x.x**
+  - need to add 'create' to Profile for asking for profile settings when syncing to
+  - adding tab requires a file lock between onlysnarf sessions to maintain the correct active tab
+  - debugged remote: debug refresh to stay open -> test javascript refresh injection
+
+  **x.x.x**
   - properly debug discount
   - properly debug promotions
-  **2.x.x**
+
+  **x.x.x**
   - properly tested: settings get
   - properly tested: settings set
   
-  **3.x.x**
+  **x.x.x**
   - Profile options completely "functional" / debugged
+
+  **3.0.0**
+  - debugged all of 2.18.x
+  - updated: images & demo gifs
+
+  **3.0.x**
 
 ----------------------------------------
 
 ## ToDo
   
 ### Low Priority
+
+  -> Bot
+  - autorespond behavior
+
   -> Cron
   - bot functionality that checks user messages for bot commands
   - ability to download images to upload / send later
@@ -420,15 +428,18 @@
   - fix literally everything
   - automatically heart / send <3 hearts to random tips in messages / campaign contributions
 
-  -> Promotions
+  -> Discount
+  - need a way for Discount to select users that are "Renew On"; click "Renew On" and get selected users? or grab from users w/ similar matching criteria?
+
+  -> Promotion
   - add email|Twitter functionality for sending trial link; add clipboard function to copy link
 
   - functionality to scan profiles to estimate their posts-to-fan income ratios
 
-  - Profile:
-    new - setup - Twitter -> profile, banner; Price and Settings
-    new - advertise
-    new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
+  -> Profile
+  - new - setup - Twitter -> profile, banner; Price and Settings
+  - new - advertise
+  - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
 
 ### Medium Priority
 
@@ -438,13 +449,10 @@
   - any links to include (counts against text limit) of content or images
   -- check for previously existing tweet
 
-### High Priority  
-  -> remote webserver behavior
-  - refresh to stay open
-  - easy reconnect for message parsing
-  - autorespond behavior
+### High Priority
 
-
+  -> remote
+  - debug / add error catch for uploads: ('Connection aborted.', BrokenPipeError(32, 'Broken pipe'))
 
 
 

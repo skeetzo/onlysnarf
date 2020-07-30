@@ -2,7 +2,9 @@ import argparse, os, re
 from datetime import datetime
 from .validators import valid_action, valid_amount, valid_date, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
 
-ACTIONS = ['discount','post','message']
+ACTIONS = ['discount','post','message',
+# 'test'
+]
 
 CATEGORIES_DEFAULT = [
   "images",
@@ -112,7 +114,7 @@ parser.add_argument('-backup', action='store_true', dest='backup',
   help='enables backup processes')
 ##
 # -browser
-parser.add_argument('-browser', type=str, default="auto", choices=["auto","google","firefox","remote","remote-chrome","remote-firefox","reconnect"], dest='browser',
+parser.add_argument('-browser', type=str, default="auto", choices=["auto","google","firefox","auto-remote","remote","remote-chrome","remote-firefox","reconnect"], dest='browser',
   help='the browser to use')
 ##
 # -category
@@ -285,6 +287,10 @@ parser.add_argument('-prefer-local', action='store_true', dest='prefer_local',
   help='prefer recently cached data')
 # -prefer-local-following
 # prefers local user cache over refreshing first call for following
+parser.add_argument('-prefer-local-following', action='store_true', dest='prefer_local_following',
+  help='prefer recently cached data for following')
+# -prefer-local-following
+# prefers local user cache over refreshing first call for following
 # parser.add_argument('-prefer-local-following', action='store_true', dest='prefer_local_following',
 #   help='prefer recently cached data for following')
 ##
@@ -399,6 +405,13 @@ parser.add_argument('-show','-show-window', dest='show', action='store_true',
 # the source to use when searching for content
 parser.add_argument('-source', dest='source', default="local", choices=["google","dropbox","remote","local"],
   help='file host location')
+##
+## DEBUGGING
+# -tab [number]
+# opens tab in browser or connects to existing tab
+# if tab number is 0, a new tab will not be created
+parser.add_argument('-tab', default=None, dest='tab',
+  help='[INCOMPLETE] open a tab in browser when reconnecting or use the (if existing) specificied tab number')
 ##
 # -tags
 # @[tag]

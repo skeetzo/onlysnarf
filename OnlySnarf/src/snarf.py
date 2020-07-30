@@ -153,25 +153,26 @@ class Snarf:
     @staticmethod
     def test():
         from .driver import Driver
-        from . import cron as Cron
-        print('0/3 : Deleting Locals')
+        from .user import User
+        # from . import cron as Cron
+        # print('0/3 : Deleting Locals')
         print('1/3 : Testing')
-        print('TESTING: Users')
-        response = Driver.users_get()
+        # print('TESTING: Users')
+        # response = Driver.users_get()
         # return True
         print('TESTING: Following')
-        response = Driver.following_get()
+        response = User.get_following()
         # return True
-        print('TESTING: Settings - Get')
-        response = Driver.settings_get_all()
-        return True
-        print('TESTING: Cron')
-        response = Cron.test()
-        if not response or response == None:
-            print("Error: Failed to test crons")
-        reset_ = reset()
-        if not reset_:
-            return print("Error: Failed to Reset")
+        # print('TESTING: Settings - Get')
+        # response = Driver.settings_get_all()
+        # return True
+        # print('TESTING: Cron')
+        # response = Cron.test()
+        # if not response or response == None:
+        #     print("Error: Failed to test crons")
+        # reset_ = reset()
+        # if not reset_:
+        #     return print("Error: Failed to Reset")
         return True
 
 ################################################################################################################################################
@@ -196,7 +197,7 @@ def exit():
 def main():
     try:
         from .file import File
-        File.remove_local()
+        # File.remove_local()
         Settings.set_prompt(False)
         Settings.set_confirm(False)
         action = Settings.get_action()

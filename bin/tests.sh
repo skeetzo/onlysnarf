@@ -24,9 +24,12 @@ show="-show"
 
 declare -a browsers
 browsers=("auto" "firefox" "google" "remote" "remote-chrome" "remote-firefox" "reconnect")
+browsers=("remote" "remote-chrome" "remote-firefox")
+browsers=("reconnect")
 
 declare -a sources
 sources=("local" "dropbox" "google" "remote")
+sources=("google")
 
 declare -a testing
 # testing=("schedule")

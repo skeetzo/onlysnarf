@@ -41,11 +41,11 @@ DOWNLOADING_MAX = False
 DOWNLOAD_MAX_IMAGES = 1000
 DOWNLOAD_MAX_VIDEOS = 1000
 # Urls
-ONLYFANS_HOME_URL = 'https://onlyfans.com'
+ONLYFANS_HOME_URL = 'https://onlyfans.com/'
 ONLYFANS_MESSAGES_URL = "/my/chats/"
 ONLYFANS_NEW_MESSAGE_URL = "/my/chats/send"
 ONLYFANS_CHAT_URL = "/my/chats/chat"
-ONLYFANS_SETTINGS_URL = "/my/settings"
+ONLYFANS_SETTINGS_URL = "/my/settings/"
 ONLYFANS_USERS_ACTIVE_URL = "/my/subscribers/active"
 ONLYFANS_USERS_FOLLOWING_URL = "/my/subscriptions/active"
 #
@@ -98,6 +98,19 @@ class Driver:
         if logged_in == False: print("Error: Failure to Login")
         Driver.LOGGED_IN = logged_in
         return logged_in
+
+    # @staticmethod
+    # def check_focus():
+    #     if not Settings.use_tabs(): return
+
+    #     # tab = 
+    #     tabNumber = int(Settings.use_tabs())
+    #     driver.switch_to.window(driver.window_handles[tabNumber])
+
+    #     # if int(tabNumber) == 0: pass # nothing required
+    #     # if int(tabNumber) > int(tabs):
+    #     # elif int(tabNumber) <= int(tabs):
+    #     time.sleep(2)
 
     @staticmethod
     def check_spawn():
@@ -354,6 +367,11 @@ class Driver:
         try:
             Settings.dev_print("finding text")
             sendText = Driver.BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_ID)
+            action = webdriver.common.action_chains.ActionChains(Driver.BROWSER)
+            action.move_to_element(sendText)
+            action.click()
+            action.perform()
+            sendText = Driver.BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_ID)
             Settings.dev_print("found text")
             sendText.clear()
             Settings.dev_print("sending text")
@@ -552,9 +570,10 @@ class Driver:
 
     # waits for page load
     def get_page_load():
-        time.sleep(5)
-        # try: WebDriverWait(Driver.BROWSER, 120, poll_frequency=10).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
-        # except Exception as e: pass
+        # time.sleep(5)
+        try: WebDriverWait(Driver.BROWSER, 60*3, poll_frequency=10).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
+        except Exception as e:
+            Settings.dev_print(e)
 
     def handle_alert():
         try:
@@ -568,17 +587,18 @@ class Driver:
         # Settings.dev_print("alert accepted")
 
     @staticmethod
-    def go_to_home():
-        # auth_ = Driver.auth()
-        # if not auth_: return False
+    def go_to_home(force=False):
+        def goto():
+            Settings.maybe_print("goto -> onlyfans.com")
+            Driver.BROWSER.get(ONLYFANS_HOME_URL)
+            Driver.get_page_load()
+        if force: return goto()
+        Settings.dev_print("current url: {}".format(Driver.BROWSER.current_url))
         if str(Driver.BROWSER.current_url) == str(ONLYFANS_HOME_URL):
             Settings.maybe_print("at -> onlyfans.com")
             Driver.BROWSER.execute_script("window.scrollTo(0, 0);")
-        else:
-            Settings.maybe_print("goto -> onlyfans.com")
-            Driver.BROWSER.get(ONLYFANS_HOME_URL)
-        Driver.get_page_load()
-
+        else: goto()
+        
     @staticmethod
     def go_to_page(page):
         auth_ = Driver.auth()
@@ -588,7 +608,7 @@ class Driver:
             Driver.BROWSER.execute_script("window.scrollTo(0, 0);")
         else:
             Settings.maybe_print("goto -> {}".format(page))
-            Driver.BROWSER.get("{}/{}".format(ONLYFANS_HOME_URL, page))
+            Driver.BROWSER.get("{}{}".format(ONLYFANS_HOME_URL, page))
         Driver.handle_alert()
         Driver.get_page_load()
 
@@ -604,7 +624,7 @@ class Driver:
         #     Driver.BROWSER.execute_script("window.scrollTo(0, 0);")
         # else:
         Settings.maybe_print("goto -> {}".format(username))
-        Driver.BROWSER.get("{}/{}".format(ONLYFANS_HOME_URL, username))
+        Driver.BROWSER.get("{}{}".format(ONLYFANS_HOME_URL, username))
         Driver.handle_alert()
         Driver.get_page_load()
 
@@ -619,7 +639,7 @@ class Driver:
         else:
             if str(settingsTab) == "profile": settingsTab = ""
             Settings.maybe_print("goto -> onlyfans.com/settings/{}".format(settingsTab))
-            Driver.go_to_page("{}/{}".format(ONLYFANS_SETTINGS_URL, settingsTab))
+            Driver.go_to_page("{}{}".format(ONLYFANS_SETTINGS_URL, settingsTab))
             # fix above with correct element to locate
         Driver.get_page_load()
 
@@ -629,7 +649,18 @@ class Driver:
 
     @staticmethod
     def login():
-        print('Logging into OnlyFans')
+
+        # check if browser is already logged in before logging in again
+        def loggedin_check():
+            Driver.go_to_home(force=True)
+            try:
+                ele = Driver.BROWSER.find_element_by_class_name(Element.get_element_by_name("loginCheck").getClass())
+                if ele: 
+                    print("Logged into OnlyFans")
+                    return True
+            except Exception as e:
+                Settings.dev_print(e)
+            return False
 
         def login_check():
             try:
@@ -737,21 +768,27 @@ class Driver:
                 # twitter = Driver.BROWSER.find_element_by_xpath("//a[@class='g-btn m-rounded m-flex m-lg m-with-icon']").click()    
 
                 time.sleep(5)
+
+                username_ = Driver.BROWSER.switch_to.active_element
+
                 # find part on page with connected user email
                 # Settings.get_email()
-                usernames = Driver.BROWSER.find_elements_by_xpath("//*[contains(text(), '{}')]".format(Settings.get_email()))
-                # 2nd mention should be correct place
-                if len(usernames) == 0:
-                    print("Error: Missing Google Usernames")
-                    return False
-                username = usernames[1]
-                # Driver.BROWSER.find("session[username_or_email]").send_keys(username)
+                # usernames = Driver.BROWSER.find_elements_by_xpath("//*[contains(text(), '{}')]".format(Settings.get_email()))
+                # # 2nd mention should be correct place
+                # if len(usernames) == 0:
+                #     print("Error: Missing Google Usernames")
+                #     return False
+                # username = usernames[1]
+                # # Driver.BROWSER.find("session[username_or_email]").send_keys(username)
                 # then click username spot
-                username.click()
-                Settings.dev_print("username clicked")
+                username_.send_keys(username)
+                username_.send_keys(Keys.ENTER)
+                Settings.dev_print("username entered")
+                time.sleep(2)
+                password_ = Driver.BROWSER.switch_to.active_element
                 # fill in password and hit the login button 
                 # password_ = Driver.BROWSER.find_element_by_xpath("//input[@id='password']")
-                password_ = Driver.BROWSER.find_element_by_name("session[password]")
+                # password_ = Driver.BROWSER.find_element_by_name("session[password]")
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
@@ -799,7 +836,12 @@ class Driver:
                 Settings.dev_print("twitter login failure")
                 Driver.error_checker(e)
             return False
-            
+
+        successful = loggedin_check()
+        if successful: return True
+
+        print('Logging into OnlyFans')
+
         try:
             if Settings.get_login_method() == "auto":
                 successful = via_form()
@@ -878,6 +920,7 @@ class Driver:
                 print('OnlyFans Message: Skipped (debug)')
                 Settings.dev_print("### Message Successful (debug) ###")
                 Settings.debug_delay_check()
+                Driver.go_to_home()
                 return True
             Settings.dev_print("clicking confirm")
             confirm.click()
@@ -1200,6 +1243,8 @@ class Driver:
                     if Settings.is_debug():
                         print('Skipped: OnlyFans Post (debug)')
                         Settings.dev_print("### Post Maybe Successful ###")
+                        Settings.debug_delay_check()
+                        Driver.go_to_home(force=True)
                         return True
                     Settings.dev_print("confirming upload")
                     send.click()
@@ -1741,10 +1786,10 @@ class Driver:
     def spawn_browser():      
         if Driver.BROWSER: return True
         # driver = None
-        print("Spawning Browser")
         type_ = None
-
+        Settings.maybe_print("spawning browser...")
         def google():
+            Settings.maybe_print("spawning chrome browser...")
             try:
                 options = webdriver.ChromeOptions()
                 options.add_argument("--no-sandbox") # Bypass OS security model
@@ -1799,7 +1844,7 @@ class Driver:
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
                 driver = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
-                print("Spawned Browser - Google")
+                print("Browser Successfull - Chrome")
                 return driver
             except Exception as e:
                 Settings.maybe_print(e)
@@ -1807,6 +1852,7 @@ class Driver:
                 return False
 
         def firefox():
+            Settings.maybe_print("spawning firefox browser...")
             # firefox needs non root
             if os.geteuid() == 0:
                 print("You must run `onlysnarf` as non-root for Firefox to work correctly!")
@@ -1822,7 +1868,7 @@ class Driver:
                 # driver = webdriver.Firefox(options=opts, log_path='/var/log/onlysnarf/geckodriver.log')
                 # driver = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
                 driver = webdriver.Firefox(options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
-                print("Spawned Browser - Firefox")
+                print("Browser Successfull - Firefox")
                 return driver
             except Exception as e:
                 Settings.maybe_print(e)
@@ -1830,8 +1876,9 @@ class Driver:
                 return False
 
         def remote():
+            Settings.maybe_print("spawning remote browser...")
             def attempt_firefox():
-                Settings.dev_print("attempting remote firefox")
+                Settings.dev_print("attempting remote: firefox")
                 try:
                     firefox_options = webdriver.FirefoxOptions()
                     if not Settings.is_show_window():
@@ -1841,11 +1888,12 @@ class Driver:
                        command_executor=link,
                        desired_capabilities=dC,
                        options=firefox_options)
+                    print("Remote Browser Successfull - Firefox")
                     return driver
                 except Exception as e:
                     Settings.dev_print(e)
             def attempt_chrome():
-                Settings.dev_print("attempting remote chrome")
+                Settings.dev_print("attempting remote: chrome")
                 try:
                     chrome_options = webdriver.ChromeOptions()
                     if not Settings.is_show_window():
@@ -1855,6 +1903,7 @@ class Driver:
                        command_executor=link,
                        desired_capabilities=dC,
                        options=chrome_options)
+                    print("Remote Browser Successfull - Chrome")
                     return driver
                 except Exception as e:
                     Settings.dev_print(e)
@@ -1881,12 +1930,11 @@ class Driver:
 
         def reconnect(reconnect_id=None, url=None):
             if reconnect_id and url:
+                Settings.maybe_print("reconnecting browser...")
                 Settings.dev_print("reconnect id: {}".format(reconnect_id))
                 Settings.dev_print("reconnect url: {}".format(url))
-
                 # executor_url = driver.command_executor._url
                 # session_id = driver.session_id
-
                 # https://stackoverflow.com/questions/8344776/can-selenium-interact-with-an-existing-browser-session
                 # def attach_to_session(executor_url, session_id):
                 original_execute = WebDriver.execute
@@ -1902,6 +1950,17 @@ class Driver:
                 driver.session_id = reconnect_id
                 # Replace the patched function with original function
                 WebDriver.execute = original_execute
+                if Settings.use_tabs():
+                    tabs = len(driver.window_handles) - 1
+                    tabNumber = int(Settings.use_tabs())
+                    Settings.dev_print("tabs: {} | {} :tabNumber".format(tabs, tabNumber))
+                    if int(tabNumber) == 0: pass # nothing required
+                    if int(tabNumber) > int(tabs):
+                        driver.execute_script('''window.open("{}","_blank");'''.format(ONLYFANS_HOME_URL))
+                    elif int(tabNumber) <= int(tabs):
+                        driver.switch_to.window(driver.window_handles[tabNumber])
+                    time.sleep(2)
+                print("Browser Successfully Reconnected")
                 return driver
 
             if Settings.get_reconnect_id() and Settings.get_reconnect_url():
@@ -1918,7 +1977,17 @@ class Driver:
 
         BROWSER_TYPE = Settings.get_browser_type()
 
-        if "remote" in str(BROWSER_TYPE):
+        if BROWSER_TYPE == "auto-remote":
+            try:
+                driver = reconnect()
+                driver.title
+                if not driver:
+                    driver = remote()
+            except Exception as e:
+                Settings.dev_print(e)
+                driver = remote()
+
+        elif "remote" in str(BROWSER_TYPE):
             driver = remote()
         elif BROWSER_TYPE == "reconnect":
             driver = reconnect()
@@ -1945,7 +2014,6 @@ class Driver:
         driver.implicitly_wait(30) # seconds
         driver.set_page_load_timeout(1200)
         driver.file_detector = LocalFileDetector()
-        print("Browser Spawned")
         Driver.BROWSER = driver
         return True
 
@@ -2170,6 +2238,11 @@ class Driver:
             User.write_users_local()
         if Settings.is_keep():
             Settings.maybe_print("Keeping Browser Open")
+            Driver.go_to_home(force=True)
+            Settings.dev_print("reset to home page")
+
+            Driver.BROWSER.execute_script("setInterval(function(){window.location.reload(1);},1000*60*9);")
+
             if Driver.NOT_INFORMED_KEPT:
                 print("Kept Browser Open")
             Driver.NOT_INFORMED_KEPT = True

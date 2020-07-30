@@ -628,6 +628,9 @@ class Settings:
 
     def set_prefer_local(buul):
         config["PREFER_LOCAL"] = bool(buul)
+    
+    def set_prefer_local_following(buul):
+        config["PREFER_LOCAL_FOLLOWING"] = bool(buul)
 
     def set_prompt(value):
         Settings.PROMPT = bool(value)
@@ -659,6 +662,9 @@ class Settings:
             config[key.upper()] = answer
         Settings.last_updated = key
         # return Settings.menu()
+
+    def use_tabs():
+        return config["TAB"] or None
 
 ###########################################################################
 
