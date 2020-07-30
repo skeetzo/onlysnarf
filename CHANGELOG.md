@@ -406,6 +406,8 @@
   - debugged all of 2.18.x
   - updated: images & demo gifs
 
+  - finish debugging `onlysnarf-config`
+
   **3.0.x**
 
 ----------------------------------------
