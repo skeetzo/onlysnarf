@@ -267,7 +267,7 @@ def get_file_parent(id_):
 
 def get_images_of_folder(folder):
     image_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and {}".format(folder['id'], MIMETYPES_IMAGES)}).GetList()
-    if len(video_list) > 0:
+    if len(image_list) > 0:
         Settings.dev_print('Images: {}'.format(len(image_list)))
     else:
         Settings.maybe_print("Images Folder (empty): {}".format(folder['title']))

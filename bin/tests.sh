@@ -19,13 +19,13 @@ echo "Testing OnlySnarf"
 # schedule
 # post
 # message
-show=""
 show="-show"
+show=""
 
 declare -a browsers
-browsers=("auto" "firefox" "google" "remote" "remote-chrome" "remote-firefox" "reconnect")
+browsers=("auto" "firefox" "google" "auto-remote" "remote" "remote-chrome" "remote-firefox" "reconnect")
 browsers=("remote" "remote-chrome" "remote-firefox")
-browsers=("reconnect")
+browsers=("auto-remote")
 
 declare -a sources
 sources=("local" "dropbox" "google" "remote")
@@ -53,9 +53,9 @@ function testes() {
 
 		for source in ${sources[@]}; do
 
-			options="-browser $browser -source $source $show $verbose"
-			bin/tests/$test.sh $options
-			# bin/tests/$test.sh $options >> /var/log/onlysnarf/tests.txt
+			echo "Running Test: $source - $browser"
+			bin/tests/$test.sh $browser $source
+			# >> /var/log/onlysnarf/tests.txt
 
 		done
 	done

@@ -158,10 +158,10 @@ class Message():
 			files.append(Settings.get_input_as_files())
 		elif len(self.files) == 0:
 			files = File.select_file_upload_method()
-		print(files)
 		if str(files) == "unset":
 			self.files = "unset"
-			return []
+			files = []
+			if Settings.is_prompt(): return []
 		if files == None: files = []
 		if Settings.get_source() == "google":
 			googleFiles = Google_File.get_files()

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-echo $1
-
 # Image & Expiration
 echo "[*] Misc - Expiration"
 onlysnarfpy \
@@ -12,7 +10,10 @@ onlysnarfpy \
 -text "expiration testes" \
 -debug-delay \
 -expiration 3 \
-"$1" \
+-keep \
+-verbose -verbose -verbose \
+-browser "$1" \
+-source "$2"
 
 echo "[*] Misc - Expiration"
 onlysnarfpy \
@@ -22,4 +23,7 @@ onlysnarfpy \
 -skip-upload \
 -debug-delay \
 -expiration 3 \
-"$1"
+-keep \
+-verbose -verbose -verbose \
+-browser "$1" \
+-source "$2" 

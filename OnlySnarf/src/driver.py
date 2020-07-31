@@ -662,15 +662,16 @@ class Driver:
                 Settings.dev_print(e)
             return False
 
-        def login_check():
+        def login_check(which):
             try:
                 Settings.dev_print("waiting for loginCheck")
                 WebDriverWait(Driver.BROWSER, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
                 print("OnlyFans Login Successful")
+                Settings.dev_print("Login Successful - {}".format(which))
                 return True
             except TimeoutException as te:
                 Settings.dev_print(str(te))
-                print("Login Failure: Timed Out! Please check your Google credentials.")
+                print("Login Failure: Timed Out! Please check your credentials.")
                 print(": If the problem persists, OnlySnarf may require an update.")
                 return False
             except Exception as e:
@@ -735,7 +736,7 @@ class Driver:
                             Settings.dev_print(e)
 
                 check_captcha()
-                return login_check()
+                return login_check("form")
             except Exception as e:
                 Settings.dev_print("form login failure")
                 Driver.error_checker(e)
@@ -792,7 +793,7 @@ class Driver:
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
-                return login_check()
+                return login_check("google")
             except Exception as e:
                 Settings.dev_print("google login failure")
                 Driver.error_checker(e)
@@ -831,7 +832,7 @@ class Driver:
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
-                return login_check()
+                return login_check("twitter")
             except Exception as e:
                 Settings.dev_print("twitter login failure")
                 Driver.error_checker(e)
@@ -1844,7 +1845,8 @@ class Driver:
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
                 driver = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
-                print("Browser Successful - Chrome")
+                print("Browser Created - Chrome")
+                Settings.dev_print("Successful Browser - Chrome")
                 return driver
             except Exception as e:
                 Settings.maybe_print(e)
@@ -1868,7 +1870,8 @@ class Driver:
                 # driver = webdriver.Firefox(options=opts, log_path='/var/log/onlysnarf/geckodriver.log')
                 # driver = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
                 driver = webdriver.Firefox(options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
-                print("Browser Successful - Firefox")
+                print("Browser Created - Firefox")
+                Settings.dev_print("Successful Browser - Firefox")
                 return driver
             except Exception as e:
                 Settings.maybe_print(e)
@@ -1888,7 +1891,8 @@ class Driver:
                        command_executor=link,
                        desired_capabilities=dC,
                        options=firefox_options)
-                    print("Remote Browser Successful - Firefox")
+                    print("Remote Browser Created - Firefox")
+                    Settings.dev_print("Successful Remote - Firefox")
                     return driver
                 except Exception as e:
                     Settings.dev_print(e)
@@ -1903,7 +1907,8 @@ class Driver:
                        command_executor=link,
                        desired_capabilities=dC,
                        options=chrome_options)
-                    print("Remote Browser Successful - Chrome")
+                    print("Remote Browser Created - Chrome")
+                    Settings.dev_print("Successful Remote - Chrome")
                     return driver
                 except Exception as e:
                     Settings.dev_print(e)
@@ -1961,6 +1966,7 @@ class Driver:
                         driver.switch_to.window(driver.window_handles[tabNumber])
                     time.sleep(2)
                 print("Browser Successfully Reconnected")
+                Settings.dev_print("Successful Reconnect")
                 return driver
 
             if Settings.get_reconnect_id() and Settings.get_reconnect_url():

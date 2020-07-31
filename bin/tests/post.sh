@@ -6,22 +6,16 @@ onlysnarfpy \
 -debug \
 -action "post" \
 -text "post testes" \
--source "$2" \
-"$1" \
-"$3"
-# -show \
-# -verbose
-# -verbose -verbose -verbose
-# -verbose -verbose
+-keep \
+-verbose -verbose -verbose \
+-browser "$1" \
+-source "$2"
 
 echo "[*] Post - No Text"
 onlysnarfpy \
 -debug \
 -action "post" \
--source "$2" \
-"$1" \
-"$3"
-# -show \
-# -verbose
-# -verbose -verbose -verbose
-# -verbose -verbose
+-keep \
+-verbose -verbose -verbose \
+-browser "$1" \
+-source "$2"

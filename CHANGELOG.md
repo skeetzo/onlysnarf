@@ -386,7 +386,8 @@
   **2.18.1**
   - debugged: redundant category asking
   - debugging: local
-
+  - updated: tests
+  
 ----------------------------------------
 
   **2.x.x**
@@ -394,7 +395,6 @@
   - adding tab requires a file lock between onlysnarf sessions to maintain the correct active tab
   - debugged remote: debug refresh to stay open -> test javascript refresh injection
 
-  
 
   **x.x.x**
   - properly debug discount
