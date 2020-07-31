@@ -227,6 +227,8 @@ class File():
         if not category: category = Settings.select_category()
         if not category: Settings.dev_print("Warning: Missing Category")
         files = File.get_files_by_category(category)
+        print("balls")
+        print(files)
         if Settings.get_title():
             for file in files:
                 if str(Settings.get_title()) == str(file.get_title()):
