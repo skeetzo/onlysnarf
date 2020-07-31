@@ -42,12 +42,13 @@ class Settings:
     \\_______  /___|  /____/ ____/_______  /___|  (____  \\\\__|  |_|   \n \
             \\/     \\/     \\/            \\/     \\/     \\/              \n"
 
-    last_updated = False
+    LAST_UPDATED_KEY = False
+    CATEGORY = None
     CONFIRM = True
     FILES = None
+    PERFORMER_CATEGORY = None
     PROMPT = True
     VERSION = pkg_resources.get_distribution("onlysnarf").version
-    PERFORMER_CATEGORY = None
 
     def __init__():
         pass
@@ -96,10 +97,10 @@ class Settings:
                 print(colorize(text, "blue"))
 
     def header():
-        if Settings.last_updated:
-            print("Updated: {} = {}".format(Settings.last_updated, config[Settings.last_updated.replace(" ","_").upper()]))
+        if Settings.LAST_UPDATED_KEY:
+            print("Updated: {} = {}".format(Settings.LAST_UPDATED_KEY, config[Settings.LAST_UPDATED_KEY.replace(" ","_").upper()]))
             print('\r')
-        Settings.last_updated = None
+        Settings.LAST_UPDATED_KEY = None
 
     # Gets
 
@@ -240,7 +241,12 @@ class Settings:
         return config["CONFIG_PATH"] or ""    
 
     def get_local_path():
-        return os.path.join(Settings.get_mount_path(), Settings.get_username())
+        localPath = os.path.join(Settings.get_mount_path(), Settings.get_username())
+        from pathlib import Path
+        Path(localPath).mkdir(parents=True, exist_ok=True)
+        for cat in Settings.get_categories():
+            Path(os.path.join(localPath, cat)).mkdir(parents=True, exist_ok=True)
+        return localPath
 
     def get_google_path():
         return config["GOOGLE_PATH"] or ""
@@ -584,6 +590,7 @@ class Settings:
             print("Error: Missing Session Path")
 
     def select_category(categories=None):
+        # if Settings.CATEGORY: return Settings.CATEGORY
         if not categories: categories = Settings.get_categories()
         print("Select a Category")
         categories.insert(0, "Back")
@@ -597,6 +604,8 @@ class Settings:
         cat = PyInquirer.prompt(question)["category"]
         if str(cat) == "back": return None
         if not Settings.confirm(cat): return Settings.select_category()
+        # Settings.CATEGORY = cat
+        config["CATEGORY"] = cat
         return cat
 
     def set_category(cat):
@@ -660,7 +669,7 @@ class Settings:
             answer = PyInquirer.prompt(question)["setting"]
             if not Settings.confirm(answer): return Settings.menu()
             config[key.upper()] = answer
-        Settings.last_updated = key
+        Settings.LAST_UPDATED_KEY = key
         # return Settings.menu()
 
     def use_tabs():

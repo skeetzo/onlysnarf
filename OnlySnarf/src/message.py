@@ -1,7 +1,8 @@
 from datetime import datetime
 from .classes import Poll, Schedule
 from .driver import Driver
-from .file import File, Google_File, Google_Folder
+from . import remote as Remote
+from .file import File, Folder, Google_File, Google_Folder
 from .settings import Settings
 from .user import User
 from .validators import NumberValidator, TimeValidator, DateValidator, DurationValidator, ExpirationValidator, ListValidator
@@ -149,7 +150,7 @@ class Message():
 	def get_files(self):
 		if str(self.files) == "unset": return []
 		if len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
-		if (Settings.is_prompt() and not Settings.prompt("upload files")) or (not Settings.is_prompt() and Settings.get_category() == None):
+		if not Settings.is_prompt() and Settings.get_category() == None:
 			self.files = "unset"
 			return []
 		files = []
@@ -157,18 +158,42 @@ class Message():
 			files.append(Settings.get_input_as_files())
 		elif len(self.files) == 0:
 			files = File.select_file_upload_method()
+		print(files)
+		if str(files) == "unset":
+			self.files = "unset"
+			return []
 		if files == None: files = []
-		if Settings.get_source() == "google" and len(files) == 0 and len(Google_File.get_files()) > 0:
-			files = Google_File.select_files()
-		# elif Settings.get_source() == "dropbox" and len(files) == 0 and len(Dropbox.get_files()) > 0:
-		# 	files = Dropbox.select_files()
-		elif Settings.get_source() == "remote" and len(files) == 0 and len(Remote.get_files()) > 0:
-			files = Remote.select_files()
-		elif Settings.get_source() == "local" and len(files) == 0 and len(File.get_files()) > 0:
-			files = File.select_files()
+		if Settings.get_source() == "google":
+			googleFiles = Google_File.get_files()
+			if len(files) == 0 and len(googleFiles) > 0:
+				files = Google_File.select_files()
+			elif len(files) == 0 and len(googleFiles) == 0:
+				self.files = "unset"
+				return self.files
+		if Settings.get_source() == "dropbox":
+			dropboxFiles = Dropbox.get_files()
+			if len(files) == 0 and len(dropboxFiles) > 0:
+				files = Dropbox.select_files()
+			elif len(files) == 0 and len(dropboxFiles) == 0:
+				self.files = "unset"
+				return self.files
+		if Settings.get_source() == "remote":
+			remoteFiles = Remote.get_files()
+			if len(remoteFiles) > 0:
+				files = Remote.select_files()
+			elif len(files) == 0 and len(remoteFiles) == 0:
+				self.files = "unset"
+				return self.files
+		if Settings.get_source() == "local":
+			localFiles = File.get_files()
+			if len(files) == 0 and len(localFiles) > 0:
+				files = File.select_files()
+			elif len(files) == 0 and len(localFiles) == 0:
+				self.files = "unset"
+				return self.files
 		filed = []
 		for file in files:
-			if isinstance(file, Google_Folder): filed.extend(file.get_files())
+			if isinstance(file, Folder) or isinstance(file, Google_Folder): filed.extend(file.get_files())
 			else:
 				if hasattr(file, "performer"):
 					self.hasPerformers = True
@@ -294,7 +319,7 @@ class Message():
 		self.get_expiration()
 		self.get_files()
 		self.get_recipients()
-		if not self.text:
+		if not self.text and str(self.files) != "unset":
 			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
 		if Settings.get_performer_category() or self.hasPerformers:
@@ -312,7 +337,7 @@ class Message():
 		self.get_schedule()
 		self.get_expiration()
 		self.get_files()
-		if not self.text:
+		if not self.text and str(self.files) != "unset":
 			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
 		if Settings.get_performer_category() or self.hasPerformers:
@@ -327,7 +352,7 @@ class Message():
 		self.get_text()
 		self.get_price()
 		self.get_files()
-		if not self.text:
+		if not self.text and str(self.files) != "unset":
 			if len(self.files) > 0:
 				self.text = self.files[0].get_title()
 		if Settings.get_performer_category() or self.hasPerformers:
@@ -345,6 +370,9 @@ class Message():
 		self.get_post()
 		if Settings.is_prompt():
 			if not Settings.prompt("Post"): return
+		if self.get_files() != "unset" and len(self.get_files()) == 0 and not self.get_text():
+			print("Error: Missing Files and Text")
+			return
 		successful = False
 		try: successful = Driver.post(self)
 		except Exception as e:
@@ -373,6 +401,9 @@ class Message():
 		self.get_message()
 		if Settings.is_prompt():
 			if not Settings.prompt("Send"): return
+		if self.get_files() != "unset" and len(self.get_files()) == 0 and not self.get_text():
+			print("Error: Missing Files and Text")
+			return
 		successful = False
 		try: 
 			# for user in self.get_recipients():

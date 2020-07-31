@@ -383,6 +383,9 @@
   - added: remote-chrome, remote-firefox, auto-remote
   - added: reconnect
   - added: session_id & session_url -> session.json for reconnecting to existing browser sessions
+  **2.18.1**
+  - debugged: redundant category asking
+  - debugging: local
 
 ----------------------------------------
 
@@ -390,6 +393,8 @@
   - need to add 'create' to Profile for asking for profile settings when syncing to
   - adding tab requires a file lock between onlysnarf sessions to maintain the correct active tab
   - debugged remote: debug refresh to stay open -> test javascript refresh injection
+
+  
 
   **x.x.x**
   - properly debug discount

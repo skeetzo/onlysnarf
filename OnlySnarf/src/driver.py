@@ -1844,7 +1844,7 @@ class Driver:
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
                 driver = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
-                print("Browser Successfull - Chrome")
+                print("Browser Successful - Chrome")
                 return driver
             except Exception as e:
                 Settings.maybe_print(e)
@@ -1868,7 +1868,7 @@ class Driver:
                 # driver = webdriver.Firefox(options=opts, log_path='/var/log/onlysnarf/geckodriver.log')
                 # driver = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
                 driver = webdriver.Firefox(options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
-                print("Browser Successfull - Firefox")
+                print("Browser Successful - Firefox")
                 return driver
             except Exception as e:
                 Settings.maybe_print(e)
@@ -1888,7 +1888,7 @@ class Driver:
                        command_executor=link,
                        desired_capabilities=dC,
                        options=firefox_options)
-                    print("Remote Browser Successfull - Firefox")
+                    print("Remote Browser Successful - Firefox")
                     return driver
                 except Exception as e:
                     Settings.dev_print(e)
@@ -1903,7 +1903,7 @@ class Driver:
                        command_executor=link,
                        desired_capabilities=dC,
                        options=chrome_options)
-                    print("Remote Browser Successfull - Chrome")
+                    print("Remote Browser Successful - Chrome")
                     return driver
                 except Exception as e:
                     Settings.dev_print(e)
