@@ -161,7 +161,7 @@ class File():
             return ""
         title, ext = os.path.splitext(path)
         self.ext = ext
-        self.title = title
+        self.title = "{}{}".format(os.path.basename(title), ext)
         return self.title
 
     # def get_type(self):
@@ -227,8 +227,6 @@ class File():
         if not category: category = Settings.select_category()
         if not category: Settings.dev_print("Warning: Missing Category")
         files = File.get_files_by_category(category)
-        print("balls")
-        print(files)
         if Settings.get_title():
             for file in files:
                 if str(Settings.get_title()) == str(file.get_title()):
@@ -297,6 +295,7 @@ class File():
             file = File()
             setattr(file, "path", os.path.join(folder.get_path(),f))
             files.append(file)
+            Settings.maybe_print("image path: {}".format(os.path.join(folder.get_path(),f)))
         return files
 
     @staticmethod
@@ -313,6 +312,7 @@ class File():
             file = File()
             setattr(file, "path", os.path.join(folder.get_path(),f))
             files.append(file)
+            Settings.maybe_print("video path: {}".format(os.path.join(folder.get_path(),f)))
         return files
 
     @staticmethod
@@ -347,20 +347,20 @@ class File():
                     if not folder: continue
                     for image in File.get_images_of_folder(folder):
                         file = File()
-                        setattr(file, "path", image)
-                        setattr(file, "category", folder)
+                        setattr(file, "path", imageget_path())
+                        setattr(file, "category", folder.get_title())
                         files.append(file)
             elif "video" in str(category):
                 categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
                 for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
                     if not folder: continue
                     videos = File.get_videos_of_folder(folder)
-                    if len(videos) > 0:
-                        files.append(folder)
+                    # if len(videos) > 0:
+                        # files.append(folder)
                     for video in videos:
                         file = File()
-                        setattr(file, "path", video)
-                        setattr(file, "category", folder)
+                        setattr(file, "path", video.get_path())
+                        setattr(file, "category", folder.get_title())
                         files.append(file)
             elif "galler" in str(category):
                 categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
@@ -371,8 +371,8 @@ class File():
                         files.append(folder)
                     for gallery in galleries:
                         file = Folder()
-                        setattr(file, "path", gallery)
-                        setattr(file, "category", folder)
+                        setattr(file, "path", galleryget_path())
+                        setattr(file, "category", folder.get_title())
                         files.append(file)
             elif "performer" in str(category):
                 categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
@@ -380,8 +380,8 @@ class File():
                     # for performer in File.get_folders_of_folder(folder):
                     if not performer: continue
                     p = Folder()
-                    setattr(p, "path", performer)
-                    setattr(p, "category", categoryFolder)
+                    setattr(p, "path", performer.get_path())
+                    setattr(p, "category", categoryFolder.get_title())
                     files.append(p)
             return files
         ##
@@ -408,7 +408,11 @@ class File():
             files_.append(file_)
         if len(files_) == 0:
             print("Missing Files")
-            return File.select_files()
+            return
+        files_.append({
+            "name": 'Back',
+            "value": None,
+        })
         question = {
             'type': 'list',
             'name': 'file',
@@ -417,6 +421,7 @@ class File():
             # 'filter': lambda file: file.lower()
         }
         answer = PyInquirer.prompt(question)
+        if not answer: return File.select_files()
         file = answer["file"]
         if not Settings.confirm(file.get_path()): return None
         return file
@@ -449,8 +454,7 @@ class File():
 
     @staticmethod
     def select_file_upload_method():
-        if str(Settings.get_source()) != "": return []
-        if not Settings.prompt("upload files"): return []
+        if not Settings.prompt("upload files"): return "unset"
         print("Select an upload source")
         sources = Settings.get_source_options()
         question = {
@@ -479,6 +483,7 @@ class File():
         self.delete()
         return True
 
+##
 
 class Folder(File):
     def __init__(self):
@@ -536,8 +541,9 @@ class Folder(File):
             files = File.get_files_by_folder(self.get_path())
             for file in files:
                 file_ = File()
-                setattr(file_, "file", file)
+                setattr(file_, "path", os.path.join(self.get_path(), file))
                 self.files.append(file_)
+                Settings.maybe_print("local file found: {}".format(file_.get_title()))
         if Settings.get_title():
             for file in self.files:
                 if str(Settings.get_title()) == str(file.get_title()):

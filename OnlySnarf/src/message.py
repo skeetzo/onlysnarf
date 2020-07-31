@@ -150,7 +150,7 @@ class Message():
 	def get_files(self):
 		if str(self.files) == "unset": return []
 		if len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
-		if (Settings.is_prompt() and not Settings.prompt("upload files")) or (not Settings.is_prompt() and Settings.get_category() == None):
+		if not Settings.is_prompt() and Settings.get_category() == None:
 			self.files = "unset"
 			return []
 		files = []
@@ -158,6 +158,10 @@ class Message():
 			files.append(Settings.get_input_as_files())
 		elif len(self.files) == 0:
 			files = File.select_file_upload_method()
+		print(files)
+		if str(files) == "unset":
+			self.files = "unset"
+			return []
 		if files == None: files = []
 		if Settings.get_source() == "google":
 			googleFiles = Google_File.get_files()
@@ -366,7 +370,7 @@ class Message():
 		self.get_post()
 		if Settings.is_prompt():
 			if not Settings.prompt("Post"): return
-		if len(self.get_files()) == 0 and not self.get_text():
+		if self.get_files() != "unset" and len(self.get_files()) == 0 and not self.get_text():
 			print("Error: Missing Files and Text")
 			return
 		successful = False
@@ -397,7 +401,7 @@ class Message():
 		self.get_message()
 		if Settings.is_prompt():
 			if not Settings.prompt("Send"): return
-		if len(self.get_files()) == 0 and not self.get_text():
+		if self.get_files() != "unset" and len(self.get_files()) == 0 and not self.get_text():
 			print("Error: Missing Files and Text")
 			return
 		successful = False

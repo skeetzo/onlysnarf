@@ -590,7 +590,7 @@ class Settings:
             print("Error: Missing Session Path")
 
     def select_category(categories=None):
-        if Settings.CATEGORY: return Settings.CATEGORY
+        # if Settings.CATEGORY: return Settings.CATEGORY
         if not categories: categories = Settings.get_categories()
         print("Select a Category")
         categories.insert(0, "Back")
@@ -604,7 +604,8 @@ class Settings:
         cat = PyInquirer.prompt(question)["category"]
         if str(cat) == "back": return None
         if not Settings.confirm(cat): return Settings.select_category()
-        Settings.CATEGORY = cat
+        # Settings.CATEGORY = cat
+        config["CATEGORY"] = cat
         return cat
 
     def set_category(cat):
