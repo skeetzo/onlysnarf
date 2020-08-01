@@ -275,7 +275,7 @@ class Settings:
         return config["REMOTE_HOST"] or ""
 
     def get_remote_port():
-        return config["REMOTE_PORT"] or ""
+        return config["REMOTE_PORT"] or 22
 
     def get_remote_username():
         return config["REMOTE_USERNAME"] or ""
@@ -287,7 +287,7 @@ class Settings:
         return config["REMOTE_HOST"] or ""
 
     def get_remote_browser_port():
-        return config["REMOTE_PORT"] or ""
+        return config["REMOTE_BROWSER_PORT"] or 4444
 
     def get_secret_path():
         return config["CLIENT_SECRET"] or ""
@@ -402,8 +402,8 @@ class Settings:
     def is_prompt():
         return Settings.PROMPT or False
 
-    def is_create_drive():
-        return config["CREATE_DRIVE"] or False
+    def is_create_missing():
+        return config["CREATE_MISSING"] or False
 
     def is_debug():
         return config["DEBUG"] or False

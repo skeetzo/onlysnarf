@@ -40,8 +40,7 @@ class File():
         ##
         self.title = None
         self.category = None # [image, gallery, video, performer]
-        ##
-        self.remote_path = None
+        self.size = None
 
     ######################################################################################
 
@@ -51,7 +50,7 @@ class File():
     def backup(self):
         if not File.backup_text(self.get_title()): return
         if Settings.get_destination() == "remote":
-            Remote.backup_file(self)
+            Remote.upload_file(self)
         elif Settings.get_destination() == "google":
             Google.upload_file(file=self)
         # elif Settings.get_destination() == "dropbox":
@@ -59,8 +58,8 @@ class File():
         else:
             # move file to local backup location
             backupPath = os.path.join(Settings.get_local_path(), "posted")
-            backupPath = os.path.join(backupPath, file.category, file.title)
-            shutil.move(file.get_path(), backupPath)
+            backupPath = os.path.join(backupPath, self.category, self.get_title())
+            shutil.move(self.get_path(), backupPath)
 
     @staticmethod
     def backup_text(title):
@@ -81,16 +80,23 @@ class File():
 
     @staticmethod
     def backup_files(files=[]):
-        if files[0] and files[0].remote_path:
-            Remote.backup_files(files)
+        if not File.backup_text(self.get_title()): return
+        if Settings.get_destination() == "remote":
+            Remote.upload_files(files)
+        elif Settings.get_destination() == "google":
+            Google.upload_files(files)
+        # elif Settings.get_destination() == "dropbox":
+            # Dropbox.upload_files(files)
         else:
             for file in files:
                 file.backup()
         return True
 
     def check_size(self):
-        if not os.path.exists(self.get_path()): return False
-        size = os.path.getsize(self.get_path())
+        if not self.size:
+            if not os.path.exists(self.get_path()): return False
+            size = os.path.getsize(self.get_path())
+        else: size = self.size
         Settings.maybe_print("File Size: {}kb - {}mb".format(size/1000, size/1000000))
         global ONE_MEGABYTE
         if size <= ONE_MEGABYTE:
@@ -98,6 +104,7 @@ class File():
         global ONE_HUNDRED_KILOBYTES
         if size <= ONE_HUNDRED_KILOBYTES:
             Settings.maybe_print("Warning: Tiny File Size")
+        self.size = size
         if size == 0:
             Settings.maybe_print("Error: Empty File Size")
             return False
@@ -118,13 +125,10 @@ class File():
     # Deletes online file
     def delete(self):
         if not File.delete_text(self.get_title()): return
-        if self.remote_path:
-            Remote.delete_file(self)
-        else:
-            try: 
-                os.remove(self.get_path())
-                print('File Deleted: {}'.format(self.get_title()))
-            except Exception as e: Settings.dev_print(e)
+        try: 
+            os.remove(self.get_path())
+            print('File Deleted: {}'.format(self.get_title()))
+        except Exception as e: Settings.dev_print(e)
 
     @staticmethod
     def delete_text(title):
@@ -139,6 +143,13 @@ class File():
             return False
         else:
             Settings.maybe_print('Deleting: {}'.format(title))
+        return True
+
+    @staticmethod
+    def download_text(title):
+        if Settings.is_skip_download():
+            print("Skipping Download (debug)")
+            return False
         return True
 
     ##############################
@@ -227,7 +238,7 @@ class File():
         if not category: category = Settings.select_category()
         if not category: Settings.dev_print("Warning: Missing Category")
         files = File.get_files_by_category(category)
-        if Settings.get_title():
+        if Settings.get_title() and str(files) != "unset":
             for file in files:
                 if str(Settings.get_title()) == str(file.get_title()):
                     files = [file]
@@ -449,12 +460,14 @@ class File():
             ##
             files.append(file)
             if "galler" in str(category) or "video" in str(category): break
+        if str(files[0]) == "unset": return files
         if not Settings.confirm([file.get_title() for file in files]): return File.select_files()
         return files
 
     @staticmethod
     def select_file_upload_method():
-        if not Settings.prompt("upload files"): return "unset"
+        if not Settings.prompt("upload files"): 
+            return "unset"
         print("Select an upload source")
         sources = Settings.get_source_options()
         question = {
@@ -464,7 +477,6 @@ class File():
             'choices': [src.title() for src in sources]
         }
         upload = PyInquirer.prompt(question)["upload"]
-        # if not Settings.confirm(upload): return File.select_file_upload_method()
         if str(upload) == "Local":
             return File.select_files()
         elif str(upload) == "Google":
@@ -482,6 +494,43 @@ class File():
         self.backup()
         self.delete()
         return True
+
+##
+
+class Remote_File(File):
+    def __init__(self):
+        File.__init__(self)
+
+    def backup(self):
+        if not File.backup_text(self.get_title()): return
+        if Settings.get_destination() == "remote":
+            Remote.backup_file(self)
+        elif Settings.get_destination() == "google":
+            Google.upload_file(file=self)
+        # elif Settings.get_destination() == "dropbox":
+        #     Dropbox.upload_file(file=self)
+        else:
+            file = self.download()
+            file.backup()
+            self.delete()
+
+    def delete(self):
+        if not File.delete_text(self.get_title()): return
+        try: 
+            Remote.delete_file(self)
+            print('File Deleted: {}'.format(self.get_title()))
+        except Exception as e: Settings.dev_print(e)
+
+    def download(self):
+        if not File.download_text(self.get_title()): return False
+        file = Remote.download_file(self)
+        if not file: return False
+        ### Finish ###
+        if not file.check_size():
+            print("Error: Missing Downloaded File")
+            return False
+        print("Downloaded: {}".format(file.get_title()))
+        return file
 
 ##
 
@@ -582,13 +631,6 @@ class Google_File(File):
         Google.delete(self)
 
     @staticmethod
-    def download_text(title):
-        if Settings.is_skip_download():
-            print("Skipping Download (debug)")
-            return False
-        return True
-
-    @staticmethod
     def download_files(files=[]):
         Settings.maybe_print('Download limit: '+str(Settings.get_image_download_limit()))
         random.shuffle(files)
@@ -602,14 +644,14 @@ class Google_File(File):
 
     # Download File
     def download(self):
-        if not Google_File.download_text(self.title): return False
+        if not File.download_text(self.get_title()): return False
         successful = Google.download_file(self)
         if not successful: return False
         ### Finish ###
         if not self.check_size():
             print("Error: Missing Downloaded File")
             return False
-        print("Downloaded: {}".format(self.title))
+        print("Downloaded: {}".format(self.get_title()))
         return True
 
     def get_ext(self):
@@ -792,6 +834,7 @@ class Google_File(File):
     def select_files():
         if not Settings.is_prompt(): return [Google_File.get_random_file()]
         category = Settings.select_category()
+        print('what the fuck')
         if not category: return File.select_file_upload_method()
         # if not Settings.confirm(category): return Google_File.select_files()
         print("Select Google Files or a Folder")
@@ -935,7 +978,7 @@ class Video(File):
         global FIFTY_MEGABYTES
         if (int(os.stat(str(path)).st_size) < FIFTY_MEGABYTES or str(Settings.is_reduce()) == "False"):
             return
-        Settings.dev_print("reduce: {}".format(self.title))
+        Settings.dev_print("reduce: {}".format(self.get_title()))
         self.path = ffmpeg.reduce(path)
     
     # unnecessary
@@ -946,7 +989,7 @@ class Video(File):
         path = self.get_path()
         if Settings.is_repair():
             return
-        Settings.dev_print("repair: {}".format(self.title))
+        Settings.dev_print("repair: {}".format(self.get_title()))
         self.path = ffmpeg.repair(path)
 
 

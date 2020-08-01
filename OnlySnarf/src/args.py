@@ -128,10 +128,10 @@ parser.add_argument('-categories', dest='categories',
   action='append', help='the categories to list in menu (appends to \'{}\''.format("\'".join(CATEGORIES_DEFAULT)), 
   default=[])
 ##
-# -create-drive 
-# creates missing OnlySnarf folders in Google Drive
-parser.add_argument('-create-drive', action='store_true', dest='create_drive',
-  help='creates missing OnlySnarf folders in Google Drive')
+# -create-missing 
+# creates missing OnlySnarf folders
+parser.add_argument('-create-missing', action='store_true', dest='create_missing',
+  help='creates missing OnlySnarf folders at target source')
 ##
 # -cron
 # determines whether script running is a cronjob
@@ -174,7 +174,9 @@ parser.add_argument('-delete-google', action='store_true', dest='delete_google',
 ##
 # -destination
 # the destination to use when backing up content
-parser.add_argument('-destination', dest='destination', default="local", choices=["google","dropbox","remote","local"],
+parser.add_argument('-destination', dest='destination', default="local", choices=["google",
+  # "dropbox",
+  "remote","local"],
   help='file backup location')
 ##
 # -discount
@@ -328,10 +330,15 @@ parser.add_argument('-profile-path', type=str, dest='profile_path',
 parser.add_argument('-remote-host', type=str, dest='remote_host',
   help='the remote host to connect to', default="127.0.0.1")
 ##
+# -remote-browser-port
+# the remote port to connect to
+parser.add_argument('-remote-browser-port', type=int, dest='remote_browser_port',
+  help='the remote port to connect to for remote browser', default=4444)
+##
 # -remote-port
 # the remote port to connect to
 parser.add_argument('-remote-port', type=int, dest='remote_port',
-  help='the remote port to connect to', default=4444)
+  help='the remote port to connect to', default=22)
 ##
 # -remote-username
 # the remote username to use
@@ -403,7 +410,9 @@ parser.add_argument('-show','-show-window', dest='show', action='store_true',
 ##
 # -source
 # the source to use when searching for content
-parser.add_argument('-source', dest='source', default="local", choices=["google","dropbox","remote","local"],
+parser.add_argument('-source', dest='source', default="local", choices=["google",
+  # "dropbox",
+  "remote","local"],
   help='file host location')
 ##
 ## DEBUGGING

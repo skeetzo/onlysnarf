@@ -198,7 +198,7 @@ def get_folder_by_name(folderName, parent=None):
             Settings.maybe_print("Found Folder: {}".format(folderName))
             cache_add([folder])
             return folder
-    if not Settings.is_create_drive():
+    if not Settings.is_create_missing():
         Settings.maybe_print("Skipping: Create Missing Folder - {}".format(folderName))
         return None
     # create if missing
@@ -320,7 +320,7 @@ def get_posted_folder_by_name(folderName, parent=None):
             cache_add([folder])
             posted = folder
     if posted == None:
-        if not Settings.is_create_drive():
+        if not Settings.is_create_missing():
             Settings.maybe_print("Skipping: Create Missing Folder - {}".format("posted"))
             return None        
         # create if missing
@@ -334,7 +334,7 @@ def get_posted_folder_by_name(folderName, parent=None):
             Settings.maybe_print("Found Folder: {}".format(folderName))
             cache_add([folder_])
             return folder_
-    if not Settings.is_create_drive():
+    if not Settings.is_create_missing():
         Settings.maybe_print("Skipping: Create Missing Folder - {}".format(folderName))
         return None
     # create if missing

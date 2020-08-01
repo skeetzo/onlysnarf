@@ -387,6 +387,10 @@
   - debugged: redundant category asking
   - debugging: local
   - updated: tests
+  **2.18.2**
+  - debugged: local
+  - create-drive -> create-missing
+  - debugging: remote
   
 ----------------------------------------
 

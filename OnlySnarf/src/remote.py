@@ -3,17 +3,35 @@ import PyInquirer
 from .settings import Settings
 
 # https://pysftp.readthedocs.io/en/release_0.2.9/cookbook.html
-
-myHostname = Settings.get_remote_host()
-myUsername = Settings.get_remote_username()
-myPassword = Settings.get_remote_password()
+HOSTNAME = str(Settings.get_remote_host())
+USERNAME = str(Settings.get_remote_username())
+PASSWORD = str(Settings.get_remote_password())
+PORT = int(Settings.get_remote_port())
 cnopts = pysftp.CnOpts(knownhosts='known_hosts')
+# cnopts = pysftp.CnOpts(knownhosts='/home/skeetzo/.ssh/known_hosts')
+cnopts.hostkeys = None
+
+def auth():
+	if HOSTNAME == "":
+		print("Error: Missing remote host")
+		return False
+	if USERNAME == "":
+		print("Error: Missing remote username")
+		return False
+	if PASSWORD == "":
+		print("Error: Missing remote password")
+		return False
+	if PORT == "":
+		print("Error: Missing remote port")
+		return False
+	return True
 
 def backup_file(file):
+	print("Backing Up File Remotely")
+	if not auth(): return
 	try:
-		print("Backing Up File Remotely")
-		with pysftp.Connection(host=myHostname, username=myUsername, password=myPassword, cnopts=cnopts) as sftp:
-			print("Connection succesfully established ... ")
+		with pysftp.Connection(host=HOSTNAME, username=USERNAME, password=PASSWORD, cnopts=cnopts, port=PORT) as sftp:
+			Settings.maybe_print("Connection succesfully established ... ")
 
 			# Define the file that you want to upload from your local directorty
 			# or absolute "C:\Users\sdkca\Desktop\TUTORIAL2.txt"
@@ -28,13 +46,14 @@ def backup_file(file):
 			sftp.put(localFilePath, remoteFilePath)
 		# connection closed automatically at the end of the with-block
 	except Exception as e:
-		print(e)
+		Settings.dev_print(e)
 
 def backup_files(files):
+	print("Backing Up Files Remotely")
+	if not auth(): return
 	try:
-		print("Backing Up Files Remotely")
-		with pysftp.Connection(host=myHostname, username=myUsername, password=myPassword, cnopts=cnopts) as sftp:
-			print("Connection succesfully established ... ")
+		with pysftp.Connection(host=HOSTNAME, username=USERNAME, password=PASSWORD, cnopts=cnopts, port=PORT) as sftp:
+			Settings.maybe_print("Connection succesfully established ... ")
 
 			for file in files:
 				# Define the file that you want to upload from your local directorty
@@ -50,26 +69,14 @@ def backup_files(files):
 				sftp.put(localFilePath, remoteFilePath)
 		# connection closed automatically at the end of the with-block
 	except Exception as e:
-		print(e)
+		Settings.dev_print(e)
 
-def delete_file(file):
+def upload_file(file):
+	print("Uploading Remote File")
+	if not auth(): return
 	try:
-		print("Deleting Remote File")
-		if not file.remote_path:
-			print("Error: File missing remote path")
-			return
-		with pysftp.Connection(host=myHostname, username=myUsername, password=myPassword, cnopts=cnopts) as sftp:
-			print("Connection succesfully established ... ")
-			pysftp.execute('rm {}'.format(file.remote_path))
-	except Exception as e:
-		print(e)
-
-# download
-def download_file(file):
-	try:
-		print("Downloading Remote File")
-		with pysftp.Connection(host=myHostname, username=myUsername, password=myPassword, cnopts=cnopts) as sftp:
-			print("Connection succesfully established ... ")
+		with pysftp.Connection(host=HOSTNAME, username=USERNAME, password=PASSWORD, cnopts=cnopts, port=PORT) as sftp:
+			Settings.maybe_print("Connection succesfully established ... ")
 
 			# Define the file that you want to download from the remote directory
 			# remoteFilePath = '/var/integraweb-db-backups/TUTORIAL.txt'
@@ -77,44 +84,121 @@ def download_file(file):
 
 			# Define the local path where the file will be saved
 			# or absolute "C:\Users\sdkca\Desktop\TUTORIAL.txt"
-			localFilePath = './TUTORIAL.txt'
+			# os.path.join(Settings.get_mount_path(), Settings.get_username(), file.category, file.get_title())
+			localFilePath = file.get_path()
 
-			sftp.get(remoteFilePath, localFilePath)
+			sftp.put(localFilePath, remoteFilePath)
 		# connection closed automatically at the end of the with-block
 	except Exception as e:
-		print(e)
+		Settings.dev_print(e)
+
+def upload_files(files):
+	print("Uploading Remote Files")
+	if not auth(): return
+	try:
+		with pysftp.Connection(host=HOSTNAME, username=USERNAME, password=PASSWORD, cnopts=cnopts, port=PORT) as sftp:
+			Settings.maybe_print("Connection succesfully established ... ")
+			for file in files:
+				remoteFilePath = file.get_path()
+				localFilePath = file.get_path()
+				sftp.put(localFilePath, remoteFilePath)
+	except Exception as e:
+		Settings.dev_print(e)
+
+def delete_file(file):
+	print("Deleting Remote File")
+	if not auth(): return
+	try:
+		if not file.remote_path:
+			print("Error: File missing remote path")
+			return
+		with pysftp.Connection(host=HOSTNAME, username=USERNAME, password=PASSWORD, cnopts=cnopts, port=PORT) as sftp:
+			Settings.maybe_print("Connection succesfully established ... ")
+			sftp.execute('rm {}'.format(file.remote_path))
+	except Exception as e:
+		Settings.dev_print(e)
+
+# download
+def download_file(file):
+	print("Downloading Remote File")
+	if not auth(): return
+	try:
+		with pysftp.Connection(host=HOSTNAME, username=USERNAME, password=PASSWORD, cnopts=cnopts, port=PORT) as sftp:
+			Settings.maybe_print("Connection succesfully established ... ")
+
+			# Define the file that you want to download from the remote directory
+			# remoteFilePath = '/var/integraweb-db-backups/TUTORIAL.txt'
+			remoteFilePath = file.get_path()
+
+			# Define the local path where the file will be saved
+			# or absolute "C:\Users\sdkca\Desktop\TUTORIAL.txt"
+			# os.path.join(Settings.get_mount_path(), Settings.get_username(), file.category, file.get_title())
+			localFilePath = file.get_path()
+
+			sftp.get(remoteFilePath, localFilePath)
+			file = File()
+			setattr(file, "path", localFilePath)
+			return file
+		# connection closed automatically at the end of the with-block
+	except Exception as e:
+		Settings.dev_print(e)
+
+def prepare_dir(sftp=None):
+	if not sftp: return
+	if not Settings.is_create_missing():
+		print("Warning: Not creating missing remote category directories")
+		return
+	Settings.maybe_print("creating missing remote folders")
+	for cat in Settings.get_categories():
+		sftp.mkdir(os.path.join(Settings.get_mount_path(), Settings.get_username(), cat))
 
 def read_files(category=None, performer=None):
+	print("Reading Remote Files")
+	if not auth(): return
 	if Settings.get_remote_host() == "127.0.0.1" or Settings.get_remote_host() == "localhost":
 		print("Please set a remote host")
 		return []
 	try:
-		print("Reading Remote Files")
-		with pysftp.Connection(host=myHostname, username=myUsername, password=myPassword, cnopts=cnopts) as sftp:
-			print("Connection succesfully established ... ")
+		with pysftp.Connection(host=HOSTNAME, username=USERNAME, password=PASSWORD, cnopts=cnopts, port=PORT) as sftp:
+			Settings.maybe_print("Connection succesfully established ... ")
 
 			# Switch to a remote directory
-			path = os.path.join(Settings.get_mount_path(), Settings.get_drive_path())
+			path = os.path.join(Settings.get_mount_path(), Settings.get_username())
 			if category:
 				path = os.path.join(path, category)
 			if performer:
 				path = os.path.join(path, performer)
-			sftp.cwd(path)
+			Settings.dev_print("remote file path: {}".format(path))
+			try:
+				sftp.cwd(path)
+			except Exception as e:
+				Settings.dev_print(e)
+				if "No such file" in str(e):
+					prepare_dir(sftp)
+					try:
+						sftp.cwd(path)
+					except Exception as e:
+						Settings.dev_print(e)
+						return []
 
-			# Obtain structure of the remote directory '/var/www/vhosts'
 			directory_structure = sftp.listdir_attr()
 
-			from .file import File
-			file = File()
+			from .file import Remote_File
+			file = Remote_File()
+			files = []
 			for attr in directory_structure:
-				print("{} {}".format(attr.filename, attr))
-				# setattr(file, "title", attr.filename)
-				# setattr(file, "remote_path", attr)
+				Settings.dev_print("{} | {}".format(attr.filename, attr))
+				setattr(file, "title", attr.filename)
+				setattr(file, "size", sftp.stat(os.path.join(path, attr.filename)).st_size)
+				setattr(file, "path", os.path.join(path, attr.filename))
 				files.append(file)
+				# print(os.path.join(path, attr.filename))
+				# print(sftp.stat(os.path.join(path, attr.filename)).st_size)
 			return files
 		# connection closed automatically at the end of the with-block
 	except Exception as e:
-		print(e)
+		Settings.dev_print(e)
+		return []
 
 def select_file(category, performer=None):
 	# if not Settings.prompt("file path"): return None
@@ -131,13 +215,13 @@ def select_file(category, performer=None):
 		}
 		files_.append(file_)
 	if len(files_) == 0:
-		print("Missing Files")
+		print("Warning: Missing Files")
 		return select_files()
 	question = {
 		'type': 'list',
 		'name': 'file',
 		'message': 'File:',
-		'choices': files
+		'choices': files_
 	}
 	answer = PyInquirer.prompt(question)
 	file = answer["file"]
@@ -145,7 +229,7 @@ def select_file(category, performer=None):
 	return file
 
 def select_files():
-	from .file import File
+	from .file import File, Remote_File
 	category = Settings.select_category()
 	if not category: return File.select_file_upload_method()
 	print("Select Remote File")
@@ -163,7 +247,7 @@ def select_files():
 			files.append(file)
 			if "galler" in str(cat) or "video" in str(cat): break
 		##
-		if isinstance(file, File): files.append(file)
+		if isinstance(file, Remote_File): files.append(file)
 		if not Settings.prompt("another file"): break
 	if not Settings.confirm([file.get_path() for file in files]): return []
 	return files

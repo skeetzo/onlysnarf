@@ -185,7 +185,7 @@ class Driver:
                 print("Warning: Unable to Find User")
                 return False
             ActionChains(Driver.BROWSER).move_to_element(user__).perform()
-            Settings.dev_print("moved to user")
+            Settings.dev_print("successfully moved to user")
             Settings.dev_print("finding discount btn")
             buttons = user__.find_elements_by_class_name(DISCOUNT_USER_BUTTONS)
             for button in buttons:
@@ -213,13 +213,13 @@ class Driver:
                 discount_.send_keys(str(Keys.UP))
             for n in range(round(int(amount)/5)-1):
                 discount_.send_keys(Keys.DOWN)
-            Settings.dev_print("entered discount amount")
+            Settings.dev_print("successfully entered discount amount")
             Settings.dev_print("entering discount months")
             for n in range(11):
                 months_.send_keys(str(Keys.UP))
             for n in range(int(months)-1):
                 months_.send_keys(Keys.DOWN)
-            Settings.dev_print("entered discount months")
+            Settings.dev_print("successfully entered discount months")
             Settings.debug_delay_check()
             Settings.dev_print("applying discount")
             buttons_ = Driver.find_elements_by_name("discountUserButton")
@@ -376,6 +376,7 @@ class Driver:
             sendText.clear()
             Settings.dev_print("sending text")
             sendText.send_keys(str(text))
+            Settings.dev_print("successfully entered text")
             return True
         except Exception as e:
             print(e)
@@ -444,7 +445,7 @@ class Driver:
                 if ">7<" in str(inner) and int(expiration) == 7: num.click()
                 if ">30<" in str(inner) and int(expiration) == 30: num.click()
                 if ">o limit<" in str(inner) and int(expiration) == 99: num.click()
-            Settings.dev_print("selected expires")
+            Settings.dev_print("successfully selected expiration")
             Settings.debug_delay_check()
             # save
             if Settings.is_debug():
@@ -941,7 +942,7 @@ class Driver:
             print("Uploading file(s): {}".format(len(files)))
             Settings.dev_print("uploading files")
             Driver.upload_files(files=files)
-            Settings.maybe_print("file(s) Entered")
+            Settings.maybe_print("successfully began file uploads")
             Settings.debug_delay_check()
             return True
         except Exception as e:
@@ -968,7 +969,7 @@ class Driver:
             # Settings.debug_delay_check()
             Settings.dev_print("saving price")
             Driver.get_element_to_click("priceClick").click()    
-            Settings.dev_print("saved price")
+            Settings.dev_print("successfully saved price")
             return True
         except Exception as e:
             Driver.error_checker(e)
@@ -990,7 +991,7 @@ class Driver:
             # message = Driver.BROWSER.find_element_by_name("message")     
             Settings.dev_print("entering text")
             message.send_keys(str(text))
-            Settings.dev_print("entered text")
+            Settings.dev_print("successfully entered text")
             return True
         except Exception as e:
             print(e)
@@ -1035,7 +1036,7 @@ class Driver:
             # clicking no longer works? just open href in browser
             # Settings.dev_print("clicking send message")
             # ele.click()
-            Settings.dev_print("messaging username: {}".format(username))
+            Settings.dev_print("successfully messaging username: {}".format(username))
             # print(ele.get_attribute("href"))
             Driver.go_to_page(ele)
         except Exception as e:
@@ -1058,6 +1059,7 @@ class Driver:
             moreOptions = Driver.get_element_to_click("moreOptions")
             if not moreOptions: return False    
             moreOptions.click()
+            Settings.dev_print("successfully opened more options (1)")
             return True
         def option_two():
             # click in empty space
@@ -1065,6 +1067,7 @@ class Driver:
             moreOptions = Driver.BROWSER.find_element_by_id(ONLYFANS_POST_TEXT_ID)
             if not moreOptions: return False    
             moreOptions.click()
+            Settings.dev_print("successfully opened more options (2)")
             return True
         try:
             successful = option_one()
@@ -1124,7 +1127,7 @@ class Driver:
             # save the duration
             Settings.dev_print("saving duration")
             Driver.get_element_to_click("pollSave").click()
-            Settings.dev_print("saved duration")
+            Settings.dev_print("successfully saved duration")
             # add extra question space
             if len(questions) > 2:
                 for question in questions[2:]:
@@ -1144,6 +1147,7 @@ class Driver:
                 Settings.dev_print("entered question")
                 time.sleep(1)
                 i+=1
+            Settings.dev_print("successfully entered questions")
             Settings.debug_delay_check()
             if Settings.is_debug():
                 print("Skipping: Poll (debug)")
@@ -1317,6 +1321,7 @@ class Driver:
             if int(months) == 99: months = 1
             for n in range(int(months)-1):
                 durationDropwdown.send_keys(Keys.DOWN)
+            Settings.dev_print("successfully set trial months")
             Settings.debug_delay_check()
             # find and click promotionalTrialConfirm
             if Settings.is_debug():
@@ -1329,7 +1334,7 @@ class Driver:
             save_ = Driver.get_element_to_click("promotionalTrialConfirm")
             Settings.dev_print("saving promotion")
             save_.click()
-            Settings.dev_print("promotion saved")
+            Settings.dev_print("successfully saved promotion")
             Settings.dev_print("copying trial link")
             Driver.find_element_by_name("promotionalTrialLink").click()
             Settings.dev_print("copied trial link")
@@ -1398,18 +1403,18 @@ class Driver:
                 expirations.send_keys(str(Keys.UP))
             for n in range(round(int(expiration)/5)-1):
                 expirations.send_keys(Keys.DOWN)
-            Settings.dev_print("entered expiration")
+            Settings.dev_print("successfully entered expiration")
             Settings.dev_print("entering duration")
             for n in range(11):
                 durations.send_keys(str(Keys.UP))
             for n in range(int(months)-1):
                 durations.send_keys(Keys.DOWN)
-            Settings.dev_print("entered duration")
+            Settings.dev_print("successfully entered duration")
             Settings.debug_delay_check()
             Settings.dev_print("entering message")
             message.clear()
             message.send_keys(message)
-            Settings.dev_print("entered message")
+            Settings.dev_print("successfully entered message")
             Settings.dev_print("applying discount")
             save = Driver.find_element_by_name("promotionalTrialApply")
             if Settings.is_debug():
@@ -1560,6 +1565,7 @@ class Driver:
                 Settings.dev_print("date: {} - {} {}".format(existingDate, month_, year_))
                 if str(month_) in str(existingDate) and str(year_) in str(existingDate): break
                 else: Driver.get_element_to_click("scheduleNextMonth").click()
+            Settings.dev_print("successfully set month")
             # set day in month
             Settings.dev_print("setting days")
             days = Driver.find_elements_by_name("scheduleDays")
@@ -1568,12 +1574,13 @@ class Driver:
                 if str(day_) == str(inner):
                     day.click()
                     Settings.dev_print("clicked day")
+            Settings.dev_print("successfully set day")
             Settings.debug_delay_check()
             # save schedule date
             saves = Driver.get_element_to_click("scheduleSave")
             Settings.dev_print("found save button, clicking")
             saves.click()
-            Settings.dev_print("clicked save button")
+            Settings.dev_print("successfully saved date")
             # set hours
             Settings.dev_print("setting hours")
             hours = Driver.find_elements_by_name("scheduleHours")
@@ -1581,7 +1588,7 @@ class Driver:
                 inner = hour.get_attribute("innerHTML")
                 if str(hour_) in str(inner) and hour.is_enabled():
                     hour.click()
-                    Settings.dev_print("hours set")
+                    Settings.dev_print("successfully set hours")
             # set minutes
             Settings.dev_print("setting minutes")
             minutes = Driver.find_elements_by_name("scheduleMinutes")
@@ -1589,7 +1596,7 @@ class Driver:
                 inner = minute.get_attribute("innerHTML")
                 if str(minute_) in str(inner) and minute.is_enabled():
                     minute.click()
-                    Settings.dev_print("minutes set")
+                    Settings.dev_print("successfully set minutes")
             # save time
             Settings.dev_print("saving schedule")
             Settings.debug_delay_check()
@@ -1965,7 +1972,6 @@ class Driver:
                     elif int(tabNumber) <= int(tabs):
                         driver.switch_to.window(driver.window_handles[tabNumber])
                     time.sleep(2)
-                print("Browser Successfully Reconnected")
                 Settings.dev_print("Successful Reconnect")
                 return driver
 
@@ -1987,6 +1993,7 @@ class Driver:
             try:
                 driver = reconnect()
                 driver.title
+                print("Browser Successfully Reconnected")
                 if not driver:
                     driver = remote()
             except Exception as e:
@@ -2126,12 +2133,14 @@ class Driver:
                     if "@" in str(ele.get_attribute("innerHTML"))
                     and "onlyfans" not in str(ele.get_attribute("innerHTML"))
                     ]
+            Settings.dev_print("successfully found users")
             # for ele in eles:
                 # print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
             if len(eles) == 0:
                 print("Error: Unable to find username")
                 return None
-            username = str(eles[0].get_attribute("href")).replace("https://onlyfans.com/","") 
+            username = str(eles[0].get_attribute("href")).replace("https://onlyfans.com/","")
+            Settings.dev_print("successfully got username: {}".format(username))
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to find username")
@@ -2155,6 +2164,7 @@ class Driver:
                 time.sleep(2)
             print()
             elements = Driver.BROWSER.find_elements_by_class_name("m-subscriptions")
+            Settings.dev_print("successfully found subscriptions")
             for ele in elements:
                 username = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
                 name = ele.find_element_by_class_name("g-user-name").get_attribute("innerHTML")
@@ -2170,6 +2180,7 @@ class Driver:
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to Find Subscriptions")
+        Settings.dev_print("successfully found following users")
         return users
 
     # returns list of accounts that follow you
@@ -2190,6 +2201,7 @@ class Driver:
                 time.sleep(2)
             print()
             elements = Driver.BROWSER.find_elements_by_class_name("m-fans")
+            Settings.dev_print("successfully found fans")
             for ele in elements:
                 username = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
                 name = ele.find_element_by_class_name("g-user-name").get_attribute("innerHTML")
@@ -2206,6 +2218,7 @@ class Driver:
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to Find Users")
+        Settings.dev_print("successfully found users")
         return users
 
     @staticmethod
@@ -2225,7 +2238,7 @@ class Driver:
             ele = ele[0]
             ele = ele.replace("https://onlyfans.com/my/chats/chat/", "")
             user_id = ele
-            Settings.maybe_print("found user id: {}".format(user_id))
+            Settings.dev_print("successfully found user id: {}".format(user_id))
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to Find User ID")
