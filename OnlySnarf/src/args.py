@@ -1,9 +1,9 @@
 import argparse, os, re
 from datetime import datetime
-from .validators import valid_action, valid_amount, valid_date, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
+from .validators import valid_action, valid_amount, valid_date, valid_limit, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
 
 ACTIONS = ['discount','post','message',
-# 'test'
+'promotion'
 ]
 
 CATEGORIES_DEFAULT = [
@@ -17,13 +17,17 @@ DISCOUNT_MAX_AMOUNT = 55
 DISCOUNT_MIN_AMOUNT = 10
 DISCOUNT_MAX_MONTHS = 7
 DISCOUNT_MIN_MONTHS = 1
-DURATION_ALLOWED = [1,3,7,30,99]
 EXPIRATION_ALLOWED = [1,3,7,30,99]
 IMAGE_DOWNLOAD_LIMIT = 6
 IMAGE_UPLOAD_LIMIT = 5
 MESSAGE_CHOICES = ["all", "recent", "favorite", "renew on"]
 PRICE_MINIMUM = 3
 UPLOAD_MAX_DURATION = 6*6 # increments of 10 minutes; 6 = 1 hr
+DURATION_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
+LIMIT_ALLOWED = [0,1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100]
+PROMOTION_EXPIRATION_ALLOWED = [int(i) for i in range(30)]
+PROMOTION_EXPIRATION_ALLOWED.insert(0,0)
+PROMOTION_OFFER_LIMIT = [0,1,2,3,4,5,6,7,8,9,10]
 
 # Paths
 MOUNT_PATH = "/opt/onlysnarf"
@@ -174,10 +178,10 @@ parser.add_argument('-delete-google', action='store_true', dest='delete_google',
 ##
 # -destination
 # the destination to use when backing up content
-parser.add_argument('-destination', dest='destination', default="local", choices=["google",
+parser.add_argument('-destination', dest='destination', default=None, choices=["google",
   # "dropbox",
   "remote","local"],
-  help='file backup location')
+  help='file backup location. prefers $source if specified')
 ##
 # -discount
 # create a format validator for discount where its "[amount]:[duration]"
@@ -190,7 +194,7 @@ parser.add_argument('-download-path', type=str, dest='download_path',
 ##
 # -duration
 # poll duration
-durationAndExpiration.add_argument('-duration', type=int, dest='duration',
+parser.add_argument('-duration', type=valid_duration, dest='duration',
   help='the duration in days (99 for \'No Limit\') for a poll', choices=DURATION_ALLOWED, default=None)
 ##
 # -email
@@ -198,9 +202,14 @@ durationAndExpiration.add_argument('-duration', type=int, dest='duration',
 parser.add_argument('-email', type=str, default="", dest='email',
   help='the OnlyFans email')
 ##
+# -promotion-expiration
+# expiration for a promotion
+parser.add_argument('-promotion-expiration', type=int, dest='promotion_expiration',
+  help='the promotions expiration in days)', choices=PROMOTION_EXPIRATION_ALLOWED, default=None)
+##
 # -expiration
 # date of post or poll expiration
-durationAndExpiration.add_argument('-expiration', type=int, dest='expiration',
+parser.add_argument('-expiration', type=int, dest='expiration',
   help='the expiration in days (99 for \'No Limit\')', choices=EXPIRATION_ALLOWED, default=None)
 ##
 # -force-backup
@@ -235,7 +244,7 @@ parser.add_argument('-keywords', dest='keywords', action='append', default=[],
 ##
 # -limit
 # maximum number of subscribers for a promotion
-parser.add_argument('-limit', type=int, default=1, dest='limit',
+parser.add_argument('-limit', type=valid_limit, default=None, dest='limit', choices=LIMIT_ALLOWED,
   help='the max number of subscribers allowed for a promotion')
 ##
 # -login
@@ -299,6 +308,11 @@ parser.add_argument('-prefer-local-following', action='store_true', dest='prefer
 # -price
 # the price to be set in a message
 parser.add_argument('-price', type=valid_price, help='the price', default=0, dest='price')
+##
+# -promotion
+# the promotion method to use
+parser.add_argument('-promotion', dest='promotion', default="campaign", choices=["campaign","trial"],
+  help='the method of promotion to use')
 ###
 ### PATHS ###
 # -drive-path
@@ -410,7 +424,7 @@ parser.add_argument('-show','-show-window', dest='show', action='store_true',
 ##
 # -source
 # the source to use when searching for content
-parser.add_argument('-source', dest='source', default="local", choices=["google",
+parser.add_argument('-source', dest='source', default=None, choices=["google",
   # "dropbox",
   "remote","local"],
   help='file host location')
@@ -527,14 +541,22 @@ parser.add_argument('-version', action='version')
 ############################################################################################
 
 args = vars(parser.parse_args())
+
+if args["source"] and not args["destination"]:
+  args["destination"] = args["source"]
+if not args["source"]: args["source"] = "local"
+if not args["destination"]: args["destination"] = "local"
 if args["debug"]: ACTIONS.append("promotion")
 if args["debug"]: ACTIONS.append("test")
+if not args["category"]: args["source"] = None
+
+############################################################################################
+
 # print(args)
 CONFIG = {}
 for key in args:
   CONFIG[key.upper()] = args.get(key)
 CONFIG = read_config(CONFIG)
-
 
 #############
 # Debugging #

@@ -133,32 +133,38 @@ class Driver:
         auth_ = Driver.auth()
         if not auth_: return False
         discount.get()
-        months = discount.months
-        amount = discount.amount
-        user = discount.username
+        months = int(discount.months)
+        amount = int(discount.amount)
+        username = str(discount.username)
+        from .user import User
+        if isinstance(discount.username, User):
+            username = discount.username.username
         if int(months) > int(Settings.get_discount_max_months()):
             print("Warning: Months Too High, Max -> {} days".format(Settings.get_discount_max_months()))
-            months = Settings.get_discount_max_months()
+            months = int(Settings.get_discount_max_months())
         elif int(months) < int(Settings.get_discount_min_months()):
             print("Warning: Months Too Low, Min -> {} days".format(Settings.get_discount_min_months()))
-            months = Settings.get_discount_min_months()
+            months = int(Settings.get_discount_min_months())
         if int(amount) > int(Settings.get_discount_max_amount()):
             print("Warning: Amount Too High, Max -> {} days".format(Settings.get_discount_max_months()))
-            amount = Settings.get_discount_max_amount()
+            amount = int(Settings.get_discount_max_amount())
         elif int(amount) < int(Settings.get_discount_min_amount()):
             print("Warning: Amount Too Low, Min -> {} days".format(Settings.get_discount_min_months()))
-            amount = Settings.get_discount_min_amount()
+            amount = int(Settings.get_discount_min_amount())
         try:
-            print("Discounting User: {}".format(user))
+            print("Discounting User: {}".format(username))
             Driver.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
             end_ = True
             count = 0
+            user_ = None
             while end_:
                 elements = Driver.BROWSER.find_elements_by_class_name("m-fans")
+                Settings.dev_print("successfully found fans")
                 for ele in elements:
-                    username = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
-                    if str(user) == str(username):
+                    username_ = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
+                    if str(username) == str(username_).replace("@",""):
                         Driver.BROWSER.execute_script("arguments[0].scrollIntoView();", ele)
+                        user_ = ele
                         end_ = False
                 if not end_: continue
                 if len(elements) == int(count): break
@@ -167,27 +173,14 @@ class Driver:
                 Driver.BROWSER.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
             print()
-            users = Driver.find_elements_by_name("discountUsers")
-            if int(len(users)) == 0:
-                print("Error: Missing Users")
+            if not user_:
+                print("Error: Unable to find user - {}".format(username))
                 return False
-            # get all the users
-            Settings.dev_print("finding user")
-            user__ = None
-            for user_ in users:
-                text = user_.get_attribute("innerHTML")
-                # Settings.dev_print("user text: {}".format(text))
-                if str(user) in text:
-                    user__ = user_
-                    Settings.dev_print("found user: {} - {}".format(user__, user_))
-                    break
-            if user__ == None:
-                print("Warning: Unable to Find User")
-                return False
-            ActionChains(Driver.BROWSER).move_to_element(user__).perform()
+            Settings.maybe_print("Found: {}".format(username))
+            ActionChains(Driver.BROWSER).move_to_element(user_).perform()
             Settings.dev_print("successfully moved to user")
             Settings.dev_print("finding discount btn")
-            buttons = user__.find_elements_by_class_name(DISCOUNT_USER_BUTTONS)
+            buttons = user_.find_elements_by_class_name(DISCOUNT_USER_BUTTONS)
             for button in buttons:
                 if "Discount" in button.get_attribute("innerHTML") and button.is_enabled() and button.is_displayed():
                     try:
@@ -228,14 +221,16 @@ class Driver:
                 if "Cancel" in button.get_attribute("innerHTML") and Settings.is_debug():
                     button.click()
                     print("Skipping: Save Discount (Debug)")
-                    Settings.dev_print("### Discount Successfully Canceled ###")
+                    Settings.dev_print("successfully canceled discount")
                     return True
                 elif "Apply" in button.get_attribute("innerHTML"):
                     button.click()
                     print("Discounted User: {}".format(user))
+                    Settings.dev_print("successfully applied discount")
                     Settings.dev_print("### Discount Successful ###")
                     return True
             Settings.dev_print("### Discount Failure ###")
+            return False
         except Exception as e:
             print(e)
             Driver.error_checker(e)
@@ -452,12 +447,12 @@ class Driver:
                 print("Skipping: Expiration (debug)")
                 Settings.dev_print("skipping expires")
                 Driver.get_element_to_click("expiresCancel").click()
-                Settings.dev_print("canceled expires")
+                Settings.dev_print("successfully canceled expires")
                 Settings.dev_print("### Expiration Successfully Canceled ###")
             else:
                 Settings.dev_print("saving expires")
                 Driver.get_element_to_click("expiresSave").click()
-                Settings.dev_print("saved expires")
+                Settings.dev_print("successfully saved expires")
                 print("Expiration Entered")
                 Settings.dev_print("### Expiration Successful ###")
             return True
@@ -467,7 +462,7 @@ class Driver:
             try:
                 Settings.dev_print("canceling expires")
                 Driver.get_element_to_click("expiresCancel").click()
-                Settings.dev_print("canceled expires")
+                Settings.dev_print("successfully canceled expires")
                 Settings.dev_print("### Expiration Successful Failure ###")
             except: 
                 Settings.dev_print("### Expiration Failure Failure")
@@ -545,7 +540,7 @@ class Driver:
             Settings.dev_print("class: {} - {}:css".format(len(eles), len(elesCSS)))
             eles.extend(elesCSS)
             for i in range(len(eles)):
-                # Settings.dev_print("ele: {} -> {}".format(eles[i].get_attribute("innerHTML").strip(), element.getText()))
+                Settings.dev_print("ele: {} -> {}".format(eles[i].get_attribute("innerHTML").strip(), element.getText()))
                 if (eles[i].is_displayed() and element.getText() and str(element.getText().lower()) in eles[i].get_attribute("innerHTML").strip().lower()) and eles[i].is_enabled():
                     Settings.dev_print("found matching ele")
                     # Settings.dev_print("found matching ele: {}".format(eles[i].get_attribute("innerHTML").strip()))
@@ -1153,7 +1148,7 @@ class Driver:
                 print("Skipping: Poll (debug)")
                 cancel = Driver.get_element_to_click("pollCancel")
                 cancel.click()
-                Settings.dev_print("canceled poll")
+                Settings.dev_print("### Poll Successfully Canceled ###")
             else:
                 print("Poll Entered")
             Settings.dev_print("### Poll Successful ###")
@@ -1196,9 +1191,15 @@ class Driver:
             print("- Text: {}".format(text))
             print("- Tweeting: {}".format(Settings.is_tweeting()))
             ## Expires, Schedule, Poll
-            if expires: Driver.expires(expires)
-            if schedule: Driver.schedule(schedule)
-            if poll: Driver.poll(poll)
+            if expires:
+                successful = Driver.expires(expires)
+                if not successful: return False
+            if schedule:
+                successful = Driver.schedule(schedule)
+                if not successful: return False
+            if poll:
+                successful = Driver.poll(poll)
+                if not successful: return False
             WAIT = WebDriverWait(Driver.BROWSER, 600, poll_frequency=10)
             ## Tweeting
             if Settings.is_tweeting():
@@ -1273,6 +1274,10 @@ class Driver:
     ##### Promotions #####
     ######################
 
+    @staticmethod
+    def promotional_campaign(promotion=None):
+        pass
+
     # or email
     @staticmethod
     def promotional_trial_link(promotion=None):
@@ -1286,12 +1291,17 @@ class Driver:
             promotion.get()
             limit = promotion.limit
             expiration = promotion.expiration
-            months = promotion.months
+            duration = promotion.duration
             user = promotion.user
             Settings.maybe_print("goto -> /my/promotions")
             Driver.BROWSER.get(('https://onlyfans.com/my/promotions'))
+
+            Settings.dev_print("showing promotional trial link")
+            Driver.get_element_to_click("promotionalTrialShow").click()
+            Settings.dev_print("successfully showed promotional trial link")
             Settings.dev_print("creating promotional trial")
             Driver.get_element_to_click("promotionalTrial").click()
+            Settings.dev_print("successfully clicked promotional trial")
             # limit dropdown
             Settings.dev_print("setting trial count")
             limitDropwdown = Driver.find_element_by_name("promotionalTrialCount")
@@ -1299,8 +1309,9 @@ class Driver:
                 limitDropwdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
             if int(limit) == 99: limit = 1
-            for n in range(int(limit)-1):
+            for n in range(int(limit)):
                 limitDropwdown.send_keys(Keys.DOWN)
+            Settings.dev_print("successfully set trial count")
             Settings.debug_delay_check()
             # expiration dropdown
             Settings.dev_print("settings trial expiration")
@@ -1309,19 +1320,28 @@ class Driver:
                 expirationDropdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
             if int(expiration) == 99: expiration = 1
-            for n in range(int(expiration)-1):
+            for n in range(int(expiration)):
                 expirationDropdown.send_keys(Keys.DOWN)
+            Settings.dev_print("successfully set trial expiration")
             Settings.debug_delay_check()
-            # months dropdown
-            Settings.dev_print("settings trial months")
+            # duration dropdown
+            # LIMIT_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
+            Settings.dev_print("settings trial duration")
             durationDropwdown = Driver.find_element_by_name("promotionalTrialDuration")
-            for n in range(11): # 32 max months
+            for n in range(11):
                 durationDropwdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
-            if int(months) == 99: months = 1
-            for n in range(int(months)-1):
+            if str(duration) == "1 day": num = 1
+            if str(duration) == "3 day": num = 2
+            if str(duration) == "7 days": num = 3
+            if str(duration) == "14 days": num = 4
+            if str(duration) == "1 month": num = 5
+            if str(duration) == "3 months": num = 6
+            if str(duration) == "6 months": num = 7
+            if str(duration) == "12 months": num = 8
+            for n in range(int(num)-1):
                 durationDropwdown.send_keys(Keys.DOWN)
-            Settings.dev_print("successfully set trial months")
+            Settings.dev_print("successfully set trial duration")
             Settings.debug_delay_check()
             # find and click promotionalTrialConfirm
             if Settings.is_debug():
@@ -1353,11 +1373,12 @@ class Driver:
             #   message      = 'Howdy from a python function', 
             #   login        = 'pythonuser', 
             #   password     = 'XXXXX')
-
             Settings.dev_print("Successful Promotion")
+            Settings.debug_delay_check()
             return True
         except Exception as e:
             Driver.error_checker(e)
+            print(e)
             print("Error: Failed to Apply Promotion")
             return None
 
@@ -1420,7 +1441,7 @@ class Driver:
             if Settings.is_debug():
                 Driver.find_element_by_name("promotionalTrialCancel").click()
                 print("Skipping: Save Discount (Debug)")
-                Settings.dev_print("### Discount Successfully Canceled ###")
+                Settings.dev_print("successfully canceled discount")
                 cancel.click()
                 return True
             save.click()
@@ -1547,7 +1568,7 @@ class Driver:
             minute_ = theSchedule.minute
             today = datetime.now()
             Settings.dev_print("today: {} {}".format(today.strftime("%B"), today.strftime("%Y")))
-            date__ = datetime.strptime(str(theSchedule.date), "%Y-%m-%d %H:%M:%S")
+            date__ = datetime.strptime(str(theSchedule.date), "%Y-%m-%d")
             if date__ < today:
                 print("Error: Unable to Schedule Earlier Date")
                 return False
@@ -1556,57 +1577,101 @@ class Driver:
             print("- Time: {}".format(theSchedule.time))
             Driver.open_more_options()
             # click schedule
-            Settings.dev_print("adding schedule")
+            Settings.dev_print("opening schedule")
             Driver.get_element_to_click("scheduleAdd").click()
-            # find and click month w/ correct date
-            while True:
-                Settings.dev_print("getting date")
-                existingDate = Driver.find_element_by_name("scheduleDate").get_attribute("innerHTML")
-                Settings.dev_print("date: {} - {} {}".format(existingDate, month_, year_))
-                if str(month_) in str(existingDate) and str(year_) in str(existingDate): break
-                else: Driver.get_element_to_click("scheduleNextMonth").click()
-            Settings.dev_print("successfully set month")
-            # set day in month
-            Settings.dev_print("setting days")
-            days = Driver.find_elements_by_name("scheduleDays")
-            for day in days:
-                inner = day.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>","")
-                if str(day_) == str(inner):
-                    day.click()
-                    Settings.dev_print("clicked day")
-            Settings.dev_print("successfully set day")
-            Settings.debug_delay_check()
+            Settings.dev_print("successfully opened schedule")
+
+            # # find and click month w/ correct date
+            # while True:
+            #     Settings.dev_print("getting date")
+            #     existingDate = Driver.find_element_by_name("scheduleDate").get_attribute("innerHTML")
+            #     Settings.dev_print("date: {} - {} {}".format(existingDate, month_, year_))
+            #     if str(month_) in str(existingDate) and str(year_) in str(existingDate): break
+            #     else: Driver.get_element_to_click("scheduleNextMonth").click()
+            # Settings.dev_print("successfully set month")
+            # # set day in month
+            # Settings.dev_print("setting days")
+            # days = Driver.find_elements_by_name("scheduleDays")
+            # for day in days:
+            #     inner = day.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>","")
+            #     if str(day_) == str(inner):
+            #         day.click()
+            #         Settings.dev_print("clicked day")
+            # Settings.dev_print("successfully set day")
+            # Settings.debug_delay_check()
+            
+
+
             # save schedule date
-            saves = Driver.get_element_to_click("scheduleSave")
-            Settings.dev_print("found save button, clicking")
+            saves = Driver.get_element_to_click("scheduleNext")
+            Settings.dev_print("found next button, clicking")
             saves.click()
             Settings.dev_print("successfully saved date")
             # set hours
+            # try:
+            #     print(1)
+            #     hours = Driver.BROWSER.find_element_by_class_name("vdatetime-time-picker.vdatetime-time-picker__with-suffix")
+            #     print(hours)
+            #     for hour in hours:
+            #         print(hour.get_attribute("class"))
+            #         print(hour.get_attribute("innerHTML"))
+            # except Exception as e:
+            #     print(e)
+
+                # try:
+                #     print(2)
+                #     hours = Driver.BROWSER.find_element_by_class_name("vdatetime-time-picker__list--hours")
+                #     print(hours)
+                #     for hour in hours:
+                #         print(hour.get_attribute("class"))
+                #         print(hour.get_attribute("innerHTML"))
+                # except Exception as e:
+                #     print(e)
+
+
+                # return False
+
             Settings.dev_print("setting hours")
             hours = Driver.find_elements_by_name("scheduleHours")
+            # this finds both hours and minutes so just cut off first 12
+            hours = hours[:12]
             for hour in hours:
                 inner = hour.get_attribute("innerHTML")
                 if str(hour_) in str(inner) and hour.is_enabled():
                     hour.click()
                     Settings.dev_print("successfully set hours")
+                    break
             # set minutes
             Settings.dev_print("setting minutes")
             minutes = Driver.find_elements_by_name("scheduleMinutes")
+            # and get ones after first 12 hours
+            minutes = minutes[12:]
             for minute in minutes:
                 inner = minute.get_attribute("innerHTML")
                 if str(minute_) in str(inner) and minute.is_enabled():
                     minute.click()
                     Settings.dev_print("successfully set minutes")
+                    break
+            # set am/pm
+            Settings.dev_print("setting suffix")
+            # suffixes = Driver.find_elements_by_name("scheduleAMPM")
+            suffixes = Driver.find_elements_by_name("scheduleMinutes")
+            for suffix in suffixes:
+                inner = suffix.get_attribute("innerHTML")
+                if str(theSchedule.suffix).lower() in str(inner).lower() and suffix.is_enabled():
+                    suffix.click()
+                    Settings.dev_print("successfully set suffix")
+                    break
             # save time
             Settings.dev_print("saving schedule")
             Settings.debug_delay_check()
             if Settings.is_debug():
                 print("Skipping: Schedule (debug)")
                 Driver.get_element_to_click("scheduleCancel").click()
-                Settings.dev_print("canceled schedule")
+                Settings.dev_print("successfully canceled schedule")
             else:
                 Driver.get_element_to_click("scheduleSave").click()
-                Settings.dev_print("saved schedule")
+                Settings.dev_print("successfully saved schedule")
                 print("Schedule Entered")
             Settings.dev_print("### Schedule Successful ###")
             return True
@@ -1989,33 +2054,38 @@ class Driver:
 
         BROWSER_TYPE = Settings.get_browser_type()
 
-        if BROWSER_TYPE == "auto-remote":
+        def auto(driver_):
+            if "remote" in BROWSER_TYPE and not driver_:
+                driver_ = remote()
+            if not driver:
+                driver_ = firefox()
+                if not driver_:
+                    driver_ = google()
+            return driver_
+
+        if BROWSER_TYPE == "google":
+            driver = google()
+        elif BROWSER_TYPE == "firefox":
+            driver = firefox()
+        elif "auto" in BROWSER_TYPE:
             try:
                 driver = reconnect()
                 driver.title
                 print("Browser Successfully Reconnected")
-                if not driver:
-                    driver = remote()
+                driver = auto(driver)
             except Exception as e:
                 Settings.dev_print(e)
-                driver = remote()
-
+                driver = auto(None)
         elif "remote" in str(BROWSER_TYPE):
             driver = remote()
         elif BROWSER_TYPE == "reconnect":
-            driver = reconnect()
-        elif BROWSER_TYPE == "google":
-            driver = google()
-        elif BROWSER_TYPE == "firefox":
-            driver = firefox()
-        elif BROWSER_TYPE == "auto":
-            driver = google()
-            if not driver:
-                driver = firefox()
-            # if not driver:
-            #     print("Warning: connecting to remote driver automatically")
-            #     driver = remote()
-
+            try:
+                driver = reconnect()
+                driver.title
+                print("Browser Successfully Reconnected")
+            except Exception as e:
+                Settings.dev_print(e)
+                driver = None        
         if driver and Settings.is_keep():
             Settings.write_session_data(driver.session_id, driver.command_executor._url)
 

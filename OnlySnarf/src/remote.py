@@ -1,5 +1,6 @@
 import pysftp, os
 import PyInquirer
+import random
 from .settings import Settings
 
 # https://pysftp.readthedocs.io/en/release_0.2.9/cookbook.html
@@ -152,7 +153,7 @@ def prepare_dir(sftp=None):
 	for cat in Settings.get_categories():
 		sftp.mkdir(os.path.join(Settings.get_mount_path(), Settings.get_username(), cat))
 
-def read_files(category=None, performer=None):
+def get_files(category=None, performer=None):
 	print("Reading Remote Files")
 	if not auth(): return
 	if Settings.get_remote_host() == "127.0.0.1" or Settings.get_remote_host() == "localhost":
@@ -200,9 +201,15 @@ def read_files(category=None, performer=None):
 		Settings.dev_print(e)
 		return []
 
+def get_random_file(category=None, performer=None):
+	if not category: category = Settings.get_category()
+	if not category:
+		print("Error: Missing category")
+		return None
+	return random.choice(get_files(category=category, performer=performer))
+
 def select_file(category, performer=None):
-	# if not Settings.prompt("file path"): return None
-	files = read_files(category=category, performer=performer)
+	files = get_files(category=category, performer=performer)
 	files_ = []
 	for file in files:
 		if isinstance(file, str):
@@ -229,6 +236,7 @@ def select_file(category, performer=None):
 	return file
 
 def select_files():
+	if not Settings.is_prompt(): return [get_random_file()]
 	from .file import File, Remote_File
 	category = Settings.select_category()
 	if not category: return File.select_file_upload_method()

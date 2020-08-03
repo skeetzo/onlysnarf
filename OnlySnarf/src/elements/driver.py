@@ -239,13 +239,13 @@ ELEMENTS = [
     # schedule minutes
     {
         "name": "scheduleMinutes",
-        "classes": ["vdatetime-time-picker__item", "button.vdatetime-time-picker__item"],
+        "classes": ["vdatetime-time-picker__item", "button.vdatetime-time-picker__item", "vdatetime-time-picker__item.vdatetime-time-picker__item--selected"],
         "text": [],
         "id": []
     },
     # schedule hours
     {
-        "name": "scheduleHours",
+        "name": "scheduleHours",  
         "classes": ["vdatetime-time-picker__item.vdatetime-time-picker__item", "button.vdatetime-time-picker__item.vdatetime-time-picker__item"],
         "text": [],
         "id": []
@@ -257,11 +257,32 @@ ELEMENTS = [
         "text": [],
         "id": []
     },
+    # schedule next
+    {
+        "name": "scheduleNext",
+        "classes": ["g-btn.m-rounded", "button.g-btn.m-rounded"],
+        "text": ["Next"],
+        "id": []
+    },
     # schedule save
     {
         "name": "scheduleSave",
         "classes": ["g-btn.m-rounded", "button.g-btn.m-rounded"],
         "text": ["Save"],
+        "id": []
+    },
+    # schedule cancel
+    {
+        "name": "scheduleCancel",
+        "classes": ["custom-datepicker-button-cancel", "button.g-btn.m-rounded"],
+        "text": ["Cancel"],
+        "id": []
+    },
+    # schedule am/pm
+    {
+        "name": "scheduleAMPM",
+        "classes": ["vdatetime-time-picker__item.vdatetime-time-picker__item--selected"],
+        "text": [],
         "id": []
     },
 
@@ -384,8 +405,14 @@ ELEMENTS = [
     },
     {
         "name": "promotionalTrial",
-        "classes": ["g.btn.m-rounded.m-sm"],
-        "text": ["Create new trial link"],
+        "classes": ["g-btn.m-rounded.m-lg.m-flex.m-with-icon.m-uppercase"],
+        "text": ["create new free trial link"],
+        "id": [],
+    },
+    {
+        "name": "promotionalTrialShow",
+        "classes": ["g-box__header.m-icon-title.m-gray-bg"],
+        "text": ["Free trial links"],
         "id": [],
     },
     {

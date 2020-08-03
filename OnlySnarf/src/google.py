@@ -3,7 +3,6 @@
 import logging
 logging.getLogger('googleapicliet.discovery_cache').setLevel(logging.ERROR)
 
-import random
 import os
 import shutil
 import datetime

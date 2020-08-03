@@ -5,6 +5,8 @@ from .user import User
 from PyInquirer import prompt
 from .validators import AmountValidator, MonthValidator, LimitValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, ExpirationValidator, ListValidator
 
+DEBUGGING_DATE = False
+
 class Discount:
 
     def __init__(self):
@@ -18,12 +20,16 @@ class Discount:
         if not self.gotten: return
         if Settings.is_prompt():
             if not Settings.prompt("Discount"): return
-        if str(self.get_username()).lower() == "all":
+        Settings.maybe_print("discounting: {}".format(self.get_username().username))
+        username = self.get_username().username
+        if username.lower() == "all":
             users = User.get_all_users()
-        elif str(self.get_username()).lower() == "recent":
-            users = User.get_new_users()
-        elif str(self.get_username()).lower() == "favorite":
+        elif username.lower() == "recent":
+            users = User.get_recent_users()
+        elif username.lower() == "favorite":
             users = User.get_favorite_users()
+        elif username.lower() == "new":
+            users = User.get_new_users()
         else: users = [self]
         successful = False
         for user in users:
@@ -50,8 +56,9 @@ class Discount:
     def get_amount(self):
         if self.amount: return self.amount
         amount = Settings.get_amount() or None
-        print(amount)
-        if amount: return amount
+        if amount: 
+            self.amount = amount
+            return amount
         if not Settings.prompt("amount"): return None
         question = {
             'type': 'input',
@@ -69,7 +76,9 @@ class Discount:
     def get_months(self):
         if self.months: return self.months
         months = Settings.get_months() or None
-        if months: return months
+        if months: 
+            self.months = months
+            return months
         if not Settings.prompt("months"): return None
         question = {
             'type': 'input',
@@ -116,9 +125,26 @@ class Poll:
         if not gotten: return
         self.gotten = True
 
+    def get_duration(self): # months
+        if self.duration: return self.duration
+        duration = Settings.get_duration()
+        if duration: return duration
+        if not Settings.prompt("duration"): return None
+        question = {
+            'type': 'input',
+            'name': 'duration',
+            'message': 'Duration [1, 3, 7, 99 (\'No Limit\')]',
+            'validate': DurationValidator
+        }
+        answers = prompt(question)
+        duration = answers["duration"]
+        if not Settings.confirm(duration): return self.get_duration()
+        self.duration = duration
+        return self.duration
+
     def get_questions(self):
         if len(self.questions) > 0: return self.questions
-        questions = Settings.get_questions() or []
+        questions = Settings.get_questions()
         if len(questions) > 0: return questions
         if not Settings.prompt("questions"): return []
         print("Enter Questions")
@@ -135,23 +161,6 @@ class Poll:
         if not Settings.confirm(questions): return self.get_questions()
         self.questions = questions
         return self.questions
-    
-    def get_duration(self): # months
-        if self.duration: return self.duration
-        duration = Settings.get_duration() or None
-        if duration: return duration
-        if not Settings.prompt("duration"): return None
-        question = {
-            'type': 'input',
-            'name': 'duration',
-            'message': 'Duration [1, 3, 7, 99 (\'No Limit\')]',
-            'validate': DurationValidator
-        }
-        answers = prompt(question)
-        duration = answers["duration"]
-        if not Settings.confirm(duration): return self.get_duration()
-        self.duration = duration
-        return self.duration
 
 class Promotion:
 
@@ -163,19 +172,6 @@ class Promotion:
         self.message = None
         self.gotten = False
 
-    # requires the copy/paste and email steps
-    def create_trial_link(self):
-        print("Promotion - Creating Trial Link")
-        self.get()
-        if not self.gotten: return
-        if not Settings.prompt("Promotion"): return
-        # limit, expiration, months, user
-        Driver.promotional_trial_link(self)
-        # link = Driver.promotional_trial_link()
-        # text = "Here's your free trial link!\n"+link
-        # Settings.dev_print("Link: "+str(text))
-        # Settings.send_email(email, text)
-
     # apply discount directly to user on user's profile page
     def apply_to_user():
         print("Promotion - Apply To User: {}".format(self.user.username))
@@ -184,6 +180,27 @@ class Promotion:
         if not Settings.prompt("Promotion"): return
         # user, expiration, months, message
         Driver.promotion_user_directly(self)
+
+    def create_campaign():
+        print("Promotion - Creating Campaign")
+        self.get()
+        if not self.gotten: return
+        if not Settings.prompt("Promotion"): return
+        Driver.promotional_campaign(self)
+
+    # requires the copy/paste and email steps
+    def create_trial_link(self):
+        print("Promotion - Creating Trial Link")
+        self.get()
+        # if not self.gotten: return
+        if Settings.is_prompt():
+            if not Settings.prompt("Promotion"): return
+        # limit, expiration, months, user
+        Driver.promotional_trial_link(self)
+        # link = Driver.promotional_trial_link()
+        # text = "Here's your free trial link!\n"+link
+        # Settings.dev_print("Link: "+str(text))
+        # Settings.send_email(email, text)
 
     def get(self):
         if self.gotten: return
@@ -202,7 +219,9 @@ class Promotion:
     def get_expiration(self):
         if self.expiration: return self.expiration
         expiration = Settings.get_expiration() or None
-        if expiration: return expiration
+        if expiration: 
+            self.expiration = expiration
+            return expiration
         if not Settings.prompt("expiration"): return None
         question = {
             'type': 'input',
@@ -219,12 +238,14 @@ class Promotion:
     def get_limit(self):
         if self.limit: return self.limit
         limit = Settings.get_limit() or None
-        if limit: return limit
+        if limit: 
+            self.limit = limit
+            return limit
         if not limit.prompt("limit"): return None
         question = {
             'type': 'input',
             'name': 'limit',
-            'message': 'Expiration [1, 3, 7, 99 (\'No Limit\')]',
+            'message': 'Limit (in days or months)',
             'validate': LimitValidator
         }
         answers = prompt(question)
@@ -236,7 +257,9 @@ class Promotion:
     def get_message(self):
         if self.message != "": return self.message
         message = Settings.get_text() or None
-        if message: return message
+        if message: 
+            self.message = message
+            return message
         if not Settings.prompt("message"): return ""
         question = {
             'type': 'input',
@@ -252,7 +275,9 @@ class Promotion:
     def get_duration(self): # months
         if self.duration: return self.duration
         duration = Settings.get_duration() or None
-        if duration: return duration
+        if duration: 
+            self.duration = duration
+            return duration
         if not Settings.prompt("duration"): return None
         question = {
             'type': 'input',
@@ -306,6 +331,7 @@ class Schedule:
         self.year = "0"
         self.month = "0"
         self.day = "0"
+        self.suffix = "am"
         ##
         self.gotten = False
 
@@ -321,20 +347,47 @@ class Schedule:
     def get(self):
         if self.gotten: return
         if self.get_date():
-            date = datetime.strptime(str(self.get_date()), "%Y-%m-%d %H:%M:%S")
+            date = self.get_date()
+            maybe_print(0)
+            maybe_print(date)
+            if self.get_time():
+                maybe_print(11)
+                maybe_print(self.get_time())
+                if "00:00:00" in str(date):
+                    date = str(date).replace("00:00:00", self.get_time())
+                else:
+                    date = "{} {}".format(date, self.get_time())
+            if "am" in self.get_time().lower(): self.suffix = "am"
+            elif "pm" in self.get_time().lower(): self.suffix = "pm"
+            maybe_print(1)
+            maybe_print(date)
+            date = datetime.strptime(str(date), "%Y-%m-%d %H:%M %p")
+            maybe_print(2)
+            maybe_print(date)
             self.year = date.year
             self.month = date.strftime("%B")
             self.day = date.day
-            if self.get_time():
-                self.hour = date.hour
-                self.minute = date.minute
+            self.hour = date.hour
+            self.minute = date.minute
+            maybe_print("year: {}".format(self.year))
+            maybe_print("month: {}".format(self.month))
+            maybe_print("day: {}".format(self.day))
+            maybe_print("hour: {}".format(self.hour))
+            maybe_print("minutes: {}".format(self.minute))
         self.gotten = True
 
     def get_date(self):
         if self.date: return self.date
         date = Settings.get_date() or None
-        if date: return date
+        if date: 
+            self.date = date
+            return date
         schedule = Settings.get_schedule() or None
+
+        # if not Settings.is_prompt():
+        #     self.date = None
+        #     return None
+
         if schedule:
             date = datetime.strptime(str(schedule), "%Y-%m-%d %H:%M:%S")
             self.date = date.date()
@@ -355,11 +408,32 @@ class Schedule:
     def get_time(self):
         if self.time: return self.time
         time = Settings.get_time() or None
-        if time: return time
+        if time: 
+            time = datetime.strptime(str(time), "%Y-%m-%d %H:%M:%S")
+            maybe_print('a')
+            maybe_print(time)
+            time = time.strftime("%I:%M %p")
+            maybe_print('b')
+            maybe_print(time)
+            self.time = time
+            maybe_print('c')
+            return self.time
+            # return time
         schedule = Settings.get_schedule() or None
+
+        # if not Settings.is_prompt():
+        #     self.time = None
+        #     return None
+
         if schedule:
             time = datetime.strptime(str(schedule), "%Y-%m-%d %H:%M:%S")
-            self.time = time.time()
+            maybe_print('e')
+            maybe_print(time)
+            time = time.strftime("%I:%M %p")
+            maybe_print('f')
+            maybe_print(time)
+            self.time = time
+            maybe_print('g')
             return self.time
         if not Settings.prompt("time"): return None
         question = {
@@ -377,3 +451,7 @@ class Schedule:
 # round to 5
 def myround(x, base=5):
     return base * round(x/base)
+
+def maybe_print(s):
+    global DEBUGGING_DATE
+    if DEBUGGING_DATE: print(s)

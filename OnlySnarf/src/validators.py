@@ -2,7 +2,7 @@ import argparse, os
 from datetime import datetime
 from PyInquirer import Validator, ValidationError
 
-ACTIONS = ['discount','post','message','test','backup','profile']
+ACTIONS = ['discount','post','message','test','backup','profile','promotion']
 CATEGORIES_DEFAULT = [
   "images",
   "galleries",
@@ -12,10 +12,11 @@ DISCOUNT_MAX_AMOUNT = 55
 DISCOUNT_MIN_AMOUNT = 10
 DISCOUNT_MAX_MONTHS = 7
 DISCOUNT_MIN_MONTHS = 1
-DURATION_ALLOWED = [1,3,7,30,99]
+DURATION_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
 EXPIRATION_ALLOWED = [1,3,7,30,99]
 LIMIT_MIN = 1
 LIMIT_MAX = 10
+LIMIT_ALLOWED = [0,1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100]
 
 # Validators
 
@@ -39,26 +40,14 @@ def valid_amount(s):
 		raise argparse.ArgumentTypeError(msg)
 
 def valid_date(s):
-	try: return datetime.strptime(s, "%Y-%m-%d")
+	try: return datetime.strptime(s, "%m-%d-%Y")
 	except ValueError:
 		msg = "Not a valid date: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
 
-def valid_time(s):
-	try: return datetime.strptime(s, "%H:%M")
-	except ValueError:
-		msg = "Not a valid time: '{0}'.".format(s)
-		raise argparse.ArgumentTypeError(msg)
-
-def valid_price(s):
-	try: return "{:.2f}".format(float(s))
-	except ValueError:
-		msg = "Not a valid price: '{0}'.".format(s)
-		raise argparse.ArgumentTypeError(msg)
-
 def valid_duration(s):
 	try:
-		if int(s) in DURATION_ALLOWED: return int(s)
+		if str(s) in DURATION_ALLOWED: return str(s)
 	except ValueError:
 		msg = "Not a valid duration: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
@@ -71,11 +60,13 @@ def valid_expiration(s):
 		msg = "Not a valid expiration: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
 
-def valid_schedule(s):
-	try: return datetime.strptime(s, "%m-%d-%Y:%H:%M")
+def valid_limit(s):
+	try:
+		if int(s) in LIMIT_ALLOWED: return int(s)
 	except ValueError:
-		msg = "Not a valid schedule: '{0}'.".format(s)
+		msg = "Not a valid limit: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
+	return int(s)
 
 def valid_month(s):
 	try:
@@ -93,6 +84,24 @@ def valid_path(s):
 		else: return os.stat(s)
 	except FileNotFoundError:
 		msg = "Not a valid path: '{0}'.".format(s)
+		raise argparse.ArgumentTypeError(msg)
+
+def valid_price(s):
+	try: return "{:.2f}".format(float(s))
+	except ValueError:
+		msg = "Not a valid price: '{0}'.".format(s)
+		raise argparse.ArgumentTypeError(msg)
+
+def valid_schedule(s):
+	try: return datetime.strptime(s, "%m-%d-%Y:%H:%M")
+	except ValueError:
+		msg = "Not a valid schedule: '{0}'.".format(s)
+		raise argparse.ArgumentTypeError(msg)
+
+def valid_time(s):
+	try: return datetime.strptime(s, "%H:%M")
+	except ValueError:
+		msg = "Not a valid time: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
 
 # check against min/max amounts & months
@@ -145,7 +154,7 @@ class DateValidator(Validator):
 			datetime.strptime(document.text, '%m-%d-%Y')
 		except ValueError:
 			raise ValidationError(
-				message='Please enter a date (mm/dd/YYYY)',
+				message='Please enter a date (mm-dd-YYYY)',
 				cursor_position=len(document.text))  # Move cursor to end
 
 class DurationValidator(Validator):

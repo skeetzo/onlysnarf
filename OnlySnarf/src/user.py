@@ -232,10 +232,18 @@ class User:
         return active_users
 
     @staticmethod
-    def get_user_by_username(username):
+    def get_user_by_username(username=None):
         if not username or username == None:
             print("Error: Missing Username")
             return None
+
+        if str(username) == "all":
+            return User.get_all_users()
+        elif str(username) == "recent":
+            return User.get_recent_users()
+        elif str(username) == "favorite":
+            return User.get_favorite_users()
+
         users = User.read_users_local()
         for user in users:
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
@@ -315,7 +323,8 @@ class User:
     def select_user():
         user = Settings.get_user() or None
         if user: return user
-        # if not Settings.prompt("user"): return None
+        # if user: return User.get_user_by_username(user.username)
+        # if not Settings.prompt("user"): return User.get_random_user()
         choices = Settings.get_message_choices()
         choices.append("enter username")
         choices.append("select username")

@@ -391,7 +391,17 @@
   - debugged: local
   - create-drive -> create-missing
   - debugging: remote
+  **2.18.3**
+  - failed expires/poll/schedule ends post
+  - fixed date validator
+  - debugged: schedule, date, time
+  - debugged: post schedule
+  - debugging promotion: updated promotion args
+  - debugged: discount
+
   
+  - debugging: promotion (mostly)
+
 ----------------------------------------
 
   **2.x.x**
@@ -401,7 +411,6 @@
 
 
   **x.x.x**
-  - properly debug discount
   - properly debug promotions
 
   **x.x.x**

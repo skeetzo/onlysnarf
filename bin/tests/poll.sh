@@ -1,11 +1,25 @@
 #!/usr/bin/env bash
 
+echo "[*] Misc - Poll 0"
+onlysnarfpy \
+-debug \
+-action "post" -category "image" \
+-skip-download \
+-text "poll testes" \
+-duration 7 \
+-question "your mom" \
+-question "some toast" \
+-question "a nice sandwich" \
+-debug-delay \
+-keep \
+-verbose -verbose -verbose \
+-browser "$1"
+
 # Image & Poll
 echo "[*] Misc - Poll 1"
 onlysnarfpy \
 -debug \
 -action "post" -category "image" \
--bykeyword "pussycats" \
 -skip-download \
 -text "poll testes" \
 -duration 7 \
@@ -22,7 +36,7 @@ echo "[*] Misc - Poll 2"
 onlysnarfpy \
 -debug \
 -action "post" -category "image" \
--bykeyword "pussycats" \
+-skip-download \
 -duration 7 \
 -question "your mom" \
 -question "some toast" \

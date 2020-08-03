@@ -19,17 +19,22 @@ echo "Testing OnlySnarf"
 # schedule
 # post
 # message
-show="-show"
 show=""
+show="-show"
 
 declare -a browsers
 browsers=("auto" "firefox" "google" "auto-remote" "remote" "remote-chrome" "remote-firefox" "reconnect")
 browsers=("remote" "remote-chrome" "remote-firefox")
 browsers=("auto-remote")
+browsers=("auto")
+browsers=("reconnect")
+browsers=("firefox")
 
 declare -a sources
 sources=("local" "dropbox" "google" "remote")
+sources=("local" "google" "remote")
 sources=("google")
+sources=("local")
 
 declare -a testing
 # testing=("schedule")
@@ -37,7 +42,11 @@ declare -a testing
 testing=("message" "schedule" "upload")
 testing=("upload")
 testing=("post")
-testing=("expiration" "message" "poll" "post" "schedule" "upload")
+testing=("discount" "expiration" "message" "poll" "post" "schedule" "upload")
+testing=("post" "schedule")
+testing=("poll" "schedule")
+testing=("discount")
+testing=("promotion")
 
 verbose=""
 verbose="-verbose -verbose"

@@ -167,13 +167,13 @@ class Settings:
         return config["BYKEYWORD"] or None
         
     def get_duration():
-        return config["DURATION"] or 0
+        return config["DURATION"]
         
     def get_duration_allowed():
         return DURATION_ALLOWED or []
         
     def get_expiration():
-        return config["EXPIRATION"] or 0
+        return config["EXPIRATION"] or config["PROMOTION_EXPIRATION"] or None
         
     def get_expiration_allowed():
         return EXPIRATION_ALLOWED or []
@@ -215,6 +215,9 @@ class Settings:
 
     def get_recent_user_count():
         return config["RECENT_USERS_COUNT"] or 0
+
+    def get_promotion():
+        return config["PROMOTION"] or None
 
     def get_password():
         return config["PASSWORD"] or ""
@@ -298,12 +301,6 @@ class Settings:
         elif config["PROFILE_SYNCTO"]: return "syncto"
         return ""
 
-    def get_promotion_method():
-        if config["PROMOTION_USER"]: return "user"
-        elif config["PROMOTION_TRIAL"]: return "trial"
-        return ""
-
-
     def get_schedule():
         if str(config["SCHEDULE"]) != "None": return config["SCHEDULE"]
         if Settings.get_date():
@@ -331,7 +328,7 @@ class Settings:
         return config["SKIPPED_USERS"] or []
         
     def get_questions():
-        return config["QUESTIONS"] or []
+        return config["QUESTIONS"]
         
     def get_upload_max():
         return config["UPLOAD_MAX"] or IMAGE_UPLOAD_LIMIT

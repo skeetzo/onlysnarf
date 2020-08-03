@@ -169,28 +169,28 @@ class Message():
 				files = Google_File.select_files()
 			elif len(files) == 0 and len(googleFiles) == 0:
 				self.files = "unset"
-				return self.files
+				return []
 		if Settings.get_source() == "dropbox":
 			dropboxFiles = Dropbox.get_files()
 			if len(files) == 0 and len(dropboxFiles) > 0:
 				files = Dropbox.select_files()
 			elif len(files) == 0 and len(dropboxFiles) == 0:
 				self.files = "unset"
-				return self.files
+				return []
 		if Settings.get_source() == "remote":
 			remoteFiles = Remote.get_files()
 			if len(remoteFiles) > 0:
 				files = Remote.select_files()
 			elif len(files) == 0 and len(remoteFiles) == 0:
 				self.files = "unset"
-				return self.files
+				return []
 		if Settings.get_source() == "local":
 			localFiles = File.get_files()
 			if len(files) == 0 and len(localFiles) > 0:
 				files = File.select_files()
 			elif len(files) == 0 and len(localFiles) == 0:
 				self.files = "unset"
-				return self.files
+				return []
 		filed = []
 		for file in files:
 			if isinstance(file, Folder) or isinstance(file, Google_Folder): filed.extend(file.get_files())
@@ -224,7 +224,7 @@ class Message():
 	def get_poll(self):
 		if str(self.poll) == "unset": return None
 		if self.poll and self.poll.check(): return self.poll
-		if not Settings.prompt("poll"):
+		if Settings.is_prompt() and not Settings.prompt("poll"):
 			self.poll = "unset"
 			return None
 		poll = Poll()
@@ -281,7 +281,7 @@ class Message():
 	def get_schedule(self):
 		if str(self.schedule) == "unset": return None
 		if self.schedule: return self.schedule
-		if not Settings.prompt("schedule"):
+		if Settings.is_prompt() and not Settings.prompt("schedule"):
 			self.schedule = "unset"
 			return None
 		schedule = Schedule()

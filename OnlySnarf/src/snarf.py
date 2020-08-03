@@ -108,11 +108,13 @@ class Snarf:
         if not promotion: promotion = Promotion()
         try: 
             # get promotion method
-            method = Settings.get_promotion_method()
-            if method == "user":
-                promotion.apply_to_user()
+            method = Settings.get_promotion()
+            if method == "campaign":
+                promotion.create_campaign()
             elif method == "trial":
                 promotion.create_trial_link()
+            elif method == "user":
+                promotion.apply_to_user()
             else: print("{}: Missing Promotion Method".format(colorize("Error","red")))
         except Exception as e: Settings.dev_print(e)
         Snarf.exit()
