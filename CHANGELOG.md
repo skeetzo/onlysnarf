@@ -398,11 +398,15 @@
   - debugged: post schedule
   - debugging promotion: updated promotion args
   - debugged: discount
-
-  
   - debugging: promotion (mostly)
+  **2.18.4**
+  - debugged: promotion- free trial (ish)
+  - debugging: promotion- campaign
+
 
 ----------------------------------------
+  **2.18.5**
+  - debugged: promotion- campaign
 
   **2.x.x**
   - need to add 'create' to Profile for asking for profile settings when syncing to

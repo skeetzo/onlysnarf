@@ -410,6 +410,18 @@ ELEMENTS = [
         "id": [],
     },
     {
+        "name": "promotionalCampaignAmount",
+        "classes": ["form-control.b-fans__trial__select"],
+        "text": ["promo-campaign-discount-percent-select"],
+        "id": [],
+    },
+    {
+        "name": "promotionalCampaign",
+        "classes": ["g-btn.m-rounded.m-block.m-uppercase"],
+        "text": [" Add a promotional campaign "],
+        "id": [],
+    },
+    {
         "name": "promotionalTrialShow",
         "classes": ["g-box__header.m-icon-title.m-gray-bg"],
         "text": ["Free trial links"],

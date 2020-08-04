@@ -165,6 +165,7 @@ class Poll:
 class Promotion:
 
     def __init__(self):
+        self.amount = None
         self.limit = None
         self.expiration = None
         self.duration = None
@@ -173,19 +174,19 @@ class Promotion:
         self.gotten = False
 
     # apply discount directly to user on user's profile page
-    def apply_to_user():
+    def apply_to_user(self):
         print("Promotion - Apply To User: {}".format(self.user.username))
         self.get()
-        if not self.gotten: return
-        if not Settings.prompt("Promotion"): return
+        if Settings.is_prompt():
+            if not Settings.prompt("Promotion"): return
         # user, expiration, months, message
         Driver.promotion_user_directly(self)
 
-    def create_campaign():
+    def create_campaign(self):
         print("Promotion - Creating Campaign")
         self.get()
-        if not self.gotten: return
-        if not Settings.prompt("Promotion"): return
+        if Settings.is_prompt():
+            if not Settings.prompt("Promotion"): return
         Driver.promotional_campaign(self)
 
     # requires the copy/paste and email steps
@@ -206,6 +207,8 @@ class Promotion:
         if self.gotten: return
         gotten = self.get_user()
         if not gotten: return
+        gotten = self.get_amount()
+        if not gotten: return
         gotten = self.get_expiration()
         if not gotten: return
         gotten = self.get_limit()
@@ -215,6 +218,26 @@ class Promotion:
         gotten = self.get_message()
         if not gotten: return
         self.gotten = True
+
+    def get_amount(self):
+        if self.amount: return self.amount
+        amount = Settings.get_amount() or None
+        if amount: 
+            self.amount = amount
+            return amount
+        if not Settings.prompt("amount"): return None
+        question = {
+            'type': 'input',
+            'name': 'amount',
+            'message': 'Amount:',
+            'validate': AmountValidator,
+            'filter': lambda val: int(myround(int(val)))
+        }
+        answers = prompt(question)
+        amount = answers["amount"]
+        if not Settings.confirm(amount): return self.get_amount()
+        self.amount = amount
+        return self.amount
 
     def get_expiration(self):
         if self.expiration: return self.expiration

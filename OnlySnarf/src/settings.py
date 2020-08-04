@@ -197,7 +197,7 @@ class Settings:
         return keywords
 
     def get_limit():
-        return config["LIMIT"] or 1
+        return config["LIMIT"] or None
 
     def get_message_choices():
         return MESSAGE_CHOICES

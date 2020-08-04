@@ -1,35 +1,35 @@
 #!/usr/bin/env bash
 
 # Promotion
-echo "[*] Promotion - Free Trial"
-onlysnarfpy \
--debug \
--action "promotion" \
--user "recent" \
--promotion "trial" \
--duration "6 months" \
--limit 0 \
--promotion-expiration 0 \
--prefer-local \
--keep \
--show \
--verbose -verbose -verbose \
--browser "$1" \
--source "$2"
-
-# Promotion
-# echo "[*] Promotion - Campaign"
+# echo "[*] Promotion - Free Trial"
 # onlysnarfpy \
 # -debug \
-# -action "discount" \
+# -action "promotion" \
 # -user "recent" \
-# -promotion "campaign" \
-# -amount 40 \
-# -expiration 9 \
-# -limit 5 \
+# -promotion "trial" \
+# -duration "6 months" \
+# -limit 0 \
+# -promotion-expiration 0 \
 # -prefer-local \
 # -keep \
 # -show \
 # -verbose -verbose -verbose \
 # -browser "$1" \
 # -source "$2"
+
+# Promotion
+echo "[*] Promotion - Campaign"
+onlysnarfpy \
+-debug \
+-action "promotion" \
+-user "recent" \
+-promotion "campaign" \
+-amount 40 \
+-promotion-expiration 0 \
+-limit 0 \
+-prefer-local \
+-keep \
+-show \
+-verbose -verbose -verbose \
+-browser "$1" \
+-source "$2"

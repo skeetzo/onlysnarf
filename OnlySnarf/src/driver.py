@@ -541,8 +541,12 @@ class Driver:
             eles.extend(elesCSS)
             for i in range(len(eles)):
                 Settings.dev_print("ele: {} -> {}".format(eles[i].get_attribute("innerHTML").strip(), element.getText()))
-                if (eles[i].is_displayed() and element.getText() and str(element.getText().lower()) in eles[i].get_attribute("innerHTML").strip().lower()) and eles[i].is_enabled():
+                if (eles[i].is_displayed() and element.getText() and str(element.getText().lower()) == eles[i].get_attribute("innerHTML").strip().lower()) and eles[i].is_enabled():
                     Settings.dev_print("found matching ele")
+                    # Settings.dev_print("found matching ele: {}".format(eles[i].get_attribute("innerHTML").strip()))
+                    return eles[i]
+                elif (eles[i].is_displayed() and element.getText() and str(element.getText().lower()) in eles[i].get_attribute("innerHTML").strip().lower()) and eles[i].is_enabled():
+                    Settings.dev_print("found matching(ish) ele")
                     # Settings.dev_print("found matching ele: {}".format(eles[i].get_attribute("innerHTML").strip()))
                     return eles[i]
                 elif (eles[i].is_displayed() and element.getText() and str(element.getText().lower()) in eles[i].get_attribute("innerHTML").strip().lower()):
@@ -1276,7 +1280,100 @@ class Driver:
 
     @staticmethod
     def promotional_campaign(promotion=None):
-        pass
+        if not promotion:
+            print("Error: Missing Promotion")
+            return False
+        auth_ = Driver.auth()
+        if not auth_: return False
+        # go to onlyfans.com/my/subscribers/active
+        try:
+            promotion.get()
+            limit = promotion.limit
+            expiration = promotion.expiration
+            duration = promotion.duration
+            user = promotion.user
+            amount = promotion.amount
+            Settings.maybe_print("goto -> /my/promotions")
+            Driver.BROWSER.get(('https://onlyfans.com/my/promotions'))
+
+            # Settings.dev_print("showing promotional campaign link")
+            # Driver.get_element_to_click("promotionalTrialShow").click()
+            # Driver.get_element_to_click("promotionalCampaignShow").click()
+            # Settings.dev_print("successfully showed promotional campaign link")
+            Settings.dev_print("clicking promotion campaign")
+            # Driver.get_element_to_click("promotionalTrial").click()
+            Driver.get_element_to_click("promotionalCampaign").click()
+            Settings.dev_print("successfully clicked promotion campaign")
+            # limit dropdown
+            Settings.dev_print("setting campaign count")
+            limitDropwdown = Driver.find_element_by_name("promotionalTrialCount")
+            # limitDropwdown = Driver.find_element_by_name("promotionalCampaignCount")
+            for n in range(11): # 11 max subscription limits
+                limitDropwdown.send_keys(str(Keys.UP))
+            Settings.debug_delay_check()
+            if limit:
+                for n in range(int(limit)):
+                    limitDropwdown.send_keys(Keys.DOWN)
+            Settings.dev_print("successfully set campaign count")
+            Settings.debug_delay_check()
+            # expiration dropdown
+            Settings.dev_print("settings campaign expiration")
+            expirationDropdown = Driver.find_element_by_name("promotionalTrialExpiration")
+            # expirationDropdown = Driver.find_element_by_name("promotionalCampaignExpiration")
+            for n in range(11): # 31 max days
+                expirationDropdown.send_keys(str(Keys.UP))
+            Settings.debug_delay_check()
+            if expiration:
+                for n in range(int(expiration)):
+                    expirationDropdown.send_keys(Keys.DOWN)
+            Settings.dev_print("successfully set campaign expiration")
+            Settings.debug_delay_check()
+            # duration dropdown
+            # LIMIT_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
+            durationDropdown = Driver.find_element_by_name("promotionalCampaignAmount")
+            Settings.dev_print("entering discount amount")
+            for n in range(11):
+                durationDropdown.send_keys(str(Keys.UP))
+            for n in range(round(int(amount)/5)-1):
+                durationDropdown.send_keys(Keys.DOWN)
+            Settings.dev_print("successfully entered discount amount")
+
+            # todo: add message to users
+            # todo: [] apply to expired subscribers checkbox
+
+            Settings.debug_delay_check()
+            # find and click promotionalTrialConfirm
+            # if Settings.is_debug():
+            #     Settings.dev_print("finding campaign cancel")
+            #     Driver.get_element_to_click("promotionalTrialCancel").click()
+            #     print("Skipping: Promotion (debug)")
+            #     Settings.dev_print("successfully cancelled promotion campaign")
+            #     return True
+            Settings.dev_print("finding campaign save")
+            save_ = Driver.get_element_to_click("promotionalTrialConfirm")
+            # save_ = Driver.get_element_to_click("promotionalCampaignConfirm")
+            save_ = Driver.BROWSER.find_elements_by_class_name("g-btn.m-rounded")
+            for save__ in save_:
+                print(save__.get_attribute("innerHTML"))
+            if len(save_) == 0:
+                Settings.dev_print("unable to find promotion 'Create'")
+                print("Error: Unable to save promotion")
+                return False
+            for save__ in save_:
+                if save__.get_attribute("innerHTML").lower().strip() == "create":
+                    save_ = save__    
+            print(save_.get_attribute("innerHTML"))
+            Settings.dev_print("saving promotion")
+            save_.click()
+            Settings.dev_print("successfully saved promotion")
+            Settings.dev_print("successful promotion campaign")
+            Settings.debug_delay_check()
+            return True
+        except Exception as e:
+            Driver.error_checker(e)
+            print(e)
+            print("Error: Failed to Apply Promotion")
+            return None
 
     # or email
     @staticmethod
@@ -1308,9 +1405,9 @@ class Driver:
             for n in range(11): # 11 max subscription limits
                 limitDropwdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
-            if int(limit) == 99: limit = 1
-            for n in range(int(limit)):
-                limitDropwdown.send_keys(Keys.DOWN)
+            if limit:
+                for n in range(int(limit)):
+                    limitDropwdown.send_keys(Keys.DOWN)
             Settings.dev_print("successfully set trial count")
             Settings.debug_delay_check()
             # expiration dropdown
@@ -1319,9 +1416,9 @@ class Driver:
             for n in range(11): # 31 max days
                 expirationDropdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
-            if int(expiration) == 99: expiration = 1
-            for n in range(int(expiration)):
-                expirationDropdown.send_keys(Keys.DOWN)
+            if expiration:
+                for n in range(int(expiration)):
+                    expirationDropdown.send_keys(Keys.DOWN)
             Settings.dev_print("successfully set trial expiration")
             Settings.debug_delay_check()
             # duration dropdown
@@ -1331,6 +1428,7 @@ class Driver:
             for n in range(11):
                 durationDropwdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
+            num = 1
             if str(duration) == "1 day": num = 1
             if str(duration) == "3 day": num = 2
             if str(duration) == "7 days": num = 3
@@ -1344,21 +1442,40 @@ class Driver:
             Settings.dev_print("successfully set trial duration")
             Settings.debug_delay_check()
             # find and click promotionalTrialConfirm
-            if Settings.is_debug():
-                Settings.dev_print("finding trial cancel")
-                Driver.get_element_to_click("promotionalTrialCancel").click()
-                print("Skipping: Promotion (debug)")
-                Settings.dev_print("Successful trial cancellation")
-                return True
+            # if Settings.is_debug():
+            #     Settings.dev_print("finding trial cancel")
+            #     Driver.get_element_to_click("promotionalTrialCancel").click()
+            #     print("Skipping: Promotion (debug)")
+            #     Settings.dev_print("successfully cancelled promotion trial")
+            #     return True
             Settings.dev_print("finding trial save")
             save_ = Driver.get_element_to_click("promotionalTrialConfirm")
+            "g-btn.m-rounded"
+
+            save_ = Driver.BROWSER.find_elements_by_class_name("g-btn.m-rounded")
+            for save__ in save_:
+                print(save__.get_attribute("innerHTML"))
+            if len(save_) == 0:
+                Settings.dev_print("unable to find promotion 'Create'")
+                print("Error: Unable to save promotion")
+                return False
+            for save__ in save_:
+                if save__.get_attribute("innerHTML").lower().strip() == "create":
+                    save_ = save__    
+            print(save_.get_attribute("innerHTML"))
             Settings.dev_print("saving promotion")
             save_.click()
             Settings.dev_print("successfully saved promotion")
-            Settings.dev_print("copying trial link")
-            Driver.find_element_by_name("promotionalTrialLink").click()
-            Settings.dev_print("copied trial link")
+            # Settings.dev_print("copying trial link")
+            # Driver.find_element_by_name("promotionalTrialLink").click()
+            # Settings.dev_print("successfully copied trial link")
 
+            # in order for this to work accurately i need to figure out the number of trial things already on the page
+            # then find the new trial thing
+            # then get the link for the new trial thing
+            # as of now it creates a new trial for the x duration so voila
+
+            # todo maybe probably never:
             # go to /home
             # enter copied paste into new post
             # get text in new post
@@ -1373,7 +1490,7 @@ class Driver:
             #   message      = 'Howdy from a python function', 
             #   login        = 'pythonuser', 
             #   password     = 'XXXXX')
-            Settings.dev_print("Successful Promotion")
+            Settings.dev_print("successful promotion trial")
             Settings.debug_delay_check()
             return True
         except Exception as e:
