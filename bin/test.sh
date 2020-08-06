@@ -17,9 +17,15 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # onlysnarfpy -debug -verbose -verbose -verbose -source local -category video
 # onlysnarfpy -debug -verbose -verbose -verbose -source remote -remote-username skeetzo
 
-onlysnarf -debug -verbose -verbose -verbose
+# onlysnarf -debug -verbose -verbose -verbose
 
-# onlysnarfpy -action test -debug -verbose -verbose -verbose -browser auto-remote -keep -remote-host 47.156.172.175 -remote-port 8888 -login google
+onlysnarfpy -action test -debug -verbose -verbose -verbose -browser firefox -login google \
+-prefer-local \
+-user "recent" \
+-amount 40 \
+-promotion-expiration 0 \
+-limit 0 \
+-text "fuck balls"
 
 # onlysnarf-config
 

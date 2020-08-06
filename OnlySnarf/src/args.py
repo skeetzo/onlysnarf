@@ -3,7 +3,8 @@ from datetime import datetime
 from .validators import valid_action, valid_amount, valid_date, valid_limit, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
 
 ACTIONS = ['discount','post','message',
-'promotion'
+'promotion', 
+'test'
 ]
 
 CATEGORIES_DEFAULT = [

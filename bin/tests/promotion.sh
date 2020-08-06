@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 
 # Promotion
-# echo "[*] Promotion - Free Trial"
-# onlysnarfpy \
-# -debug \
-# -action "promotion" \
-# -user "recent" \
-# -promotion "trial" \
-# -duration "6 months" \
-# -limit 0 \
-# -promotion-expiration 0 \
-# -prefer-local \
-# -keep \
-# -show \
-# -verbose -verbose -verbose \
-# -browser "$1" \
-# -source "$2"
+echo "[*] Promotion - Free Trial"
+onlysnarfpy \
+-debug \
+-action "promotion" \
+-user "recent" \
+-promotion "trial" \
+-duration "6 months" \
+-limit 0 \
+-promotion-expiration 0 \
+-prefer-local \
+-keep \
+-show \
+-verbose -verbose -verbose \
+-browser "$1" \
+-source "$2"
 
 # Promotion
 echo "[*] Promotion - Campaign"
@@ -27,6 +27,8 @@ onlysnarfpy \
 -amount 40 \
 -promotion-expiration 0 \
 -limit 0 \
+-text "fuck balls" \
+-debug-delay \
 -prefer-local \
 -keep \
 -show \

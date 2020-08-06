@@ -46,11 +46,11 @@ class Discount:
     def get(self):
         if self.gotten: return
         gotten = self.get_username()
-        if not gotten: return
+        # if not gotten: return
         gotten = self.get_amount()
-        if not gotten: return
+        # if not gotten: return
         gotten = self.get_months()
-        if not gotten: return
+        # if not gotten: return
         self.gotten = True
 
     def get_amount(self):
@@ -206,17 +206,11 @@ class Promotion:
     def get(self):
         if self.gotten: return
         gotten = self.get_user()
-        if not gotten: return
         gotten = self.get_amount()
-        if not gotten: return
         gotten = self.get_expiration()
-        if not gotten: return
         gotten = self.get_limit()
-        if not gotten: return
         gotten = self.get_duration()
-        if not gotten: return
         gotten = self.get_message()
-        if not gotten: return
         self.gotten = True
 
     def get_amount(self):
@@ -264,7 +258,7 @@ class Promotion:
         if limit: 
             self.limit = limit
             return limit
-        if not limit.prompt("limit"): return None
+        if not Settings.prompt("limit"): return None
         question = {
             'type': 'input',
             'name': 'limit',
@@ -278,7 +272,7 @@ class Promotion:
         return self.limit
 
     def get_message(self):
-        if self.message != "": return self.message
+        if self.message != None: return self.message
         message = Settings.get_text() or None
         if message: 
             self.message = message

@@ -402,20 +402,17 @@
   **2.18.4**
   - debugged: promotion- free trial (ish)
   - debugging: promotion- campaign
+  **2.18.5**
+  - debugged: promotion- campaign
 
 
 ----------------------------------------
-  **2.18.5**
-  - debugged: promotion- campaign
 
   **2.x.x**
   - need to add 'create' to Profile for asking for profile settings when syncing to
   - adding tab requires a file lock between onlysnarf sessions to maintain the correct active tab
   - debugged remote: debug refresh to stay open -> test javascript refresh injection
 
-
-  **x.x.x**
-  - properly debug promotions
 
   **x.x.x**
   - properly tested: settings get
@@ -442,15 +439,15 @@
 
   -> Bot
   - autorespond behavior
+  - bot functionality to check posts for quiz answers
+  - bot functionality that checks user messages for bot commands
 
   -> Cron
-  - bot functionality that checks user messages for bot commands
   - ability to download images to upload / send later
   --
   - add: read messages html for emojis
   - update: backup function to include original folder name -> posted/galleries/$file
   - [MESSAGES] layout in config for preset message formats
-  - bot functionality to check posts for quiz answers
   - fix literally everything
   - automatically heart / send <3 hearts to random tips in messages / campaign contributions
 
@@ -459,7 +456,6 @@
 
   -> Promotion
   - add email|Twitter functionality for sending trial link; add clipboard function to copy link
-
   - functionality to scan profiles to estimate their posts-to-fan income ratios
 
   -> Profile

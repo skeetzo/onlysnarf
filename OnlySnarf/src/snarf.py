@@ -162,8 +162,12 @@ class Snarf:
         # print('TESTING: Users')
         # response = Driver.users_get()
         # return True
-        print('TESTING: Following')
-        response = User.get_following()
+        # print('TESTING: Following')
+        # response = User.get_following()
+        from .classes import Promotion
+        promotion = Promotion()
+        
+        promotion.create_campaign()
         # return True
         # print('TESTING: Settings - Get')
         # response = Driver.settings_get_all()

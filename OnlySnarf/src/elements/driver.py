@@ -428,8 +428,14 @@ ELEMENTS = [
         "id": [],
     },
     {
+        "name": "promotionalCopy",
+        "classes": ["g-btn.m-rounded.m-uppercase"],
+        "text": ["Copy link to profile"],
+        "id": [],
+    },
+    {
         "name": "promotionalTrialCount",
-        "classes": [],
+        "classes": ["form-control.b-fans__trial__select"],
         "text": [],
         "id": ["trial-count-select"],
     },
@@ -438,6 +444,12 @@ ELEMENTS = [
         "classes": [],
         "text": [],
         "id": ["trial-expiration-select"],
+    },
+    {
+        "name": "promotionalTrialMessage",
+        "classes": ["form-control.g-input"],
+        "text": ["Type a message to users (optional)"],
+        "id": [],
     },
     {
         "name": "promotionalTrialDuration",

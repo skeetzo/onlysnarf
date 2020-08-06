@@ -1293,21 +1293,28 @@ class Driver:
             duration = promotion.duration
             user = promotion.user
             amount = promotion.amount
+            text = promotion.message
             Settings.maybe_print("goto -> /my/promotions")
             Driver.BROWSER.get(('https://onlyfans.com/my/promotions'))
 
-            # Settings.dev_print("showing promotional campaign link")
-            # Driver.get_element_to_click("promotionalTrialShow").click()
-            # Driver.get_element_to_click("promotionalCampaignShow").click()
-            # Settings.dev_print("successfully showed promotional campaign link")
+            Settings.dev_print("checking existing promotion")
+            copies = Driver.BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-uppercase")
+            for copy in copies:
+                if "copy link to profile" in str(copy.get_attribute("innerHTML")).lower():
+                # print("{}".format(copy.get_attribute("innerHTML")))
+                    copy.click()
+                    Settings.dev_print("successfully clicked early copy")
+                    print("Warning: a Promotion already exists")
+                    print("Copied existing promotion")
+                    return True
             Settings.dev_print("clicking promotion campaign")
-            # Driver.get_element_to_click("promotionalTrial").click()
             Driver.get_element_to_click("promotionalCampaign").click()
             Settings.dev_print("successfully clicked promotion campaign")
+            # Settings.debug_delay_check()
+            time.sleep(10)
             # limit dropdown
             Settings.dev_print("setting campaign count")
             limitDropwdown = Driver.find_element_by_name("promotionalTrialCount")
-            # limitDropwdown = Driver.find_element_by_name("promotionalCampaignCount")
             for n in range(11): # 11 max subscription limits
                 limitDropwdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
@@ -1319,7 +1326,6 @@ class Driver:
             # expiration dropdown
             Settings.dev_print("settings campaign expiration")
             expirationDropdown = Driver.find_element_by_name("promotionalTrialExpiration")
-            # expirationDropdown = Driver.find_element_by_name("promotionalCampaignExpiration")
             for n in range(11): # 31 max days
                 expirationDropdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
@@ -1337,18 +1343,21 @@ class Driver:
             for n in range(round(int(amount)/5)-1):
                 durationDropdown.send_keys(Keys.DOWN)
             Settings.dev_print("successfully entered discount amount")
-
             # todo: add message to users
+            message = Driver.find_element_by_name("promotionalTrialMessage")
+            Settings.dev_print("found message text")
+            message.clear()
+            Settings.dev_print("sending text")
+            message.send_keys(str(text))
             # todo: [] apply to expired subscribers checkbox
-
             Settings.debug_delay_check()
             # find and click promotionalTrialConfirm
-            # if Settings.is_debug():
-            #     Settings.dev_print("finding campaign cancel")
-            #     Driver.get_element_to_click("promotionalTrialCancel").click()
-            #     print("Skipping: Promotion (debug)")
-            #     Settings.dev_print("successfully cancelled promotion campaign")
-            #     return True
+            if Settings.is_debug():
+                Settings.dev_print("finding campaign cancel")
+                Driver.get_element_to_click("promotionalTrialCancel").click()
+                print("Skipping: Promotion (debug)")
+                Settings.dev_print("successfully cancelled promotion campaign")
+                return True
             Settings.dev_print("finding campaign save")
             save_ = Driver.get_element_to_click("promotionalTrialConfirm")
             # save_ = Driver.get_element_to_click("promotionalCampaignConfirm")
@@ -1367,7 +1376,15 @@ class Driver:
             save_.click()
             Settings.dev_print("successfully saved promotion")
             Settings.dev_print("successful promotion campaign")
+            # todo: add copy link to profile
             Settings.debug_delay_check()
+            Settings.dev_print("clicking copy")
+            copies = Driver.BROWSER.find_elements_by_class_name("g-btn.m-rounded.m-uppercase")
+            for copy in copies:
+                print("{}".format(copy.get_attribute("innerHTML")))
+                if "copy link to profile" in str(copy.get_attribute("innerHTML")).lower():
+                    copy.click()
+                    Settings.dev_print("successfully clicked copy")
             return True
         except Exception as e:
             Driver.error_checker(e)
