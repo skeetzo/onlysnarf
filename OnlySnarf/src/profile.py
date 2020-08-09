@@ -77,6 +77,9 @@ class Profile:
     # |- two step authentication
     # |- watermark enabled & custom text
     def check():
+        if not Settings.is_debug():
+            print("### Not Available ###")
+            return
         print("Checking Profile Settings")
         profile = Profile.read_local() or Profile.create()
         desiredProfile = {
@@ -118,6 +121,9 @@ class Profile:
     # About, Price, Wishlist
     # watermark enabled & custom text == username
     def setup():
+        if not Settings.is_debug():
+            print("### Not Available ###")
+            return
         print("Setting up basic profile settings")
         profile = Profile.read_local() or Profile.create()
         desiredProfile = {
