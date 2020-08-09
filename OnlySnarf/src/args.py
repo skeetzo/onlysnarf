@@ -2,8 +2,7 @@ import argparse, os, re
 from datetime import datetime
 from .validators import valid_action, valid_amount, valid_date, valid_limit, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
 
-ACTIONS = ['discount','post','message',
-'promotion', 
+ACTIONS = ['discount','message','post','profile','promotion', 
 'test'
 ]
 
@@ -309,10 +308,14 @@ parser.add_argument('-prefer-local-following', action='store_true', dest='prefer
 # -price
 # the price to be set in a message
 parser.add_argument('-price', type=valid_price, help='the price', default=0, dest='price')
+## 
+# -profile-method
+parser.add_argument('-profile-method', dest="profile_method", default="syncfrom", choices=["syncto","syncfrom"],
+  help='the profile method to use')
 ##
 # -promotion
 # the promotion method to use
-parser.add_argument('-promotion', dest='promotion', default="campaign", choices=["campaign","trial"],
+parser.add_argument('-promotion-method', dest='promotion_method', default="campaign", choices=["campaign","trial"],
   help='the method of promotion to use')
 ###
 ### PATHS ###
@@ -506,17 +509,6 @@ parser.add_argument('-username-twitter', type=str, default="", dest='username_tw
 parser.add_argument('-v', '-verbose', dest="verbose", action='count', default=0, 
   help="verbosity level (max 3)")
 
-## Profile Methods
-# -profile-backup
-parser.add_argument('-profile-backup', dest="profile_backup", action='store_true', 
-  help="uses backup method when combined with action=profile")
-# -profile-syncto
-parser.add_argument('-profile-syncto', dest="profile_syncto", action='store_true', 
-  help="uses sync to method when combined with action=profile")
-# -profile-syncfrom
-parser.add_argument('-profile-syncfrom', dest="profile_syncfrom", action='store_true', 
-  help="uses sync from method when combined with action=profile")
-
 ## Promotion Methods
 # -promotion-user
 parser.add_argument('-promotion-user', dest="promotion_user", action='store_true', 
@@ -524,6 +516,7 @@ parser.add_argument('-promotion-user', dest="promotion_user", action='store_true
 # -promotion-trial
 parser.add_argument('-promotion-trial', dest="promotion_trial", action='store_true', 
   help="uses trial method when combined with action=promotion")
+
 
 ##
 # Positional

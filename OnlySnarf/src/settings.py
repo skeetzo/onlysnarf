@@ -96,6 +96,9 @@ class Settings:
             else:
                 print(colorize(text, "blue"))
 
+    def err_print(error):
+        print("{}: {}".format(colorize("Error","red"), error))
+
     def header():
         if Settings.LAST_UPDATED_KEY:
             print("Updated: {} = {}".format(Settings.LAST_UPDATED_KEY, config[Settings.LAST_UPDATED_KEY.replace(" ","_").upper()]))
@@ -216,8 +219,8 @@ class Settings:
     def get_recent_user_count():
         return config["RECENT_USERS_COUNT"] or 0
 
-    def get_promotion():
-        return config["PROMOTION"] or None
+    def get_promotion_method():
+        return config["PROMOTION_METHOD"] or None
 
     def get_password():
         return config["PASSWORD"] or ""
@@ -296,10 +299,7 @@ class Settings:
         return config["CLIENT_SECRET"] or ""
 
     def get_profile_method():
-        if config["PROFILE_BACKUP"]: return "backup"
-        elif config["PROFILE_SYNCFROM"]: return "syncfrom"
-        elif config["PROFILE_SYNCTO"]: return "syncto"
-        return ""
+        return config["PROFILE_METHOD"] or None
 
     def get_schedule():
         if str(config["SCHEDULE"]) != "None": return config["SCHEDULE"]

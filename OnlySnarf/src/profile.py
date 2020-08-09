@@ -65,15 +65,90 @@ class Profile:
     def advertise():
         pass
 
-    # new - posts - , etc; recommend what to post
-    def posts():
+    def advertise_menu():
         pass
 
-    # new - setup - Twitter -> profile, banner; Price and Settings
+    # check settings for 'profile completion'
+    # |- subscription price |- calculate recommended price from percentile count, posts numbers etc 
+    # |-  Reward for subscriber referrals
+    # |- about, location, website url, wishlist
+    # |- if connected twitter/google
+    # |- welcome message enabled
+    # |- two step authentication
+    # |- watermark enabled & custom text
+    def check():
+        print("Checking Profile Settings")
+        profile = Profile.read_local() or Profile.create()
+        desiredProfile = {
+            "subprice":"avalue", # do manually to check price number as int
+            "about":"avalue",
+            "location":"avalue",
+            "websiteURL":"avalue",
+            "wishlist":"avalue",
+            "twitter":"avalue",
+            "google":"avalue",
+            "welcomeMessage":"avalue",
+            "twoStepAuth":True,
+            "watermark":True,
+            "watermarkPhoto":True
+            "watermarkVideo":True
+        }
+        # get profile settings
+        # check against preferred settings
+        # output message
+        failed = False
+        for key, value in profile.items():
+            for key_, value_ in desiredProfile.items():
+                Settings.dev_print("{}: {} = {}".format(key, value, value_))
+                if value and if str(value_) != "avalue":
+                    if value != value_:
+                        print("Warning: Unrecommended setting - {}".format(key))
+                        failed = True
+                elif not value or if str(value) != str(value_):
+                    print("Warning: Unrecommended setting - {}".format(key))
+                    failed = True
+        if failed:
+            print("Error: Profile check failed!")
+            return False
+        print("Success! Profile check completed.")
+        return True
+
+    # update basic new profile settings w/ profile settings or prompt 
+    # get Twitter profile & banner and use to update profile & banner
+    # About, Price, Wishlist
+    # watermark enabled & custom text == username
     def setup():
-        pass
+        print("Setting up basic profile settings")
+        profile = Profile.read_local() or Profile.create()
+        desiredProfile = {
+            "subprice":"avalue", # do manually to check price number as int
+            "about":"avalue",
 
-    def new_menu():
+            "welcomeMessage":"avalue",
+            "watermark":True,
+            "watermarkText":True
+        }
+        
+        # compare to existing values to ignore already correctly set values
+        for key, value in profile.items():
+            for key_, value_ in desiredProfile.items():
+                if str(key) == "subprice":
+                    # do stuff
+                    continue
+
+                Settings.dev_print("{}: {} = {}".format(key, value, value_))
+                setattr(profile, str(key), value_)
+
+        # search for twitter banner
+        twitterBanner = None
+        # search for twitter profile photo
+        twitterProfile = None
+        # update both
+        setattr(profile, "coverImage", twitterBanner)
+        setattr(profile, "profilePhoto", twitterProfile)
+        Profile.sync_to_profile(profile=profile)
+
+    def posts_menu():
         if not Settings.is_debug():
             print("### Not Available ###")
             return
@@ -81,10 +156,9 @@ class Profile:
         if (action == 'back'): return Profile.menu()
         elif (action == 'advertise'):
             Profile.advertise()
-        elif (action == 'posts'):
-            Profile.posts()
-        elif (action == 'setup'):
-            Profile.setup()
+        # elif (action == 'new')
+        # elif (action == 'new')
+
         Profile.menu()
 
     def ask_new():
@@ -105,55 +179,47 @@ class Profile:
             from OnlySnarf.bin.menu import Menu
             return Menu.main_menu()
         elif (action == 'backup'): Profile.backup_menu()
-        elif (action == 'sync from'): Profile.sync_from_profile()
-        elif (action == 'sync to'): Profile.sync_to_profile()
-        elif (action == 'new'): Profile.new_menu()
+        elif (action == 'check'): Profile.check()
+        elif (action == 'posts'): Profile.posts_menu()
+        elif (action == 'setup'): Profile.setup()
+        elif (action == 'sync'): Profile.sync_from_profile()
+        # elif (action == 'sync to'): Profile.sync_to_profile()
         
     def ask_action():
         menu_prompt = {
             'type': 'list',
             'name': 'action',
             'message': 'Please select a profile action:',
-            'choices': ['Back', 'Backup','Sync From', 'Sync To',
-                # 'New'
+            'choices': ['Back', 'Backup','Sync', 
+                # 'Sync To',
+                'Check',
+                'Posts',
+                'Setup'
             ],
             'filter': lambda val: str(val).lower()
         }
         answers = prompt(menu_prompt)
         return answers['action']
 
-
-
-
-
-
-
-
-
-
-
-
     @staticmethod
     def create():
-        # checks settings / config for profile settings config file
-        # asks for missing options
-
-
-
-
-        pass
-
-
-
-
-
-
-
-
-
-
-
-
+        if not Settings.is_prompt():
+            return Profile()
+        if not Settings.prompt("create profile"):
+            return Profile()
+        profile = Profile()
+        print("Follow the prompts to create a Profile of settings.")
+        print("Enter 'n' or nothing to not change the value.")
+        for key, value in profile.items():
+            question = {
+                'type': 'input',
+                'message': '{}:'.format(str(key).title()),
+                'name': 'answer'
+            }
+            value_ = prompt(question)["answer"]
+            if str(value_) == "n" or str(value_) == "" or str(value_) == " ": continue
+            setattr(profile, str(key), value_)
+        return profile
 
     @staticmethod
     def sync_from_profile():
@@ -173,7 +239,7 @@ class Profile:
         # syncs profile settings to onlyfans
         print("Syncing to Profile")
         if not profile:
-            profile = Profile.create()
+            profile = Profile.read_local() or Profile.create()
         for tab in Profile.TABS:
             profile.sync_to_tab(tab)
         print("Synced to Profile")
@@ -209,6 +275,11 @@ class Profile:
             "about": "",
             "location": "",
             "websiteURL": None,
+            "wishlist":None,
+            "twitter":None,
+            "google":None,
+            "welcomeMessage":None,
+            "twoStepAuth":False,
             "username": "",
             "email": "",
             "password": "",
@@ -253,8 +324,9 @@ class Profile:
     @staticmethod
     def read_local():
         Settings.maybe_print("Getting Local Profile")
-        profile_ = {}
+        profile = None
         try:
+            profile_ = {}
             with open(str(Settings.get_profile_path())) as json_file:  
                 profile_ = json.load(json_file)['profile']
             Settings.maybe_print("Loaded Local Profile")
@@ -273,7 +345,7 @@ class Profile:
         Settings.maybe_print("local profile path: "+str(Settings.get_profile_path()))
         try:
             with open(str(Settings.get_profile_path()), 'w') as outfile:  
-                json.dump({"profile":profile}, outfile, indent=4, sort_keys=True)
+                json.dump({"profile":profile.__dict__}, outfile, indent=4, sort_keys=True)
         except FileNotFoundError:
             print("Error: Missing Profile File")
         except OSError:

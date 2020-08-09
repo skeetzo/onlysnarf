@@ -94,7 +94,7 @@ class Snarf:
                 Profile.sync_from_profile()
             elif method == "syncto":
                 Profile.sync_to_profile()
-            else: print("{}: Missing Profile Method".format(colorize("Error","red")))
+            else: Settings.err_print("Missing Profile Method")
         except Exception as e: Settings.dev_print(e)
         Snarf.exit()
         
@@ -108,14 +108,14 @@ class Snarf:
         if not promotion: promotion = Promotion()
         try: 
             # get promotion method
-            method = Settings.get_promotion()
+            method = Settings.get_promotion_method()
             if method == "campaign":
                 promotion.create_campaign()
             elif method == "trial":
                 promotion.create_trial_link()
             elif method == "user":
                 promotion.apply_to_user()
-            else: print("{}: Missing Promotion Method".format(colorize("Error","red")))
+            else: Settings.err_print("Missing Promotion Method")
         except Exception as e: Settings.dev_print(e)
         Snarf.exit()
 
@@ -164,14 +164,17 @@ class Snarf:
         # return True
         # print('TESTING: Following')
         # response = User.get_following()
-        from .classes import Promotion
-        promotion = Promotion()
+        # from .classes import Promotion
+        # promotion = Promotion()
         
-        promotion.create_campaign()
+        # promotion.create_campaign()
         # return True
-        # print('TESTING: Settings - Get')
-        # response = Driver.settings_get_all()
-        # return True
+        print('TESTING: Settings - Get')
+        profile = Profile.sync_from_profile()
+        print('TESTING: Settings - Set')
+        Profile.sync_to_profile(profile=profile)
+
+        return True
         # print('TESTING: Cron')
         # response = Cron.test()
         # if not response or response == None:

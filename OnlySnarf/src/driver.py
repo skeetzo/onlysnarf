@@ -1861,7 +1861,7 @@ class Driver:
                 Settings.dev_print("searching: {} - {}".format(name, type_))
                 try:
                     element = Driver.find_element_by_name(name)
-                    Settings.dev_print("Successful ele: {}".format(name))
+                    Settings.dev_print("successful ele: {}".format(name))
                 except Exception as e:
                     Driver.error_checker(e)
                     continue
@@ -1881,16 +1881,17 @@ class Driver:
                 elif str(type_) == "list":
                     status = element.get_attribute("innerHTML")
                 elif str(type_) == "file":
+                    print("NEED TO UPDATE THIS")
                     # can get file from image above
                     # can set once found
                     # status = element.get_attribute("innerHTML")
-                    pass
+                    # pass
                 elif str(type_) == "checkbox":
                     status = element.is_selected()
-                if status is not None: Settings.dev_print("Successful value: {}".format(status))
+                if status is not None: Settings.dev_print("successful value: {}".format(status))
                 Settings.maybe_print("{} : {}".format(name, status))
                 setattr(profile, str(name), status)
-            Settings.dev_print("Successfully got settings page: {}".format(page))
+            Settings.dev_print("successfully got settings page: {}".format(page))
             print("Settings Page Retrieved: {}".format(page))
         except Exception as e:
             Driver.error_checker(e)
@@ -1917,11 +1918,12 @@ class Driver:
                 Settings.dev_print("searching: {} - {}".format(name, type_))
                 try:
                     element = Driver.find_element_by_name(name)
-                    Settings.dev_print("Successful ele: {}".format(name))
+                    Settings.dev_print("successful ele: {}".format(name))
                 except Exception as e:
                     Driver.error_checker(e)
                     continue
                 if str(type_) == "text":
+
                     element.send_keys(getattr(profile, str(name)))
                 elif str(type_) == "toggle":
                     # somehow set the other toggle state
@@ -1938,9 +1940,11 @@ class Driver:
                     element.send_keys(getattr(profile, str(name)))
                 elif str(type_) == "checkbox":
                     element.click()
-                # Settings.dev_print("Successful value: {}".format(status))
-            Driver.settings_save(page=page)
-            Settings.dev_print("Successfully set settings page: {}".format(page))
+            if Settings.is_debug():
+                Settings.dev_print("successfully cancelled settings page: {}".format(page))
+            else:
+                Driver.settings_save(page=page)
+                Settings.dev_print("successfully set settings page: {}".format(page))
             print("Settings Page Updated: {}".format(page))
         except Exception as e:
             Driver.error_checker(e)

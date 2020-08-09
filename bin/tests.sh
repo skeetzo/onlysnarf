@@ -37,16 +37,13 @@ sources=("google")
 sources=("local")
 
 declare -a testing
-# testing=("schedule")
-# testing=("discount" "expiration" "message" "poll" "post" "schedule" "upload")
-testing=("message" "schedule" "upload")
+testing=("discount" "expiration" "message" "poll" "post" "schedule" "settings" "upload")
 testing=("upload")
 testing=("post")
-testing=("discount" "expiration" "message" "poll" "post" "schedule" "upload")
-testing=("post" "schedule")
-testing=("poll" "schedule")
 testing=("discount")
 testing=("promotion")
+testing=("message")
+testing=("settings")
 
 verbose=""
 verbose="-verbose -verbose"

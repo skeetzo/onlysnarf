@@ -404,19 +404,24 @@
   - debugging: promotion- campaign
   **2.18.5**
   - debugged: promotion- campaign
-
+  - debugging: settings
 
 ----------------------------------------
 
   **2.x.x**
   - need to add 'create' to Profile for asking for profile settings when syncing to
-  - adding tab requires a file lock between onlysnarf sessions to maintain the correct active tab
-  - debugged remote: debug refresh to stay open -> test javascript refresh injection
-
-
-  **x.x.x**
   - properly tested: settings get
   - properly tested: settings set
+
+  - adding tab requires a file lock between onlysnarf sessions to maintain the correct active tab
+  - debugged remote: debug refresh to stay open -> test javascript refresh injection
+  
+
+  **x.x.x**
+  - test Profile: check
+  - test Profile: posts
+  |- advertise - tweet to advertise new account, tweet to ask about what you should post
+  - test Profile: setup
   
   **x.x.x**
   - Profile options completely "functional" / debugged
