@@ -209,7 +209,9 @@ class User:
     # gets users from local or refreshes from onlyfans.com
     @staticmethod
     def get_active_users():
-        if Settings.is_prefer_local(): return User.read_users_local()
+        if Settings.is_prefer_local():
+            users = User.read_users_local()
+            if len(users) > 0: return users
         active_users = []
         users = Driver.users_get()
         for user in users:
@@ -340,6 +342,7 @@ class User:
     # probably not necessary
     def parse_message(message=None):
         self.messages.remove(str(message))
+        self.messages_parsed.append(str(message))
 
     # gets a list of all subscribed user_ids from local txt
     @staticmethod
