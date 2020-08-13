@@ -1604,19 +1604,19 @@ class Driver:
         try:
             # go to onlyfans.com/my/subscribers/active
             Driver.message_user(username=username, user_id=user_id)
-            messages_from_ = []
+            messages_sent_ = []
             try:
-                messages_from_ = Driver.find_elements_by_name("messagesFrom")
+                messages_sent_ = Driver.find_elements_by_name("messagesFrom")
             except Exception as e:
                 if "Unable to locate elements" in str(e):
                     pass
 
-            # print("first message: {}".format(messages_to_[0].get_attribute("innerHTML")))
-            # messages_to_.pop(0) # drop self user at top of page
+            # print("first message: {}".format(messages_received_[0].get_attribute("innerHTML")))
+            # messages_received_.pop(0) # drop self user at top of page
             messages_all_ = Driver.find_elements_by_name("messagesAll")
             messages_all = []
-            messages_to = []
-            messages_from = []
+            messages_received = []
+            messages_sent = []
             # timestamps_ = Driver.BROWSER.find_elements_by_class_name("b-chat__message__time")
             # timestamps = []
             # for timestamp in timestamps_:
@@ -1626,46 +1626,50 @@ class Driver:
                 # Settings.maybe_print("timestamp: {}".format(timestamp))
                 # timestamps.append(timestamp)
             for message in messages_all_:
-                Settings.maybe_print("all: {}".format(message.get_attribute("innerHTML")))
-                messages_all.append(message.get_attribute("innerHTML"))
+                message = message.get_attribute("innerHTML")
+                message = re.sub(r'<[a-zA-Z0-9=\"\\/_\-!&;%@#$\(\)\.:\+\s]*>', "", message)
+                Settings.maybe_print("all: {}".format(message))
+                messages_all.append(message)
             messages_and_timestamps = []
             # messages_and_timestamps = [j for i in zip(timestamps,messages_all) for j in i]
             # Settings.maybe_print("Chat Log:")
             # for f in messages_and_timestamps:
                 # Settings.maybe_print(": {}".format(f))
-            for message in messages_from_:
+            for message in messages_sent_:
                 # Settings.maybe_print("from1: {}".format(message.get_attribute("innerHTML")))
-                message = message.find_element_by_class_name(ONLYFANS_MESSAGES)
-                Settings.maybe_print("from: {}".format(message.get_attribute("innerHTML")))
-                messages_from.append(message.get_attribute("innerHTML"))
+                message = message.find_element_by_class_name(ONLYFANS_MESSAGES).get_attribute("innerHTML")
+                message = re.sub(r'<[a-zA-Z0-9=\"\\/_\-!&;%@#$\(\)\.:\+\s]*>', "", message)
+                Settings.maybe_print("sent: {}".format(message))
+                messages_sent.append(message)
             i = 0
+
+            # messages_all = list(set(messages_all))
+            # messages_sent = list(set(messages_sent))
+            # i really only want to remove duplicates if they're over a certain str length
+
+            def remove_dupes(list_):
+                for i in range(len(list_)):
+                    for j in range(len(list_)):
+                        # if j >= len(list_): break
+                        if i==j: continue
+                        if str(list_[i]) == str(list_[j]) and len(str(list_[i])) > 10:
+                            del list_[j]
+                            remove_dupes(list_)
+                            return
+                            
+            remove_dupes(messages_all)
+            remove_dupes(messages_sent)
+
             for message in messages_all:
-                from_ = False
-                to_ = False
-                for mess in messages_from:
-                    if str(message) == str(mess):
-                        from_ = True
-                for mess in messages_to:
-                    if str(message) == str(mess):
-                        to_ = True
-                if not from_:
-                    # Settings.maybe_print("to_: {}".format(message))
-                    # messages_to[i] = [timestamps[i], message]
-                    # messages_to[i] = message
-                    messages_to.append(message)
-                    # Settings.maybe_print("to_: {}".format(messages_to[i]))
-                # elif from_:
-                    # Settings.maybe_print("from_: {}".format(message))
-                    # messages_from[i] = [timestamps[i], message]
-                    # messages_from[i] = message
-                    # Settings.maybe_print("from_: {}".format(messages_from[i]))
+                if message not in messages_sent:
+                    messages_received.append(message)
                 i += 1
-            Settings.maybe_print("to: {}".format(messages_to))
-            Settings.maybe_print("from: {}".format(messages_from))
-            Settings.maybe_print("Messages From: {}".format(len(messages_from)))
-            Settings.maybe_print("Messages To: {}".format(len(messages_to)))
+            Settings.maybe_print("received: {}".format(messages_received))
+            Settings.maybe_print("sent: {}".format(messages_sent))
+            Settings.maybe_print("Messages Sent: {}".format(len(messages_sent)))
+            Settings.maybe_print("Messages Received: {}".format(len(messages_received)))
             Settings.maybe_print("Messages All: {}".format(len(messages_all)))
-            return [messages_all, messages_and_timestamps, messages_to, messages_from]
+            return [messages_all, messages_and_timestamps, messages_received, messages_sent]
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failure to Read Chat - {}".format(username))
