@@ -2,7 +2,7 @@ import argparse, os
 from datetime import datetime
 from PyInquirer import Validator, ValidationError
 
-ACTIONS = ['discount','post','message','test','backup','profile','promotion']
+ACTIONS = ['discount','post','message','test','backup','profile','promotion','bot']
 CATEGORIES_DEFAULT = [
   "images",
   "galleries",

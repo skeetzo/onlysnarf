@@ -417,6 +417,8 @@
   - debugged remote: debug refresh to stay open -> test javascript refresh injection
   
 
+  - added: bot functionality - menu prompt, tip parsing
+
   **x.x.x**
   - test Profile: check
   - test Profile: posts

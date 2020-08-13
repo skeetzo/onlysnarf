@@ -2,7 +2,7 @@ import argparse, os, re
 from datetime import datetime
 from .validators import valid_action, valid_amount, valid_date, valid_limit, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
 
-ACTIONS = ['discount','message','post','profile','promotion', 
+ACTIONS = ['bot','discount','message','post','profile','promotion', 
 'test'
 ]
 
@@ -540,8 +540,8 @@ if args["source"] and not args["destination"]:
   args["destination"] = args["source"]
 if not args["source"]: args["source"] = "local"
 if not args["destination"]: args["destination"] = "local"
-if args["debug"]: ACTIONS.append("promotion")
-if args["debug"]: ACTIONS.append("test")
+# if args["debug"]: ACTIONS.append("promotion")
+# if args["debug"]: ACTIONS.append("test")
 if not args["category"]: args["source"] = None
 
 ############################################################################################

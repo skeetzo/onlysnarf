@@ -27,6 +27,9 @@ class Message():
 		self.poll = None
 		self.schedule = None
 		##
+		self.isTip = False
+		self.tip = None
+		##
 		self.gotten = False
 
 	###########################################################################
@@ -141,6 +144,10 @@ class Message():
 		if not Settings.confirm(tags): return self.get_tags()
 		self.tags = tags
 		return self.tags
+
+	def get_tip():
+		return 0
+		# pass
 
 	# ensures File references exist and are downloaded
 	# files are File references
@@ -360,6 +367,14 @@ class Message():
 		else:
 			self.performers = "unset"
 		self.gotten = True
+
+	@staticmethod
+	def is_tip(message):
+		return False
+		# pass
+		# check if message is tip
+		# returns false
+		# or returns true and tip amount
 
 	@staticmethod
 	def Post():

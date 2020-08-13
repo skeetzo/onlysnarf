@@ -23,6 +23,7 @@ class User:
         self.name = data.get('name') or ""
         self.username = data.get('username').replace("@","") or ""
         self.id = data.get('id') or None
+        self.messages_parsed = data.get('messages_parsed') or []
         self.messages_from = data.get('messages_from') or []
         self.messages_to = data.get('messages_to') or []
         self.messages = data.get('messages') or []
@@ -37,6 +38,7 @@ class User:
         self.messages_from = ",".join(self.messages_from).split(",")
         self.messages_to = ",".join(self.messages_from).split(",")
         self.messages = ",".join(self.messages_from).split(",")
+        self.messages_parsed = ",".join(self.messages_parsed).split(",")
         self.preferences = ",".join(self.messages_from).split(",")
         self.sent_files = ",".join(self.messages_from).split(",")
         self.statement_history = ",".join(self.messages_from).split(",")
@@ -56,6 +58,7 @@ class User:
     def get_id(self):
         if self.id: return self.id
         id_ = Driver.user_get_id(self.get_username())
+        if not id_: return None
         self.id = id_
         return self.id
 
@@ -131,6 +134,7 @@ class User:
             "name":str(self.name),
             "username":str(self.username),
             "id":str(self.id),
+            "messages_parsed":str(self.messages_parsed),
             "messages_from":str(self.messages_from),
             "messages_to":str(self.messages_to),
             "messages":str(self.messages),
@@ -164,7 +168,7 @@ class User:
         User.enter_message(message=Settings.get_default_refresher())
 
     # saves chat log to user
-    def readChat(self, Driver):
+    def read_chat(self):
         print("Reading Chat: {} - {}".format(self.username, self.id))
         messages = Driver.read_user_messages(self.id)
         self.messages = messages[0]
@@ -187,6 +191,16 @@ class User:
     def unfavor(self):
         print("Unfavoring: {}".format(self.username))
         self.isFavorite = False
+
+    @staticmethod
+    def update_chat_logs(users=[]):
+        print("Updating Chat Logs")
+        if len(users) == 0:
+            users = User.get_all_users()
+        for user in users:
+            user.read_chat()
+        User.write_users_local(users=users)
+        return users
 
     @staticmethod
     def get_all_users():
@@ -230,6 +244,11 @@ class User:
         User.write_following_local(users=active_users)
         Settings.set_prefer_local_following(True)
         return active_users
+
+    def get_unparsed_messages(self):
+        unparsed_messages = [m for m in self.messages if m not in self.messages_parsed]  
+        Settings.dev_print("unparsed messages: {}\n{}".format(len(unparsed_messages),"\n".join(unparsed_messages)))
+        return unparsed_messages
 
     @staticmethod
     def get_user_by_username(username=None):
@@ -292,7 +311,6 @@ class User:
     @staticmethod
     def get_never_messaged_users():
         Settings.maybe_print("Getting New Users")
-        update_chat_logs()
         users = User.get_all_users()
         newUsers = []
         for user in users:
@@ -317,6 +335,30 @@ class User:
             i += 1
             if i == int(Settings.get_recent_user_count()):
                 return users_
+        return users_
+
+    # probably not necessary
+    def parse_message(message=None):
+        self.messages.remove(str(message))
+
+    # gets a list of all subscribed user_ids from local txt
+    @staticmethod
+    def read_users_local():
+        Settings.maybe_print("getting local users")
+        users = []
+        users_ = []
+        try:
+            with open(str(Settings.get_users_path())) as json_file:  
+                users = json.load(json_file)['users']
+            Settings.maybe_print("loaded local users")
+            for user in users:
+                try:
+                    users_.append(User(json.loads(user)))
+                except Exception as e:
+                    Settings.dev_print(e)
+            return users_
+        except Exception as e:
+            Settings.dev_print(e)
         return users_
 
     @staticmethod
@@ -384,25 +426,10 @@ class User:
         if not Settings.confirm(user.username): return User.select_username()
         return user
 
-    # gets a list of all subscribed user_ids from local txt
-    @staticmethod
-    def read_users_local():
-        Settings.maybe_print("getting local users")
-        users = []
-        users_ = []
-        try:
-            with open(str(Settings.get_users_path())) as json_file:  
-                users = json.load(json_file)['users']
-            Settings.maybe_print("loaded local users")
-            for user in users:
-                try:
-                    users_.append(User(json.loads(user)))
-                except Exception as e:
-                    Settings.dev_print(e)
-            return users_
-        except Exception as e:
-            Settings.dev_print(e)
-        return users_
+    def send_dick_pics(self, num):
+        print("Sending Dick Pics: {}".format(num))
+        # pass
+        # downloads a dick pic from configured source and sends to user
 
     @staticmethod
     def skipUserCheck(user):

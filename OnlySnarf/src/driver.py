@@ -1596,12 +1596,12 @@ class Driver:
     ######################################################################
 
     @staticmethod
-    def read_user_messages(user):
+    def read_user_messages(username):
         auth_ = Driver.auth()
         if not auth_: return False
         try:
             # go to onlyfans.com/my/subscribers/active
-            Driver.message_user(user)
+            Driver.message_user(username)
             messages_from_ = Driver.find_elements_by_name("messagesFrom")
             # print("first message: {}".format(messages_to_[0].get_attribute("innerHTML")))
             # messages_to_.pop(0) # drop self user at top of page
@@ -1660,8 +1660,17 @@ class Driver:
             return [messages_all, messages_and_timestamps, messages_to, messages_from]
         except Exception as e:
             Driver.error_checker(e)
-            print("Error: Failure to Read Chat - {}".format(user.username))
-            return [[],[],[]]
+            print("Error: Failure to Read Chat - {}".format(username))
+            return [[],[],[],[]]
+
+    ###################
+    ##### Refresh #####
+    ###################
+
+    @staticmethod
+    def refresh():
+        Settings.dev_print("refreshing browser")
+        Driver.BROWSER.refresh()
 
     #################
     ##### Reset #####
@@ -2238,24 +2247,6 @@ class Driver:
         Driver.BROWSER = driver
         return True
 
-    # update chat logs for all users
-    @staticmethod
-    def update_chat_logs():
-        global USER_CACHE_LOCKED
-        USER_CACHE_LOCKED = True
-        print("Updating User Chats")
-        users = Driver.users_get()
-        for user in users:
-            Driver.update_chat_log(user)
-        USER_CACHE_LOCKED = False
-
-    @staticmethod
-    def update_chat_log(user):
-        print("Updating Chat: {}".format(user.username))
-        if not user:
-            return print("Error: Missing User")
-        user.readChat()
-
     ##################
     ##### Upload #####
     ##################
@@ -2423,10 +2414,10 @@ class Driver:
             Settings.maybe_print("Found: {}".format(len(users)))
             for user in users:
                 Settings.dev_print(user)
+            Settings.dev_print("successfully found users")
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to Find Users")
-        Settings.dev_print("successfully found users")
         return users
 
     @staticmethod
@@ -2441,13 +2432,14 @@ class Driver:
             ele = [ele.get_attribute("href") for ele in elements
                     if "/my/chats/chat/" in str(ele.get_attribute("href"))]
             if len(ele) == 0: 
-                print("Warning: User Cannot Be Messaged")
+                print("Warning: Unable to find user id")
                 return None
             ele = ele[0]
             ele = ele.replace("https://onlyfans.com/my/chats/chat/", "")
             user_id = ele
             Settings.dev_print("successfully found user id: {}".format(user_id))
         except Exception as e:
+            Settings.dev_print("failure to find id: {}".format(username))
             Driver.error_checker(e)
             print("Error: Failed to Find User ID")
         return user_id

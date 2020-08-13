@@ -93,7 +93,7 @@ class Profile:
             "welcomeMessage":"avalue",
             "twoStepAuth":True,
             "watermark":True,
-            "watermarkPhoto":True
+            "watermarkPhoto":True,
             "watermarkVideo":True
         }
         # get profile settings
@@ -103,11 +103,11 @@ class Profile:
         for key, value in profile.items():
             for key_, value_ in desiredProfile.items():
                 Settings.dev_print("{}: {} = {}".format(key, value, value_))
-                if value and if str(value_) != "avalue":
+                if value and str(value_) != "avalue":
                     if value != value_:
                         print("Warning: Unrecommended setting - {}".format(key))
                         failed = True
-                elif not value or if str(value) != str(value_):
+                elif not value or str(value) != str(value_):
                     print("Warning: Unrecommended setting - {}".format(key))
                     failed = True
         if failed:

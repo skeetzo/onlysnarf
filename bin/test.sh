@@ -10,6 +10,10 @@ echo "##################################################" >> ../onlysnarf/logs/t
 echo "################## Start #########################" >> ../onlysnarf/logs/test.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
+
+onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action bot -keep -prefer-local
+# onlysnarfpy -debug -verbose -verbose -verbose -browser reconnect -action bot -keep -prefer-local
+
 # onlysnarfpy -debug -verbose -verbose -verbose -browser remote -prefer-local -remote-host 192.168.1.99 -source google -category video
 # onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -prefer-local -remote-host 47.156.172.175 -remote-port 8888 -source google -category video -keep -show -login google -skip-download
 # onlysnarfpy -debug -verbose -verbose -verbose -browser auto-remote -source google -category video -keep -skip-download -login google -remote-host 47.156.172.175 -remote-port 8888
@@ -19,13 +23,13 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 # onlysnarf -debug -verbose -verbose -verbose
 
-onlysnarfpy -action test -debug -verbose -verbose -verbose -browser firefox -login google \
--prefer-local \
--user "recent" \
--amount 40 \
--promotion-expiration 0 \
--limit 0 \
--text "fuck balls"
+# onlysnarfpy -action test -debug -verbose -verbose -verbose -browser firefox -login google \
+# -prefer-local \
+# -user "recent" \
+# -amount 40 \
+# -promotion-expiration 0 \
+# -limit 0 \
+# -text "fuck balls"
 
 # onlysnarf-config
 
