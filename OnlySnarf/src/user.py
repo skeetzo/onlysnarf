@@ -170,7 +170,7 @@ class User:
     # saves chat log to user
     def read_chat(self):
         print("Reading Chat: {} - {}".format(self.username, self.id))
-        messages = Driver.read_user_messages(self.id)
+        messages = Driver.read_user_messages(username=self.username, user_id=self.id)
         self.messages = messages[0]
         # self.messages_and_timestamps = messages[1]
         self.messages_to = messages[2]

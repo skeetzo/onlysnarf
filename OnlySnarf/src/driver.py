@@ -1018,12 +1018,14 @@ class Driver:
     def message_user(username=None, user_id=None):
         auth_ = Driver.auth()
         if not auth_: return None
-        if user_id: return Driver.message_user_by_id(user_id=user_id)
+        Settings.dev_print("username: {} : {}: user_id".format(username, user_id))
+        if user_id and str(user_id) != "None": return Driver.message_user_by_id(user_id=user_id)
         if not username:
             print("Error: Missing Username to Message")
             return False
         try:
             Driver.go_to_page(username)
+            time.sleep(2)
             elements = Driver.BROWSER.find_elements_by_tag_name("a")
             ele = [ele for ele in elements
                     if "/my/chats/chat/" in str(ele.get_attribute("href"))]
@@ -1596,13 +1598,19 @@ class Driver:
     ######################################################################
 
     @staticmethod
-    def read_user_messages(username):
+    def read_user_messages(username=None, user_id=None):
         auth_ = Driver.auth()
         if not auth_: return False
         try:
             # go to onlyfans.com/my/subscribers/active
-            Driver.message_user(username)
-            messages_from_ = Driver.find_elements_by_name("messagesFrom")
+            Driver.message_user(username=username, user_id=user_id)
+            messages_from_ = []
+            try:
+                messages_from_ = Driver.find_elements_by_name("messagesFrom")
+            except Exception as e:
+                if "Unable to locate elements" in str(e):
+                    pass
+
             # print("first message: {}".format(messages_to_[0].get_attribute("innerHTML")))
             # messages_to_.pop(0) # drop self user at top of page
             messages_all_ = Driver.find_elements_by_name("messagesAll")

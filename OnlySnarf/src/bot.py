@@ -55,7 +55,6 @@ class Bot:
 		self.running = threading.Timer(RUN_DURATION, self.run).start()
 		# read all messages
 		users = User.update_chat_logs()
-		print(users)
 		# respond to messages
 		for user in users:
 			Bot.parse(user=user)

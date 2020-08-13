@@ -319,7 +319,7 @@ ELEMENTS = [
     # messages from user
     {
         "name": "messagesFrom",
-        "classes": ["m-from-me"],
+        "classes": ["m-from-me","b-chat__message.m-from-me"],
         "text": [],
         "id": []
     },

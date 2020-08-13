@@ -11,7 +11,8 @@ echo "################## Start #########################" >> ../onlysnarf/logs/t
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
 
-onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action bot -keep -prefer-local
+onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot -keep -prefer-local -show
+# onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action bot -keep -prefer-local
 # onlysnarfpy -debug -verbose -verbose -verbose -browser reconnect -action bot -keep -prefer-local
 
 # onlysnarfpy -debug -verbose -verbose -verbose -browser remote -prefer-local -remote-host 192.168.1.99 -source google -category video

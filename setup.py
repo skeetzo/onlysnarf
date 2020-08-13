@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="2.18.5",
+    version="2.18.6",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
@@ -16,7 +16,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     install_requires=[
-        'selenium',
+        'selenium==3.141',
         'pydrive',
         'pathlib', 
         'chromedriver-binary',
@@ -28,7 +28,8 @@ setuptools.setup(
         'ffmpeg',
         'wget',
         'pysftp',
-        'moviepy'
+        'pillow'
+        # 'moviepy'
         ],
     entry_points={
         'console_scripts' : [
