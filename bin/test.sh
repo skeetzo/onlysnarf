@@ -10,6 +10,8 @@ echo "##################################################" >> ../onlysnarf/logs/t
 echo "################## Start #########################" >> ../onlysnarf/logs/test.txt 2>&1
 echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
 
+## Bot
+# screen -dmS snarfbot /usr/local/bin/onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot -keep -prefer-local >> /var/log/onlysnarf/bot.log 2>&1
 
 # onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot -keep -prefer-local -show
 onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action bot -keep -prefer-local
