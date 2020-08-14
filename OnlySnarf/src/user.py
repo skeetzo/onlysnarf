@@ -24,8 +24,8 @@ class User:
         self.username = data.get('username').replace("@","") or ""
         self.id = data.get('id') or None
         self.messages_parsed = data.get('messages_parsed') or []
-        self.messages_from = data.get('messages_from') or []
-        self.messages_to = data.get('messages_to') or []
+        self.messages_sent = data.get('messages_sent') or []
+        self.messages_received = data.get('messages_received') or []
         self.messages = data.get('messages') or []
         self.preferences = data.get('preferences') or []
         self.last_messaged_on = data.get('last_messaged_on')
@@ -35,13 +35,13 @@ class User:
         self.statement_history = data.get('statement_history') or []
         self.started = data.get('started')
         ###### fucking json #####
-        self.messages_from = ",".join(self.messages_from).split(",")
-        self.messages_to = ",".join(self.messages_from).split(",")
-        self.messages = ",".join(self.messages_from).split(",")
+        self.messages_sent = ",".join(self.messages_sent).split(",")
+        self.messages_received = ",".join(self.messages_sent).split(",")
+        self.messages = ",".join(self.messages_sent).split(",")
         self.messages_parsed = ",".join(self.messages_parsed).split(",")
-        self.preferences = ",".join(self.messages_from).split(",")
-        self.sent_files = ",".join(self.messages_from).split(",")
-        self.statement_history = ",".join(self.messages_from).split(",")
+        self.preferences = ",".join(self.messages_sent).split(",")
+        self.sent_files = ",".join(self.messages_sent).split(",")
+        self.statement_history = ",".join(self.messages_sent).split(",")
         #########################
         self.discount = None
         self.promotion = None
@@ -135,8 +135,8 @@ class User:
             "username":str(self.username),
             "id":str(self.id),
             "messages_parsed":str(self.messages_parsed),
-            "messages_from":str(self.messages_from),
-            "messages_to":str(self.messages_to),
+            "messages_sent":str(self.messages_sent),
+            "messages_received":str(self.messages_received),
             "messages":str(self.messages),
             "preferences":str(self.preferences),
             "last_messaged_on":str(self.last_messaged_on),
@@ -173,8 +173,8 @@ class User:
         messages = Driver.read_user_messages(username=self.username, user_id=self.id)
         self.messages = messages[0]
         # self.messages_and_timestamps = messages[1]
-        self.messages_to = messages[2]
-        self.messages_from = messages[3]
+        self.messages_received = messages[2]
+        self.messages_sent = messages[3]
         Settings.maybe_print("Chat Read: {} - {}".format(self.username, self.id))
 
     # saves statement / payment history
@@ -316,7 +316,7 @@ class User:
         users = User.get_all_users()
         newUsers = []
         for user in users:
-            if len(user.messages_to) == 0:
+            if len(user.messages_received) == 0:
                 Settings.maybe_print("Never Messaged User: {}".format(user.username))
                 user = User.skipUserCheck(user)
                 if user is None: continue

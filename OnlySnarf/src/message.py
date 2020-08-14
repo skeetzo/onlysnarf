@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from .classes import Poll, Schedule
 from .driver import Driver
@@ -26,9 +27,6 @@ class Message():
 		self.expiration = None
 		self.poll = None
 		self.schedule = None
-		##
-		self.isTip = False
-		self.tip = None
 		##
 		self.gotten = False
 
@@ -145,8 +143,16 @@ class Message():
 		self.tags = tags
 		return self.tags
 
-	def get_tip():
-		return 0
+	@staticmethod
+	# gets tip text from a message
+	def isTip(text):
+		amount = 0
+		if re.search(r'I sent you a $[0-9]*.00 tip ♥'):
+			amount = re.match(r'I sent you a $([0-9]*).00 tip ♥')
+			print("amount: {}".format(amount))
+			return True, amount
+		return False, amount
+		# check text for "I sent you a $5.00 tip ♥"
 		# pass
 
 	# ensures File references exist and are downloaded
