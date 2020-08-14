@@ -16,7 +16,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     install_requires=[
-        'selenium==3.141',
+        'selenium==3.141.0',
         'pydrive',
         'pathlib', 
         'chromedriver-binary',

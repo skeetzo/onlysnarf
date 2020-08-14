@@ -408,8 +408,6 @@
 
 
 
-
-
 ----------------------------------------
 
   **2.x.x**
@@ -418,7 +416,9 @@
   - properly tested: settings set
 
   - adding tab requires a file lock between onlysnarf sessions to maintain the correct active tab
-  - debugged remote: debug refresh to stay open -> test javascript refresh injection
+  |- add focus to driver
+  |- add use tabs when opening new pages and tab list
+  - debugged remote: debug refresh to stay open
   
 
   - added: bot functionality - menu prompt, tip parsing

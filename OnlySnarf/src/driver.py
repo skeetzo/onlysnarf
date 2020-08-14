@@ -83,9 +83,12 @@ class Driver:
     LOGGED_IN = False
     NOT_INFORMED_KEPT = False # whether or not "Keep"ing the browser session has been printed once upon exit
 
-    def __init__():
-        pass
-        # BROWSER = None
+    def __init__(cookies=None):
+        if cookies:
+            # start browser with session from cookies
+            # or figure out where this check goes
+            pass
+        self.BROWSER = None
 
     @staticmethod
     def auth():
