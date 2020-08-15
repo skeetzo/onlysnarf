@@ -187,8 +187,8 @@ class File():
     @staticmethod
     def get_tmp():
         tmp = os.getcwd()
-        if Settings.get_mount_path() != "":
-            tmp = os.path.join(Settings.get_mount_path(), "tmp")
+        if Settings.get_download_path() != "":
+            tmp = os.path.join(Settings.get_download_path(), "tmp")
         else:
             tmp = os.path.join(tmp, "tmp")
         if not os.path.exists(str(tmp)):

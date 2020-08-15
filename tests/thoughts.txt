@@ -28,3 +28,30 @@ i should close tabs after a set amount of time
 since Driver is setup to globally use 1 browser, i'll need to update it to having a browser
 per Driver object
 
+
+
+
+
+
+
+
+
+
+
+since i'm going to be saving pages and opening new tabs,
+some functions are going to need to be updated to searching for already existing browsers
+and then if one of those browsers has the page already open
+if not, then it should open a tab from the main browser for example to the users page
+
+
+user.discount
+user.get_id
+user.message
+user.enter_message
+user.message stuff
+user.read_chat
+user.read_statements
+user.get_active_users
+user.get_following
+
+

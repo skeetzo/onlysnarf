@@ -25,9 +25,9 @@ show="-show"
 declare -a browsers
 browsers=("auto" "firefox" "google" "auto-remote" "remote" "remote-chrome" "remote-firefox" "reconnect")
 browsers=("remote" "remote-chrome" "remote-firefox")
-browsers=("auto-remote")
 browsers=("auto")
 browsers=("reconnect")
+browsers=("auto-remote")
 browsers=("firefox")
 
 declare -a sources
@@ -37,13 +37,14 @@ sources=("google")
 sources=("local")
 
 declare -a testing
-testing=("discount" "expiration" "message" "poll" "post" "schedule" "settings" "upload")
 testing=("upload")
 testing=("post")
-testing=("discount")
 testing=("promotion")
 testing=("message")
 testing=("settings")
+testing=("discount")
+testing=("discount" "expiration" "message" "poll" "post" "schedule" "settings" "upload")
+testing=("expiration" "message" "poll" "post" "schedule" "settings" "upload")
 
 verbose=""
 verbose="-verbose -verbose"

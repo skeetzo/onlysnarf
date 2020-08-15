@@ -132,6 +132,11 @@ parser.add_argument('-categories', dest='categories',
   action='append', help='the categories to list in menu (appends to \'{}\''.format("\'".join(CATEGORIES_DEFAULT)), 
   default=[])
 ##
+# -cookies
+# load & save from/to local cookies path
+parser.add_argument('-cookies', action='store_true', dest='cookies',
+  help='enable loading & saving from/to the local cookies path')
+##
 # -create-missing 
 # creates missing OnlySnarf folders
 parser.add_argument('-create-missing', action='store_true', dest='create_missing',
@@ -432,13 +437,6 @@ parser.add_argument('-source', dest='source', default=None, choices=["google",
   # "dropbox",
   "remote","local"],
   help='file host location')
-##
-## DEBUGGING
-# -tab [number]
-# opens tab in browser or connects to existing tab
-# if tab number is 0, a new tab will not be created
-parser.add_argument('-tab', default=None, dest='tab',
-  help='[INCOMPLETE] open a tab in browser when reconnecting or use the (if existing) specificied tab number')
 ##
 # -tags
 # @[tag]

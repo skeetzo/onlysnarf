@@ -15,6 +15,7 @@ commands = [
 class Bot:
 
 	def __init__(self):
+		self.browser = None
 		self.refreshing = None
 		self.running = None
 		##
@@ -30,19 +31,17 @@ class Bot:
 			if isTip:
 				successful = Bot.tipped(user=user, amount=amount)
 			elif "0) menu" in str(message).lower():
-				Bot.prompt(user=user)
+				bot.prompt(user=user)
 			if successful:
 				user.parse_message(message=message.message)
 
-	@staticmethod
-	def prompt(user=None):
+	def prompt(self, user=None):
 		# show list of commands available
-		User.message(message="Commands available:\n0) menu\n1) notice me senpai")
+		User.message(browser=self.browser, message="Commands available:\n0) menu\n1) notice me senpai")
 
 	# refresh the Driver
-	@staticmethod
-	def refresh():
-		Driver.refresh()
+	def refresh(self):
+		Driver.refresh(browser=self.browser)
 
 	# handle the timer for refreshing the Driver
 	def refresher(self):
@@ -53,8 +52,9 @@ class Bot:
 	def run(self):
 		if self.running: self.running.stop()
 		self.running = threading.Timer(RUN_DURATION, self.run).start()
+		self.browser = Driver.spawn_browser()
 		# read all messages
-		users = User.update_chat_logs()
+		users = User.update_chat_logs(browser=self.browser)
 		# respond to messages
 		for user in users:
 			Bot.parse(user=user)

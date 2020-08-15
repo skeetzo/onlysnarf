@@ -405,20 +405,17 @@
   **2.18.5**
   - debugged: promotion- campaign
   - debugging: settings
-
+  **2.19.0**
+  - added tabs behavior
 
 
 ----------------------------------------
+
 
   **2.x.x**
   - need to add 'create' to Profile for asking for profile settings when syncing to
   - properly tested: settings get
   - properly tested: settings set
-
-  - adding tab requires a file lock between onlysnarf sessions to maintain the correct active tab
-  |- add focus to driver
-  |- add use tabs when opening new pages and tab list
-  - debugged remote: debug refresh to stay open
   
 
   - added: bot functionality - menu prompt, tip parsing

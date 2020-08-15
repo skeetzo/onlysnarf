@@ -45,19 +45,17 @@ class User:
         #########################
         self.discount = None
         self.promotion = None
+        #########################
+        self.browser = Driver.BROWSER
         # try:
             # Settings.dev_print("User: {} - {} - {}".format(self.name, self.username, self.id))
         # except Exception as e:
             # Settings.dev_print(e)
             # Settings.dev_print("User: {}".format(self.id))
 
-    def discount(self, discount=None):
-        if not discount: discount = Settings.get_discount()
-        return Driver.discount_user(discount)
-
     def get_id(self):
         if self.id: return self.id
-        id_ = Driver.user_get_id(self.get_username())
+        id_ = Driver.user_get_id(self.get_username(), browser=self.browser)
         if not id_: return None
         self.id = id_
         return self.id
@@ -68,9 +66,9 @@ class User:
     def message(self, message=None):
         if str(self.username) == "": return print("User Error: Missing Message Username")
         print("Messaging: {} - {}".format(self.username, self.id))
-        successful = Driver.message(username=self.get_username(), user_id=self.id)
+        successful = Driver.message(browser=self.browser, username=self.get_username(), user_id=self.id)
         if not successful: return False
-        successful = User.enter_message(message)
+        successful = User.enter_message(browser=self.browser, message=message)
         if not successful: return False
         print("Messaged: {}".format(self.username))
 
@@ -81,11 +79,11 @@ class User:
         user.message(message=message)    
 
     @staticmethod
-    def enter_message(message=None):
+    def enter_message(browser=None, message=None):
         try:
             print("Entering Message: {} - ${}".format(message.text, message.get_price() or 0))
             def enter_text(text):
-                success = Driver.message_text(text)
+                success = Driver.message_text(text, browser=browser)
                 if not success: return False
                 return True
             def enter_price(price):
@@ -94,7 +92,7 @@ class User:
                     print("Warning: Price Too Low, Free Image")
                     print("Price Minimum: ${}".format(Settings.get_price_minimum()))
                 else:
-                    success = Driver.message_price(price)
+                    success = Driver.message_price(price, browser=browser)
                     if not success: return False
                 Settings.debug_delay_check()
                 return True
@@ -103,14 +101,14 @@ class User:
                 # if str(file_name) in self.sent_files:
                     # print("Error: File Already Sent: {} -> {}".format(file_name, self.username))
                     # return False
-                success = Driver.message_files(files)
+                success = Driver.message_files(files, browser=browser)
                 if not success: return False
                 # if not Settings.is_debug():
                     # self.sent_files.append(str(file_name))
                 Settings.debug_delay_check()
                 return True
             def confirm():
-                success = Driver.message_confirm()
+                success = Driver.message_confirm(browser=browser)
                 if not success: return False
                 return True
             if not enter_text(message.get_text()): return False # not allowed to fail
@@ -154,7 +152,7 @@ class User:
             return print("Error: User Not New")
         print("Sending User Greeting: {}".format(self.username))
         # self.send_message(message=Settings.DEFAULT_GREETING)
-        User.enter_message(message=Settings.get_default_greeting())
+        User.enter_message(browser=self.browser, message=Settings.get_default_greeting())
 
     # send refresher message to user
     def refresh(self):
@@ -165,12 +163,12 @@ class User:
             return print("Error: Refresher Date Too Early - {}".format((timedelta(self.last_messaged_on)-timedelta(datetime())).days))
         print("Sending User Refresher: {}".format(self.username))
         # self.send_message(message=Settings.user_DEFAULT_REFRESHER)
-        User.enter_message(message=Settings.get_default_refresher())
+        User.enter_message(browser=self.browser, message=Settings.get_default_refresher())
 
     # saves chat log to user
     def read_chat(self):
         print("Reading Chat: {} - {}".format(self.username, self.id))
-        messages = Driver.read_user_messages(username=self.username, user_id=self.id)
+        messages = Driver.read_user_messages(browser=self.browser, username=self.username, user_id=self.id)
         self.messages = messages[0]
         # self.messages_and_timestamps = messages[1]
         self.messages_received = messages[2]
@@ -180,7 +178,7 @@ class User:
     # saves statement / payment history
     def statementHistory(self, history):
         print("Reading Statement History: {} - {}".format(self.username, self.id))
-        Driver.read_statements(user=self.id)
+        # Driver.read_statements(browser=self.browser, user=self.id)
 
     # sets as favorite
     def favor(self):
@@ -193,32 +191,33 @@ class User:
         self.isFavorite = False
 
     @staticmethod
-    def update_chat_logs(users=[]):
+    def update_chat_logs(browser=None, users=[]):
         print("Updating Chat Logs")
         if len(users) == 0:
-            users = User.get_all_users()
+            users = User.get_all_users(browser=browser)
         for user in users:
             user.read_chat()
         User.write_users_local(users=users)
         return users
 
     @staticmethod
-    def get_all_users():
-        return User.get_active_users()
+    def get_all_users(browser=None):
+        return User.get_active_users(browser=browser)
 
     # gets users from local or refreshes from onlyfans.com
     @staticmethod
-    def get_active_users():
+    def get_active_users(browser=None):
         if Settings.is_prefer_local():
             users = User.read_users_local()
             if len(users) > 0: return users
         active_users = []
-        users = Driver.users_get()
+        users = Driver.users_get(browser=browser)
         for user in users:
             try:
                 user = User(user)
                 user = User.skipUserCheck(user)
                 if user is None: continue
+                setattr(user, "browser", browser)
                 active_users.append(user)
             except Exception as e:
                 Settings.dev_print(e)
@@ -230,15 +229,16 @@ class User:
 
     @staticmethod
     # return following Users
-    def get_following():
+    def get_following(browser=None):
         if Settings.is_prefer_local_following(): return User.read_following_local()
         active_users = []
-        users = Driver.following_get()
+        users = Driver.following_get(browser=browser)
         for user in users:
             try:
                 user = User(user)
                 user = User.skipUserCheck(user)
                 if user is None: continue
+                setattr(user, "browser", browser)
                 active_users.append(user)
             except Exception as e:
                 Settings.dev_print(e)

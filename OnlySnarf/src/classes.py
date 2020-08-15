@@ -1,9 +1,13 @@
+import re
 from datetime import datetime
 from .driver import Driver
 from .settings import Settings
 from .user import User
 from PyInquirer import prompt
+from PyInquirer import Validator, ValidationError
 from .validators import AmountValidator, MonthValidator, LimitValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, ExpirationValidator, ListValidator
+from . import remote as Remote
+from .file import File, Folder, Google_File, Google_Folder
 
 DEBUGGING_DATE = False
 
@@ -34,7 +38,7 @@ class Discount:
         successful = False
         for user in users:
             self.username = user.username
-            successful_ = Driver.discount_user(self)
+            successful_ = Driver.discount_user(discount=self)
             if successful_: successful = successful_
         return successful
 
@@ -99,6 +103,380 @@ class Discount:
         self.username = username
         return self.username
 
+########################################################################################
+
+class Message():
+    def __init__(self):
+        self.text = None
+        self.files = []
+        ##
+        self.keywords = []
+        self.tags = []
+        self.performers = []
+        self.hasPerformers = False
+        ## messages
+        self.price = None
+        self.recipients = [] # users to send to
+        self.users = [] # prepared recipients
+        ## posts
+        self.expiration = None
+        self.poll = None
+        self.schedule = None
+        ##
+        self.gotten = False
+
+    def backup_files(self):
+        for file in self.files:
+            file.backup()
+
+    def delete_files(self):
+        for file in self.files:
+            file.delete()
+
+    def cleanup_files(self):
+        self.backup_files()
+        self.delete_files()
+
+    @staticmethod
+    def format_keywords(keywords):
+        if len(keywords) > 0: return " #{}".format(" #".join(keywords))
+        return ""
+
+    @staticmethod
+    def format_performers(performers): # spaced added after @ to close performer search modal
+        if len(performers) > 0: return " w/ @{} ".format(" @".join(performers))
+        return ""
+            
+    @staticmethod
+    def format_tags(tags):
+        if len(tags) > 0: return " @{}".format(" @".join(tags))
+        return ""
+
+    def format_text(self):
+        return "{}{}{}{}".format(self.get_text(), Message.format_performers(self.get_performers()), Message.format_tags(self.get_tags()),
+            Message.format_keywords(self.get_keywords())).strip()
+
+    def get_keywords(self):
+        if str(self.keywords) == "unset": return []
+        # if self.keywords: return self.keywords
+        if len(self.keywords) > 0: return self.keywords
+        keywords = Settings.get_keywords() or []
+        if len(keywords) > 0: return keywords
+        if not Settings.prompt("keywords"):
+            self.keywords = "unset"
+            return []
+        question = {
+            'type': 'input',
+            'name': 'keywords',
+            'message': 'Keywords:',
+            'validate': ListValidator
+        }
+        answers = prompt(question)
+        keywords = answers["keywords"]
+        keywords = keywords.split(",")
+        keywords = [n.strip() for n in keywords]
+        if not Settings.confirm(keywords): return self.get_keywords()
+        self.keywords = keywords
+        return self.keywords
+
+    def get_performers(self):
+        if str(self.performers) == "unset": return []
+        # if self.performers: return self.performers
+        if len(self.performers) > 0: return self.performers
+        performers = Settings.get_performers() or []
+        if len(performers) > 0: return performers
+
+        if len(self.files) > 0:
+            for file in self.files:
+                if hasattr(file, "performer"):
+                    p = getattr(file, "performer")
+                    if p not in performers:
+                        performers.append(p)
+            if len(performers) > 0:
+                self.performers = performers
+                return performers
+
+        if not Settings.prompt("performers"):
+            self.performers = "unset"
+            return []
+        question = {
+            'type': 'input',
+            'name': 'performers',
+            'message': 'Performers:',
+            'validate': ListValidator
+        }
+        answers = prompt(question)
+        performers = answers["performers"]
+        performers = performers.split(",")
+        performers = [n.strip() for n in performers]
+        if not Settings.confirm(performers): return self.get_performers()
+        self.performers = performers
+        return self.performers
+
+    def get_tags(self):
+        if str(self.tags) == "unset": return []
+        # if self.tags: return self.tags
+        if len(self.tags) > 0: return self.tags
+        tags = Settings.get_tags() or []
+        if len(tags) > 0: return tags
+        if not Settings.prompt("tags"):
+            self.tags = "unset"
+            return []
+        question = {
+            'type': 'input',
+            'name': 'tags',
+            'message': 'Tags:',
+            'validate': ListValidator
+        }
+        answers = prompt(question)
+        tags = answers["tags"]
+        tags = tags.split(",")
+        tags = [n.strip() for n in tags]
+        if not Settings.confirm(tags): return self.get_tags()
+        self.tags = tags
+        return self.tags
+
+    @staticmethod
+    # gets tip text from a message
+    def isTip(text):
+        amount = 0
+        if re.search(r'I sent you a $[0-9]*.00 tip ♥'):
+            amount = re.match(r'I sent you a $([0-9]*).00 tip ♥')
+            print("amount: {}".format(amount))
+            return True, amount
+        return False, amount
+        # check text for "I sent you a $5.00 tip ♥"
+        # pass
+
+    # ensures File references exist and are downloaded
+    # files are File references
+    # file references can be GoogleId references which need to download their source
+    # files exist when checked for size
+    # ?
+    def get_files(self):
+        if str(self.files) == "unset": return []
+        if len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
+        if not Settings.is_prompt() and Settings.get_category() == None:
+            self.files = "unset"
+            return []
+        files = []
+        if len(self.files) == 0 and len(Settings.get_input()) > 0:
+            files.append(Settings.get_input_as_files())
+        elif len(self.files) == 0:
+            files = File.select_file_upload_method()
+            if str(files[0]) == "unset" or str(files) == "unset":
+                self.files = "unset"
+                files = []
+                if Settings.is_prompt(): return []
+        if files == None: files = []
+        if Settings.get_source() == "google":
+            googleFiles = Google_File.get_files()
+            if len(files) == 0 and len(googleFiles) > 0:
+                files = Google_File.select_files()
+            elif len(files) == 0 and len(googleFiles) == 0:
+                self.files = "unset"
+                return []
+        if Settings.get_source() == "dropbox":
+            dropboxFiles = Dropbox.get_files()
+            if len(files) == 0 and len(dropboxFiles) > 0:
+                files = Dropbox.select_files()
+            elif len(files) == 0 and len(dropboxFiles) == 0:
+                self.files = "unset"
+                return []
+        if Settings.get_source() == "remote":
+            remoteFiles = Remote.get_files()
+            if len(remoteFiles) > 0:
+                files = Remote.select_files()
+            elif len(files) == 0 and len(remoteFiles) == 0:
+                self.files = "unset"
+                return []
+        if Settings.get_source() == "local":
+            localFiles = File.get_files()
+            if len(files) == 0 and len(localFiles) > 0:
+                files = File.select_files()
+            elif len(files) == 0 and len(localFiles) == 0:
+                self.files = "unset"
+                return []
+        filed = []
+        for file in files:
+            if isinstance(file, Folder) or isinstance(file, Google_Folder): filed.extend(file.get_files())
+            else:
+                if hasattr(file, "performer"):
+                    self.hasPerformers = True
+                filed.append(file)
+        self.files = filed[:int(Settings.get_upload_max())]
+        return self.files
+
+    def get_expiration(self):
+        if str(self.expiration) == "unset": return None
+        if self.expiration: return self.expiration
+        expires = Settings.get_expiration() or None
+        if expires: return expires
+        if not Settings.prompt("expiration"):
+            self.expiration = "unset"
+            return None
+        question = {
+            'type': 'input',
+            'name': 'expiration',
+            'message': 'Expiration [1, 3, 7, 99 (\'No Limit\')]',
+            'validate': ExpirationValidator
+        }
+        answers = prompt(question)
+        expiration = answers["expiration"]
+        if not Settings.confirm(expiration): return self.get_expiration()
+        self.expiration = expiration
+        return self.expiration
+
+    def get_poll(self):
+        if str(self.poll) == "unset": return None
+        if self.poll and self.poll.check(): return self.poll
+        if Settings.is_prompt() and not Settings.prompt("poll"):
+            self.poll = "unset"
+            return None
+        poll = Poll()
+        poll.get()
+        if not poll.check(): return None
+        self.poll = poll
+        return poll
+
+    def get_price(self):
+        if self.price: return self.price
+        price = Settings.get_price() or None
+        if price: return price
+        if not Settings.prompt("price"): return ""
+        question = {
+            'type': 'input',
+            'name': 'price',
+            'message': 'Price',
+            'validate': NumberValidator,
+            'filter': lambda val: int(val)
+        }
+        answers = prompt(question)
+        price = answers["price"]
+        if not Settings.confirm(price): return self.get_price()
+        self.price = price
+        return self.price
+
+    # ensures listed recipients are users
+    # Settings.USERS and self.recipients should be usernames
+    # if includes [all, recent, favorite] & usernames it only uses the 1st found of [all,...]
+    def get_recipients(self):
+        if len(self.users) > 0: return self.users
+        users = []
+        if len(self.recipients) == 0 and len(Settings.get_users()) > 0: 
+            users = Settings.get_users()
+        elif len(self.recipients) == 0 and Settings.get_user(): 
+            users = [Settings.get_user()]
+        elif len(self.recipients) == 0:
+            users = User.select_users()
+        # users = []
+        # for user in recipients:
+        #     if str(user.username).lower() == "all":
+        #         users = User.get_all_users()
+        #         break
+        #     elif str(user.username).lower() == "recent":
+        #         users = User.get_recent_users()
+        #         break
+        #     elif str(user.username).lower() == "favorite":
+        #         users = User.get_favorite_users()
+        #         break
+        #     else: users.append(user)
+        self.users = users
+        return self.users
+
+    def get_schedule(self):
+        if str(self.schedule) == "unset": return None
+        if self.schedule: return self.schedule
+        if Settings.is_prompt() and not Settings.prompt("schedule"):
+            self.schedule = "unset"
+            return None
+        schedule = Schedule()
+        schedule.get()
+        if not schedule.check(): return None
+        self.schedule = schedule
+        return schedule
+        
+    def get_text(self):
+        if self.text: return self.text
+        text = Settings.get_text() or None
+        if text: 
+            self.text = text
+            return text
+        if not Settings.prompt("text"): return None
+        question = {
+            'type': 'input',
+            'name': 'text',
+            'message': 'Text:'
+        }
+        answers = prompt(question)
+        text = answers["text"]
+        if not Settings.confirm(text): return self.get_text()
+        self.text = text
+        return self.text
+
+    def get(self):
+        if self.gotten: return
+        self.get_text()
+        self.get_keywords()
+        self.get_tags()
+        self.get_price()
+        self.get_poll()
+        self.get_schedule()
+        self.get_expiration()
+        self.get_files()
+        self.get_recipients()
+        if not self.text and str(self.files) != "unset":
+            if len(self.files) > 0:
+                self.text = self.files[0].get_title()
+        if Settings.get_performer_category() or self.hasPerformers:
+            self.get_performers()
+        else: # might as well skip asking if not pulling from performer category
+            self.performers = "unset"
+        self.gotten = True
+
+    def get_post(self):
+        if self.gotten: return
+        self.get_text()
+        self.get_keywords()
+        self.get_tags()
+        self.get_poll()
+        self.get_schedule()
+        self.get_expiration()
+        self.get_files()
+        if not self.text and str(self.files) != "unset":
+            if len(self.files) > 0:
+                self.text = self.files[0].get_title()
+        if Settings.get_performer_category() or self.hasPerformers:
+            self.get_performers()
+        else:
+            self.performers = "unset"
+        self.gotten = True
+
+    def get_message(self):
+        if self.gotten: return
+        self.get_recipients()
+        self.get_text()
+        self.get_price()
+        self.get_files()
+        if not self.text and str(self.files) != "unset":
+            if len(self.files) > 0:
+                self.text = self.files[0].get_title()
+        if Settings.get_performer_category() or self.hasPerformers:
+            self.get_performers()
+        else:
+            self.performers = "unset"
+        self.gotten = True
+
+    @staticmethod
+    def is_tip(message):
+        return False
+        # pass
+        # check if message is tip
+        # returns false
+        # or returns true and tip amount
+
+########################################################################################
+
 class Poll:
 
     def __init__(self):
@@ -162,6 +540,8 @@ class Poll:
         self.questions = questions
         return self.questions
 
+########################################################################################
+
 class Promotion:
 
     def __init__(self):
@@ -180,14 +560,14 @@ class Promotion:
         if Settings.is_prompt():
             if not Settings.prompt("Promotion"): return
         # user, expiration, months, message
-        Driver.promotion_user_directly(self)
+        Driver.promotion_user_directly(promotion=self)
 
     def create_campaign(self):
         print("Promotion - Creating Campaign")
         self.get()
         if Settings.is_prompt():
             if not Settings.prompt("Promotion"): return
-        Driver.promotional_campaign(self)
+        Driver.promotional_campaign(promotion=self)
 
     # requires the copy/paste and email steps
     def create_trial_link(self):
@@ -197,7 +577,7 @@ class Promotion:
         if Settings.is_prompt():
             if not Settings.prompt("Promotion"): return
         # limit, expiration, months, user
-        Driver.promotional_trial_link(self)
+        Driver.promotional_trial_link(promotion=self)
         # link = Driver.promotional_trial_link()
         # text = "Here's your free trial link!\n"+link
         # Settings.dev_print("Link: "+str(text))
@@ -336,6 +716,8 @@ class Promotion:
         }
         answers = prompt(menu_prompt)
         return answers['action']
+
+########################################################################################
 
 class Schedule:
 

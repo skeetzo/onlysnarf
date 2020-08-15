@@ -29,8 +29,7 @@ class Snarf:
     def bot(bot=None):
         try:
             from .bot import Bot
-            if not bot:
-                bot = Bot()
+            if not bot: bot = Bot()
             bot.run()
         except Exception as e: Settings.dev_print(e)
         Snarf.exit()
@@ -45,27 +44,6 @@ class Snarf:
         if not discount: discount = Discount()
         try: discount.apply()
         except Exception as e: Settings.dev_print(e)
-        Snarf.exit()
-
-    ################
-    ##### Exit #####
-    ################
-
-    @staticmethod
-    def exit():
-        exit()
-
-    #################
-    ##### Login #####
-    #################
-
-    @staticmethod
-    def login():
-        from .driver import Driver
-        loggedIn = False
-        try: loggedIn = Driver.auth()
-        except Exception as e: Settings.dev_print(e)
-        return loggedIn
 
     ###################
     ##### Message #####
@@ -73,11 +51,30 @@ class Snarf:
 
     @staticmethod
     def message(message=None):
-        from .message import Message
+        from .classes import Message
         if not message: message = Message()
-        try: message.send()
+        try:
+            message.get_message()
+            if Settings.is_prompt():
+                if not Settings.prompt("Send"): return
+            if message.get_files() != "unset" and len(message.get_files()) == 0 and not message.get_text():
+                print("Error: Missing Files and Text")
+                return
+            successful = False
+            try: 
+                # for user in self.get_recipients():
+                for user in self.users:
+                    # if isinstance(user, str) and str(user) == "post": successful_ = Driver.post(self)
+                    # print("Messaging: {}".format(user.username))
+                    if isinstance(user, User): successful_ = User.message_user(user.username, message)
+                    else: successful_ = User.message_user(user, message)
+                    if not successful_: continue
+                    successful_ = self.driver.message(user.username)
+            except Exception as e:
+                Settings.dev_print(e)
+                successful = False
+            if successful: message.cleanup_files()
         except Exception as e: Settings.dev_print(e)
-        Snarf.exit()
                 
     ################
     ##### Post #####
@@ -85,11 +82,22 @@ class Snarf:
 
     @staticmethod
     def post(message=None):
-        from .message import Message
+        from .classes import Message
         if not message: message = Message()
-        try: message.post()
+        try:
+            message.get_post()
+            if Settings.is_prompt():
+                if not Settings.prompt("Post"): return
+            if message.get_files() != "unset" and len(message.get_files()) == 0 and not message.get_text():
+                print("Error: Missing Files and Text")
+                return
+            successful = False
+            try: successful = self.driver.post(message)
+            except Exception as e:
+                Settings.dev_print(e)
+                successful = False
+            if successful: message.cleanup_files()
         except Exception as e: Settings.dev_print(e)
-        Snarf.exit()
 
     ###################
     ##### Profile #####
@@ -110,7 +118,6 @@ class Snarf:
                 Profile.sync_to_profile()
             else: Settings.err_print("Missing Profile Method")
         except Exception as e: Settings.dev_print(e)
-        Snarf.exit()
         
     #####################
     ##### Promotion #####
@@ -131,23 +138,13 @@ class Snarf:
                 promotion.apply_to_user()
             else: Settings.err_print("Missing Promotion Method")
         except Exception as e: Settings.dev_print(e)
-        Snarf.exit()
-
-    #################
-    ##### Reset #####
-    #################
-
-    @staticmethod
-    def reset():
-        from .driver import Driver
-        Driver.reset()
 
     #################
     ##### Users #####
     #################
 
     @staticmethod
-    def get_following():
+    def get_following(self):
         from .user import User
         users = []
         try: users = User.get_following()
@@ -155,7 +152,7 @@ class Snarf:
         return users
 
     @staticmethod
-    def get_users():
+    def get_users(self):
         from .user import User
         users = []
         try: users = User.get_all_users()
@@ -167,8 +164,7 @@ class Snarf:
     ###############
 
     @staticmethod
-    def test():
-        from .driver import Driver
+    def test(self):
         from .user import User
         # from . import cron as Cron
         # print('0/3 : Deleting Locals')
@@ -202,6 +198,8 @@ class Snarf:
 
 import atexit
 def exit_handler():
+    from .driver import Driver
+    Driver.exit_all()
     print("Shnarrf?")
     exit()
 atexit.register(exit_handler)
@@ -213,8 +211,6 @@ atexit.register(exit_handler)
 # signal.signal(signal.SIGINT, signal_handler)
   
 def exit():
-    from OnlySnarf.src.driver import Driver
-    Driver.exit()
     sys.exit(0)
 
 def main():
@@ -243,12 +239,11 @@ def main():
             success = Snarf.profile()
         else:
             print("Warning: Missing Method")
-        Snarf.exit()
     except Exception as e:
         Settings.dev_print(e)
         print("Shnarf!")
     finally:
-        sys.exit(0)
+        exit()
 
 ################################################################################################################################################
 

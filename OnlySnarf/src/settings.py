@@ -133,6 +133,9 @@ class Settings:
         cats.extend(list(config["CATEGORIES"]))
         return cats
 
+    def get_cookies_path():
+        return os.path.join(Settings.get_mount_path(), Settings.get_username(), "cookies.pkl")
+
     def get_price():
         return config["PRICE"] or ""
 
@@ -669,8 +672,8 @@ class Settings:
         Settings.LAST_UPDATED_KEY = key
         # return Settings.menu()
 
-    def use_tabs():
-        return config["TAB"] or None
+    def use_cookies():
+        return config["COOKIES"] or False
 
 ###########################################################################
 
