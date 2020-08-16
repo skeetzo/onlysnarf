@@ -52,6 +52,7 @@ class Snarf:
     @staticmethod
     def message(message=None):
         from .classes import Message
+        from .user import User
         if not message: message = Message()
         try:
             message.get_message()
@@ -63,13 +64,11 @@ class Snarf:
             successful = False
             try: 
                 # for user in self.get_recipients():
-                for user in self.users:
+                for user in message.users:
                     # if isinstance(user, str) and str(user) == "post": successful_ = Driver.post(self)
                     # print("Messaging: {}".format(user.username))
-                    if isinstance(user, User): successful_ = User.message_user(user.username, message)
-                    else: successful_ = User.message_user(user, message)
-                    if not successful_: continue
-                    successful_ = self.driver.message(user.username)
+                    if isinstance(user, User): successful = User.message_user(username=user.username, message=message)
+                    else: successful = User.message_user(username=user, message=message)
             except Exception as e:
                 Settings.dev_print(e)
                 successful = False
@@ -92,7 +91,9 @@ class Snarf:
                 print("Error: Missing Files and Text")
                 return
             successful = False
-            try: successful = self.driver.post(message)
+            try:
+                from .driver import Driver 
+                successful = Driver.post(message=message)
             except Exception as e:
                 Settings.dev_print(e)
                 successful = False
@@ -144,7 +145,7 @@ class Snarf:
     #################
 
     @staticmethod
-    def get_following(self):
+    def get_following():
         from .user import User
         users = []
         try: users = User.get_following()
@@ -152,7 +153,7 @@ class Snarf:
         return users
 
     @staticmethod
-    def get_users(self):
+    def get_users():
         from .user import User
         users = []
         try: users = User.get_all_users()
@@ -164,7 +165,7 @@ class Snarf:
     ###############
 
     @staticmethod
-    def test(self):
+    def test():
         from .user import User
         # from . import cron as Cron
         # print('0/3 : Deleting Locals')

@@ -340,7 +340,7 @@ class User:
         return users_
 
     # probably not necessary
-    def parse_message(message=None):
+    def parse_message(self, message=None):
         self.messages.remove(str(message))
         self.messages_parsed.append(str(message))
 

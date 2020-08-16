@@ -406,7 +406,8 @@
   - debugged: promotion- campaign
   - debugging: settings
   **2.19.0**
-  - added tabs behavior
+  - added: tabs behavior
+  - added: cookies
 
 
 ----------------------------------------

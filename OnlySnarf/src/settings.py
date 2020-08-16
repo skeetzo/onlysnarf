@@ -24,6 +24,8 @@ DISCOUNT_MIN_AMOUNT = 10
 DISCOUNT_MAX_MONTHS = 7
 DISCOUNT_MIN_MONTHS = 1
 DURATION_ALLOWED = [1,3,7,30,99]
+PROMOTION_DURATION_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
+
 EXPIRATION_ALLOWED = [1,3,7,30,99]
 IMAGE_DOWNLOAD_LIMIT = 6
 IMAGE_UPLOAD_LIMIT = 5
@@ -173,11 +175,17 @@ class Settings:
         return config["BYKEYWORD"] or None
         
     def get_duration():
-        return config["DURATION"]
+        return config["DURATION"] or None
+
+    def get_promo_duration():
+        return config["DURATION_PROMO"] or None
         
     def get_duration_allowed():
         return DURATION_ALLOWED or []
         
+    def get_duration_promo_allowed():
+        return PROMOTION_DURATION_ALLOWED or []
+
     def get_expiration():
         return config["EXPIRATION"] or config["PROMOTION_EXPIRATION"] or None
         
@@ -331,7 +339,7 @@ class Settings:
         return config["SKIPPED_USERS"] or []
         
     def get_questions():
-        return config["QUESTIONS"]
+        return config["QUESTIONS"] or []
         
     def get_upload_max():
         return config["UPLOAD_MAX"] or IMAGE_UPLOAD_LIMIT

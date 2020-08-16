@@ -1,6 +1,6 @@
 import argparse, os, re
 from datetime import datetime
-from .validators import valid_action, valid_amount, valid_date, valid_limit, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
+from .validators import valid_action, valid_amount, valid_promo_duration, valid_date, valid_limit, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
 
 ACTIONS = ['bot','discount','message','post','profile','promotion', 
 'test'
@@ -23,11 +23,12 @@ IMAGE_UPLOAD_LIMIT = 5
 MESSAGE_CHOICES = ["all", "recent", "favorite", "renew on"]
 PRICE_MINIMUM = 3
 UPLOAD_MAX_DURATION = 6*6 # increments of 10 minutes; 6 = 1 hr
-DURATION_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
+DURATION_ALLOWED = [1,3,7,30,99]
 LIMIT_ALLOWED = [0,1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100]
 PROMOTION_EXPIRATION_ALLOWED = [int(i) for i in range(30)]
 PROMOTION_EXPIRATION_ALLOWED.insert(0,0)
 PROMOTION_OFFER_LIMIT = [0,1,2,3,4,5,6,7,8,9,10]
+PROMOTION_DURATION_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
 
 # Paths
 MOUNT_PATH = "/opt/onlysnarf"
@@ -201,6 +202,11 @@ parser.add_argument('-download-path', type=str, dest='download_path',
 # poll duration
 parser.add_argument('-duration', type=valid_duration, dest='duration',
   help='the duration in days (99 for \'No Limit\') for a poll', choices=DURATION_ALLOWED, default=None)
+##
+# -duration-promo
+# promotion duration
+parser.add_argument('-duration-promo', type=valid_promo_duration, dest='duration_promo',
+  help='the duration in days (99 for \'No Limit\') for a promotion', choices=PROMOTION_DURATION_ALLOWED, default=None)
 ##
 # -email
 # the OnlyFans email to use for login

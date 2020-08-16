@@ -14,6 +14,7 @@ onlysnarfpy \
 -verbose -verbose -verbose \
 -browser "$1" \
 -source "$2"
+# -show \
 
 echo "[*] Message - Recent & Gallery"
 onlysnarfpy \
@@ -30,6 +31,7 @@ onlysnarfpy \
 -verbose -verbose -verbose \
 -browser "$1" \
 -source "$2"
+# -show \
 
 echo "[*] Message - All & Video"
 onlysnarfpy \
@@ -45,3 +47,4 @@ onlysnarfpy \
 -verbose -verbose -verbose \
 -browser "$1" \
 -source "$2"
+# -show \

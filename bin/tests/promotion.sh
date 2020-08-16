@@ -12,10 +12,10 @@ onlysnarfpy \
 -promotion-expiration 0 \
 -prefer-local \
 -keep \
--show \
 -verbose -verbose -verbose \
 -browser "$1" \
 -source "$2"
+# -show \
 
 # Promotion
 echo "[*] Promotion - Campaign"
@@ -31,7 +31,7 @@ onlysnarfpy \
 -debug-delay \
 -prefer-local \
 -keep \
--show \
 -verbose -verbose -verbose \
 -browser "$1" \
 -source "$2"
+# -show \

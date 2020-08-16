@@ -136,7 +136,7 @@ class Driver:
     ####################
 
     @staticmethod
-    def discount_user(browser=None, discount=None):
+    def discount_user(discount=None, browser=None):
         if not browser: browser = Driver.get_browser()
         if not discount:
             print("Error: Missing Discount")
@@ -144,9 +144,9 @@ class Driver:
         auth_ = Driver.auth(browser=browser)
         if not auth_: return False
         discount.get()
-        months = int(discount.months)
-        amount = int(discount.amount)
-        username = str(discount.username)
+        months = int(discount.get_months())
+        amount = int(discount.get_amount())
+        username = str(discount.get_username())
         from .user import User
         if isinstance(discount.username, User):
             username = discount.username.username
@@ -312,7 +312,7 @@ class Driver:
         return imagesDownloaded
 
     @staticmethod
-    def download_messages(browser=None, user="all"):
+    def download_messages(user="all", browser=None):
         if not browser: browser = Driver.get_browser()
         print("Downloading Messages: {}".format(user))
         try:
@@ -425,7 +425,7 @@ class Driver:
     ######################
 
     @staticmethod
-    def expires(browser=None, expiration=None):
+    def expires(expiration=None, browser=None):
         if not browser: browser = Driver.get_browser()
         if not expiration:
             print("Error: Missing Expiration")
@@ -688,27 +688,31 @@ class Driver:
         if not browser: browser = Driver.get_browser()
         original_handle = browser.current_window_handle
         Settings.dev_print("tabs: {}".format(Driver.TABS))
-        for page_, handle in Driver.TABS:
-            if str(page_) == str(page):
+        try:
+            for page_, handle in Driver.TABS:
+                if str(page_) == str(page):
+                    browser.switch_to_window(handle)
+                    Settings.dev_print("successfully located tab in cache: {}".format(page))
+                    return True
+            for handle in browser.window_handles[0]:
                 browser.switch_to_window(handle)
-                Settings.dev_print("successfully located tab in cache: {}".format(page))
-                return True
-        for handle in browser.window_handles[0]:
-            browser.switch_to_window(handle)
-            if str(page) in str(browser.current_url):
-                Settings.dev_print("successfully located tab: {}".format(page))
-                return True
-        for handle in browser.window_handles:
-            browser.switch_to_window(handle)
-            if str(page) in str(browser.current_url):
-                Settings.dev_print("successfully located tab in windows: {}".format(page))
-                return True
-        Settings.dev_print("failed to locate tab: {}".format(page))
-        browser.switch_to_window(original_handle)
+                if str(page) in str(browser.current_url):
+                    Settings.dev_print("successfully located tab: {}".format(page))
+                    return True
+            for handle in browser.window_handles:
+                browser.switch_to_window(handle)
+                if str(page) in str(browser.current_url):
+                    Settings.dev_print("successfully located tab in windows: {}".format(page))
+                    return True
+            Settings.dev_print("failed to locate tab: {}".format(page))
+            browser.switch_to_window(original_handle)
+        except Exception as e:
+            if "Unable to locate window" not in str(e):
+                Settings.dev_print(e)
         return False
 
     @staticmethod
-    def open_tab(browser=None, url=None):
+    def open_tab(url=None, browser=None, ):
         if not url:
             Settings.err_print("Missing url")
             return False
@@ -965,7 +969,7 @@ class Driver:
     ####################
 
     @staticmethod
-    def message(browser=None, username=None, user_id=None):
+    def message(username=None, user_id=None, browser=None):
         if not browser: browser = Driver.get_browser()
         if not username and not user_id:
             print("Error: Missing User to Message")
@@ -1032,7 +1036,7 @@ class Driver:
             return False
 
     @staticmethod
-    def message_files(browser=None, files=[]):
+    def message_files(files=[], browser=None):
         if not browser: browser = Driver.get_browser()
         if len(files) == 0: return True
         try:
@@ -1054,9 +1058,22 @@ class Driver:
             if not price or price == None or str(price) == "None":
                 print("Error: Missing Price")
                 return False
+            time.sleep(1) # prevents delay from inputted text preventing buttom from being available to click
             print("Enter price: {}".format(price))
             Settings.dev_print("waiting for price area to enter price")
-            priceElement = WebDriverWait(browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ONLYFANS_PRICE2)))
+
+            # finds the button on the page with the #icon-price text
+            priceElements = browser.find_elements_by_class_name("g-btn.m-flat.has-tooltip")
+            priceElement = None
+            for ele in priceElements:
+                # Settings.dev_print("{}  {}".format(, ele.get_attribute("value")))
+                if "#icon-price" in str(ele.get_attribute("innerHTML")):
+                    priceElement = ele
+            if not priceElement:
+                Settings.dev_print("failed to find price button")
+                print("Error: Failure to Enter Price")
+                return False
+            # priceElement = WebDriverWait(browser, 60, poll_frequency=10).until(EC.element_to_be_clickable(priceElement))
             Settings.dev_print("entering price")
             priceElement.click()
             actions = ActionChains(browser)
@@ -1070,6 +1087,7 @@ class Driver:
             return True
         except Exception as e:
             Driver.error_checker(e)
+            print(e)
             print("Error: Failure to Enter Price")
             return False
 
@@ -1097,7 +1115,7 @@ class Driver:
             return False
 
     @staticmethod
-    def message_user_by_id(browser=None, user_id=None):
+    def message_user_by_id(user_id=None, browser=None):
         if not browser: browser = Driver.get_browser()
         user_id = str(user_id).replace("@u","").replace("@","")
         if not user_id or user_id == None or str(user_id) == "None":
@@ -1114,7 +1132,7 @@ class Driver:
             return False
 
     @staticmethod
-    def message_user(browser=None, username=None, user_id=None):
+    def message_user(username=None, user_id=None, browser=None):
         if not browser: browser = Driver.get_browser()
         auth_ = Driver.auth(browser=browser)
         if not auth_: return None
@@ -1185,7 +1203,7 @@ class Driver:
     ################
 
     @staticmethod
-    def poll(browser=None, poll=None):
+    def poll(poll=None, browser=None):
         if not browser: browser = Driver.get_browser()
         if not poll:
             print("Error: Missing Poll")
@@ -1194,8 +1212,8 @@ class Driver:
         if not auth_: return False
         Settings.dev_print("poll")
         poll.get()
-        duration = poll.duration
-        questions = poll.questions
+        duration = poll.get_duration()
+        questions = poll.get_questions()
         try:
             print("Poll:")
             print("- Duration: {}".format(duration))
@@ -1271,7 +1289,7 @@ class Driver:
     ################
 
     @staticmethod
-    def post(browser=None, message=None):
+    def post(message=None, browser=None):
         if not browser: browser = Driver.get_browser()
         if not message:
             print("Error: Missing Message")
@@ -1300,13 +1318,13 @@ class Driver:
             print("- Tweeting: {}".format(Settings.is_tweeting()))
             ## Expires, Schedule, Poll
             if expires:
-                successful = Driver.expires(expires, browser=browser)
+                successful = Driver.expires(expiration=expires, browser=browser)
                 if not successful: return False
             if schedule:
-                successful = Driver.schedule(schedule, browser=browser)
+                successful = Driver.schedule(schedule=schedule, browser=browser)
                 if not successful: return False
             if poll:
-                successful = Driver.poll(poll, browser=browser)
+                successful = Driver.poll(poll=poll, browser=browser)
                 if not successful: return False
             WAIT = WebDriverWait(browser, 600, poll_frequency=10)
             ## Tweeting
@@ -1383,7 +1401,7 @@ class Driver:
     ######################
 
     @staticmethod
-    def promotional_campaign(browser=None, promotion=None):
+    def promotional_campaign(promotion=None, browser=None):
         if not browser: browser = Driver.get_browser()
         if not promotion:
             print("Error: Missing Promotion")
@@ -1393,12 +1411,12 @@ class Driver:
         # go to onlyfans.com/my/subscribers/active
         try:
             promotion.get()
-            limit = promotion.limit
-            expiration = promotion.expiration
-            duration = promotion.duration
-            user = promotion.user
-            amount = promotion.amount
-            text = promotion.message
+            limit = promotion.get_limit()
+            expiration = promotion.get_expiration()
+            duration = promotion.get_duration()
+            user = promotion.get_user()
+            amount = promotion.get_amount()
+            text = promotion.get_message()
             Settings.maybe_print("goto -> /my/promotions")
             browser.get(('https://onlyfans.com/my/promotions'))
 
@@ -1498,7 +1516,7 @@ class Driver:
 
     # or email
     @staticmethod
-    def promotional_trial_link(browser=None, promotion=None):
+    def promotional_trial_link(promotion=None, browser=None):
         if not browser: browser = Driver.get_browser()
         if not promotion:
             print("Error: Missing Promotion")
@@ -1508,10 +1526,10 @@ class Driver:
         # go to onlyfans.com/my/subscribers/active
         try:
             promotion.get()
-            limit = promotion.limit
-            expiration = promotion.expiration
-            duration = promotion.duration
-            user = promotion.user
+            limit = promotion.get_limit()
+            expiration = promotion.get_expiration()
+            duration = promotion.get_duration()
+            user = promotion.get_user()
             Settings.maybe_print("goto -> /my/promotions")
             browser.get(('https://onlyfans.com/my/promotions'))
 
@@ -1621,7 +1639,7 @@ class Driver:
             return None
 
     @staticmethod
-    def promotion_user_directly(browser=None, promotion=None):
+    def promotion_user_directly(promotion=None, browser=None):
         if not browser: browser = Driver.get_browser()
         if not promotion:
             print("Error: Missing Promotion")
@@ -1630,10 +1648,10 @@ class Driver:
         if not auth_: return False
         # go to onlyfans.com/my/subscribers/active
         promotion.get()
-        expiration = promotion.expiration
-        months = promotion.duration
-        user = promotion.user
-        message = promotion.message
+        expiration = promotion.get_expiration()
+        months = promotion.get_duration()
+        user = promotion.get_user()
+        message = promotion.get_message()
         if int(expiration) > int(Settings.get_discount_max_amount()):
             print("Warning: Discount Too High, Max -> {}%".format(Settings.get_discount_max_amount()))
             discount = Settings.get_discount_max_amount()
@@ -1701,7 +1719,7 @@ class Driver:
     ######################################################################
 
     @staticmethod
-    def read_user_messages(browser=None, username=None, user_id=None):
+    def read_user_messages(username=None, user_id=None, browser=None):
         if not browser: browser = Driver.get_browser()
         auth_ = Driver.auth(browser=browser)
         if not auth_: return False
@@ -1814,29 +1832,29 @@ class Driver:
     ####################
 
     @staticmethod
-    def schedule(browser=None, theSchedule=None):
+    def schedule(schedule=None, browser=None):
         if not browser: browser = Driver.get_browser()
-        if not theSchedule:
+        if not schedule:
             print("Error: Missing Schedule")
             return False
         auth_ = Driver.auth(browser=browser)
         if not auth_: return False
         try:
-            theSchedule.get()
-            month_ = theSchedule.month
-            day_ = theSchedule.day
-            year_ = theSchedule.year
-            hour_ = theSchedule.hour
-            minute_ = theSchedule.minute
+            schedule.get()
+            month_ = schedule.month
+            day_ = schedule.day
+            year_ = schedule.year
+            hour_ = schedule.hour
+            minute_ = schedule.minute
             today = datetime.now()
             Settings.dev_print("today: {} {}".format(today.strftime("%B"), today.strftime("%Y")))
-            date__ = datetime.strptime(str(theSchedule.date), "%Y-%m-%d")
+            date__ = datetime.strptime(str(schedule.date), "%Y-%m-%d")
             if date__ < today:
                 print("Error: Unable to Schedule Earlier Date")
                 return False
             print("Schedule:")
-            print("- Date: {}".format(theSchedule.date))
-            print("- Time: {}".format(theSchedule.time))
+            print("- Date: {}".format(schedule.date))
+            print("- Time: {}".format(schedule.time))
             Driver.open_more_options(browser=browser)
             # click schedule
             Settings.dev_print("opening schedule")
@@ -1920,7 +1938,7 @@ class Driver:
             suffixes = Driver.find_elements_by_name("scheduleMinutes", browser=browser)
             for suffix in suffixes:
                 inner = suffix.get_attribute("innerHTML")
-                if str(theSchedule.suffix).lower() in str(inner).lower() and suffix.is_enabled():
+                if str(schedule.suffix).lower() in str(inner).lower() and suffix.is_enabled():
                     suffix.click()
                     Settings.dev_print("successfully set suffix")
                     break
@@ -1969,7 +1987,7 @@ class Driver:
     #     return profile
 
     @staticmethod
-    def sync_from_settings_page(browser=None, profile=None, page=None):
+    def sync_from_settings_page(profile=None, page=None, browser=None):
         if not browser: browser = Driver.get_browser()
         auth_ = Driver.auth(browser=browser)
         if not auth_: return False
@@ -2104,7 +2122,7 @@ class Driver:
         # notifications
         # other
     @staticmethod
-    def settings_save(browser=None, page=None):
+    def settings_save(page=None, browser=None):
         if not browser: browser = Driver.get_browser()
         if str(page) not in ["profile", "account", "security"]:
             Settings.dev_print("not saving: {}".format(page))
@@ -2382,7 +2400,7 @@ class Driver:
 
     # uploads image into post or message
     @staticmethod
-    def upload_files(browser=None, files=[]):
+    def upload_files(files=[], browser=None):
         if not browser: browser = Driver.get_browser()
         if Settings.is_skip_download(): 
             print("Skipping Upload (download)")

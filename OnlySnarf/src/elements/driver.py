@@ -290,7 +290,7 @@ ELEMENTS = [
     # message enter text
     {
         "name": "messageText",
-        "classes": [".form-control.b-chat__message-input"],
+        "classes": ["form-control.b-make-post__text-input", ".form-control.b-chat__message-input"],
         "text": [],
         "id": []
     },

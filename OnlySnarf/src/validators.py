@@ -12,7 +12,8 @@ DISCOUNT_MAX_AMOUNT = 55
 DISCOUNT_MIN_AMOUNT = 10
 DISCOUNT_MAX_MONTHS = 7
 DISCOUNT_MIN_MONTHS = 1
-DURATION_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
+PROMOTION_DURATION_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
+DURATION_ALLOWED = [1,3,7,30,99]
 EXPIRATION_ALLOWED = [1,3,7,30,99]
 LIMIT_MIN = 1
 LIMIT_MAX = 10
@@ -48,6 +49,14 @@ def valid_date(s):
 def valid_duration(s):
 	try:
 		if str(s) in DURATION_ALLOWED: return str(s)
+	except ValueError:
+		msg = "Not a valid duration: '{0}'.".format(s)
+		raise argparse.ArgumentTypeError(msg)
+	return int(s)
+
+def valid_promo_duration(s):
+	try:
+		if str(s) in PROMOTION_DURATION_ALLOWED: return str(s)
 	except ValueError:
 		msg = "Not a valid duration: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
@@ -162,6 +171,13 @@ class DurationValidator(Validator):
 		if str(document.text).lower() not in str(Settings.get_duration_allowed()).lower():
 			raise ValidationError(
 				message='Please enter a duration ({})'.format(", ".join(Settings.get_duration_allowed())),
+				cursor_position=len(document.text))  # Move cursor to end
+
+class PromoDurationValidator(Validator):
+	def validate(self, document):
+		if str(document.text).lower() not in str(Settings.get_duration_promo_allowed()).lower():
+			raise ValidationError(
+				message='Please enter a promo duration ({})'.format(", ".join(Settings.get_duration_promo_allowed())),
 				cursor_position=len(document.text))  # Move cursor to end
 
 class ExpirationValidator(Validator):

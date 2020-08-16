@@ -5,7 +5,7 @@ from .settings import Settings
 from .user import User
 from PyInquirer import prompt
 from PyInquirer import Validator, ValidationError
-from .validators import AmountValidator, MonthValidator, LimitValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, ExpirationValidator, ListValidator
+from .validators import AmountValidator, MonthValidator, LimitValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ExpirationValidator, ListValidator
 from . import remote as Remote
 from .file import File, Folder, Google_File, Google_Folder
 
@@ -126,11 +126,11 @@ class Message():
         self.gotten = False
 
     def backup_files(self):
-        for file in self.files:
+        for file in self.get_files():
             file.backup()
 
     def delete_files(self):
-        for file in self.files:
+        for file in self.get_files():
             file.delete()
 
     def cleanup_files(self):
@@ -311,7 +311,9 @@ class Message():
         if str(self.expiration) == "unset": return None
         if self.expiration: return self.expiration
         expires = Settings.get_expiration() or None
-        if expires: return expires
+        if expires: 
+            self.expiration = expires
+            return expires
         if not Settings.prompt("expiration"):
             self.expiration = "unset"
             return None
@@ -342,7 +344,9 @@ class Message():
     def get_price(self):
         if self.price: return self.price
         price = Settings.get_price() or None
-        if price: return price
+        if price: 
+            self.price = price
+            return price
         if not Settings.prompt("price"): return ""
         question = {
             'type': 'input',
@@ -506,7 +510,9 @@ class Poll:
     def get_duration(self): # months
         if self.duration: return self.duration
         duration = Settings.get_duration()
-        if duration: return duration
+        if duration: 
+            self.duration = duration
+            return duration
         if not Settings.prompt("duration"): return None
         question = {
             'type': 'input',
@@ -523,7 +529,9 @@ class Poll:
     def get_questions(self):
         if len(self.questions) > 0: return self.questions
         questions = Settings.get_questions()
-        if len(questions) > 0: return questions
+        if len(questions) > 0: 
+            self.questions = questions
+            return questions
         if not Settings.prompt("questions"): return []
         print("Enter Questions")
         while True:
@@ -671,7 +679,7 @@ class Promotion:
 
     def get_duration(self): # months
         if self.duration: return self.duration
-        duration = Settings.get_duration() or None
+        duration = Settings.get_promo_duration() or None
         if duration: 
             self.duration = duration
             return duration
@@ -679,8 +687,8 @@ class Promotion:
         question = {
             'type': 'input',
             'name': 'duration',
-            'message': 'Duration [1, 3, 7, 99 (\'No Limit\')]',
-            'validate': DurationValidator
+            'message': 'Duration [1 day, 3 days, 7 days, ...]',
+            'validate': PromoDurationValidator
         }
         answers = prompt(question)
         duration = answers["duration"]
