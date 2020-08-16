@@ -27,8 +27,8 @@ browsers=("auto" "firefox" "google" "auto-remote" "remote" "remote-chrome" "remo
 browsers=("remote" "remote-chrome" "remote-firefox")
 browsers=("reconnect")
 browsers=("auto")
-browsers=("firefox")
 browsers=("auto-remote")
+browsers=("firefox")
 
 declare -a sources
 sources=("local" "dropbox" "google" "remote")
@@ -42,9 +42,9 @@ testing=("post")
 testing=("promotion")
 testing=("settings")
 testing=("discount")
-testing=("discount" "expiration" "message" "poll" "post" "schedule" "settings" "upload")
 testing=("message")
 testing=("poll" "post" "schedule" "settings" "upload")
+testing=("discount" "expiration" "message" "poll" "post" "schedule" "settings" "upload")
 
 verbose=""
 verbose="-verbose -verbose"
