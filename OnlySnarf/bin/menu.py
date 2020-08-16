@@ -12,8 +12,7 @@ from PyInquirer import prompt
 ##
 # from OnlySnarf.src.cron import Cron
 from OnlySnarf.src.colorize import colorize
-from OnlySnarf.src.classes import Discount, Promotion
-from OnlySnarf.src.message import Message
+from OnlySnarf.src.classes import Discount, Promotion, Message
 from OnlySnarf.src.profile import Profile
 from OnlySnarf.src.settings import Settings
 from OnlySnarf.src import google as Google
