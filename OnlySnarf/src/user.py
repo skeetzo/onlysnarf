@@ -21,7 +21,7 @@ class User:
         data = json.loads(json.dumps(data))
         # print(data)
         self.name = data.get('name') or ""
-        self.username = data.get('username').replace("@","") or ""
+        self.username = str(data.get('username')).replace("@","") or ""
         self.id = data.get('id') or None
         self.messages_parsed = data.get('messages_parsed') or []
         self.messages_sent = data.get('messages_sent') or []
@@ -191,10 +191,10 @@ class User:
         self.isFavorite = False
 
     @staticmethod
-    def update_chat_logs(browser=None, users=[]):
-        print("Updating Chat Logs")
+    def update_chat_logs(users=[], browser=None):
         if len(users) == 0:
             users = User.get_all_users(browser=browser)
+        print("Updating Chat Logs: {}".format(len(users)))
         for user in users:
             user.read_chat()
         User.write_users_local(users=users)
@@ -363,6 +363,18 @@ class User:
         except Exception as e:
             Settings.dev_print(e)
         return users_
+
+    @staticmethod
+    def get_recent_messagers(browser=None):
+        Settings.maybe_print("getting recent users from messages")
+        users = []
+        try:
+            users_ = Driver.messages_scan(browser=browser)
+            for user in users_:
+                users.append(User({"id":user}))
+        except Exception as e:
+            Settings.dev_print(e)
+        return users
 
     @staticmethod
     def select_user():

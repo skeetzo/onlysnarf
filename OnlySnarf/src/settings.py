@@ -399,6 +399,9 @@ class Settings:
     def set_performer_category(category):
         Settings.PERFORMER_CATEGORY = category
 
+    def get_user_num():
+        return config["USERS_READ"] or 10
+
     # Bools
 
     def is_confirm():

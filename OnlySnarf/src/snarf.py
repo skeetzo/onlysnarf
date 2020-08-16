@@ -32,7 +32,6 @@ class Snarf:
             if not bot: bot = Bot()
             bot.run()
         except Exception as e: Settings.dev_print(e)
-        Snarf.exit()
 
     ####################
     ##### Discount #####

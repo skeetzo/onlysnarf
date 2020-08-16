@@ -1148,7 +1148,7 @@ class Driver:
             ele = [ele for ele in elements
                     if "/my/chats/chat/" in str(ele.get_attribute("href"))]
             if len(ele) == 0:
-                print("Warning: User Cannot Be Messaged")
+                print("Warning: User cannot be messaged - unable to locate id")
                 return False
             ele = ele[0]
             ele = ele.get_attribute("href").replace("https://onlyfans.com", "")
@@ -1163,6 +1163,66 @@ class Driver:
             print("Error: Failed to Message User")
             return False
         return True
+
+    @staticmethod
+    def messages_scan(num=0, browser=None):
+        if not browser: browser = Driver.get_browser()
+        # go to /messages page
+        # get top n users
+        Settings.dev_print("scanning messages")
+        # 
+
+        # g-avatar online_status_class m-w50 -> username
+        # b-chats__item__link -> id
+
+        # if users found < n, scroll
+        # g-section-title -> scroll this
+        if int(num) == 0: num = Settings.get_user_num()
+        users = []
+        try:
+            auth_ = Driver.auth(browser=browser)
+            if not auth_: return False
+            Driver.go_to_page("/my/chats", browser=browser)
+
+            count = 0
+            while True:
+                elements = browser.find_elements_by_class_name("g-user-username")
+                if len(elements) == int(num): break
+                if len(elements) == int(count): break
+                print_same_line("({}/{}) scrolling...".format(count, len(elements)))
+                count = len(elements)
+                elementToFocus = browser.find_element_by_class_name("g-section-title")
+                browser.execute_script("arguments[0].focus();", elementToFocus)
+                browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(2)
+
+            users_ = browser.find_elements_by_class_name("g-user-username")
+            Settings.dev_print("users: {}".format(len(users_)))
+
+            user_ids = browser.find_elements_by_class_name("b-chats__item__link")
+            Settings.dev_print("ids: {}".format(len(user_ids)))
+
+
+            # for user in users_:
+            #     if not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
+            #     print(str(user.get_attribute("href")).replace("https://onlyfans.com/", ""))
+
+            #     users.append(str(user.get_attribute("href")).replace("https://onlyfans.com/", ""))
+
+            for user in user_ids:
+                if not user or not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
+                # print(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
+                # print(str(user.get_attribute("innerHTML")))
+                users.append(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
+
+
+            return users[:num]
+        except Exception as e:
+            Driver.error_checker(e)
+            print("Error: Failed to Scan Messages")
+        return users
+
+
 
     ####################################################################################################
     ####################################################################################################
@@ -1848,7 +1908,21 @@ class Driver:
             minute_ = schedule.minute
             today = datetime.now()
             Settings.dev_print("today: {} {}".format(today.strftime("%B"), today.strftime("%Y")))
-            date__ = datetime.strptime(str(schedule.date), "%Y-%m-%d")
+            date__ = None
+            try:
+                date__ = datetime.strptime(str(schedule.date), "%Y-%m-%d")
+
+            except Exception as e:
+                if "unconverted data remains:  00:00:00" in str(e):
+                    date__ = datetime.strptime(str(schedule.date), "%Y-%m-%d %H:%M:%S")
+                else:
+                    Settings.maybe_print(e)
+                    print("Error: Unable to parse date")
+                    return False
+            if not date__:
+                print("Error: Unable to parse date")
+                return False
+
             if date__ < today:
                 print("Error: Unable to Schedule Earlier Date")
                 return False

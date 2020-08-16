@@ -407,11 +407,14 @@
   - debugging: settings
   **2.19.0**
   - added: tabs behavior
-  - added: cookies
-
+  - added: cookies - wow i'm a fucking idiot for not adding this sooner
+  - debugging: bot
 
 ----------------------------------------
+theres still a bug of it not adding the currect window.handle number to the TABS cache
 
+i need to turn driver into using self so that browsers can remember their individual tabs
+with self.tabs instead of Driver.TABS
 
   **2.x.x**
   - need to add 'create' to Profile for asking for profile settings when syncing to

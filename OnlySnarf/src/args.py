@@ -508,6 +508,11 @@ parser.add_argument('-username-google', type=str, default="", dest='username_goo
 parser.add_argument('-username-twitter', type=str, default="", dest='username_twitter',
   help='the Twitter username for login')
 ##
+# -users-read
+# the number of users read when checking messages
+parser.add_argument('-users-read', type=int, dest='users_read',
+  help='the number of users to read when checking messages', default=10)
+##
 # -verbose
 # v, vv, vvv
 parser.add_argument('-v', '-verbose', dest="verbose", action='count', default=0, 

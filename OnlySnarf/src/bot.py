@@ -1,6 +1,7 @@
 import threading
+import concurrent.futures
 from .driver import Driver
-from .message import Message
+from .classes import Message
 from .user import User
 from .settings import Settings
 
@@ -21,11 +22,19 @@ class Bot:
 		##
 		self.refresher()
 
+	@staticmethod
 	def parse(user):
 		# check user for commands in unchecked messages
 		# run command
+		# print("user: {}".format(user))
+		# print("parsing: {}".format(user.username))
+
+		# if not user or not user.username or str(user) == "None" or str(user.username) == "None": return
 		commands = ["0) menu"]
-		for message in user.get_unparsed_messages():
+		unparsed = user.get_unparsed_messages()
+		if len(unparsed) == 0:
+			User.update_chat_logs(users=[user], browser=user.browser)
+		for message in unparsed:
 			successful = False
 			isTip, amount = Message.isTip(message)
 			if isTip:
@@ -47,17 +56,32 @@ class Bot:
 	def refresher(self):
 		if not Settings.is_keep(): return
 		if self.refreshing: self.refreshing.stop()
-		self.refreshing = threading.Timer(REFRESH_DURATION, Bot.refresh).start()
+		self.refreshing = threading.Timer(REFRESH_DURATION, self.refresh).start()
 
 	def run(self):
 		if self.running: self.running.stop()
 		self.running = threading.Timer(RUN_DURATION, self.run).start()
 		self.browser = Driver.spawn_browser()
 		# read all messages
-		users = User.update_chat_logs(browser=self.browser)
+		users = []
+		if Settings.get_user() and Settings.get_user().username == "all":
+			users = User.update_chat_logs(browser=self.browser)
+		else:
+			users = User.get_recent_messagers(browser=self.browser)
+		print("Users to parse: {}".format(len(users)))
+
+		def parse(user):
+			browser = Driver.spawn_browser()
+			user.browser = browser
+			Bot.parse(user=user, browser=self.browser)
+ 
 		# respond to messages
-		for user in users:
-			Bot.parse(user=user)
+		with concurrent.futures.ThreadPoolExecutor() as executor:
+			executor.map(parse, users)
+
+		# for user in users:
+		# 	setattr(user, "browser", self.browser)
+		# 	Bot.parse(user=user)
 
 	def tipped(user=None, amount=None):
 		# for every $x amount, send 1 dick pic

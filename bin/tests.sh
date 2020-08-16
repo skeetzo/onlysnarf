@@ -45,6 +45,7 @@ testing=("discount")
 testing=("message")
 testing=("poll" "post" "schedule" "settings" "upload")
 testing=("discount" "expiration" "message" "poll" "post" "schedule" "settings" "upload")
+testing=("bot")
 
 verbose=""
 verbose="-verbose -verbose"
@@ -61,7 +62,7 @@ function testes() {
 		for source in ${sources[@]}; do
 
 			echo "Running Test: $source - $browser"
-			bin/tests/$test.sh $browser $source
+			../onlysnarf/bin/tests/$test.sh $browser $source
 			# >> /var/log/onlysnarf/tests.txt
 
 		done

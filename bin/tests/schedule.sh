@@ -8,7 +8,7 @@ onlysnarfpy \
 -bykeyword "pussycats" \
 -skip-download \
 -text "schedule testes" \
--schedule "8-7-2020:22:30" \
+-schedule "6-6-2021:22:30" \
 -debug-delay \
 -keep \
 -verbose -verbose -verbose \
@@ -22,7 +22,7 @@ onlysnarfpy \
 -bykeyword "pussycats" \
 -skip-download \
 -text "schedule testes" \
--date "8-7-2020" \
+-date "6-6-2021" \
 -time "16:26" \
 -debug-delay \
 -keep \
@@ -37,7 +37,7 @@ onlysnarfpy \
 -bykeyword "pussycats" \
 -skip-download \
 -text "schedule testes" \
--date "8-7-2020" \
+-date "6-6-2021" \
 -debug-delay \
 -keep \
 -verbose -verbose -verbose \

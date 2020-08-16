@@ -10,3 +10,4 @@ onlysnarfpy \
 -verbose -verbose -verbose \
 -browser "$1" \
 -source "$2"
+# -show \
