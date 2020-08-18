@@ -12,6 +12,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 ## Bot
 # screen -dmSL snarfbot /usr/local/bin/onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot
+
 onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser "auto-remote" -source "google"
 
 # onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot -keep -prefer-local -show

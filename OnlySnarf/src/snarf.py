@@ -91,8 +91,9 @@ class Snarf:
                 return
             successful = False
             try:
-                from .driver import Driver 
-                successful = Driver.post(message=message)
+                from .driver import Driver
+                driver = Driver.get_driver()
+                successful = driver.post(message=message)
             except Exception as e:
                 Settings.dev_print(e)
                 successful = False

@@ -36,9 +36,10 @@ class Discount:
             users = User.get_new_users()
         else: users = [self]
         successful = False
+        driver = Driver.get_driver()
         for user in users:
             self.username = user.username
-            successful_ = Driver.discount_user(discount=self)
+            successful_ = driver.discount_user(discount=self)
             if successful_: successful = successful_
         return successful
 
@@ -242,6 +243,7 @@ class Message():
         amount = 0
         if re.search(r'I sent you a $[0-9]*.00 tip ♥'):
             amount = re.match(r'I sent you a $([0-9]*).00 tip ♥')
+            Settings.dev_print("successfully found tip")
             print("amount: {}".format(amount))
             return True, amount
         return False, amount
@@ -575,7 +577,9 @@ class Promotion:
         self.get()
         if Settings.is_prompt():
             if not Settings.prompt("Promotion"): return
-        Driver.promotional_campaign(promotion=self)
+        from .driver import Driver
+        driver = Driver.get_driver()
+        driver.promotional_campaign(promotion=self)
 
     # requires the copy/paste and email steps
     def create_trial_link(self):
@@ -585,7 +589,9 @@ class Promotion:
         if Settings.is_prompt():
             if not Settings.prompt("Promotion"): return
         # limit, expiration, months, user
-        Driver.promotional_trial_link(promotion=self)
+        from .driver import Driver
+        driver = Driver.get_driver()
+        driver.promotional_trial_link(promotion=self)
         # link = Driver.promotional_trial_link()
         # text = "Here's your free trial link!\n"+link
         # Settings.dev_print("Link: "+str(text))

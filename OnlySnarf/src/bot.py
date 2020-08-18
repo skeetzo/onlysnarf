@@ -6,51 +6,58 @@ from .user import User
 from .settings import Settings
 
 REFRESH_DURATION = 60*9
-RUN_DURATION = 60*20
+RUN_DURATION = 60*2
 
-commands = [
-	"0) menu",
-	# "1) dick pic""
-]
+# commands = [
+# 	"0) menu",
+# 	# "1) dick pic""
+# ]
+
+COMMANDS_AVAILABLE = "Commands available:\n0) menu\n1) notice me senpai"
 
 class Bot:
 
+	USERS = []
+
 	def __init__(self):
-		self.browser = None
+		self.driver = Driver(browser=None)
 		self.refreshing = None
 		self.running = None
 		##
-		self.refresher()
+		# self.refresher()
 
 	@staticmethod
 	def parse(user):
+		print("Parsing: {} - {}".format(user.username, user.id))
 		# check user for commands in unchecked messages
 		# run command
 		# print("user: {}".format(user))
 		# print("parsing: {}".format(user.username))
 
 		# if not user or not user.username or str(user) == "None" or str(user.username) == "None": return
-		commands = ["0) menu"]
+		# commands = ["0) menu"]
 		unparsed = user.get_unparsed_messages()
 		if len(unparsed) == 0:
-			User.update_chat_logs(users=[user], browser=user.browser)
+			User.update_chat_logs(users=[user])
 		for message in unparsed:
 			successful = False
-			isTip, amount = Message.isTip(message)
+			isTipamount = Message.isTip(message)
 			if isTip:
 				successful = Bot.tipped(user=user, amount=amount)
 			elif "0) menu" in str(message).lower():
-				bot.prompt(user=user)
+				successful = Bot.prompt(user=user)
 			if successful:
 				user.parse_message(message=message.message)
 
-	def prompt(self, user=None):
+	@staticmethod
+	def prompt(user=None):
 		# show list of commands available
-		User.message(browser=self.browser, message="Commands available:\n0) menu\n1) notice me senpai")
+		user.message(message=COMMANDS_AVAILABLE)
+		return True
 
 	# refresh the Driver
 	def refresh(self):
-		Driver.refresh(browser=self.browser)
+		self.driver.refresh()
 
 	# handle the timer for refreshing the Driver
 	def refresher(self):
@@ -60,31 +67,39 @@ class Bot:
 
 	def run(self):
 		if self.running: self.running.stop()
-		self.running = threading.Timer(RUN_DURATION, self.run).start()
-		self.browser = Driver.spawn_browser()
 		# read all messages
-		users = []
-		if Settings.get_user() and Settings.get_user().username == "all":
-			users = User.update_chat_logs(browser=self.browser)
+		users = Bot.USERS
+		if len(users) == 0:
+			if Settings.get_user() and Settings.get_user().username == "all":
+				users = User.update_chat_logs(driver=self.driver)
+			else:
+				users = User.get_recent_messagers(driver=self.driver)
+			Bot.USERS = users
 		else:
-			users = User.get_recent_messagers(browser=self.browser)
+			User.update_chat_logs(users=users, driver=self.driver)
+			users_ = User.get_recent_messagers(driver=self.driver)
+			for user in users_:
+				if user not in users:
+					users.append(user)
+
 		print("Users to parse: {}".format(len(users)))
+		self.running = threading.Timer(RUN_DURATION*len(users), self.run).start()
 
 		def parse(user):
-			browser = Driver.spawn_browser()
-			user.browser = browser
-			Bot.parse(user=user, browser=self.browser)
- 
+			user.driver = Driver(browser=None)
+			# user.driver.browser = user.driver.spawn()
+			Bot.parse(user=user) 
+
 		# respond to messages
 		with concurrent.futures.ThreadPoolExecutor() as executor:
 			executor.map(parse, users)
 
 		# for user in users:
-		# 	setattr(user, "browser", self.browser)
+		# 	setattr(user, "driver", self.driver)
 		# 	Bot.parse(user=user)
 
 	def tipped(user=None, amount=None):
-		# for every $x amount, send 1 dick pic
+		# for every $x amountsend 1 dick pic
 		num = amount%5
 		Settings.dev_print("tipped num: {}".format(num))
 		user.send_dick_pics(num)
