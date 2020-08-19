@@ -409,19 +409,21 @@
   - added: tabs behavior
   - added: cookies - wow i'm a fucking idiot for not adding this sooner
   - debugging: bot
+  - properly tested: settings get
+  - properly testedish: settings set
+  **2.20.0**
+  - added: bot functionality - menu prompt, tip parsing
+  **2.20.1**
+  - updated: saving session_id and session_url
 
 ----------------------------------------
-theres still a bug of it not adding the currect window.handle number to the TABS cache
+  - theres a bug of it not adding the currect window.handle number to the TABS cache
+  |- probably from firefox's tab not always going 1 to the right? but is that part of the loop check?
+
 
 
   **2.x.x**
-  - need to add 'create' to Profile for asking for profile settings when syncing to
-  - properly tested: settings get
-  - properly tested: settings set
   
-
-  - added: bot functionality - menu prompt, tip parsing
-
   **x.x.x**
   - test Profile: check
   - test Profile: posts
@@ -432,7 +434,6 @@ theres still a bug of it not adding the currect window.handle number to the TABS
   - Profile options completely "functional" / debugged
 
   **3.0.0**
-  - debugged all of 2.18.x
   - updated: images & demo gifs
 
   - finish debugging `onlysnarf-config`
@@ -446,7 +447,6 @@ theres still a bug of it not adding the currect window.handle number to the TABS
   - add to upload: greatest & least (folder sizes)
 
 ### Low Priority
-
   -> Bot
   - autorespond behavior
   - bot functionality to check posts for quiz answers
@@ -472,6 +472,7 @@ theres still a bug of it not adding the currect window.handle number to the TABS
   - new - setup - Twitter -> profile, banner; Price and Settings
   - new - advertise
   - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
+  - need to add 'create' to Profile for asking for profile settings when syncing to
 
 ### Medium Priority
 
@@ -483,7 +484,12 @@ theres still a bug of it not adding the currect window.handle number to the TABS
 
 ### High Priority
 
-  -> remote
+  -> Bot
+  - complete bot functionality
+  - debug tip reward process
+
+  -> Remote
+  -- need to reproduce --
   - debug / add error catch for uploads: ('Connection aborted.', BrokenPipeError(32, 'Broken pipe'))
 
 

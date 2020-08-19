@@ -80,8 +80,7 @@ class User:
         # setattr(user, "username", username)
         user.message(message=message)    
 
-    @staticmethod
-    def enter_message(message=None):
+    def enter_message(self, message=None):
         try:
             print("Entering Message: {} - ${}".format(message.text, message.get_price() or 0))
             def enter_text(text):
@@ -195,7 +194,7 @@ class User:
     @staticmethod
     def update_chat_logs(users=[], driver=None):
         if len(users) == 0:
-            users = User.get_all_users()
+            users = User.get_all_users(driver=driver)
         print("Updating Chat Logs: {}".format(len(users)))
         for user in users:
             user.read_chat()
@@ -204,7 +203,7 @@ class User:
 
     @staticmethod
     def get_all_users(driver=None):
-        return User.get_active_users()
+        return User.get_active_users(driver=driver)
 
     # gets users from local or refreshes from onlyfans.com
     @staticmethod
@@ -213,7 +212,7 @@ class User:
             users = User.read_users_local()
             if len(users) > 0: return users
         active_users = []
-        users = self.driver.users_get()
+        users = driver.users_get()
         for user in users:
             try:
                 user = User(user)
@@ -234,7 +233,7 @@ class User:
     def get_following(driver=None):
         if Settings.is_prefer_local_following(): return User.read_following_local()
         active_users = []
-        users = self.driver.following_get()
+        users = driver.following_get()
         for user in users:
             try:
                 user = User(user)
@@ -348,7 +347,7 @@ class User:
 
     # gets a list of all subscribed user_ids from local txt
     @staticmethod
-    def read_users_local():
+    def read_users_local(driver=None):
         Settings.maybe_print("getting local users")
         users = []
         users_ = []
@@ -358,7 +357,9 @@ class User:
             Settings.maybe_print("loaded local users")
             for user in users:
                 try:
-                    users_.append(User(json.loads(user)))
+                    user_ = User(json.loads(user))
+                    setattr(user_, "driver", driver)
+                    users_.append(user_)
                 except Exception as e:
                     Settings.dev_print(e)
             return users_
@@ -373,7 +374,9 @@ class User:
         try:
             users_ = driver.messages_scan()
             for user in users_:
-                users.append(User({"id":user}))
+                user_ = User({"id":user})
+                setattr(user_, "driver", driver)
+                users.append(user_)
         except Exception as e:
             Settings.dev_print(e)
         return users

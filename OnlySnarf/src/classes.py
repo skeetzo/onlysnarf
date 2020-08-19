@@ -241,10 +241,10 @@ class Message():
     # gets tip text from a message
     def isTip(text):
         amount = 0
-        if re.search(r'I sent you a $[0-9]*.00 tip ♥'):
-            amount = re.match(r'I sent you a $([0-9]*).00 tip ♥')
+        if re.search(r'I sent you a \$[0-9]*\.00 tip ♥', text):
+            amount = re.match(r'I sent you a \$([0-9]*)\.00 tip ♥', text).group(1)
             Settings.dev_print("successfully found tip")
-            print("amount: {}".format(amount))
+            Settings.dev_print("amount: {}".format(amount))
             return True, amount
         return False, amount
         # check text for "I sent you a $5.00 tip ♥"

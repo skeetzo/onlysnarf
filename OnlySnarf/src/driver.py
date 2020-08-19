@@ -92,6 +92,8 @@ class Driver:
         self.browser = browser
         self.tabs = []
         self.logged_in = False
+        self.session_id = None
+        self.session_url = None
         ##
         if not self.browser:
             self.browser = self.spawn()
@@ -2143,7 +2145,7 @@ class Driver:
     #################
 
     def spawn(self):
-        browser = Driver.spawn_browser()
+        browser = Driver.spawn_browser(driver=self)
         if not browser: return None
         self.browser = browser
         ## Cookies
@@ -2154,7 +2156,7 @@ class Driver:
         return self.browser
 
     @staticmethod
-    def spawn_browser():
+    def spawn_browser(driver=None):
         type_ = None
         Settings.maybe_print("spawning browser...")
         def google():
@@ -2212,10 +2214,10 @@ class Driver:
                 # desired_capabilities = capabilities
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
-                driver = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
+                browser = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
                 print("Browser Created - Chrome")
                 Settings.dev_print("Successful Browser - Chrome")
-                return driver
+                return browser
             except Exception as e:
                 Settings.maybe_print(e)
                 Settings.warn_print("Missing Chromedriver")
@@ -2235,12 +2237,12 @@ class Driver:
                 opts.log.level = "trace"
                 if not Settings.is_show_window():
                     opts.add_argument("--headless")
-                # driver = webdriver.Firefox(options=opts, log_path='/var/log/onlysnarf/geckodriver.log')
-                # driver = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
-                driver = webdriver.Firefox(options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
+                # browser = webdriver.Firefox(options=opts, log_path='/var/log/onlysnarf/geckodriver.log')
+                # browser = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
+                browser = webdriver.Firefox(options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
                 print("Browser Created - Firefox")
                 Settings.dev_print("Successful Browser - Firefox")
-                return driver
+                return browser
             except Exception as e:
                 Settings.maybe_print(e)
                 Settings.warn_print("Missing Geckodriver")
@@ -2251,8 +2253,8 @@ class Driver:
                 Settings.maybe_print("reconnecting browser...")
                 Settings.dev_print("reconnect id: {}".format(reconnect_id))
                 Settings.dev_print("reconnect url: {}".format(url))
-                # executor_url = driver.command_executor._url
-                # session_id = driver.session_id
+                # executor_url = browser.command_executor._url
+                # session_id = browser.session_id
                 # https://stackoverflow.com/questions/8344776/can-selenium-interact-with-an-existing-browser-session
                 # def attach_to_session(executor_url, session_id):
                 original_execute = WebDriver.execute
@@ -2262,10 +2264,10 @@ class Driver:
                         return {'success': 0, 'value': None, 'sessionId': reconnect_id}
                     else:
                         return original_execute(self, command, params)
-                # Patch the function before creating the driver object
+                # Patch the function before creating the browser object
                 WebDriver.execute = new_command_execute
-                driver = webdriver.Remote(command_executor=url, desired_capabilities={})
-                driver.session_id = reconnect_id
+                browser = webdriver.Remote(command_executor=url, desired_capabilities={})
+                browser.session_id = reconnect_id
                 # Replace the patched function with original function
                 WebDriver.execute = original_execute
                 # if Settings.use_tabs():
@@ -2274,14 +2276,15 @@ class Driver:
                 #     Settings.dev_print("tabs: {} | {} :tabNumber".format(tabs, tabNumber))
                 #     if int(tabNumber) == 0: pass # nothing required
                 #     if int(tabNumber) > int(tabs):
-                #         driver.execute_script('''window.open("{}","_blank");'''.format(ONLYFANS_HOME_URL))
+                #         browser.execute_script('''window.open("{}","_blank");'''.format(ONLYFANS_HOME_URL))
                 #     elif int(tabNumber) <= int(tabs):
-                #         driver.switch_to.window(driver.window_handles[tabNumber])
+                #         browser.switch_to.window(browser.window_handles[tabNumber])
                 #     time.sleep(2)
                 Settings.dev_print("Successful Reconnect")
-                return driver
-
-            if Settings.get_reconnect_id() and Settings.get_reconnect_url():
+                return browser
+            if driver and driver.session_id and driver.session_url:
+                return reconnect(reconnect_id=driver.session_id, url=driver.session_url)
+            elif Settings.get_reconnect_id() and Settings.get_reconnect_url():
                 return reconnect(reconnect_id=Settings.get_reconnect_id(), url=Settings.get_reconnect_url())
             try:
                 id_, url_ = Settings.read_session_data()
@@ -2302,13 +2305,13 @@ class Driver:
                     if not Settings.is_show_window():
                         firefox_options.add_argument('--headless')
                     dC = DesiredCapabilities.FIREFOX
-                    driver = webdriver.Remote(
+                    browser = webdriver.Remote(
                        command_executor=link,
                        desired_capabilities=dC,
                        options=firefox_options)
                     print("Remote Browser Created - Firefox")
                     Settings.dev_print("Successful Remote - Firefox")
-                    return driver
+                    return browser
                 except Exception as e:
                     Settings.dev_print(e)
             def attempt_chrome():
@@ -2318,13 +2321,13 @@ class Driver:
                     if not Settings.is_show_window():
                         chrome_options.add_argument('--headless')
                     dC = DesiredCapabilities.CHROME
-                    driver = webdriver.Remote(
+                    browser = webdriver.Remote(
                        command_executor=link,
                        desired_capabilities=dC,
                        options=chrome_options)
                     print("Remote Browser Created - Chrome")
                     Settings.dev_print("Successful Remote - Chrome")
-                    return driver
+                    return browser
                 except Exception as e:
                     Settings.dev_print(e)
             try:
@@ -2350,52 +2353,53 @@ class Driver:
 
         BROWSER_TYPE = Settings.get_browser_type()
 
-        def auto(driver_):
-            if "remote" in BROWSER_TYPE and not driver_:
-                driver_ = remote()
-            if not driver:
-                driver_ = firefox()
-                if not driver_:
-                    driver_ = google()
-            return driver_
+        def auto(browser_):
+            if "remote" in BROWSER_TYPE and not browser_:
+                browser_ = remote()
+            if not browser:
+                browser_ = firefox()
+                if not browser_:
+                    browser_ = google()
+            return browser_
 
         if BROWSER_TYPE == "google":
-            driver = google()
+            browser = google()
         elif BROWSER_TYPE == "firefox":
-            driver = firefox()
+            browser = firefox()
         elif "auto" in BROWSER_TYPE:
             try:
-                driver = reconnect()
-                driver.title
+                browser = reconnect()
+                browser.title
                 print("Browser Successfully Reconnected")
-                driver = auto(driver)
+                browser = auto(browser)
             except Exception as e:
                 Settings.dev_print(e)
-                driver = auto(None)
+                browser = auto(None)
         elif "remote" in str(BROWSER_TYPE):
-            driver = remote()
+            browser = remote()
         elif BROWSER_TYPE == "reconnect":
             try:
-                driver = reconnect()
-                driver.title
+                browser = reconnect()
+                browser.title
                 print("Browser Successfully Reconnected")
             except Exception as e:
                 Settings.dev_print(e)
-                driver = None        
-        if driver and Settings.is_keep():
-            Settings.write_session_data(driver.session_id, driver.command_executor._url)
-
-        if not driver:
+                browser = None        
+        if browser and Settings.is_keep():
+            Settings.write_session_data(browser.session_id, browser.command_executor._url)
+            if driver:
+                driver.session_id = browser.session_id
+                driver.session_url = browser.command_executor._url
+        if not browser:
             Settings.err_print("Unable to spawn browser")
             # sys.exit(1)
             os._exit(1)
-
-        driver.implicitly_wait(30) # seconds
-        driver.set_page_load_timeout(1200)
-        driver.file_detector = LocalFileDetector()
-        if not Driver.BROWSER: Driver.BROWSER = driver
-        Driver.BROWSERS.append(driver)
-        return driver
+        browser.implicitly_wait(30) # seconds
+        browser.set_page_load_timeout(1200)
+        browser.file_detector = LocalFileDetector()
+        if not Driver.BROWSER: Driver.BROWSER = browser
+        Driver.BROWSERS.append(browser)
+        return browser
 
     ##################
     ##### Upload #####

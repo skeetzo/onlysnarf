@@ -101,6 +101,9 @@ class Settings:
     def err_print(error):
         print("{}: {}".format(colorize("Error","red"), error))
 
+    def warn_print(error):
+        print("{}: {}".format(colorize("Warning","yellow"), error))
+
     def header():
         if Settings.LAST_UPDATED_KEY:
             print("Updated: {} = {}".format(Settings.LAST_UPDATED_KEY, config[Settings.LAST_UPDATED_KEY.replace(" ","_").upper()]))

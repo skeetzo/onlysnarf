@@ -27,7 +27,7 @@ class Bot:
 		# self.refresher()
 
 	@staticmethod
-	def parse(user):
+	def parse(user=None):
 		print("Parsing: {} - {}".format(user.username, user.id))
 		# check user for commands in unchecked messages
 		# run command
@@ -37,11 +37,9 @@ class Bot:
 		# if not user or not user.username or str(user) == "None" or str(user.username) == "None": return
 		# commands = ["0) menu"]
 		unparsed = user.get_unparsed_messages()
-		if len(unparsed) == 0:
-			User.update_chat_logs(users=[user])
 		for message in unparsed:
 			successful = False
-			isTipamount = Message.isTip(message)
+			isTip, amount = Message.isTip(message)
 			if isTip:
 				successful = Bot.tipped(user=user, amount=amount)
 			elif "0) menu" in str(message).lower():
@@ -74,12 +72,14 @@ class Bot:
 				users = User.update_chat_logs(driver=self.driver)
 			else:
 				users = User.get_recent_messagers(driver=self.driver)
+				users = User.update_chat_logs(users=users, driver=self.driver)
 			Bot.USERS = users
 		else:
-			User.update_chat_logs(users=users, driver=self.driver)
+			users = User.update_chat_logs(users=users, driver=self.driver)
 			users_ = User.get_recent_messagers(driver=self.driver)
 			for user in users_:
 				if user not in users:
+					print("maybe doing something")
 					users.append(user)
 
 		print("Users to parse: {}".format(len(users)))
@@ -91,12 +91,15 @@ class Bot:
 			Bot.parse(user=user) 
 
 		# respond to messages
-		with concurrent.futures.ThreadPoolExecutor() as executor:
-			executor.map(parse, users)
+		# with concurrent.futures.ThreadPoolExecutor() as executor:
+			# executor.map(parse, users)
 
-		# for user in users:
-		# 	setattr(user, "driver", self.driver)
-		# 	Bot.parse(user=user)
+		for user in users:
+			if not user.driver or not user.browser:
+				# setattr(user, "driver", Driver(browser=None))
+				# setattr(user, "browser", user.driver.spawn())
+				setattr(user, "driver", self.driver)
+			Bot.parse(user=user)
 
 	def tipped(user=None, amount=None):
 		# for every $x amountsend 1 dick pic
