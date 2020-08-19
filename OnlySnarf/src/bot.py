@@ -4,6 +4,7 @@ from .driver import Driver
 from .classes import Message
 from .user import User
 from .settings import Settings
+from .snarf import Snarf
 
 REFRESH_DURATION = 60*9
 RUN_DURATION = 60*2
@@ -15,11 +16,12 @@ RUN_DURATION = 60*2
 
 COMMANDS_AVAILABLE = "Commands available:\n0) menu\n1) notice me senpai"
 
-class Bot:
+class Bot(Snarf):
 
 	USERS = []
 
 	def __init__(self):
+        Snarf.__init__(self)
 		self.driver = Driver(browser=None)
 		self.refreshing = None
 		self.running = None
@@ -75,25 +77,26 @@ class Bot:
 				users = User.update_chat_logs(users=users, driver=self.driver)
 			Bot.USERS = users
 		else:
-			users = User.update_chat_logs(users=users, driver=self.driver)
-			users_ = User.get_recent_messagers(driver=self.driver)
-			for user in users_:
-				if user not in users:
-					print("maybe doing something")
-					users.append(user)
+			users_ = User.get_recent_messagers(notusers=users, driver=self.driver)
+			users = User.update_chat_logs(users=users_, driver=self.driver)
 
 		print("Users to parse: {}".format(len(users)))
 		self.running = threading.Timer(RUN_DURATION*len(users), self.run).start()
 
 		def parse(user):
-			user.driver = Driver(browser=None)
+			if not user.driver or not user.browser:
+				user.driver = Driver(browser=None)
 			# user.driver.browser = user.driver.spawn()
 			Bot.parse(user=user) 
 
 		# respond to messages
-		# with concurrent.futures.ThreadPoolExecutor() as executor:
-			# executor.map(parse, users)
 
+		MAX = 3
+		if "remote" in str(Settings.get_browser_type()): MAX = 10
+		with concurrent.futures.ThreadPoolExecutor(max_workers=MAX) as executor:
+			executor.map(parse, users)
+
+		return
 		for user in users:
 			if not user.driver or not user.browser:
 				# setattr(user, "driver", Driver(browser=None))
@@ -101,8 +104,9 @@ class Bot:
 				setattr(user, "driver", self.driver)
 			Bot.parse(user=user)
 
+	@staticmethod
 	def tipped(user=None, amount=None):
 		# for every $x amountsend 1 dick pic
 		num = amount%5
 		Settings.dev_print("tipped num: {}".format(num))
-		user.send_dick_pics(num)
+		return user.send_dick_pics(num)

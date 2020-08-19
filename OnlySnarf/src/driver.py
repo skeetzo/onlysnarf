@@ -1116,7 +1116,7 @@ class Driver:
             return False
         return True
 
-    def messages_scan(self, num=0):
+    def messages_scan(self, notusers=[], num=0):
         # go to /messages page
         # get top n users
         Settings.dev_print("scanning messages")
@@ -1134,14 +1134,17 @@ class Driver:
             if not auth_: return False
             self.go_to_page("/my/chats")
 
+            num += len(notusers)
+
             count = 0
             while True:
-                elements = self.browser.find_elements_by_class_name("g-user-username")
+                elements = self.browser.find_elements_by_class_name("b-chats__item__link")
                 if len(elements) == int(num): break
                 if len(elements) == int(count): break
                 print_same_line("({}/{}) scrolling...".format(count, len(elements)))
                 count = len(elements)
-                elementToFocus = self.browser.find_element_by_class_name("g-section-title")
+                # elementToFocus = self.browser.find_element_by_class_name("g-section-title")
+                elementToFocus = elements[0]
                 self.browser.execute_script("arguments[0].focus();", elementToFocus)
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
@@ -1163,6 +1166,10 @@ class Driver:
                 if not user or not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
                 # print(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
                 # print(str(user.get_attribute("innerHTML")))
+                for notuser in notusers:
+                    if str(notuser.id) == str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""): 
+                        print("skipping not user")
+                        continue
                 users.append(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
 
 

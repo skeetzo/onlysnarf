@@ -70,7 +70,7 @@ class User:
         print("Messaging: {} - {}".format(self.username, self.id))
         successful = self.driver.message(username=self.get_username(), user_id=self.id)
         if not successful: return False
-        successful = User.enter_message(message=message)
+        successful = self.enter_message(message=message)
         if not successful: return False
         print("Messaged: {}".format(self.username))
 
@@ -368,11 +368,11 @@ class User:
         return users_
 
     @staticmethod
-    def get_recent_messagers(driver=None):
+    def get_recent_messagers(notusers=[], driver=None):
         Settings.maybe_print("getting recent users from messages")
         users = []
         try:
-            users_ = driver.messages_scan()
+            users_ = driver.messages_scan(notusers=notusers)
             for user in users_:
                 user_ = User({"id":user})
                 setattr(user_, "driver", driver)
@@ -450,6 +450,14 @@ class User:
         print("Sending Dick Pics: {}".format(num))
         # pass
         # downloads a dick pic from configured source and sends to user
+
+        # search source for dick pics
+        # send dick pics
+        # Settings.get_drive_keyword()
+        Settings.set_bycategory("dick")
+        message = Message()
+        setattr(message, "text", "8=======D~~") # todo: randomize this
+        self.message(message=message)
 
     @staticmethod
     def skipUserCheck(user):

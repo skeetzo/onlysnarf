@@ -21,18 +21,6 @@ class Snarf:
     def __init__(self):
         pass
 
-    ###############
-    ##### Bot #####
-    ###############
-
-    @staticmethod
-    def bot(bot=None):
-        try:
-            from .bot import Bot
-            if not bot: bot = Bot()
-            bot.run()
-        except Exception as e: Settings.dev_print(e)
-
     ####################
     ##### Discount #####
     ####################
@@ -227,7 +215,8 @@ def main():
         if str(action) == "test":
             success = Snarf.test()
         elif str(action) == "bot":
-            success = Snarf.bot()
+            bot = Bot()
+            success = bot.run()
         elif str(action) == "post":
             success = Snarf.post()
         elif str(action) == "message":

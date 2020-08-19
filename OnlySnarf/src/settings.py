@@ -622,6 +622,9 @@ class Settings:
         config["CATEGORY"] = cat
         return cat
 
+    def set_bycategory(cat):
+        config["BYCATEGORY"] = cat
+
     def set_category(cat):
         config["CATEGORY"] = cat
 
