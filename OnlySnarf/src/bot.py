@@ -21,7 +21,7 @@ class Bot(Snarf):
 	USERS = []
 
 	def __init__(self):
-        Snarf.__init__(self)
+		Snarf.__init__(self)
 		self.driver = Driver(browser=None)
 		self.refreshing = None
 		self.running = None
@@ -38,6 +38,9 @@ class Bot(Snarf):
 
 		# if not user or not user.username or str(user) == "None" or str(user.username) == "None": return
 		# commands = ["0) menu"]
+
+		user.update_chat_log()
+
 		unparsed = user.get_unparsed_messages()
 		for message in unparsed:
 			successful = False
@@ -70,39 +73,41 @@ class Bot(Snarf):
 		# read all messages
 		users = Bot.USERS
 		if len(users) == 0:
-			if Settings.get_user() and Settings.get_user().username == "all":
-				users = User.update_chat_logs(driver=self.driver)
-			else:
-				users = User.get_recent_messagers(driver=self.driver)
-				users = User.update_chat_logs(users=users, driver=self.driver)
-			Bot.USERS = users
+			users = User.get_recent_messagers(driver=self.driver)
 		else:
-			users_ = User.get_recent_messagers(notusers=users, driver=self.driver)
-			users = User.update_chat_logs(users=users_, driver=self.driver)
+			users = User.get_recent_messagers(notusers=users, driver=self.driver)
+		Bot.USERS = users
 
 		print("Users to parse: {}".format(len(users)))
 		self.running = threading.Timer(RUN_DURATION*len(users), self.run).start()
 
-		def parse(user):
-			if not user.driver or not user.browser:
-				user.driver = Driver(browser=None)
-			# user.driver.browser = user.driver.spawn()
-			Bot.parse(user=user) 
 
 		# respond to messages
 
-		MAX = 3
-		if "remote" in str(Settings.get_browser_type()): MAX = 10
-		with concurrent.futures.ThreadPoolExecutor(max_workers=MAX) as executor:
-			executor.map(parse, users)
+		def threaded():
+			def parse(user):
+				if not user.driver or not user.browser:
+					user.driver = Driver(browser=None)
+				# user.driver.browser = user.driver.spawn()
+				Bot.parse(user=user)
 
-		return
-		for user in users:
-			if not user.driver or not user.browser:
-				# setattr(user, "driver", Driver(browser=None))
-				# setattr(user, "browser", user.driver.spawn())
-				setattr(user, "driver", self.driver)
-			Bot.parse(user=user)
+			MAX = 3
+			if "remote" in str(Settings.get_browser_type()): MAX = 10
+			with concurrent.futures.ThreadPoolExecutor(max_workers=MAX) as executor:
+				executor.map(parse, users)
+
+		def single():
+			for user in users:
+				if not user.driver or not user.browser:
+					# setattr(user, "driver", Driver(browser=None))
+					# setattr(user, "browser", user.driver.spawn())
+					setattr(user, "driver", self.driver)
+				Bot.parse(user=user)
+
+		if "remote" in Settings.get_browser_type() or "reconnect" in Settings.get_browser_type():
+			single()
+		else:
+			threaded()
 
 	@staticmethod
 	def tipped(user=None, amount=None):

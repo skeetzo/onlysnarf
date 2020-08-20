@@ -215,6 +215,7 @@ def main():
         if str(action) == "test":
             success = Snarf.test()
         elif str(action) == "bot":
+            from .bot import Bot
             bot = Bot()
             success = bot.run()
         elif str(action) == "post":

@@ -691,13 +691,14 @@ class Driver:
         # https://stackoverflow.com/questions/50844779/how-to-handle-multiple-windows-in-python-selenium-with-firefox-driver
         windows_before  = self.browser.current_window_handle
         Settings.dev_print("First Window Handle is : %s" %windows_before)
+        windows = self.browser.window_handles
         self.browser.execute_script('''window.open("{}","_blank");'''.format(url))
         self.handle_alert()
         self.get_page_load()
         # self.browser.execute_script("window.open('https://www.yahoo.com')")
         WebDriverWait(self.browser, 10).until(EC.number_of_windows_to_be(len(self.browser.window_handles)))
         windows_after = self.browser.window_handles
-        new_window = [x for x in windows_after if x != windows_before][0]
+        new_window = [x for x in windows_after if x not in windows][0]
         # self.browser.switch_to_window(new_window) <!---deprecated>
         self.browser.switch_to_window(new_window)
         Settings.dev_print("Page Title after Tab Switching is : %s" %self.browser.title)
@@ -1139,8 +1140,8 @@ class Driver:
             count = 0
             while True:
                 elements = self.browser.find_elements_by_class_name("b-chats__item__link")
-                if len(elements) == int(num): break
-                if len(elements) == int(count): break
+                if len(elements) <= int(num): break
+                if len(elements) <= int(count): break
                 print_same_line("({}/{}) scrolling...".format(count, len(elements)))
                 count = len(elements)
                 # elementToFocus = self.browser.find_element_by_class_name("g-section-title")
