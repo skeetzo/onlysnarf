@@ -4,7 +4,6 @@ from .driver import Driver
 from .classes import Message
 from .user import User
 from .settings import Settings
-from .snarf import Snarf
 
 REFRESH_DURATION = 60*9
 RUN_DURATION = 60*2
@@ -16,12 +15,11 @@ RUN_DURATION = 60*2
 
 COMMANDS_AVAILABLE = "Commands available:\n0) menu\n1) notice me senpai"
 
-class Bot(Snarf):
+class Bot():
 
 	USERS = []
 
 	def __init__(self):
-		Snarf.__init__(self)
 		self.driver = Driver(browser=None)
 		self.refreshing = None
 		self.running = None
@@ -80,7 +78,6 @@ class Bot(Snarf):
 
 		print("Users to parse: {}".format(len(users)))
 		self.running = threading.Timer(RUN_DURATION*len(users), self.run).start()
-
 
 		# respond to messages
 

@@ -2542,7 +2542,6 @@ class Driver:
         return users
 
     # returns list of accounts that follow you
-    @staticmethod
     def users_get(self):
         auth_ = self.auth()
         if not auth_: return False
