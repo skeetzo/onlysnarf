@@ -1096,7 +1096,7 @@ class Driver:
             return False
         try:
             self.go_to_page(username)
-            time.sleep(2)
+            time.sleep(5) # for whatever reason this constantly errors out from load times
             elements = self.browser.find_elements_by_tag_name("a")
             ele = [ele for ele in elements
                     if "/my/chats/chat/" in str(ele.get_attribute("href"))]

@@ -18,9 +18,11 @@ COMMANDS_AVAILABLE = "Commands available:\n0) menu\n1) notice me senpai"
 class Bot():
 
 	USERS = []
+	i = 0
 
 	def __init__(self):
 		self.driver = Driver(browser=None)
+		self.drivers = [self.driver]
 		self.refreshing = None
 		self.running = None
 		##
@@ -84,7 +86,13 @@ class Bot():
 		def threaded():
 			def parse(user):
 				if not user.driver or not user.browser:
-					user.driver = Driver(browser=None)
+
+					if len(self.drivers) == 10:
+						user.driver = self.drivers[Driver.i]
+						Driver.i += 1
+						if Driver.i == 10: Driver.i = 0
+					else:
+						user.driver = Driver(browser=None)
 				# user.driver.browser = user.driver.spawn()
 				Bot.parse(user=user)
 
