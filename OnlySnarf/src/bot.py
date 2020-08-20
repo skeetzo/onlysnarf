@@ -93,6 +93,7 @@ class Bot():
 						if Driver.i == 10: Driver.i = 0
 					else:
 						user.driver = Driver(browser=None)
+						self.drivers.append(user.driver)
 				# user.driver.browser = user.driver.spawn()
 				Bot.parse(user=user)
 
