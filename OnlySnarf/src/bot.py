@@ -73,7 +73,7 @@ class Bot(Snarf):
 		# read all messages
 		users = Bot.USERS
 		if len(users) == 0:
-			users = User.get_recent_messagers(driver=self.driver)
+			users = User.get_all_users(driver=self.driver)
 		else:
 			users = User.get_recent_messagers(notusers=users, driver=self.driver)
 		Bot.USERS = users
@@ -91,8 +91,8 @@ class Bot(Snarf):
 				# user.driver.browser = user.driver.spawn()
 				Bot.parse(user=user)
 
-			MAX = 3
-			if "remote" in str(Settings.get_browser_type()): MAX = 10
+			MAX = 10
+			# if "remote" in str(Settings.get_browser_type()): MAX = 10
 			with concurrent.futures.ThreadPoolExecutor(max_workers=MAX) as executor:
 				executor.map(parse, users)
 
