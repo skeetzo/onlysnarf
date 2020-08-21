@@ -15,16 +15,23 @@ RUN_DURATION = 60*2
 
 COMMANDS_AVAILABLE = "Commands available:\n0) menu\n1) notice me senpai"
 
+MAX_BROWSERS = 10
+# MAX_THREADS = 5
+
 class Bot():
 
 	USERS = []
 	i = 0
+	lock = threading.RLock()
 
 	def __init__(self):
-		self.driver = Driver(browser=None)
-		self.drivers = [self.driver]
+		self.driver = None
+		self.drivers = []
 		self.refreshing = None
 		self.running = None
+		self.lock = threading.RLock()
+		self.locks = []
+
 		##
 		# self.refresher()
 
@@ -51,6 +58,17 @@ class Bot():
 				successful = Bot.prompt(user=user)
 			if successful:
 				user.parse_message(message=message.message)
+		Settings.dev_print("successfully parsed user: {} - {}".format(user.username, user.id))
+
+	@staticmethod
+	def get_index():
+		# Bot.lock.acquire()
+		i = Bot.i
+		Bot.i += 1
+		if Bot.i == MAX_BROWSERS: Bot.i = 0
+		# Bot.lock.release()
+		print("i: {}".format(i))
+		return i
 
 	@staticmethod
 	def prompt(user=None):
@@ -70,6 +88,7 @@ class Bot():
 
 	def run(self):
 		if self.running: self.running.stop()
+		if not self.driver: self.driver = Driver(browser=None)
 		# read all messages
 		users = Bot.USERS
 		if len(users) == 0:
@@ -80,26 +99,42 @@ class Bot():
 
 		print("Users to parse: {}".format(len(users)))
 		self.running = threading.Timer(RUN_DURATION*len(users), self.run).start()
+		# self.running = threading.Timer(RUN_DURATION, self.run).start()
 
 		# respond to messages
 
 		def threaded():
 			def parse(user):
-				if not user.driver or not user.browser:
+				self.lock.acquire()
+				i = int(Bot.get_index())
+				# if i > len(self.locks):
+					# self.locks.append(threading.RLock())
+				# self.locks[i].acquire()
+				try:
+					# self.lock.acquire()
+					if not user.driver or not user.browser:
+						if len(self.drivers) == 0:
+							user.driver = self.driver
+							self.drivers.append(user.driver)
+							self.driver = None
+						elif len(self.drivers) >= MAX_BROWSERS:
+							user.driver = self.drivers[i]
+						else:
+							user.driver = Driver(browser=None)
+							self.drivers.append(user.driver)
+					self.lock.release()
+					Bot.parse(user=user)
+				except Exception as e:
+					print(e)
+					Settings.dev_print("failed to parse user: {} - {}".format(user.id, user.username))
+				# finally:
+					# self.locks[i].release()
 
-					if len(self.drivers) == 10:
-						user.driver = self.drivers[Driver.i]
-						Driver.i += 1
-						if Driver.i == 10: Driver.i = 0
-					else:
-						user.driver = Driver(browser=None)
-						self.drivers.append(user.driver)
-				# user.driver.browser = user.driver.spawn()
-				Bot.parse(user=user)
+			# for user in users:
+			# 	prepare(user)
 
-			MAX = 10
-			# if "remote" in str(Settings.get_browser_type()): MAX = 10
-			with concurrent.futures.ThreadPoolExecutor(max_workers=MAX) as executor:
+			# if "remote" in str(Settings.get_browser_type()): MAX_THREADS = 10
+			with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_BROWSERS) as executor:
 				executor.map(parse, users)
 
 		def single():
