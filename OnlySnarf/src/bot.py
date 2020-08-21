@@ -15,7 +15,7 @@ RUN_DURATION = 60*2
 
 COMMANDS_AVAILABLE = "Commands available:\n0) menu\n1) notice me senpai"
 
-MAX_BROWSERS = 20
+MAX_BROWSERS = 3
 # MAX_THREADS = 5
 
 class Bot():
