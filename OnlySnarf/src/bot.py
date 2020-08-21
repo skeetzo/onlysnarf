@@ -15,7 +15,7 @@ RUN_DURATION = 60*2
 
 COMMANDS_AVAILABLE = "Commands available:\n0) menu\n1) notice me senpai"
 
-MAX_BROWSERS = 10
+MAX_BROWSERS = 20
 # MAX_THREADS = 5
 
 class Bot():
@@ -67,7 +67,6 @@ class Bot():
 		Bot.i += 1
 		if Bot.i == MAX_BROWSERS: Bot.i = 0
 		# Bot.lock.release()
-		print("i: {}".format(i))
 		return i
 
 	@staticmethod
@@ -98,7 +97,7 @@ class Bot():
 		Bot.USERS = users
 
 		print("Users to parse: {}".format(len(users)))
-		self.running = threading.Timer(RUN_DURATION*len(users), self.run).start()
+		# self.running = threading.Timer(RUN_DURATION*len(users), self.run).start()
 		# self.running = threading.Timer(RUN_DURATION, self.run).start()
 
 		# respond to messages
@@ -149,6 +148,9 @@ class Bot():
 			single()
 		else:
 			threaded()
+
+		time.sleep(RUN_DURATION)
+		self.run()
 
 	@staticmethod
 	def tipped(user=None, amount=None):

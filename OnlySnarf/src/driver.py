@@ -578,6 +578,11 @@ class Driver:
         if not Driver.BROWSER: 
             Settings.err_print("Failure to Spawn Browser")
         return Driver.BROWSER
+
+    def get_browser(self):
+        if not self.browser:
+            self.browser = self.spawn()
+        return self.browser
         
     # waits for page load
     def get_page_load(self):
@@ -1736,10 +1741,16 @@ class Driver:
             except Exception as e:
                 if "Unable to locate elements" in str(e):
                     pass
-
+                else: Settings.dev_print(e)
             # print("first message: {}".format(messages_received_[0].get_attribute("innerHTML")))
             # messages_received_.pop(0) # drop self user at top of page
-            messages_all_ = self.find_elements_by_name("messagesAll")
+            messages_all_ = []
+            try:
+                messages_all_ = self.find_elements_by_name("messagesAll")
+            except Exception as e:
+                if "Unable to locate elements" in str(e):
+                    pass
+                else: Settings.dev_print(e)
             messages_all = []
             messages_received = []
             messages_sent = []
@@ -2549,10 +2560,30 @@ class Driver:
         try:
             self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
             count = 0
+            # user_count = int(self.browser.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML").strip())
+            user_count = self.browser.find_elements_by_tag_name("a")
+            # for ele in user_count:
+                # print("{}  -  {}".format(ele.get_attribute("href"), ele.get_attribute("innerHTML")))
+            user_count = [ele.get_attribute("innerHTML").strip() for ele in user_count
+                            if "/my/subscribers/active" in str(ele.get_attribute("href"))][0]
+            # doesnt' work for whatever reason
+            # print(user_count)
+            # user_count = re.match(r"([0-9]*)", str(user_count))
+            # print(user_count.groups())
+            # user_count = user_count.group(1)
+            # print(user_count)
+            # user_count = int(user_count)
+            # print(user_count)
+
+            # <span class="l-sidebar__user-data__item__count">423</span> Fans
+
+            user_count = re.sub(r'<[a-zA-Z\s=\"\-\_/]*>', "", str(user_count))
+            user_count = user_count.replace(" Fans", "")
+
             while True:
                 elements = self.browser.find_elements_by_class_name("m-fans")
-                if len(elements) == int(count): break
-                print_same_line("({}/{}) scrolling...".format(count, len(elements)))
+                if len(elements) == int(user_count): break
+                print_same_line("({}/{}) scrolling...".format(count, user_count))
                 count = len(elements)
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
