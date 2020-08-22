@@ -13,7 +13,7 @@ RUN_DURATION = 60*2
 # 	# "1) dick pic""
 # ]
 
-COMMANDS_AVAILABLE = "Commands available:\n0) menu\n1) notice me senpai"
+# COMMANDS_AVAILABLE = "Commands available:\n0) menu\n1) notice me senpai"
 
 MAX_BROWSERS = 3
 # MAX_THREADS = 5
@@ -54,8 +54,8 @@ class Bot():
 			isTip, amount = Message.isTip(message)
 			if isTip:
 				successful = Bot.tipped(user=user, amount=amount)
-			elif "0) menu" in str(message).lower():
-				successful = Bot.prompt(user=user)
+			# elif "0) menu" in str(message).lower():
+			# 	successful = Bot.prompt(user=user)
 			if successful:
 				user.parse_message(message=message.message)
 		Settings.dev_print("successfully parsed user: {} - {}".format(user.username, user.id))
