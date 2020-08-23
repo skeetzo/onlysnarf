@@ -6,7 +6,9 @@ from .user import User
 from .settings import Settings
 
 REFRESH_DURATION = 60*9
-RUN_DURATION = 60*2
+
+# RUN_DURATION_ALL = 60*60
+# RUN_DURATION_RECENT = 60*10
 
 # commands = [
 # 	"0) menu",
@@ -86,15 +88,19 @@ class Bot():
 		self.refreshing = threading.Timer(REFRESH_DURATION, self.refresh).start()
 
 	def run(self):
-		if self.running: self.running.stop()
+		# if self.running: self.running.stop()
 		if not self.driver: self.driver = Driver(browser=None)
+
 		# read all messages
-		users = Bot.USERS
-		if len(users) == 0:
-			users = User.get_all_users(driver=self.driver)
-		else:
-			users = User.get_recent_messagers(notusers=users, driver=self.driver)
-		Bot.USERS = users
+		# users = Bot.USERS
+		# if len(users) == 0:
+		# 	users = User.get_all_users(driver=self.driver)
+		# else:
+		# 	users = User.get_recent_messagers(driver=self.driver)
+		# 	# users = User.get_recent_messagers(notusers=users, driver=self.driver)
+		# Bot.USERS = users
+
+		users = User.get_recent_messagers(driver=self.driver)
 
 		print("Users to parse: {}".format(len(users)))
 		# self.running = threading.Timer(RUN_DURATION*len(users), self.run).start()
@@ -149,8 +155,30 @@ class Bot():
 		else:
 			threaded()
 
-		time.sleep(RUN_DURATION)
+		time.sleep(60*10)
+
+		users = User.get_all_users(driver=self.driver)
+
+		print("Users to parse: {}".format(len(users)))
+
+		if "remote" in Settings.get_browser_type() or "reconnect" in Settings.get_browser_type():
+			single()
+		else:
+			threaded()
+
+		time.sleep(60*10)
+
+		users = User.get_recent_messagers(driver=self.driver)
+
+		print("Users to parse: {}".format(len(users)))
+
+		if "remote" in Settings.get_browser_type() or "reconnect" in Settings.get_browser_type():
+			single()
+		else:
+			threaded()
+
 		self.run()
+
 
 	@staticmethod
 	def tipped(user=None, amount=None):

@@ -13,7 +13,13 @@ echo "##################################################" >> ../onlysnarf/logs/t
 ## Bot
 # screen -dmSL snarfbot /usr/local/bin/onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot
 
-onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser "firefox" -source "google" -prefer-local
+
+# /usr/local/bin/onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser "firefox" -source "google" >> /var/log/onlysnarf/bot.log 2>&1
+
+
+
+
+onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser "firefox" -source "google" -prefer-local -show
 # onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser reconnect -source google
 
 # onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot -keep -prefer-local -show

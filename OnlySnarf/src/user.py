@@ -358,11 +358,13 @@ class User:
         self.messages_parsed.append(str(message))
 
     @staticmethod
-    def get_recent_messagers(notusers=[], driver=None):
+    def get_recent_messagers(driver=None):
+    # def get_recent_messagers(notusers=[], driver=None):
         Settings.maybe_print("getting recent users from messages")
         users = []
         try:
-            users_ = driver.messages_scan(notusers=notusers)
+            users_ = driver.messages_scan()
+            # users_ = driver.messages_scan(notusers=notusers)
             for user in users_:
                 user_ = User({"id":user})
                 setattr(user_, "driver", driver)

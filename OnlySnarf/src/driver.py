@@ -1122,7 +1122,7 @@ class Driver:
             return False
         return True
 
-    def messages_scan(self, notusers=[], num=0):
+    def messages_scan(self, num=0):
         # go to /messages page
         # get top n users
         Settings.dev_print("scanning messages")
@@ -1133,27 +1133,40 @@ class Driver:
 
         # if users found < n, scroll
         # g-section-title -> scroll this
-        if int(num) == 0: num = Settings.get_user_num()
+        # if int(num) == 0: num = Settings.get_user_num()
         users = []
         try:
             auth_ = self.auth()
             if not auth_: return False
             self.go_to_page("/my/chats")
 
-            num += len(notusers)
+            # num += len(notusers)
 
-            count = 0
-            while True:
-                elements = self.browser.find_elements_by_class_name("b-chats__item__link")
-                if len(elements) <= int(num): break
-                if len(elements) <= int(count): break
-                print_same_line("({}/{}) scrolling...".format(count, len(elements)))
-                count = len(elements)
+            ## so none of the scrolling is working, might as well only return the top 10 every time
+            # count = 0
+            # while True:
+                # elements = self.browser.find_elements_by_class_name("b-chats__item__link")
+                # if len(elements) <= int(num): break
+                # if len(elements) <= int(count): break
+                # print_same_line("({}/{}) scrolling...".format(count, len(elements)))
+                # count = len(elements)
                 # elementToFocus = self.browser.find_element_by_class_name("g-section-title")
-                elementToFocus = elements[0]
-                self.browser.execute_script("arguments[0].focus();", elementToFocus)
-                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(2)
+                # elementToFocus = elements[0]
+                # print(elementToFocus.get_attribute("innerHTML"))
+                # self.browser.execute_script("arguments[0].focus();", elementToFocus)
+                # actions = ActionChains(self.browser)
+                # actions.send_keys(Keys.PAGE_DOWN) 
+                # actions.perform()
+                # self.browser.execute_script("window.scrollBy(0,250)", "");
+                # self.browser.execute_script("scroll(0, 250);");
+                # elementToFocus.send_keys(Keys.END)
+                # elementToFocus.sendKeys(Keys.PAGE_DOWN);
+                # elementToFocus.sendKeys(Keys.PAGE_DOWN);
+                # elementToFocus.sendKeys(Keys.PAGE_DOWN);
+                # elementToFocus = elements[0]
+                # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                # self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                # time.sleep(2)
 
             users_ = self.browser.find_elements_by_class_name("g-user-username")
             Settings.dev_print("users: {}".format(len(users_)))
@@ -1172,15 +1185,16 @@ class Driver:
                 if not user or not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
                 # print(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
                 # print(str(user.get_attribute("innerHTML")))
-                for notuser in notusers:
-                    if str(notuser.id) == str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""): 
-                        print("skipping not user")
-                        continue
+                # for notuser in notusers:
+                    # if str(notuser.id) == str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""): 
+                        # print("skipping not user")
+                        # continue
                 users.append(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
 
 
             return users[:num]
         except Exception as e:
+            print(e)
             Driver.error_checker(e)
             print("Error: Failed to Scan Messages")
         return users
