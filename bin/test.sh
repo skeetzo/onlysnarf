@@ -19,7 +19,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 
 
-onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser "firefox" -source "google" -prefer-local -show
+onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser "firefox" -source "google" -prefer-local >> /var/log/onlysnarf/bot.log
 # onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser reconnect -source google
 
 # onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot -keep -prefer-local -show

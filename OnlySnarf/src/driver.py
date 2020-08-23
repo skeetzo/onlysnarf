@@ -1192,7 +1192,7 @@ class Driver:
                 users.append(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
 
 
-            return users[:num]
+            return users[:10]
         except Exception as e:
             print(e)
             Driver.error_checker(e)
