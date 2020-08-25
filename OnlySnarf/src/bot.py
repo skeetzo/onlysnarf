@@ -157,7 +157,7 @@ class Bot():
 			threaded()
 
 		time.sleep(60*10)
-
+		if not self.driver: self.driver = Driver(browser=None)
 		users = User.get_all_users(driver=self.driver)
 
 		print("Users to parse: {}".format(len(users)))
@@ -168,7 +168,7 @@ class Bot():
 			threaded()
 
 		time.sleep(60*10)
-
+		if not self.driver: self.driver = Driver(browser=None)
 		users = User.get_recent_messagers(driver=self.driver)
 
 		print("Users to parse: {}".format(len(users)))
