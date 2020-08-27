@@ -56,7 +56,9 @@ class Bot():
 			successful = False
 			isTip, amount = Message.isTip(message)
 			if isTip:
+				print(0)
 				successful = Bot.tipped(user=user, amount=amount)
+				print(1)
 			# elif "0) menu" in str(message).lower():
 			# 	successful = Bot.prompt(user=user)
 			if successful:
@@ -184,6 +186,6 @@ class Bot():
 	@staticmethod
 	def tipped(user=None, amount=None):
 		# for every $x amountsend 1 dick pic
-		num = amount%5
+		num = int(amount)%5
 		Settings.dev_print("tipped num: {}".format(num))
 		return user.send_dick_pics(num)
