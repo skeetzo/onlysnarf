@@ -8,8 +8,8 @@ onlysnarfpy \
 -user "recent" \
 -amount 40 \
 -months 3 \
--prefer-local \
 -keep \
+-prefer-local \
 -verbose -verbose -verbose \
 -browser "$1" \
 -source "$2"

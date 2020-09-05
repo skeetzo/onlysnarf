@@ -110,13 +110,13 @@ ELEMENTS = [
     },
     {
         "name": "expiresSave",
-        "classes": ["g-btn.m-rounded"],
+        "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded"],
         "text": ["Save"],
         "id": []
     },
     {
         "name": "expiresCancel",
-        "classes": ["g-btn.m-rounded.m-border"],
+        "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded.m-border"],
         "text": ["Cancel"],
         "id": []
     },
@@ -187,7 +187,7 @@ ELEMENTS = [
     # discount modal for user
     {
         "name": "discountUserButton",
-        "classes": ["g-btn.m-rounded"],
+        "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded"],
         "text": ["Apply"],
         "id": []
     },
@@ -267,14 +267,14 @@ ELEMENTS = [
     # schedule save
     {
         "name": "scheduleSave",
-        "classes": ["g-btn.m-rounded", "button.g-btn.m-rounded"],
+        "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded", "button.g-btn.m-rounded"],
         "text": ["Save"],
         "id": []
     },
     # schedule cancel
     {
         "name": "scheduleCancel",
-        "classes": ["custom-datepicker-button-cancel", "button.g-btn.m-rounded"],
+        "classes": ["g-btn.m-transparent-bg", "custom-datepicker-button-cancel", "button.g-btn.m-rounded"],
         "text": ["Cancel"],
         "id": []
     },

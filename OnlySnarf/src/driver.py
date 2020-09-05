@@ -65,7 +65,7 @@ PASSWORD_XPATH = "//input[@id='password']"
 ONLYFANS_POST_TEXT_ID = "new_post_text_input"
 ONLYFANS_MESSAGES = "b-chat__message__text"
 MESSAGE_CONFIRM = "g-btn.m-rounded.b-chat__btn-submit"
-DISCOUNT_INPUT = "form-control.b-fans__trial__select"
+DISCOUNT_INPUT = "form-control.b-fans__trial__select-wrapper"
 ONLYFANS_TWEET = "//label[@for='new_post_tweet_send']"
 ONLYFANS_PRICE2 = "button.b-chat__btn-set-price"
 POLL_INPUT_XPATH = "//input[@class='form-control']"
@@ -203,7 +203,14 @@ class Driver:
                         return False
             time.sleep(1)
             Settings.dev_print("finding months and discount amount btns")
-            (months_, discount_) = self.browser.find_elements_by_class_name(DISCOUNT_INPUT)
+            # (months_, discount_) = self.browser.find_elements_by_class_name(DISCOUNT_INPUT)
+# b-fans__trial__select-item m-w-2-2 m-first-child
+            # eles = self.browser.find_elements_by_class_name("b-fans__trial__select-item")
+            months_ = self.browser.find_element_by_class_name("b-fans__trial__select-item.m-w-2-2.m-first-child")
+            discount_ = self.browser.find_element_by_class_name("b-fans__trial__select-item.m-w-2-2.m-last-child")
+            # print(len(eles))
+            # months_ = eles[0]
+            # discount_ = eles[1]
             Settings.dev_print("found months and discount amount")
             # removed in 2.10, inputs changed to above
             # months_ = self.browser.find_element_by_class_name(MONTHS_INPUT)
@@ -211,16 +218,30 @@ class Driver:
                 # print("Warning: Existing Discount")
             # discount_.clear()
             Settings.dev_print("entering discount amount")
+            discount_.click()
+            time.sleep(1)
+            action = webdriver.common.action_chains.ActionChains(self.browser)
             for n in range(11):
-                discount_.send_keys(str(Keys.UP))
+                action.send_keys(Keys.UP)
+                # discount_.send_keys(str(Keys.UP))
             for n in range(round(int(amount)/5)-1):
-                discount_.send_keys(Keys.DOWN)
+                # discount_.send_keys(Keys.DOWN)
+                action.send_keys(Keys.DOWN)
+            action.send_keys(Keys.RETURN)
+            action.perform()
             Settings.dev_print("successfully entered discount amount")
             Settings.dev_print("entering discount months")
+            months_.click()
+            time.sleep(1)
+            action = webdriver.common.action_chains.ActionChains(self.browser)
             for n in range(11):
-                months_.send_keys(str(Keys.UP))
+                action.send_keys(Keys.UP)
+                # months_.send_keys(str(Keys.UP))
             for n in range(int(months)-1):
-                months_.send_keys(Keys.DOWN)
+                action.send_keys(Keys.DOWN)
+                # months_.send_keys(Keys.DOWN)
+            action.send_keys(Keys.RETURN)
+            action.perform()
             Settings.dev_print("successfully entered discount months")
             Settings.debug_delay_check()
             Settings.dev_print("applying discount")
@@ -243,7 +264,7 @@ class Driver:
         except Exception as e:
             print(e)
             Driver.error_checker(e)
-            buttons_ = self.find_elements_by_name("discountUserButtons")
+            buttons_ = self.find_elements_by_name("discountUserButton")
             for button in buttons_:
                 if "Cancel" in button.get_attribute("innerHTML"):
                     button.click()

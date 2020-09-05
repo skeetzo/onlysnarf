@@ -224,6 +224,7 @@ class User:
             users = User.read_users_local()
             if len(users) > 0: return users
         active_users = []
+        if not driver: driver = Driver.get_driver()
         users = driver.users_get()
         for user in users:
             try:
@@ -266,24 +267,24 @@ class User:
         return unparsed_messages
 
     @staticmethod
-    def get_user_by_username(username=None):
+    def get_user_by_username(driver=None, username=None):
         if not username or username == None:
             print("Error: Missing Username")
             return None
 
         if str(username) == "all":
-            return User.get_all_users()
+            return User.get_all_users(driver=driver)
         elif str(username) == "recent":
-            return User.get_recent_users()
+            return User.get_recent_users(driver=driver)
         elif str(username) == "favorite":
-            return User.get_favorite_users()
+            return User.get_favorite_users(driver=driver)
 
         users = User.read_users_local()
         for user in users:
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
                 Settings.maybe_print("Found User: Local")
                 return user
-        users = User.get_all_users()
+        users = User.get_all_users(driver=driver)
         for user in users:
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
                 Settings.maybe_print("Found User: Members")
@@ -292,9 +293,9 @@ class User:
         return None
 
     @staticmethod
-    def get_favorite_users():
+    def get_favorite_users(driver=None):
         Settings.maybe_print("Getting Favorite Users")
-        users = User.get_all_users()
+        users = User.get_all_users(driver=driver)
         favUsers = []
         favorites = ",".join(str(Settings.get_users_favorite()))
         for user in users:
@@ -307,9 +308,9 @@ class User:
 
     # returns users that have no messages sent to them
     @staticmethod
-    def get_new_users():
+    def get_new_users(driver=None):
         Settings.maybe_print("Getting New Users")
-        users = User.get_all_users()
+        users = User.get_all_users(driver=driver)
         newUsers = []
         date_ = datetime.today() - timedelta(days=10)
         for user in users:
@@ -324,9 +325,9 @@ class User:
         return newUsers
 
     @staticmethod
-    def get_never_messaged_users():
+    def get_never_messaged_users(driver=None):
         Settings.maybe_print("Getting New Users")
-        users = User.get_all_users()
+        users = User.get_all_users(driver=driver)
         newUsers = []
         for user in users:
             if len(user.messages_received) == 0:
@@ -337,9 +338,9 @@ class User:
         return newUsers
 
     @staticmethod
-    def get_recent_users():
+    def get_recent_users(driver=None):
         Settings.maybe_print("Getting Recent Users")
-        users = User.get_all_users()
+        users = User.get_all_users(driver=driver)
         i = 0
         users_ = []
         for user in users:

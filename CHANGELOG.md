@@ -416,6 +416,8 @@
   **2.20.1**
   - updated: saving session_id and session_url
   - more bot debugging
+  - fixed bin/install-firefox.sh: update for processor
+  - more debugging
 
 ----------------------------------------
   - theres a bug of it not adding the currect window.handle number to the TABS cache
@@ -424,6 +426,7 @@
 
 
   **2.x.x**
+  **2.20.2**
   
   **x.x.x**
   - test Profile: check

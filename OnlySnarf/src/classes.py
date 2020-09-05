@@ -25,18 +25,18 @@ class Discount:
         if Settings.is_prompt():
             if not Settings.prompt("Discount"): return
         Settings.maybe_print("discounting: {}".format(self.get_username().username))
+        driver = Driver.get_driver()
         username = self.get_username().username
         if username.lower() == "all":
-            users = User.get_all_users()
+            users = User.get_all_users(driver=driver)
         elif username.lower() == "recent":
-            users = User.get_recent_users()
+            users = User.get_recent_users(driver=driver)
         elif username.lower() == "favorite":
-            users = User.get_favorite_users()
+            users = User.get_favorite_users(driver=driver)
         elif username.lower() == "new":
-            users = User.get_new_users()
+            users = User.get_new_users(driver=driver)
         else: users = [self]
         successful = False
-        driver = Driver.get_driver()
         for user in users:
             self.username = user.username
             successful_ = driver.discount_user(discount=self)

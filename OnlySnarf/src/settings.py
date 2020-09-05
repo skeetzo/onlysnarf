@@ -365,6 +365,8 @@ class Settings:
             # user = User({})
             user = User({"username":config["USER"]})
             # setattr(user, "username", config["USER"])
+            from .driver import Driver
+            setattr(user, "driver", Driver.get_driver())
             users_.append(user)
         return users_
 
