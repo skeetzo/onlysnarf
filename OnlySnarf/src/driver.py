@@ -578,6 +578,11 @@ class Driver:
         if not Driver.BROWSER: 
             Settings.err_print("Failure to Spawn Browser")
         return Driver.BROWSER
+
+    def get_browser(self):
+        if not self.browser:
+            self.browser = self.spawn()
+        return self.browser
         
     # waits for page load
     def get_page_load(self):
@@ -691,13 +696,14 @@ class Driver:
         # https://stackoverflow.com/questions/50844779/how-to-handle-multiple-windows-in-python-selenium-with-firefox-driver
         windows_before  = self.browser.current_window_handle
         Settings.dev_print("First Window Handle is : %s" %windows_before)
+        windows = self.browser.window_handles
         self.browser.execute_script('''window.open("{}","_blank");'''.format(url))
         self.handle_alert()
         self.get_page_load()
         # self.browser.execute_script("window.open('https://www.yahoo.com')")
         WebDriverWait(self.browser, 10).until(EC.number_of_windows_to_be(len(self.browser.window_handles)))
         windows_after = self.browser.window_handles
-        new_window = [x for x in windows_after if x != windows_before][0]
+        new_window = [x for x in windows_after if x not in windows][0]
         # self.browser.switch_to_window(new_window) <!---deprecated>
         self.browser.switch_to_window(new_window)
         Settings.dev_print("Page Title after Tab Switching is : %s" %self.browser.title)
@@ -1095,7 +1101,7 @@ class Driver:
             return False
         try:
             self.go_to_page(username)
-            time.sleep(2)
+            time.sleep(5) # for whatever reason this constantly errors out from load times
             elements = self.browser.find_elements_by_tag_name("a")
             ele = [ele for ele in elements
                     if "/my/chats/chat/" in str(ele.get_attribute("href"))]
@@ -1127,24 +1133,40 @@ class Driver:
 
         # if users found < n, scroll
         # g-section-title -> scroll this
-        if int(num) == 0: num = Settings.get_user_num()
+        # if int(num) == 0: num = Settings.get_user_num()
         users = []
         try:
             auth_ = self.auth()
             if not auth_: return False
             self.go_to_page("/my/chats")
 
-            count = 0
-            while True:
-                elements = self.browser.find_elements_by_class_name("g-user-username")
-                if len(elements) == int(num): break
-                if len(elements) == int(count): break
-                print_same_line("({}/{}) scrolling...".format(count, len(elements)))
-                count = len(elements)
-                elementToFocus = self.browser.find_element_by_class_name("g-section-title")
-                self.browser.execute_script("arguments[0].focus();", elementToFocus)
-                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(2)
+            # num += len(notusers)
+
+            ## so none of the scrolling is working, might as well only return the top 10 every time
+            # count = 0
+            # while True:
+                # elements = self.browser.find_elements_by_class_name("b-chats__item__link")
+                # if len(elements) <= int(num): break
+                # if len(elements) <= int(count): break
+                # print_same_line("({}/{}) scrolling...".format(count, len(elements)))
+                # count = len(elements)
+                # elementToFocus = self.browser.find_element_by_class_name("g-section-title")
+                # elementToFocus = elements[0]
+                # print(elementToFocus.get_attribute("innerHTML"))
+                # self.browser.execute_script("arguments[0].focus();", elementToFocus)
+                # actions = ActionChains(self.browser)
+                # actions.send_keys(Keys.PAGE_DOWN) 
+                # actions.perform()
+                # self.browser.execute_script("window.scrollBy(0,250)", "");
+                # self.browser.execute_script("scroll(0, 250);");
+                # elementToFocus.send_keys(Keys.END)
+                # elementToFocus.sendKeys(Keys.PAGE_DOWN);
+                # elementToFocus.sendKeys(Keys.PAGE_DOWN);
+                # elementToFocus.sendKeys(Keys.PAGE_DOWN);
+                # elementToFocus = elements[0]
+                # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                # self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                # time.sleep(2)
 
             users_ = self.browser.find_elements_by_class_name("g-user-username")
             Settings.dev_print("users: {}".format(len(users_)))
@@ -1163,11 +1185,16 @@ class Driver:
                 if not user or not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
                 # print(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
                 # print(str(user.get_attribute("innerHTML")))
+                # for notuser in notusers:
+                    # if str(notuser.id) == str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""): 
+                        # print("skipping not user")
+                        # continue
                 users.append(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
 
 
-            return users[:num]
+            return users[:10]
         except Exception as e:
+            print(e)
             Driver.error_checker(e)
             print("Error: Failed to Scan Messages")
         return users
@@ -1728,10 +1755,16 @@ class Driver:
             except Exception as e:
                 if "Unable to locate elements" in str(e):
                     pass
-
+                else: Settings.dev_print(e)
             # print("first message: {}".format(messages_received_[0].get_attribute("innerHTML")))
             # messages_received_.pop(0) # drop self user at top of page
-            messages_all_ = self.find_elements_by_name("messagesAll")
+            messages_all_ = []
+            try:
+                messages_all_ = self.find_elements_by_name("messagesAll")
+            except Exception as e:
+                if "Unable to locate elements" in str(e):
+                    pass
+                else: Settings.dev_print(e)
             messages_all = []
             messages_received = []
             messages_sent = []
@@ -2534,7 +2567,6 @@ class Driver:
         return users
 
     # returns list of accounts that follow you
-    @staticmethod
     def users_get(self):
         auth_ = self.auth()
         if not auth_: return False
@@ -2542,10 +2574,30 @@ class Driver:
         try:
             self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
             count = 0
+            # user_count = int(self.browser.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML").strip())
+            user_count = self.browser.find_elements_by_tag_name("a")
+            # for ele in user_count:
+                # print("{}  -  {}".format(ele.get_attribute("href"), ele.get_attribute("innerHTML")))
+            user_count = [ele.get_attribute("innerHTML").strip() for ele in user_count
+                            if "/my/subscribers/active" in str(ele.get_attribute("href"))][0]
+            # doesnt' work for whatever reason
+            # print(user_count)
+            # user_count = re.match(r"([0-9]*)", str(user_count))
+            # print(user_count.groups())
+            # user_count = user_count.group(1)
+            # print(user_count)
+            # user_count = int(user_count)
+            # print(user_count)
+
+            # <span class="l-sidebar__user-data__item__count">423</span> Fans
+
+            user_count = re.sub(r'<[a-zA-Z\s=\"\-\_/]*>', "", str(user_count))
+            user_count = user_count.replace(" Fans", "")
+
             while True:
                 elements = self.browser.find_elements_by_class_name("m-fans")
-                if len(elements) == int(count): break
-                print_same_line("({}/{}) scrolling...".format(count, len(elements)))
+                if len(elements) == int(user_count): break
+                print_same_line("({}/{}) scrolling...".format(count, user_count))
                 count = len(elements)
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)

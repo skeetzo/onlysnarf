@@ -1,3 +1,4 @@
+import time
 import threading
 import concurrent.futures
 from .driver import Driver
@@ -6,23 +7,34 @@ from .user import User
 from .settings import Settings
 
 REFRESH_DURATION = 60*9
-RUN_DURATION = 60*2
+
+# RUN_DURATION_ALL = 60*60
+# RUN_DURATION_RECENT = 60*10
 
 # commands = [
 # 	"0) menu",
 # 	# "1) dick pic""
 # ]
 
-COMMANDS_AVAILABLE = "Commands available:\n0) menu\n1) notice me senpai"
+# COMMANDS_AVAILABLE = "Commands available:\n0) menu\n1) notice me senpai"
 
-class Bot:
+MAX_BROWSERS = 3
+# MAX_THREADS = 5
+
+class Bot():
 
 	USERS = []
+	i = 0
+	lock = threading.RLock()
 
 	def __init__(self):
-		self.driver = Driver(browser=None)
+		self.driver = None
+		self.drivers = []
 		self.refreshing = None
 		self.running = None
+		self.lock = threading.RLock()
+		self.locks = []
+
 		##
 		# self.refresher()
 
@@ -36,16 +48,31 @@ class Bot:
 
 		# if not user or not user.username or str(user) == "None" or str(user.username) == "None": return
 		# commands = ["0) menu"]
+
+		user.update_chat_log()
+
 		unparsed = user.get_unparsed_messages()
 		for message in unparsed:
 			successful = False
 			isTip, amount = Message.isTip(message)
 			if isTip:
+				print(0)
 				successful = Bot.tipped(user=user, amount=amount)
-			elif "0) menu" in str(message).lower():
-				successful = Bot.prompt(user=user)
+				print(1)
+			# elif "0) menu" in str(message).lower():
+			# 	successful = Bot.prompt(user=user)
 			if successful:
 				user.parse_message(message=message.message)
+		Settings.dev_print("successfully parsed user: {} - {}".format(user.username, user.id))
+
+	@staticmethod
+	def get_index():
+		# Bot.lock.acquire()
+		i = Bot.i
+		Bot.i += 1
+		if Bot.i == MAX_BROWSERS: Bot.i = 0
+		# Bot.lock.release()
+		return i
 
 	@staticmethod
 	def prompt(user=None):
@@ -64,45 +91,101 @@ class Bot:
 		self.refreshing = threading.Timer(REFRESH_DURATION, self.refresh).start()
 
 	def run(self):
-		if self.running: self.running.stop()
+		# if self.running: self.running.stop()
+		if not self.driver: self.driver = Driver(browser=None)
+
 		# read all messages
-		users = Bot.USERS
-		if len(users) == 0:
-			if Settings.get_user() and Settings.get_user().username == "all":
-				users = User.update_chat_logs(driver=self.driver)
-			else:
-				users = User.get_recent_messagers(driver=self.driver)
-				users = User.update_chat_logs(users=users, driver=self.driver)
-			Bot.USERS = users
-		else:
-			users = User.update_chat_logs(users=users, driver=self.driver)
-			users_ = User.get_recent_messagers(driver=self.driver)
-			for user in users_:
-				if user not in users:
-					print("maybe doing something")
-					users.append(user)
+		# users = Bot.USERS
+		# if len(users) == 0:
+		# 	users = User.get_all_users(driver=self.driver)
+		# else:
+		# 	users = User.get_recent_messagers(driver=self.driver)
+		# 	# users = User.get_recent_messagers(notusers=users, driver=self.driver)
+		# Bot.USERS = users
+
+		users = User.get_recent_messagers(driver=self.driver)
 
 		print("Users to parse: {}".format(len(users)))
-		self.running = threading.Timer(RUN_DURATION*len(users), self.run).start()
-
-		def parse(user):
-			user.driver = Driver(browser=None)
-			# user.driver.browser = user.driver.spawn()
-			Bot.parse(user=user) 
+		# self.running = threading.Timer(RUN_DURATION*len(users), self.run).start()
+		# self.running = threading.Timer(RUN_DURATION, self.run).start()
 
 		# respond to messages
-		# with concurrent.futures.ThreadPoolExecutor() as executor:
-			# executor.map(parse, users)
 
-		for user in users:
-			if not user.driver or not user.browser:
-				# setattr(user, "driver", Driver(browser=None))
-				# setattr(user, "browser", user.driver.spawn())
-				setattr(user, "driver", self.driver)
-			Bot.parse(user=user)
+		def threaded():
+			def parse(user):
+				self.lock.acquire()
+				i = int(Bot.get_index())
+				# if i > len(self.locks):
+					# self.locks.append(threading.RLock())
+				# self.locks[i].acquire()
+				try:
+					# self.lock.acquire()
+					if not user.driver or not user.browser:
+						if len(self.drivers) == 0:
+							user.driver = self.driver
+							self.drivers.append(user.driver)
+							self.driver = None
+						elif len(self.drivers) >= MAX_BROWSERS:
+							user.driver = self.drivers[i]
+						else:
+							user.driver = Driver(browser=None)
+							self.drivers.append(user.driver)
+					self.lock.release()
+					Bot.parse(user=user)
+				except Exception as e:
+					print(e)
+					Settings.dev_print("failed to parse user: {} - {}".format(user.id, user.username))
+				# finally:
+					# self.locks[i].release()
 
+			# for user in users:
+			# 	prepare(user)
+
+			# if "remote" in str(Settings.get_browser_type()): MAX_THREADS = 10
+			with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_BROWSERS) as executor:
+				executor.map(parse, users)
+
+		def single():
+			for user in users:
+				if not user.driver or not user.browser:
+					# setattr(user, "driver", Driver(browser=None))
+					# setattr(user, "browser", user.driver.spawn())
+					setattr(user, "driver", self.driver)
+				Bot.parse(user=user)
+
+		if "remote" in Settings.get_browser_type() or "reconnect" in Settings.get_browser_type():
+			single()
+		else:
+			threaded()
+
+		time.sleep(60*10)
+		if not self.driver: self.driver = Driver(browser=None)
+		users = User.get_all_users(driver=self.driver)
+
+		print("Users to parse: {}".format(len(users)))
+
+		if "remote" in Settings.get_browser_type() or "reconnect" in Settings.get_browser_type():
+			single()
+		else:
+			threaded()
+
+		time.sleep(60*10)
+		if not self.driver: self.driver = Driver(browser=None)
+		users = User.get_recent_messagers(driver=self.driver)
+
+		print("Users to parse: {}".format(len(users)))
+
+		if "remote" in Settings.get_browser_type() or "reconnect" in Settings.get_browser_type():
+			single()
+		else:
+			threaded()
+
+		self.run()
+
+
+	@staticmethod
 	def tipped(user=None, amount=None):
 		# for every $x amountsend 1 dick pic
-		num = amount%5
+		num = int(amount)%5
 		Settings.dev_print("tipped num: {}".format(num))
-		user.send_dick_pics(num)
+		return user.send_dick_pics(num)

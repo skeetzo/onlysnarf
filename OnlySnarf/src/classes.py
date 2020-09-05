@@ -245,8 +245,13 @@ class Message():
             amount = re.match(r'I sent you a \$([0-9]*)\.00 tip ♥', text).group(1)
             Settings.dev_print("successfully found tip")
             Settings.dev_print("amount: {}".format(amount))
-            return True, amount
-        return False, amount
+            return True, int(amount)
+        elif re.search(r"I\'ve contributed \$[0-9]*\.00 to your Campaign", text):
+            amount = re.match(r'I\'ve contributed \$([0-9]*)\.00 to your Campaign', text).group(1)
+            Settings.dev_print("successfully found campaign donation")
+            Settings.dev_print("amount: {}".format(amount))
+            return True, int(amount)
+        return False, int(amount)
         # check text for "I sent you a $5.00 tip ♥"
         # pass
 

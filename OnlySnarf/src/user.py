@@ -70,7 +70,7 @@ class User:
         print("Messaging: {} - {}".format(self.username, self.id))
         successful = self.driver.message(username=self.get_username(), user_id=self.id)
         if not successful: return False
-        successful = User.enter_message(message=message)
+        successful = self.enter_message(message=message)
         if not successful: return False
         print("Messaged: {}".format(self.username))
 
@@ -124,7 +124,7 @@ class User:
 
     def equals(self, user):
         # print(str(user.username)+" == "+str(self.username))
-        if user.username == self.username:
+        if str(user.username) == str(self.username) or str(user.id) == str(self.id):
             return True
         return False
 
@@ -190,6 +190,18 @@ class User:
     def unfavor(self):
         print("Unfavoring: {}".format(self.username))
         self.isFavorite = False
+
+    def update(self, user):
+        return # todo fix this
+        for key, value in json.loads(user.toJSON()).items():
+            # print("updating: {} = {}".format(key, value))
+            setattr(self, str(key), value)
+
+    def update_chat_log(self):
+        print("Updating Chat Log: {} - {}".format(self.username, self.id))
+        user = self.read_chat()
+        # todo: fix self.udpdate before this works
+        # User.write_users_local(users=[self])
 
     @staticmethod
     def update_chat_logs(users=[], driver=None):
@@ -345,34 +357,14 @@ class User:
         self.messages.remove(str(message))
         self.messages_parsed.append(str(message))
 
-    # gets a list of all subscribed user_ids from local txt
-    @staticmethod
-    def read_users_local(driver=None):
-        Settings.maybe_print("getting local users")
-        users = []
-        users_ = []
-        try:
-            with open(str(Settings.get_users_path())) as json_file:  
-                users = json.load(json_file)['users']
-            Settings.maybe_print("loaded local users")
-            for user in users:
-                try:
-                    user_ = User(json.loads(user))
-                    setattr(user_, "driver", driver)
-                    users_.append(user_)
-                except Exception as e:
-                    Settings.dev_print(e)
-            return users_
-        except Exception as e:
-            Settings.dev_print(e)
-        return users_
-
     @staticmethod
     def get_recent_messagers(driver=None):
+    # def get_recent_messagers(notusers=[], driver=None):
         Settings.maybe_print("getting recent users from messages")
         users = []
         try:
             users_ = driver.messages_scan()
+            # users_ = driver.messages_scan(notusers=notusers)
             for user in users_:
                 user_ = User({"id":user})
                 setattr(user_, "driver", driver)
@@ -451,12 +443,42 @@ class User:
         # pass
         # downloads a dick pic from configured source and sends to user
 
+        # search source for dick pics
+        # send dick pics
+        # Settings.get_drive_keyword()
+        Settings.set_bycategory("dick")
+        message = Message()
+        setattr(message, "text", "8=======D~~") # todo: randomize this
+        self.message(message=message)
+
     @staticmethod
     def skipUserCheck(user):
         if str(user.id).lower() in Settings.get_skipped_users() or str(user.username).lower() in Settings.get_skipped_users():
             Settings.maybe_print("skipping: {}".format(user.username))
             return None
         return user
+
+    # gets a list of all subscribed user_ids from local txt
+    @staticmethod
+    def read_users_local(driver=None):
+        Settings.maybe_print("getting local users")
+        users = []
+        users_ = []
+        try:
+            with open(str(Settings.get_users_path())) as json_file:  
+                users = json.load(json_file)['users']
+            Settings.maybe_print("loaded local users")
+            for user in users:
+                try:
+                    user_ = User(json.loads(user))
+                    setattr(user_, "driver", driver)
+                    users_.append(user_)
+                except Exception as e:
+                    Settings.dev_print(e)
+            return users_
+        except Exception as e:
+            Settings.dev_print(e)
+        return users_
 
     # writes user list to local txt
     @staticmethod
@@ -468,6 +490,14 @@ class User:
             return
         print("Saving Users Locally")
         Settings.maybe_print("local users path: "+str(Settings.get_users_path()))
+        ##
+        # update from existing
+        existingUsers = User.read_users_local()
+        for user in users:
+            for user_ in existingUsers:
+                if user.equals(user_):
+                    user.update(user_)
+        ##
         data = {}
         data['users'] = []
         for user in users:

@@ -415,11 +415,12 @@
   - added: bot functionality - menu prompt, tip parsing
   **2.20.1**
   - updated: saving session_id and session_url
+  - more bot debugging
 
 ----------------------------------------
   - theres a bug of it not adding the currect window.handle number to the TABS cache
   |- probably from firefox's tab not always going 1 to the right? but is that part of the loop check?
-
+  - empty messages bug: Type a message below to start a conversation with 
 
 
   **2.x.x**
