@@ -2332,7 +2332,6 @@ class Driver:
                 #     elif int(tabNumber) <= int(tabs):
                 #         browser.switch_to.window(browser.window_handles[tabNumber])
                 #     time.sleep(2)
-                Settings.dev_print("Successful Reconnect")
                 return browser
             if driver and driver.session_id and driver.session_url:
                 return reconnect(reconnect_id=driver.session_id, url=driver.session_url)
@@ -2422,9 +2421,11 @@ class Driver:
             try:
                 browser = reconnect()
                 browser.title
-                print("Browser Successfully Reconnected")
+                print("Browser Reconnected")
+                Settings.dev_print("successful reconnect")
                 browser = auto(browser)
             except Exception as e:
+                Settings.dev_print("failed to reconnect")
                 Settings.dev_print(e)
                 browser = auto(None)
         elif "remote" in str(BROWSER_TYPE):
@@ -2433,8 +2434,10 @@ class Driver:
             try:
                 browser = reconnect()
                 browser.title
-                print("Browser Successfully Reconnected")
+                print("Browser Reconnected")
+                Settings.dev_print("successful reconnect")
             except Exception as e:
+                Settings.dev_print("failed to reconnect")
                 Settings.dev_print(e)
                 browser = None        
         if browser and Settings.is_keep():

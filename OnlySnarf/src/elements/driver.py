@@ -260,7 +260,7 @@ ELEMENTS = [
     # schedule next
     {
         "name": "scheduleNext",
-        "classes": ["g-btn.m-rounded", "button.g-btn.m-rounded"],
+        "classes": ["g-btn.m-transparent-bg.m-no-uppercase", "g-btn.m-rounded", "button.g-btn.m-rounded"],
         "text": ["Next"],
         "id": []
     },
