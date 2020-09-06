@@ -46,7 +46,7 @@ testing=("message")
 testing=("poll" "post" "schedule" "settings" "upload")
 testing=("bot")
 testing=("discount" "expiration" "message" "poll" "post" "schedule" "settings" "upload")
-testing=("message" "poll" "post" "schedule")
+testing=("message" "schedule")
 
 verbose=""
 verbose="-verbose -verbose"

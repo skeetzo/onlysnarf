@@ -78,6 +78,7 @@ class User:
     def message_user(username="", message=None):
         user = User({"username":username})
         # setattr(user, "username", username)
+        setattr(user, "driver", Driver.get_driver())
         user.message(message=message)    
 
     def enter_message(self, message=None):

@@ -1086,7 +1086,8 @@ class Driver:
                 return False
             print("Enter text: {}".format(text))
             Settings.dev_print("finding text area")
-            message = self.find_element_by_name("messageText")     
+            # message = self.find_element_by_name("messageText")     
+            message = self.browser.find_element_by_id("new_post_text_input")     
             # message = self.browser.find_element_by_name("message")     
             Settings.dev_print("entering text")
             message.send_keys(str(text))
@@ -1258,7 +1259,6 @@ class Driver:
     ##### Poll #####
     ################
 
-    @staticmethod
     def poll(self, poll=None):
         if not poll:
             print("Error: Missing Poll")
@@ -1453,7 +1453,6 @@ class Driver:
     ##### Promotions #####
     ######################
 
-    @staticmethod
     def promotional_campaign(self, promotion=None):
         if not promotion:
             print("Error: Missing Promotion")
@@ -1877,7 +1876,6 @@ class Driver:
     ##### Schedule #####
     ####################
 
-    @staticmethod
     def schedule(self, schedule=None):
         if not schedule:
             print("Error: Missing Schedule")
@@ -2518,7 +2516,7 @@ class Driver:
                 # if this doesn't force it then it'll loop forever without a stopper
             ###
         # one last final check
-        self.error_window_upload()
+        # self.error_window_upload()
         Settings.debug_delay_check()
         Settings.dev_print("### Files Upload Successful ###")
         return True
