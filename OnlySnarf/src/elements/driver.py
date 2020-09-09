@@ -260,7 +260,7 @@ ELEMENTS = [
     # schedule next
     {
         "name": "scheduleNext",
-        "classes": ["g-btn.m-rounded", "button.g-btn.m-rounded"],
+        "classes": ["g-btn.m-transparent-bg", "g-btn.m-transparent-bg.m-no-uppercase", "g-btn.m-rounded", "button.g-btn.m-rounded"],
         "text": ["Next"],
         "id": []
     },
@@ -305,7 +305,7 @@ ELEMENTS = [
     # tab probably closes error windows...
     {
         "name": "errorUpload",
-        "classes": ["g-btn.m-rounded.m-border", "button.g-btn.m-rounded.m-border"],
+        "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded.m-border", "button.g-btn.m-rounded.m-border"],
         "text": ["Close"],
         "id": []
     },

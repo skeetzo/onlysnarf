@@ -129,7 +129,7 @@ class MonthValidator(Validator):
 	def validate(self, document):
 		if int(document.text) < DISCOUNT_MIN_MONTHS or int(document.text) > DISCOUNT_MAX_MONTHS:
 			raise ValidationError(
-				message='Please enter a month number (1-12)',
+				message='Please enter a month number between {}-{}'.format(DISCOUNT_MIN_MONTHS, DISCOUNT_MAX_MONTHS),
 				cursor_position=len(document.text))
 
 class AmountValidator(Validator):

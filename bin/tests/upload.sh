@@ -5,7 +5,6 @@ echo "[*] Upload - Image"
 onlysnarfpy \
 -debug \
 -action "post" -category "image" \
--bykeyword "test" \
 -text "image testes" \
 -keywords "ballsacks" -keywords "tits" \
 -tags "sexy" \
@@ -15,13 +14,13 @@ onlysnarfpy \
 -verbose -verbose -verbose \
 -browser "$1" \
 -source "$2"
+# -bykeyword "pussycats" \
 
 # Gallery
 echo "[*] Upload - Gallery"
 onlysnarfpy \
 -debug \
 -action "post" -category "gallery" \
--bykeyword "test" \
 -text "gallery testes" \
 -performers "balls" -performers "sacks" \
 -debug-delay \
@@ -29,16 +28,17 @@ onlysnarfpy \
 -verbose -verbose -verbose \
 -browser "$1" \
 -source "$2"
+# -bykeyword "pussycats" \
 
 # Video
 echo "[*] Upload - Video"
 onlysnarfpy \
 -debug \
 -action "post" -category "video" \
--bykeyword "test" \
 -text "fuck my upload speeds in the face" \
 -debug-delay \
 -keep \
 -verbose -verbose -verbose \
 -browser "$1" \
 -source "$2"
+# -bykeyword "pussycats" \

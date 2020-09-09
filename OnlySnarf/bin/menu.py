@@ -125,7 +125,7 @@ signal.signal(signal.SIGINT, signal_handler)
   
 def exit():
     from OnlySnarf.src.driver import Driver
-    Driver.exit()
+    Driver.exit_all()
     sys.exit(0)
 
 ######################################################

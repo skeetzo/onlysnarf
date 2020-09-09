@@ -9,8 +9,8 @@ onlysnarfpy \
 -amount 40 \
 -months 3 \
 -keep \
--prefer-local \
 -verbose -verbose -verbose \
+-prefer-local \
 -browser "$1" \
 -source "$2"
 # -show \

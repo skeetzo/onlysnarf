@@ -186,14 +186,18 @@ class File():
 
     @staticmethod
     def get_tmp():
-        tmp = os.getcwd()
-        if Settings.get_download_path() != "":
-            tmp = os.path.join(Settings.get_download_path(), "tmp")
-        else:
-            tmp = os.path.join(tmp, "tmp")
-        if not os.path.exists(str(tmp)):
-            os.mkdir(str(tmp))
-        return tmp
+        # tmp = os.getcwd()
+        # if Settings.get_download_path() != "":
+        #     tmp = os.path.join(Settings.get_download_path(), "tmp")
+        # else:
+        #     tmp = os.path.join(tmp, "tmp")
+        # if not os.path.exists(str(tmp)):
+        #     os.mkdir(str(tmp))
+        # return tmp
+        download_path = Settings.get_download_path()
+        if not os.path.exists(str(download_path)):
+            os.mkdir(str(download_path))
+        return download_path
 
     def get_type(self):
         if self.type: return self.type
@@ -208,6 +212,7 @@ class File():
     # file references can be GoogleId references which need to download their source
     # files exist when checked for size
     def prepare(self):
+        Settings.maybe_print("preparing0: {}".format(self.get_title()))
         self.get_type().prepare()
         if not self.check_size():
             return False
@@ -610,6 +615,14 @@ class Folder(File):
         self.title = title
         return self.title
 
+    def prepare():
+        prepared = False
+        for file in self.get_files():
+            prepared_ = file.prepare()
+            if prepared_: prepared = prepared_
+        return prepared
+
+
 ###################################################################################
 
 class Google_File(File):
@@ -795,6 +808,7 @@ class Google_File(File):
     # file references can be GoogleId references which need to download their source
     # files exist when checked for size
     def prepare(self):
+        Settings.maybe_print("preparing1: {}".format(self.get_title()))
         if not self.check_size():
             self.download()
         return super()
@@ -924,6 +938,13 @@ class Google_Folder(Google_File):
                     break
         return self.files
 
+    def prepare():
+        prepared = False
+        for file in self.get_files():
+            prepared_ = file.prepare()
+            if prepared_: prepared = prepared_
+        return prepared
+        
 ###################################################################################
 
 class Image(File):
@@ -931,7 +952,8 @@ class Image(File):
         pass
 
     def prepare(self):
-        pass
+        Settings.maybe_print("preparingi: {}".format(self.get_title()))
+        return super()
 
 ###################################################################################
 
@@ -966,9 +988,11 @@ class Video(File):
         self.screenshots = ffmpeg.frames(path)
 
     def prepare(self):
+        Settings.maybe_print("preparingv: {}".format(self.get_title()))
         self.reduce()
         self.repair()
         self.watermark()
+        return super()
 
     def reduce(self):
         if not Settings.is_reduce(): 

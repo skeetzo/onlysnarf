@@ -418,6 +418,7 @@
   - more bot debugging
   - fixed bin/install-firefox.sh: update for processor
   - more debugging
+  - fixed: file input
 
 ----------------------------------------
   - theres a bug of it not adding the currect window.handle number to the TABS cache

@@ -227,7 +227,7 @@ class Driver:
             for n in range(round(int(amount)/5)-1):
                 # discount_.send_keys(Keys.DOWN)
                 action.send_keys(Keys.DOWN)
-            action.send_keys(Keys.RETURN)
+            action.send_keys(Keys.TAB)
             action.perform()
             Settings.dev_print("successfully entered discount amount")
             Settings.dev_print("entering discount months")
@@ -240,7 +240,7 @@ class Driver:
             for n in range(int(months)-1):
                 action.send_keys(Keys.DOWN)
                 # months_.send_keys(Keys.DOWN)
-            action.send_keys(Keys.RETURN)
+            action.send_keys(Keys.TAB)
             action.perform()
             Settings.dev_print("successfully entered discount months")
             Settings.debug_delay_check()
@@ -1028,7 +1028,6 @@ class Driver:
     def message_files(self, files=[]):
         if len(files) == 0: return True
         try:
-            print("Uploading file(s): {}".format(len(files)))
             Settings.dev_print("uploading files")
             self.upload_files(files=files)
             Settings.maybe_print("successfully began file uploads")
@@ -1917,27 +1916,25 @@ class Driver:
             self.get_element_to_click("scheduleAdd").click()
             Settings.dev_print("successfully opened schedule")
 
-            # # find and click month w/ correct date
-            # while True:
-            #     Settings.dev_print("getting date")
-            #     existingDate = self.find_element_by_name("scheduleDate").get_attribute("innerHTML")
-            #     Settings.dev_print("date: {} - {} {}".format(existingDate, month_, year_))
-            #     if str(month_) in str(existingDate) and str(year_) in str(existingDate): break
-            #     else: self.get_element_to_click("scheduleNextMonth").click()
-            # Settings.dev_print("successfully set month")
-            # # set day in month
-            # Settings.dev_print("setting days")
-            # days = self.find_elements_by_name("scheduleDays")
-            # for day in days:
-            #     inner = day.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>","")
-            #     if str(day_) == str(inner):
-            #         day.click()
-            #         Settings.dev_print("clicked day")
-            # Settings.dev_print("successfully set day")
-            # Settings.debug_delay_check()
+            # find and click month w/ correct date
+            while True:
+                Settings.dev_print("getting date")
+                existingDate = self.find_element_by_name("scheduleDate").get_attribute("innerHTML")
+                Settings.dev_print("date: {} - {} {}".format(existingDate, month_, year_))
+                if str(month_) in str(existingDate) and str(year_) in str(existingDate): break
+                else: self.get_element_to_click("scheduleNextMonth").click()
+            Settings.dev_print("successfully set month")
+            # set day in month
+            Settings.dev_print("setting days")
+            days = self.find_elements_by_name("scheduleDays")
+            for day in days:
+                inner = day.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>","")
+                if str(day_) == str(inner):
+                    day.click()
+                    Settings.dev_print("clicked day")
+            Settings.dev_print("successfully set day")
+            Settings.debug_delay_check()
             
-
-
             # save schedule date
             saves = self.get_element_to_click("scheduleNext")
             Settings.dev_print("found next button, clicking")
@@ -2470,7 +2467,7 @@ class Driver:
             print("Skipping Upload: Disabled")
             return False
         files = files[:int(Settings.get_upload_max())]
-        Settings.dev_print("uploading image files: {}".format(len(files)))
+        print("Uploading file(s): {}".format(len(files)))
 
         ####
 
@@ -2487,6 +2484,8 @@ class Driver:
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
             executor.map(prepare, files)
+
+        Settings.dev_print("files prepared: {}".format(len(files_)))
 
         ####
 
