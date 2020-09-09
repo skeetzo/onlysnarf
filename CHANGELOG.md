@@ -417,6 +417,7 @@
   - updated: saving session_id and session_url
   - more bot debugging
   - fixed bin/install-firefox.sh: update for processor
+  **2.20.2**
   - more debugging
   - fixed: file input
 
