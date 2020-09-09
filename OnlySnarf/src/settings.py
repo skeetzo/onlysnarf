@@ -204,6 +204,7 @@ class Settings:
         files = []
         for file_path in config["INPUT"]:
             file = File()
+            setattr(file, "path", file_path)
             files.append(file)
         Settings.FILES = files
         return files
