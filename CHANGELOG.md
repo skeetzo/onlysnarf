@@ -422,6 +422,13 @@
   - fixed: file input
 
 ----------------------------------------
+  **2.21.0**
+  - added: user lists (finally) - favorites, bookmarks, friends, etc
+
+
+  test: User.get_users_by_list, Driver.get_list, Driver.get_lists
+
+
   - theres a bug of it not adding the currect window.handle number to the TABS cache
   |- probably from firefox's tab not always going 1 to the right? but is that part of the loop check?
   - empty messages bug: Type a message below to start a conversation with 

@@ -2588,12 +2588,13 @@ class Driver:
         return users
 
     # returns list of accounts that follow you
-    def users_get(self):
+    def users_get(self, page=None):
         auth_ = self.auth()
         if not auth_: return False
         users = []
         try:
-            self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
+            if not page:
+                self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
             count = 0
             # user_count = int(self.browser.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML").strip())
             user_count = self.browser.find_elements_by_tag_name("a")
@@ -2626,6 +2627,45 @@ class Driver:
             elements = self.browser.find_elements_by_class_name("m-fans")
             Settings.dev_print("successfully found fans")
             for ele in elements:
+
+
+
+                # add checks for lists here
+
+                # /my/favorites
+                # /my/lists/34324234
+
+
+
+                
+                eles_ = elements.find_elements_by_tag_name("a")
+
+                eles = [ele_ for ele in eles_
+                    if "/my/favorites" in str(ele.get_attribute("href"))]
+                if len(eles) > 0: isFavorite = True
+
+
+                lists = []
+                eles = [ele.get_attribute("href") for ele in eles_
+                    if "/my/lists" in str(ele.get_attribute("href"))]
+                for list_ in eles:
+                    print("FOUND LIST")
+                    print("FOUND LIST")
+                    print("FOUND LIST")
+                    listNum = ele.replace("https://onlyfans.com/my/lists/", "")
+                    print(listNum)
+                    lists.append(listNum)
+
+                    ##
+                    # need to open tab and find name of list if not already known
+                    ##
+                    # check if list name is already known
+                    # open tab to list page
+                    # find html on page with list name
+                    # save list
+
+        
+
                 username = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
                 name = ele.find_element_by_class_name("g-user-name").get_attribute("innerHTML")
                 name = re.sub("<!-*>", "", name)
@@ -2634,7 +2674,7 @@ class Driver:
                 # print("username: {}".format(username))
                 # print("name: {}".format(name))
                 # start = datetime.strptime(str(datetime.now()), "%m-%d-%Y:%H:%M")
-                users.append({"name":name, "username":username.replace("@","")}) # ,"id":user_id, "started":start})
+                users.append({"name":name, "username":username.replace("@",""), "isFavorite":isFavorite, "lists":lists}) # ,"id":user_id, "started":start})
             Settings.maybe_print("Found: {}".format(len(users)))
             for user in users:
                 Settings.dev_print(user)
@@ -2666,6 +2706,72 @@ class Driver:
             Driver.error_checker(e)
             print("Error: Failed to Find User ID")
         return user_id
+
+    def get_list(self, name=None, number=None):
+        pass
+
+    def get_lists(self):
+        auth_ = self.auth()
+        if not auth_: return None
+        lists = []
+        try:
+            self.go_to_page("/my/lists")
+
+            elements = self.browser.find_elements_by_tag_name("a")
+
+            # find favorites
+            # find bookmarks
+            # find friends
+            # find other lists and their names
+            # each page has the same user boxes that are used in users_get
+
+            # /my/favorites
+            # /my/bookmarks
+            # /my/friends
+            # /my/lists
+            # b-users-lists__item -> href -> /my/lists/#
+            # b-users-lists__item__name -> innerHTML -> list name
+            # b-users-lists__item__count -> innerHTML -> list amount
+
+            for ele in elements:
+                if "/my/favorites" in str(ele.get_attribute("href")):
+                    count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML")
+                    if int(count) > 0: lists.append("favorites")
+                elif "/my/bookmarks" in str(ele.get_attribute("href")):
+                    count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML")
+                    if int(count) > 0: lists.append("bookmarks")
+                elif "/my/friends" in str(ele.get_attribute("href")):
+                    count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML")
+                    if int(count) > 0: lists.append("friends")
+                elif "/my/lists" in str(ele.get_attribute("href")):
+                    try:
+                        ele = ele.find_element_by_class_name("b-users-lists__item__text")
+                        listNumber = ele.get_attribute("href").replace("https://onlyfans.com/my/lists", "")
+                        listName = ele.find_element_by_class_name("b-users-lists__item__name").get_attribute("innerHTML")
+                        count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML")
+                        print(listNumber)
+                        print(listName)
+                        if int(count) > 0: lists.append([listNumber, listName])
+                    except Exception as e:
+                        print(e)
+            Settings.dev_print("successfully found lists: {}".format(len(lists)))
+        except Exception as e:
+            Driver.error_checker(e)
+            print(e)
+            print("Error: Failed to Find Lists")
+        return lists
+
+    def get_list_members(self, list):
+        # gets members from list
+        auth_ = self.auth()
+        if not auth_: return None
+        users = []
+        try:
+            users = self.users_get(page="/my/lists/{}".format(int(list_)))
+        except Exception as e:
+            Driver.error_checker(e)
+            print("Error: Failed to Find List Members")
+        return users
 
     ################
     ##### Exit #####

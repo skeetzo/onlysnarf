@@ -18,7 +18,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser "firefox" -source "google" -prefer-local >> /var/log/onlysnarf/bot.log
 # onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser reconnect -source google
 
-onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot -keep -prefer-local -show
+# onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot -keep -prefer-local -show
 # onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action bot -keep -prefer-local
 # onlysnarfpy -debug -verbose -verbose -verbose -browser reconnect -action bot -keep -prefer-local
 
@@ -29,7 +29,7 @@ onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot -keep
 # onlysnarfpy -debug -verbose -verbose -verbose -source local -category video
 # onlysnarfpy -debug -verbose -verbose -verbose -source remote -remote-username skeetzo
 
-# onlysnarf -debug -verbose -verbose -verbose
+onlysnarf -debug -verbose -verbose -verbose
 
 # onlysnarfpy -action test -debug -verbose -verbose -verbose -browser firefox -login google \
 # -prefer-local \

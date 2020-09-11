@@ -32,6 +32,7 @@ class User:
         self.sent_files = data.get('sent_files') or []
         self.subscribed_on = data.get('subscribed_on')
         self.isFavorite = data.get('isFavorite') or False
+        self.lists = data.get('lists') or []
         self.statement_history = data.get('statement_history') or []
         self.started = data.get('started')
         ###### fucking json #####
@@ -298,14 +299,28 @@ class User:
         Settings.maybe_print("Getting Favorite Users")
         users = User.get_all_users(driver=driver)
         favUsers = []
-        favorites = ",".join(str(Settings.get_users_favorite()))
+        # favorites = ",".join(str(Settings.get_users_favorite()))
         for user in users:
-            if user in favorites:
+            if user.isFavorite:
                 Settings.maybe_print("Fav User: {}".format(user.username))
                 user = User.skipUserCheck(user)
                 if user is None: continue
                 favUsers.append(user)
         return favUsers
+
+    @staticmethod
+    def get_users_by_list(number=None, name=None, driver=None):
+        Settings.maybe_print("Getting Users by List: {} - {}".format(number, name))
+
+        users = Driver.get_list(number=number, name=name)
+
+        listUsers = []
+        for user in users:
+            Settings.maybe_print("User: {}".format(user.username))
+            user = User.skipUserCheck(user)
+            if user is None: continue
+            listUsers.append(user)
+        return listUsers
 
     # returns users that have no messages sent to them
     @staticmethod
@@ -377,6 +392,7 @@ class User:
 
     @staticmethod
     def select_user():
+        print('a')
         user = Settings.get_user() or None
         if user: return user
         # if user: return User.get_user_by_username(user.username)
@@ -401,6 +417,8 @@ class User:
             return User.select_username()
         elif str(user) == "favorites":
             return User.get_favorite_users()
+        elif str(user) == "list":
+            return User.list_menu()
         if not Settings.confirm(user): return User.select_user()
         return user
 
@@ -416,6 +434,56 @@ class User:
             if not Settings.prompt("another user"): break
         if not Settings.confirm([user.username for user in users]): return User.select_users()
         return users
+
+    @staticmethod
+    def list_menu():
+        question = {
+            'type': 'list',
+            'name': 'answer',
+            'message': 'User:',
+            'choices': ["Back", "Enter", "Select"]
+        }
+        answer = PyInquirer.prompt(question)["answer"]
+        if str(answer) == "Back":
+            print(0)
+            return User.select_user()
+        elif str(answer) == "Enter":
+            question = {
+                'type': 'input',
+                'message': 'Enter List (name or #):',
+                'name': 'list'
+            }
+            list_ = PyInquirer.prompt(question)["list"]
+            theList = None
+            try:
+                theList = int(list_)
+                users = User.get_users_by_list(number=theList, driver=Driver.get_driver())
+            except Exception as e:
+                try:
+                    theList = str(list_)
+                    return User.get_users_by_list(name=theList, driver=Driver.get_driver())
+                except Exception as e:
+                    Settings.err_print("Unable to find list number")
+        elif str(answer) == "Select":
+            lists_ = Driver.get_driver().get_lists()
+            lists__ = [{"name":"Back", "value":"back"}]
+            for list___ in lists_:
+                lists__.append({
+                    "name":list___[1],
+                    "value":list___[0],
+                })
+            question = {
+                'type': 'list',
+                'name': 'answer',
+                'message': 'Lists:',
+                'choices': lists_
+            }
+            answer = PyInquirer.prompt(question)["answer"]
+            if str(answer) == "back":
+                return User.select_user()
+            else:
+                return User.get_list_members(answer)
+        return []
 
     @staticmethod
     def select_username():

@@ -30,7 +30,7 @@ EXPIRATION_ALLOWED = [1,3,7,30,99]
 IMAGE_DOWNLOAD_LIMIT = 6
 IMAGE_UPLOAD_LIMIT = 5
 IMAGE_UPLOAD_LIMIT_MESSAGES = 5
-MESSAGE_CHOICES = ["all", "recent", "favorite", "renew on"]
+MESSAGE_CHOICES = ["all", "recent", "favorite", "renew on", "list"]
 PRICE_MINIMUM = 3
 UPLOAD_MAX_DURATION = 6*6 # increments of 10 minutes; 6 = 1 hr
 # 12 = 2 hrs
@@ -390,8 +390,8 @@ class Settings:
     def get_username_twitter():
         return config["USERNAME_TWITTER"] or ""
 
-    def get_users_favorite():
-        return config["USERS_FAVORITE"] or []
+    # def get_users_favorite():
+    #     return config["USERS_FAVORITE"] or []
         
     def get_verbosity():
         return config["VERBOSE"] or 0
