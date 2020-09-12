@@ -104,6 +104,23 @@ class Discount:
         self.username = username
         return self.username
 
+    def grandfatherer(self, users=[]):
+        if len(users) == 0:
+            users = Users.get_users_by_list(name="grandfathered")
+        print("Discount - Grandfathering: {}".format(len(users)))
+        # apply discount to all users in grandfathered list
+        from .driver import Driver
+        from .validators import DISCOUNT_MAX_MONTHS, DISCOUNT_MAX_AMOUNT
+        self.months = DISCOUNT_MAX_MONTHS
+        self.amount = DISCOUNT_MAX_AMOUNT
+        for user in users:
+            self.username = user.username
+            Settings.maybe_print("discounting: {}".format(self.username))
+            try:
+                Driver.get_driver().discount_user(discount=self)
+            except Exception as e:
+                print(e)
+
 ########################################################################################
 
 class Message():
@@ -570,34 +587,39 @@ class Promotion:
         self.gotten = False
 
     # apply discount directly to user on user's profile page
-    def apply_to_user(self):
-        print("Promotion - Apply To User: {}".format(self.user.username))
-        self.get()
+    @staticmethod
+    def apply_to_user():
+        print("Promotion - Apply To User")
+        p = Promotion()
+        p.get()
         if Settings.is_prompt():
             if not Settings.prompt("Promotion"): return
         # user, expiration, months, message
-        Driver.promotion_user_directly(promotion=self)
+        from .driver import Driver
+        Driver.get_driver().promotion_user_directly(promotion=p)
 
-    def create_campaign(self):
+    @staticmethod
+    def create_campaign():
         print("Promotion - Creating Campaign")
-        self.get()
+        p = Promotion()
+        p.get()
         if Settings.is_prompt():
             if not Settings.prompt("Promotion"): return
         from .driver import Driver
-        driver = Driver.get_driver()
-        driver.promotional_campaign(promotion=self)
+        Driver.get_driver().promotional_campaign(promotion=p)
 
     # requires the copy/paste and email steps
-    def create_trial_link(self):
+    @staticmethod
+    def create_trial_link():
         print("Promotion - Creating Trial Link")
-        self.get()
+        p = Promotion()
+        p.get()
         # if not self.gotten: return
         if Settings.is_prompt():
             if not Settings.prompt("Promotion"): return
         # limit, expiration, months, user
         from .driver import Driver
-        driver = Driver.get_driver()
-        driver.promotional_trial_link(promotion=self)
+        Driver.get_driver().promotional_trial_link(promotion=p)
         # link = Driver.promotional_trial_link()
         # text = "Here's your free trial link!\n"+link
         # Settings.dev_print("Link: "+str(text))
@@ -715,18 +737,34 @@ class Promotion:
         return self.user
 
     @staticmethod
+    def grandfathered():
+        print("Promotion - Grandfather")
+        if Settings.is_prompt():
+            if not Settings.prompt("Grandfather"): return
+        from .driver import Driver
+        Settings.maybe_print("getting users to grandfather")
+        # get all users
+        users = User.get_all_users()
+        # add all users to 'grandfathered' list
+        Settings.maybe_print("grandfathering: {}".format(len(users)))
+        Driver.get_driver().add_users_to_list(users=users, name="grandfathered")
+        d = Discount()
+        d.grandfatherer(users=users)
+
+    @staticmethod
     def menu():
         if not Settings.is_debug():
             print("### Not Available ###")
             return
         action = Promotion.ask_action()
         if (action == 'Back'): pass
-        elif (action == 'apply to user'): promotion.create_trial_link()
-        elif (action == 'create trial link'): promotion.apply_to_user()
+        elif (action == 'apply to user'): Promotion.create_trial_link()
+        elif (action == 'create trial link'): Promotion.apply_to_user()
+        elif (action == 'grandfather'): Promotion.grandfathered()
 
     @staticmethod
     def ask_action():
-        options = ["back", "apply to user", "create trial link"]
+        options = ["back", "apply to user", "create trial link", "grandfather"]
         menu_prompt = {
             'type': 'list',
             'name': 'action',

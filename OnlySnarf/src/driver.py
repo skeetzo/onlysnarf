@@ -2708,7 +2708,19 @@ class Driver:
         return user_id
 
     def get_list(self, name=None, number=None):
-        pass
+        # gets members from list
+        auth_ = self.auth()
+        if not auth_: return None
+        users = []
+        try:
+            if name:
+                users = self.users_get(page="/my/lists/{}".format(name))
+            elif number:
+                users = self.users_get(page="/my/lists/{}".format(number))
+        except Exception as e:
+            Driver.error_checker(e)
+            print("Error: Failed to find list members")
+        return users
 
     def get_lists(self):
         auth_ = self.auth()
@@ -2770,8 +2782,73 @@ class Driver:
             users = self.users_get(page="/my/lists/{}".format(int(list_)))
         except Exception as e:
             Driver.error_checker(e)
-            print("Error: Failed to Find List Members")
+            print("Error: Failed to find list members")
         return users
+
+
+    def add_users_to_list(self, users=[], number=None, name=None):
+
+        auth_ = self.auth()
+        if not auth_: return None
+        try:
+
+            users_ = self.get_list(number=number, name=name)
+            users = [user for user in users not in users_]
+
+            Settings.maybe_print("Adding Users to List: {} - {} - {}".format(len(users), number, name))
+
+            Settings.dev_print("opening toggle options")
+            self.browser.find_element_by_id("__BVID__501__BV_toggle_").click()
+            # find button by id: __BVID__501__BV_toggle_
+            time.sleep(1)
+
+            # find button: dropdown_item - 'Add users to list'
+            Settings.dev_print("clicking list add")
+            eles = self.browser.find_elements_by_name("dropwdown_item")
+            for ele in eles:
+                if "Add users to list" in str(ele.get_attribute("innerHTML")):
+                    ele.click()
+                    Settings.dev_print("successfully clicked list add")
+
+
+            def scrollWait():
+                count = 0
+                while True:
+                    elements = self.browser.find_elements_by_class_name("b-chats__available-users__item-search")
+                    if len(elements) == int(count): break
+                    print_same_line("({}/{}) scrolling...".format(count, user_count))
+                    count = len(elements)
+                    self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    time.sleep(1)
+                print()
+
+            while len(users) > 0:
+                # find user thing
+                eles = self.browser.find_elements_by_class_name()
+                for ele in eles:
+                    for i, user in enumerate(users):
+                        if str(user.username) in str(ele.get_attribute("href")):
+                            Settings.maybe_print("found user: {}".format(user.username))
+                            ActionChains(self.browser).move_to_element(ele).perform()
+                            ele.click()
+                            users.pop(i)
+                scrollWait()
+
+            if Settings.is_debug():
+                print("Skipping: List Add (debug)")
+                Settings.dev_print("skipping list save")
+                self.browser.refresh()
+                Settings.dev_print("### List Add Successfully Canceled ###")
+                return
+
+            Settings.dev_print("saving list")
+            save = self.find_element_by_name("listSave")
+            ActionChains(self.browser).move_to_element(save).perform()
+            save.click()
+            Settings.dev_print("### successfully added users to list")
+        except Exception as e:
+            Driver.error_checker(e)
+            print("Error: Failed to add users to list")
 
     ################
     ##### Exit #####

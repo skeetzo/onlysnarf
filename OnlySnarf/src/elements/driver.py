@@ -198,6 +198,12 @@ ELEMENTS = [
         "text": ["Save"],
         "id": []
     },
+    {
+        "name": "listSave",
+        "classes": ["g-btn.m-rounded.m-sm-width"],
+        "text": ["Add"],
+        "id": []
+    },
 
     ## price
     # price add

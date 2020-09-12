@@ -426,7 +426,10 @@
   - added: user lists (finally) - favorites, bookmarks, friends, etc
 
 
+  - grandfather debugging:
   test: User.get_users_by_list, Driver.get_list, Driver.get_lists
+  test: discount - grandfather via promotion
+  test: promotions
 
 
   - theres a bug of it not adding the currect window.handle number to the TABS cache

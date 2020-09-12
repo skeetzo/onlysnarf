@@ -326,7 +326,7 @@ parser.add_argument('-profile-method', dest="profile_method", default="syncfrom"
 ##
 # -promotion
 # the promotion method to use
-parser.add_argument('-promotion-method', dest='promotion_method', default="campaign", choices=["campaign","trial"],
+parser.add_argument('-promotion-method', dest='promotion_method', default="campaign", choices=["campaign","trial","grandfather"],
   help='the method of promotion to use')
 ###
 ### PATHS ###

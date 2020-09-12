@@ -112,18 +112,19 @@ class Snarf:
     #####################
 
     @staticmethod
-    def promotion(promotion=None):
+    def promotion():
         from .classes import Promotion
-        if not promotion: promotion = Promotion()
         try: 
             # get promotion method
             method = Settings.get_promotion_method()
             if method == "campaign":
-                promotion.create_campaign()
+                Promotion.create_campaign()
             elif method == "trial":
-                promotion.create_trial_link()
+                Promotion.create_trial_link()
             elif method == "user":
-                promotion.apply_to_user()
+                Promotion.apply_to_user()
+            elif method == "grandfather":
+                Promotion.grandfathered()
             else: Settings.err_print("Missing Promotion Method")
         except Exception as e: Settings.dev_print(e)
 

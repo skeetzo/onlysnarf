@@ -482,7 +482,7 @@ class User:
             if str(answer) == "back":
                 return User.select_user()
             else:
-                return User.get_list_members(answer)
+                return Driver.get_driver().get_list_members(answer)
         return []
 
     @staticmethod
