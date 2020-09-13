@@ -2594,7 +2594,6 @@ class Driver:
         users = []
         try:
             self.go_to_page(page)
-            count = 0
             # user_count = int(self.browser.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML").strip())
             user_count = self.browser.find_elements_by_tag_name("a")
             # for ele in user_count:
@@ -2614,7 +2613,9 @@ class Driver:
 
             user_count = re.sub(r'<[a-zA-Z\s=\"\-\_/]*>', "", str(user_count))
             user_count = user_count.replace(" Fans", "")
+            thirdTime = 0
 
+            count = 0
             while True:
                 elements = self.browser.find_elements_by_class_name("m-fans")
                 if len(elements) == int(user_count): break
@@ -2622,6 +2623,8 @@ class Driver:
                 count = len(elements)
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
+                if thirdTime >= 3 and len(elements) == 0: break
+                thirdTime += 1
             print()
             elements = self.browser.find_elements_by_class_name("m-fans")
             Settings.dev_print("successfully found fans")
@@ -2636,8 +2639,9 @@ class Driver:
 
 
 
-                
-                eles_ = elements.find_elements_by_tag_name("a")
+                print(0)
+                eles_ = ele.find_elements_by_tag_name("a")
+                print(1)
 
                 eles = [ele_ for ele in eles_
                     if "/my/favorites" in str(ele.get_attribute("href"))]
@@ -2774,17 +2778,15 @@ class Driver:
                         listNumber = ele.get_attribute("href").replace("https://onlyfans.com/my/lists/", "")
                         listName = ele.find_element_by_class_name("b-users-lists__item__name").get_attribute("innerHTML").strip()
                         count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML").replace("people", "").replace("person", "").strip()
-                        Settings.dev_print(count)
-                        Settings.dev_print(listNumber)
-                        Settings.dev_print(listName)
-                        if int(count) > 0: lists.append([listNumber, listName])
+                        Settings.dev_print("{} - {}: {}".format(listNumber, listName, count))
+                        lists.append([listNumber, listName])
                     except Exception as e:
                         Settings.dev_print(e)
             Settings.dev_print("successfully found lists: {}".format(len(lists)))
         except Exception as e:
             Driver.error_checker(e)
             print(e)
-            print("Error: Failed to Find Lists")
+            Settings.err_print("Failed to Find Lists")
         return lists
 
     def get_list_members(self, list):
@@ -2803,44 +2805,58 @@ class Driver:
     def add_users_to_list(self, users=[], number=None, name=None):
 
         auth_ = self.auth()
-        if not auth_: return None
+        if not auth_: return False
         try:
 
             users_ = self.get_list(number=number, name=name)
-            users = [user for user in users not in users_]
-
+            users = [user for user in users if user not in users_]
             Settings.maybe_print("Adding Users to List: {} - {} - {}".format(len(users), number, name))
 
             Settings.dev_print("opening toggle options")
-            self.browser.find_element_by_id("__BVID__501__BV_toggle_").click()
+            # self.browser.find_element_by_id("__BVID__501__BV_toggle_").click()
+            toggle = self.browser.find_element_by_class_name("b-users__list__add-btn")
+            Settings.dev_print("clicking toggle options")
+            toggle.click()
+            Settings.dev_print("toggle options opened")
+
             # find button by id: __BVID__501__BV_toggle_
             time.sleep(1)
 
             # find button: dropdown_item - 'Add users to list'
-            Settings.dev_print("clicking list add")
-            eles = self.browser.find_elements_by_name("dropwdown_item")
-            for ele in eles:
-                if "Add users to list" in str(ele.get_attribute("innerHTML")):
-                    ele.click()
-                    Settings.dev_print("successfully clicked list add")
+            # Settings.dev_print("clicking list add")
+            # foundIt = False
+            # eles = self.browser.find_elements_by_name("dropwdown-item")
+            # for ele in eles:
+            #     if "add users to list" in str(ele.get_attribute("innerHTML")).lower():
+            #         ele.click()
+            #         Settings.dev_print("successfully clicked list add")
+            #         foundIt = True
 
+            # if not foundIt:
+            #     Settings.err_print("Fucked up")
+            #     return False
 
             def scrollWait():
                 count = 0
                 while True:
-                    elements = self.browser.find_elements_by_class_name("b-chats__available-users__item-search")
+                    elements = self.browser.find_elements_by_class_name("b-chats__available-users__item.m-search")
                     if len(elements) == int(count): break
-                    print_same_line("({}/{}) scrolling...".format(count, user_count))
+                    if len(elements) == int(len(users)): break
+                    print_same_line("({}/{}) scrolling...".format(count, len(users)))
                     count = len(elements)
                     self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                     time.sleep(1)
                 print()
 
+
             while len(users) > 0:
+                Settings.maybe_print("searching for users")
                 # find user thing
-                eles = self.browser.find_elements_by_class_name()
+                eles = self.browser.find_elements_by_class_name("m-fans")
+                print(len(eles))
                 for ele in eles:
                     for i, user in enumerate(users):
+                        print("{} - {}".format(i, user))
                         if str(user.username) in str(ele.get_attribute("href")):
                             Settings.maybe_print("found user: {}".format(user.username))
                             ActionChains(self.browser).move_to_element(ele).perform()
@@ -2863,6 +2879,8 @@ class Driver:
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to add users to list")
+            return False
+        return True
 
     ################
     ##### Exit #####

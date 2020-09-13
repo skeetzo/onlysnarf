@@ -747,7 +747,8 @@ class Promotion:
         users = User.get_all_users()
         # add all users to 'grandfathered' list
         Settings.maybe_print("grandfathering: {}".format(len(users)))
-        Driver.get_driver().add_users_to_list(users=users, name="grandfathered")
+        successful = Driver.get_driver().add_users_to_list(users=users, name="grandfathered")
+        if not successful: return
         d = Discount()
         d.grandfatherer(users=users)
 

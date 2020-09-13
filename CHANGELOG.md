@@ -421,20 +421,24 @@
   - more debugging
   - fixed: file input
 
+
 ----------------------------------------
   **2.21.0**
   - added: user lists (finally) - favorites, bookmarks, friends, etc
+  - debugged: grandfather promotion
 
-
-  - grandfather debugging:
-  test: User.get_users_by_list, Driver.get_list, Driver.get_lists
-  test: discount - grandfather via promotion
-  test: promotions
+  **3.0.0**
+  - major updates to browsers debugged
+  - lists debugged
+  - grandfather promotion
 
 
   - theres a bug of it not adding the currect window.handle number to the TABS cache
   |- probably from firefox's tab not always going 1 to the right? but is that part of the loop check?
+  |- but it doesn't really seem to be a problem???
+  
   - empty messages bug: Type a message below to start a conversation with 
+
 
 
   **2.x.x**
