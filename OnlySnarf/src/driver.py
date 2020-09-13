@@ -2841,7 +2841,7 @@ class Driver:
                 while True:
                     elements = self.browser.find_elements_by_class_name("b-chats__available-users__item.m-search")
                     if len(elements) == int(count): break
-                    if len(elements) == int(len(users)): break
+                    # if len(elements) == int(len(users)): break
                     print_same_line("({}/{}) scrolling...".format(count, len(users)))
                     count = len(elements)
                     self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -2852,16 +2852,18 @@ class Driver:
             while len(users) > 0:
                 Settings.maybe_print("searching for users")
                 # find user thing
-                eles = self.browser.find_elements_by_class_name("m-fans")
-                print(len(eles))
+                eles = self.browser.find_elements_by_class_name("b-chats__available-users__item.m-search")
+                skip = False
                 for ele in eles:
+                    if skip: break
                     for i, user in enumerate(users):
-                        print("{} - {}".format(i, user))
+                        # print("{} - {}".format(i, user.username))
                         if str(user.username) in str(ele.get_attribute("href")):
                             Settings.maybe_print("found user: {}".format(user.username))
                             ActionChains(self.browser).move_to_element(ele).perform()
                             ele.click()
                             users.pop(i)
+                            skip = True
                 scrollWait()
 
             if Settings.is_debug():
@@ -2877,6 +2879,7 @@ class Driver:
             save.click()
             Settings.dev_print("### successfully added users to list")
         except Exception as e:
+            print(e)
             Driver.error_checker(e)
             print("Error: Failed to add users to list")
             return False
