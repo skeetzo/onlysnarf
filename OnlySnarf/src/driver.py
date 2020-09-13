@@ -2588,13 +2588,12 @@ class Driver:
         return users
 
     # returns list of accounts that follow you
-    def users_get(self, page=None):
+    def users_get(self, page=ONLYFANS_USERS_ACTIVE_URL):
         auth_ = self.auth()
         if not auth_: return False
         users = []
         try:
-            if not page:
-                self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
+            self.go_to_page(page)
             count = 0
             # user_count = int(self.browser.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML").strip())
             user_count = self.browser.find_elements_by_tag_name("a")
@@ -2712,10 +2711,18 @@ class Driver:
         auth_ = self.auth()
         if not auth_: return None
         users = []
+        Settings.maybe_print("getting list: {} - {}".format(name, number))
         try:
-            if name:
-                users = self.users_get(page="/my/lists/{}".format(name))
-            elif number:
+            if number:
+                users = self.users_get(page="/my/lists/{}".format(number))
+            elif name:
+                # get lists
+                # find list with name
+                # get list number and use that
+                lists = self.get_lists()
+                for list_ in lists:
+                    if str(list_[1]).lower() == str(name).lower():
+                        number = list_[0]
                 users = self.users_get(page="/my/lists/{}".format(number))
         except Exception as e:
             Driver.error_checker(e)
@@ -2727,9 +2734,10 @@ class Driver:
         if not auth_: return None
         lists = []
         try:
+            Settings.maybe_print("getting lists")
             self.go_to_page("/my/lists")
 
-            elements = self.browser.find_elements_by_tag_name("a")
+            elements = self.browser.find_elements_by_class_name("b-users-lists__item")
 
             # find favorites
             # find bookmarks
@@ -2747,25 +2755,31 @@ class Driver:
 
             for ele in elements:
                 if "/my/favorites" in str(ele.get_attribute("href")):
-                    count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML")
+                    # print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+                    count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML").replace("people", "").replace("person", "").strip()
                     if int(count) > 0: lists.append("favorites")
                 elif "/my/bookmarks" in str(ele.get_attribute("href")):
-                    count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML")
+                    # print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+                    count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML").replace("people", "").replace("person", "").strip()
                     if int(count) > 0: lists.append("bookmarks")
                 elif "/my/friends" in str(ele.get_attribute("href")):
-                    count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML")
+                    # print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+                    count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML").replace("people", "").replace("person", "").strip()
                     if int(count) > 0: lists.append("friends")
                 elif "/my/lists" in str(ele.get_attribute("href")):
                     try:
-                        ele = ele.find_element_by_class_name("b-users-lists__item__text")
-                        listNumber = ele.get_attribute("href").replace("https://onlyfans.com/my/lists", "")
-                        listName = ele.find_element_by_class_name("b-users-lists__item__name").get_attribute("innerHTML")
-                        count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML")
-                        print(listNumber)
-                        print(listName)
+                        # print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+
+                        # ele = ele.find_element_by_class_name("b-users-lists__item__text")
+                        listNumber = ele.get_attribute("href").replace("https://onlyfans.com/my/lists/", "")
+                        listName = ele.find_element_by_class_name("b-users-lists__item__name").get_attribute("innerHTML").strip()
+                        count = ele.find_element_by_class_name("b-users-lists__item__count").get_attribute("innerHTML").replace("people", "").replace("person", "").strip()
+                        Settings.dev_print(count)
+                        Settings.dev_print(listNumber)
+                        Settings.dev_print(listName)
                         if int(count) > 0: lists.append([listNumber, listName])
                     except Exception as e:
-                        print(e)
+                        Settings.dev_print(e)
             Settings.dev_print("successfully found lists: {}".format(len(lists)))
         except Exception as e:
             Driver.error_checker(e)

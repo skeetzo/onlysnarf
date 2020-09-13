@@ -106,7 +106,7 @@ class Discount:
 
     def grandfatherer(self, users=[]):
         if len(users) == 0:
-            users = Users.get_users_by_list(name="grandfathered")
+            users = User.get_users_by_list(name="grandfathered")
         print("Discount - Grandfathering: {}".format(len(users)))
         # apply discount to all users in grandfathered list
         from .driver import Driver
