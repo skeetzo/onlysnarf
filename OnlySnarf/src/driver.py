@@ -2637,27 +2637,19 @@ class Driver:
                 # /my/favorites
                 # /my/lists/34324234
 
+                # eles_ = ele.find_elements_by_tag_name("a")
+                # isFavorite = False
+                # eles = [ele for ele in eles_
+                #     if "/my/favorites" in str(ele.get_attribute("href"))]
+                # if len(eles) > 0: isFavorite = True
 
-
-                print(0)
-                eles_ = ele.find_elements_by_tag_name("a")
-                print(1)
-
-                eles = [ele_ for ele in eles_
-                    if "/my/favorites" in str(ele.get_attribute("href"))]
-                if len(eles) > 0: isFavorite = True
-
-
-                lists = []
-                eles = [ele.get_attribute("href") for ele in eles_
-                    if "/my/lists" in str(ele.get_attribute("href"))]
-                for list_ in eles:
-                    print("FOUND LIST")
-                    print("FOUND LIST")
-                    print("FOUND LIST")
-                    listNum = ele.replace("https://onlyfans.com/my/lists/", "")
-                    print(listNum)
-                    lists.append(listNum)
+                # lists = []
+                # eles = [ele.get_attribute("href") for ele in eles_
+                #     if "/my/lists" in str(ele.get_attribute("href"))]
+                # for list_ in eles:
+                #     listNum = str(list_).replace("https://onlyfans.com/my/lists/", "")
+                #     Settings.maybe_print("list #: {}".format(listNum))
+                #     lists.append(listNum)
 
                     ##
                     # need to open tab and find name of list if not already known
@@ -2666,10 +2658,10 @@ class Driver:
                     # open tab to list page
                     # find html on page with list name
                     # save list
-
-        
-
+                # Settings.dev_print("successfully found lists")
+                Settings.dev_print("finding users")
                 username = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
+                Settings.dev_print("found users")
                 name = ele.find_element_by_class_name("g-user-name").get_attribute("innerHTML")
                 name = re.sub("<!-*>", "", name)
                 name = re.sub("<.*\">", "", name)
@@ -2677,7 +2669,8 @@ class Driver:
                 # print("username: {}".format(username))
                 # print("name: {}".format(name))
                 # start = datetime.strptime(str(datetime.now()), "%m-%d-%Y:%H:%M")
-                users.append({"name":name, "username":username.replace("@",""), "isFavorite":isFavorite, "lists":lists}) # ,"id":user_id, "started":start})
+                # users.append({"name":name, "username":username.replace("@",""), "isFavorite":isFavorite, "lists":lists}) # ,"id":user_id, "started":start})
+                users.append({"name":name, "username":username.replace("@","")}) # ,"id":user_id, "started":start})
             Settings.maybe_print("Found: {}".format(len(users)))
             for user in users:
                 Settings.dev_print(user)
@@ -2853,17 +2846,14 @@ class Driver:
                 Settings.maybe_print("searching for users")
                 # find user thing
                 eles = self.browser.find_elements_by_class_name("b-chats__available-users__item.m-search")
-                skip = False
                 for ele in eles:
-                    if skip: break
                     for i, user in enumerate(users):
                         # print("{} - {}".format(i, user.username))
                         if str(user.username) in str(ele.get_attribute("href")):
                             Settings.maybe_print("found user: {}".format(user.username))
-                            ActionChains(self.browser).move_to_element(ele).perform()
-                            ele.click()
+                            ActionChains(self.browser).move_to_element(ele).click().perform()
                             users.pop(i)
-                            skip = True
+                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 scrollWait()
 
             if Settings.is_debug():

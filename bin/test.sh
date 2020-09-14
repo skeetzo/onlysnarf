@@ -29,7 +29,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # onlysnarfpy -debug -verbose -verbose -verbose -source local -category video
 # onlysnarfpy -debug -verbose -verbose -verbose -source remote -remote-username skeetzo
 
-onlysnarfpy -debug -verbose -verbose -verbose -promotion-method "grandfather" -show -action promotion -prefer-local
+onlysnarfpy -debug -verbose -verbose -verbose -promotion-method "grandfather" -action promotion -prefer-local
 
 # onlysnarf -debug -verbose -verbose -verbose
 
