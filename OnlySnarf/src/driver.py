@@ -141,26 +141,26 @@ class Driver:
             return False
         auth_ = self.auth()
         if not auth_: return False
-        discount.get()
-        months = int(discount.get_months())
-        amount = int(discount.get_amount())
-        username = str(discount.get_username())
-        from .user import User
-        if isinstance(discount.username, User):
-            username = discount.username.username
-        if int(months) > int(Settings.get_discount_max_months()):
-            print("Warning: Months Too High, Max -> {} days".format(Settings.get_discount_max_months()))
-            months = int(Settings.get_discount_max_months())
-        elif int(months) < int(Settings.get_discount_min_months()):
-            print("Warning: Months Too Low, Min -> {} days".format(Settings.get_discount_min_months()))
-            months = int(Settings.get_discount_min_months())
-        if int(amount) > int(Settings.get_discount_max_amount()):
-            print("Warning: Amount Too High, Max -> {} days".format(Settings.get_discount_max_months()))
-            amount = int(Settings.get_discount_max_amount())
-        elif int(amount) < int(Settings.get_discount_min_amount()):
-            print("Warning: Amount Too Low, Min -> {} days".format(Settings.get_discount_min_months()))
-            amount = int(Settings.get_discount_min_amount())
         try:
+            discount.get()
+            months = int(discount.get_months())
+            amount = int(discount.get_amount())
+            username = str(discount.get_username())
+            from .user import User
+            if isinstance(discount.username, User):
+                username = discount.username.username
+            if int(months) > int(Settings.get_discount_max_months()):
+                print("Warning: Months Too High, Max -> {} months".format(Settings.get_discount_max_months()))
+                months = int(Settings.get_discount_max_months())
+            elif int(months) < int(Settings.get_discount_min_months()):
+                print("Warning: Months Too Low, Min -> {} months".format(Settings.get_discount_min_months()))
+                months = int(Settings.get_discount_min_months())
+            if int(amount) > int(Settings.get_discount_max_amount()):
+                print("Warning: Amount Too High, Max -> {}%".format(Settings.get_discount_max_months()))
+                amount = int(Settings.get_discount_max_amount())
+            elif int(amount) < int(Settings.get_discount_min_amount()):
+                print("Warning: Amount Too Low, Min -> {}%".format(Settings.get_discount_min_months()))
+                amount = int(Settings.get_discount_min_amount())
             print("Discounting User: {}".format(username))
             self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
             end_ = True
@@ -206,40 +206,66 @@ class Driver:
             # (months_, discount_) = self.browser.find_elements_by_class_name(DISCOUNT_INPUT)
 # b-fans__trial__select-item m-w-2-2 m-first-child
             # eles = self.browser.find_elements_by_class_name("b-fans__trial__select-item")
-            months_ = self.browser.find_element_by_class_name("b-fans__trial__select-item.m-w-2-2.m-first-child")
-            discount_ = self.browser.find_element_by_class_name("b-fans__trial__select-item.m-w-2-2.m-last-child")
-            # print(len(eles))
-            # months_ = eles[0]
-            # discount_ = eles[1]
+            from .validators import DISCOUNT_MAX_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_AMOUNT, DISCOUNT_MIN_MONTHS
+            discountAmount = DISCOUNT_MIN_AMOUNT
+            monthsAmount = DISCOUNT_MIN_MONTHS
+            months_ = self.browser.find_element_by_class_name("b-fans__trial__select-item.m-w-2-2.m-last-child")
+            discount_ = self.browser.find_element_by_class_name("b-fans__trial__select-item.m-w-2-2.m-first-child")
             Settings.dev_print("found months and discount amount")
-            # removed in 2.10, inputs changed to above
-            # months_ = self.browser.find_element_by_class_name(MONTHS_INPUT)
-            # if discount_.get_attribute("value") != "":
-                # print("Warning: Existing Discount")
-            # discount_.clear()
+            eles = self.browser.find_elements_by_class_name("v-select__selection.v-select__selection--comma")
+            for ele in eles:
+                if str("% discount") in ele.get_attribute("innerHTML"):
+                    discountAmount = int(ele.get_attribute("innerHTML").replace("% discount", ""))
+                    Settings.dev_print("amount: {}".format(discountAmount))
+                elif str(" month") in ele.get_attribute("innerHTML"):
+                    monthsAmount = int(ele.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
+                    Settings.dev_print("months: {}".format(monthsAmount))
+
+
+            # add checks for existing numbers and if already the right number don't go up or down so set them to 0
+            # 5 10 15 20 25 30 35 40 45 50 55
+            # 1 2  3  4  5  6  7  8  9  10 11
+            # 55 -> 50
+            # 12 -> 11
+            # fix 55 / 5 + 1 = 12 = up 12
+            #     55 / 5 - 1 = 10 = down 10 
+            #                     = 50
+
+            # get list of usernames that were missed from logs before erasing them when full
+
+            # not properly finding tabs still
+
             Settings.dev_print("entering discount amount")
-            discount_.click()
-            time.sleep(1)
-            action = webdriver.common.action_chains.ActionChains(self.browser)
-            for n in range(11):
+            up_ = int((discountAmount / 5) + 1)
+            down_ = int((int(amount) / 5) - 1)
+            Settings.dev_print("up: {}".format(up_))
+            Settings.dev_print("down: {}".format(down_))
+            action = ActionChains(self.browser)
+            action.click(on_element=discount_)
+            action.pause(1)
+            for n in range(up_):
                 action.send_keys(Keys.UP)
-                # discount_.send_keys(str(Keys.UP))
-            for n in range(round(int(amount)/5)-1):
-                # discount_.send_keys(Keys.DOWN)
+                action.pause(0.5)
+            for n in range(down_):
                 action.send_keys(Keys.DOWN)
+                action.pause(0.5)                
             action.send_keys(Keys.TAB)
             action.perform()
             Settings.dev_print("successfully entered discount amount")
             Settings.dev_print("entering discount months")
-            months_.click()
-            time.sleep(1)
-            action = webdriver.common.action_chains.ActionChains(self.browser)
-            for n in range(11):
+            up_ = int(monthsAmount - 1)
+            down_ = int(int(months))
+            Settings.dev_print("up: {}".format(up_))
+            Settings.dev_print("down: {}".format(down_))
+            action = ActionChains(self.browser)
+            action.click(on_element=months_)
+            action.pause(1)
+            for n in range(up_):
                 action.send_keys(Keys.UP)
-                # months_.send_keys(str(Keys.UP))
-            for n in range(int(months)-1):
+                action.pause(0.5)
+            for n in range(down_):
                 action.send_keys(Keys.DOWN)
-                # months_.send_keys(Keys.DOWN)
+                action.pause(0.5)
             action.send_keys(Keys.TAB)
             action.perform()
             Settings.dev_print("successfully entered discount months")
@@ -255,7 +281,7 @@ class Driver:
                     return True
                 elif "Apply" in button.get_attribute("innerHTML"):
                     button.click()
-                    print("Discounted User: {}".format(user))
+                    print("Discounted User: {}".format(username))
                     Settings.dev_print("successfully applied discount")
                     Settings.dev_print("### Discount Successful ###")
                     return True
@@ -2619,6 +2645,7 @@ class Driver:
             while True:
                 elements = self.browser.find_elements_by_class_name("m-fans")
                 if len(elements) == int(user_count): break
+                if len(elements) == int(count) and thirdTime >= 3: break
                 print_same_line("({}/{}) scrolling...".format(count, user_count))
                 count = len(elements)
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -2628,6 +2655,7 @@ class Driver:
             print()
             elements = self.browser.find_elements_by_class_name("m-fans")
             Settings.dev_print("successfully found fans")
+            Settings.dev_print("finding users")
             for ele in elements:
 
 
@@ -2659,9 +2687,7 @@ class Driver:
                     # find html on page with list name
                     # save list
                 # Settings.dev_print("successfully found lists")
-                Settings.dev_print("finding users")
                 username = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
-                Settings.dev_print("found users")
                 name = ele.find_element_by_class_name("g-user-name").get_attribute("innerHTML")
                 name = re.sub("<!-*>", "", name)
                 name = re.sub("<.*\">", "", name)
@@ -2671,6 +2697,7 @@ class Driver:
                 # start = datetime.strptime(str(datetime.now()), "%m-%d-%Y:%H:%M")
                 # users.append({"name":name, "username":username.replace("@",""), "isFavorite":isFavorite, "lists":lists}) # ,"id":user_id, "started":start})
                 users.append({"name":name, "username":username.replace("@","")}) # ,"id":user_id, "started":start})
+            Settings.dev_print("found users")
             Settings.maybe_print("Found: {}".format(len(users)))
             for user in users:
                 Settings.dev_print(user)
@@ -2829,21 +2856,40 @@ class Driver:
             #     Settings.err_print("Fucked up")
             #     return False
 
-            def scrollWait():
-                count = 0
-                while True:
-                    elements = self.browser.find_elements_by_class_name("b-chats__available-users__item.m-search")
-                    if len(elements) == int(count): break
-                    # if len(elements) == int(len(users)): break
-                    print_same_line("({}/{}) scrolling...".format(count, len(users)))
-                    count = len(elements)
-                    self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                    time.sleep(1)
-                print()
+            
 
 
+
+            def move_to_then_click_element(element):
+                # https://stackoverflow.com/questions/44777053/selenium-movetargetoutofboundsexception-with-firefox
+                def scroll_shim(passed_in_driver, object):
+                    x = object.location['x']
+                    y = object.location['y']
+                    scroll_by_coord = 'window.scrollTo(%s,%s);' % (
+                        x,
+                        y
+                    )
+                    scroll_nav_out_of_way = 'window.scrollBy(0, -120);'
+                    passed_in_driver.execute_script(scroll_by_coord)
+                    passed_in_driver.execute_script(scroll_nav_out_of_way)
+                #
+                try:
+                    ActionChains(self.browser).move_to_element(element).click().perform()
+                except Exception as e:
+                    Settings.dev_print(e)
+                    if 'firefox' in self.browser.capabilities['browserName']:
+                        scroll_shim(self.browser, element)
+                    try:
+                        ActionChains(self.browser).move_to_element(element).click().perform()
+                    except Exception as e:
+                        Settings.dev_print(e)
+                    # self.browser.execute_script("arguments[0].scrollIntoView();", ele)
+                        self.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
+                        ActionChains(self.browser).move_to_element(element).click().perform()
+
+
+            Settings.maybe_print("searching for users")
             while len(users) > 0:
-                Settings.maybe_print("searching for users")
                 # find user thing
                 eles = self.browser.find_elements_by_class_name("b-chats__available-users__item.m-search")
                 for ele in eles:
@@ -2851,22 +2897,23 @@ class Driver:
                         # print("{} - {}".format(i, user.username))
                         if str(user.username) in str(ele.get_attribute("href")):
                             Settings.maybe_print("found user: {}".format(user.username))
-                            ActionChains(self.browser).move_to_element(ele).click().perform()
+                            # time.sleep(2)
+                            move_to_then_click_element(ele)
                             users.pop(i)
+                print_same_line("({}/{}) scrolling...".format(len(eles), len(users)))
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                scrollWait()
 
+            print()
             if Settings.is_debug():
                 print("Skipping: List Add (debug)")
                 Settings.dev_print("skipping list save")
                 self.browser.refresh()
                 Settings.dev_print("### List Add Successfully Canceled ###")
-                return
+                return True
 
             Settings.dev_print("saving list")
             save = self.find_element_by_name("listSave")
-            ActionChains(self.browser).move_to_element(save).perform()
-            save.click()
+            move_to_then_click_element(save)
             Settings.dev_print("### successfully added users to list")
         except Exception as e:
             print(e)

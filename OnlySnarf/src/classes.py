@@ -745,12 +745,24 @@ class Promotion:
         Settings.maybe_print("getting users to grandfather")
         # get all users
         users = User.get_all_users()
-        # add all users to 'grandfathered' list
-        Settings.maybe_print("grandfathering: {}".format(len(users)))
-        successful = Driver.get_driver().add_users_to_list(users=users, name="grandfathered")
-        if not successful: return
-        d = Discount()
-        d.grandfatherer(users=users)
+
+        def chunks(lst, n):
+            """Yield successive n-sized chunks from lst."""
+            for i in range(0, len(lst), n):
+                yield lst[i:i + n]
+
+
+        userChunks = chunks(users, 5)
+        num = 1
+        for userChunk in userChunks:
+            print("Chunk: {}/{}".format(num, len(users)/5))
+            num += 1
+            # add all users to 'grandfathered' list
+            Settings.maybe_print("grandfathering: {}".format(len(userChunk)))
+            successful = Driver.get_driver().add_users_to_list(users=userChunk, name="grandfathered")
+            if not successful: return
+            d = Discount()
+            d.grandfatherer(users=userChunk)
 
     @staticmethod
     def menu():
