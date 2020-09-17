@@ -2912,12 +2912,12 @@ class Driver:
             # users = [user for user in users if user not in users_]
 
             for i, user in enumerate(users):
-            popped = False
-            for user_ in users_:
-                for key, value in user_.items():
-                    if str(key) == "username" and str(user.username) == str(value):
-                        popped = True
-            if popped: users.pop(i)
+                popped = False
+                for user_ in users_:
+                    for key, value in user_.items():
+                        if str(key) == "username" and str(user.username) == str(value):
+                            popped = True
+                if popped: users.pop(i)
 
             Settings.maybe_print("Adding Users to List: {} - {} - {}".format(len(users), number, name))
 
