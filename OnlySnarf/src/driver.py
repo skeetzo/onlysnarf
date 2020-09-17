@@ -41,7 +41,7 @@ DOWNLOADING_MAX = False
 DOWNLOAD_MAX_IMAGES = 1000
 DOWNLOAD_MAX_VIDEOS = 1000
 # Urls
-ONLYFANS_HOME_URL = 'https://onlyfans.com/'
+ONLYFANS_HOME_URL = 'https://onlyfans.com'
 ONLYFANS_MESSAGES_URL = "/my/chats/"
 ONLYFANS_NEW_MESSAGE_URL = "/my/chats/send"
 ONLYFANS_CHAT_URL = "/my/chats/chat"
@@ -204,7 +204,7 @@ class Driver:
             time.sleep(1)
             Settings.dev_print("finding months and discount amount btns")
             # (months_, discount_) = self.browser.find_elements_by_class_name(DISCOUNT_INPUT)
-# b-fans__trial__select-item m-w-2-2 m-first-child
+            # b-fans__trial__select-item m-w-2-2 m-first-child
             # eles = self.browser.find_elements_by_class_name("b-fans__trial__select-item")
             from .validators import DISCOUNT_MAX_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_AMOUNT, DISCOUNT_MIN_MONTHS
             discountAmount = DISCOUNT_MIN_AMOUNT
@@ -212,72 +212,79 @@ class Driver:
             months_ = self.browser.find_element_by_class_name("b-fans__trial__select-item.m-w-2-2.m-last-child")
             discount_ = self.browser.find_element_by_class_name("b-fans__trial__select-item.m-w-2-2.m-first-child")
             Settings.dev_print("found months and discount amount")
-            eles = self.browser.find_elements_by_class_name("v-select__selection.v-select__selection--comma")
-            for ele in eles:
-                if str("% discount") in ele.get_attribute("innerHTML"):
-                    discountAmount = int(ele.get_attribute("innerHTML").replace("% discount", ""))
-                    Settings.dev_print("amount: {}".format(discountAmount))
-                elif str(" month") in ele.get_attribute("innerHTML"):
-                    monthsAmount = int(ele.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
-                    Settings.dev_print("months: {}".format(monthsAmount))
 
+            def apply_discount():
+                Settings.dev_print("attempting discount")
+                eles = self.browser.find_elements_by_class_name("v-select__selection.v-select__selection--comma")
+                for ele in eles:
+                    if str("% discount") in ele.get_attribute("innerHTML"):
+                        discountAmount = int(ele.get_attribute("innerHTML").replace("% discount", ""))
+                        Settings.dev_print("amount: {}".format(discountAmount))
+                    elif str(" month") in ele.get_attribute("innerHTML"):
+                        monthsAmount = int(ele.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
+                        Settings.dev_print("months: {}".format(monthsAmount))
+                ## amount
+                Settings.dev_print("entering discount amount")
+                if int(discountAmount) != int(amount):
+                    up_ = int((discountAmount / 5) - 1)
+                    down_ = int((int(amount) / 5) - 1)
+                    Settings.dev_print("up: {}".format(up_))
+                    Settings.dev_print("down: {}".format(down_))
+                    action = ActionChains(self.browser)
+                    action.click(on_element=discount_)
+                    action.pause(1)
+                    for n in range(up_):
+                        action.send_keys(Keys.UP)
+                        action.pause(0.5)
+                    for n in range(down_):
+                        action.send_keys(Keys.DOWN)
+                        action.pause(0.5)                
+                    action.send_keys(Keys.TAB)
+                    action.perform()
+                Settings.dev_print("successfully entered discount amount")
+                ## months
+                Settings.dev_print("entering discount months")
+                if int(monthsAmount) != int(months):
+                    up_ = int(monthsAmount - 1)
+                    down_ = int(int(months) - 1)
+                    Settings.dev_print("up: {}".format(up_))
+                    Settings.dev_print("down: {}".format(down_))
+                    action = ActionChains(self.browser)
+                    action.click(on_element=months_)
+                    action.pause(1)
+                    for n in range(up_):
+                        action.send_keys(Keys.UP)
+                        action.pause(0.5)
+                    for n in range(down_):
+                        action.send_keys(Keys.DOWN)
+                        action.pause(0.5)
+                    action.send_keys(Keys.TAB)
+                    action.perform()
+                Settings.dev_print("successfully entered discount months")
+                return discountAmount, monthsAmount
 
-            # add checks for existing numbers and if already the right number don't go up or down so set them to 0
-            # 5 10 15 20 25 30 35 40 45 50 55
-            # 1 2  3  4  5  6  7  8  9  10 11
-            # 55 -> 50
-            # 12 -> 11
-            # fix 55 / 5 + 1 = 12 = up 12
-            #     55 / 5 - 1 = 10 = down 10 
-            #                     = 50
-
-            # get list of usernames that were missed from logs before erasing them when full
-
-            # not properly finding tabs still
-
-            Settings.dev_print("entering discount amount")
-            up_ = int((discountAmount / 5) + 1)
-            down_ = int((int(amount) / 5) - 1)
-            Settings.dev_print("up: {}".format(up_))
-            Settings.dev_print("down: {}".format(down_))
-            action = ActionChains(self.browser)
-            action.click(on_element=discount_)
-            action.pause(1)
-            for n in range(up_):
-                action.send_keys(Keys.UP)
-                action.pause(0.5)
-            for n in range(down_):
-                action.send_keys(Keys.DOWN)
-                action.pause(0.5)                
-            action.send_keys(Keys.TAB)
-            action.perform()
-            Settings.dev_print("successfully entered discount amount")
-            Settings.dev_print("entering discount months")
-            up_ = int(monthsAmount - 1)
-            down_ = int(int(months))
-            Settings.dev_print("up: {}".format(up_))
-            Settings.dev_print("down: {}".format(down_))
-            action = ActionChains(self.browser)
-            action.click(on_element=months_)
-            action.pause(1)
-            for n in range(up_):
-                action.send_keys(Keys.UP)
-                action.pause(0.5)
-            for n in range(down_):
-                action.send_keys(Keys.DOWN)
-                action.pause(0.5)
-            action.send_keys(Keys.TAB)
-            action.perform()
-            Settings.dev_print("successfully entered discount months")
+            discountAmount, monthsAmount = apply_discount()
+            while int(discountAmount) != int(amount) and int(monthsAmount) != int(months):
+                # print("{} = {}    {} = {}".format(discountAmount, amount, monthsAmount, months))
+                discountAmount, monthsAmount = apply_discount()
+              
             Settings.debug_delay_check()
+            ## apply
             Settings.dev_print("applying discount")
             buttons_ = self.find_elements_by_name("discountUserButton")
             for button in buttons_:
                 if not button.is_enabled() and not button.is_displayed(): continue
-                if "Cancel" in button.get_attribute("innerHTML") and Settings.is_debug():
+                if "Cancel" in button.get_attribute("innerHTML") and int(discountAmount) == int(amount) and int(monthsAmount) == int(months):
+                    print("Skipping: Existing Discount")
                     button.click()
+                    Settings.dev_print("successfully skipped existing discount")
+                    Settings.dev_print("### Discount Successful ###")
+                    return True
+                if "Cancel" in button.get_attribute("innerHTML") and Settings.is_debug():
                     print("Skipping: Save Discount (Debug)")
+                    button.click()
                     Settings.dev_print("successfully canceled discount")
+                    Settings.dev_print("### Discount Successful ###")
                     return True
                 elif "Apply" in button.get_attribute("innerHTML"):
                     button.click()
@@ -656,7 +663,9 @@ class Driver:
             self.handle_alert()
             self.get_page_load()
         if force: return goto()
-        self.search_for_tab(ONLYFANS_HOME_URL)
+        if self.search_for_tab(ONLYFANS_HOME_URL):
+            Settings.maybe_print("found -> /")
+            return
         Settings.dev_print("current url: {}".format(self.browser.current_url))
         if str(self.browser.current_url) == str(ONLYFANS_HOME_URL):
             Settings.maybe_print("at -> onlyfans.com")
@@ -666,7 +675,9 @@ class Driver:
     def go_to_page(self, page):
         auth_ = self.auth()
         if not auth_: return False
-        self.search_for_tab(page)
+        if self.search_for_tab("{}{}".format(ONLYFANS_HOME_URL, page)):
+            Settings.maybe_print("found -> {}".format(page))
+            return
         if str(self.browser.current_url) == str(page) or str(page) in str(self.browser.current_url):
             Settings.maybe_print("at -> {}".format(page))
             self.browser.execute_script("window.scrollTo(0, 0);")
@@ -683,7 +694,9 @@ class Driver:
         username = Settings.get_username()
         if str(username) == "":
             username = self.get_username()
-        self.search_for_tab(username)
+        if self.search_for_tab("{}/{}".format(ONLYFANS_HOME_URL, username)):
+            Settings.maybe_print("found -> /{}".format(username))
+            return
         if str(username) in str(self.browser.current_url):
             Settings.maybe_print("at -> {}".format(username))
             self.browser.execute_script("window.scrollTo(0, 0);")
@@ -698,7 +711,9 @@ class Driver:
     def go_to_settings(self, settingsTab):
         auth_ = self.auth()
         if not auth_: return False
-        self.search_for_tab("settings/{}".format(settingsTab))
+        if self.search_for_tab("{}/settings/{}".format(ONLYFANS_SETTINGS_URL, settingsTab)):  
+            Settings.maybe_print("found -> settings/{}".format(settingsTab))
+            return
         if str(self.browser.current_url) == str(ONLYFANS_SETTINGS_URL) and str(settingsTab) == "profile":
             Settings.maybe_print("at -> onlyfans.com/settings/{}".format(settingsTab))
             self.browser.execute_script("window.scrollTo(0, 0);")
@@ -712,6 +727,7 @@ class Driver:
         Settings.dev_print("tabs: {}".format(self.tabs))
         try:
             for page_, handle in self.tabs:
+                # Settings.dev_print("{} = {}".format(page_, page))
                 if str(page_) == str(page):
                     self.browser.switch_to_window(handle)
                     Settings.dev_print("successfully located tab in cache: {}".format(page))
@@ -742,19 +758,19 @@ class Driver:
         # self.browser.get(url)
         # https://stackoverflow.com/questions/50844779/how-to-handle-multiple-windows-in-python-selenium-with-firefox-driver
         windows_before  = self.browser.current_window_handle
-        Settings.dev_print("First Window Handle is : %s" %windows_before)
+        Settings.dev_print("Current Window Handle is : %s" %windows_before)
         windows = self.browser.window_handles
         self.browser.execute_script('''window.open("{}","_blank");'''.format(url))
         self.handle_alert()
         self.get_page_load()
         # self.browser.execute_script("window.open('https://www.yahoo.com')")
-        WebDriverWait(self.browser, 10).until(EC.number_of_windows_to_be(len(self.browser.window_handles)))
+        WebDriverWait(self.browser, 10).until(EC.number_of_windows_to_be(len(windows)+1))
         windows_after = self.browser.window_handles
         new_window = [x for x in windows_after if x not in windows][0]
         # self.browser.switch_to_window(new_window) <!---deprecated>
         self.browser.switch_to_window(new_window)
         Settings.dev_print("Page Title after Tab Switching is : %s" %self.browser.title)
-        Settings.dev_print("Second Window Handle is : %s" %new_window)
+        Settings.dev_print("New Window Handle is : %s" %new_window)
         self.tabs.append([url, new_window])
     
     ##################
@@ -2737,21 +2753,16 @@ class Driver:
         users = []
         Settings.maybe_print("getting list: {} - {}".format(name, number))
         try:
-            if number:
-                users = self.users_get(page="/my/lists/{}".format(number))
-            elif name:
-                # get lists
-                # find list with name
-                # get list number and use that
-                lists = self.get_lists()
-                for list_ in lists:
-                    if str(list_[1]).lower() == str(name).lower():
-                        number = list_[0]
-                users = self.users_get(page="/my/lists/{}".format(number))
+            for list_ in self.get_lists():
+                if name and str(list_[1]).lower() == str(name).lower():
+                    number = list_[0]
+                if number and str(list_[0]).lower() == str(number).lower():
+                    name = list_[1]
+            users = self.users_get(page="/my/lists/{}".format(number))
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to find list members")
-        return users
+        return users, name, number
 
     def get_lists(self):
         auth_ = self.auth()
@@ -2821,6 +2832,75 @@ class Driver:
             print("Error: Failed to find list members")
         return users
 
+    def add_user_to_list(self, username=None, listNumber=None):
+        print("Adding user to list: {} - {}".format(username, listNumber))
+        if not username:
+            print("Error: Missing Username for List")
+            return False
+        if not listNumber:
+            print("Error: Missing List Number")
+            return False
+        auth_ = self.auth()
+        if not auth_: return False
+        users = []
+        try:
+            self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
+            end_ = True
+            count = 0
+            user_ = None
+            while end_:
+                elements = self.browser.find_elements_by_class_name("m-fans")
+                Settings.dev_print("successfully found fans")
+                for ele in elements:
+                    username_ = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
+                    if str(username) == str(username_).replace("@",""):
+                        self.browser.execute_script("arguments[0].scrollIntoView();", ele)
+                        user_ = ele
+                        end_ = False
+                if not end_: continue
+                if len(elements) == int(count): break
+                print_same_line("({}/{}) scrolling...".format(count, len(elements)))
+                count = len(elements)
+                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(2)
+            print()
+            if not user_:
+                print("Error: Unable to find user - {}".format(username))
+                return False
+            Settings.maybe_print("Found: {}".format(username))
+            ActionChains(self.browser).move_to_element(user_).perform()
+
+            Settings.dev_print("finding list add")
+            listAdds = user_.find_elements_by_class_name("g-btn.m-add-to-lists")
+            listAdd_ = None
+            for listAdd in listAdds:
+                if str("/my/lists/"+listNumber) in str(listAdd.get_attribute("href")):
+                    print("Skipping: User already on list - {}".format(listNumber))
+                    return True
+                if "Lists" in str(listAdd.get_attribute("innerHTML")):
+                    Settings.dev_print("found list add")
+                    listAdd_ = listAdd
+            Settings.dev_print("clicking list add")
+            listAdd_.click()
+            links = self.browser.find_elements_by_class_name("b-users-lists__item")
+            for link in links:
+                # print("{} {}".format(link.get_attribute("href"), link.get_attribute("innerHTML")))
+                if str("/my/lists/"+listNumber) in str(link.get_attribute("href")):
+                    Settings.dev_print("clicking list")
+                    move_to_then_click_element(self.browser, link)
+                    time.sleep(0.5)
+                    Settings.dev_print("successfully clicked list")
+            Settings.dev_print("searching for list save")
+            close = self.get_element_to_click("listSingleSave")
+            Settings.dev_print("clicking save list")
+            close.click()
+
+            Settings.dev_print("successfully added user to list - {}".format(listNumber))
+            return True
+        except Exception as e:
+            Driver.error_checker(e)
+            print("Error: Failed to add user to list")
+        return False
 
     def add_users_to_list(self, users=[], number=None, name=None):
 
@@ -2828,16 +2908,30 @@ class Driver:
         if not auth_: return False
         try:
 
-            users_ = self.get_list(number=number, name=name)
-            users = [user for user in users if user not in users_]
+            users_, name, number = self.get_list(number=number, name=name)
+            # users = [user for user in users if user not in users_]
+
+            for i, user in enumerate(users):
+            popped = False
+            for user_ in users_:
+                for key, value in user_.items():
+                    if str(key) == "username" and str(user.username) == str(value):
+                        popped = True
+            if popped: users.pop(i)
+
             Settings.maybe_print("Adding Users to List: {} - {} - {}".format(len(users), number, name))
 
-            Settings.dev_print("opening toggle options")
             # self.browser.find_element_by_id("__BVID__501__BV_toggle_").click()
-            toggle = self.browser.find_element_by_class_name("b-users__list__add-btn")
-            Settings.dev_print("clicking toggle options")
-            toggle.click()
-            Settings.dev_print("toggle options opened")
+            try:
+                Settings.dev_print("opening toggle options")
+                toggle = self.browser.find_element_by_class_name("b-users__list__add-btn")
+                Settings.dev_print("clicking toggle options")
+                toggle.click()
+                Settings.dev_print("toggle options opened")
+            except Exception as e:
+                print(e)
+                print("weird fuckup")
+                return self.add_users_to_list(users=users, number=number, name=name)
 
             # find button by id: __BVID__501__BV_toggle_
             time.sleep(1)
@@ -2860,34 +2954,9 @@ class Driver:
 
 
 
-            def move_to_then_click_element(element):
-                # https://stackoverflow.com/questions/44777053/selenium-movetargetoutofboundsexception-with-firefox
-                def scroll_shim(passed_in_driver, object):
-                    x = object.location['x']
-                    y = object.location['y']
-                    scroll_by_coord = 'window.scrollTo(%s,%s);' % (
-                        x,
-                        y
-                    )
-                    scroll_nav_out_of_way = 'window.scrollBy(0, -120);'
-                    passed_in_driver.execute_script(scroll_by_coord)
-                    passed_in_driver.execute_script(scroll_nav_out_of_way)
-                #
-                try:
-                    ActionChains(self.browser).move_to_element(element).click().perform()
-                except Exception as e:
-                    Settings.dev_print(e)
-                    if 'firefox' in self.browser.capabilities['browserName']:
-                        scroll_shim(self.browser, element)
-                    try:
-                        ActionChains(self.browser).move_to_element(element).click().perform()
-                    except Exception as e:
-                        Settings.dev_print(e)
-                    # self.browser.execute_script("arguments[0].scrollIntoView();", ele)
-                        self.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
-                        ActionChains(self.browser).move_to_element(element).click().perform()
+            
 
-
+            original_handle = self.browser.current_window_handle
             Settings.maybe_print("searching for users")
             while len(users) > 0:
                 # find user thing
@@ -2898,11 +2967,19 @@ class Driver:
                         if str(user.username) in str(ele.get_attribute("href")):
                             Settings.maybe_print("found user: {}".format(user.username))
                             # time.sleep(2)
-                            move_to_then_click_element(ele)
+                            move_to_then_click_element(self.browser, ele)
                             users.pop(i)
                 print_same_line("({}/{}) scrolling...".format(len(eles), len(users)))
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                if len(eles) > 100:
+                    Settings.maybe_print("adding users to list individually")
+                    for i, user in enumerate(users):
+                        successful = self.add_user_to_list(username=user.username, listNumber=number)
+                        if successful: users.pop(i)
 
+                # if current window has changed, switch back
+                if self.browser.current_window_handle != original_handle:
+                    self.browser.switch_to_window(original_handle)
             print()
             if Settings.is_debug():
                 print("Skipping: List Add (debug)")
@@ -2913,7 +2990,7 @@ class Driver:
 
             Settings.dev_print("saving list")
             save = self.find_element_by_name("listSave")
-            move_to_then_click_element(save)
+            move_to_then_click_element(self.browser, save)
             Settings.dev_print("### successfully added users to list")
         except Exception as e:
             print(e)
@@ -3073,3 +3150,36 @@ def sendemail(from_addr, to_addr_list, cc_addr_list,
     problems = server.sendmail(from_addr, to_addr_list, message)
     server.quit()
     return problems
+
+
+
+
+
+
+
+def move_to_then_click_element(browser, element):
+    # https://stackoverflow.com/questions/44777053/selenium-movetargetoutofboundsexception-with-firefox
+    def scroll_shim(passed_in_driver, object):
+        x = object.location['x']
+        y = object.location['y']
+        scroll_by_coord = 'window.scrollTo(%s,%s);' % (
+            x,
+            y
+        )
+        scroll_nav_out_of_way = 'window.scrollBy(0, -120);'
+        passed_in_driver.execute_script(scroll_by_coord)
+        passed_in_driver.execute_script(scroll_nav_out_of_way)
+    #
+    try:
+        ActionChains(browser).move_to_element(element).click().perform()
+    except Exception as e:
+        Settings.dev_print(e)
+        if 'firefox' in browser.capabilities['browserName']:
+            scroll_shim(browser, element)
+        try:
+            ActionChains(browser).move_to_element(element).click().perform()
+        except Exception as e:
+            Settings.dev_print(e)
+        # self.browser.execute_script("arguments[0].scrollIntoView();", ele)
+            browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
+            ActionChains(browser).move_to_element(element).click().perform()

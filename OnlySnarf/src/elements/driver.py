@@ -109,6 +109,12 @@ ELEMENTS = [
         "id": []
     },
     {
+        "name": "listSingleSave",
+        "classes": ["g-btn.m-transparent-bg"],
+        "text": ["Close"],
+        "id": []
+    },
+    {
         "name": "expiresSave",
         "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded"],
         "text": ["Save"],

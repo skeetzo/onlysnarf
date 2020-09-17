@@ -18,6 +18,12 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser "firefox" -source "google" -prefer-local >> /var/log/onlysnarf/bot.log
 # onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser reconnect -source google
 
+
+# onlysnarfpy -debug -verbose -verbose -verbose -action post -category "performer" -show -source google
+
+onlysnarfpy -verbose -verbose -verbose -action promotion -promotion-method "grandfather" -prefer-local -show
+
+
 # onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot -keep -prefer-local -show
 # onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action bot -keep -prefer-local
 # onlysnarfpy -debug -verbose -verbose -verbose -browser reconnect -action bot -keep -prefer-local
@@ -29,7 +35,6 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # onlysnarfpy -debug -verbose -verbose -verbose -source local -category video
 # onlysnarfpy -debug -verbose -verbose -verbose -source remote -remote-username skeetzo
 
-onlysnarfpy -verbose -verbose -verbose -action promotion -promotion-method "grandfather" -prefer-local
 # onlysnarfpy -debug -verbose -verbose -verbose -user "recent" -action discount -prefer-local -show -amount 10 -months 12
 # onlysnarfpy -debug -verbose -verbose -verbose -user "recent" -action discount -prefer-local -show -amount 30 -months 1
 

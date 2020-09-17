@@ -392,11 +392,11 @@ class File():
                         files.append(file)
             elif "performer" in str(category):
                 categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
-                for performer in File.get_folders_of_folder_by_keywords(categoryFolder):
+                for performer_ in File.get_folders_of_folder_by_keywords(categoryFolder):
                     # for performer in File.get_folders_of_folder(folder):
-                    if not performer: continue
+                    if not performer_: continue
                     p = Folder()
-                    setattr(p, "path", performer.get_path())
+                    setattr(p, "path", performer_.get_path())
                     setattr(p, "category", categoryFolder.get_title())
                     files.append(p)
             return files
