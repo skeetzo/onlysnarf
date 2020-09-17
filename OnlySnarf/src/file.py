@@ -719,6 +719,7 @@ class Google_File(File):
                         file = Google_File()
                         setattr(file, "file", image)
                         setattr(file, "parent", folder)
+                        if performer: setattr(file, "performer", performer)
                         files.append(file)
             elif "video" in str(category):
                 categoryFolder = Google.get_folder_by_name(category, parent=categoryFolder)
@@ -730,6 +731,7 @@ class Google_File(File):
                         file = Google_File()
                         setattr(file, "file", video)
                         setattr(file, "parent", folder)
+                        if performer: setattr(file, "performer", performer)
                         files.append(file)
             elif "galler" in str(category):
                 categoryFolder = Google.get_folder_by_name(category, parent=categoryFolder)
@@ -741,26 +743,53 @@ class Google_File(File):
                         file = Google_Folder()
                         setattr(file, "file", gallery)
                         setattr(file, "parent", folder)
+                        if performer: setattr(file, "performer", performer)
                         files.append(file)
             elif "performer" in str(category):
                 categoryFolder = Google.get_folder_by_name(category, parent=categoryFolder)
-                for performer in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                for performer_ in Google.get_folders_of_folder_by_keywords(categoryFolder):
                     # for performer in Google.get_folders_of_folder(folder):
                     p = Google_Folder()
-                    setattr(p, "file", performer)
+                    setattr(p, "file", performer_)
                     setattr(p, "parent", categoryFolder)
                     files.append(p)
             return files
         ##
-        if performer:
+        if str(cat) == "performers":
             categoryFolder = Google.get_folder_by_name("performers")
-            for performerFolder in Google.get_folders_of_folder_by_keywords(categoryFolder):
-                if str(performer) == str(performerFolder['title']):
+            performers = Google.get_folders_of_folder_by_keywords(categoryFolder)
+            for performerFolder in performers:
+                if performer and str(performer) == str(performerFolder['title']):
                     return parse_categories(cat, categoryFolder=performerFolder)
+
+            if Settings.get_sort_method() == "random":
+                randomPerformers = performers
+                randomPerformers = random.shuffle(randomPerformers)
+                randomCats = Settings.get_categories()
+                randomCats = random.shuffle(randomCats)
+                for performer_ in randomPerformers:
+                    for cat_ in randomCats:
+                        maybeFiles = parse_categories(Settings.get_category_performer() or cat_, categoryFolder=performer_)
+                        if len(maybeFiles) > 0: return maybeFiles
+            else:
+                for performer_ in performers:
+                    for cat_ in Settings.get_categories():
+                        maybeFiles = parse_categories(Settings.get_category_performer() or cat_, categoryFolder=performer_)
+                        if len(maybeFiles) > 0: return maybeFiles
         return parse_categories(cat)
 
     @staticmethod
     def get_random_file():
+        if Settings.get_sort_method() == "ordered":
+            return sorted(Google_File.get_files(), key = lambda x: x.get_title())[0]
+
+            # this sort isn't working because some of the files returned by the list in the function right above with files = [] and then parse_categories
+            # are strings and strs have no attribute get_title
+
+            # so i need to get rid of the strings as headers int he array for the menu by aggregating header titles into the files themselves for the menu to then 
+            # refence or figure out another way to sort this array
+
+
         return random.choice(Google_File.get_files())
 
     def get_mimetype(self):
@@ -848,7 +877,6 @@ class Google_File(File):
     def select_files():
         if not Settings.is_prompt(): return [Google_File.get_random_file()]
         category = Settings.select_category()
-        print('what the fuck')
         if not category: return File.select_file_upload_method()
         # if not Settings.confirm(category): return Google_File.select_files()
         print("Select Google Files or a Folder")

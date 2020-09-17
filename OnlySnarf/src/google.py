@@ -131,6 +131,8 @@ def backup_file(file):
         if file.category or Settings.get_category():
             category = file.category or Settings.get_category()
             backupTo = get_posted_folder_by_name(category)
+            if str(category) == "performers" and Settings.get_category_performer():
+                backupTo = get_folder_by_name(Settings.get_category_performer(), parent=backupTo)
             stri = "posted/{}".format(backupTo["title"])
         # check posted for folder of existing parent name
         file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and title='{}'".format(backupTo['id'], str(file.get_parent()["title"]))}).GetList()

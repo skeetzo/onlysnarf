@@ -421,7 +421,6 @@
   - more debugging
   - fixed: file input
 
-
 ----------------------------------------
   **2.21.0**
   - added: user lists (finally) - favorites, bookmarks, friends, etc
@@ -430,7 +429,10 @@
   **3.0.0**
   - major updates to browsers debugged
   - lists debugged
-  - grandfather promotion
+  - added: grandfather promotion
+  - added: lists
+  - added: sort [ordered|random]
+  - debugging: grandfathered
 
 
   - theres a bug of it not adding the currect window.handle number to the TABS cache

@@ -1,0 +1,46 @@
+### successfully added users to list
+Getting Users by List: None - grandfathered
+get_list() missing 1 required positional argument: 'self'
+Chunk: 2/70.2
+grandfathering: 5
+getting list: grandfathe
+
+
+
+
+
+successfully found users
+Adding Users to List: 5 - 507086604 - Grandfathered
+opening toggle options
+Message: Unable to locate element: .b-users__list__add-btn
+
+weird fuckup
+getting list: Grandfathered - 507086604
+getting lists
+tabs: [['https://onlyfans.com/', '15'], ['https://onlyfans.com/my/li
+
+
+
+
+
+
+successfully found users
+Adding Users to List: 5 - 507086604 - Grandfathered
+opening toggle options
+Message: Unable to locate element: .b-users__list__add-btn
+
+weird fuckup
+getting list: Grandfathered - 507086604
+getting lists
+tabs: [['https://onlyfans.com/', '15'], ['https://onlyfans.com/my/lists', '2147483652'], ['https://onlyfans.com/my/lists/507086604', '2147483653'], ['https://onlyfans.com/my/subscribers/active', '2147483654']]
+successfully located tab
+
+opening toggle options
+Message: Unable to locate element: .b-users__list__add-btn
+
+weird fuckup
+getting list: Grandfathered - 507086604
+getting lists
+tabs: [['https://onlyfans.com/', '15'], ['https://onlyfans.com/my/lists', '2147483652'], ['https://onlyfans.com/my/lists/507086604', '2147483653'], [
+
+

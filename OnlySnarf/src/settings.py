@@ -132,6 +132,14 @@ class Settings:
         if str(cat) == "performer": cat = "performers"
         return cat or None
 
+    def get_category_performer():
+        cat = config["PERFORMER_CATEGORY"]
+        if str(cat) == "image": cat = "images"
+        if str(cat) == "gallery": cat = "galleries"
+        if str(cat) == "video": cat = "videos"
+        # if str(cat) == "performer": cat = "performers"
+        return cat or None
+
     def get_categories():
         cats = []
         cats.extend(list(CATEGORIES_DEFAULT))
@@ -222,6 +230,9 @@ class Settings:
 
     def get_mount_path():
         return config["MOUNT_PATH"] or "/opt/onlysnarf"
+
+    def get_sort_method():
+        return config["SORT"] or "random"
 
     def get_performers():
         performers = config["PERFORMERS"] or []

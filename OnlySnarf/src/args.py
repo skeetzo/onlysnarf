@@ -127,6 +127,11 @@ parser.add_argument('-browser', type=str, default="auto", choices=["auto","googl
 parser.add_argument('-category', default=None, dest='category',
   help='the category of content to post or message')
 ##
+# -category-performer
+# the category of folder to upload of a performer
+parser.add_argument('-category-performer', default=None, dest='performer_category',
+  help='the category of content to post or message of a performer')
+##
 # configurable w/ profile.conf
 # OnlySnarf Drive folder list, appends to defaults
 parser.add_argument('-categories', dest='categories',
@@ -436,6 +441,11 @@ parser.add_argument('-skip-users', dest='skipped_users',
 # shows window
 parser.add_argument('-show','-show-window', dest='show', action='store_true', 
   help='enable displaying the browser window')
+##
+# -sort
+# the sort method to use when selecting content unprompted
+parser.add_argument('-sort', dest='sort', default="random", choices=["ordered","random"],
+  help='the sort method to use when selecting content unprompted')
 ##
 # -source
 # the source to use when searching for content

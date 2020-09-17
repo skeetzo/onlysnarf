@@ -454,9 +454,7 @@ class Message():
         self.get_expiration()
         self.get_files()
         self.get_recipients()
-        if not self.text and str(self.files) != "unset":
-            if len(self.files) > 0:
-                self.text = self.files[0].get_title()
+        self.set_text()
         if Settings.get_performer_category() or self.hasPerformers:
             self.get_performers()
         else: # might as well skip asking if not pulling from performer category
@@ -472,9 +470,7 @@ class Message():
         self.get_schedule()
         self.get_expiration()
         self.get_files()
-        if not self.text and str(self.files) != "unset":
-            if len(self.files) > 0:
-                self.text = self.files[0].get_title()
+        self.set_text()
         if Settings.get_performer_category() or self.hasPerformers:
             self.get_performers()
         else:
@@ -487,9 +483,7 @@ class Message():
         self.get_text()
         self.get_price()
         self.get_files()
-        if not self.text and str(self.files) != "unset":
-            if len(self.files) > 0:
-                self.text = self.files[0].get_title()
+        self.set_text()
         if Settings.get_performer_category() or self.hasPerformers:
             self.get_performers()
         else:
@@ -503,6 +497,23 @@ class Message():
         # check if message is tip
         # returns false
         # or returns true and tip amount
+
+    def set_text(self):
+        if not self.text and len(self.get_files()) > 0:
+            self.text = self.files[0].get_title()
+            # probably a random filename
+            if "_" in str(self.text):
+                self.text = self.files[0].get_parent()["title"]
+            else:
+                try: 
+                    int(self.text)
+                    # is a simple int
+                    if int(self.text) > 20:
+                        self.text = self.files[0].get_parent()["title"]
+                except Exception as e:
+                    # not a simple int
+                    # do nothing cause probably set already
+                    pass
 
 ########################################################################################
 
