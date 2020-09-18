@@ -20,8 +20,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 # onlysnarfpy -debug -verbose -verbose -verbose -action post -category "performer" -source google -category-performer "video"
 
-onlysnarfpy -verbose -verbose -verbose -action promotion -promotion-method "grandfather" -prefer-local -show
-
+onlysnarfpy -verbose -verbose -verbose -action promotion -promotion-method "grandfather" -prefer-local
 
 # onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot -keep -prefer-local -show
 # onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action bot -keep -prefer-local
