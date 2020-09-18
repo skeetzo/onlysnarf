@@ -86,11 +86,11 @@ class Driver:
     DRIVERS = []
     NOT_INFORMED_KEPT = False # whether or not "Keep"ing the self.browser session has been printed once upon exit
     NOT_INFORMED_CLOSED = False # same dumb shit as above
-    TABS = []
 
     def __init__(self, browser=None):
         self.browser = browser
         self.tabs = []
+        self.lists = []
         self.logged_in = False
         self.session_id = None
         self.session_url = None
@@ -168,7 +168,6 @@ class Driver:
             user_ = None
             while end_:
                 elements = self.browser.find_elements_by_class_name("m-fans")
-                Settings.dev_print("successfully found fans")
                 for ele in elements:
                     username_ = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
                     if str(username) == str(username_).replace("@",""):
@@ -182,6 +181,7 @@ class Driver:
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
             print()
+            Settings.dev_print("successfully found fans")
             if not user_:
                 print("Error: Unable to find user - {}".format(username))
                 return False
@@ -2746,18 +2746,32 @@ class Driver:
             print("Error: Failed to Find User ID")
         return user_id
 
+    def search_for_list(self, name=None, number=None):
+        Settings.dev_print("lists: {}".format(self.lists))
+        try:
+            for list_ in self.lists:
+                if list_[0] == name or list_[1] == number:
+                    return list_[0], list_[1]
+            Settings.dev_print("failed to locate list: {} - {}".format(name, number))
+        except Exception as e:
+            if "Unable to locate window" not in str(e):
+                Settings.dev_print(e)
+        return name, number
+
     def get_list(self, name=None, number=None):
         # gets members from list
         auth_ = self.auth()
         if not auth_: return None
         users = []
         Settings.maybe_print("getting list: {} - {}".format(name, number))
+        name, number = self.search_for_list(name=name, number=number)
         try:
-            for list_ in self.get_lists():
-                if name and str(list_[1]).lower() == str(name).lower():
-                    number = list_[0]
-                if number and str(list_[0]).lower() == str(number).lower():
-                    name = list_[1]
+            if not name or not number:
+                for list_ in self.get_lists():
+                    if name and str(list_[1]).lower() == str(name).lower():
+                        number = list_[0]
+                    if number and str(list_[0]).lower() == str(number).lower():
+                        name = list_[1]
             users = self.users_get(page="/my/lists/{}".format(number))
         except Exception as e:
             Driver.error_checker(e)
@@ -2903,25 +2917,18 @@ class Driver:
         return False
 
     def add_users_to_list(self, users=[], number=None, name=None):
-
         auth_ = self.auth()
         if not auth_: return False
         try:
-
+            users = users.copy()
             users_, name, number = self.get_list(number=number, name=name)
             # users = [user for user in users if user not in users_]
-
-            for i, user in enumerate(users):
-                popped = False
+            for i, user in enumerate(users[:]):
                 for user_ in users_:
                     for key, value in user_.items():
                         if str(key) == "username" and str(user.username) == str(value):
-                            popped = True
-                if popped: users.pop(i)
-
+                            users.remove(user)
             Settings.maybe_print("Adding Users to List: {} - {} - {}".format(len(users), number, name))
-
-            # self.browser.find_element_by_id("__BVID__501__BV_toggle_").click()
             try:
                 Settings.dev_print("opening toggle options")
                 toggle = self.browser.find_element_by_class_name("b-users__list__add-btn")
@@ -2929,34 +2936,12 @@ class Driver:
                 toggle.click()
                 Settings.dev_print("toggle options opened")
             except Exception as e:
-                print(e)
-                print("weird fuckup")
-                return self.add_users_to_list(users=users, number=number, name=name)
-
-            # find button by id: __BVID__501__BV_toggle_
+                Settings.dev_print("no options to toggle - users already available")
+                # print("weird fuckup")
+                # return self.add_users_to_list(users=users, number=number, name=name)
             time.sleep(1)
-
-            # find button: dropdown_item - 'Add users to list'
-            # Settings.dev_print("clicking list add")
-            # foundIt = False
-            # eles = self.browser.find_elements_by_name("dropwdown-item")
-            # for ele in eles:
-            #     if "add users to list" in str(ele.get_attribute("innerHTML")).lower():
-            #         ele.click()
-            #         Settings.dev_print("successfully clicked list add")
-            #         foundIt = True
-
-            # if not foundIt:
-            #     Settings.err_print("Fucked up")
-            #     return False
-
-            
-
-
-
-            
-
             original_handle = self.browser.current_window_handle
+            clicked = False
             Settings.maybe_print("searching for users")
             while len(users) > 0:
                 # find user thing
@@ -2969,6 +2954,7 @@ class Driver:
                             # time.sleep(2)
                             move_to_then_click_element(self.browser, ele)
                             users.pop(i)
+                            clicked = True
                 print_same_line("({}/{}) scrolling...".format(len(eles), len(users)))
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 if len(eles) > 100:
@@ -2981,13 +2967,18 @@ class Driver:
                 if self.browser.current_window_handle != original_handle:
                     self.browser.switch_to_window(original_handle)
             print()
+            if not clicked:
+                print("Skipping: List Add (none)")
+                Settings.dev_print("skipping list save")
+                self.browser.refresh()
+                Settings.dev_print("### List Add Successfully Skipped ###")
+                return True
             if Settings.is_debug():
                 print("Skipping: List Add (debug)")
                 Settings.dev_print("skipping list save")
                 self.browser.refresh()
                 Settings.dev_print("### List Add Successfully Canceled ###")
                 return True
-
             Settings.dev_print("saving list")
             save = self.find_element_by_name("listSave")
             move_to_then_click_element(self.browser, save)

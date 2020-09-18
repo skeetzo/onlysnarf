@@ -18,10 +18,9 @@ echo "##################################################" >> ../onlysnarf/logs/t
 # onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser "firefox" -source "google" -prefer-local >> /var/log/onlysnarf/bot.log
 # onlysnarfpy -debug -action "bot" -verbose -verbose -verbose -browser reconnect -source google
 
+# onlysnarfpy -debug -verbose -verbose -verbose -action post -category "performer" -source google -category-performer "video"
 
-onlysnarfpy -debug -verbose -verbose -verbose -action post -category "performer" -show -source google -category-performer "video" -sort "ordered"
-
-# onlysnarfpy -verbose -verbose -verbose -action promotion -promotion-method "grandfather" -prefer-local -show
+onlysnarfpy -verbose -verbose -verbose -action promotion -promotion-method "grandfather" -prefer-local -show
 
 
 # onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot -keep -prefer-local -show

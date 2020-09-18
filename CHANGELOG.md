@@ -434,6 +434,9 @@
   - added: sort [ordered|random]
   - debugging: grandfathered
 
+  - fixed: performer uploads
+  - added: fetch file by sort - random|ordered
+
 
   - theres a bug of it not adding the currect window.handle number to the TABS cache
   |- probably from firefox's tab not always going 1 to the right? but is that part of the loop check?

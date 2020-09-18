@@ -303,6 +303,8 @@ def get_folders_of_folder_by_keywords(folder):
         else:
             Settings.dev_print("{}".format(folder['title']))
         foundFolders.append(folder)
+    if Settings.get_sort_method() == "ordered":
+        foundFolders = sorted(foundFolders, key = lambda x: x["title"])
     return foundFolders
 
 def get_posted_folder_by_name(folderName, parent=None):

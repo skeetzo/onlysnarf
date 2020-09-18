@@ -757,40 +757,57 @@ class Google_File(File):
         ##
         if str(cat) == "performers":
             categoryFolder = Google.get_folder_by_name("performers")
-            performers = Google.get_folders_of_folder_by_keywords(categoryFolder)
-            for performerFolder in performers:
+            performerFolders = Google.get_folders_of_folder_by_keywords(categoryFolder)
+            for performerFolder in performerFolders:
                 if performer and str(performer) == str(performerFolder['title']):
                     return parse_categories(cat, categoryFolder=performerFolder)
 
-            if Settings.get_sort_method() == "random":
-                randomPerformers = performers
-                randomPerformers = random.shuffle(randomPerformers)
+            if Settings.get_sort_method() == "ordered":
+                sortedPerformers = performerFolders
+                sortedPerformers = sorted(sortedPerformers, key = lambda x: x["title"])
+                for performer_ in sortedPerformers:
+                    performer = performer_["title"]
+                    if Settings.get_category_performer():
+                        maybeFiles = parse_categories(Settings.get_category_performer(), categoryFolder=performer_)
+                        if len(maybeFiles) > 0: 
+                            Settings.maybe_print("Performer: {}".format(performer))
+                            return maybeFiles
+                        continue
+                    for cat_ in Settings.get_categories().remove("performers"):
+                        maybeFiles = parse_categories(cat_, categoryFolder=performer_)
+                        if len(maybeFiles) > 0: 
+                            Settings.maybe_print("Performer: {}".format(performer))
+                            return maybeFiles
+            elif Settings.get_sort_method() == "random":
+                randomPerformers = performerFolders
+                random.shuffle(randomPerformers)
                 randomCats = Settings.get_categories()
-                randomCats = random.shuffle(randomCats)
+                randomCats.remove("performers")
+                random.shuffle(randomCats)
                 for performer_ in randomPerformers:
+                    performer = performer_["title"]
+                    if Settings.get_category_performer():
+                        maybeFiles = parse_categories(Settings.get_category_performer(), categoryFolder=performer_)
+                        if len(maybeFiles) > 0: 
+                            Settings.maybe_print("Performer: {}".format(performer))
+                            return maybeFiles
+                        continue
                     for cat_ in randomCats:
-                        maybeFiles = parse_categories(Settings.get_category_performer() or cat_, categoryFolder=performer_)
-                        if len(maybeFiles) > 0: return maybeFiles
-            else:
-                for performer_ in performers:
-                    for cat_ in Settings.get_categories():
-                        maybeFiles = parse_categories(Settings.get_category_performer() or cat_, categoryFolder=performer_)
-                        if len(maybeFiles) > 0: return maybeFiles
+                        maybeFiles = parse_categories(cat_, categoryFolder=performer_)
+                        if len(maybeFiles) > 0: 
+                            Settings.maybe_print("Performer: {}".format(performer))
+                            return maybeFiles
         return parse_categories(cat)
 
     @staticmethod
     def get_random_file():
+        files = Google_File.get_files()
+        files = [file for file in files if not isinstance(file, str)]
+        randomFile = random.choice(files)
         if Settings.get_sort_method() == "ordered":
-            return sorted(Google_File.get_files(), key = lambda x: x.get_title())[0]
-
-            # this sort isn't working because some of the files returned by the list in the function right above with files = [] and then parse_categories
-            # are strings and strs have no attribute get_title
-
-            # so i need to get rid of the strings as headers int he array for the menu by aggregating header titles into the files themselves for the menu to then 
-            # refence or figure out another way to sort this array
-
-
-        return random.choice(Google_File.get_files())
+            randomFile = sorted(files, key = lambda x: x.get_title())[0]
+        Settings.maybe_print("Random File: {}".format(randomFile.get_title()))
+        return randomFile
 
     def get_mimetype(self):
         if self.mimeType: return self.mimeType

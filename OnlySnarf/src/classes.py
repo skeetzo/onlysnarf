@@ -105,11 +105,11 @@ class Discount:
         return self.username
 
     def grandfatherer(self, users=[]):
+        from .driver import Driver
         if len(users) == 0:
-            users = User.get_users_by_list(name="grandfathered")
+            users = User.get_users_by_list(name="grandfathered", driver=Driver.get_driver())
         print("Discount - Grandfathering: {}".format(len(users)))
         # apply discount to all users in grandfathered list
-        from .driver import Driver
         from .validators import DISCOUNT_MAX_MONTHS, DISCOUNT_MAX_AMOUNT
         self.months = DISCOUNT_MAX_MONTHS
         self.amount = DISCOUNT_MAX_AMOUNT
@@ -498,11 +498,18 @@ class Message():
         # returns false
         # or returns true and tip amount
 
+    def set_keywords(self):
+        if len(self.get_keywords()) == 0 and len(self.get_files()) > 0:
+            self.keywords = self.files[0].get_parent()["title"].split(" ")
+            for keyword in self.keywords:
+                if str(keyword) in str(self.text):
+                    self.keywords = []
+            
     def set_text(self):
         if not self.text and len(self.get_files()) > 0:
             self.text = self.files[0].get_title()
-            # probably a random filename
-            if "_" in str(self.text):
+            # if "_" in str(self.text):
+            if re.match("[0-9]_[0-9]", self.text) is not None:
                 self.text = self.files[0].get_parent()["title"]
             else:
                 try: 
@@ -514,6 +521,8 @@ class Message():
                     # not a simple int
                     # do nothing cause probably set already
                     pass
+            self.text = self.text.replace("_", " ")
+            self.set_keywords()
 
 ########################################################################################
 
@@ -759,13 +768,11 @@ class Promotion:
 
         users_, name, number = Driver.get_driver().get_list(name="grandfathered")
 
-        for i, user in enumerate(users):
-            popped = False
+        for i, user in enumerate(users[:]):
             for user_ in users_:
                 for key, value in user_.items():
                     if str(key) == "username" and str(user.username) == str(value):
-                        popped = True
-            if popped: users.pop(i)
+                        users.remove(user)
 
         # users = [user for user in users if user not in users_]
 

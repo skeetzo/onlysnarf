@@ -311,9 +311,7 @@ class User:
     @staticmethod
     def get_users_by_list(number=None, name=None, driver=None):
         Settings.maybe_print("Getting Users by List: {} - {}".format(number, name))
-
-        users = Driver.get_list(number=number, name=name)
-
+        users = driver.get_list(number=number, name=name)
         listUsers = []
         for user in users:
             Settings.maybe_print("User: {}".format(user.username))
