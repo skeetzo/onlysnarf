@@ -2864,7 +2864,6 @@ class Driver:
             user_ = None
             while end_:
                 elements = self.browser.find_elements_by_class_name("m-fans")
-                Settings.dev_print("successfully found fans")
                 for ele in elements:
                     username_ = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
                     if str(username) == str(username_).replace("@",""):
@@ -2878,6 +2877,7 @@ class Driver:
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
             print()
+            Settings.dev_print("successfully found fans")
             if not user_:
                 print("Error: Unable to find user - {}".format(username))
                 return False
@@ -2891,7 +2891,7 @@ class Driver:
                 if str("/my/lists/"+listNumber) in str(listAdd.get_attribute("href")):
                     print("Skipping: User already on list - {}".format(listNumber))
                     return True
-                if "Lists" in str(listAdd.get_attribute("innerHTML")):
+                if " lists " in str(listAdd.get_attribute("innerHTML")).lower():
                     Settings.dev_print("found list add")
                     listAdd_ = listAdd
             Settings.dev_print("clicking list add")
@@ -2947,21 +2947,21 @@ class Driver:
                 # find user thing
                 eles = self.browser.find_elements_by_class_name("b-chats__available-users__item.m-search")
                 for ele in eles:
-                    for i, user in enumerate(users):
+                    for user in users.copy():
                         # print("{} - {}".format(i, user.username))
                         if str(user.username) in str(ele.get_attribute("href")):
                             Settings.maybe_print("found user: {}".format(user.username))
                             # time.sleep(2)
                             move_to_then_click_element(self.browser, ele)
-                            users.pop(i)
+                            users.remove(user)
                             clicked = True
                 print_same_line("({}/{}) scrolling...".format(len(eles), len(users)))
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 if len(eles) > 100:
                     Settings.maybe_print("adding users to list individually")
-                    for i, user in enumerate(users):
+                    for user in users.copy():
                         successful = self.add_user_to_list(username=user.username, listNumber=number)
-                        if successful: users.pop(i)
+                        if successful: users.remove(user)
 
                 # if current window has changed, switch back
                 if self.browser.current_window_handle != original_handle:
