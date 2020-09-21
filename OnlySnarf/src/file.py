@@ -399,6 +399,12 @@ class File():
                     setattr(p, "path", performer_.get_path())
                     setattr(p, "category", categoryFolder.get_title())
                     files.append(p)
+
+
+            # so categories like 'messages'
+            # treat like videos? galleries?
+            else:
+
             return files
         ##
         if performer:
