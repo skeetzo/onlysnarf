@@ -420,74 +420,45 @@
   **2.20.2**
   - more debugging
   - fixed: file input
-
-----------------------------------------
-  **2.21.0**
-  - added: user lists (finally) - favorites, bookmarks, friends, etc
-  - debugged: grandfather promotion
-
-  **3.0.0**
-  - major updates to browsers debugged
-  - lists debugged
-  - added: grandfather promotion
-  - added: lists
-  - added: sort [ordered|random]
   - debugging: grandfathered
-
+**3.0.0 : 9/21/2020**
+  - major updates to browsers debugged
+  - added: grandfather promotion
+  - added: user lists (finally) - favorites, bookmarks, friends, etc
   - fixed: performer uploads
-  - added: fetch file by sort - random|ordered
+  - added: specify inner category for performers via 'category-performer'
+  - added: fetch file by 'sort' - random|ordered
+  -> Bot
+  - bot functionality to check posts for tips
+  - automatically heart / send dick pics to tips in messages
 
-
-  - theres a bug of it not adding the currect window.handle number to the TABS cache
-  |- probably from firefox's tab not always going 1 to the right? but is that part of the loop check?
-  |- but it doesn't really seem to be a problem???
-  
+----------------------------------------  
   - empty messages bug: Type a message below to start a conversation with 
 
-
-
-  **2.x.x**
-  **2.20.2**
-  
   **x.x.x**
   - test Profile: check
   - test Profile: posts
   |- advertise - tweet to advertise new account, tweet to ask about what you should post
   - test Profile: setup
   
-  **x.x.x**
-  - Profile options completely "functional" / debugged
-
-  **3.0.0**
+  - finish debugging `onlysnarf-config`
   - updated: images & demo gifs
 
-  - finish debugging `onlysnarf-config`
-
-  **3.0.x**
+  **x.x.x**
+  - Profile options completely "functional" / debugged
 
 ----------------------------------------
 
 ## ToDo
-  
   - add to upload: greatest & least (folder sizes)
 
 ### Low Priority
-  -> Bot
-  - autorespond behavior
-  - bot functionality to check posts for quiz answers
-  - bot functionality that checks user messages for bot commands
-
-  -> Cron
-  - ability to download images to upload / send later
-  --
   - add: read messages html for emojis
   - update: backup function to include original folder name -> posted/galleries/$file
   - [MESSAGES] layout in config for preset message formats
-  - fix literally everything
-  - automatically heart / send <3 hearts to random tips in messages / campaign contributions
 
-  -> Discount
-  - need a way for Discount to select users that are "Renew On"; click "Renew On" and get selected users? or grab from users w/ similar matching criteria?
+  -> Cron
+  - completely remove cron features
 
   -> Promotion
   - add email|Twitter functionality for sending trial link; add clipboard function to copy link
@@ -499,24 +470,19 @@
   - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
   - need to add 'create' to Profile for asking for profile settings when syncing to
 
-### Medium Priority
-
   -> Twitter
   - tweet reminders
   - can enter text that is tweeted
-  - any links to include (counts against text limit) of content or images
+  - include media attachments
   -- check for previously existing tweet
-
-### High Priority
-
-  -> Bot
-  - complete bot functionality
-  - debug tip reward process
 
   -> Remote
   -- need to reproduce --
   - debug / add error catch for uploads: ('Connection aborted.', BrokenPipeError(32, 'Broken pipe'))
 
+### Medium Priority
+
+### High Priority
 
 
 Referral Code

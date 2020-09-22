@@ -40,6 +40,7 @@ DOWNLOADING = True
 DOWNLOADING_MAX = False
 DOWNLOAD_MAX_IMAGES = 1000
 DOWNLOAD_MAX_VIDEOS = 1000
+MAX_TABS = 20
 # Urls
 ONLYFANS_HOME_URL = 'https://onlyfans.com'
 ONLYFANS_MESSAGES_URL = "/my/chats/"
@@ -726,10 +727,11 @@ class Driver:
         original_handle = self.browser.current_window_handle
         Settings.dev_print("tabs: {}".format(self.tabs))
         try:
-            for page_, handle in self.tabs:
+            for page_, handle, value in self.tabs:
                 # Settings.dev_print("{} = {}".format(page_, page))
                 if str(page_) == str(page):
                     self.browser.switch_to_window(handle)
+                    value += 1
                     Settings.dev_print("successfully located tab in cache: {}".format(page))
                     return True
             for handle in self.browser.window_handles[0]:
@@ -771,7 +773,14 @@ class Driver:
         self.browser.switch_to_window(new_window)
         Settings.dev_print("Page Title after Tab Switching is : %s" %self.browser.title)
         Settings.dev_print("New Window Handle is : %s" %new_window)
-        self.tabs.append([url, new_window])
+        self.tabs.append([url, new_window, 0]) # url, window_handle, use count
+
+        if len(self.tabs) > MAX_TABS:
+            least = self.tabs[0]
+            for i, tab in enumerate(self.tabs):
+                if int(tab[2]) < int(least[2]):
+                    least = tab
+            self.tabs.remove(least)
     
     ##################
     ###### Login #####
@@ -2242,7 +2251,7 @@ class Driver:
         ## Cookies
         if Settings.use_cookies():
             self.cookies_load()
-        self.tabs.append([browser.current_url, browser.current_window_handle])
+        self.tabs.append([browser.current_url, browser.current_window_handle, 0])
         Driver.DRIVERS.append(self)
         return self.browser
 
@@ -2300,8 +2309,8 @@ class Driver:
                   }
                 }  
                 service_args = []
-                if Settings.is_debug():
-                    service_args = ["--verbose", "--log-path=/var/log/onlysnarf/chromedriver.log"]
+                # if Settings.is_debug():
+                    # service_args = ["--verbose", "--log-path=/var/log/onlysnarf/chromedriver.log"]
                 # desired_capabilities = capabilities
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
@@ -2323,14 +2332,15 @@ class Driver:
                # sys.exit("You need root permissions to do this, laterz!")
             try:
                 d = DesiredCapabilities.FIREFOX
-                d['loggingPrefs'] = {'browser': 'ALL'}
+                # d['loggingPrefs'] = {'browser': 'ALL'}
                 opts = FirefoxOptions()
-                opts.log.level = "trace"
+                # opts.log.level = "trace"
                 if not Settings.is_show_window():
                     opts.add_argument("--headless")
                 # browser = webdriver.Firefox(options=opts, log_path='/var/log/onlysnarf/geckodriver.log')
                 # browser = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
-                browser = webdriver.Firefox(options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
+                # browser = webdriver.Firefox(options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
+                browser = webdriver.Firefox(options=opts, desired_capabilities=d)
                 print("Browser Created - Firefox")
                 Settings.dev_print("Successful Browser - Firefox")
                 return browser
