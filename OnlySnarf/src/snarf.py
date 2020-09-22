@@ -190,7 +190,8 @@ def exit_handler():
     from .driver import Driver
     Driver.exit_all()
     print("Shnarrf?")
-    exit()
+    sys.exit(0)
+    # exit()
 atexit.register(exit_handler)
 
 # import signal
@@ -234,7 +235,7 @@ def main():
         Settings.dev_print(e)
         print("Shnarf!")
     finally:
-        exit()
+        exit_handler()
 
 ################################################################################################################################################
 
