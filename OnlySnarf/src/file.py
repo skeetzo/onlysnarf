@@ -378,7 +378,17 @@ class File():
                         setattr(file, "path", video.get_path())
                         setattr(file, "category", folder.get_title())
                         files.append(file)
-            elif "galler" in str(category):
+            elif "performer" in str(category):
+                categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
+                for performer_ in File.get_folders_of_folder_by_keywords(categoryFolder):
+                    # for performer in File.get_folders_of_folder(folder):
+                    if not performer_: continue
+                    p = Folder()
+                    setattr(p, "path", performer_.get_path())
+                    setattr(p, "category", categoryFolder.get_title())
+                    files.append(p)
+            # elif "galler" in str(category):
+            else:
                 categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
                 for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
                     if not folder: continue
@@ -390,21 +400,6 @@ class File():
                         setattr(file, "path", galleryget_path())
                         setattr(file, "category", folder.get_title())
                         files.append(file)
-            elif "performer" in str(category):
-                categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
-                for performer_ in File.get_folders_of_folder_by_keywords(categoryFolder):
-                    # for performer in File.get_folders_of_folder(folder):
-                    if not performer_: continue
-                    p = Folder()
-                    setattr(p, "path", performer_.get_path())
-                    setattr(p, "category", categoryFolder.get_title())
-                    files.append(p)
-
-
-            # so categories like 'messages'
-            # treat like videos? galleries?
-            else:
-
             return files
         ##
         if performer:

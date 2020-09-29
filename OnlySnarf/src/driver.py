@@ -773,14 +773,13 @@ class Driver:
         self.browser.switch_to_window(new_window)
         Settings.dev_print("Page Title after Tab Switching is : %s" %self.browser.title)
         Settings.dev_print("New Window Handle is : %s" %new_window)
-        self.tabs.append([url, new_window, 0]) # url, window_handle, use count
-
-        if len(self.tabs) > MAX_TABS:
+        if len(self.tabs) >= MAX_TABS:
             least = self.tabs[0]
             for i, tab in enumerate(self.tabs):
                 if int(tab[2]) < int(least[2]):
                     least = tab
             self.tabs.remove(least)
+        self.tabs.append([url, new_window, 0]) # url, window_handle, use count
     
     ##################
     ###### Login #####
