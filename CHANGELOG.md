@@ -431,6 +431,8 @@
   -> Bot
   - bot functionality to check posts for tips
   - automatically heart / send dick pics to tips in messages
+  **3.0.1**
+  - added argument error catch
 
 ----------------------------------------  
   - empty messages bug: Type a message below to start a conversation with 

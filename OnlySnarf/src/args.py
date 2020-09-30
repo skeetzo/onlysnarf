@@ -553,7 +553,12 @@ parser.add_argument('-version', action='version')
 
 ############################################################################################
 
-args = vars(parser.parse_args())
+try:
+  args = vars(parser.parse_args())
+except Exception as e:
+  print("Error: Incorrect arg format")
+  import sys
+  sys.exit(1)
 
 if args["source"] and not args["destination"]:
   args["destination"] = args["source"]
