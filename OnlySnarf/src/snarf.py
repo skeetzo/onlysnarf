@@ -17,27 +17,39 @@ from .settings import Settings
 #####################
 
 class Snarf:
+    """OnlySnarf main class and runtime parser"""
 
     def __init__(self):
         pass
 
-    ####################
-    ##### Discount #####
-    ####################
-
     @staticmethod
     def discount(discount=None):
+        """
+        Applies the provided discount or creates one from args / prompts.
+
+        Parameters
+        ----------
+        discount : classes.Discount
+            A discount consisting of amount, months, and / or username. Prompts for missing.
+
+        """
         from .classes import Discount
         if not discount: discount = Discount()
         try: discount.apply()
         except Exception as e: Settings.dev_print(e)
 
-    ###################
-    ##### Message #####
-    ###################
-
     @staticmethod
     def message(message=None):
+        """
+        Sends the provided message or creates one from args / prompts.
+
+        Parameters
+        ----------
+        message : classes.Message
+            A message consisting of text, recipient(s), and possibly also files, keywords, tags, 
+                performers, and/or price 
+        
+        """
         from .classes import Message
         from .user import User
         if not message: message = Message()
@@ -46,7 +58,7 @@ class Snarf:
             if Settings.is_prompt():
                 if not Settings.prompt("Send"): return
             if message.get_files() != "unset" and len(message.get_files()) == 0 and not message.get_text():
-                print("Error: Missing Files and Text")
+                Settings.err_print("Missing Files and Text")
                 return
             successful = False
             try: 
@@ -62,12 +74,18 @@ class Snarf:
             if successful: message.cleanup_files()
         except Exception as e: Settings.dev_print(e)
                 
-    ################
-    ##### Post #####
-    ################
-
     @staticmethod
     def post(message=None):
+        """
+        Posts the provided text or from args / prompts.
+
+        Parameters
+        ----------
+        message : classes.Post
+            A post consisting of text and possibly also files, keywords, tags, performers,
+                expiration, poll, and/or schedule
+        
+        """
         from .classes import Message
         if not message: message = Message()
         try:
@@ -75,7 +93,7 @@ class Snarf:
             if Settings.is_prompt():
                 if not Settings.prompt("Post"): return
             if message.get_files() != "unset" and len(message.get_files()) == 0 and not message.get_text():
-                print("Error: Missing Files and Text")
+                Settings.err_print("Missing Files and Text")
                 return
             successful = False
             try:
@@ -87,12 +105,25 @@ class Snarf:
             if successful: message.cleanup_files()
         except Exception as e: Settings.dev_print(e)
 
-    ###################
-    ##### Profile #####
-    ###################
-
     @staticmethod
     def profile(profile=None):
+        """
+        Runs the profile method specified at runtime.
+
+        backup - downloads all content and saves settings
+
+        syncFrom - reads all profile settings and saves locally
+
+        syncTo - updates profile settings with provided profile
+
+        Extended description of function.
+
+        Parameters
+        ----------
+        profile : profile.Profile
+            Class representation of Onlyfans profile settings
+
+        """
         from .profile import Profile
         if not profile: profile = Profile()
         try: 
@@ -107,12 +138,20 @@ class Snarf:
             else: Settings.err_print("Missing Profile Method")
         except Exception as e: Settings.dev_print(e)
         
-    #####################
-    ##### Promotion #####
-    #####################
-
     @staticmethod
     def promotion():
+        """
+        Runs the promotion method specified at runtime.
+
+        campain - creates discount campaign
+
+        trial - creates free trial
+
+        user - applies directly to user
+
+        grandfather - applies discounted price to existing users and adds them all to list
+
+        """
         from .classes import Promotion
         try: 
             # get promotion method
@@ -128,80 +167,27 @@ class Snarf:
             else: Settings.err_print("Missing Promotion Method")
         except Exception as e: Settings.dev_print(e)
 
-    #################
-    ##### Users #####
-    #################
-
-    @staticmethod
-    def get_following():
-        from .user import User
-        users = []
-        try: users = User.get_following()
-        except Exception as e: Settings.dev_print(e)
-        return users
-
-    @staticmethod
-    def get_users():
-        from .user import User
-        users = []
-        try: users = User.get_all_users()
-        except Exception as e: Settings.dev_print(e)
-        return users
-
-    ###############
-    ##### Dev #####
-    ###############
-
+    # developer testing
     @staticmethod
     def test():
         from .user import User
-        # from . import cron as Cron
-        # print('0/3 : Deleting Locals')
         print('1/3 : Testing')
-        # print('TESTING: Users')
-        # response = Driver.users_get()
-        # return True
-        # print('TESTING: Following')
-        # response = User.get_following()
-        # from .classes import Promotion
-        # promotion = Promotion()
-        
-        # promotion.create_campaign()
-        # return True
         print('TESTING: Settings - Get')
         profile = Profile.sync_from_profile()
         print('TESTING: Settings - Set')
         Profile.sync_to_profile(profile=profile)
-
-        return True
-        # print('TESTING: Cron')
-        # response = Cron.test()
-        # if not response or response == None:
-        #     print("Error: Failed to test crons")
-        # reset_ = reset()
-        # if not reset_:
-        #     return print("Error: Failed to Reset")
         return True
 
 ################################################################################################################################################
 
-import atexit
 def exit_handler():
     from .driver import Driver
     Driver.exit_all()
     print("Shnarrf?")
     sys.exit(0)
-    # exit()
-atexit.register(exit_handler)
 
-# import signal
-# def signal_handler(sig, frame):
-#     print('Shnnnarf?')
-#     exit()
-# signal.signal(signal.SIGINT, signal_handler)
-  
-def exit():
-    sys.exit(0)
+import atexit
+atexit.register(exit_handler)
 
 def main():
     try:
@@ -230,7 +216,7 @@ def main():
         elif str(action) == "profile":
             success = Snarf.profile()
         else:
-            print("Warning: Missing Method")
+            Settings.warn_print("Missing Method")
     except Exception as e:
         Settings.dev_print(e)
         print("Shnarf!")

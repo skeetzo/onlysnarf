@@ -54,7 +54,7 @@ class Bot():
 		unparsed = user.get_unparsed_messages()
 		for message in unparsed:
 			successful = False
-			isTip, amount = Message.isTip(message)
+			isTip, amount = Message.is_tip(message)
 			if isTip:
 				print(0)
 				successful = Bot.tipped(user=user, amount=amount)
@@ -65,32 +65,7 @@ class Bot():
 				user.parse_message(message=message.message)
 		Settings.dev_print("successfully parsed user: {} - {}".format(user.username, user.id))
 
-	@staticmethod
-	def get_index():
-		# Bot.lock.acquire()
-		i = Bot.i
-		Bot.i += 1
-		if Bot.i == MAX_BROWSERS: Bot.i = 0
-		# Bot.lock.release()
-		return i
-
-	@staticmethod
-	def prompt(user=None):
-		# show list of commands available
-		user.message(message=COMMANDS_AVAILABLE)
-		return True
-
-	# refresh the Driver
-	def refresh(self):
-		self.driver.refresh()
-
-	# handle the timer for refreshing the Driver
-	def refresher(self):
-		if not Settings.is_keep(): return
-		if self.refreshing: self.refreshing.stop()
-		self.refreshing = threading.Timer(REFRESH_DURATION, self.refresh).start()
-
-	def run(self):
+	def parse_messages(self):
 		# if self.running: self.running.stop()
 		if not self.driver: self.driver = Driver(browser=None)
 
@@ -180,7 +155,33 @@ class Bot():
 		else:
 			threaded()
 
-		self.run()
+		# self.parse_messages()
+
+	@staticmethod
+	def get_index():
+		# Bot.lock.acquire()
+		i = Bot.i
+		Bot.i += 1
+		if Bot.i == MAX_BROWSERS: Bot.i = 0
+		# Bot.lock.release()
+		return i
+
+	@staticmethod
+	def prompt(user=None):
+		# show list of commands available
+		user.message(message=COMMANDS_AVAILABLE)
+		return True
+
+	# refresh the Driver
+	def refresh(self):
+		self.driver.refresh()
+
+	# handle the timer for refreshing the Driver
+	def refresher(self):
+		if not Settings.is_keep(): return
+		if self.refreshing: self.refreshing.stop()
+		self.refreshing = threading.Timer(REFRESH_DURATION, self.refresh).start()
+
 
 
 	@staticmethod

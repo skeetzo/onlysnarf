@@ -8,6 +8,8 @@ CATEGORIES_DEFAULT = [
   "galleries",
   "videos"
 ]
+PRICE_MIN = 3
+PRICE_MAX = 100
 DISCOUNT_MAX_AMOUNT = 55
 DISCOUNT_MIN_AMOUNT = 5
 DISCOUNT_MAX_MONTHS = 12
@@ -209,4 +211,11 @@ class LimitValidator(Validator):
 		except Exception as e:
 			raise ValidationError(
 				message='Please enter a number between {} and {}'.format(LIMIT_MIN, LIMIT_MAX),
+				cursor_position=len(document.text))  # Move cursor to end
+
+class PriceValidator(Validator):
+	def validate(self, document):
+		if int(document.text) < PRICE_MIN or int(document.text) > PRICE_MAX:
+			raise ValidationError(
+				message='Please enter a number between {} and {}'.format(PRICE_MIN, PRICE_MAX),
 				cursor_position=len(document.text))  # Move cursor to end
