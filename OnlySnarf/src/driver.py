@@ -1514,7 +1514,7 @@ class Driver:
             limit = promotion.get_limit()
             expiration = promotion.get_expiration()
             duration = promotion.get_duration()
-            user = promotion.get_user()
+            # user = promotion.get_user()
             amount = promotion.get_amount()
             text = promotion.get_message()
             Settings.maybe_print("goto -> /my/promotions")
@@ -1702,6 +1702,8 @@ class Driver:
             Settings.dev_print("saving promotion")
             save_.click()
             Settings.dev_print("successfully saved promotion")
+            ## TODO ##
+            link = ""
             # Settings.dev_print("copying trial link")
             # self.find_element_by_name("promotionalTrialLink").click()
             # Settings.dev_print("successfully copied trial link")
@@ -1728,7 +1730,7 @@ class Driver:
             #   password     = 'XXXXX')
             Settings.dev_print("successful promotion trial")
             Settings.debug_delay_check()
-            return True
+            return link
         except Exception as e:
             Driver.error_checker(e)
             print("Error: Failed to Apply Promotion")
@@ -1759,8 +1761,8 @@ class Driver:
             print("Warning: Duration Too Low, Min -> {} days".format(Settings.get_discount_min_months()))
             months = Settings.get_discount_min_months()
         try:
-            Settings.maybe_print("goto -> /{}".format(user.username))
-            self.go_to_page(user.username)
+            Settings.maybe_print("goto -> /{}".format(user))
+            self.go_to_page(user)
             # click discount button
             self.get_element_to_click("discountUser").click()
             # enter expiration

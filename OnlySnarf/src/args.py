@@ -331,7 +331,7 @@ parser.add_argument('-profile-method', dest="profile_method", default="syncfrom"
 ##
 # -promotion
 # the promotion method to use
-parser.add_argument('-promotion-method', dest='promotion_method', default="campaign", choices=["campaign","trial","grandfather"],
+parser.add_argument('-promotion-method', dest='promotion_method', default="campaign", choices=["campaign","trial","grandfather","user"],
   help='the method of promotion to use')
 ###
 ### PATHS ###
@@ -532,9 +532,7 @@ parser.add_argument('-v', '-verbose', dest="verbose", action='count', default=0,
 # -promotion-user
 parser.add_argument('-promotion-user', dest="promotion_user", action='store_true', 
   help="uses user method when combined with action=promotion")
-# -promotion-trial
-parser.add_argument('-promotion-trial', dest="promotion_trial", action='store_true', 
-  help="uses trial method when combined with action=promotion")
+
 
 
 ##

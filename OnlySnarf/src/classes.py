@@ -10,8 +10,6 @@ from .validators import AmountValidator, MonthValidator, LimitValidator, PriceVa
 from . import remote as Remote
 from .file import File, Folder, Google_File, Google_Folder
 
-DEBUGGING_DATE = False
-
 class Discount:
     """OnlyFans discount class"""
 
@@ -37,7 +35,7 @@ class Discount:
 
         """
 
-        # ensure the discount has all the proper values
+        # ensure the discount has non default values
         self.get()
         if not self.gotten:
             Settings.err_print("Unable to apply discount")
@@ -69,7 +67,7 @@ class Discount:
         discount.apply()
 
     def get(self):
-        """Update the discount object with all of its required values"""
+        """Update the discount object's default values"""
 
         if self.gotten: return
         gotten = self.get_username()
@@ -297,6 +295,7 @@ class Message():
         if str(self.keywords) == "unset": return []
         # if self.keywords: return self.keywords
         if len(self.keywords) > 0: return self.keywords
+        # retrieve from args and return if exists
         keywords = Settings.get_keywords() or []
         if len(keywords) > 0: return keywords
         if not Settings.prompt("keywords"):
@@ -328,6 +327,7 @@ class Message():
 
         if str(self.performers) == "unset": return []
         if len(self.performers) > 0: return self.performers
+        # retrieve from args and return if exists
         performers = Settings.get_performers() or []
         # ensures all performers from files are included
         if len(self.files) > 0:
@@ -421,6 +421,7 @@ class Message():
                 files = []
                 if Settings.is_prompt(): return []
         if files == None: files = []
+        # get files from appropriate source's menu selection
         if Settings.get_source() == "google":
             googleFiles = Google_File.get_files()
             if len(files) == 0 and len(googleFiles) > 0:
@@ -467,6 +468,7 @@ class Message():
 
         if str(self.expiration) == "unset": return None
         if self.expiration: return self.expiration
+        # retrieve from args and return if exists
         expires = Settings.get_expiration() or None
         if expires: 
             self.expiration = expires
@@ -499,11 +501,14 @@ class Message():
         """
 
         if str(self.poll) == "unset": return None
+        # check if poll is ready
         if self.poll and self.poll.check(): return self.poll
+        # prompt skip
         if Settings.is_prompt() and not Settings.prompt("poll"):
             self.poll = "unset"
             return None
         poll = Poll()
+        # ensure the poll has non default values
         poll.get()
         # check if valid poll
         if not poll.check(): return None
@@ -522,6 +527,7 @@ class Message():
         """
 
         if self.price: return self.price
+        # retrieve from args and return if exists
         price = Settings.get_price() or None
         if price: 
             self.price = price
@@ -597,6 +603,7 @@ def get_recipients(self):
         """
 
         if self.text: return self.text
+        # retrieve from args and return if exists
         text = Settings.get_text() or None
         if text: 
             self.text = text
@@ -696,89 +703,32 @@ def get_recipients(self):
             self.set_keywords()
 
 ########################################################################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+########################################################################################
+########################################################################################
 
 class Poll:
+    """OnlyFans Poll class"""
 
     def __init__(self):
+        """OnlyFans Poll object"""
+
+        # duration of poll
         self.duration = None
+        # list of strings
         self.questions = []
+        # prevents double prompts
         self.gotten = False
 
-    def apply(self):
-        self.get()
-        if not self.gotten: return
-        if not Settings.prompt("Poll"): return
-        return True
-
     def check(self):
+        """Check if poll is ready with valid values
+
+        Returns
+        -------
+        bool
+            Whether the poll is ready to be posted or not
+
+        """
+
         if len(self.get_questions()) > 0: return True
         if self.get_duration(): return True
         return False
@@ -786,17 +736,31 @@ class Poll:
     def get(self):
         if self.gotten: return
         gotten = self.get_duration()
+        # return early if skipped
         if not gotten: return
         gotten = self.get_questions()
+        # return early if skipped
         if not gotten: return
         self.gotten = True
 
-    def get_duration(self): # months
+    def get_duration(self):
+        """
+        Gets the duration value if not none else sets it from args or prompts.
+
+        Returns
+        -------
+        int
+            The duration as an int
+
+        """
+
         if self.duration: return self.duration
+        # retrieve from args and return if exists
         duration = Settings.get_duration()
         if duration: 
             self.duration = duration
             return duration
+        # prompt skip
         if not Settings.prompt("duration"): return None
         question = {
             'type': 'input',
@@ -804,18 +768,30 @@ class Poll:
             'message': 'Duration [1, 3, 7, 99 (\'No Limit\')]',
             'validate': DurationValidator
         }
-        answers = prompt(question)
-        duration = answers["duration"]
+        duration = prompt(question)["duration"]
+        # confirm duration
         if not Settings.confirm(duration): return self.get_duration()
         self.duration = duration
         return self.duration
 
     def get_questions(self):
+        """
+        Gets the questions value if not none else sets it from args or prompts.
+
+        Returns
+        -------
+        list
+            The questions as strings in a list
+
+        """
+
         if len(self.questions) > 0: return self.questions
+        # retrieve from args and return if exists
         questions = Settings.get_questions()
         if len(questions) > 0: 
             self.questions = questions
             return questions
+        # prompt skip
         if not Settings.prompt("questions"): return []
         print("Enter Questions")
         while True:
@@ -824,67 +800,154 @@ class Poll:
                 'name': 'question',
                 'message': 'Question:',
             }
-            answers = prompt(question)
-            question = answers["question"]
+            answers = prompt(question)["question"]
             if str(question) == "": break
             questions.append(question)
+        # confirm questions
         if not Settings.confirm(questions): return self.get_questions()
         self.questions = questions
         return self.questions
 
 ########################################################################################
+########################################################################################
+########################################################################################
 
 class Promotion:
+    """Promotion class"""
 
     def __init__(self):
+        """Promotion object"""
+
+        # the amount to discount
         self.amount = None
+        # the number of trials to allow
         self.limit = None
+        # the expiration of the trial
         self.expiration = None
+        # the duration of the discount
         self.duration = None
+        # the user to apply the promotion to
         self.user = None
+        # the message to provide with the promotion
         self.message = None
+        # prevents double prompts
         self.gotten = False
 
-    # apply discount directly to user on user's profile page
     @staticmethod
     def apply_to_user():
+        """Applies promotion directly to user via their profile page
+        
+           Applying a discount to a user requires:
+           - amount
+           - duration
+           - expiration
+           - message
+           - user
+
+        """
+
         print("Promotion - Apply To User")
         p = Promotion()
-        p.get()
+        # ensure the promotion has non default values, return early if missing
+        # p.get()
+        gotten = p.get_amount()
+        if not gotten: return
+        gotten = p.get_duration()
+        if not gotten: return
+        gotten = p.get_expiration()
+        if not gotten: return
+        gotten = p.get_message()
+        if not gotten: return
+        gotten = p.get_user()
+        if not gotten: return
+        # prompt skip
         if Settings.is_prompt():
             if not Settings.prompt("Promotion"): return
-        # user, expiration, months, message
         from .driver import Driver
+        # get default driver and apply the promotion directly
         Driver.get_driver().promotion_user_directly(promotion=p)
 
     @staticmethod
     def create_campaign():
+        """Creates a Promotional Campaign
+
+           A campaign consists of:
+           - amount
+           - duration
+           - expiration
+           - limit
+           - user
+           - text
+
+        """
+
         print("Promotion - Creating Campaign")
         p = Promotion()
-        p.get()
+        # ensure the promotion has non default values, return early if missing
+        # p.get()
+        gotten = p.get_amount()
+        if not gotten: return
+        gotten = p.get_user()
+        if not gotten: return
+        gotten = p.get_expiration()
+        if not gotten: return
+        gotten = p.get_limit()
+        if not gotten: return
+        gotten = p.get_duration()
+        if not gotten: return
+        gotten = p.get_message()
+        if not gotten: return
+        # prompt skip
         if Settings.is_prompt():
             if not Settings.prompt("Promotion"): return
         from .driver import Driver
+        # get the default driver and enter the promotion campaign
         Driver.get_driver().promotional_campaign(promotion=p)
 
     # requires the copy/paste and email steps
     @staticmethod
     def create_trial_link():
+        """Creates a Promotional Trial Link
+
+           A trial link consists of:
+           - duration
+           - expiration
+           - limit
+           - message
+           - user
+            
+           Note: this creates a free trial link but does NOT send it to the user
+           because it is incomplete. The copy/paste step to message to a user is nonfunctioning.           
+
+        """
+
         print("Promotion - Creating Trial Link")
         p = Promotion()
-        p.get()
+        # ensure the promotion has non default values, return early if missing
+        # p.get()
+        gotten = p.get_duration()
+        if not gotten: return
+        gotten = p.get_expiration()
+        if not gotten: return
+        gotten = p.get_limit()
+        if not gotten: return
+        gotten = p.get_message()
+        if not gotten: return
+        gotten = p.get_user()
+        if not gotten: return
         # if not self.gotten: return
         if Settings.is_prompt():
             if not Settings.prompt("Promotion"): return
         # limit, expiration, months, user
         from .driver import Driver
-        Driver.get_driver().promotional_trial_link(promotion=p)
-        # link = Driver.promotional_trial_link()
+        link = Driver.get_driver().promotional_trial_link(promotion=p)
         # text = "Here's your free trial link!\n"+link
         # Settings.dev_print("Link: "+str(text))
         # Settings.send_email(email, text)
 
     def get(self):
+        """Update the promotion object's default values"""
+
         if self.gotten: return
         gotten = self.get_user()
         gotten = self.get_amount()
@@ -895,11 +958,23 @@ class Promotion:
         self.gotten = True
 
     def get_amount(self):
+        """
+        Gets the amount value if not none else sets it from args or prompts.
+
+        Returns
+        -------
+        int
+            The amount as an int
+
+        """
+
         if self.amount: return self.amount
+        # retrieve from args and return if exists
         amount = Settings.get_amount() or None
         if amount: 
             self.amount = amount
             return amount
+        # prompt skip
         if not Settings.prompt("amount"): return None
         question = {
             'type': 'input',
@@ -908,18 +983,30 @@ class Promotion:
             'validate': AmountValidator,
             'filter': lambda val: int(myround(int(val)))
         }
-        answers = prompt(question)
-        amount = answers["amount"]
+        amount = prompt(question)["amount"]
+        # confirm amount
         if not Settings.confirm(amount): return self.get_amount()
         self.amount = amount
         return self.amount
 
     def get_expiration(self):
+        """
+        Gets the expiration value if not none else sets it from args or prompts.
+
+        Returns
+        -------
+        int
+            The expiration as an int
+
+        """
+
         if self.expiration: return self.expiration
+        # retrieve from args and return if exists
         expiration = Settings.get_expiration() or None
         if expiration: 
             self.expiration = expiration
             return expiration
+        # prompt skip
         if not Settings.prompt("expiration"): return None
         question = {
             'type': 'input',
@@ -927,18 +1014,30 @@ class Promotion:
             'message': 'Expiration [1, 3, 7, 99 (\'No Limit\')]',
             'validate': ExpirationValidator
         }
-        answers = prompt(question)
-        expiration = answers["expiration"]
+        expiration = prompt(question)["expiration"]
+        # confirm expiration
         if not Settings.confirm(expiration): return self.get_expiration()
         self.expiration = expiration
         return self.expiration
 
     def get_limit(self):
+        """
+        Gets the expiration value if not none else sets it from args or prompts.
+
+        Returns
+        -------
+        int
+            The expiration as an int
+
+        """
+
         if self.limit: return self.limit
+        # retrieve from args and return if exists
         limit = Settings.get_limit() or None
         if limit: 
             self.limit = limit
             return limit
+        # prompt skip
         if not Settings.prompt("limit"): return None
         question = {
             'type': 'input',
@@ -946,36 +1045,60 @@ class Promotion:
             'message': 'Limit (in days or months)',
             'validate': LimitValidator
         }
-        answers = prompt(question)
-        limit = answers["limit"]
+        limit = prompt(question)["limit"]
+        # confirm limit
         if not Settings.confirm(limit): return self.get_limit()
         self.limit = limit
         return self.limit
 
     def get_message(self):
+        """
+        Gets the message value if not none else sets it from args or prompts.
+
+        Returns
+        -------
+        str
+            The message as a str
+
+        """
+
         if self.message != None: return self.message
+        # retrieve from args and return if exists
         message = Settings.get_text() or None
         if message: 
             self.message = message
             return message
+        # prompt skip
         if not Settings.prompt("message"): return ""
         question = {
             'type': 'input',
             'name': 'message',
             'message': 'Message:'
         }
-        answers = prompt(question)
-        message = answers["message"]
+        message = prompt(question)["message"]
+        # confirm message
         if not Settings.confirm(message): return self.get_text()
         self.message = message
         return self.message
 
-    def get_duration(self): # months
+    def get_duration(self):
+        """
+        Gets the duration value if not none else sets it from args or prompts.
+
+        Returns
+        -------
+        int
+            The duration as an int
+
+        """
+
         if self.duration: return self.duration
+        # retrieve from args and return if exists
         duration = Settings.get_promo_duration() or None
         if duration: 
             self.duration = duration
             return duration
+        # duration skip
         if not Settings.prompt("duration"): return None
         question = {
             'type': 'input',
@@ -983,72 +1106,113 @@ class Promotion:
             'message': 'Duration [1 day, 3 days, 7 days, ...]',
             'validate': PromoDurationValidator
         }
-        answers = prompt(question)
-        duration = answers["duration"]
+        duration = prompt(question)["duration"]
+        # confirm duration
         if not Settings.confirm(duration): return self.get_duration()
         self.duration = duration
         return self.duration
 
     def get_user(self):
+        """
+        Populate and get the username value
+
+        If not found in args and prompt is enabled, ask for value.
+
+        Returns
+        -------
+        User
+            the user to apply the promotion to
+
+        """
+
         if self.user: return self.user
         user = User.select_user()
-        self.user = user
+        self.user = user.username
         return self.user
 
     @staticmethod
     def grandfathered():
+        """
+        Executes the 'Grandfather' promotion model
+
+        In groups of 5, existing users will be added to the 'Grandfathered' OnlyFans list and
+        then provided with the max discount for the max months. If the process interrupts, 
+        running again will continue to discount users not yet added to the list.
+
+        """
+
         print("Promotion - Grandfather")
+        # prompt skip
         if Settings.is_prompt():
             if not Settings.prompt("Grandfather"): return
-        from .driver import Driver
         Settings.maybe_print("getting users to grandfather")
         # get all users
         users = User.get_all_users()
-
+        from .driver import Driver
+        # get all users from logged in user's 'grandfathered' list
         users_, name, number = Driver.get_driver().get_list(name="grandfathered")
-
+        # remove all users that have already been grandfathered from the list of all users
+        # users = [user for user in users if user not in users_] # i guess doesn't work?
         for i, user in enumerate(users[:]):
             for user_ in users_:
                 for key, value in user_.items():
                     if str(key) == "username" and str(user.username) == str(value):
                         users.remove(user)
 
-        # users = [user for user in users if user not in users_]
-
         def chunks(lst, n):
             """Yield successive n-sized chunks from lst."""
             for i in range(0, len(lst), n):
                 yield lst[i:i + n]
 
+        # get users in groups of 5 to allow performance over interrupts
         userChunks = chunks(users, 5)
         num = 1
         for userChunk in userChunks:
             print("Chunk: {}/{}".format(num, len(users)/5))
             num += 1
-            # add all users to 'grandfathered' list
+            # add users to 'grandfathered' list prior to discounting
             Settings.maybe_print("grandfathering: {}".format(len(userChunk)))
             try:
                 successful = Driver.get_driver().add_users_to_list(users=userChunk, number=number, name="grandfathered")
+                # if successful then discount
                 if not successful: return
-                d = Discount()
+                d = Discount() # discount will fill defaults with promotion values
                 d.grandfatherer(users=userChunk)
             except Exception as e:
-                print(e)
+                Settings.dev_print(e)
 
     @staticmethod
     def menu():
+        """Promotion menu interface"""
+
         if not Settings.is_debug():
             print("### Not Available ###")
             return
         action = Promotion.ask_action()
         if (action == 'Back'): pass
-        elif (action == 'apply to user'): Promotion.create_trial_link()
-        elif (action == 'create trial link'): Promotion.apply_to_user()
+        elif (action == 'trial'): Promotion.create_trial_link()
+        elif (action == 'campaign'): Promotion.create_campaign()
+        elif (action == 'user'): Promotion.apply_to_user()
         elif (action == 'grandfather'): Promotion.grandfathered()
 
     @staticmethod
     def ask_action():
-        options = ["back", "apply to user", "create trial link", "grandfather"]
+        """Promotion menu selection
+
+        Returns
+        -------
+        str
+            The menu action to take
+
+        """
+
+        # arg - promotion_method: campaign, trial, user, grandfather
+        options = ["back", 
+            "campaign", # 
+            "grandfather" # this mostly completely works
+            "trial", # this isn't even finished but it does mostly work
+            "user", # should this be here?
+        ]
         menu_prompt = {
             'type': 'list',
             'name': 'action',
@@ -1059,6 +1223,8 @@ class Promotion:
         answers = prompt(menu_prompt)
         return answers['action']
 
+########################################################################################
+########################################################################################
 ########################################################################################
 
 class Schedule:
@@ -1118,21 +1284,28 @@ class Schedule:
         self.gotten = True
 
     def get_date(self):
+        """
+        Gets the date value if not none else sets it from args or prompts.
+
+        Returns
+        -------
+        str
+            The date as a valid date string
+
+        """
+
         if self.date: return self.date
         date = Settings.get_date() or None
         if date: 
             self.date = date
             return date
+        # retrieve from args and return if exists
         schedule = Settings.get_schedule() or None
-
-        # if not Settings.is_prompt():
-        #     self.date = None
-        #     return None
-
         if schedule:
             date = datetime.strptime(str(schedule), "%Y-%m-%d %H:%M:%S")
             self.date = date.date()
             return self.date
+        # prompt skip
         if not Settings.prompt("date"): return None
         question = {
             'type': 'input',
@@ -1140,42 +1313,43 @@ class Schedule:
             'message': 'Enter a date (MM-DD-YYYY):',
             'validate': DateValidator
         }
-        answers = prompt(question)
-        date = answers["date"]
+        date = prompt(question)["date"]
+        # confirm date
         if not Settings.confirm(date): return self.get_date()
         self.date = date
         return self.date
 
     def get_time(self):
+        """
+        Gets the time value if not none else sets it from args or prompts.
+
+        Returns
+        -------
+        str
+            The time as a valid time string
+
+        """
+
         if self.time: return self.time
+        # retrieve from args and return if exists
         time = Settings.get_time() or None
         if time: 
             time = datetime.strptime(str(time), "%Y-%m-%d %H:%M:%S")
-            maybe_print('a')
-            maybe_print(time)
+            # Settings.dev_print(time)
             time = time.strftime("%I:%M %p")
-            maybe_print('b')
-            maybe_print(time)
+            # Settings.dev_print(time)
             self.time = time
-            maybe_print('c')
             return self.time
-            # return time
+        # retrieve time from schedule args and return if exists
         schedule = Settings.get_schedule() or None
-
-        # if not Settings.is_prompt():
-        #     self.time = None
-        #     return None
-
         if schedule:
             time = datetime.strptime(str(schedule), "%Y-%m-%d %H:%M:%S")
-            maybe_print('e')
-            maybe_print(time)
+            # Settings.dev_print(time)
             time = time.strftime("%I:%M %p")
-            maybe_print('f')
-            maybe_print(time)
+            # Settings.dev_print(time)
             self.time = time
-            maybe_print('g')
             return self.time
+        # prompt skip
         if not Settings.prompt("time"): return None
         question = {
             'type': 'input',
@@ -1183,8 +1357,8 @@ class Schedule:
             'message': 'Enter a time (HH:MM):',
             'validate': TimeValidator
         }
-        answers = prompt(question)
-        time = answers["time"]
+        time = prompt(question)["time"]
+        # confirm time
         if not Settings.confirm(time): return self.get_time()
         self.time = time
         return self.time
@@ -1192,7 +1366,3 @@ class Schedule:
 # round to 5
 def myround(x, base=5):
     return base * round(x/base)
-
-def maybe_print(s):
-    global DEBUGGING_DATE
-    if DEBUGGING_DATE: print(s)
