@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# 3/28/2019: Skeetzo
+
 import logging
 logging.getLogger('googleapicliet.discovery_cache').setLevel(logging.ERROR)
 
@@ -26,9 +26,8 @@ from .settings import Settings
 ##### Globals #####
 ###################
 
-CACHE = []
-
 AUTH = False
+CACHE = []
 DRIVE = None
 PYDRIVE = None
 ONE_GIGABYTE = 1000000000
@@ -61,8 +60,9 @@ def print_same_line(text):
 ##### Auth #####
 ################
 
-# Google Auth
 def authGoogle():
+    """Authorizes Google Drive API"""
+
     Settings.dev_print('Authenticating Google')
     try:
         # PyDrive
@@ -85,7 +85,7 @@ def authGoogle():
         gauth.SaveCredentialsFile(Settings.get_google_path())
         global PYDRIVE
         PYDRIVE = GoogleDrive(gauth)
-        # Drive v3 API
+        # Drive v3 API (alternative downloads)
         SCOPES = 'https://www.googleapis.com/auth/drive'
         store = file.Storage(Settings.get_google_path())
         creds = store.get()
@@ -102,65 +102,72 @@ def authGoogle():
     return True
 
 def checkAuth():
+    """Check if Google Drive is authorized, if not then authorize"""
+
     global AUTH
     if not AUTH:
         AUTH = authGoogle()
     return AUTH
 
-################################
-##### Archiving / Deleting #####
-################################
+###########################################
+##### Archiving / Creating / Deleting #####
+###########################################
 
-# Deletes folder
-def delete_folder(folder):
-    if Settings.is_delete() and Settings.is_delete_empty():
-        try:
-            print("Deleting empty folder: {}".format(folder["title"]))
-            folder.Trash()
-        except Exception as e: Settings.dev_print(e)
-
-# Archives posted file / folder by updating their parent id
-# posted
-# - [image, gallery, video, performer]
-# -- [file / folders]
 def backup_file(file):
+    """
+    Backs up file to Google Drive in OnlyFans/posted folder
+
+    Parameters
+    ----------
+    file : Google File
+        Google Drive file to backup
+
+    """
+
     try:
         global PYDRIVE
+        # get backup folder
         backupTo = get_folder_by_name("posted")
+        # determine category of folder to backup into
         stri = "posted/{}".format(backupTo["title"])
         if file.category or Settings.get_category():
             category = file.category or Settings.get_category()
+            # get the folder to back up to
             backupTo = get_posted_folder_by_name(category)
+            # if performer, get the proper inner category folder
             if str(category) == "performers" and Settings.get_category_performer():
                 backupTo = get_folder_by_name(Settings.get_category_performer(), parent=backupTo)
             stri = "posted/{}".format(backupTo["title"])
-        # check posted for folder of existing parent name
+
+        # check posted for folder to backup with existing name
         file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and title='{}'".format(backupTo['id'], str(file.get_parent()["title"]))}).GetList()
         if len(file_list) == 0:
             parentFolder = PYDRIVE.CreateFile({'title':str(file.get_parent()["title"]), 'parents':[{"kind": "drive#fileLink", "id": str(backupTo['id'])}], 'mimeType':'application/vnd.google-apps.folder'})
         else:
             parentFolder = file_list[0]
+
         parentFolder.Upload()
         Settings.dev_print("Moving To: {}".format(stri))
+        # change parents of file to "move" it
         file.get_file()['parents'] = [{"kind": "drive#fileLink", "id": str(parentFolder['id'])}]
         file.get_file().Upload()
         print("File Backed Up: {}".format(file.get_title()))
     except Exception as e:
         Settings.dev_print(e)
 
-###################
-##### Folders #####
-###################
-
 def create_folders():
+    """Create OnlySnarf category folders"""
+
     auth = checkAuth()
     if not auth: return
     print("Creating Folders: {}".format(Settings.get_drive_path()))
+    # get root OnlySnarf folder in Drive
     OnlyFansFolder = get_folder_root()
     if OnlyFansFolder is None:
-        print("Error: Unable To Create Folders")
+        print("Error: Unable To Create Category Folders")
         return
     file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(OnlyFansFolder['id'])}).GetList()
+    # create each missing folder
     for folder in Settings.get_categories():
         found = False
         for folder_ in file_list:
@@ -168,23 +175,192 @@ def create_folders():
                 Settings.maybe_print("Found Folder: {}".format(folder))
                 found = True
         if not found:
+            if not Settings.is_create_missing():
+                Settings.maybe_print("Skipping: Create Missing Category Folder - {}".format(folder))
+                continue   
             Settings.maybe_print("Created Folder: {}".format(folder))
             contentFolder = PYDRIVE.CreateFile({"title": str(folder), "parents": [{"id": OnlyFansFolder['id']}], "mimeType": "application/vnd.google-apps.folder"})
             contentFolder.Upload()
 
-def find_folder(parent, folderName):
-    checkAuth()
-    if str(parent) != "root":
-        parent = parent['id']
-    Settings.maybe_print("Finding Folder: {}/{}".format(parent, folderName))
-    file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(parent)}).GetList()
-    for folder in file_list:
-        if str(folder['title']) == str(folderName):
-            return folder
-    print("Error: Unable to Find Folder - {}".format(folderName))
-    return None
+def delete_folder(folder):
+    """
+    Delete folder
+
+    Parameters
+    ----------
+    folder : Google Folder
+        Google Drive folder to delete
+
+    """
+
+    if Settings.is_delete():
+        try:
+            print("Deleting folder: {}".format(folder["title"]))
+            folder.Trash()
+        except Exception as e: Settings.dev_print(e)
+
+#################
+##### Cache #####
+#################
+
+def cache_add(folders):
+    """Add folder to local cache"""
+
+    global CACHE
+    for folder in folders:
+        CACHE.append([folder['title'], folder])
+
+def cache_check(folderName):
+    """Check local cache for folder by name"""
+
+    global CACHE
+    for folder in CACHE:
+        if str(CACHE[0]) == str(folderName):
+            return CACHE[1]
+    return False
+
+####################
+##### Download #####
+####################
+
+def download_file(file):
+    """
+    Download file using one of two methods
+
+    1) PyDrive
+    2) Google Drive - shows download %
+
+    Parameters
+    ----------
+    file : Google File
+        Google file to download
+
+    Returns
+    -------
+    bool
+        Whether or not the download was successful
+
+    """
+
+    Settings.maybe_print("Downloading File: {}".format(file.get_title()))
+    def method_one():
+        try:
+            with open(str(file.get_path()), 'w+b') as output:
+                # print("8",end="",flush=True)
+                request = DRIVE.files().get_media(fileId=file.get_id())
+                downloader = MediaIoBaseDownload(output, request)
+                # print("=",end="",flush=True)
+                done = False
+                while done is False:
+                    # print("=",end="",flush=True)
+                    status, done = downloader.next_chunk()
+                    if int(Settings.get_verbosity()) >= 1:
+                        print("Downloading: %d%%\r" % (status.progress() * 100), end="")
+                # print("D")
+                Settings.maybe_print("Download Complete (1)")
+        except Exception as e:
+            Settings.dev_print(e)
+            return False
+        return True 
+    def method_two():
+        try:
+            file.get_file().GetContentFile(file.get_path())
+            Settings.maybe_print("Download Complete (2)")
+        except Exception as e:
+            Settings.dev_print(e)
+            return False
+        return True
+    successful = method_one() or method_two()
+    return successful
+
+###############
+##### Get #####
+###############
+
+def get_files_by_folder_id(folderID):
+    """Get files of folder by id
+
+    Parameters
+    ----------
+    folderID : str
+        The folder id of the Google Folder to get the files of
+
+    Returns
+    -------
+    list
+        A list of Google Files in the matching folder
+
+    """
+
+    if not folderID:
+        print("Error: Missing Folder ID")
+        return
+    auth = checkAuth()
+    if not auth: return []
+    return PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(folderID)}).GetList()
+    
+def get_file(id_):
+    """Get file by id
+
+    Parameters
+    ----------
+    id_ : str
+        The id of the Google File to locate
+
+    Returns
+    -------
+    Google File
+        The located Google File
+
+    """
+
+    auth = checkAuth()
+    if not auth: return
+    myfile = PYDRIVE.CreateFile({'id': id_})
+    # myfile.FetchMetadata()
+    return myfile
+
+def get_file_parent(id_):
+    """
+    Get parent file of file
+
+    Parameters
+    ----------
+    id_ : str
+        The id of the Google File to locate
+
+    Returns
+    -------
+    Google Folder
+        The located parent Google Folder
+
+    """
+    # auth = checkAuth()
+    # if not auth: return
+    # Settings.dev_print("getting file parent: {}".format(id_))
+    parent = get_file(id_)["parents"][0]
+    parent = PYDRIVE.CreateFile({'id': parent["id"]})
+    return parent
+
 
 def get_folder_by_name(folderName, parent=None):
+    """
+    Find folder by name with parent
+    
+    Parameters
+    ----------
+    folderName : str
+        Name of folder to find
+    parent : str
+        Optional parent folder to search within 
+
+    Returns
+    -------
+    Google Folder
+        The located / created Google Folder
+
+    """
+
     global CACHE
     if cache_check(folderName): return cache_check(folderName)
     auth = checkAuth()
@@ -208,84 +384,71 @@ def get_folder_by_name(folderName, parent=None):
     Settings.maybe_print("Created Folder: {}".format(folderName))
     return folder
 
-
-####################
-##### Download #####
-####################
-
-def download_file(file):
-    Settings.maybe_print("Downloading File: {}".format(file.get_title()))
-    # download file
-    def method_two():
-        file.get_file().GetContentFile(file.get_path())
-        Settings.maybe_print("Download Complete (2)")
-    def method_one():
-        try:
-            with open(str(file.get_path()), 'w+b') as output:
-                # print("8",end="",flush=True)
-                request = DRIVE.files().get_media(fileId=file.get_id())
-                downloader = MediaIoBaseDownload(output, request)
-                # print("=",end="",flush=True)
-                done = False
-                while done is False:
-                    # print("=",end="",flush=True)
-                    status, done = downloader.next_chunk()
-                    if int(Settings.get_verbosity()) >= 1:
-                        print("Downloading: %d%%\r" % (status.progress() * 100), end="")
-                # print("D")
-                Settings.maybe_print("Download Complete (1)")
-        except Exception as e:
-            Settings.dev_print(e)
-            return False
-        return True 
-    successful = method_one() or method_two()
-    return successful
-
-###############
-##### Get #####
-###############
-
-def get_files_by_folder_id(folderID):
-    if not folderID:
-        print("Error: Missing Folder ID")
-        return
-    auth = checkAuth()
-    if not auth: return []
-    return PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(folderID)}).GetList()
-    
-def get_file(id_):
-    auth = checkAuth()
-    if not auth: return
-    myfile = PYDRIVE.CreateFile({'id': id_})
-    # myfile.FetchMetadata()
-    return myfile
-
-def get_file_parent(id_):
-    # Settings.dev_print("getting file parent: {}".format(id_))
-    parent = get_file(id_)["parents"][0]
-    parent = PYDRIVE.CreateFile({'id': parent["id"]})
-    return parent
-
 def get_images_of_folder(folder):
+    """
+    Get all image files of folder
+
+    Parameters
+    ----------
+    folder : Google Folder
+        The Google Folder to search for images
+
+    Returns
+    -------
+    list
+        The images located within the folder
+
+    """
+
     image_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and {}".format(folder['id'], MIMETYPES_IMAGES)}).GetList()
     if len(image_list) > 0:
         Settings.dev_print('Images: {}'.format(len(image_list)))
     else:
         Settings.maybe_print("Images Folder (empty): {}".format(folder['title']))
-        delete_folder(folder)
+        if Settings.is_delete_empty(): delete_folder(folder)
     return image_list
 
 def get_videos_of_folder(folder):
+    """
+    Gets all video files of folder
+
+    Parameters
+    ----------
+    folder : Google Folder
+        The Google Folder to search for videos
+
+    Returns
+    -------
+    list
+        The videos located within the folder
+
+    """
+
     video_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false and {}".format(folder['id'], MIMETYPES_VIDEOS)}).GetList()
     if len(video_list) > 0:
         Settings.dev_print('Videos: {}'.format(len(video_list)))
     else:
         Settings.maybe_print("Video Folder (empty): {}".format(folder['title']))
-        delete_folder(folder)
+        if Settings.is_delete_empty(): delete_folder(folder)
     return video_list
 
 # returns first layer of files found
 def get_folders_of_folder_by_keywords(folder):
+    """
+    Gets all folders in folder by the matching keywords
+
+    Parameters
+    ----------
+    folder : Google Folder
+        The Google Folder to search for keywords within
+
+    Returns
+    -------
+    list
+        The matching keyword folders located within folder
+
+    """
+
     auth = checkAuth()
     if not auth: return []
     Settings.maybe_print("Getting Keywords in: {}".format(folder['title']))
@@ -308,6 +471,23 @@ def get_folders_of_folder_by_keywords(folder):
     return foundFolders
 
 def get_posted_folder_by_name(folderName, parent=None):
+    """
+    Get folder in "posted" folders by name.
+
+    Parameters
+    ----------
+    folderName : str
+        Name of the folder to find
+    parent : Google Folder
+        Optional Google Folder to search in
+
+    Returns
+    -------
+    Google Folder
+        The Google Folder that matches the folderName
+
+    """
+
     global CACHE
     if cache_check(folderName): return cache_check(folderName)
     auth = checkAuth()
@@ -348,6 +528,21 @@ def get_posted_folder_by_name(folderName, parent=None):
     return folder
 
 def get_folders_of_folder(folder):
+    """
+    Get folders of folder.
+
+    Parameters
+    ----------
+    folder : Google Folder
+        The folder to get the folders of
+
+    Returns
+    -------
+    list
+        A list of the folders found
+
+    """
+
     global CACHE
     if cache_check(folder): return cache_check(folder)
     auth = checkAuth()
@@ -362,12 +557,24 @@ def get_folders_of_folder(folder):
             folders.append(folder)
         else:
             Settings.maybe_print("Found Folder (empty): {}".format(folder['title']))
-            delete_folder(folder)
+            if Settings.is_delete_empty(): delete_folder(folder)
     cache_add(folders)
     return folders
 
 # Creates the OnlyFans folder structure
 def get_folder_root():
+    """
+    Gets the OnlySnarf root folder.
+
+    Creates the OnlySnarf folder structure if missing.
+
+    Returns
+    -------
+    Google Folder
+        The root OnlySnarf folder
+
+    """
+
     auth = checkAuth()
     if not auth: return
     global OnlyFansFolder_
@@ -379,14 +586,12 @@ def get_folder_root():
         root_folders = str(Settings.get_drive_path()).split("/")
         Settings.maybe_print("Mount Folders: {}".format("/".join(root_folders)))    
         for folder in root_folders:
-            # mount_root = get_folder_by_name(mount_root, parent=folder)
-            mount_root = find_folder(mount_root, folder)
+            mount_root = get_folder_by_name(mount_root, parent=folder)
             if mount_root is None:
                 mount_root = "root"
                 print("Warning: Drive Mount Folder Not Found")
                 break
-        # mount_root = get_folder_by_name(mount_root, parent=Settings.get_drive_root())
-        mount_root = find_folder(mount_root, Settings.get_drive_root())
+        mount_root = get_folder_by_name(mount_root, parent=Settings.get_drive_root())
         if mount_root is None:
             mount_root = {"id":"root"}
             print("Warning: Drive Mount Folder Not Found")
@@ -411,6 +616,21 @@ def get_folder_root():
 ##################
 
 def upload_file(file=None):
+    """
+    Upload file to Google Drive
+
+    Parameters
+    ----------
+    file : Google File
+        Google file to be uploaded
+
+    Returns
+    -------
+    bool
+        Whether or not the upload was successful
+
+    """
+
     auth = checkAuth()
     if not auth: return False
     if not file:
@@ -424,24 +644,27 @@ def upload_file(file=None):
         return False
     else:
         print('Google Upload (file): {}'.format(filename))
-    # if not mimetype:
-    #     print("Error: Missing Mimetype")
-    #     return
-    
-    # file_metadata = {
-    #     'name': str(filename),
-    #     'mimeType': str(mimetype),
-    #     'parents': [{"kind": "drive#fileLink", "id": str(parent['id'])}]
-    # }
-    # media = MediaFileUpload(path, mimetype=str(mimetype), resumable=True)
-    # file = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
     uploadedFile = PYDRIVE.CreateFile({'title':str(file.get_title()), 'parents':[{"kind": "drive#fileLink", "id": str(file.get_parent()["id"])}],'mimeType':str(file.get_mimetype())})
     uploadedFile.SetContentFile(file.get_path())
     uploadedFile.Upload()
-    # print('File ID: {}'.format(file.get('id')))
     return True
 
 def upload_gallery(files=[]):
+    """
+    Upload files to folder.
+
+    Parameters
+    ----------
+    files : list
+        The list of files to upload
+
+    Returns
+    -------
+    bool
+        Whether or not the upload was successful
+
+    """
+
     parent = get_folder_by_name("posted")
     if not parent:
         print("Error: Missing Posted Folder")
@@ -454,13 +677,6 @@ def upload_gallery(files=[]):
         return False
     else:
         print('Google Upload: {}'.format(path))
-    # file_metadata = {
-    #     'name': str(datetime.datetime.now()),
-    #     'mimeType': str("application/vnd.google-apps.folder"),
-    #     'parents': [{"kind": "drive#fileLink", "id": str(parent['id'])}]
-    # }
-    # media = MediaFileUpload(path, mimetype="application/vnd.google-apps.folder", resumable=True)
-    # parent = DRIVE.files().create(body=file_metadata, fields='id').execute()
     tmp_folder = PYDRIVE.CreateFile({'title':str(datetime.datetime.now()), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':'application/vnd.google-apps.folder'})
     tmp_folder.Upload()
     successful = False
@@ -468,28 +684,3 @@ def upload_gallery(files=[]):
         setattr(file, "parent", tmp_folder)
         successful = upload_file(file=file)
     return successful
-
-
-def cache_add(folders):
-    global CACHE
-    for folder in folders:
-        CACHE.append([folder['title'], folder])
-
-def cache_check(folderName):
-    global CACHE
-    for folder in CACHE:
-        if str(CACHE[0]) == str(folderName):
-            return CACHE[1]
-    return False
-
-
-
-
-
-
-
-
-
-
-
-

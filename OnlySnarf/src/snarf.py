@@ -20,6 +20,8 @@ class Snarf:
     """OnlySnarf main class and runtime parser"""
 
     def __init__(self):
+        """Snarf object"""
+
         pass
 
     @staticmethod
@@ -181,6 +183,8 @@ class Snarf:
 ################################################################################################################################################
 
 def exit_handler():
+    """Exit cleanly"""
+
     from .driver import Driver
     Driver.exit_all()
     print("Shnarrf?")

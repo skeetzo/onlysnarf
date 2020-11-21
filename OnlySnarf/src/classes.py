@@ -545,7 +545,7 @@ class Message():
         self.price = price
         return self.price
 
-def get_recipients(self):
+    def get_recipients(self):
         """
         Gets the recipients value if not none else sets it from args or prompts.
 

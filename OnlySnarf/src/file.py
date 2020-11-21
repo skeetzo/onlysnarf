@@ -31,30 +31,37 @@ def print_same_line(text):
 ###############################################################
 
 class File():
+    """File class"""
+
     FILES = None
 
     def __init__(self):
+        """File object represents local image/video file"""
+
+        # the path to the file locally
         self.path = None
+        # the file extension
         self.ext = None
+        # image|video
         self.type = None
         ##
+        # file title reference
         self.title = None
-        self.category = None # [image, gallery, video, performer]
+        # [image, gallery, video, performer]
+        self.category = None
+        # file size
         self.size = None
 
     ######################################################################################
 
-    # move to backup folder in GDrive
-    # Google.move_file
-    # Google.move_files
     def backup(self):
+        """Backup file to appropriate destination source"""
+
         if not File.backup_text(self.get_title()): return
         if Settings.get_destination() == "remote":
             Remote.upload_file(self)
         elif Settings.get_destination() == "google":
             Google.upload_file(file=self)
-        # elif Settings.get_destination() == "dropbox":
-            # Dropbox.upload_file(file=self)
         else:
             # move file to local backup location
             backupPath = os.path.join(Settings.get_local_path(), "posted")
@@ -63,6 +70,16 @@ class File():
 
     @staticmethod
     def backup_text(title):
+        """
+        Print applicable backup text
+
+        Returns
+        -------
+        bool
+            Whether or not the file should be backed up
+
+        """
+
         if Settings.is_skip_download():
             Settings.maybe_print("Warning: Skipping Backup, skipped download")
             return False
@@ -80,19 +97,37 @@ class File():
 
     @staticmethod
     def backup_files(files=[]):
+        """
+        Backup files provided to appropriate destinations
+
+        Returns
+        -------
+        bool
+            Whether or not the files were backed up successfully
+
+        """
+
         if not File.backup_text(self.get_title()): return
         if Settings.get_destination() == "remote":
             Remote.upload_files(files)
         elif Settings.get_destination() == "google":
             Google.upload_files(files)
-        # elif Settings.get_destination() == "dropbox":
-            # Dropbox.upload_files(files)
         else:
             for file in files:
                 file.backup()
         return True
 
     def check_size(self):
+        """
+        Check file size.
+
+        Returns
+        -------
+        bool
+            Whether or not the file exists by checking size
+
+        """
+
         if not self.size:
             if not os.path.exists(self.get_path()): return False
             size = os.path.getsize(self.get_path())
@@ -100,30 +135,19 @@ class File():
         Settings.maybe_print("File Size: {}kb - {}mb".format(size/1000, size/1000000))
         global ONE_MEGABYTE
         if size <= ONE_MEGABYTE:
-            Settings.maybe_print("Warning: Small File Size")
+            Settings.warn_print("Small File Size")
         global ONE_HUNDRED_KILOBYTES
         if size <= ONE_HUNDRED_KILOBYTES:
-            Settings.maybe_print("Warning: Tiny File Size")
+            Settings.warn_print("Tiny File Size")
         self.size = size
         if size == 0:
-            Settings.maybe_print("Error: Empty File Size")
+            Settings.err_print("Empty File Size")
             return False
         return True
 
-    # def combine(self):
-    #     if len(self.files) == 0: return
-    #     Settings.dev_print("combining files: {}".format(len(self.files)))
-    #     Settings.dev_print("combine path: {}".format(combinedPath))
-    #     combinedPath = os.path.join(File.get_tmp(), "{}-combined".format(self.title))
-    #     for file in files:
-    #         shutil.move(file.get_path(), combinedPath)
-    #         file.path = "{}/{}".format(combinedPath, self.title)
-    #     self.combined = ffmpeg.combine(combinedPath)
-
-    ##############################
-
-    # Deletes online file
     def delete(self):
+        """Delete file"""
+
         if not File.delete_text(self.get_title()): return
         try: 
             os.remove(self.get_path())
@@ -132,6 +156,16 @@ class File():
 
     @staticmethod
     def delete_text(title):
+        """
+        Print applicable deletion text
+        
+        Returns
+        -------
+        bool
+            Whether or not the file should be deleted
+
+        """
+
         if Settings.is_skip_download():
             Settings.maybe_print("Warning: Skipping Delete, skipped download")
             return False
@@ -147,6 +181,16 @@ class File():
 
     @staticmethod
     def download_text(title):
+        """
+        Print applicable download text.
+        
+        Returns
+        -------
+        bool
+            Whether or not the file should be downloaded
+
+        """
+
         if Settings.is_skip_download():
             print("Skipping Download (debug)")
             return False
@@ -155,16 +199,38 @@ class File():
     ##############################
 
     def get_ext(self):
+        """Get the file's extension"""
+
         if self.ext: return self.ext
         self.get_title()
 
     def get_path(self):
+        """
+        Get the file's path
+        
+        Returns
+        -------
+        str
+            The file path
+
+        """
+
         if not self.path:
             Settings.maybe_print("Error: Missing File Path")
             return  ""
         return self.path
 
     def get_title(self):
+        """
+        Get the file's title from it's filename
+        
+        Returns
+        -------
+        str
+            The file's title or filename without extension
+
+        """
+
         if self.title: return self.title
         path = self.get_path()
         if str(path) == "": 
@@ -175,17 +241,10 @@ class File():
         self.title = "{}{}".format(os.path.basename(title), ext)
         return self.title
 
-    # def get_type(self):
-    #     if str(self.type) != "": return self.type
-    #     if (self.get_ext()) in MIMETYPES_IMAGES_LIST:
-    #         self.type = Image()
-    #     elif (self.get_ext()) in MIMETYPES_VIDEOS_LIST:
-    #         self.type = Video()
-    #     setattr(self.type, "path", self.get_path())
-    #     return self.type
-
     @staticmethod
     def get_tmp():
+        """Creates / gets the default temporary download directory"""
+
         # tmp = os.getcwd()
         # if Settings.get_download_path() != "":
         #     tmp = os.path.join(Settings.get_download_path(), "tmp")
@@ -200,6 +259,16 @@ class File():
         return download_path
 
     def get_type(self):
+        """
+        Gets the file's type as an inner class of either Image or Video
+        
+        Returns
+        -------
+        Image|Video
+            The file's type as an image or video class
+
+        """
+
         if self.type: return self.type
         if str(self.get_ext()) in str(MIMETYPES_VIDEOS_LIST):
             self.type = Video()
@@ -208,19 +277,32 @@ class File():
         else: print("Warning: Unable to Parse File Type")
         return self.type
 
-    # files are File references
-    # file references can be GoogleId references which need to download their source
-    # files exist when checked for size
     def prepare(self):
-        Settings.maybe_print("preparing0: {}".format(self.get_title()))
+        """
+        Prepares the file for uploading.
+
+        Runs the apppropriate file type method and downloads the file locally if necessary.
+
+        Returns
+        -------
+        bool
+            Whether or not the file is prepared
+
+        """
+
+        # Settings.maybe_print("preparing: {}".format(self.get_title()))
         self.get_type().prepare()
         if not self.check_size():
             return False
         return True
 
-    # Deletes all local files
     @staticmethod
     def remove_local():
+        """
+        Delete all local files.
+
+        """
+
         try:
             # if str(Settings.SKIP_DELETE) == "True":
                 # Settings.maybe_print("Skipping Local Remove")
@@ -238,6 +320,16 @@ class File():
 
     @staticmethod
     def get_files():
+        """
+        Get files from the runtime category folder.
+
+        Returns
+        -------
+        list
+            The files retrieved
+
+        """
+
         if File.FILES: return File.FILES
         category = Settings.get_category()
         if not category: category = Settings.select_category()
@@ -253,6 +345,21 @@ class File():
 
     @staticmethod
     def get_files_by_folder(path):
+        """
+        Get local files from the local folder path.
+
+        Parameters
+        ----------
+        path : str
+            Path to folder to get files of
+
+        Returns
+        -------
+        list
+            The files at the path
+
+        """
+
         f = []
         for (dirpath, dirnames, filenames) in walk(path):
             f.extend(filenames)
@@ -260,6 +367,23 @@ class File():
         return f
 
     def get_folder_by_name(category, parent=None):
+        """
+        Get local folder by category and parent.
+
+        Parameters
+        ----------
+        category : str
+            The category or folder name to get
+        parent : file.Folder
+            The local folder's parent to search within
+
+        Returns
+        -------
+        str
+            The folder path of the found folder
+
+        """
+
         if not parent:
             parent = Settings.get_local_path()
         Settings.maybe_print("parent: {}".format(parent))
@@ -273,8 +397,199 @@ class File():
             break
         return None
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     @staticmethod
     def get_folders_of_folder_by_keywords(categoryFolder):
+        """
+        Summary line.
+
+        Extended description of function.
+
+        Parameters
+        ----------
+        arg1 : int
+            Description of arg1
+        arg2 : str
+            Description of arg2
+
+        Returns
+        -------
+        int
+            Description of return value
+
+        """
+
         Settings.dev_print("getting keywords of folder: {}".format(categoryFolder))
         if categoryFolder == None: return []
         folders = File.get_folders_of_folder(categoryFolder)
@@ -295,10 +610,31 @@ class File():
 
     @staticmethod
     def get_random_file():
+        """Get random file from all files"""
+
         return random.choice(File.get_files())
 
     @staticmethod
     def get_images_of_folder(folder):
+        """
+        Summary line.
+
+        Extended description of function.
+
+        Parameters
+        ----------
+        arg1 : int
+            Description of arg1
+        arg2 : str
+            Description of arg2
+
+        Returns
+        -------
+        int
+            Description of return value
+
+        """
+
         Settings.dev_print("getting images of folder: {}".format(folder.get_title()))
         if not folder: return []
         imgs = []
@@ -316,6 +652,25 @@ class File():
 
     @staticmethod
     def get_videos_of_folder(folder):
+        """
+        Summary line.
+
+        Extended description of function.
+
+        Parameters
+        ----------
+        arg1 : int
+            Description of arg1
+        arg2 : str
+            Description of arg2
+
+        Returns
+        -------
+        int
+            Description of return value
+
+        """
+
         Settings.dev_print("getting videos of folder: {}".format(folder.get_title()))
         if not folder: return []
         videos = []
@@ -333,6 +688,25 @@ class File():
 
     @staticmethod
     def get_folders_of_folder(folderPath):
+        """
+        Summary line.
+
+        Extended description of function.
+
+        Parameters
+        ----------
+        arg1 : int
+            Description of arg1
+        arg2 : str
+            Description of arg2
+
+        Returns
+        -------
+        int
+            Description of return value
+
+        """
+
         # os.walk(directory)
         # will yield a tuple for each subdirectory. Ths first entry in the 3-tuple is a directory name, so
         # [x[0] for x in os.walk(directory)]
@@ -351,10 +725,48 @@ class File():
 
     @staticmethod
     def get_files_by_category(cat, performer=None):
+        """
+        Summary line.
+
+        Extended description of function.
+
+        Parameters
+        ----------
+        arg1 : int
+            Description of arg1
+        arg2 : str
+            Description of arg2
+
+        Returns
+        -------
+        int
+            Description of return value
+
+        """
+
         Settings.maybe_print("loading local files...")
         files = []
         ##
         def parse_categories(category, categoryFolder=None):
+            """
+            Summary line.
+
+            Extended description of function.
+
+            Parameters
+            ----------
+            arg1 : int
+                Description of arg1
+            arg2 : str
+                Description of arg2
+
+            Returns
+            -------
+            int
+                Description of return value
+
+            """
+
             files = []
             # return File.get_files_by_category(cat)
             if "image" in str(category):
@@ -411,6 +823,25 @@ class File():
 
     @staticmethod
     def select_file(category, performer=None):
+        """
+        Summary line.
+
+        Extended description of function.
+
+        Parameters
+        ----------
+        arg1 : int
+            Description of arg1
+        arg2 : str
+            Description of arg2
+
+        Returns
+        -------
+        int
+            Description of return value
+
+        """
+
         files = File.get_files_by_category(category, performer=performer)
         files_ = []
         for file in files:
@@ -445,6 +876,25 @@ class File():
 
     @staticmethod
     def select_files():
+        """
+        Summary line.
+
+        Extended description of function.
+
+        Parameters
+        ----------
+        arg1 : int
+            Description of arg1
+        arg2 : str
+            Description of arg2
+
+        Returns
+        -------
+        int
+            Description of return value
+
+        """
+
         if not Settings.is_prompt(): return [File.get_random_file()]
         category = Settings.select_category()
         if not category: return File.select_file_upload_method()
@@ -472,6 +922,16 @@ class File():
 
     @staticmethod
     def select_file_upload_method():
+        """
+        Menu to select the method to upload a file.
+
+        Returns
+        -------
+        list
+            The appropriately selected files
+
+        """
+
         if not Settings.prompt("upload files"): 
             return "unset"
         print("Select an upload source")
@@ -483,6 +943,12 @@ class File():
             'choices': [src.title() for src in sources]
         }
         upload = PyInquirer.prompt(question)["upload"]
+
+
+        # everything after this part should be in another function
+        # this should just return the string of the upload source
+
+
         if str(upload) == "Local":
             return File.select_files()
         elif str(upload) == "Google":
@@ -493,7 +959,32 @@ class File():
             return Remote.select_files()
         return File.select_files()
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     def upload(self):
+        """
+        Process ran by a file after it has been uploaded.
+
+        Ensures the file has been backed up and then deleted locally.
+        
+        Returns
+        -------
+        bool
+            Whether or not the file was properly handled after its upload
+
+        """
         if not self.prepare():
             print("Error: Unable to Upload File - {}".format(self.get_title()))
             return False
@@ -502,6 +993,39 @@ class File():
         return True
 
 ##
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class Remote_File(File):
     def __init__(self):
@@ -554,6 +1078,19 @@ class Folder(File):
             exists = file.check_size()
             if not exists: return False
         return True
+
+    # def combine(self):
+    #     if len(self.files) == 0: return
+    #     Settings.dev_print("combining files: {}".format(len(self.files)))
+    #     Settings.dev_print("combine path: {}".format(combinedPath))
+    #     combinedPath = os.path.join(File.get_tmp(), "{}-combined".format(self.title))
+    #     for file in files:
+    #         shutil.move(file.get_path(), combinedPath)
+    #         file.path = "{}/{}".format(combinedPath, self.title)
+    #     self.combined = ffmpeg.combine(combinedPath)
+
+    ##############################
+
 
     def download(self):
         print("Downloading Folder: {}".format(self.get_title()))
