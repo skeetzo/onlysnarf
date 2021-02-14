@@ -433,8 +433,14 @@
   - automatically heart / send dick pics to tips in messages
   **3.0.1**
   - added argument error catch
+  **3.0.2**
+  - documentation started
+  **3.0.3**
+  - selenium version 3.141.1 -> 3.141.59
+  - bin/install-firefox version 26 -> 29
 
 ----------------------------------------  
+
   - empty messages bug: Type a message below to start a conversation with 
 
   **x.x.x**
