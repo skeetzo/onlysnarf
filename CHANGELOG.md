@@ -438,6 +438,8 @@
   **3.0.3**
   - selenium version 3.141.1 -> 3.141.59
   - bin/install-firefox version 26 -> 29
+  **3.0.4**
+  - jk no selenium bump...
 
 ----------------------------------------  
 

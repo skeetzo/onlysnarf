@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="3.0.3",
+    version="3.0.4",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
@@ -16,7 +16,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     install_requires=[
-        'selenium==3.141.59',
+        'selenium==3.141.0',
         'pydrive',
         'pathlib', 
         'chromedriver-binary',
