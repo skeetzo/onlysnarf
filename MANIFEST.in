@@ -1,0 +1,13 @@
+# Config
+include OnlySnarf/src/*
+include OnlySnarf/bin/*
+include OnlySnarf/config.conf
+include OnlySnarf/google_creds.txt
+
+exclude OnlySnarf/notes.py
+
+# Include the README
+include *.md
+
+# Include the license file
+include LICENSE.txt

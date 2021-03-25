@@ -1,0 +1,57 @@
+so it takes fucking forever to read 1 chat at a time
+
+1 driver controls 1 browser
+
+even if i had multiple tabs open in 1 browser, it would need a locking system to properly manage
+and even then it would still only focus on 1 browser at a time
+
+so i need to open multiple browsers
+and have each browser remember its behavior to do/close
+
+it would be much nicer if i could open tabs on the same driver and have a new driver control that tab
+cause that would likely allow for preserving the login state
+or just create a browser using the same cookies / session
+
+
+
+i should have 1 driver control 1 browser
+
+i should have a max number of browsers that can be opened
+i can then create a threadpool for queuing drivers for actions such as messaging multiple users
+
+i should have tabs be opened when i'm opening a new page
+otherwise i can just focus on the already opened page
+i should close tabs after a set amount of time
+
+
+
+since Driver is setup to globally use 1 browser, i'll need to update it to having a browser
+per Driver object
+
+
+
+
+
+
+
+
+
+
+
+since i'm going to be saving pages and opening new tabs,
+some functions are going to need to be updated to searching for already existing browsers
+and then if one of those browsers has the page already open
+if not, then it should open a tab from the main browser for example to the users page
+
+
+user.discount
+user.get_id
+user.message
+user.enter_message
+user.message stuff
+user.read_chat
+user.read_statements
+user.get_active_users
+user.get_following
+
+

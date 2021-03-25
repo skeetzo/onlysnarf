@@ -1,70 +1,114 @@
-# Getting Started with Create React App
+# OnlySnarf
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+`pip3 install OnlySnarf`  
+or  
+`git clone git@github.com:skeetzo/onlysnarf && sudo python3 setup.py install`
 
-## Available Scripts
+## Description
 
-In the project directory, you can run:
+OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans. OnlySnarf is capable of downloading a file (image or video) or gallery of files (images) locally or from a remote location such as a [local or remote file system, Google Drive, ...] to upload to an OnlyFans account.
 
-### `yarn start`
+## Menu
+[Menu](https://github.com/skeetzo/onlysnarf/blob/master/menu.md)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Previews
+![preview](https://github.com/skeetzo/onlysnarf/blob/master/images/preview.jpeg)
+[Gallery](https://github.com/skeetzo/onlysnarf/blob/master/images/gallery.gif)
+[Video](https://github.com/skeetzo/onlysnarf/blob/master/images/video.gif)
+[Discount](https://github.com/skeetzo/onlysnarf/blob/master/images/discount-recent.gif)
+[Message](https://github.com/skeetzo/onlysnarf/blob/master/images/message-recent-debug.gif)
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Scripts
+First run:  
+  * `(sudo) onlysnarf-config`
+Then from within project's OnlySnarf directory either:  
+  * `(sudo) onlysnarf [args]`
+  * `(sudo) onlysnarfpy (-debug) -category image|gallery|video`
+  * or directly via `python3 onlysnarf.py (-debug) -category image|gallery|video`
 
-### `yarn test`
+## args
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+-debug  
+  `python3 onlysnarf.py -debug`  
+Tests configuration. Does not upload or remove from Google Drive.
 
-### `yarn build`
+-category image  
+  `python3 onlysnarf.py -category image`  
+Uploads an image labeled: 'imageName - %d%m%y'  
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+-category gallery  
+  `python3 onlysnarf.py -category gallery`  
+Uploads a gallery labeled: 'folderName - %d%m%y'  
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+-category video  
+  `python3 onlysnarf.py -category video`  
+Uploads a video labeled: 'folderName - %d%m%y'  
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+-text  
+  `python3 onlysnarf.py -category video -text "your mom"`  
+Uploads a video labeled: 'your mom'  
 
-### `yarn eject`
+-show
+  `python3 onlysnarf.py -show`
+Shows the Chromium browser
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+**more available in menu**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Or include a 'config.conf' file located at '/opt/onlysnarf/config.conf' to set variables at runtime without using arguments. An example file has been provided. Please be sure to follow the key:value pattern. A starting # denotes a comment.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Authentication  
+--------------
+When downloading/uploading from a Google Drive account this package requires configuring a Google App with *PyDrive* for access to your Google Drive. The Drive API requires OAuth2.0 for authentication.
+###### from [Auth Quickstart](https://raw.githubusercontent.com/gsuitedevs/PyDrive/master/docs/quickstart.rst)
+1. Go to `APIs Console`_ and make your own project.
+2. Search for 'Google Drive API', select the entry, and click 'Enable'.
+3. Select 'Credentials' from the left menu, click 'Create Credentials', select 'OAuth client ID'.
+4. Now, the product name and consent screen need to be set -> click 'Configure consent screen' and follow the instructions. Once finished:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+ a. Select 'Application type' to be *Web application*.
+ b. Enter an appropriate name.
+ c. Input *http://localhost:8080* for 'Authorized JavaScript origins'.
+ d. Input *http://localhost:8080/* for 'Authorized redirect URIs'.
+ e. Click 'Create'.
 
-## Learn More
+5. Click 'Download JSON' on the right side of Client ID to download **client_secret_<really long ID>.json**.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+**Rename the file to "client_secrets.json" and place it into your installed OnlySnarf directory.**
+To update your installation with the new file, run `onlysnarf-config`, select 'Update Google Creds', and enter the location of your "client_secret.json" file.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Config
+##### config.conf  
+Path: /opt/onlysnarf/config.conf (previously /etc/onlysnarf/config.conf)
+Create or update the "config.conf" file with the following values:
+  * username -> the Twitter connected to your OnlyFans's username  
+  * password -> the Twitter conencted to your OnlyFans's password  
 
-### Code Splitting
+###### Why Twitter credentials?
+OnlyFans uses a captcha to prevent malicious bots from accessing user accounts. However, this captcha is only necessary when logging in with your OnlyFans username and password. Logging in with the provided Twitter authentication does not provide a captcha and thus allows a more accessible automated entrance.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+##### google_creds.txt   
+Generated by Google Drive's authentication process. Saves Google authentication for repeat access.
 
-### Analyzing the Bundle Size
+##### settings.yaml  
+Used to facilitate Google Drive's python authentication. Requires generating an app w/ credentials via Google Console. Credentials are authenticated once and then saved to "google_creds.txt".
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Example Crons  
 
-### Making a Progressive Web App
+Upload a random image once a day at noon:  
+  `* 12 * * * onlysnarfpy -category image`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Upload a random gallery of images every Wednesday at 2:30pm:  
+  `30 14 * * 3 onlysnarfpy -category gallery`
 
-### Advanced Configuration
+Upload a random video every Friday in the month of June at 6:00pm:  
+  `00 18 * 6 5 onlysnarfpy -category video`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Text will be generated if not provided with `-text`
+  `* 12 * * * onlysnarfpy -category image -text "Your mother is a dirty whore"`
 
-### Deployment
+## Dependencies
+  ### Google Chrome -> `sudo apt install -y google-chrome-beta`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Referral
+Feel free to make use of my referral code ;)  
+https://onlyfans.com/?ref=409408
