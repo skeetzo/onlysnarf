@@ -1,6 +1,0 @@
-{
-  "rules": {
-    "one-var": "off",
-    "@typescript-eslint/no-explicit-any": "off" // let's do better in the future
-  }
-}

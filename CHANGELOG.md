@@ -46,7 +46,7 @@
   - settings globals -> class
   **4/16/2019**
   - fucking default variables
-**1.0.0 : 4/22/2019**
+**1.0.0 : Production : 4/22/2019**
   - save image_name instead of path
   - uploaded to pip
   **1.0.1**
@@ -421,7 +421,7 @@
   - more debugging
   - fixed: file input
   - debugging: grandfathered
-**3.0.0 : 9/21/2020**
+**3.0.0 : Bot Experiments : 9/21/2020**
   - major updates to browsers debugged
   - added: grandfather promotion
   - added: user lists (finally) - favorites, bookmarks, friends, etc
@@ -440,9 +440,15 @@
   - bin/install-firefox version 26 -> 29
   **3.0.4**
   - jk no selenium bump...
-
-  **3.0.5**
+**4.0.0 : Flask & React : 3/24/2021**
   - flask-react integration and folder restructure
+  **4.0.1**
+  - combined args: download_max & upload_max -> image-limit
+  - added arg: delete (from delete_google)
+  - removed: all cron references
+  - changed: output print to log and uppercase to lowercase, except for menu cli
+
+----------------------------------------  
 
 ----------------------------------------  
 
