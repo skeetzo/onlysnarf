@@ -442,12 +442,14 @@
   - jk no selenium bump...
 **4.0.0 : Flask & React : 3/24/2021**
   - flask-react integration and folder restructure
-  **4.0.1**
+  **3/25/2021**
   - combined args: download_max & upload_max -> image-limit
   - added arg: delete (from delete_google)
   - removed: all cron references
   - changed: output print to log and uppercase to lowercase, except for menu cli
-
+  **4/14/2021**
+  - added test skeletons
+  
 ----------------------------------------  
 
 ----------------------------------------  

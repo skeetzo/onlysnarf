@@ -22,6 +22,7 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 # onlysnarfpy -verbose -verbose -verbose -action promotion -promotion-method "grandfather" -prefer-local
 
+onlysnarfpy -debug -verbose -verbose -category image
 onlysnarfpy -debug -verbose -verbose -browser firefox -action bot -keep -prefer-local
 onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action bot -keep -prefer-local
 onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action post -category gallery
