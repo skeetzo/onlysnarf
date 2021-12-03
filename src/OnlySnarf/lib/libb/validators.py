@@ -1,7 +1,7 @@
 import argparse, os
 from datetime import datetime
 from PyInquirer import Validator, ValidationError
-from .libb import defaults as DEFAULT
+from . import defaults as DEFAULT
 
 # Validators
 

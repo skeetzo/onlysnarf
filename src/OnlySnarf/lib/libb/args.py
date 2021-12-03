@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser(prog='OnlySnarf', allow_abbrev=False, epilog="S
 
 ############
 
-from libb.optional_args import apply_args
+from .optional_args import apply_args
 apply_args(parser)
 
 ##

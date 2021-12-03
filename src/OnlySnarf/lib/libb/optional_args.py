@@ -5,7 +5,7 @@
 from datetime import datetime
 from .validators import valid_action, valid_amount, valid_promo_duration, valid_date, valid_limit, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
 
-from .libb import defaults as DEFAULT
+from . import defaults as DEFAULT
 
 def apply_args(parser):
   # mutually exclusive
@@ -109,7 +109,7 @@ def apply_args(parser):
     help='ignore upload max wait attempts')
   # # -image-limit
   # # maximum number of images that can be downloaded / uploaded
-  parser.add_argument('-image-limit', type=int, default=IMAGE_LIMIT, dest='image_limit',
+  parser.add_argument('-image-limit', type=int, default=DEFAULT.IMAGE_LIMIT, dest='image_limit',
     help='the max number of images to download / upload')
   ##
   # -keep

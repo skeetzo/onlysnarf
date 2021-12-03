@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # sudo cp ../onlysnarf/OnlySnarf/config.conf /etc/onlysnarf
-sudo python3 ../onlysnarf/setup.py install
+sudo python3.8 ../onlysnarf/setup.py install
 wait
 mkdir -p ../onlysnarf/logs
 echo "-----------------------------------------------------"
@@ -20,12 +20,12 @@ echo "##################################################" >> ../onlysnarf/logs/t
 
 # onlysnarfpy -debug -verbose -verbose -verbose -action post -category "performer" -source google -category-performer "video"
 
-# onlysnarfpy -verbose -verbose -verbose -action promotion -promotion-method "grandfather" -prefer-local
+onlysnarfpy -verbose -verbose -verbose -action promotion -promotion-method "grandfather" -browser remote
 
-onlysnarfpy -debug -verbose -verbose -category image
-onlysnarfpy -debug -verbose -verbose -browser firefox -action bot -keep -prefer-local
-onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action bot -keep -prefer-local
-onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action post -category gallery
+# onlysnarfpy -debug -verbose -verbose -category image
+# onlysnarfpy -debug -verbose -verbose -browser firefox -action bot -keep -prefer-local
+# onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action bot -keep -prefer-local
+# onlysnarfpy -debug -verbose -verbose -verbose -browser remote-firefox -action post -category gallery
 # onlysnarfpy -debug -verbose -verbose -verbose -browser reconnect -action bot -keep -prefer-local
 
 # onlysnarfpy -debug -verbose -verbose -verbose -browser remote -prefer-local -remote-host 192.168.1.99 -source google -category video
