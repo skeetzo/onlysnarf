@@ -33,9 +33,9 @@ setuptools.setup(
         ],
     entry_points={
         'console_scripts' : [
-            'onlysnarf = app.menu:main',
-            'onlysnarfpy = app.snarf:main',
-            'onlysnarf-config = app.config:main'
+            'onlysnarf = src.OnlySnarf.menu:main',
+            'onlysnarfpy = src.OnlySnarf.snarf:main',
+            'onlysnarf-config = src.OnlySnarf.config:main'
         ]
     },
     classifiers=[

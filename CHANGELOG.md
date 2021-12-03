@@ -451,6 +451,18 @@
   - added test skeletons
   
 ----------------------------------------  
+## Doing
+- set up free account
+- update paid account $ structure
+- grandfather everyone currently to a free amount
+- check DD writeup, elaborate on crypto payments and current market forewarning
+- take a look at AVN stars, maybe (re) set up profile, bio, socials etc
+- add command to check messages for content request queue
+- check / clean content folders
+- separate free profile drive folders
+- cleanup post text format
+- cleanup social links + snapchat
+
 
 ----------------------------------------  
 

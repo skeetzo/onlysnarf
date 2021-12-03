@@ -10,7 +10,7 @@ import sys
 import pathlib
 import time
 ##
-from lib.settings import Settings
+from .lib.settings import Settings
 
 #################
 ##### Snarf #####
