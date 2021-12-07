@@ -91,7 +91,7 @@ def authGoogle():
         DRIVE = build('drive', 'v3', http=creds.authorize(Http()))
     except Exception as e:
         Settings.dev_print(e)
-       Settings.print('Error: Unable to Authenticate w/ Google')
+        Settings.print('Error: Unable to Authenticate w/ Google')
         return False
     Settings.dev_print("authentication successful") 
     return True
@@ -146,7 +146,7 @@ def backup_file(file):
         # change parents of file to "move" it
         file.get_file()['parents'] = [{"kind": "drive#fileLink", "id": str(parentFolder['id'])}]
         file.get_file().Upload()
-       Settings.print("File Backed Up: {}".format(file.get_title()))
+        Settings.print("File Backed Up: {}".format(file.get_title()))
     except Exception as e:
         Settings.dev_print(e)
 
@@ -155,11 +155,11 @@ def create_folders():
 
     auth = checkAuth()
     if not auth: return
-   Settings.print("Creating Folders: {}".format(Settings.get_drive_path()))
+    Settings.print("Creating Folders: {}".format(Settings.get_drive_path()))
     # get root OnlySnarf folder in Drive
     OnlyFansFolder = get_folder_root()
     if OnlyFansFolder is None:
-       Settings.err_print("unable to create category folders")
+        Settings.err_print("unable to create category folders")
         return
     file_list = PYDRIVE.ListFile({'q': "'{}' in parents and trashed=false".format(OnlyFansFolder['id'])}).GetList()
     # create each missing folder
@@ -190,7 +190,7 @@ def delete_folder(folder):
 
     if Settings.is_delete():
         try:
-           Settings.print("Deleting folder: {}".format(folder["title"]))
+            Settings.print("Deleting folder: {}".format(folder["title"]))
             folder.Trash()
         except Exception as e: Settings.dev_print(e)
 
@@ -288,7 +288,7 @@ def get_files_by_folder_id(folderID):
     """
 
     if not folderID:
-       Settings.err_print("missing folder id")
+        Settings.err_print("missing folder id")
         return
     auth = checkAuth()
     if not auth: return []
@@ -584,12 +584,12 @@ def get_folder_root():
             mount_root = get_folder_by_name(mount_root, parent=folder)
             if mount_root is None:
                 mount_root = "root"
-               Settings.warn_print("drive mount folder not found")
+                Settings.warn_print("drive mount folder not found")
                 break
         mount_root = get_folder_by_name(mount_root, parent=Settings.get_drive_root())
         if mount_root is None:
             mount_root = {"id":"root"}
-           Settings.warn_print("drive mount folder not found")
+            Settings.warn_print("drive mount folder not found")
         else:
             Settings.maybe_print("found root (alt): {}/{}".format(Settings.get_drive_path(), Settings.get_drive_root()))
         OnlyFansFolder = mount_root
@@ -600,7 +600,7 @@ def get_folder_root():
                 OnlyFansFolder = folder
                 Settings.maybe_print("found root: {}".format(Settings.get_drive_path()))
     if OnlyFansFolder is None:
-       Settings.print("Creating Root: {}".format(Settings.get_drive_path()))
+        Settings.print("Creating Root: {}".format(Settings.get_drive_path()))
         OnlyFansFolder = PYDRIVE.CreateFile({"title": str(Settings.get_drive_path()), "mimeType": "application/vnd.google-apps.folder"})
         OnlyFansFolder.Upload()
     OnlyFansFolder_ = OnlyFansFolder
@@ -629,16 +629,16 @@ def upload_file(file=None):
     auth = checkAuth()
     if not auth: return False
     if not file:
-       Settings.err_print("missing file")
+        Settings.err_print("missing file")
         return False
     if Settings.is_debug():
-       Settings.print("Skipping Google Upload (debug): {}".format(filename))
+        Settings.print("Skipping Google Upload (debug): {}".format(filename))
         return False
     elif not Settings.is_backup():
-       Settings.print('Skipping Google Upload (disabled): {}'.format(filename))
+        Settings.print('Skipping Google Upload (disabled): {}'.format(filename))
         return False
     else:
-       Settings.print('Google Upload (file): {}'.format(filename))
+        Settings.print('Google Upload (file): {}'.format(filename))
     uploadedFile = PYDRIVE.CreateFile({'title':str(file.get_title()), 'parents':[{"kind": "drive#fileLink", "id": str(file.get_parent()["id"])}],'mimeType':str(file.get_mimetype())})
     uploadedFile.SetContentFile(file.get_path())
     uploadedFile.Upload()
@@ -662,16 +662,16 @@ def upload_gallery(files=[]):
 
     parent = get_folder_by_name("posted")
     if not parent:
-       Settings.err_print("missing posted folder")
+        Settings.err_print("missing posted folder")
         return False
     if Settings.is_debug():
-       Settings.print("Skipping Google Upload (debug): {}".format(path))
+        Settings.print("Skipping Google Upload (debug): {}".format(path))
         return False
     elif not Settings.is_backup():
-       Settings.print('Skipping Google Upload (disabled): {}'.format(path))
+        Settings.print('Skipping Google Upload (disabled): {}'.format(path))
         return False
     else:
-       Settings.print('Google Upload: {}'.format(path))
+        Settings.print('Google Upload: {}'.format(path))
     tmp_folder = PYDRIVE.CreateFile({'title':str(datetime.datetime.now()), 'parents':[{"kind": "drive#fileLink", "id": str(parent['id'])}],'mimeType':'application/vnd.google-apps.folder'})
     tmp_folder.Upload()
     successful = False
