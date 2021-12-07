@@ -11,13 +11,13 @@ import sys
 import pathlib
 from PyInquirer import prompt
 ##
-from lib.colorize import colorize
-from lib.actions.discount import Discount
-from lib.actions.promotion import Promotion
-from lib.actions.message import Message
-from lib.profile import Profile
-from lib.settings import Settings
-from lib import google as Google
+from .src import colorize
+from .src.classes import Discount
+from .src.classes import Promotion
+from .src.classes import Message
+from .src.classes import Profile
+from .src import Settings
+from .src import google as Google
 
 ####################
 ##### CLI Menu #####

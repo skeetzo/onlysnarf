@@ -449,20 +449,9 @@
   - changed: output print to log and uppercase to lowercase, except for menu cli
   **4/14/2021**
   - added test skeletons
-  
-----------------------------------------  
-## Doing
-- set up free account
-- update paid account $ structure
-- grandfather everyone currently to a free amount
-- check DD writeup, elaborate on crypto payments and current market forewarning
-- take a look at AVN stars, maybe (re) set up profile, bio, socials etc
-- add command to check messages for content request queue
-- check / clean content folders
-- separate free profile drive folders
-- cleanup post text format
-- cleanup social links + snapchat
-
+  **4.0.1 : 12/6/2021**
+  - removed react shit...
+  - cleaned up dir structure; needs updates to package links
 
 ----------------------------------------  
 
@@ -482,8 +471,29 @@
 
 ----------------------------------------
 
-## ToDo
+## TODO
+
+  - continue cleaning up dir structure
+
+  - update from.package imports to be shorter -> properly add to __init__.py files
+
   - add to upload: greatest & least (folder sizes)
+
+  ----------------------------------------  
+- set up free account
+- update paid account $ structure
+- grandfather everyone currently to a free amount
+- check DD writeup, elaborate on crypto payments and current market forewarning
+- take a look at AVN stars, maybe (re) set up profile, bio, socials etc
+- add command to check messages for content request queue
+- check / clean content folders
+- separate free profile drive folders
+- cleanup post text format
+- cleanup social links + snapchat
+
+
+
+
 
 ### Low Priority
   - add: read messages html for emojis

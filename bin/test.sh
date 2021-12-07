@@ -2,13 +2,13 @@
 # sudo cp ../onlysnarf/OnlySnarf/config.conf /etc/onlysnarf
 sudo python3.8 ../onlysnarf/setup.py install
 wait
-mkdir -p ../onlysnarf/logs
+mkdir -p ../onlysnarf/log
 echo "-----------------------------------------------------"
 echo "Testing OnlySnarf"
 
-echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
-echo "################## Start #########################" >> ../onlysnarf/logs/test.txt 2>&1
-echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
+echo "##################################################" >> ../onlysnarf/log/test.txt 2>&1
+echo "################## Start #########################" >> ../onlysnarf/log/test.txt 2>&1
+echo "##################################################" >> ../onlysnarf/log/test.txt 2>&1
 
 ## Bot
 # screen -dmSL snarfbot /usr/local/bin/onlysnarfpy -debug -verbose -verbose -verbose -browser firefox -action bot
@@ -101,6 +101,6 @@ onlysnarfpy -verbose -verbose -verbose -action promotion -promotion-method "gran
 # -image-download-limit 20 \
 # -force-upload
 
-echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
-echo "################### End ##########################" >> ../onlysnarf/logs/test.txt 2>&1
-echo "##################################################" >> ../onlysnarf/logs/test.txt 2>&1
+echo "##################################################" >> ../onlysnarf/log/test.txt 2>&1
+echo "################### End ##########################" >> ../onlysnarf/log/test.txt 2>&1
+echo "##################################################" >> ../onlysnarf/log/test.txt 2>&1

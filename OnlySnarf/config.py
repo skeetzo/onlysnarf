@@ -6,10 +6,10 @@ import sys
 import json
 import shutil
 ##
-from lib import google as Google
-from lib import driver as OnlySnarf
-from lib.settings import Settings
-from lib.libb.colorize import colorize
+from src import google as Google
+from src import driver as OnlySnarf
+from src import Settings
+from src import colorize
 
 def checkBothCreds():
     checkGoogle()
