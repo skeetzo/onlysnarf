@@ -453,6 +453,10 @@
   - removed react shit...
   - cleaned up dir structure; needs updates to package links
 
+  **12/8/2021**
+  - cleaned up snarf.py staticness
+  - updated test_snarf
+
 ----------------------------------------  
 
   - empty messages bug: Type a message below to start a conversation with 

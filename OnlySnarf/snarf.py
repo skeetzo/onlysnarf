@@ -1,23 +1,21 @@
 #!/usr/bin/python3
-# main OnlySnarf class
-
-import random
-import os
-import shutil
-import datetime
-import json
+# OnlySnarf interface class
 import sys
-import pathlib
-import time
 ##
-from .lib.settings import Settings
+import Settings
 
 #################
 ##### Snarf #####
 #################
 
 class Snarf:
-    """OnlySnarf main class and runtime parser"""
+    """
+    OnlySnarf main class and runtime parser.
+
+    All methods are static and handle the basic runtime operations, 
+     importing variables from settings & args.
+
+    """
 
     def __init__(self):
         """Snarf object"""
@@ -25,7 +23,7 @@ class Snarf:
         pass
 
     @staticmethod
-    def discount(discount=None):
+    def discount():
         """
         Applies the provided discount or creates one from args / prompts.
 
@@ -36,12 +34,12 @@ class Snarf:
 
         """
         from lib.actions.discount import Discount
-        if not discount: discount = Discount()
+        discount = Discount()
         try: discount.apply()
         except Exception as e: Settings.dev_print(e)
 
     @staticmethod
-    def message(message=None):
+    def message():
         """
         Sends the provided message or creates one from args / prompts.
 
@@ -54,7 +52,7 @@ class Snarf:
         """
         from lib.actions.message import Message
         from lib.user import User
-        if not message: message = Message()
+        message = Message()
         try:
             message.get_message()
             if Settings.is_prompt():
@@ -68,16 +66,19 @@ class Snarf:
                 for user in message.users:
                     # if isinstance(user, str) and str(user) == "post": successful_ = Driver.post(self)
                     # print("Messaging: {}".format(user.username))
-                    if isinstance(user, User): successful = User.message_user(username=user.username, message=message)
-                    else: successful = User.message_user(username=user, message=message)
+                    if isinstance(user, User):
+                        successful = User.message_user(username=user.username, message=message)
+                    else:
+                        successful = User.message_user(username=user, message=message)
             except Exception as e:
                 Settings.dev_print(e)
                 successful = False
             if successful: message.cleanup_files()
-        except Exception as e: Settings.dev_print(e)
+        except Exception as e:
+            Settings.dev_print(e)
                 
     @staticmethod
-    def post(message=None):
+    def post():
         """
         Posts the provided text or from args / prompts.
 
@@ -89,7 +90,7 @@ class Snarf:
         
         """
         from lib.actions.message import Message
-        if not message: message = Message()
+        message = Message()
         try:
             message.get_post()
             if Settings.is_prompt():
@@ -105,10 +106,13 @@ class Snarf:
                 Settings.dev_print(e)
                 successful = False
             if successful: message.cleanup_files()
-        except Exception as e: Settings.dev_print(e)
+            return successful
+        except Exception as e:
+            Settings.dev_print(e)
+        return False
 
     @staticmethod
-    def profile(profile=None):
+    def profile():
         """
         Runs the profile method specified at runtime.
 
@@ -127,18 +131,21 @@ class Snarf:
 
         """
         from lib.actions.profile import Profile
-        if not profile: profile = Profile()
+        profile = Profile()
         try: 
             # get profile method
             method = Settings.get_profile_method()
+            successful = False
             if method == "backup":
-                profile.backup_content()
+                successful = profile.backup_content()
             elif method == "syncfrom":
-                Profile.sync_from_profile()
+                successful = Profile.sync_from_profile()
             elif method == "syncto":
-                Profile.sync_to_profile()
+                successful = Profile.sync_to_profile()
             else: Settings.err_print("Missing Profile Method")
+            return successful
         except Exception as e: Settings.dev_print(e)
+        return False
         
     @staticmethod
     def promotion():
@@ -158,16 +165,19 @@ class Snarf:
         try: 
             # get promotion method
             method = Settings.get_promotion_method()
+            successful = False
             if method == "campaign":
-                Promotion.create_campaign()
+                successful = Promotion.create_campaign()
             elif method == "trial":
-                Promotion.create_trial_link()
+                successful = Promotion.create_trial_link()
             elif method == "user":
-                Promotion.apply_to_user()
+                successful = Promotion.apply_to_user()
             elif method == "grandfather":
-                Promotion.grandfathered()
+                successful = Promotion.grandfathered()
             else: Settings.err_print("Missing Promotion Method")
+            return successful
         except Exception as e: Settings.dev_print(e)
+        return False
 
     # developer testing
     @staticmethod
@@ -195,10 +205,13 @@ atexit.register(exit_handler)
 
 def main():
     try:
-        # from .file import File
-        # File.remove_local()
+        # purge local files
+        from .file import File
+        File.remove_local()
+        # disable menu prompts
         Settings.set_prompt(False)
         Settings.set_confirm(False)
+        # get the thing, do the thing
         action = Settings.get_action()
         Settings.print("Running - {}".format(action))
         action = getattr(Snarf, action)
