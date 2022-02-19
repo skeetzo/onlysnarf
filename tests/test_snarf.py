@@ -1,16 +1,10 @@
 import unittest
-import os
+import datetime
 from decimal import Decimal
 
-os.environ['ENV'] = "test"
-
-# from lib.config import config
-from OnlySnarf.snarf import Snarf
-from OnlySnarf.src.classes.discount import Discount
-
-# from .util.config import config
+import Snarf
+import Discount
 import config
-
 
 # import warnings
 
@@ -40,6 +34,18 @@ class TestSnarf(unittest.TestCase):
     def test_post(self):
         assert self.test_snarf.Post(), "unable to post message"
 
+    def test_poll(self):
+        config["duration"] = 99
+        config["expiration"] = 99
+        config["questions"] = ["suck","my","dick"]
+        assert self.test_snarf.Post(), "unable to post poll"
+
+    def test_schedule(self):
+        today = datetime.datetime()
+        today = today + datetime.timedelta(1) # +1 day
+        config["schedule"] = today.strftime("%m-%d-%Y:%H:%M") # "MM-DD-YYYY:HH:MM"
+        assert self.test_snarf.Post(), "unable to post schedule"
+
     def test_profile_backup(self):
         config["profile_method"] = "backup"
         assert self.test_snarf.Profile(), "unable to backup profile"
@@ -64,6 +70,7 @@ class TestSnarf(unittest.TestCase):
         config["promotion_method"] = "user"
         assert self.test_snarf.Promotion(), "unable to apply promotion: user"
 
+    @unittest.skip("unnecessary")
     def test_promotion_grandfather(self):
         config["promotion_method"] = "grandfather"
         assert self.test_snarf.Promotion(), "unable to apply promotion: grandfather"

@@ -10,7 +10,7 @@ from pathlib import Path
 
 baseDir = "/var/log"
 if os.environ.get('ENV') == "test":
-	baseDir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../log"))
+	baseDir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../log"))
 logPath = os.path.join(baseDir, "onlysnarf.log")
 
 Path(os.path.basename(os.path.dirname(logPath))).mkdir(parents=True, exist_ok=True)

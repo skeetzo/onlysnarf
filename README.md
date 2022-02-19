@@ -30,7 +30,7 @@ Then from within project's OnlySnarf directory either:
 
 -debug  
   `python3 onlysnarf.py -debug`  
-Tests configuration. Does not upload or remove from Google Drive.
+Tests configuration. Does not upload or remove from file source.
 
 -category image  
   `python3 onlysnarf.py -category image`  
@@ -50,13 +50,13 @@ Uploads a video labeled: 'your mom'
 
 -show
   `python3 onlysnarf.py -show`
-Shows the Chromium browser
+Shows the browser
 
 **more available in menu**
 
 Or include a 'config.conf' file located at '/opt/onlysnarf/config.conf' to set variables at runtime without using arguments. An example file has been provided. Please be sure to follow the key:value pattern. A starting # denotes a comment.
 
-## Authentication  
+## Google Authentication  
 --------------
 When downloading/uploading from a Google Drive account this package requires configuring a Google App with *PyDrive* for access to your Google Drive. The Drive API requires OAuth2.0 for authentication.
 ###### from [Auth Quickstart](https://raw.githubusercontent.com/gsuitedevs/PyDrive/master/docs/quickstart.rst)
