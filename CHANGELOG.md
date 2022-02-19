@@ -1,6 +1,5 @@
-# OnlySnarf  
+# Changelog  
 
-## Changelog  
 **0.0.1 : 9/25/2018**
   - code organized
   **0.0.2 : 10/20/2018**
@@ -442,22 +441,89 @@
   - jk no selenium bump...
 **4.0.0 : Flask & React : 3/24/2021**
   - flask-react integration and folder restructure
-  **3/25/2021**
+  **4.0.1 : 3/25/2021**
   - combined args: download_max & upload_max -> image-limit
   - added arg: delete (from delete_google)
   - removed: all cron references
   - changed: output print to log and uppercase to lowercase, except for menu cli
-  **4/14/2021**
+  **4.0.2 : 4/14/2021**
   - added test skeletons
-  **4.0.1 : 12/6/2021**
+  **4.0.3 : 12/6/2021**
   - removed react shit...
   - cleaned up dir structure; needs updates to package links
-
-  **12/8/2021**
+  **4.0.4 : 12/8/2021**
   - cleaned up snarf.py staticness
   - updated test_snarf
+**4.1.0 : Beginning Phase Out : 2/19/2022**
+  - removed all the flask stuff that was being added
+  - updated readme
+  - dropped prices to free account
+  - grandfathered everyone currently to a free amount a while ago
+  - removed paid account $ structure
+  - add flask gui for onlysnarf, etc -> submodules -> idea moved to next encompassing project -> ?
+  - review setup / config
+  - removed all email notifications implementations
+  - added easier on off toggle states
+  - checked DD writeup / ended project, elaborated on crypto payments and current market forewarning w/ fans
+  - completely removed cron features
+  - checked / cleaned content folders -> organize for free model funnel
+  - cleaned up social links + snapchat
+  - updated from.package imports to be shorter -> properly add to __init__.py files
+
+--------------------------------------------------------------------------------
+
+
+
+## TODO
+
+  - finish / update tests -> must update main module to accomodate mass changes
+  - update: backup function to include original folder name -> posted/galleries/$file
+-->
+  - copy & cleanup dir structure for next iteration content release project
+  - take a look at AVN stars, maybe (re) set up profile, bio, socials etc
+
+
+----------------------------------------
+  END OF LIFE PHASE
+----------------------------------------
+
+  -> Profile - REVIEW USABILITY
+  - new - setup - Twitter -> profile, banner; Price and Settings
+  - new - advertise
+  - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
+  - need to add 'create' to Profile for asking for profile settings when syncing to
+
+  -> Twitter - ENABLE AND EMPHASIZE w/ FREE MODEL MARCH
+  - tweet reminders
+  - can enter text that is tweeted
+  - include media attachments
+  -- check for previously existing tweet
+
+  -> Remote
+  -- need to reproduce --
+  - debug / add error catch for uploads: ('Connection aborted.', BrokenPipeError(32, 'Broken pipe'))
+
+
+----------------------------------------
+  NEXT PROJECT
+----------------------------------------
+
+Final Missing Test notes:
+- window boot w/ config commands
+- ffmpeg input/outputs results
+- file server upload/downloads & functionality
+- google functionality
+- any weird specific things in settings
+- user functionality
+
+- add to upload scheme: least to greatest (folder sizes)
+
 
 ----------------------------------------  
+
+
+
+# Bugs
 
   - empty messages bug: Type a message below to start a conversation with 
 
@@ -472,75 +538,3 @@
 
   **x.x.x**
   - Profile options completely "functional" / debugged
-
-----------------------------------------
-
-## TODO
-
-  - continue cleaning up dir structure
-
-  - update from.package imports to be shorter -> properly add to __init__.py files
-
-  - add to upload: greatest & least (folder sizes)
-
-  ----------------------------------------  
-- set up free account
-- update paid account $ structure
-- grandfather everyone currently to a free amount
-- check DD writeup, elaborate on crypto payments and current market forewarning
-- take a look at AVN stars, maybe (re) set up profile, bio, socials etc
-- add command to check messages for content request queue
-- check / clean content folders
-- separate free profile drive folders
-- cleanup post text format
-- cleanup social links + snapchat
-
-
-
-
-
-### Low Priority
-  - add: read messages html for emojis
-  - update: backup function to include original folder name -> posted/galleries/$file
-  - [MESSAGES] layout in config for preset message formats
-
-  -> Cron
-  - completely remove cron features
-
-  -> Promotion
-  - add email|Twitter functionality for sending trial link; add clipboard function to copy link
-  - functionality to scan profiles to estimate their posts-to-fan income ratios
-
-  -> Profile
-  - new - setup - Twitter -> profile, banner; Price and Settings
-  - new - advertise
-  - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
-  - need to add 'create' to Profile for asking for profile settings when syncing to
-
-  -> Twitter
-  - tweet reminders
-  - can enter text that is tweeted
-  - include media attachments
-  -- check for previously existing tweet
-
-  -> Remote
-  -- need to reproduce --
-  - debug / add error catch for uploads: ('Connection aborted.', BrokenPipeError(32, 'Broken pipe'))
-
-### Medium Priority
-
-### High Priority
-
-
-Referral Code
-https://onlyfans.com/?ref=409408
-
-
-
-
-
-- add flask gui for onlysnarf, etc -> submodules
-- incorporate into dd as cms
-- add much better setup / config
-- email notifications
-- on off toggle

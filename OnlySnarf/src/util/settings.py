@@ -3,10 +3,10 @@ import time
 import PyInquirer
 import os, json
 ##
-from .libb.colorize import colorize
-from .libb.config import config
-from .libb import defaults as DEFAULT
-from .libb.logger import logging
+from .colorize import colorize
+from .config import config
+from . import defaults as DEFAULT
+from .logger import logging
 log = logging.getLogger('onlysnarf')
 
 class Settings:
