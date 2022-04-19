@@ -24,8 +24,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 from pathlib import Path
 ##
-from .element import Element
-from .settings import Settings
+from ..classes.element import Element
+from ..util.settings import Settings
 
 ###################
 ##### Globals #####
@@ -1366,6 +1366,10 @@ class Driver:
             Driver.error_checker(e)
             Settings.err_print("failure to upload file(s)")
             return False
+
+
+
+
 
     def message_price(self, price):
         """

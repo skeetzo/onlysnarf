@@ -1,14 +1,22 @@
 #!/usr/bin/python3
 # OnlySnarf interface class
+
 import sys
 ##
-import Settings
+from .lib.driver import Driver
+from .util.settings import Settings
+from .classes.discount import Discount
+from .classes.message import Message
+from .classes.profile import Profile
+from .classes.promotion import Promotion
+from .classes.user import User
 
 #################
 ##### Snarf #####
 #################
 
 class Snarf:
+
     """
     OnlySnarf main class and runtime parser.
 
@@ -24,6 +32,7 @@ class Snarf:
 
     @staticmethod
     def discount():
+
         """
         Applies the provided discount or creates one from args / prompts.
 
@@ -33,13 +42,14 @@ class Snarf:
             A discount consisting of amount, months, and / or username. Prompts for missing.
 
         """
-        from lib.actions.discount import Discount
+
         discount = Discount()
         try: discount.apply()
         except Exception as e: Settings.dev_print(e)
 
     @staticmethod
     def message():
+
         """
         Sends the provided message or creates one from args / prompts.
 
@@ -50,8 +60,7 @@ class Snarf:
                 performers, and/or price 
         
         """
-        from lib.actions.message import Message
-        from lib.user import User
+
         message = Message()
         try:
             message.get_message()
@@ -79,6 +88,7 @@ class Snarf:
                 
     @staticmethod
     def post():
+
         """
         Posts the provided text or from args / prompts.
 
@@ -89,7 +99,7 @@ class Snarf:
                 expiration, poll, and/or schedule
         
         """
-        from lib.actions.message import Message
+
         message = Message()
         try:
             message.get_post()
@@ -100,7 +110,6 @@ class Snarf:
                 return
             successful = False
             try:
-                from .driver import Driver
                 successful = Driver.get_driver().post(message=message)
             except Exception as e:
                 Settings.dev_print(e)
@@ -113,6 +122,7 @@ class Snarf:
 
     @staticmethod
     def profile():
+
         """
         Runs the profile method specified at runtime.
 
@@ -130,7 +140,7 @@ class Snarf:
             Class representation of Onlyfans profile settings
 
         """
-        from lib.actions.profile import Profile
+
         profile = Profile()
         try: 
             # get profile method
@@ -149,6 +159,7 @@ class Snarf:
         
     @staticmethod
     def promotion():
+
         """
         Runs the promotion method specified at runtime.
 
@@ -161,7 +172,7 @@ class Snarf:
         grandfather - applies discounted price to existing users and adds them all to list
 
         """
-        from .classes import Promotion
+
         try: 
             # get promotion method
             method = Settings.get_promotion_method()
@@ -195,7 +206,6 @@ class Snarf:
 def exit_handler():
     """Exit cleanly"""
 
-    from .driver import Driver
     Driver.exit_all()
     Settings.print("Shnarrf!")
     sys.exit(0)
@@ -205,7 +215,7 @@ atexit.register(exit_handler)
 
 def main():
     try:
-        # purge local files
+        # purge local tmp files
         from .file import File
         File.remove_local()
         # disable menu prompts

@@ -269,7 +269,7 @@ class Settings:
         return config["remote_password"] or ""
 
     def get_remote_browser_host():
-        return config["remote_host"] or ""
+        return config["remote_browser_host"] or ""
 
     def get_remote_browser_port():
         return config["remote_browser_port"] or DEFAULT.BROWSER_PORT
@@ -715,3 +715,60 @@ class Settings:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#######################################################################################
+
+def delayForThirty():
+    Settings.maybe_print("30...")
+    time.sleep(10)
+    Settings.maybe_print("20...")
+    time.sleep(10)
+    Settings.maybe_print("10...")
+    time.sleep(7)
+    Settings.maybe_print("3...")
+    time.sleep(1)
+    Settings.maybe_print("2...")
+    time.sleep(1)
+    Settings.maybe_print("1...")
+    time.sleep(1)

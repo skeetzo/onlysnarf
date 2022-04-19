@@ -2,18 +2,25 @@ import pysftp, os
 import PyInquirer
 import random
 ##
-from .settings import Settings
+from ..util.settings import Settings
 
-# https://pysftp.readthedocs.io/en/release_0.2.9/cookbook.html
-HOSTNAME = str(Settings.get_remote_host())
-USERNAME = str(Settings.get_remote_username())
-PASSWORD = str(Settings.get_remote_password())
-PORT = int(Settings.get_remote_port())
-cnopts = pysftp.CnOpts(knownhosts='known_hosts')
-# cnopts = pysftp.CnOpts(knownhosts='/home/skeetzo/.ssh/known_hosts')
-cnopts.hostkeys = None
 
 def auth():
+	
+	global HOSTNAME
+	global USERNAME
+	global PASSWORD
+	global PORT
+
+	# https://pysftp.readthedocs.io/en/release_0.2.9/cookbook.html
+	HOSTNAME = str(Settings.get_remote_host())
+	USERNAME = str(Settings.get_remote_username())
+	PASSWORD = str(Settings.get_remote_password())
+	PORT = int(Settings.get_remote_port())
+	cnopts = pysftp.CnOpts(knownhosts='known_hosts')
+	# cnopts = pysftp.CnOpts(knownhosts='/home/skeetzo/.ssh/known_hosts')
+	cnopts.hostkeys = None
+
 	if HOSTNAME == "":
 		print("Error: Missing remote host")
 		return False

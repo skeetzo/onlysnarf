@@ -51,5 +51,5 @@ if not args["category"]: args["source"] = None
 #############
 # Debugging #
 # import sys
-# print(CONFIG)
+# print(args)
 # sys.exit(0)

@@ -3,8 +3,8 @@
 import json
 from PyInquirer import prompt
 ##
-from .driver import Driver
-from .settings import Settings
+from ..lib.driver import Driver
+from ..util.settings import Settings
 from .user import User
 
 class Profile:

@@ -11,8 +11,9 @@ config_file = configparser.ConfigParser()
 config_file.read(configFile)
 
 # overwrite values from arguments with config values
-if os.environ.get('ENV') != "test": from .args import args as config
-else: config = {"debug":False}
+# if os.environ.get('ENV') != "test": 
+from .args import args as config
+# else: config = {"debug":False}
 
 for section in config_file.sections():
   for key in config_file[section]:

@@ -1,9 +1,9 @@
 # for easily interacting with changeable page elements
 
-from .settings import Settings
-from .elements.driver import ELEMENTS as driverElements
-from .elements.login import ELEMENTS as loginElements
-from .elements.profile import ELEMENTS as profileElements
+from ..util.settings import Settings
+from ..elements.driver import ELEMENTS as driverElements
+from ..elements.login import ELEMENTS as loginElements
+from ..elements.profile import ELEMENTS as profileElements
 
 ONLYFANS_ELEMENTS = []
 ONLYFANS_ELEMENTS.extend(driverElements)

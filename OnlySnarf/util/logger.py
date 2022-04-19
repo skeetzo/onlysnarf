@@ -10,7 +10,7 @@ from pathlib import Path
 
 baseDir = "/var/log"
 if os.environ.get('ENV') == "test":
-	baseDir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../log"))
+	baseDir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../log"))
 logPath = os.path.join(baseDir, "onlysnarf.log")
 
 Path(os.path.basename(os.path.dirname(logPath))).mkdir(parents=True, exist_ok=True)
@@ -27,7 +27,6 @@ class CustomFormatter(logging.Formatter):
     """Logging Formatter to add colors and count warning / errors"""
 
     teal = ""
-
     grey = "\x1b[38;21m"
     yellow = "\x1b[33;21m"
     red = "\x1b[31;21m"
@@ -35,16 +34,16 @@ class CustomFormatter(logging.Formatter):
     reset = "\x1b[0m"
     format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
 
-    FORMATS = {
-    	logging.SUCCESSFUL: green + format + reset,
-    	logging.FAILURE: red + format + reset,
-        logging.DEBUG: grey + format + reset,
-        logging.VERBOSE: teal + format + reset,
-        logging.INFO: grey + format + reset,
-        logging.WARNING: yellow + format + reset,
-        logging.ERROR: red + format + reset,
-        logging.CRITICAL: bold_red + format + reset
-    }
+    # FORMATS = {
+    # 	logging.SUCCESSFUL: green + format + reset,
+    # 	logging.FAILURE: red + format + reset,
+    #     logging.DEBUG: grey + format + reset,
+    #     logging.VERBOSE: teal + format + reset,
+    #     logging.INFO: grey + format + reset,
+    #     logging.WARNING: yellow + format + reset,
+    #     logging.ERROR: red + format + reset,
+    #     logging.CRITICAL: bold_red + format + reset
+    # }
 
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
