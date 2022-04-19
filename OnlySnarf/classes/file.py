@@ -3,10 +3,10 @@ import PyInquirer
 from PIL import Image
 from os import walk
 ##
-from . import google as Google
-from . import remote as Remote
-from .ffmpeg import ffmpeg
-from .settings import Settings
+from ..lib import google as Google
+from ..lib import remote as Remote
+from ..lib.ffmpeg import ffmpeg
+from ..util.settings import Settings
 
 ONE_GIGABYTE = 1000000000
 ONE_MEGABYTE = 1000000

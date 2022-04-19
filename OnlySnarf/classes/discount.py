@@ -1,20 +1,17 @@
-import re
-from datetime import datetime
-from .driver import Driver
-from .settings import Settings
+from ..lib.driver import Driver
+from ..util.settings import Settings
 from .user import User
 from PyInquirer import prompt
-from PyInquirer import Validator, ValidationError
 ##
-from .validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ExpirationValidator, ListValidator
-from . import remote as Remote
-from .file import File, Folder, Google_File, Google_Folder
+from ..util.validators import AmountValidator, MonthValidator
 
 class Discount:
+
     """OnlyFans discount class"""
 
     def __init__(self):
-        """OnlyFans discount object"""
+
+        """OnlyFans discount action."""
 
         # amount in percent
         self.amount = None
@@ -26,6 +23,7 @@ class Discount:
         self.gotten = False
 
     def apply(self):
+
         """
         Applies the discounted amount to the recipient username via Driver.discount_user
 
@@ -61,6 +59,7 @@ class Discount:
 
     @staticmethod
     def create():
+
         """Create and apply a discount from args or prompts"""
 
         discount = Discount()
@@ -76,6 +75,7 @@ class Discount:
         self.gotten = True
 
     def get_amount(self):
+
         """
         Populate and get the amount value
 
@@ -109,6 +109,7 @@ class Discount:
         return self.amount
 
     def get_months(self):
+
         """
         Populate and get the months value
 
@@ -142,6 +143,7 @@ class Discount:
         return self.months
 
     def get_username(self):
+
         """
         Populate and get the username value
 
@@ -159,6 +161,7 @@ class Discount:
         return self.username
 
     def grandfatherer(self, users=[]):
+
         """
         Executes the 'Grandfather' discount model
 
@@ -172,7 +175,6 @@ class Discount:
 
         """
 
-        from .driver import Driver
         if len(users) == 0:
             users = User.get_users_by_list(name="grandfathered", driver=Driver.get_driver())
         print("Discount - Grandfathering: {} users".format(len(users)))

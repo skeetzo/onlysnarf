@@ -2,7 +2,7 @@ import ffmpeg
 import datetime
 import os
 ##
-from .settings import Settings
+from ..util.settings import Settings
 
 ##################
 ##### FFMPEG #####

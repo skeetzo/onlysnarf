@@ -1,13 +1,13 @@
 import re
 from datetime import datetime
-from .driver import Driver
-from .settings import Settings
+from ..lib.driver import Driver
+from ..util.settings import Settings
 from .user import User
 from PyInquirer import prompt
 from PyInquirer import Validator, ValidationError
 ##
-from .validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ExpirationValidator, ListValidator
-from . import remote as Remote
+from ..util.validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ExpirationValidator, ListValidator
+from ..lib import remote as Remote
 from .file import File, Folder, Google_File, Google_Folder
 
 class Promotion:

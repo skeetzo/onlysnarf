@@ -469,57 +469,55 @@
   - checked / cleaned content folders -> organize for free model funnel
   - cleaned up social links + snapchat
   - updated from.package imports to be shorter -> properly add to __init__.py files
+  **4.1.1 : 3/10/2022**
+  - take a look at AVN stars, maybe (re) set up profile, bio, socials etc and integrate ---> nah, too lazy
 
---------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
 
+- copy & cleanup dir structure for inclusion into next iteration content release project
 
 
 ## TODO
 
-  - finish / update tests -> must update main module to accomodate mass changes
-  - update: backup function to include original folder name -> posted/galleries/$file
--->
-  - copy & cleanup dir structure for next iteration content release project
-  - take a look at AVN stars, maybe (re) set up profile, bio, socials etc
+- add to upload scheme: least to greatest (folder sizes)
+
+- finish / update tests -> must update main module to accomodate mass changes to file struct
+
+- update: backup function to include original folder name -> posted/galleries/$file
+
 
 
 ----------------------------------------
   END OF LIFE PHASE
 ----------------------------------------
 
-  -> Profile - REVIEW USABILITY
-  - new - setup - Twitter -> profile, banner; Price and Settings
-  - new - advertise
-  - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
-  - need to add 'create' to Profile for asking for profile settings when syncing to
+-> Profile - REVIEW USABILITY
+- new - setup - Twitter -> profile, banner; Price and Settings
+- new - advertise
+- new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
+- need to add 'create' to Profile for asking for profile settings when syncing to
 
-  -> Twitter - ENABLE AND EMPHASIZE w/ FREE MODEL MARCH
-  - tweet reminders
-  - can enter text that is tweeted
-  - include media attachments
-  -- check for previously existing tweet
+-> Twitter - ENABLE AND EMPHASIZE w/ FREE MODEL MARCH
+- tweet reminders
+- can enter text that is tweeted
+- include media attachments
+-- check for previously existing tweet
 
-  -> Remote
-  -- need to reproduce --
-  - debug / add error catch for uploads: ('Connection aborted.', BrokenPipeError(32, 'Broken pipe'))
-
-
-----------------------------------------
-  NEXT PROJECT
-----------------------------------------
+-> Remote
+-- need to reproduce --
+- debug / add error catch for uploads: ('Connection aborted.', BrokenPipeError(32, 'Broken pipe'))
 
 Final Missing Test notes:
-- window boot w/ config commands
+- window boot w/ config commands (what even was this? oh missing tests)
 - ffmpeg input/outputs results
 - file server upload/downloads & functionality
 - google functionality
 - any weird specific things in settings
 - user functionality
 
-- add to upload scheme: least to greatest (folder sizes)
 
 
-----------------------------------------  
+------------------------------------------------------------------------------------  
 
 
 

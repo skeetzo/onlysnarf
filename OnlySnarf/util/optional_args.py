@@ -226,7 +226,7 @@ def apply_args(parser):
   ##
   # -remote-host
   # the remote host to connect to
-  parser.add_argument('-remote-browser-host', type=str, dest='remote_host',
+  parser.add_argument('-remote-browser-host', type=str, dest='remote_browser_host',
     help='the remote host to connect to for remote browser', default="127.0.0.1")
   ##
   # -remote-port
