@@ -11,7 +11,7 @@ log = logging.getLogger('onlysnarf')
 
 class Settings:
     
-    LAST_UPDATED_KEY = False
+    LAST_UPDATED_KEY = None
     CATEGORY = None
     CONFIRM = True
     FILES = None
@@ -45,17 +45,11 @@ class Settings:
 
     def maybe_print(text):
         if int(config["verbose"]) >= 2:
-            log.verbose(text)
+            log.debug(text)
 
-    # update for verbosity
     def dev_print(text):
         if int(config["verbose"]) >= 3:
-            if "successful" in str(text).lower():
-                log.successful(text)
-            elif "failure" in str(text).lower():
-                log.failure(text)
-            else:
-                log.debug(text)
+            log.debug(text)
 
     def err_print(error):
         log.error(error)
@@ -71,7 +65,7 @@ class Settings:
         return config["action"]
 
     def get_actions():
-        return config["actions"]
+        return DEFAULT.ACTIONS
 
     def get_amount():
         return config["amount"]
@@ -90,14 +84,6 @@ class Settings:
         if str(cat) == "performer": cat = "performers"
         return cat or None
 
-    def get_category_performer():
-        cat = config["performer_category"]
-        if str(cat) == "image": cat = "images"
-        if str(cat) == "gallery": cat = "galleries"
-        if str(cat) == "video": cat = "videos"
-        # if str(cat) == "performer": cat = "performers"
-        return cat or None
-
     def get_categories():
         cats = []
         cats.extend(list(DEFAULT.CATEGORIES))
@@ -105,7 +91,7 @@ class Settings:
         return cats
 
     def get_cookies_path():
-        return os.path.join(Settings.get_mount_path(), Settings.get_username(), "cookies.pkl")
+        return os.path.join(Settings.get_root_path(), Settings.get_username(), "cookies.pkl")
 
     def get_price():
         return config["price"] or ""
@@ -180,14 +166,11 @@ class Settings:
         keywords = [n.strip() for n in keywords]
         return keywords
 
-    def get_limit():
-        return config["limit"] or None
-
     def get_message_choices():
         return DEFAULT.MESSAGE_CHOICES
 
-    def get_mount_path():
-        return config["mount_path"] or DEFAULT.MOUNT_PATH
+    def get_root_path():
+        return config["root_path"] or DEFAULT.ROOT_PATH
 
     def get_sort_method():
         return config["sort"] or "random"
@@ -202,6 +185,9 @@ class Settings:
 
     def get_recent_user_count():
         return config["recent_users_count"] or 0
+    
+    def get_promotion_limit():
+        return config["promotion_limit"] or None
 
     def get_promotion_method():
         return config["promotion_method"] or None
@@ -218,12 +204,6 @@ class Settings:
     def get_download_path():
         return config["download_path"] or ""
 
-    def get_drive_path():
-        return config["drive_path"] or "root"
-
-    def get_drive_root():
-        return config["drive_root"] or "OnlySnarf"
-
     def get_users_path():
         return config["users_path"] or DEFAULT.USERS_PATH
 
@@ -231,15 +211,12 @@ class Settings:
         return config["config_path"] or ""    
 
     def get_local_path():
-        localPath = os.path.join(Settings.get_mount_path(), Settings.get_username())
+        localPath = os.path.join(Settings.get_root_path(), Settings.get_username())
         from pathlib import Path
         Path(localPath).mkdir(parents=True, exist_ok=True)
         for cat in Settings.get_categories():
             Path(os.path.join(localPath, cat)).mkdir(parents=True, exist_ok=True)
         return localPath
-
-    def get_google_path():
-        return config["google_path"] or ""
 
     def get_destination():
         return config["destination"] or ""
@@ -257,10 +234,13 @@ class Settings:
         return config["session_url"] or ""
 
     def get_remote_host():
-        return config["remote_host"] or ""
+        return config["remote_host"] or DEFAULT.REMOTE_HOST
 
     def get_remote_port():
         return config["remote_port"] or DEFAULT.REMOTE_PORT
+
+    def get_remote_path():
+        return config["remote_path"] or DEFAULT.REMOTE_PATH
 
     def get_remote_username():
         return config["remote_username"] or ""
@@ -269,13 +249,10 @@ class Settings:
         return config["remote_password"] or ""
 
     def get_remote_browser_host():
-        return config["remote_browser_host"] or ""
+        return config["remote_browser_host"] or DEFAULT.REMOTE_BROWSER
 
     def get_remote_browser_port():
         return config["remote_browser_port"] or DEFAULT.BROWSER_PORT
-
-    def get_secret_path():
-        return config["client_secret"] or ""
 
     def get_profile_method():
         return config["profile_method"] or None
@@ -337,10 +314,8 @@ class Settings:
 
     def get_user():
         if not config["user"]: return None
-        from .user import User
-        user = User({"username":config["user"]})
-        # setattr(user, "username", config["user"])
-        return user
+        from ..classes.user import User
+        return User({"username":config["user"]})
 
     def get_email():
         return config["email"] or ""
@@ -354,6 +329,19 @@ class Settings:
     def get_username_twitter():
         return config["username_twitter"] or ""
 
+
+    ## TODO
+    # add arg -profile
+    # add method for reading config profiles from conf/users
+
+    def get_profile():
+        pass
+
+    def select_profile():
+        pass
+
+
+
     # def get_users_favorite():
     #     return config["users_favorite"] or []
         
@@ -362,12 +350,6 @@ class Settings:
 
     def get_version():
         return pkg_resources.get_distribution("onlysnarf").version
-
-    def get_performer_category():
-        return Settings.PERFORMER_CATEGORY
-
-    def set_performer_category(category):
-        Settings.PERFORMER_CATEGORY = category
 
     def get_user_num():
         return config["users_read"] or DEFAULT.USER_LIMIT
@@ -386,17 +368,11 @@ class Settings:
     def is_prompt():
         return Settings.PROMPT or False
 
-    def is_create_missing():
-        return config["create_missing"] or False
-
     def is_debug():
         return config["debug"] or False
 
     def is_debug_delay():
         return config["debug_delay"] or False
-
-    def is_delete():
-        return config["delete_google"] or False
 
     def is_force_backup():
         return config["force_backup"] or False
@@ -409,9 +385,6 @@ class Settings:
 
     def is_prefer_local():
         return config["prefer_local"] or False
-        
-    def is_prefer_local_following():
-        return config["prefer_local_following"] or False
 
     def is_save_users():
         return config["save_users"] or False
@@ -462,13 +435,13 @@ class Settings:
         return PyInquirer.prompt(questions)["confirm"]
 
     def header():
-        if Settings.LAST_UPDATED_KEY:
-            print("Updated: {} = {}".format(Settings.LAST_UPDATED_KEY, config[Settings.LAST_UPDATED_KEY.replace(" ","_").upper()]))
+        if Settings.LAST_UPDATED_KEY is not None:
+            print("Updated: {} = {}".format(Settings.LAST_UPDATED_KEY, config[str(Settings.LAST_UPDATED_KEY).replace(" ","_").lower()]))
             print('\r')
         Settings.LAST_UPDATED_KEY = None
 
     def menu():
-        skipList = ["action", "amount", "category", "categories", "cron", "input", "messages", "posts", "date", "duration", "expiration", "keywords", "limit", "months", "bykeyword", "notkeyword", "price", "config_path", "google_path", "client_secret", "questions", "schedule", "skipped_users", "tags", "text", "time", "title", "user", "users", "username", "password", "users_favorite"]
+        skipList = ["action", "amount", "category", "categories", "cron", "input", "messages", "posts", "date", "duration", "expiration", "keywords", "limit", "months", "bykeyword", "notkeyword", "price", "config_path", "questions", "schedule", "skipped_users", "tags", "text", "time", "title", "user", "users", "username", "password", "users_favorite"]
         print('Settings')
         keys = [key.replace("_"," ").title() for key in config.keys() if key.lower() not in skipList and "categories" not in str(key).lower() and "messages" not in str(key).lower()]
         keys.insert(0, "Back")
@@ -481,8 +454,7 @@ class Settings:
         }
         answer = PyInquirer.prompt(question)["choice"]
         if str(answer).lower() == "back": return
-        answer = answer.replace(" ", "_").upper()
-        Settings.set_setting(answer)
+        Settings.set_setting(answer.replace(" ", "_"))
 
     def prompt(text):
         if list(text) == []: return False
@@ -568,7 +540,7 @@ class Settings:
 
     def read_session_data():
         Settings.maybe_print("reading local session")
-        path_ = os.path.join(Settings.get_mount_path(), "session.json")
+        path_ = os.path.join(Settings.get_root_path(), "session.json")
         Settings.dev_print("local session path: "+str(path_))
         id_ = None
         url = None
@@ -586,7 +558,7 @@ class Settings:
         Settings.maybe_print("writing local session")
         Settings.dev_print("saving session id: {}".format(id_))        
         Settings.dev_print("saving session url: {}".format(url))
-        path_ = os.path.join(Settings.get_mount_path(), "session.json")
+        path_ = os.path.join(Settings.get_root_path(), "session.json")
         Settings.dev_print("local session path: "+str(path_))
         data = {}
         data['id'] = id_
@@ -662,32 +634,33 @@ class Settings:
         Settings.PROMPT = bool(value)
 
     def set_setting(key):
-        value = config[key]
-        key = key.replace("_"," ").title()
-        print("Current: {}".format(value))
-        if str(value) == "True" or str(value) == "False":
-            question = {
-                'type': 'confirm',
-                'name': 'setting',
-                'message': "Toggle value?",
-                # 'default': int(value)
-            }
-            answer = PyInquirer.prompt(question)["setting"]
-            if not answer: return Settings.menu()
-            if value: config[key.upper()] = False
-            else: config[key.upper()] = True
-        else:
-            question = {
-                'type': 'input',
-                'name': 'setting',
-                'message': "New value:",
-                # 'default': int(value)
-            }
-            answer = PyInquirer.prompt(question)["setting"]
-            if not Settings.confirm(answer): return Settings.menu()
-            config[key.upper()] = answer
-        Settings.LAST_UPDATED_KEY = key
-        # return Settings.menu()
+        try:
+            value = config[key]
+            key = key.replace("_"," ").title()
+            print("Current: {}".format(value))
+            if str(value) == "True" or str(value) == "False":
+                question = {
+                    'type': 'confirm',
+                    'name': 'setting',
+                    'message': "Toggle value?"
+                }
+                answer = PyInquirer.prompt(question)["setting"]
+                if not answer: return Settings.menu()
+                if bool(value): config[key.lower()] = False
+                else: config[key.lower()] = True
+            else:
+                question = {
+                    'type': 'input',
+                    'name': 'setting',
+                    'message': "New value:",
+                    # 'default': int(value)
+                }
+                answer = PyInquirer.prompt(question)["setting"]
+                if not Settings.confirm(answer): return Settings.menu()
+                config[key.lower().replace(" ","_")] = answer
+            Settings.LAST_UPDATED_KEY = key.lower()
+        except Exception as e:
+            Settings.dev_print(e)
 
 ###########################################################################
 

@@ -2,10 +2,10 @@ import time
 import threading
 import concurrent.futures
 ##
-from .driver import Driver
-from .actions import Message
-from .user import User
-from .settings import Settings
+from OnlySnarf.driver import Driver
+from OnlySnarf.actions import Message
+from OnlySnarf.user import User
+from OnlySnarf.settings import Settings
 
 REFRESH_DURATION = 60*9
 

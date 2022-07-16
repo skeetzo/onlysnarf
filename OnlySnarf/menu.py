@@ -4,20 +4,14 @@
 import time
 import random
 import os
-import shutil
-import datetime
-import json
 import sys
-import pathlib
 from PyInquirer import prompt
 ##
-from .util import colorize
-from .classes import Discount
-from .classes import Promotion
-from .classes import Message
-from .classes import Profile
-from .lib import google as Google
-from .util import Settings
+from OnlySnarf.snarf import Snarf
+# from OnlySnarf.lib.driver import Driver
+from OnlySnarf.classes.profile import Profile
+from OnlySnarf.util.colorize import colorize
+from OnlySnarf.util.settings import Settings
 
 ####################
 ##### CLI Menu #####
@@ -35,9 +29,17 @@ class Menu:
     def __init__(self):
         pass
 
-    # Action
-
     def ask_action():
+        """
+        Ask action to take
+
+        Returns
+        -------
+        str
+            The action selected
+
+        """
+
         options = ["back"]
         options.extend(Settings.get_actions())
         menu_prompt = {
@@ -52,18 +54,29 @@ class Menu:
         return answers['action']
 
     def action_menu():
+        """
+        Prompt the action menu. Cycles back to main menu
+
+
+        """
+
         action = Menu.ask_action()
         if (action == 'back'): return Menu.main()
-        elif (action == 'discount'): Discount.create()
-        elif (action == 'message'): Message.Send()
-        elif (action == 'post'): Message.Post()
-        elif (action == 'promotion'): Promotion.menu()
+        elif (action == 'discount'): Snarf.discount()
+        elif (action == 'message'): Snarf.message()
+        elif (action == 'post'): Snarf.post()
+        elif (action == 'profile'): Snarf.profile()
+        elif (action == 'promotion'): Snarf.promotion()
         else: print("Missing Action: {}".format(colorize(action,"red")))
         Menu.main()
         
-    # Main
-
     def header():
+        """
+        Show the header text
+
+
+        """
+
         if not Settings.is_debug(): os.system('clear')
         print(colorize(Menu.ASCII, 'header'))
         print(colorize('version {}\n'.format(Settings.get_version()), 'green'))
@@ -71,9 +84,21 @@ class Menu:
         Menu.settings_header()
 
     def settings_header():
+        """
+        Show the settings header text
+
+
+        """
+
         Settings.header()
 
     def user_header():
+        """
+        Show the user header text
+
+
+        """
+
         print("User:")
         if Settings.get_email() != "":
             print(" - Email = {}".format(Settings.get_email()))
@@ -91,6 +116,16 @@ class Menu:
         print('\r')
 
     def menu():
+        """
+        Prompt the basic menu selection
+
+        Returns
+        -------
+        str
+            The menu option selected
+
+        """
+
         menu_prompt = {
             'type': 'list',
             'name': 'menu',
@@ -101,14 +136,27 @@ class Menu:
         return answers['menu']
 
     def main_menu():
+        """
+        Show the main menu
+
+
+        """
+
         action = Menu.menu()
         if (action == 'Action'): Menu.action_menu()
         elif (action == 'Profile'): Profile.menu()
         elif (action == 'Settings'): Settings.menu()
         else: exit()
-        Menu.main_menu()
+        # Menu.main_menu()
+        Menu.main()
 
     def main():
+        """
+        Primary script entry
+
+
+        """
+
         time.sleep(1)
         try:
             Menu.header()
@@ -132,8 +180,7 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
   
 def exit():
-    from lib.driver import Driver
-    Driver.exit_all()
+    # Driver.exit_all()
     sys.exit(0)
 
 ######################################################
@@ -143,9 +190,9 @@ def main():
 
 if __name__ == "__main__":
     try:
-        menu = Menu()
-        menu.main()
+        Menu.main()
     except Exception as e:
+        Settings.dev_print(e)
         print("Shhhhhnnnnnarf!")
     finally:
         exit()

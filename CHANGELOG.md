@@ -471,6 +471,11 @@
   - updated from.package imports to be shorter -> properly add to __init__.py files
   **4.1.1 : 3/10/2022**
   - take a look at AVN stars, maybe (re) set up profile, bio, socials etc and integrate ---> nah, too lazy
+  **4.1.2 : 7/15/2022**
+  - added docstring comments for menu.py
+  - moved config baseDir -> "/HOME/$USER/.onlysnarf"
+  - removed google & dropbox (finally)
+  - fixed action: Settings -> now sets values again
 
 ------------------------------------------------------------------------------------
 
@@ -479,12 +484,17 @@
 
 ## TODO
 
+- add method for reading profiles from conf/users
+- add arg: -profile for user data
+
 - add to upload scheme: least to greatest (folder sizes)
+- add default values to config.conf
 
 - finish / update tests -> must update main module to accomodate mass changes to file struct
 
 - update: backup function to include original folder name -> posted/galleries/$file
 
+- finish adding docstrings to classes/user.py
 
 
 ----------------------------------------

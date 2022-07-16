@@ -24,8 +24,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 from pathlib import Path
 ##
-from ..classes.element import Element
-from ..util.settings import Settings
+from OnlySnarf.classes.element import Element
+from OnlySnarf.util.settings import Settings
 
 ###################
 ##### Globals #####
@@ -754,10 +754,12 @@ class Driver:
             The default WebDriver object in use or was created
 
         """
-
-        if not Driver.DRIVER:
-            Driver.DRIVER = Driver(browser=Driver.BROWSER)
-        return Driver.DRIVER
+        try:
+            if not Driver.DRIVER:
+                Driver.DRIVER = Driver(browser=Driver.BROWSER)
+            return Driver.DRIVER
+        except Exception as e:
+            print(e)
 
     # waits for page load
     def get_page_load(self):
@@ -1078,7 +1080,7 @@ class Driver:
                     Settings.dev_print("attempting captcha")
                     try:
                         time.sleep(10) # wait extra long to make sure it doesn't verify obnoxiously
-                        el=browser.find_element_by_name("password")
+                        el = self.browser.find_element_by_name("password")
                         if not el: return # likely logged in without captcha
                         action = webdriver.common.action_chains.ActionChains(self.browser)
                         action.move_to_element_with_offset(el, 40, 100)
@@ -1809,6 +1811,7 @@ class Driver:
         if not auth_: return False
         Settings.dev_print("posting")
         try:
+            WEB_DRIVER = Driver.get_driver()
             self.go_to_home()
             # message.get_post()
             files = message.get_files()
@@ -1819,29 +1822,27 @@ class Driver:
             schedule = message.get_schedule()
             poll = message.get_poll()
             if str(text) == "None": text = ""
+            Settings.print("====================")
             Settings.print("Posting:")
             Settings.print("- Files: {}".format(len(files)))
             Settings.print("- Keywords: {}".format(keywords))
             Settings.print("- Performers: {}".format(performers))
             Settings.print("- Text: {}".format(text))
             Settings.print("- Tweeting: {}".format(Settings.is_tweeting()))
+            Settings.print("====================")
             ## Expires, Schedule, Poll
             if expires:
-                successful = self.expires(expiration=expires)
-                if not successful: return False
+                if not self.expires(expiration=expires): return False
             if schedule:
-                successful = self.schedule(schedule=schedule)
-                if not successful: return False
+                if not self.schedule(schedule=schedule): return False
             if poll:
-                successful = self.poll(poll=poll)
-                if not successful: return False
+                if not self.poll(poll=poll): return False
             WAIT = WebDriverWait(self.browser, 600, poll_frequency=10)
             ## Tweeting
             if Settings.is_tweeting():
                 Settings.dev_print("tweeting")
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, Element.get_element_by_name("tweet").getXPath()))).click()
-            else:
-                Settings.dev_print("not tweeting")
+            else: Settings.dev_print("not tweeting")
             ## Files
             successful_upload = False
             try:
@@ -1854,13 +1855,13 @@ class Driver:
             if not successful_text:
                 Settings.err_print("unable to enter text")
                 return False
-            ## Confirm
+            ## Upload
             i = 0
             while successful_upload:
                 try:
                     WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("sendButton").getClass())))
                     Settings.dev_print("upload complete")
-                    break
+                    break # or successful_upload = False
                 except Exception as e:
                     # try: 
                     #     # check for existence of "thumbnail is fucked up" modal and hit ok button
@@ -1877,13 +1878,13 @@ class Driver:
                     if i == int(Settings.get_upload_max_duration()) and not Settings.is_force_upload():
                         Settings.err_print("max upload time reached")
                         return False
+            ## Confirm
             try:
                 send = self.find_element_to_click("new_post")
                 if send:
                     Settings.debug_delay_check()
                     if Settings.is_debug():
                         Settings.print('Skipped: OnlyFans Post (debug)')
-                        Settings.dev_print("### Post Maybe Successful ###")
                         Settings.debug_delay_check()
                         self.go_to_home(force=True)
                         return True
@@ -1897,7 +1898,6 @@ class Driver:
                 Settings.dev_print(e)
                 return False
             # send[1].click() # the 0th one is disabled
-            Settings.dev_print("### Post Successful ###")
             Settings.print('OnlyFans Post Complete')
             return True
         except Exception as e:
@@ -2827,7 +2827,7 @@ class Driver:
         """
 
         type_ = None
-        Settings.maybe_print("spawning browser...")
+        Settings.print("spawning web browser...")
         def google():
             """
             Spawn a Google browser
@@ -2923,7 +2923,7 @@ class Driver:
                 d = DesiredCapabilities.FIREFOX
                 # d['loggingPrefs'] = {'browser': 'ALL'}
                 opts = FirefoxOptions()
-                # opts.log.level = "trace"
+                opts.log.level = "info"
                 if not Settings.is_show_window():
                     opts.add_argument("--headless")
                 # browser = webdriver.Firefox(options=opts, log_path='/var/log/onlysnarf/geckodriver.log')
@@ -3026,7 +3026,7 @@ class Driver:
                        desired_capabilities=dC,
                        options=firefox_options)
                     Settings.print("Remote Browser Created - Firefox")
-                    Settings.dev_print("successful remote - firefox")
+                    Settings.maybe_print("successful remote - firefox")
                     return browser
                 except Exception as e:
                     Settings.dev_print(e)
@@ -3042,7 +3042,7 @@ class Driver:
                        desired_capabilities=dC,
                        options=chrome_options)
                     Settings.print("Remote Browser Created - Chrome")
-                    Settings.dev_print("successful remote - chrome")
+                    Settings.maybe_print("successful remote - chrome")
                     return browser
                 except Exception as e:
                     Settings.dev_print(e)
@@ -3085,25 +3085,27 @@ class Driver:
         elif "auto" in BROWSER_TYPE:
             try:
                 browser = reconnect()
-                browser.title
+                browser.title # fails check with: 'NoneType' object has no attribute 'title'
                 Settings.print("Browser Reconnected")
-                Settings.dev_print("successful reconnect")
+                Settings.maybe_print("successful reconnect")
                 browser = auto(browser)
             except Exception as e:
-                Settings.dev_print("failed to reconnect")
-                Settings.dev_print(e)
+                Settings.maybe_print("failed to reconnect")
+                if str(e) != "'NoneType' object has no attribute 'title'":
+                    Settings.dev_print(e)
                 browser = auto(None)
         elif "remote" in str(BROWSER_TYPE):
             browser = remote()
         elif BROWSER_TYPE == "reconnect":
             try:
                 browser = reconnect()
-                browser.title
+                browser.title # fails check with: 'NoneType' object has no attribute 'title'
                 Settings.print("Browser Reconnected")
-                Settings.dev_print("successful reconnect")
+                Settings.maybe_print("successful reconnect")
             except Exception as e:
-                Settings.dev_print("failed to reconnect")
-                Settings.dev_print(e)
+                Settings.maybe_print("failed to reconnect")
+                if str(e) != "'NoneType' object has no attribute 'title'":
+                    Settings.dev_print(e)
                 browser = None        
         if browser and Settings.is_keep():
             Settings.write_session_data(browser.session_id, browser.command_executor._url)

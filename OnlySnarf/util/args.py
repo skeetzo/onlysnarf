@@ -1,5 +1,4 @@
-
-import argparse, os, re
+import argparse
 from typing import Dict, Any
 from .validators import valid_path
 
@@ -26,7 +25,7 @@ apply_args(parser)
 ##
 # input
 parser.add_argument('input', default=[], nargs=argparse.REMAINDER, 
-  type=valid_path, help='file input to post or message')
+  type=valid_path, help='file or folder path for input to post or message')
 
 ##
 import pkg_resources

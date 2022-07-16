@@ -8,7 +8,7 @@ from PyInquirer import Validator, ValidationError
 ##
 from .validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ExpirationValidator, ListValidator
 from . import remote as Remote
-from .file import File, Folder, Google_File, Google_Folder
+from .file import File, Folder
 
 class Poll:
     """OnlyFans Poll class"""

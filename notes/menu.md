@@ -107,7 +107,7 @@ The maximum number of files to upload.
 Keep the browser open when finished (allows for reconnect).
 -keywords
 The folder by keyword to download & upload.
--limit
+-promotion-limit
 The max number of subscribers for a promotion.
 -login [OnlyFans|Twitter|Google]
 The method to use to log in.

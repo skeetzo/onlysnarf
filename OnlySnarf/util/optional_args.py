@@ -4,7 +4,6 @@
 ####################################################################################
 from datetime import datetime
 from .validators import valid_action, valid_amount, valid_promo_duration, valid_date, valid_limit, valid_time, valid_price, valid_duration, valid_expiration, valid_schedule, valid_month, valid_path
-
 from . import defaults as DEFAULT
 
 def apply_args(parser):
@@ -41,11 +40,6 @@ def apply_args(parser):
   parser.add_argument('-category', default=None, dest='category',
     help='the category of content to post or message')
   ##
-  # -category-performer
-  # the category of folder to upload of a performer
-  parser.add_argument('-category-performer', default=None, dest='performer_category',
-    help='the category of content to post or message of a performer')
-  ##
   # -cookies
   # load & save from/to local cookies path
   parser.add_argument('-cookies', action='store_true', dest='cookies',
@@ -55,23 +49,34 @@ def apply_args(parser):
   # date in MM-DD-YYYY
   parser.add_argument('-date', type=valid_date, default=None, dest='date',
     help='schedule date (MM-DD-YYYY)')
-  ##
+  ## DEBUGGING
   # -debug
   # debugging - skips uploading and deleting unless otherwise forced
   parser.add_argument('-debug', action='store_true', dest='debug',
     help='enable debugging')
+
+
+
+
+  ## TODO
+  # change deletion behavior to preserve better
+
   ##
   # -delete
-  # delete content instaed of backing it up
+  # delete content after upload
   parser.add_argument('-delete', action='store_true', dest='delete',
     help='delete file instead of backing up')
+
+
+
+
+
+
   ##
   # -destination
   # the destination to use when backing up content
-  parser.add_argument('-destination', dest='destination', default=None, choices=["google",
-    # "dropbox",
-    "remote","local"],
-    help='file backup location. prefers $source if specified')
+  parser.add_argument('-destination', dest='destination', default=None, choices=["remote","local"],
+    help='file backup location. uses same as -source if none specified')
   ##
   # -duration
   # poll duration
@@ -86,19 +91,24 @@ def apply_args(parser):
   # -email
   # the OnlyFans email to use for login
   parser.add_argument('-email', type=str, default="", dest='email',
-    help='the OnlyFans email')
+    help='the email for an OnlyFans profile')
   ##
   # -promotion-expiration
   # expiration for a promotion
   parser.add_argument('-promotion-expiration', type=int, dest='promotion_expiration',
     help='the promotions expiration in days)', choices=DEFAULT.PROMOTION_EXPIRATION_ALLOWED, default=None)
   ##
+  # -promotion-limit
+  # maximum number of subscribers for a promotion
+  parser.add_argument('-promotion-limit', type=valid_limit, default=None, dest='promotion_limit', choices=DEFAULT.LIMIT_ALLOWED,
+    help='the max number of subscribers allowed for a promotion')
+  ##
   # -expiration
   # date of post or poll expiration
   parser.add_argument('-expiration', type=int, dest='expiration',
     help='the expiration in days (99 for \'No Limit\')', choices=DEFAULT.EXPIRATION_ALLOWED, default=None)
-  ##
-  # -force-backup
+  ## DEBUGGING
+  # -force-backup 
   # force backup during debugging
   parser.add_argument('-force-backup', action='store_true', dest='force_backup',
     help='force backup when debugging')
@@ -115,33 +125,23 @@ def apply_args(parser):
   # -keep
   # keep the browser window open
   parser.add_argument('-keep', action='store_true', dest='keep',
-    help='keep the browser window open after script ends')
+    help='keep the browser window open after scripting ends')
   ##
   # -keywords
   # keywords to # in post
   parser.add_argument('-keywords', dest='keywords', action='append', default=[], 
     help="the keywords (#[keyword])")
   ##
-  # -limit
-  # maximum number of subscribers for a promotion
-  parser.add_argument('-limit', type=valid_limit, default=None, dest='limit', choices=DEFAULT.LIMIT_ALLOWED,
-    help='the max number of subscribers allowed for a promotion')
-  ##
   # -login
   # the method to prefer when logging in
   parser.add_argument('-login', dest='login', default="auto", choices=["auto","onlyfans","twitter","google"],
-    help='the method of login to prefer')
+    help='the method of user login to prefer')
   ##
   # -months
   # action: discount
   # the number of months to discount for
   parser.add_argument('-months', type=valid_month, default=None, dest='months',
     help='the number of months to discount or apply promotion')
-  ##
-  # -mount-path
-  # the mounth path for a local directory of OnlyFans config files
-  parser.add_argument('-mount-path', dest='mount_path',
-    help='the local path to OnlySnarf processes')
   ##
   # -bykeyword
   # the keyword to search for in folder selection
@@ -156,7 +156,7 @@ def apply_args(parser):
   # -password
   # the password for OnlyFans
   parser.add_argument('-password', type=str, dest='password',
-    help='the OnlyFans password for login')
+    help='the OnlyFans user password for login (used with username)')
   ##
   # -password
   # the password for Google
@@ -167,23 +167,28 @@ def apply_args(parser):
   # the password for Twitter
   parser.add_argument('-password-twitter', type=str, dest='twitter_password',
     help='the Twitter password for login')
+
+
+  ## TODO
+  # ensure changes work
+
   ##
   # -performers
-  # list of performers to tag in post
+  # list of performers to upload matching content of
   parser.add_argument('-performers', dest='performers', action='append',  default=[],
-    help='the performers to list (w/ @[performer]')
+    help='the performers to upload. adds \"w/ @[...performers]\"')
+
+
+
+  ##
   # -prefer-local
   # prefers local user cache over refreshing first call
   parser.add_argument('-prefer-local', action='store_true', dest='prefer_local',
     help='prefer recently cached data')
-  # -prefer-local-following
-  # prefers local user cache over refreshing first call for following
-  parser.add_argument('-prefer-local-following', action='store_true', dest='prefer_local_following',
-    help='prefer recently cached data for following')
   ##
   # -price
   # the price to be set in a message
-  parser.add_argument('-price', type=valid_price, help='the price', default=0, dest='price')
+  parser.add_argument('-price', type=valid_price, help='the price to charge', default=0, dest='price')
   ## 
   # -profile-method
   parser.add_argument('-profile-method', dest="profile_method", default="syncfrom", choices=["syncto","syncfrom"],
@@ -192,32 +197,31 @@ def apply_args(parser):
   # -promotion
   # the promotion method to use
   parser.add_argument('-promotion-method', dest='promotion_method', default="campaign", choices=["campaign","trial","grandfather","user"],
-    help='the method of promotion to use')
-  ###
-  ### PATHS ###
-  # -drive-path
-  # the folder path within Google Drive for OnlySnarf's root folder
-  parser.add_argument('-drive-path', dest="path_drive", type=str, 
-    help='the folder path within Drive to root OnlySnarf (/OnlySnarf)')
+    help='the promotion method to use')
+  ##
+  # -promotion-user
+  parser.add_argument('-promotion-user', dest="promotion_user", action='store_true', 
+    help="uses user method when combined with action=promotion")
+  ##
   # -config-path
   # the path to the config.conf file
   parser.add_argument('-config-path', dest="path_config", type=str, 
     help='the path to the config.conf', default=DEFAULT.CONFIG_PATH)
-  # -google-path
-  # the path to the google_creds.txt
-  parser.add_argument('-google-creds', dest="path_google", type=str, 
-    help='the path to Google credentials', default=DEFAULT.GOOGLE_PATH)
-  # the path to the client_secret.json
-  parser.add_argument('-client-secret', dest="client_secret", type=str, 
-    help='the path to Google secret credentials', default=DEFAULT.SECRET_PATH)
+  ##
   # -user-path
   # the path to the users.json file
   parser.add_argument('-users-path', type=str, dest='path_users',
     help='the path to cache users locally', default=DEFAULT.USERS_PATH)
+  ##
   # -profile-path
   # the path to the profile.json file
   parser.add_argument('-profile-path', type=str, dest='profile_path',
     help='the path to cache profile locally', default=DEFAULT.PROFILE_PATH)
+  ##
+  # -root-path
+  # the root path for a local directory of OnlyFans config files
+  parser.add_argument('-root-path', dest='root_path',
+    help='the local path to OnlySnarf processes')
   ##
   # -remote-host
   # the remote host to connect to
@@ -248,6 +252,7 @@ def apply_args(parser):
   # the remote password to use
   parser.add_argument('-remote-password', type=int, dest='remote_password',
     help='the remote password to use', default=None)
+
   ###
   ##
   # -question
@@ -268,13 +273,8 @@ def apply_args(parser):
     help='enable repairing videos as appropriate (buggy)')
   ##
   # can be set in profile.conf
-  # root Google drive folder
-  parser.add_argument('-drive-root', type=str, default='OnlySnarf', dest='drive_root',
-    help='the Google Drive root folder name')
-  ##
-  # can be set in profile.conf
   # root remote folder
-  parser.add_argument('-remote-root', type=str, default='/opt/onlysnarf', dest='remote_root',
+  parser.add_argument('-remote-path', type=str, default=DEFAULT.REMOTE_PATH, dest='remote_path',
     help='the root remote file sharing folder name')
   ##
   # -save-users
@@ -319,9 +319,7 @@ def apply_args(parser):
   ##
   # -source
   # the source to use when searching for content
-  parser.add_argument('-source', dest='source', default=None, choices=["google",
-    # "dropbox",
-    "remote","local"],
+  parser.add_argument('-source', dest='source', default="local", choices=["remote","local"],
     help='file host location')
   ##
   # -tags
@@ -345,8 +343,8 @@ def apply_args(parser):
     help='the title of the file to search for')
   ##
   # -thumbnail
-  parser.add_argument('-thumbnail', action='store_true', dest='thumbnail',
-    help='fix thumbnails when necessary')
+  # parser.add_argument('-fix-thumbnail', action='store_true', dest='thumbnail',
+    # help='fix thumbnails when necessary')
   ##
   # -tweet
   # enabled tweeting
@@ -370,8 +368,8 @@ def apply_args(parser):
   ##
   # -users-favorite
   # list of favorited users
-  parser.add_argument('-users-favorite', default=[],
-    dest='users_favorite', action='append', help='supplied list of favorite users')
+  # parser.add_argument('-users-favorite', default=[],
+    # dest='users_favorite', action='append', help='supplied list of favorite users')
   ##
   # -username
   # the OnlyFans username to use
@@ -397,9 +395,3 @@ def apply_args(parser):
   # v, vv, vvv
   parser.add_argument('-v', '-verbose', dest="verbose", action='count', default=0, 
     help="verbosity level (max 3)")
-
-  ## Promotion Methods
-  # -promotion-user
-  parser.add_argument('-promotion-user', dest="promotion_user", action='store_true', 
-    help="uses user method when combined with action=promotion")
-

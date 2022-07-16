@@ -1,17 +1,15 @@
-
-from .config import config
+import os
 import logging
+from pathlib import Path
+from . import defaults as DEFAULT
+from .config import config
 
 loglevel = logging.INFO
 if config["debug"]: loglevel = logging.DEBUG
 
-import os
-from pathlib import Path
-
-baseDir = "/var/log"
+logPath = DEFAULT.LOG_PATH
 if os.environ.get('ENV') == "test":
-	baseDir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../log"))
-logPath = os.path.join(baseDir, "onlysnarf.log")
+	logPath = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../log", "onlysnarf.log"))
 
 Path(os.path.basename(os.path.dirname(logPath))).mkdir(parents=True, exist_ok=True)
 
@@ -32,18 +30,17 @@ class CustomFormatter(logging.Formatter):
     red = "\x1b[31;21m"
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
-    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    # the filename & line isn't helpful when i'm redirecting through Settings.maybe_print & dev_print
+    # format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
-    # FORMATS = {
-    # 	logging.SUCCESSFUL: green + format + reset,
-    # 	logging.FAILURE: red + format + reset,
-    #     logging.DEBUG: grey + format + reset,
-    #     logging.VERBOSE: teal + format + reset,
-    #     logging.INFO: grey + format + reset,
-    #     logging.WARNING: yellow + format + reset,
-    #     logging.ERROR: red + format + reset,
-    #     logging.CRITICAL: bold_red + format + reset
-    # }
+    FORMATS = {
+        logging.DEBUG: grey + format + reset,
+        logging.INFO: grey + format + reset,
+        logging.WARNING: yellow + format + reset,
+        logging.ERROR: red + format + reset,
+        logging.CRITICAL: bold_red + format + reset
+    }
 
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
