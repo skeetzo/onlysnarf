@@ -1239,6 +1239,7 @@ class Driver:
                 successful = via_google()
             if not successful:
                 Settings.print("OnlyFans Login Failed")
+                return False
             return yasssss()
         except Exception as e:
             Settings.dev_print("login failure")
@@ -2918,12 +2919,11 @@ class Driver:
             if os.geteuid() == 0:
                 Settings.print("You must run `onlysnarf` as non-root for Firefox to work correctly!")
                 return False
-               # sys.exit("You need root permissions to do this, laterz!")
             try:
                 d = DesiredCapabilities.FIREFOX
                 # d['loggingPrefs'] = {'browser': 'ALL'}
                 opts = FirefoxOptions()
-                opts.log.level = "info"
+                opts.log.level = "trace"
                 if not Settings.is_show_window():
                     opts.add_argument("--headless")
                 # browser = webdriver.Firefox(options=opts, log_path='/var/log/onlysnarf/geckodriver.log')
@@ -3304,7 +3304,7 @@ class Driver:
         """
 
         auth_ = self.auth()
-        if not auth_: return False
+        if not auth_: return []
         users = []
         try:
             self.go_to_page(page)
