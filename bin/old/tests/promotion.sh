@@ -8,7 +8,7 @@ onlysnarfpy \
 -user "recent" \
 -promotion "trial" \
 -duration "6 months" \
--limit 0 \
+-promotion-limit 0 \
 -promotion-expiration 0 \
 -prefer-local \
 -keep \
@@ -26,7 +26,7 @@ onlysnarfpy \
 -promotion "campaign" \
 -amount 40 \
 -promotion-expiration 0 \
--limit 0 \
+-promotion-limit 0 \
 -text "fuck balls" \
 -debug-delay \
 -prefer-local \

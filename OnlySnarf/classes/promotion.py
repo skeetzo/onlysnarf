@@ -8,7 +8,7 @@ from PyInquirer import Validator, ValidationError
 ##
 from ..util.validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ExpirationValidator, ListValidator
 from ..lib import remote as Remote
-from .file import File, Folder, Google_File, Google_Folder
+from .file import File, Folder
 
 class Promotion:
     """Promotion class"""
@@ -49,21 +49,22 @@ class Promotion:
         # ensure the promotion has non default values, return early if missing
         # p.get()
         gotten = p.get_amount()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_duration()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_expiration()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_message()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_user()
-        if not gotten: return
+        if not gotten: return False
         # prompt skip
         if Settings.is_prompt():
-            if not Settings.prompt("Promotion"): return
+            if not Settings.prompt("Promotion"): return False
         from .driver import Driver
         # get default driver and apply the promotion directly
         Driver.get_driver().promotion_user_directly(promotion=p)
+        return True
 
     @staticmethod
     def create_campaign():
@@ -84,23 +85,24 @@ class Promotion:
         # ensure the promotion has non default values, return early if missing
         # p.get()
         gotten = p.get_amount()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_user()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_expiration()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_limit()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_duration()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_message()
-        if not gotten: return
+        if not gotten: return False
         # prompt skip
         if Settings.is_prompt():
-            if not Settings.prompt("Promotion"): return
+            if not Settings.prompt("Promotion"): return False
         from .driver import Driver
         # get the default driver and enter the promotion campaign
         Driver.get_driver().promotional_campaign(promotion=p)
+        return True
 
     # requires the copy/paste and email steps
     @staticmethod
@@ -124,24 +126,25 @@ class Promotion:
         # ensure the promotion has non default values, return early if missing
         # p.get()
         gotten = p.get_duration()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_expiration()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_limit()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_message()
-        if not gotten: return
+        if not gotten: return False
         gotten = p.get_user()
-        if not gotten: return
+        if not gotten: return False
         # if not self.gotten: return
         if Settings.is_prompt():
-            if not Settings.prompt("Promotion"): return
+            if not Settings.prompt("Promotion"): return False
         # limit, expiration, months, user
         from .driver import Driver
         link = Driver.get_driver().promotional_trial_link(promotion=p)
         # text = "Here's your free trial link!\n"+link
         # Settings.dev_print("Link: "+str(text))
         # Settings.send_email(email, text)
+        return True
 
     def get(self):
         """Update the promotion object's default values"""
@@ -231,7 +234,7 @@ class Promotion:
 
         if self.limit: return self.limit
         # retrieve from args and return if exists
-        limit = Settings.get_limit() or None
+        limit = Settings.get_promotion_limit() or None
         if limit: 
             self.limit = limit
             return limit
@@ -342,7 +345,7 @@ class Promotion:
         print("Promotion - Grandfather")
         # prompt skip
         if Settings.is_prompt():
-            if not Settings.prompt("Grandfather"): return
+            if not Settings.prompt("Grandfather"): return False
         Settings.maybe_print("getting users to grandfather")
         # get all users
         users = User.get_all_users()
@@ -378,6 +381,7 @@ class Promotion:
                 d.grandfatherer(users=userChunk)
             except Exception as e:
                 Settings.dev_print(e)
+        return True
 
     @staticmethod
     def menu():

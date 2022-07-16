@@ -3,13 +3,13 @@
 
 import sys
 ##
-from .lib.driver import Driver
-from .util.settings import Settings
-from .classes.discount import Discount
-from .classes.message import Message
-from .classes.profile import Profile
-from .classes.promotion import Promotion
-from .classes.user import User
+from OnlySnarf.lib.driver import Driver
+from OnlySnarf.util.settings import Settings
+from OnlySnarf.classes.discount import Discount
+from OnlySnarf.classes.message import Message
+from OnlySnarf.classes.profile import Profile
+from OnlySnarf.classes.promotion import Promotion
+from OnlySnarf.classes.user import User
 
 #################
 ##### Snarf #####
@@ -44,8 +44,9 @@ class Snarf:
         """
 
         discount = Discount()
-        try: discount.apply()
+        try: return discount.apply()
         except Exception as e: Settings.dev_print(e)
+        return False
 
     @staticmethod
     def message():
@@ -62,29 +63,9 @@ class Snarf:
         """
 
         message = Message()
-        try:
-            message.get_message()
-            if Settings.is_prompt():
-                if not Settings.prompt("Send"): return
-            if message.get_files() != "unset" and len(message.get_files()) == 0 and not message.get_text():
-                Settings.err_print("Missing Files and Text")
-                return
-            successful = False
-            try: 
-                # for user in self.get_recipients():
-                for user in message.users:
-                    # if isinstance(user, str) and str(user) == "post": successful_ = Driver.post(self)
-                    # print("Messaging: {}".format(user.username))
-                    if isinstance(user, User):
-                        successful = User.message_user(username=user.username, message=message)
-                    else:
-                        successful = User.message_user(username=user, message=message)
-            except Exception as e:
-                Settings.dev_print(e)
-                successful = False
-            if successful: message.cleanup_files()
-        except Exception as e:
-            Settings.dev_print(e)
+        try: return message.send_message()
+        except Exception as e: Settings.dev_print(e)
+        return False
                 
     @staticmethod
     def post():
@@ -101,23 +82,8 @@ class Snarf:
         """
 
         message = Message()
-        try:
-            message.get_post()
-            if Settings.is_prompt():
-                if not Settings.prompt("Post"): return
-            if message.get_files() != "unset" and len(message.get_files()) == 0 and not message.get_text():
-                Settings.err_print("Missing Files and Text")
-                return
-            successful = False
-            try:
-                successful = Driver.get_driver().post(message=message)
-            except Exception as e:
-                Settings.dev_print(e)
-                successful = False
-            if successful: message.cleanup_files()
-            return successful
-        except Exception as e:
-            Settings.dev_print(e)
+        try: return message.send_post()
+        except Exception as e: Settings.dev_print(e)
         return False
 
     @staticmethod
@@ -145,15 +111,10 @@ class Snarf:
         try: 
             # get profile method
             method = Settings.get_profile_method()
-            successful = False
-            if method == "backup":
-                successful = profile.backup_content()
-            elif method == "syncfrom":
-                successful = Profile.sync_from_profile()
-            elif method == "syncto":
-                successful = Profile.sync_to_profile()
+            if method == "backup": return Profile.backup_content()
+            elif method == "syncfrom": return Profile.sync_from_profile()
+            elif method == "syncto": return Profile.sync_to_profile()
             else: Settings.err_print("Missing Profile Method")
-            return successful
         except Exception as e: Settings.dev_print(e)
         return False
         
@@ -176,30 +137,13 @@ class Snarf:
         try: 
             # get promotion method
             method = Settings.get_promotion_method()
-            successful = False
-            if method == "campaign":
-                successful = Promotion.create_campaign()
-            elif method == "trial":
-                successful = Promotion.create_trial_link()
-            elif method == "user":
-                successful = Promotion.apply_to_user()
-            elif method == "grandfather":
-                successful = Promotion.grandfathered()
+            if method == "campaign": return Promotion.create_campaign()
+            elif method == "trial": return Promotion.create_trial_link()
+            elif method == "user": return Promotion.apply_to_user()
+            elif method == "grandfather": return Promotion.grandfathered()
             else: Settings.err_print("Missing Promotion Method")
-            return successful
         except Exception as e: Settings.dev_print(e)
         return False
-
-    # developer testing
-    @staticmethod
-    def test():
-        from .user import User
-        Settings.print('1/3 : Testing')
-        Settings.print('TESTING: Settings - Get')
-        profile = Profile.sync_from_profile()
-        Settings.print('TESTING: Settings - Set')
-        Profile.sync_to_profile(profile=profile)
-        return True
 
 ################################################################################################################################################
 
@@ -225,7 +169,9 @@ def main():
         action = Settings.get_action()
         Settings.print("Running - {}".format(action))
         action = getattr(Snarf, action)
-        success = action()
+        successful = action()
+        if successful: Settings.print("Shnarrf shnarfff shnarf!!")
+        else: Settings.print("Shnarrf shnaaaaaaaarrrff!!")
     except Exception as e:
         Settings.dev_print(e)
         Settings.print("Shnarf??")

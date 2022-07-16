@@ -93,7 +93,7 @@ def upload_file(file):
 
 			# Define the local path where the file will be saved
 			# or absolute "C:\Users\sdkca\Desktop\TUTORIAL.txt"
-			# os.path.join(Settings.get_mount_path(), Settings.get_username(), file.category, file.get_title())
+			# os.path.join(Settings.get_root_path(), Settings.get_username(), file.category, file.get_title())
 			localFilePath = file.get_path()
 
 			sftp.put(localFilePath, remoteFilePath)
@@ -141,7 +141,7 @@ def download_file(file):
 
 			# Define the local path where the file will be saved
 			# or absolute "C:\Users\sdkca\Desktop\TUTORIAL.txt"
-			# os.path.join(Settings.get_mount_path(), Settings.get_username(), file.category, file.get_title())
+			# os.path.join(Settings.get_root_path(), Settings.get_username(), file.category, file.get_title())
 			localFilePath = file.get_path()
 
 			sftp.get(remoteFilePath, localFilePath)
@@ -159,7 +159,7 @@ def prepare_dir(sftp=None):
 		return
 	Settings.maybe_print("creating missing remote folders")
 	for cat in Settings.get_categories():
-		sftp.mkdir(os.path.join(Settings.get_mount_path(), Settings.get_username(), cat))
+		sftp.mkdir(os.path.join(Settings.get_root_path(), Settings.get_username(), cat))
 
 def get_files(category=None, performer=None):
 	print("Reading Remote Files")
@@ -172,7 +172,7 @@ def get_files(category=None, performer=None):
 			Settings.maybe_print("connection succesfully established ... ")
 
 			# Switch to a remote directory
-			path = os.path.join(Settings.get_mount_path(), Settings.get_username())
+			path = os.path.join(Settings.get_root_path(), Settings.get_username())
 			if category:
 				path = os.path.join(path, category)
 			if performer:

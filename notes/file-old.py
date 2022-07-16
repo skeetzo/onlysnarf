@@ -3,6 +3,7 @@ import PyInquirer
 from PIL import Image
 from os import walk
 ##
+from ..lib import google as Google
 from ..lib import remote as Remote
 from ..lib.ffmpeg import ffmpeg
 from ..util.settings import Settings
@@ -54,6 +55,8 @@ class File():
         if not File.backup_text(self.get_title()): return
         if Settings.get_destination() == "remote":
             Remote.upload_file(self)
+        elif Settings.get_destination() == "google":
+            Google.upload_file(file=self)
         else:
             # move file to local backup location
             backupPath = os.path.join(Settings.get_local_path(), "posted")
@@ -102,6 +105,8 @@ class File():
         if not File.backup_text(self.get_title()): return
         if Settings.get_destination() == "remote":
             Remote.upload_files(files)
+        elif Settings.get_destination() == "google":
+            Google.upload_files(files)
         else:
             for file in files:
                 file.backup()
@@ -941,6 +946,10 @@ class File():
 
         if str(upload) == "Local":
             return File.select_files()
+        elif str(upload) == "Google":
+            return Google_File.select_files()
+        # elif str(upload) == "Dropbox":
+            # return Dropbox.select_files()
         elif str(upload) == "Remote":
             return Remote.select_files()
         return File.select_files()
@@ -1021,6 +1030,10 @@ class Remote_File(File):
         if not File.backup_text(self.get_title()): return
         if Settings.get_destination() == "remote":
             Remote.backup_file(self)
+        elif Settings.get_destination() == "google":
+            Google.upload_file(file=self)
+        # elif Settings.get_destination() == "dropbox":
+        #     Dropbox.upload_file(file=self)
         else:
             file = self.download()
             file.backup()
@@ -1053,6 +1066,7 @@ class Folder(File):
 
     def backup(self):
         if File.backup_text(self.get_title()): return
+        # Google.upload_gallery(files=self.files)
 
     def check_size(self):
         for file in self.get_files():
@@ -1140,6 +1154,373 @@ class Folder(File):
             if prepared_: prepared = prepared_
         return prepared
 
+
+###################################################################################
+
+class Google_File(File):
+
+    def __init__(self):
+        File.__init__(self)
+        self.id = None
+        self.title = None
+        self.file = None
+        self.parent = None
+        self.mimeType = None
+
+    def backup(self):
+        if not File.backup_text(self.get_title()): return
+        Google.backup_file(self)
+
+    def delete(self):
+        if not File.delete_text(self.get_title()): return
+        Google.delete(self)
+
+    @staticmethod
+    def download_files(files=[]):
+        Settings.maybe_print("download limit: "+str(Settings.get_image_download_limit()))
+        random.shuffle(files)
+        files = files[:int(Settings.get_image_download_limit())]
+        Settings.print('Downloading Files: {}'.format(len(files)))
+        i = 1
+        for file in sorted(files, key = lambda x: x['title']):
+            Settings.print('Downloading: {}/{}'.format(i, Settings.get_image_download_limit()))
+            file.download()
+        Settings.print("Downloaded: {}".format(len(files)))
+
+    # Download File
+    def download(self):
+        if not File.download_text(self.get_title()): return False
+        successful = Google.download_file(self)
+        if not successful: return False
+        ### Finish ###
+        if not self.check_size():
+            Settings.err_print("missing downloaded file")
+            return False
+        Settings.print("Downloaded: {}".format(self.get_title()))
+        return True
+
+    def get_ext(self):
+        if self.ext: return self.ext
+        title, ext = os.path.splitext(self.get_file()["title"])
+        if str(ext) == "":
+            ext = self.get_file()["mimeType"]
+            mime, ext = str(ext).split("/")
+            ext = "."+str(ext)
+        self.ext = ext
+        self.title = title
+        return self.ext
+
+    def get_id(self):
+        if self.id: return self.id
+        if self.file: self.id = self.file["id"]
+        return self.id
+
+    def get_file(self):
+        if self.file: return self.file
+        self.file = Google.get_file(self.get_id())
+        # if not self.check_size(): self.download()
+        return self.file
+
+    @staticmethod
+    def get_files():
+        if File.FILES: return File.FILES
+        category = Settings.get_category()
+        if not category: category = Settings.select_category()
+        if not category: Settings.warn_print("missing category")
+        files = Google_File.get_files_by_category(category)
+        if Settings.get_title():
+            for file in files:
+                if str(Settings.get_title()) == str(file.get_title()):
+                    files = [file]
+                    break
+        File.FILES = files
+        return files
+
+    @staticmethod
+    def get_files_by_category(cat, performer=None):
+        Settings.maybe_print("Loading Google Files...")
+        files = []
+        ##
+        def parse_categories(category, categoryFolder=None):
+            files = []
+            # return Google_File.get_files_by_category(cat)
+            if "image" in str(category):
+                categoryFolder = Google.get_folder_by_name(category, parent=categoryFolder)
+                for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                    for image in Google.get_images_of_folder(folder):
+                        file = Google_File()
+                        setattr(file, "file", image)
+                        setattr(file, "parent", folder)
+                        if performer: setattr(file, "performer", performer)
+                        files.append(file)
+            elif "video" in str(category):
+                categoryFolder = Google.get_folder_by_name(category, parent=categoryFolder)
+                for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                    videos = Google.get_videos_of_folder(folder)
+                    if len(videos) > 0:
+                        files.append(folder["title"])
+                    for video in videos:
+                        file = Google_File()
+                        setattr(file, "file", video)
+                        setattr(file, "parent", folder)
+                        if performer: setattr(file, "performer", performer)
+                        files.append(file)
+            elif "galler" in str(category):
+                categoryFolder = Google.get_folder_by_name(category, parent=categoryFolder)
+                for folder in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                    galleries = Google.get_folders_of_folder(folder)
+                    if len(galleries) > 0:
+                        files.append(folder["title"])
+                    for gallery in galleries:
+                        file = Google_Folder()
+                        setattr(file, "file", gallery)
+                        setattr(file, "parent", folder)
+                        if performer: setattr(file, "performer", performer)
+                        files.append(file)
+            elif "performer" in str(category):
+                categoryFolder = Google.get_folder_by_name(category, parent=categoryFolder)
+                for performer_ in Google.get_folders_of_folder_by_keywords(categoryFolder):
+                    # for performer in Google.get_folders_of_folder(folder):
+                    p = Google_Folder()
+                    setattr(p, "file", performer_)
+                    setattr(p, "parent", categoryFolder)
+                    files.append(p)
+            return files
+        ##
+        if str(cat) == "performers":
+            categoryFolder = Google.get_folder_by_name("performers")
+            performerFolders = Google.get_folders_of_folder_by_keywords(categoryFolder)
+            for performerFolder in performerFolders:
+                if performer and str(performer) == str(performerFolder['title']):
+                    return parse_categories(cat, categoryFolder=performerFolder)
+
+            if Settings.get_sort_method() == "ordered":
+                sortedPerformers = performerFolders
+                sortedPerformers = sorted(sortedPerformers, key = lambda x: x["title"])
+                for performer_ in sortedPerformers:
+                    performer = performer_["title"]
+                    if Settings.get_category_performer():
+                        maybeFiles = parse_categories(Settings.get_category_performer(), categoryFolder=performer_)
+                        if len(maybeFiles) > 0: 
+                            Settings.maybe_print("performer: {}".format(performer))
+                            return maybeFiles
+                        continue
+                    for cat_ in Settings.get_categories().remove("performers"):
+                        maybeFiles = parse_categories(cat_, categoryFolder=performer_)
+                        if len(maybeFiles) > 0: 
+                            Settings.maybe_print("performer: {}".format(performer))
+                            return maybeFiles
+            elif Settings.get_sort_method() == "random":
+                randomPerformers = performerFolders
+                random.shuffle(randomPerformers)
+                randomCats = Settings.get_categories()
+                randomCats.remove("performers")
+                random.shuffle(randomCats)
+                for performer_ in randomPerformers:
+                    performer = performer_["title"]
+                    if Settings.get_category_performer():
+                        maybeFiles = parse_categories(Settings.get_category_performer(), categoryFolder=performer_)
+                        if len(maybeFiles) > 0: 
+                            Settings.maybe_print("performer: {}".format(performer))
+                            return maybeFiles
+                        continue
+                    for cat_ in randomCats:
+                        maybeFiles = parse_categories(cat_, categoryFolder=performer_)
+                        if len(maybeFiles) > 0: 
+                            Settings.maybe_print("performer: {}".format(performer))
+                            return maybeFiles
+        return parse_categories(cat)
+
+    @staticmethod
+    def get_random_file():
+        files = Google_File.get_files()
+        files = [file for file in files if not isinstance(file, str)]
+        randomFile = random.choice(files)
+        if Settings.get_sort_method() == "ordered":
+            randomFile = sorted(files, key = lambda x: x.get_title())[0]
+        Settings.maybe_print("random file: {}".format(randomFile.get_title()))
+        return randomFile
+
+    def get_mimetype(self):
+        if self.mimeType: return self.mimeType
+        self.mimeType = self.get_file()["mimeType"]
+        return self.mimeType
+
+    def get_parent(self):
+        if self.parent: return self.parent 
+        self.parent = Google.get_file_parent(self.get_id())
+        return self.parent
+
+    def get_path(self):
+        if self.path: return self.path
+        # downloads to /tmp/downloads or whatever
+        # if exists, adds 1 to end of name
+        tmp = File.get_tmp()
+        def counterfy():
+            filename_ = str(self.get_title())+"{}"+str(self.get_ext())
+            counter = 0
+            while os.path.isfile(os.path.join(tmp, filename_.format(counter))):
+                counter += 1
+            filename_ = filename_.format(counter)
+            Settings.maybe_print("filename: {}".format(filename_))
+            filename_ = os.path.join(tmp, filename_.format(counter))
+            return filename_
+        filename = os.path.join(tmp, "{}{}".format(self.get_title(), self.get_ext()))
+        if os.path.isfile(filename) and not Settings.is_prefer_local():
+            filename = counterfy()
+        # tmp = File.get_tmp() # i don't think this should be in file over settings
+        filename = filename.strip('\'').strip('\"').strip()
+        self.path = filename
+        Settings.dev_print(self.path)
+        return self.path
+
+    def get_title(self):
+        ## title would be set when created
+        if self.title: return self.title
+        title, ext = os.path.splitext(self.get_file()["title"])
+        self.ext = ext
+        self.title = title.replace(" ","_")
+        return self.title
+
+    # files are File references
+    # file references can be GoogleId references which need to download their source
+    # files exist when checked for size
+    def prepare(self):
+        Settings.maybe_print("preparing1: {}".format(self.get_title()))
+        if not self.check_size():
+            self.download()
+        return super()
+
+    @staticmethod
+    def select_file(category, performer=None):
+        if not Settings.is_prompt(): return Google_File.get_random_file()
+        # this is a list of google files to select from
+        files = Google_File.get_files_by_category(category, performer=performer)
+        files_ = []
+        for file in files:
+            if isinstance(file, str):
+                files_.append(PyInquirer.Separator())
+                continue
+            file.category = category
+            file_ = {
+                "name": file.file['title'],
+                "value": file,
+                "short": file.file['id']
+            }
+            files_.append(file_)
+        if len(files_) == 0:
+            Settings.print("Missing Files")
+            return Google_File.select_files()
+        question = {
+            'type': 'list',
+            'name': 'file',
+            'message': 'Google Files:',
+            'choices': files_,
+            # 'filter': lambda file: file.lower()
+        }
+        file = PyInquirer.prompt(question)["file"]
+        if not Settings.confirm(file.get_title()): return Google_File.select_file(category)
+        return file
+
+    @staticmethod
+    def select_files():
+        if not Settings.is_prompt(): return [Google_File.get_random_file()]
+        category = Settings.select_category()
+        if not category: return File.select_file_upload_method()
+        # if not Settings.confirm(category): return Google_File.select_files()
+        Settings.print("Select Google Files or a Folder")
+        files = []
+        while True:
+            file = Google_File.select_file(category)
+            if not file: break
+            ##
+            if "performer" in str(category):
+                cat = Settings.select_category([cat for cat in Settings.get_categories() if "performer" not in cat])
+                performerName = file.get_title()
+                file = Google_File.select_file(cat, performer=performerName)
+                if not file: break
+                setattr(file, "performer", performerName)
+                files.append(file)
+                if "galler" in str(cat) or "video" in str(cat): break
+            ##
+            files.append(file)
+            if "galler" in str(category) or "video" in str(category): break
+        if not Settings.confirm([file.file['title'] for file in files]): return Google_File.select_files()
+        return files
+
+##########################################################################################
+
+class Google_Folder(Google_File):
+    def __init__(self):
+        Google_File.__init__(self)
+        self.files = None
+
+    def backup(self):
+        if File.backup_text(self.get_title()): return
+        Google.upload_gallery(files=self.files)
+
+    def check_size(self):
+        for file in self.get_files():
+            exists = file.check_size()
+            if not exists: return False
+        return True
+
+    def download(self):
+        Settings.print("Downloading Folder: {}".format(self.get_title()))
+        if len(self.files) == 0:
+            file_list = Google.get_files_by_folder_id(self.get_id())
+            self.files = []
+            for file in file_list:
+                file_ = Google_File()
+                setattr(file_, "id", file["id"])
+                setattr(file_, "file", file)
+                self.files.append(file_)
+        folder_size = len(self.files)
+        Settings.maybe_print("folder size: {}".format(folder_size))
+        Settings.maybe_print("upload limit: {}".format(Settings.get_upload_max()))
+        if int(folder_size) == 0:
+            Settings.err_print("empty folder")
+            return False
+        file_list = self.files
+        random.shuffle(file_list)
+        file_list = file_list[:int(Settings.get_upload_max())]
+        ## video preference
+        videos = []
+        for file in file_list:
+            if str(file.get_mimetype()) in MIMETYPES_VIDEOS_LIST:
+                videos.append(file)
+        if len(videos) > 0: file_list = [random.choice(videos)]
+        ##
+        i = 1
+        for file in sorted(file_list, key = lambda x: x.get_title()):
+            Settings.print("Downloading: {} ({}/{})".format(file.get_title(), i, folder_size))
+            file.download()
+            i+=1
+        Settings.print()
+        Settings.print("Downloaded Folder: {}".format(self.get_title()))
+
+    def get_files(self):
+        if not self.files:
+            self.files = []
+            files = Google.get_files_by_folder_id(self.get_id())
+            for file in files:
+                file_ = Google_File()
+                setattr(file_, "file", file)
+                self.files.append(file_)
+        if Settings.get_title():
+            for file in self.files:
+                if str(Settings.get_title()) == str(file.get_title()):
+                    self.files = [file]
+                    break
+        return self.files
+
+    def prepare():
+        prepared = False
+        for file in self.get_files():
+            prepared_ = file.prepare()
+            if prepared_: prepared = prepared_
+        return prepared
+        
 ###################################################################################
 
 class Image(File):

@@ -8,7 +8,7 @@ from PyInquirer import Validator, ValidationError
 ##
 from ..util.validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ExpirationValidator, ListValidator
 from ..lib import remote as Remote
-from .file import File, Folder, Google_File, Google_Folder
+from .file import File, Folder
 
 class Message():
     """OnlyFans message (and post) class"""
@@ -213,7 +213,6 @@ class Message():
         Gets files from args specified source or prompts as necessary.
 
         Uses appropriate file select method as specified by runtime args:
-        - google
         - remote
         - local
 
@@ -242,14 +241,7 @@ class Message():
                 if Settings.is_prompt(): return []
         if files == None: files = []
         # get files from appropriate source's menu selection
-        if Settings.get_source() == "google":
-            googleFiles = Google_File.get_files()
-            if len(files) == 0 and len(googleFiles) > 0:
-                files = Google_File.select_files()
-            elif len(files) == 0 and len(googleFiles) == 0:
-                self.files = "unset"
-                return []
-        elif Settings.get_source() == "remote":
+        if Settings.get_source() == "remote":
             remoteFiles = Remote.get_files()
             if len(remoteFiles) > 0:
                 files = Remote.select_files()
@@ -266,11 +258,11 @@ class Message():
         filed = []
         for file in files:
             # turn all folders into their files
-            if isinstance(file, Folder) or isinstance(file, Google_Folder): filed.extend(file.get_files())
+            if isinstance(file, Folder): filed.extend(file.get_files())
             else:
                 # flag that the files include a performer
                 if hasattr(file, "performer"):
-                    self.hasPerformers = True
+                    self.performers.append(getattr("performer", file))
                 filed.append(file)
         self.files = filed[:int(Settings.get_upload_max())]
         return self.files
@@ -454,10 +446,9 @@ class Message():
         self.get_files()
         self.get_recipients()
         self.set_text()
-        if Settings.get_performer_category() or self.hasPerformers:
-            self.get_performers()
-        else: # might as well skip asking if not pulling from performer category
-            self.performers = "unset"
+
+        self.get_performers()
+
         self.gotten = True
 
     def get_post(self):
@@ -471,10 +462,9 @@ class Message():
         self.get_expiration()
         self.get_files()
         self.set_text()
-        if Settings.get_performer_category() or self.hasPerformers:
-            self.get_performers()
-        else:
-            self.performers = "unset"
+
+        self.get_performers()
+
         self.gotten = True
 
     def get_message(self):
@@ -486,11 +476,67 @@ class Message():
         self.get_price()
         self.get_files()
         self.set_text()
-        if Settings.get_performer_category() or self.hasPerformers:
-            self.get_performers()
-        else:
-            self.performers = "unset"
+
+        self.get_performers()
+
         self.gotten = True
+
+    def send_message(self):
+        try:
+            self.get_message()
+            if Settings.is_prompt():
+                if not Settings.prompt("Send"): return
+            if self.get_files() != "unset" and len(self.get_files()) == 0 and not self.get_text():
+                Settings.err_print("Missing Files and Text")
+                return False
+            successes = 0
+            failures = 0
+            try: 
+                for user in self.users:
+                    successful = False
+                    if isinstance(user, User):
+                        successful = User.message_user(username=user.username, message=self)
+                    else:
+                        successful = User.message_user(username=user, message=self)
+                    if successful: successes+=1
+                    else: failures+=1
+            except Exception as e:
+                Settings.dev_print(e)
+                failures+=1
+            if failures >= successes:
+                Settings.print("Successful | Failed: {} | {}".format(successes, failures))
+                return False
+            self.cleanup_files()
+            return True
+        except Exception as e:
+            Settings.dev_print(e)
+        return False
+
+    def send_post(self):
+        try:
+            self.get_post()
+            if Settings.is_prompt():
+                if not Settings.prompt("Post"): return False
+            if self.get_files() != "unset" and len(self.get_files()) == 0 and not self.get_text():
+                Settings.err_print("Missing Files and Text")
+                return False
+            successes = 0
+            failures = 0
+            try:
+                successful = Driver.get_driver().post(message=self)
+                if successful: successes+=1
+                else: failures+=1
+            except Exception as e:
+                Settings.dev_print(e)
+                failures+=1
+            if failures >= successes:
+                Settings.print("Successful | Failed: {} | {}".format(successes, failures))
+                return False
+            self.cleanup_files()
+            return True
+        except Exception as e:
+            Settings.dev_print(e)
+        return False
 
     def set_keywords(self):
         """Sets keywords from this object's file's title"""

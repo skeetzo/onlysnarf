@@ -259,20 +259,6 @@ class User:
         User.write_users_local(users=users)
         return users
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @staticmethod
     def get_all_users(driver=None):
         return User.get_active_users(driver=driver)
@@ -280,12 +266,18 @@ class User:
     # gets users from local or refreshes from onlyfans.com
     @staticmethod
     def get_active_users(driver=None):
-        if Settings.is_prefer_local():
+        print(0)
+        if bool(Settings.is_prefer_local()):
+            print(1)
             users = User.read_users_local()
+            print(2)
             if len(users) > 0: return users
+        print(3)
         active_users = []
         if not driver: driver = Driver.get_driver()
+        print(4)
         users = driver.users_get()
+        print(5)
         for user in users:
             try:
                 user = User(user)
@@ -304,7 +296,9 @@ class User:
     @staticmethod
     # return following Users
     def get_following(driver=None):
-        if Settings.is_prefer_local_following(): return User.read_following_local()
+        if Settings.is_prefer_local():
+            users = User.read_following_local()
+            if len(users) > 0: return users
         active_users = []
         users = driver.following_get()
         for user in users:
@@ -318,7 +312,7 @@ class User:
                 Settings.dev_print(e)
         Settings.maybe_print("following: {}".format(len(active_users)))
         User.write_following_local(users=active_users)
-        Settings.set_prefer_local_following(True)
+        Settings.set_prefer_local(True)
         return active_users
 
 
@@ -380,6 +374,8 @@ class User:
         Settings.err_print("missing user by username - {}".format(username))
         return None
 
+    ## TODO
+    # make this actually do something
     @staticmethod
     def get_favorite_users(driver=None):
         Settings.maybe_print("getting favorite users")
@@ -572,7 +568,6 @@ class User:
 
     @staticmethod
     def select_user():
-        Settings.print('a')
         user = Settings.get_user() or None
         if user: return user
         # if user: return User.get_user_by_username(user.username)

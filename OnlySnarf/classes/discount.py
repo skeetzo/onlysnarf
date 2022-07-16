@@ -53,9 +53,21 @@ class Discount:
         elif self.username.lower() == "new":
             users = User.get_new_users(driver=driver)
         else: users = [self]
+        successes = 0
+        failures = 0
         for user in users:
-            self.username = user.username
-            driver.discount_user(discount=self)
+            try:
+                self.username = user.username
+                successful = driver.discount_user(discount=self)
+                if successful: successes+=1
+                else: failures+=1
+            except Exception as e:
+                Settings.dev_print(e)
+                failures+=1
+        if failures >= successes:
+            Settings.print("Successful | Failed: {} | {}".format(successes, failures))
+            return False
+        return True
 
     @staticmethod
     def create():

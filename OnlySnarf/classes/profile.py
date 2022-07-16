@@ -50,7 +50,11 @@ class Profile:
     def backup_content():
         print("Backing Up: Content")
         Driver.download_content()
+        ## TODO
+        # files = Driver.download_content()
+        # Files.backup(files)
         print("Backed Up: Content")
+        return True
 
     @staticmethod
     def backup_messages():
@@ -229,6 +233,14 @@ class Profile:
         return profile
 
     @staticmethod
+    def get_profile():
+        print("Getting Profile")
+        profile = Profile()
+        for tab in Profile.TABS:
+            profile.sync_from_tab(tab)
+        return profile
+
+    @staticmethod
     def sync_from_profile():
         # opens every settings tab in the browser from pages or all
         # gets necessary variables from browser
@@ -239,7 +251,7 @@ class Profile:
             profile.sync_from_tab(tab)
         print("Synced from Profile")
         Profile.write_local(profile)
-        return profile
+        return True
 
     @staticmethod
     def sync_to_profile(profile=None):
@@ -250,6 +262,7 @@ class Profile:
         for tab in Profile.TABS:
             profile.sync_to_tab(tab)
         print("Synced to Profile")
+        return True
 
     def sync_from_tab(self, tab):
         # syncs profile settings from the specificed tab
@@ -347,7 +360,7 @@ class Profile:
     @staticmethod
     def write_local(profile=None):
         if profile is None:
-            profile = Profile.sync_from_profile()
+            profile = Profile.get_profile()
         print("Saving Profile Locally")
         Settings.maybe_print("local profile path: "+str(Settings.get_profile_path()))
         try:
