@@ -266,24 +266,18 @@ class User:
     # gets users from local or refreshes from onlyfans.com
     @staticmethod
     def get_active_users(driver=None):
-        print(0)
         if bool(Settings.is_prefer_local()):
-            print(1)
             users = User.read_users_local()
-            print(2)
             if len(users) > 0: return users
-        print(3)
         active_users = []
         if not driver: driver = Driver.get_driver()
-        print(4)
         users = driver.users_get()
-        print(5)
         for user in users:
             try:
                 user = User(user)
                 user = User.skipUserCheck(user)
                 if user is None: continue
-                setattr(user, "driver", driver)
+                setattr(user, "driver", driver) # associate the webdriver with the user it found
                 active_users.append(user)
             except Exception as e:
                 Settings.dev_print(e)
