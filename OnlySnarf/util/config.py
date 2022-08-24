@@ -1,20 +1,22 @@
+# parse config file while maintaining default values from args
+
+import configparser
 import os
+
+## SAME as Settings.get_base_directory ##
 USER = os.getenv('USER')
 if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "None":
     USER = os.getenv('SUDO_USER')
 baseDir = "/home/{}/.onlysnarf".format(USER)
-
-# parse config file
-import configparser
-
-# baseDir = os.path.dirname(__file__)
-# if os.environ.get('ENV') == "test": baseDir = os.path.dirname(__file__)
-configFile = os.path.join(baseDir, "config.conf")
+if os.environ.get('ENV') == "test":
+  cwd = os.getcwd()
+  # baseDir = os.path.dirname(__file__)
+#########################################
 
 config_file = configparser.ConfigParser()
-config_file.read(configFile)
+config_file.read(os.path.join(baseDir, "config.conf"))
 
-# overwrite values from arguments with config values
+# continue to overwrite values from arguments with config values
 
 # use this if its weird during unit tests
 # if os.environ.get('ENV') != "test": 

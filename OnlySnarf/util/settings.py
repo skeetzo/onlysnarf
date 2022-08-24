@@ -70,6 +70,16 @@ class Settings:
     def get_amount():
         return config["amount"]
 
+    def get_base_directory():
+        USER = os.getenv('USER')
+        if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "None":
+            USER = os.getenv('SUDO_USER')
+        baseDir = "/home/{}/.onlysnarf".format(USER)
+        if os.environ.get('ENV') == "test":
+          baseDir = os.getcwd()
+          # baseDir = os.path.dirname(__file__)
+        return baseDir
+
     def get_browser_type():
         return config["browser"]
 
@@ -91,7 +101,7 @@ class Settings:
         return cats
 
     def get_cookies_path():
-        return os.path.join(Settings.get_root_path(), Settings.get_username(), "cookies.pkl")
+        return os.path.join(Settings.get_base_directory(), Settings.get_username(), "cookies.pkl")
 
     def get_price():
         return config["price"] or ""
@@ -193,13 +203,25 @@ class Settings:
         return config["promotion_method"] or None
 
     def get_password():
-        return config["password"] or ""
+        try:
+            return config["password"] or Settings.get_user_config(Settings.get_username())["onlyfans_password"]
+        except Exception as e:
+            Settings.err_print(e)
+        return ""
 
     def get_password_google():
-        return config["password_google"] or ""
+        try:
+            return config["password_google"] or Settings.get_user_config(Settings.get_username())["google_password"]
+        except Exception as e:
+            Settings.err_print(e)
+        return ""
 
     def get_password_twitter():
-        return config["password_twitter"] or ""
+        try:
+            return config["password_twitter"] or Settings.get_user_config(Settings.get_username())["twitter_password"]
+        except Exception as e:
+            Settings.err_print(e)
+        return ""
 
     def get_download_path():
         return config["download_path"] or ""
@@ -291,6 +313,7 @@ class Settings:
         
     # def get_upload_max_messages():
         # return config["upload_max_messages"] or UPLOAD_MAX_MESSAGES
+        
     def get_login_method():
         return config["login"] or ""
         
@@ -320,15 +343,41 @@ class Settings:
     def get_email():
         return config["email"] or ""
 
+    def get_user_configs():
+        # load configs from .onlysnarf or baseDir
+        pass
+
+    def get_user_config(username="default"):
+        import configparser
+        config_file = configparser.ConfigParser()
+        config_file.read(os.path.join(Settings.get_base_directory(), "users", username+".conf"))
+        userConfig = {}
+        for section in config_file.sections():
+          for key in config_file[section]:
+            # print(section, key, config_file[section][key].strip("\""))
+            userConfig[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
+        return userConfig
+
     def get_username():
-        return config["username"] or ""
+        try:
+            return config["username"] or Settings.get_user_config()["onlyfans_username"]
+        except Exception as e:
+            Settings.err_print(e)
+        return ""
 
     def get_username_google():
-        return config["username_google"] or ""
+        try:
+            return config["username_google"] or Settings.get_user_config(Settings.get_username())["google_username"]
+        except Exception as e:
+            Settings.err_print(e)
+        return ""            
 
     def get_username_twitter():
-        return config["username_twitter"] or ""
-
+        try:
+            return config["username_twitter"] or Settings.get_user_config(Settings.get_username())["twitter_username"]
+        except Exception as e:
+            Settings.err_print(e)
+        return ""
 
     ## TODO
     # add arg -profile
@@ -469,6 +518,7 @@ class Settings:
         return PyInquirer.prompt(question)["confirm"]
 
     def prompt_email():
+        if not Settings.PROMPT: return False
         question = {
             'type': 'input',
             'message': 'Email:',
@@ -479,6 +529,7 @@ class Settings:
         return email
 
     def prompt_username():
+        if not Settings.PROMPT: return False
         question = {
             'type': 'input',
             'message': 'Username:',
@@ -489,6 +540,7 @@ class Settings:
         return username
 
     def prompt_password():
+        if not Settings.PROMPT: return False
         question = {
             'type': 'password',
             'message': 'Password:',
@@ -499,6 +551,7 @@ class Settings:
         return pw
 
     def prompt_username_google():
+        if not Settings.PROMPT: return False
         question = {
             'type': 'input',
             'message': 'Google username:',
@@ -509,6 +562,7 @@ class Settings:
         return username
 
     def prompt_password_google():
+        if not Settings.PROMPT: return False
         question = {
             'type': 'password',
             'message': 'Google password:',
@@ -519,6 +573,7 @@ class Settings:
         return pw
 
     def prompt_username_twitter():
+        if not Settings.PROMPT: return False
         question = {
             'type': 'input',
             'message': 'Twitter username:',
@@ -529,6 +584,7 @@ class Settings:
         return username
 
     def prompt_password_twitter():
+        if not Settings.PROMPT: return False
         question = {
             'type': 'password',
             'message': 'Twitter password:',
@@ -540,7 +596,7 @@ class Settings:
 
     def read_session_data():
         Settings.maybe_print("reading local session")
-        path_ = os.path.join(Settings.get_root_path(), "session.json")
+        path_ = os.path.join(Settings.get_base_directory(), "session.json")
         Settings.dev_print("local session path: "+str(path_))
         id_ = None
         url = None
@@ -558,7 +614,7 @@ class Settings:
         Settings.maybe_print("writing local session")
         Settings.dev_print("saving session id: {}".format(id_))        
         Settings.dev_print("saving session url: {}".format(url))
-        path_ = os.path.join(Settings.get_root_path(), "session.json")
+        path_ = os.path.join(Settings.get_base_directory(), "session.json")
         Settings.dev_print("local session path: "+str(path_))
         data = {}
         data['id'] = id_

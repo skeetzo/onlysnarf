@@ -45,7 +45,7 @@
   - settings globals -> class
   **4/16/2019**
   - fucking default variables
-**1.0.0 : Production : 4/22/2019**
+  **1.0.0 : Production : 4/22/2019**
   - save image_name instead of path
   - uploaded to pip
   **1.0.1**
@@ -125,7 +125,7 @@
   - fixed verbose output
   **1.4.3 : 9/21/2019**
   - dbot issue
-**2.0.0 : 9/25/2019**
+  **2.0.0 : 9/25/2019**
   - added functionality to choose instead of random
   **2.0.1**
   - oops
@@ -420,7 +420,7 @@
   - more debugging
   - fixed: file input
   - debugging: grandfathered
-**3.0.0 : Bot Experiments : 9/21/2020**
+  **3.0.0 : Bot Experiments : 9/21/2020**
   - major updates to browsers debugged
   - added: grandfather promotion
   - added: user lists (finally) - favorites, bookmarks, friends, etc
@@ -439,7 +439,7 @@
   - bin/install-firefox version 26 -> 29
   **3.0.4**
   - jk no selenium bump...
-**4.0.0 : Flask & React : 3/24/2021**
+  **4.0.0 : Flask & React : 3/24/2021**
   - flask-react integration and folder restructure
   **4.0.1 : 3/25/2021**
   - combined args: download_max & upload_max -> image-limit
@@ -454,7 +454,7 @@
   **4.0.4 : 12/8/2021**
   - cleaned up snarf.py staticness
   - updated test_snarf
-**4.1.0 : Beginning Phase Out : 2/19/2022**
+  **4.1.0 : Beginning Phase Out : 2/19/2022**
   - removed all the flask stuff that was being added
   - updated readme
   - dropped prices to free account
@@ -476,15 +476,17 @@
   - moved config baseDir -> "/HOME/$USER/.onlysnarf"
   - removed google & dropbox (finally)
   - fixed action: Settings -> now sets values again
+**4.1.3 : 8/23/2022**
+  - begin testing finally yay
+  - moved saving configs & user configs & session id & cookies to .onlysnarf
+  - added method for reading profiles from conf/users / .onlysnarf/users
 
 ------------------------------------------------------------------------------------
 
 - copy & cleanup dir structure for inclusion into next iteration content release project
 
-
 ## TODO
 
-- add method for reading profiles from conf/users
 - add arg: -profile for user data
 
 - add to upload scheme: least to greatest (folder sizes)
