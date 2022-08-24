@@ -62,6 +62,7 @@ CONFIGS_PATH = "{}/.onlysnarf".format(USER_HOME)
 USERS_PATH = os.path.join(CONFIGS_PATH, "users.json")
 PROFILE_PATH = os.path.join(CONFIGS_PATH, "profile.json")
 CONFIG_PATH = os.path.join(CONFIGS_PATH, "config.conf")
+PROFILES_PATH = os.path.join(CONFIGS_PATH, "users")
 
 # print(ROOT_PATH)
 # print(DOWNLOAD_PATH)

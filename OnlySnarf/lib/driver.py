@@ -910,22 +910,22 @@ class Driver:
             for page_, handle, value in self.tabs:
                 # Settings.dev_print("{} = {}".format(page_, page))
                 if str(page_) == str(page):
-                    self.browser.switch_to_window(handle)
+                    self.browser.switch_to.window(handle)
                     value += 1
                     Settings.dev_print("successfully located tab in cache: {}".format(page))
                     return True
             for handle in self.browser.window_handles[0]:
-                self.browser.switch_to_window(handle)
+                self.browser.switch_to.window(handle)
                 if str(page) in str(self.browser.current_url):
                     Settings.dev_print("successfully located tab: {}".format(page))
                     return True
             for handle in self.browser.window_handles:
-                self.browser.switch_to_window(handle)
+                self.browser.switch_to.window(handle)
                 if str(page) in str(self.browser.current_url):
                     Settings.dev_print("successfully located tab in windows: {}".format(page))
                     return True
             Settings.dev_print("failed to locate tab: {}".format(page))
-            self.browser.switch_to_window(original_handle)
+            self.browser.switch_to.window(original_handle)
         except Exception as e:
             if "Unable to locate window" not in str(e):
                 Settings.dev_print(e)
@@ -964,8 +964,8 @@ class Driver:
         WebDriverWait(self.browser, 10).until(EC.number_of_windows_to_be(len(windows)+1))
         windows_after = self.browser.window_handles
         new_window = [x for x in windows_after if x not in windows][0]
-        # self.browser.switch_to_window(new_window) <!---deprecated>
-        self.browser.switch_to_window(new_window)
+        # self.browser.switch_to.window(new_window) <!---deprecated>
+        self.browser.switch_to.window(new_window)
         Settings.dev_print("page title after tab switching is : %s" %self.browser.title)
         Settings.dev_print("new window handle is : %s" %new_window)
         if len(self.tabs) >= Driver.MAX_TABS:
@@ -2828,7 +2828,6 @@ class Driver:
         """
 
         type_ = None
-        Settings.print("spawning web browser...")
         def google():
             """
             Spawn a Google browser
@@ -2999,7 +2998,7 @@ class Driver:
                 Settings.maybe_print(e)
                 Settings.err_print("unable to connect to remote server")
                 return None        
-            Settings.err_print("missing reconnect id or url")
+            Settings.dev_print("missing reconnect id or url")
             return None
 
         def remote():
@@ -3078,6 +3077,8 @@ class Driver:
                     browser_ = google()
             return browser_
 
+        Settings.print("spawning web browser...")
+
         if BROWSER_TYPE == "google":
             browser = google()
         elif BROWSER_TYPE == "firefox":
@@ -3106,7 +3107,8 @@ class Driver:
                 Settings.maybe_print("failed to reconnect")
                 if str(e) != "'NoneType' object has no attribute 'title'":
                     Settings.dev_print(e)
-                browser = None        
+                browser = None
+        else: browser = None    
         if browser and Settings.is_keep():
             Settings.write_session_data(browser.session_id, browser.command_executor._url)
             if driver:
@@ -3749,7 +3751,7 @@ class Driver:
                         if successful: users.remove(user)
                 # if current window has changed, switch back
                 if self.browser.current_window_handle != original_handle:
-                    self.browser.switch_to_window(original_handle)
+                    self.browser.switch_to.window(original_handle)
             Settings.print()
             if not clicked:
                 Settings.print("Skipping: List Add (none)")

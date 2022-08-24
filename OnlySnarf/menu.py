@@ -8,7 +8,7 @@ import sys
 from PyInquirer import prompt
 ##
 from OnlySnarf.snarf import Snarf
-# from OnlySnarf.lib.driver import Driver
+from OnlySnarf.lib.driver import Driver
 from OnlySnarf.classes.profile import Profile
 from OnlySnarf.util.colorize import colorize
 from OnlySnarf.util.settings import Settings
@@ -180,7 +180,7 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
   
 def exit():
-    # Driver.exit_all()
+    Driver.exit_all()
     sys.exit(0)
 
 ######################################################
