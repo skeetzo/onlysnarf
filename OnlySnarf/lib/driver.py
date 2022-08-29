@@ -1048,7 +1048,7 @@ class Driver:
 
             try:
                 Settings.maybe_print("logging in via form")
-                username = str(Settings.get_email())
+                username = str(Settings.get_username_onlyfans())
                 password = str(Settings.get_password())
                 if not username or username == "":
                     username = Settings.prompt_email()
@@ -3108,12 +3108,16 @@ class Driver:
                 if str(e) != "'NoneType' object has no attribute 'title'":
                     Settings.dev_print(e)
                 browser = None
-        else: browser = None    
+        else: browser = None
+
+        # BUG:
+        # why the fuck is this basic fucking boolean check not working???
         if browser and Settings.is_keep():
-            Settings.write_session_data(browser.session_id, browser.command_executor._url)
-            if driver:
-                driver.session_id = browser.session_id
-                driver.session_url = browser.command_executor._url
+            pass
+            # Settings.write_session_data(browser.session_id, browser.command_executor._url)
+            # if driver:
+                # driver.session_id = browser.session_id
+                # driver.session_url = browser.command_executor._url
         if not browser:
             Settings.err_print("unable to spawn browser")
             # sys.exit(1)
@@ -3786,7 +3790,7 @@ class Driver:
         if self.browser == None: return
         if Settings.is_save_users():
             Settings.print("Saving and Exiting OnlyFans")
-            from .user import User
+            from OnlySnarf.classes.user import User
             User.write_users_local()
         if Settings.is_keep():
             Settings.maybe_print("keeping browser open")
