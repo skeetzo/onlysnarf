@@ -90,8 +90,8 @@ def apply_args(parser):
   ##
   # -email
   # the OnlyFans email to use for login
-  parser.add_argument('-email', type=str, default="", dest='email',
-    help='the email for an OnlyFans profile')
+  # parser.add_argument('-email', type=str, default="", dest='email',
+    # help='the email for an OnlyFans profile')
   ##
   # -promotion-expiration
   # expiration for a promotion
@@ -378,12 +378,12 @@ def apply_args(parser):
   ##
   # -username-google
   # the Google username to use
-  parser.add_argument('-username-google', type=str, default="", dest='username_google',
+  parser.add_argument('-username-google', type=str, default="", dest='google_username',
     help='the Google username for login')
   ##
   # -username-twitter
   # the Twitter username to use
-  parser.add_argument('-username-twitter', type=str, default="", dest='username_twitter',
+  parser.add_argument('-username-twitter', type=str, default="", dest='twitter_username',
     help='the Twitter username for login')
   ##
   # -users-read

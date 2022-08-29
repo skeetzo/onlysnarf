@@ -476,14 +476,18 @@
   - moved config baseDir -> "/HOME/$USER/.onlysnarf"
   - removed google & dropbox (finally)
   - fixed action: Settings -> now sets values again
-**4.1.3 : 8/23/2022**
+  **4.1.3 : 8/23/2022**
   - begin testing finally yay
   - moved saving configs & user configs & session id & cookies to .onlysnarf
   - added method for reading profiles from conf/users / .onlysnarf/users
+**4.1.4 : 8/29/2022**
+  - finished first login test
+  - removed 'email' from config for fetching username for login
 
 ------------------------------------------------------------------------------------
 
 - copy & cleanup dir structure for inclusion into next iteration content release project
+
 
 ## TODO
 
@@ -548,3 +552,7 @@ Final Missing Test notes:
 
   **x.x.x**
   - Profile options completely "functional" / debugged
+
+
+- random fucking bug in driver that is forcing to save session data regardless of the value of "keep" window
+possibly due to config values being used as strings instead of booleans?

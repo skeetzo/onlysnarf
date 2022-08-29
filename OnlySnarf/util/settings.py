@@ -101,7 +101,8 @@ class Settings:
         return cats
 
     def get_cookies_path():
-        return os.path.join(Settings.get_base_directory(), Settings.get_username(), "cookies.pkl")
+        # return os.path.join(Settings.get_base_directory(), Settings.get_username(), "cookies.pkl")
+        return os.path.join(Settings.get_base_directory(), "cookies.pkl")
 
     def get_price():
         return config["price"] or ""
@@ -211,14 +212,14 @@ class Settings:
 
     def get_password_google():
         try:
-            return config["password_google"] or Settings.get_user_config(Settings.get_username())["google_password"]
+            return config["google_password"] or Settings.get_user_config(Settings.get_username())["google_password"]
         except Exception as e:
             Settings.err_print(e)
         return ""
 
     def get_password_twitter():
         try:
-            return config["password_twitter"] or Settings.get_user_config(Settings.get_username())["twitter_password"]
+            return config["twitter_password"] or Settings.get_user_config(Settings.get_username())["twitter_password"]
         except Exception as e:
             Settings.err_print(e)
         return ""
@@ -313,7 +314,7 @@ class Settings:
         
     # def get_upload_max_messages():
         # return config["upload_max_messages"] or UPLOAD_MAX_MESSAGES
-        
+
     def get_login_method():
         return config["login"] or ""
         
@@ -350,31 +351,37 @@ class Settings:
     def get_user_config(username="default"):
         import configparser
         config_file = configparser.ConfigParser()
+        # strip email
+        if "@" in username: username = username[0 : username.index("@")]
         config_file.read(os.path.join(Settings.get_base_directory(), "users", username+".conf"))
         userConfig = {}
         for section in config_file.sections():
-          for key in config_file[section]:
-            # print(section, key, config_file[section][key].strip("\""))
-            userConfig[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
+            # print(section)
+            for key in config_file[section]:
+                # print(section, key, config_file[section][key].strip("\""))
+                userConfig[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
         return userConfig
 
     def get_username():
+        return config["username"] or ""
+
+    def get_username_onlyfans():
         try:
-            return config["username"] or Settings.get_user_config()["onlyfans_username"]
+            return Settings.get_user_config(Settings.get_username())["onlyfans_username"]
         except Exception as e:
             Settings.err_print(e)
         return ""
 
     def get_username_google():
         try:
-            return config["username_google"] or Settings.get_user_config(Settings.get_username())["google_username"]
+            return config["google_username"] or Settings.get_user_config(Settings.get_username())["google_username"]
         except Exception as e:
             Settings.err_print(e)
         return ""            
 
     def get_username_twitter():
         try:
-            return config["username_twitter"] or Settings.get_user_config(Settings.get_username())["twitter_username"]
+            return config["twitter_username"] or Settings.get_user_config(Settings.get_username())["twitter_username"]
         except Exception as e:
             Settings.err_print(e)
         return ""
@@ -430,7 +437,7 @@ class Settings:
         return config["force_upload"] or False
 
     def is_keep():
-        return config["keep"] or False
+        return bool(config["keep"]) or False
 
     def is_prefer_local():
         return config["prefer_local"] or False

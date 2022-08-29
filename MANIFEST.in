@@ -1,9 +1,7 @@
 # Config
 include OnlySnarf/conf/*
-#include OnlySnarf/config.conf
-#include OnlySnarf/google_creds.txt
 
-exclude OnlySnarf/notes.py
+exclude OnlySnarf/notes
 
 # Include the README
 include *.md
