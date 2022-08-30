@@ -3109,15 +3109,11 @@ class Driver:
                     Settings.dev_print(e)
                 browser = None
         else: browser = None
-
-        # BUG:
-        # why the fuck is this basic fucking boolean check not working???
         if browser and Settings.is_keep():
-            pass
-            # Settings.write_session_data(browser.session_id, browser.command_executor._url)
-            # if driver:
-                # driver.session_id = browser.session_id
-                # driver.session_url = browser.command_executor._url
+            Settings.write_session_data(browser.session_id, browser.command_executor._url)
+            if driver:
+                driver.session_id = browser.session_id
+                driver.session_url = browser.command_executor._url
         if not browser:
             Settings.err_print("unable to spawn browser")
             # sys.exit(1)

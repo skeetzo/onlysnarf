@@ -11,6 +11,9 @@ from OnlySnarf.util.settings import Settings
 Settings.set_prompt(False)
 Settings.set_confirm(False)
 
+import os
+os.environ['ENV'] = "test"
+
 # import warnings
 
 class TestSnarf(unittest.TestCase):
@@ -32,6 +35,10 @@ class TestSnarf(unittest.TestCase):
 
     def test_login(self):
         assert self.driver.auth(), "unable to login"
+
+    def test_users(self):
+        from OnlySnarf.classes.user import User
+        assert User.read_users_local(), "unable to read users"
 
     # def test_discount(self):
     #     assert self.test_snarf.discount(), "unable to apply discount"

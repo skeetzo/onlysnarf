@@ -75,8 +75,8 @@ class Settings:
         if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "None":
             USER = os.getenv('SUDO_USER')
         baseDir = "/home/{}/.onlysnarf".format(USER)
-        if os.environ.get('ENV') == "test":
-          baseDir = os.getcwd()
+        # if os.environ.get('ENV') == "test":
+          # baseDir = os.getcwd()
           # baseDir = os.path.dirname(__file__)
         return baseDir
 
@@ -358,7 +358,7 @@ class Settings:
         for section in config_file.sections():
             # print(section)
             for key in config_file[section]:
-                # print(section, key, config_file[section][key].strip("\""))
+                print(section, key, config_file[section][key].strip("\""))
                 userConfig[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
         return userConfig
 
@@ -413,61 +413,61 @@ class Settings:
     # Bools
 
     def is_confirm():
-        return Settings.CONFIRM or False
+        return bool(Settings.CONFIRM) or False
 
     def is_cookies():
-        return config["cookies"] or False
+        return bool(config["cookies"]) or False
 
     def is_delete_empty():
-        return config["delete_empty"] or False
+        return bool(config["delete_empty"]) or False
 
     def is_prompt():
-        return Settings.PROMPT or False
+        return bool(Settings.PROMPT) or False
 
     def is_debug():
-        return config["debug"] or False
+        return bool(config["debug"]) or False
 
     def is_debug_delay():
-        return config["debug_delay"] or False
+        return bool(config["debug_delay"]) or False
 
     def is_force_backup():
-        return config["force_backup"] or False
+        return bool(config["force_backup"]) or False
 
     def is_force_upload():
-        return config["force_upload"] or False
+        return bool(config["force_upload"]) or False
 
     def is_keep():
         return bool(config["keep"]) or False
 
     def is_prefer_local():
-        return config["prefer_local"] or False
+        return bool(config["prefer_local"]) or False
 
     def is_save_users():
-        return config["save_users"] or False
+        return bool(config["save_users"]) or False
         
     def is_reduce():
-        return config["enable_reduce"] or False
+        return bool(config["enable_reduce"]) or False
     
     def is_show_window():
-        return config["show"] or False
+        return bool(config["show"]) or False
 
     def is_split():
-        return config["enable_split"] or False
+        return bool(config["enable_split"]) or False
         
     def is_trim():
-        return config["enable_trim"] or False
+        return bool(config["enable_trim"]) or False
         
     def is_tweeting():
-        return config["tweeting"] or False
+        return bool(config["tweeting"]) or False
         
     def is_backup():
-        return config["backup"] or False
+        return bool(config["backup"]) or False
         
     def is_skip_download():
-        return config["skip_download"] or False
+        return bool(config["skip_download"]) or False
         
     def is_skip_upload():
-        return config["skip_upload"] or False
+        return bool(config["skip_upload"]) or False
 
     ##
     # Menu

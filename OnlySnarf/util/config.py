@@ -7,14 +7,16 @@ import os
 USER = os.getenv('USER')
 if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "None":
     USER = os.getenv('SUDO_USER')
-baseDir = "/home/{}/.onlysnarf".format(USER)
+
+configFile = "config.conf"
 if os.environ.get('ENV') == "test":
-  cwd = os.getcwd()
-  # baseDir = os.path.dirname(__file__)
-#########################################
+  # cwd = os.getcwd()
+  configFile = os.path.join(os.getcwd(), "OnlySnarf/conf", "test-config.conf")
+else:
+  configFile = os.path.join("/home/{}/.onlysnarf".format(USER), "config.conf")
 
 config_file = configparser.ConfigParser()
-config_file.read(os.path.join(baseDir, "config.conf"))
+config_file.read(configFile)
 
 # continue to overwrite values from arguments with config values
 
