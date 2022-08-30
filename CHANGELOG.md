@@ -486,8 +486,9 @@
 
 ------------------------------------------------------------------------------------
 
-- copy & cleanup dir structure for inclusion into next iteration content release project
-
+>>>>>
+>>>>> need to fix boolean bug before continuing tests
+>>>>>
 
 ## TODO
 
@@ -501,7 +502,7 @@
 - update: backup function to include original folder name -> posted/galleries/$file
 
 - finish adding docstrings to classes/user.py
-
+- copy & cleanup dir structure for inclusion into next iteration content release project
 
 ----------------------------------------
   END OF LIFE PHASE
