@@ -26,7 +26,7 @@ class Settings:
     #####################
 
     def debug_delay_check():
-        if Settings.is_debug() and Settings.is_debug_delay():
+        if Settings.is_debug() == "True" and Settings.is_debug_delay() == "True":
             time.sleep(int(10))
 
     ##
@@ -163,7 +163,7 @@ class Settings:
 
     def get_input_as_files():
         if Settings.FILES: return Settings.FILES
-        from .file import File
+        from ..classes.file import File
         files = []
         for file_path in config["input"]:
             file = File()
@@ -325,13 +325,13 @@ class Settings:
     def get_users():
         users = config["users"] or []
         users = [n.strip() for n in users]
-        from .user import User
+        from ..classes.user import User
         users_ = []
         for user in users:
             # user = User({})
             user = User({"username":config["user"]})
             # setattr(user, "username", config["user"])
-            from .driver import Driver
+            from ..lib.driver import Driver
             setattr(user, "driver", Driver.get_driver())
             users_.append(user)
         return users_
@@ -424,7 +424,7 @@ class Settings:
     def is_prompt():
         return Settings.PROMPT or False
 
-    def is_debug(process):
+    def is_debug(process=None):
         if process == "firefox": return config["debug_firefox"]
         elif process == "selenium": return config["debug_selenium"]
         return config["debug"] or False

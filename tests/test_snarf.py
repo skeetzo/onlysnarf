@@ -41,15 +41,20 @@ class TestSnarf(unittest.TestCase):
     #     from OnlySnarf.classes.user import User
     #     assert User.get_all_users(), "unable to read users"
 
-    def test_discount(self):
-        config["prefer_local"] = True
-        config["amount"] = DEFAULT.DISCOUNT_MIN_AMOUNT
-        config["months"] = DEFAULT.DISCOUNT_MIN_MONTHS
-        config["user"] = "all"
-        assert self.test_snarf.discount(), "unable to apply discount"
+    # def test_discount(self):
+    #     config["prefer_local"] = True
+    #     config["amount"] = DEFAULT.DISCOUNT_MIN_AMOUNT
+    #     config["months"] = DEFAULT.DISCOUNT_MIN_MONTHS
+    #     config["user"] = "ddezeht"
+    #     assert self.test_snarf.discount(), "unable to apply discount"
 
-    # def test_message(self):
-    #     assert self.test_snarf.message(), "unable to send message"
+    def test_message(self):
+        config["prefer_local"] = True
+        config["image"] = "public/images/shnarf.jpg"
+        config["price"] = DEFAULT.PRICE_MINIMUM
+        config["text"] = "test balls"
+        config["user"] = "ddezeht"
+        assert self.test_snarf.message(), "unable to send message"
 
     # def test_post(self):
     #     assert self.test_snarf.post(), "unable to post message"

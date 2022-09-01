@@ -483,20 +483,23 @@
   **4.1.4 : 8/29/2022**
   - finished first login test
   - removed 'email' from config for fetching username for login
-**4.1.5 : 8/31/2022**
-- added 'debug-firefox' to args for enabling trace logging
-- added 'debug-selenium' to control logging
-- finished test_users
-- added temporary fix for boolean bug: using "True" and "False" strings instead of booleans
+  **4.1.5 : 8/31/2022**
+  - added 'debug-firefox' to args for enabling trace logging
+  - added 'debug-selenium' to control logging
+  - finished test_users
+  - added temporary fix for boolean bug: using "True" and "False" strings instead of booleans
+**4.1.6 : 9/1/2022**
+  - finished debugging test_discount
 
 ------------------------------------------------------------------------------------
 
-- finish debugging test_discount
+- finish debugging test_message
 
->>>>>
-need to fix cookies not loading to skip login process
->>>>>
 
+## Not Working
+
+- cookies: currently prevents saving login session
+- google login: unsafe browser warning
 
 ## TODO
 

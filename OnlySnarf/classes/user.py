@@ -103,8 +103,12 @@ class User:
 
         if not self.get_username() and not self.get_id(): return Settings.error("Missing user identifiers")
         Settings.print("Messaging: {} - {}".format(self.username, self.id))
-        successful = Driver.message(username=self.username, user_id=self.id, message=message)
+        successful = Driver.get_driver().message(username=self.username, user_id=self.id)
         if not successful: return False
+
+        successful = self.enter_message(message=message)
+        if not successful: return False
+
         Settings.print("Messaged: {}".format(self.username))
         return True
 
@@ -147,7 +151,7 @@ class User:
 
             # enter the text of the message
             def enter_text(text):
-                return Driver.message_text(text)
+                return Driver.get_driver().message_text(text)
             
             # enter the price to send the message to the user
             def enter_price(price):
@@ -155,7 +159,7 @@ class User:
                 if price != None and Decimal(sub(r'[^\d.]', '', price)) < Decimal(Settings.get_price_minimum()):
                     Settings.warn_print("price too low; {} < {}".format(price, Settings.get_price_minimum()))
                     return False
-                return Driver.message_price(price)
+                return Driver.get_driver().message_price(price)
             
             # enter files by filepath while checking for already sent files
             def enter_files(files):
@@ -165,10 +169,10 @@ class User:
                         Settings.err_print("file already sent to user: {} <-- {}".format(self.username, file_name))
                         return False
                     self.sent_files.append(file_name)
-                return Driver.message_files(files)
+                return Driver.get_driver().message_files(files)
                 
             def confirm():
-                return Driver.message_confirm()
+                return Driver.get_driver().message_confirm()
 
             successfull.append(enter_text(message.text))
             successfull.append(enter_price(message.price))
