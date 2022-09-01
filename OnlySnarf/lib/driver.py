@@ -121,6 +121,7 @@ class Driver:
             for cookie in cookies:
                 self.browser.add_cookie(cookie)
             Settings.dev_print("successfully loaded cookies")
+            self.refresh()
         else: 
             Settings.dev_print("failed to load cookies")
             Settings.dev_print(e)
@@ -175,7 +176,8 @@ class Driver:
             amount = int(discount.get_amount())
             username = str(discount.get_username())
             # ensure username is actually a username
-            from OnlySnarf.classes.user import User
+            # from OnlySnarf.classes.user import User
+            from ..classes.user import User
             if isinstance(discount.username, User):
                 username = discount.username.username
             # check variable constraints
@@ -191,11 +193,12 @@ class Driver:
             elif int(amount) < int(Settings.get_discount_min_amount()):
                 Settings.warn_print("amount too low, min -> {}%".format(Settings.get_discount_min_months()))
                 amount = int(Settings.get_discount_min_amount())
-            Settings.print("Discounting User: {}".format(username))
+            Settings.print("Discounting: {}".format(username))
             self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
             end_ = True
             count = 0
             user_ = None
+            Settings.print("searching for user...")
             # scroll through users on page until user is found
             while end_:
                 elements = self.browser.find_elements_by_class_name("m-fans")
@@ -220,16 +223,10 @@ class Driver:
             ActionChains(self.browser).move_to_element(user_).perform()
             Settings.dev_print("successfully moved to user")
             Settings.dev_print("finding discount btn")
-
-
-            ## TODO: finish testing
-            # should find at least 1, no button eles found
             buttons = user_.find_elements_by_class_name(Element.get_element_by_name("discountUser").getClass())
-            print(buttons)
-
             clicked = False
             for button in buttons:
-                print(button.get_attribute("innerHTML"))
+                # print(button.get_attribute("innerHTML"))
                 if "Discount" in button.get_attribute("innerHTML") and button.is_enabled() and button.is_displayed():
                     try:
                         Settings.dev_print("clicking discount btn")
@@ -249,20 +246,21 @@ class Driver:
             from OnlySnarf.util.defaults import DISCOUNT_MAX_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_AMOUNT, DISCOUNT_MIN_MONTHS
             discountAmount = DISCOUNT_MIN_AMOUNT
             monthsAmount = DISCOUNT_MIN_MONTHS
-            months_ = self.browser.find_element_by_class_name("b-fans__trial__select-item.m-w-2-2.m-last-child")
-            discount_ = self.browser.find_element_by_class_name("b-fans__trial__select-item.m-w-2-2.m-first-child")
+            print(self.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserAmount").getClass()))
+            discountEle = self.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserAmount").getClass())[0]
+            monthsEle = self.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserMonths").getClass())[1]
             Settings.dev_print("found months and discount amount")
 
             def apply_discount():
                 Settings.dev_print("attempting discount")
-                eles = self.browser.find_elements_by_class_name("v-select__selection.v-select__selection--comma")
-                for ele in eles:
-                    if str("% discount") in ele.get_attribute("innerHTML"):
-                        discountAmount = int(ele.get_attribute("innerHTML").replace("% discount", ""))
-                        Settings.dev_print("amount: {}".format(discountAmount))
-                    elif str(" month") in ele.get_attribute("innerHTML"):
-                        monthsAmount = int(ele.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
-                        Settings.dev_print("months: {}".format(monthsAmount))
+                # eles = self.browser.find_elements_by_class_name("v-select__selection.v-select__selection--comma")
+                # for ele in eles:
+                    # if str("% discount") in ele.get_attribute("innerHTML"):
+                discountAmount = int(discountEle.get_attribute("innerHTML").replace("% discount", ""))
+                Settings.dev_print("amount: {}".format(discountAmount))
+                    # elif str(" month") in ele.get_attribute("innerHTML"):
+                monthsAmount = int(monthsEle.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
+                Settings.dev_print("months: {}".format(monthsAmount))
                 ## amount
                 Settings.dev_print("entering discount amount")
                 if int(discountAmount) != int(amount):
@@ -271,7 +269,7 @@ class Driver:
                     Settings.dev_print("up: {}".format(up_))
                     Settings.dev_print("down: {}".format(down_))
                     action = ActionChains(self.browser)
-                    action.click(on_element=discount_)
+                    action.click(on_element=discountEle)
                     action.pause(1)
                     for n in range(up_):
                         action.send_keys(Keys.UP)
@@ -290,7 +288,7 @@ class Driver:
                     Settings.dev_print("up: {}".format(up_))
                     Settings.dev_print("down: {}".format(down_))
                     action = ActionChains(self.browser)
-                    action.click(on_element=months_)
+                    action.click(on_element=monthsEle)
                     action.pause(1)
                     for n in range(up_):
                         action.send_keys(Keys.UP)
@@ -303,7 +301,7 @@ class Driver:
                 Settings.dev_print("successfully entered discount months")
                 return discountAmount, monthsAmount
 
-            # discount method is repeated until values are correct
+            # discount method is repeated until values are correct because somehow it occasionally messes up...
             discountAmount, monthsAmount = apply_discount()
             while int(discountAmount) != int(amount) and int(monthsAmount) != int(months):
                 # Settings.print("{} = {}    {} = {}".format(discountAmount, amount, monthsAmount, months))
@@ -329,7 +327,7 @@ class Driver:
                     return True
                 elif "Apply" in button.get_attribute("innerHTML"):
                     button.click()
-                    Settings.print("Discounted User: {}".format(username))
+                    Settings.print("Discounted: {}".format(username))
                     Settings.dev_print("successfully applied discount")
                     Settings.dev_print("### Discount Successful ###")
                     return True
@@ -415,7 +413,8 @@ class Driver:
         Settings.print("Downloading Messages: {}".format(user))
         try:
             if str(user) == "all":
-                from OnlySnarf.classes.user import User
+                # from OnlySnarf.classes.user import User
+                from ..classes.user import User
                 user = random.choice(User.get_all_users())
             self.message_user(username=user.username)
             contentCount = 0
@@ -843,7 +842,7 @@ class Driver:
 
         auth_ = self.auth()
         if not auth_: return False
-        if self.search_for_tab("{}{}".format(ONLYFANS_HOME_URL, page)):
+        if self.search_for_tab("{}/{}".format(ONLYFANS_HOME_URL, page).replace("//","/")):
             Settings.maybe_print("found -> {}".format(page))
             return
         if str(self.browser.current_url) == str(page) or str(page) in str(self.browser.current_url):
@@ -1240,7 +1239,7 @@ class Driver:
 
         successful = loggedin_check()
         if successful: return yasssss() # already logged in
-        Settings.print('Logging into OnlyFans')
+        Settings.print('logging into OnlyFans...')
         try:
             if Settings.get_login_method() == "auto":
                 successful = via_form()
@@ -1255,13 +1254,13 @@ class Driver:
             elif Settings.get_login_method() == "google":
                 successful = via_google()
             if not successful:
-                Settings.print("OnlyFans Login Failed")
+                Settings.print("OnlyFans login failed!")
                 return False
             return yasssss()
         except Exception as e:
             Settings.dev_print("login failure")
             Driver.error_checker(e)
-            Settings.print("OnlyFans Login Failed")
+            Settings.print("OnlyFans login failed!")
             return False
 
     ####################
@@ -2268,7 +2267,7 @@ class Driver:
                 cancel.click()
                 return True
             save.click()
-            Settings.print("Discounted User: {}".format(user.username))
+            Settings.print("Discounted: {}".format(user.username))
             Settings.dev_print("### User Discount Successful ###")
             return True
         except Exception as e:
@@ -2393,7 +2392,7 @@ class Driver:
     def refresh(self):
         """Refresh the web browser"""
 
-        Settings.dev_print("refreshing self.browser")
+        Settings.dev_print("refreshing browser...")
         self.browser.refresh()
 
     #################
@@ -2627,7 +2626,7 @@ class Driver:
         auth_ = self.auth()
         if not auth_: return False
         Settings.print("Getting Settings: {}".format(page))
-        from .profile import Profile
+        from ..classes.profile import Profile
         try:
             variables = Profile.get_variables_for_page(page)
             Settings.dev_print("going to settings page: {}".format(page))
@@ -2700,7 +2699,7 @@ class Driver:
         auth_ = self.auth()
         if not auth_: return False
         Settings.print("Updating Page Settings: {}".format(page))
-        from .profile import Profile
+        from ..classes.profile import Profile
         try:
             variables = Profile.get_variables_for_page(page)
             Settings.dev_print("going to settings page: {}".format(page))
@@ -3807,7 +3806,8 @@ class Driver:
         if self.browser == None: return
         if Settings.is_save_users() == "True":
             Settings.print("Saving and Exiting OnlyFans")
-            from OnlySnarf.classes.user import User
+            # from OnlySnarf.classes.user import User
+            from ..classes.user import User
             User.write_users_local()
         if Settings.is_keep() == "True":
             Settings.maybe_print("keeping browser open")

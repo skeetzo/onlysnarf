@@ -207,20 +207,7 @@ ELEMENTS = [
         "text": ["Cancel"],
         "id": []
     },
-    # discount modal for user
-    {
-        "name": "discountUserButton",
-        "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded"],
-        "text": ["Apply"],
-        "id": []
-    },
-    # discount save for user
-    {
-        "name": "discountUsers",
-        "classes": ["b-users__item.m-fans"],
-        "text": ["Save"],
-        "id": []
-    },
+    
     {
         "name": "listSave",
         "classes": ["g-btn.m-rounded.m-sm-width"],
@@ -510,10 +497,40 @@ ELEMENTS = [
         "text": [],
         "id": ["__BVID__56__BV_toggle_"],
     },
+
+    # save discount for user
+    {
+        "name": "discountUserButton",
+        "classes": ["g-btn.m-flat.m-btn-gaps.m-reset-width", "g-btn.m-rounded"],
+        "text": ["Apply"],
+        "id": []
+    },
+    # discount save for user
+    # {
+    #     "name": "discountUsers",
+    #     "classes": ["b-users__item.m-fans"],
+    #     "text": ["Save"],
+    #     "id": []
+    # },
+
     {
         "name": "discountUser",
-        "classes": ["button"],
-        "text": ["Give user a discount"],
+        "classes": ["b-tabs__nav__text"],
+        "text": ["Discount"],
+        "id": [],
+    },
+
+    {
+        "name": "discountUserAmount",
+        "classes": ["v-select__selection.v-select__selection--comma"],
+        "text": ["% discount"],
+        "id": [],
+    },
+
+    {
+        "name": "discountUserMonths",
+        "classes": ["v-select__selection.v-select__selection--comma"],
+        "text": [" month"],
         "id": [],
     },
 

@@ -370,12 +370,12 @@ class Message():
 
         if len(self.users) > 0: return self.users
         # if no recipients, prompt for them
-        if len(self.recipients) == 0 and len(Settings.get_users()) > 0: 
+        if len(self.users) == 0 and len(Settings.get_users()) > 0: 
             self.users = Settings.get_users()
-        elif len(self.recipients) == 0 and Settings.get_user(): 
+        elif len(self.users) == 0 and Settings.get_user(): 
             self.users = [Settings.get_user()]
         # select users
-        elif len(self.recipients) == 0:
+        elif len(self.users) == 0:
             self.users = User.select_users()
         return self.users
 
