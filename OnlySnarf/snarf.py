@@ -9,7 +9,7 @@ from OnlySnarf.classes.discount import Discount
 from OnlySnarf.classes.message import Message
 from OnlySnarf.classes.profile import Profile
 from OnlySnarf.classes.promotion import Promotion
-from OnlySnarf.classes.user import User
+# from OnlySnarf.classes.user import User
 
 #################
 ##### Snarf #####

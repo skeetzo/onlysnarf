@@ -65,7 +65,7 @@ class Discount:
                 Settings.dev_print(e)
                 failures+=1
         if failures >= successes:
-            Settings.print("Successful | Failed: {} | {}".format(successes, failures))
+            Settings.print("Successful: {} | Failed: {}".format(successes, failures))
             return False
         return True
 
@@ -169,7 +169,7 @@ class Discount:
         """
 
         if self.username: return self.username
-        self.username = User.select_user()
+        self.username = User.select_user().username
         return self.username
 
     def grandfatherer(self, users=[]):

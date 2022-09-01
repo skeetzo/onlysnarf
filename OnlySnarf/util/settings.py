@@ -1,7 +1,7 @@
 import pkg_resources
 import time
 import PyInquirer
-import os, json
+import os, json, sys
 ##
 from .colorize import colorize
 from .config import config
@@ -228,7 +228,7 @@ class Settings:
         return config["download_path"] or ""
 
     def get_users_path():
-        return config["users_path"] or DEFAULT.USERS_PATH
+        return config["path_users"] or DEFAULT.USERS_PATH
 
     def get_config_path():
         return config["config_path"] or ""    
@@ -316,7 +316,7 @@ class Settings:
         # return config["upload_max_messages"] or UPLOAD_MAX_MESSAGES
 
     def get_login_method():
-        return config["login"] or ""
+        return config["login"] or "onlyfans"
         
     def get_upload_max_duration():
         return config["upload_max_duration"] or DEFAULT.UPLOAD_MAX_DURATION # 6 hours
@@ -358,7 +358,7 @@ class Settings:
         for section in config_file.sections():
             # print(section)
             for key in config_file[section]:
-                print(section, key, config_file[section][key].strip("\""))
+                # print(section, key, config_file[section][key].strip("\""))
                 userConfig[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
         return userConfig
 
@@ -413,61 +413,63 @@ class Settings:
     # Bools
 
     def is_confirm():
-        return bool(Settings.CONFIRM) or False
+        return Settings.CONFIRM or False
 
     def is_cookies():
-        return bool(config["cookies"]) or False
+        return config["cookies"] or False
 
     def is_delete_empty():
-        return bool(config["delete_empty"]) or False
+        return config["delete_empty"] or False
 
     def is_prompt():
-        return bool(Settings.PROMPT) or False
+        return Settings.PROMPT or False
 
-    def is_debug():
-        return bool(config["debug"]) or False
+    def is_debug(process):
+        if process == "firefox": return config["debug_firefox"]
+        elif process == "selenium": return config["debug_selenium"]
+        return config["debug"] or False
 
     def is_debug_delay():
-        return bool(config["debug_delay"]) or False
+        return config["debug_delay"] or False
 
     def is_force_backup():
-        return bool(config["force_backup"]) or False
+        return config["force_backup"] or False
 
     def is_force_upload():
-        return bool(config["force_upload"]) or False
+        return config["force_upload"] or False
 
     def is_keep():
-        return bool(config["keep"]) or False
+        return config["keep"] or False
 
     def is_prefer_local():
-        return bool(config["prefer_local"]) or False
+        return config["prefer_local"] or False
 
     def is_save_users():
-        return bool(config["save_users"]) or False
+        return config["save_users"] or False
         
     def is_reduce():
-        return bool(config["enable_reduce"]) or False
+        return config["enable_reduce"] or False
     
     def is_show_window():
-        return bool(config["show"]) or False
+        return config["show"] or False
 
     def is_split():
-        return bool(config["enable_split"]) or False
+        return config["enable_split"] or False
         
     def is_trim():
-        return bool(config["enable_trim"]) or False
+        return config["enable_trim"] or False
         
     def is_tweeting():
-        return bool(config["tweeting"]) or False
+        return config["tweeting"] or False
         
     def is_backup():
-        return bool(config["backup"]) or False
+        return config["backup"] or False
         
     def is_skip_download():
-        return bool(config["skip_download"]) or False
+        return config["skip_download"] or False
         
     def is_skip_upload():
-        return bool(config["skip_upload"]) or False
+        return config["skip_upload"] or False
 
     ##
     # Menu

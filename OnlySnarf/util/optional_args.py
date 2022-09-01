@@ -54,6 +54,14 @@ def apply_args(parser):
   # debugging - skips uploading and deleting unless otherwise forced
   parser.add_argument('-debug', action='store_true', dest='debug',
     help='enable debugging')
+  # -debug-firefox
+  # enables trace logging
+  parser.add_argument('-debug-firefox', action='store_true', dest='debug_firefox',
+    help='enable debugging of firefox')
+  # -debug-selenium
+  # enables selenium logging
+  parser.add_argument('-debug-selenium', action='store_true', dest='debug_selenium',
+    help='enable debugging of selenium')
 
 
 
@@ -208,6 +216,11 @@ def apply_args(parser):
   parser.add_argument('-config-path', dest="path_config", type=str, 
     help='the path to the config.conf', default=DEFAULT.CONFIG_PATH)
   ##
+  # -download-path
+  # the path to the downloaded files
+  parser.add_argument('-download-path', type=str, dest='path_download',
+    help='the path to download files to', default=DEFAULT.DOWNLOAD_PATH)
+  ##
   # -user-path
   # the path to the users.json file
   parser.add_argument('-users-path', type=str, dest='path_users',
@@ -359,12 +372,12 @@ def apply_args(parser):
   # -user
   # the user to target
   parser.add_argument('-user', type=str,  default=None, dest='user',
-    help='the user to message')
+    help='the user to target with an action')
   ##
   # -users
   # the users to target
   parser.add_argument('-users', dest='users', action='append', default=[],
-    help='the users to message')
+    help='the users to target with actions')
   ##
   # -users-favorite
   # list of favorited users

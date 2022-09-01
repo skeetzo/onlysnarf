@@ -480,15 +480,23 @@
   - begin testing finally yay
   - moved saving configs & user configs & session id & cookies to .onlysnarf
   - added method for reading profiles from conf/users / .onlysnarf/users
-**4.1.4 : 8/29/2022**
+  **4.1.4 : 8/29/2022**
   - finished first login test
   - removed 'email' from config for fetching username for login
+**4.1.5 : 8/31/2022**
+- added 'debug-firefox' to args for enabling trace logging
+- added 'debug-selenium' to control logging
+- finished test_users
+- added temporary fix for boolean bug: using "True" and "False" strings instead of booleans
 
 ------------------------------------------------------------------------------------
 
+- finish debugging test_discount
+
 >>>>>
->>>>> need to fix boolean bug before continuing tests
+need to fix cookies not loading to skip login process
 >>>>>
+
 
 ## TODO
 
@@ -554,6 +562,5 @@ Final Missing Test notes:
   **x.x.x**
   - Profile options completely "functional" / debugged
 
-
-- random fucking bug in driver that is forcing to save session data regardless of the value of "keep" window
-possibly due to config values being used as strings instead of booleans?
+**4.1.4**
+  - boolean checks from "Settings.is_" functions are failing: replaced with redundant "== True"

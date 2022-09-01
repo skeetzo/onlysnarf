@@ -3,11 +3,12 @@ import random
 import os
 import shutil
 import json
-import sys
+# import sys
 import pathlib
 import chromedriver_binary
 import time
 import wget
+import pickle
 from datetime import datetime, timedelta
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
@@ -114,12 +115,15 @@ class Driver:
         if os.path.exists(Settings.get_cookies_path()):
             # must be at onlyfans.com to load cookies of onlyfans.com
             self.go_to_home()
-            import pickle
-            cookies = pickle.load(open(Settings.get_cookies_path(), "rb"))
+            file = open(Settings.get_cookies_path(), "rb")
+            cookies = pickle.load(file)
+            file.close()
             for cookie in cookies:
                 self.browser.add_cookie(cookie)
             Settings.dev_print("successfully loaded cookies")
-        else: Settings.dev_print("failed to load cookies")
+        else: 
+            Settings.dev_print("failed to load cookies")
+            Settings.dev_print(e)
 
     def cookies_save(self):
         """Saves existing web browser cookies to local source"""
@@ -127,8 +131,9 @@ class Driver:
         try:
             # must be at onlyfans.com to save cookies of onlyfans.com
             self.go_to_home()
-            import pickle
-            pickle.dump(self.browser.get_cookies(), open(Settings.get_cookies_path(), "wb")) # "cookies.pkl"
+            file = open(Settings.get_cookies_path(), "wb")
+            pickle.dump(self.browser.get_cookies(), file) # "cookies.pkl"
+            file.close()
             Settings.dev_print("successfully saved cookies")
         except Exception as e:
             Settings.dev_print("failed to save cookies")
@@ -170,7 +175,7 @@ class Driver:
             amount = int(discount.get_amount())
             username = str(discount.get_username())
             # ensure username is actually a username
-            from .user import User
+            from OnlySnarf.classes.user import User
             if isinstance(discount.username, User):
                 username = discount.username.username
             # check variable constraints
@@ -206,7 +211,7 @@ class Driver:
                 count = len(elements)
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
-            Settings.print()
+            Settings.print("")
             Settings.dev_print("successfully found fans")
             if not user_:
                 Settings.err_print("unable to find user - {}".format(username))
@@ -215,21 +220,33 @@ class Driver:
             ActionChains(self.browser).move_to_element(user_).perform()
             Settings.dev_print("successfully moved to user")
             Settings.dev_print("finding discount btn")
+
+
+            ## TODO: finish testing
+            # should find at least 1, no button eles found
             buttons = user_.find_elements_by_class_name(Element.get_element_by_name("discountUser").getClass())
+            print(buttons)
+
+            clicked = False
             for button in buttons:
+                print(button.get_attribute("innerHTML"))
                 if "Discount" in button.get_attribute("innerHTML") and button.is_enabled() and button.is_displayed():
                     try:
                         Settings.dev_print("clicking discount btn")
                         button.click()
                         Settings.dev_print("clicked discount btn")
+                        clicked = True
                         break
                     except Exception as e:
                         Driver.error_checker(e)
-                        Settings.warn_print("unable to find user")
+                        Settings.warn_print("unable to click discount btn for: {}".format(username))
                         return False
+            if not clicked:
+                Settings.warn_print("unable to find discount btn for: {}".format(username))
+                return False
             time.sleep(1)
             Settings.dev_print("finding months and discount amount btns")
-            from .validators import DISCOUNT_MAX_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_AMOUNT, DISCOUNT_MIN_MONTHS
+            from OnlySnarf.util.defaults import DISCOUNT_MAX_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_AMOUNT, DISCOUNT_MIN_MONTHS
             discountAmount = DISCOUNT_MIN_AMOUNT
             monthsAmount = DISCOUNT_MIN_MONTHS
             months_ = self.browser.find_element_by_class_name("b-fans__trial__select-item.m-w-2-2.m-last-child")
@@ -304,7 +321,7 @@ class Driver:
                     Settings.dev_print("successfully skipped existing discount")
                     Settings.dev_print("### Discount Successful ###")
                     return True
-                if "Cancel" in button.get_attribute("innerHTML") and Settings.is_debug():
+                if "Cancel" in button.get_attribute("innerHTML") and Settings.is_debug() == "True":
                     Settings.print("Skipping: Save Discount (Debug)")
                     button.click()
                     Settings.dev_print("successfully canceled discount")
@@ -345,7 +362,7 @@ class Driver:
                     Settings.print_same_line("({}/{}) scrolling...".format(n,int(int(int(num)/5)+1)))
                     self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                     time.sleep(1)
-                Settings.print()
+                Settings.print("")
             except Exception as e:
                 Settings.print(e)
                 Settings.err_print("failed to find content to scroll")
@@ -379,7 +396,7 @@ class Driver:
                         imagesDownloaded.append(i)
                     except Exception as e: Settings.print(e)
                 i+=1
-            Settings.print()
+            Settings.print("")
         except Exception as e:
             Settings.print(e)
         return imagesDownloaded
@@ -398,7 +415,7 @@ class Driver:
         Settings.print("Downloading Messages: {}".format(user))
         try:
             if str(user) == "all":
-                from .user import User
+                from OnlySnarf.classes.user import User
                 user = random.choice(User.get_all_users())
             self.message_user(username=user.username)
             contentCount = 0
@@ -448,7 +465,7 @@ class Driver:
                         videosDownloaded.append(i)
                     except Exception as e: Settings.print(e)
                 i+=1
-            Settings.print()
+            Settings.print("")
         except Exception as e:
             Settings.print(e)
         return videosDownloaded
@@ -577,7 +594,7 @@ class Driver:
             Settings.dev_print("successfully selected expiration")
             Settings.debug_delay_check()
             # save
-            if Settings.is_debug():
+            if Settings.is_debug() == "True":
                 Settings.print("Skipping: Expiration (debug)")
                 Settings.dev_print("skipping expires")
                 self.find_element_to_click("expiresCancel").click()
@@ -1069,7 +1086,7 @@ class Driver:
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
-                time.sleep(10) # wait for potential captcha
+                # time.sleep(10) # wait for potential captcha
 
                 # captcha = self.browser.find_elements_by_id("recaptcha-anchor")
                 # captcha2 = self.browser.find_elements_by_class_name("recaptcha-checkbox")
@@ -1077,11 +1094,11 @@ class Driver:
                 # Settings.print(captcha2)
 
                 def check_captcha():
-                    Settings.dev_print("attempting captcha")
                     try:
                         time.sleep(10) # wait extra long to make sure it doesn't verify obnoxiously
                         el = self.browser.find_element_by_name("password")
                         if not el: return # likely logged in without captcha
+                        Settings.dev_print("waiting for captcha completion by user...")
                         action = webdriver.common.action_chains.ActionChains(self.browser)
                         action.move_to_element_with_offset(el, 40, 100)
                         action.click()
@@ -1217,7 +1234,7 @@ class Driver:
             """Succesful login"""
 
             ## Cookies
-            if Settings.is_cookies():
+            if Settings.is_cookies() == "True":
                 self.cookies_save()
             return True
 
@@ -1325,7 +1342,7 @@ class Driver:
                         return False
             Settings.dev_print("getting confirm to click")
             confirm = self.find_element_to_click("new_post")
-            if Settings.is_debug():
+            if Settings.is_debug() == "True":
                 Settings.print('OnlyFans Message: Skipped (debug)')
                 Settings.dev_print("### Message Successful (debug) ###")
                 Settings.debug_delay_check()
@@ -1762,7 +1779,7 @@ class Driver:
                 i+=1
             Settings.dev_print("successfully entered questions")
             Settings.debug_delay_check()
-            if Settings.is_debug():
+            if Settings.is_debug() == "True":
                 Settings.print("Skipping: Poll (debug)")
                 cancel = self.find_element_to_click("pollCancel")
                 cancel.click()
@@ -1840,7 +1857,7 @@ class Driver:
                 if not self.poll(poll=poll): return False
             WAIT = WebDriverWait(self.browser, 600, poll_frequency=10)
             ## Tweeting
-            if Settings.is_tweeting():
+            if Settings.is_tweeting() == "True":
                 Settings.dev_print("tweeting")
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, Element.get_element_by_name("tweet").getXPath()))).click()
             else: Settings.dev_print("not tweeting")
@@ -1876,7 +1893,7 @@ class Driver:
                     Settings.print('uploading...')
                     Driver.error_checker(e)
                     i+=1
-                    if i == int(Settings.get_upload_max_duration()) and not Settings.is_force_upload():
+                    if i == int(Settings.get_upload_max_duration()) and Settings.is_force_upload() == "False":
                         Settings.err_print("max upload time reached")
                         return False
             ## Confirm
@@ -1884,7 +1901,7 @@ class Driver:
                 send = self.find_element_to_click("new_post")
                 if send:
                     Settings.debug_delay_check()
-                    if Settings.is_debug():
+                    if Settings.is_debug() == "True":
                         Settings.print('Skipped: OnlyFans Post (debug)')
                         Settings.debug_delay_check()
                         self.go_to_home(force=True)
@@ -1997,7 +2014,7 @@ class Driver:
             # todo: [] apply to expired subscribers checkbox
             Settings.debug_delay_check()
             # find and click promotionalTrialConfirm
-            if Settings.is_debug():
+            if Settings.is_debug() == "True":
                 Settings.dev_print("finding campaign cancel")
                 self.find_element_to_click("promotionalTrialCancel").click()
                 Settings.print("Skipping: Promotion (debug)")
@@ -2244,7 +2261,7 @@ class Driver:
             Settings.dev_print("successfully entered message")
             Settings.dev_print("applying discount")
             save = self.find_element_by_name("promotionalTrialApply")
-            if Settings.is_debug():
+            if Settings.is_debug() == "True":
                 self.find_element_by_name("promotionalTrialCancel").click()
                 Settings.print("Skipping: Save Discount (Debug)")
                 Settings.dev_print("successfully canceled discount")
@@ -2548,7 +2565,7 @@ class Driver:
             # save time
             Settings.dev_print("saving schedule")
             Settings.debug_delay_check()
-            if Settings.is_debug():
+            if Settings.is_debug() == "True":
                 Settings.print("Skipping: Schedule (debug)")
                 self.find_element_to_click("scheduleCancel").click()
                 Settings.dev_print("successfully canceled schedule")
@@ -2721,7 +2738,7 @@ class Driver:
                     element.send_keys(getattr(profile, str(name)))
                 elif str(type_) == "checkbox":
                     element.click()
-            if Settings.is_debug():
+            if Settings.is_debug() == "True":
                 Settings.dev_print("successfully cancelled settings page: {}".format(page))
             else:
                 self.settings_save(page=page)
@@ -2774,7 +2791,7 @@ class Driver:
             Settings.dev_print("derp")
             element = self.find_element_to_click("profileSave")
             Settings.dev_print("found page save")
-            if Settings.is_debug():
+            if Settings.is_debug() == "True":
                 Settings.print("Skipping: Save (debug)")
             else:
                 Settings.dev_print("saving page")
@@ -2802,7 +2819,7 @@ class Driver:
         if not browser: return None
         self.browser = browser
         ## Cookies
-        if Settings.is_cookies():
+        if Settings.is_cookies() == "True":
             self.cookies_load()
         self.tabs.append([browser.current_url, browser.current_window_handle, 0])
         Driver.DRIVERS.append(self)
@@ -2847,7 +2864,7 @@ class Driver:
                 # options.add_argument("--disable-dev-shm-usage") # overcome limited resource problems
                 # options.add_argument("--disable-gpu") # applicable to windows os only
                 options.add_argument('--disable-software-rasterizer')
-                if not Settings.is_show_window():
+                if not Settings.is_show_window() == "True":
                     options.add_argument('--headless')
                     # options.add_argument('--disable-smooth-scrolling')
                 #
@@ -2855,7 +2872,8 @@ class Driver:
                 options.add_argument("--disable-infobars") # disabling infobars
                 # options.add_argument("--start-maximized")
                 # options.add_argument("--window-size=1920,1080")
-                # options.add_argument("--user-data-dir=/tmp/");
+                # options.add_argument("--user-data-dir=/tmp/")
+                options.add_argument("user-data-dir=selenium") 
                 # options.add_argument('--disable-login-animations')
                 # options.add_argument('--disable-modal-animations')
                 # options.add_argument('--disable-sync')
@@ -2868,7 +2886,7 @@ class Driver:
                 # options.add_argument('--user-agent=MozillaYerMomFox')
                 options.add_argument("--remote-debugging-address=localhost")
                 options.add_argument("--remote-debugging-port=9223")
-                options.add_argument("--allow-insecure-localhost")
+                options.add_argument("--allow-insecure-localhost")                
                 # options.add_argument("--acceptInsecureCerts")
                 #
                 # options.add_experimental_option("prefs", {
@@ -2922,9 +2940,13 @@ class Driver:
                 d = DesiredCapabilities.FIREFOX
                 # d['loggingPrefs'] = {'browser': 'ALL'}
                 opts = FirefoxOptions()
-                opts.log.level = "trace"
-                if not Settings.is_show_window():
+                if Settings.is_debug("firefox") == "True":
+                    opts.log.level = "trace"
+                if Settings.is_show_window() == "False":
                     opts.add_argument("--headless")
+
+                opts.add_argument("--user-data-dir=/tmp")
+
                 # browser = webdriver.Firefox(options=opts, log_path='/var/log/onlysnarf/geckodriver.log')
                 # browser = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
                 # browser = webdriver.Firefox(options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
@@ -3017,7 +3039,7 @@ class Driver:
                 Settings.dev_print("attempting remote: firefox")
                 try:
                     firefox_options = webdriver.FirefoxOptions()
-                    if not Settings.is_show_window():
+                    if Settings.is_show_window() == "False":
                         firefox_options.add_argument('--headless')
                     dC = DesiredCapabilities.FIREFOX
                     browser = webdriver.Remote(
@@ -3033,7 +3055,7 @@ class Driver:
                 Settings.dev_print("attempting remote: chrome")
                 try:
                     chrome_options = webdriver.ChromeOptions()
-                    if not Settings.is_show_window():
+                    if Settings.is_show_window() == "False":
                         chrome_options.add_argument('--headless')
                     dC = DesiredCapabilities.CHROME
                     browser = webdriver.Remote(
@@ -3067,6 +3089,13 @@ class Driver:
                 return False
 
         BROWSER_TYPE = Settings.get_browser_type()
+
+        if Settings.is_debug("selenium") == "False":
+            import logging
+            from selenium.webdriver.remote.remote_connection import LOGGER
+            LOGGER.setLevel(logging.WARNING)
+            # logging.getLogger("requests").setLevel(logging.WARNING)
+            logging.getLogger("urllib3").setLevel(logging.WARNING)
 
         def auto(browser_):
             if "remote" in BROWSER_TYPE and not browser_:
@@ -3109,7 +3138,7 @@ class Driver:
                     Settings.dev_print(e)
                 browser = None
         else: browser = None
-        if browser and Settings.is_keep():
+        if Settings.is_keep() == "True":
             Settings.write_session_data(browser.session_id, browser.command_executor._url)
             if driver:
                 driver.session_id = browser.session_id
@@ -3147,14 +3176,14 @@ class Driver:
 
         """
 
-        if Settings.is_skip_download(): 
+        if Settings.is_skip_download() == "True": 
             Settings.print("Skipping Upload (download)")
             return True
-        elif Settings.is_skip_upload(): 
+        elif Settings.is_skip_upload() == "True": 
             Settings.print("Skipping Upload (upload)")
             return True
         if len(files) == 0: return False
-        if Settings.is_skip_upload():
+        if Settings.is_skip_upload() == "True":
             Settings.print("Skipping Upload: Disabled")
             return False
         files = files[:int(Settings.get_upload_max())]
@@ -3273,7 +3302,7 @@ class Driver:
                 count = len(elements)
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
-            Settings.print()
+            Settings.print("")
             elements = self.browser.find_elements_by_class_name("m-subscriptions")
             Settings.dev_print("successfully found subscriptions")
             for ele in elements:
@@ -3312,25 +3341,18 @@ class Driver:
             self.go_to_page(page)
             # user_count = int(self.browser.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML").strip())
             user_count = self.browser.find_elements_by_tag_name("a")
+            # for debugging new regexes:
             # for ele in user_count:
-                # Settings.print("{}  -  {}".format(ele.get_attribute("href"), ele.get_attribute("innerHTML")))
+            #     Settings.print("{}  -  {}".format(ele.get_attribute("href"), ele.get_attribute("innerHTML")))
             user_count = [ele.get_attribute("innerHTML").strip() for ele in user_count
-                            if "/my/subscribers/active" in str(ele.get_attribute("href"))][0]
-            # doesnt' work for whatever reason
-            # Settings.print(user_count)
-            # user_count = re.match(r"([0-9]*)", str(user_count))
-            # Settings.print(user_count.groups())
-            # user_count = user_count.group(1)
-            # Settings.print(user_count)
-            # user_count = int(user_count)
-            # Settings.print(user_count)
-
+                            if "/my/subscribers/active" in str(ele.get_attribute("href"))][2] # get 3rd occurrence
+            # should be:
             # <span class="l-sidebar__user-data__item__count">423</span> Fans
+            user_count = re.search(r'>[0-9]*<', str(user_count))
+            user_count = user_count.group()
+            user_count = user_count.replace("<","").replace(">","")
 
-            user_count = re.sub(r'<[a-zA-Z\s=\"\-\_/]*>', "", str(user_count))
-            user_count = user_count.replace(" Fans", "")
             thirdTime = 0
-
             count = 0
             while True:
                 elements = self.browser.find_elements_by_class_name("m-fans")
@@ -3342,13 +3364,11 @@ class Driver:
                 time.sleep(2)
                 if thirdTime >= 3 and len(elements) == 0: break
                 thirdTime += 1
-            Settings.print()
+            Settings.print("")
             elements = self.browser.find_elements_by_class_name("m-fans")
             Settings.dev_print("successfully found fans")
             Settings.dev_print("finding users")
             for ele in elements:
-
-
 
                 # add checks for lists here
 
@@ -3393,6 +3413,7 @@ class Driver:
                 Settings.dev_print(user)
             Settings.dev_print("successfully found users")
         except Exception as e:
+            print(e)
             Driver.error_checker(e)
             Settings.err_print("failed to find users")
         return users
@@ -3646,7 +3667,7 @@ class Driver:
                 count = len(elements)
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
-            Settings.print()
+            Settings.print("")
             Settings.dev_print("successfully found fans")
             if not user_:
                 Settings.err_print("unable to find user - {}".format(username))
@@ -3752,14 +3773,14 @@ class Driver:
                 # if current window has changed, switch back
                 if self.browser.current_window_handle != original_handle:
                     self.browser.switch_to.window(original_handle)
-            Settings.print()
+            Settings.print("")
             if not clicked:
                 Settings.print("Skipping: List Add (none)")
                 Settings.dev_print("skipping list save")
                 self.browser.refresh()
                 Settings.dev_print("### List Add Successfully Skipped ###")
                 return True
-            if Settings.is_debug():
+            if Settings.is_debug() == "True":
                 Settings.print("Skipping: List Add (debug)")
                 Settings.dev_print("skipping list save")
                 self.browser.refresh()
@@ -3784,11 +3805,11 @@ class Driver:
         """Save and exit"""
 
         if self.browser == None: return
-        if Settings.is_save_users():
+        if Settings.is_save_users() == "True":
             Settings.print("Saving and Exiting OnlyFans")
             from OnlySnarf.classes.user import User
             User.write_users_local()
-        if Settings.is_keep():
+        if Settings.is_keep() == "True":
             Settings.maybe_print("keeping browser open")
             # self.go_to_home(force=True)
             self.go_to_home()

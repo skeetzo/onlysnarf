@@ -1,3 +1,6 @@
+import os
+os.environ['ENV'] = "test"
+
 import unittest
 import datetime
 from decimal import Decimal
@@ -6,13 +9,10 @@ from OnlySnarf.snarf import Snarf
 from OnlySnarf.classes.discount import Discount
 from OnlySnarf.util.config import config
 from OnlySnarf.lib.driver import Driver
-
 from OnlySnarf.util.settings import Settings
+from OnlySnarf.util import defaults as DEFAULT
 Settings.set_prompt(False)
 Settings.set_confirm(False)
-
-import os
-os.environ['ENV'] = "test"
 
 # import warnings
 
@@ -33,15 +33,20 @@ class TestSnarf(unittest.TestCase):
     def tearDown(self):
         Driver.exit_all()
 
-    def test_login(self):
-        assert self.driver.auth(), "unable to login"
+    # def test_login(self):
+        # assert self.driver.auth(), "unable to login"
 
-    def test_users(self):
-        from OnlySnarf.classes.user import User
-        assert User.read_users_local(), "unable to read users"
+    # def test_users(self):
+        # config["prefer_local"] = False
+    #     from OnlySnarf.classes.user import User
+    #     assert User.get_all_users(), "unable to read users"
 
-    # def test_discount(self):
-    #     assert self.test_snarf.discount(), "unable to apply discount"
+    def test_discount(self):
+        config["prefer_local"] = True
+        config["amount"] = DEFAULT.DISCOUNT_MIN_AMOUNT
+        config["months"] = DEFAULT.DISCOUNT_MIN_MONTHS
+        config["user"] = "all"
+        assert self.test_snarf.discount(), "unable to apply discount"
 
     # def test_message(self):
     #     assert self.test_snarf.message(), "unable to send message"
