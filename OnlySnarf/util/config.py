@@ -20,9 +20,6 @@ config_file.read(configFile)
 
 # continue to overwrite values from arguments with config values
 
-# use this if its weird during unit tests
-# if os.environ.get('ENV') != "test": 
-
 # relabels args -> config for cleaner usage
 from .args import args as config
 # else: config = {"debug":False}

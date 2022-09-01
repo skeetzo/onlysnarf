@@ -233,8 +233,8 @@ class User:
         Settings.maybe_print("chat read: {} - {}".format(self.username, self.id))
 
     def update(self, user):
-        print("classes.User: THIS NEEDS TO BE FIXED")
-        return # todo fix this
+        # print("classes.User: THIS NEEDS TO BE FIXED")
+        # return # todo fix this
         for key, value in json.loads(user.toJSON()).items():
             # Settings.print("updating: {} = {}".format(key, value))
             setattr(self, str(key), value)
@@ -266,7 +266,7 @@ class User:
     # gets users from local or refreshes from onlyfans.com
     @staticmethod
     def get_active_users(driver=None):
-        if bool(Settings.is_prefer_local()):
+        if Settings.is_prefer_local():
             users = User.read_users_local()
             if len(users) > 0: return users
         active_users = []

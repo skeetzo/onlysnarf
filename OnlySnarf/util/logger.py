@@ -9,7 +9,7 @@ if config["debug"]: loglevel = logging.DEBUG
 
 logPath = DEFAULT.LOG_PATH
 if os.environ.get('ENV') == "test":
-	logPath = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../log", "onlysnarf.log"))
+    logPath = os.path.join(os.getcwd(), "log", "onlysnarf.log")
 
 Path(os.path.basename(os.path.dirname(logPath))).mkdir(parents=True, exist_ok=True)
 
@@ -61,4 +61,5 @@ console.setFormatter(CustomFormatter())
 # add the handler to the root logger
 logging.getLogger('').addHandler(console)
 
-if os.environ.get("ENV") == "test": logging.getLogger('').removeHandler(console)
+# hide output during tests
+# if os.environ.get("ENV") == "test": logging.getLogger('').removeHandler(console)
