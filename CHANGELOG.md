@@ -493,12 +493,13 @@
 
 ------------------------------------------------------------------------------------
 
-- finish debugging test_message
+- finish debugging test_message --> fucking svgs preventing file uploads (for Post as well)
 
 ## Not Working
 
 - cookies: currently prevents saving login session
 - google login: unsafe browser warning
+- browser reconnect / keep open
 
 ## TODO
 
