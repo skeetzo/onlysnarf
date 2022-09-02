@@ -52,17 +52,9 @@ class User:
             # Settings.dev_print(e)
             # Settings.dev_print("user: {}".format(self.id))
 
-
-
-    def _check(self):
-        """
-        Check for valid message components. Throw on failure.
-        """
-        pass
-
-
-
-
+        # BUG: fix empty array
+        if self.sent_files[0] == "":
+            self.sent_files = []
 
 
     def get_id(self):
@@ -144,9 +136,6 @@ class User:
         """
 
         try:
-            # check for valid message components
-            message._check()
-
             Settings.print("Entering Message: {} - ${}".format(message.text, message.price or 0))
 
             # enter the text of the message
@@ -156,15 +145,16 @@ class User:
             # enter the price to send the message to the user
             def enter_price(price):
                 if not price: return True
-                if price != None and Decimal(sub(r'[^\d.]', '', price)) < Decimal(Settings.get_price_minimum()):
+                if price != None and Decimal(sub(r'[^\d.]', '', str(price))) < Decimal(Settings.get_price_minimum()):
                     Settings.warn_print("price too low; {} < {}".format(price, Settings.get_price_minimum()))
                     return False
                 return Driver.get_driver().message_price(price)
             
             # enter files by filepath while checking for already sent files
             def enter_files(files):
+                # if isinstance(files, str) and str(files) == "unset": return True
                 for file in files:
-                    file_name = os.path.basename(file)
+                    file_name = file.get_title()
                     if str(file_name) in self.sent_files:
                         Settings.err_print("file already sent to user: {} <-- {}".format(self.username, file_name))
                         return False
@@ -174,9 +164,10 @@ class User:
             def confirm():
                 return Driver.get_driver().message_confirm()
 
-            successfull.append(enter_text(message.text))
-            successfull.append(enter_price(message.price))
-            successfull.append(enter_files(message.files))
+            successful = []
+            successful.append(enter_text(message.text))
+            successful.append(enter_price(message.price))
+            successful.append(enter_files(message.files))
             if all(successful):
                 successful = confirm()
                 Settings.print("Message Entered")

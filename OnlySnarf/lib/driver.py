@@ -842,7 +842,7 @@ class Driver:
 
         auth_ = self.auth()
         if not auth_: return False
-        if self.search_for_tab("{}/{}".format(ONLYFANS_HOME_URL, page).replace("//","/")):
+        if self.search_for_tab(page):
             Settings.maybe_print("found -> {}".format(page))
             return
         if str(self.browser.current_url) == str(page) or str(page) in str(self.browser.current_url):
@@ -850,8 +850,7 @@ class Driver:
             self.browser.execute_script("window.scrollTo(0, 0);")
         else:
             Settings.maybe_print("goto -> {}".format(page))
-            # self.browser.get("{}{}".format(ONLYFANS_HOME_URL, page))
-            self.open_tab(url="{}{}".format(ONLYFANS_HOME_URL, page))
+            self.open_tab(url=page)
             self.handle_alert()
             self.get_page_load()
 
@@ -863,7 +862,8 @@ class Driver:
         username = Settings.get_username()
         if str(username) == "":
             username = self.get_username()
-        if self.search_for_tab("{}/{}".format(ONLYFANS_HOME_URL, username)):
+        page = "{}/{}".format(ONLYFANS_HOME_URL, username)
+        if self.search_for_tab(page):
             Settings.maybe_print("found -> /{}".format(username))
             return
         if str(username) in str(self.browser.current_url):
@@ -872,9 +872,9 @@ class Driver:
         else:
             Settings.maybe_print("goto -> {}".format(username))
             # self.browser.get("{}{}".format(ONLYFANS_HOME_URL, username))
-            self.open_tab(url="{}{}".format(ONLYFANS_HOME_URL, username))
-            self.handle_alert()
-            self.get_page_load()
+            self.open_tab(url=page)
+            # self.handle_alert()
+            # self.get_page_load()
 
     # onlyfans.com/my/settings
     def go_to_settings(self, settingsTab):
@@ -974,6 +974,7 @@ class Driver:
         Settings.dev_print("current window handle is : %s" %windows_before)
         windows = self.browser.window_handles
         self.browser.execute_script('''window.open("{}","_blank");'''.format(url))
+        # self.browser.execute_script("window.open('{}')".format(url))
         self.handle_alert()
         self.get_page_load()
         # self.browser.execute_script("window.open('https://www.yahoo.com')")
@@ -1329,7 +1330,7 @@ class Driver:
             Settings.dev_print("waiting for message confirm to be clickable")
             while True:
                 try:                
-                    WAIT.until(EC.element_to_be_clickable((By.CLASS_NAME, MESSAGE_CONFIRM)))
+                    WAIT.until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("uploadMessageConfirm").getClass())))
                     Settings.dev_print("message confirm is clickable")
                     break
                 except Exception as e:
@@ -1376,7 +1377,6 @@ class Driver:
 
         if len(files) == 0: return True
         try:
-            Settings.dev_print("uploading files")
             self.upload_files(files=files)
             Settings.maybe_print("successfully began file uploads")
             Settings.debug_delay_check()
@@ -1411,10 +1411,10 @@ class Driver:
                 Settings.err_print("missing price")
                 return False
             time.sleep(1) # prevents delay from inputted text preventing buttom from being available to click
-            Settings.print("Enter price: {}".format(price))
+            # Settings.print("price: {}".format(price))
             Settings.dev_print("waiting for price area to enter price")
             # finds the button on the page with the #icon-price text
-            priceElements = self.browser.find_elements_by_class_name("g-btn.m-flat.has-tooltip")
+            priceElements = self.browser.find_elements_by_class_name(Element.get_element_by_name("priceClick").getClass())
             priceElement = None
             for ele in priceElements:
                 # Settings.dev_print("{}  {}".format(ele.get_attribute("value")))
@@ -1433,7 +1433,7 @@ class Driver:
             Settings.dev_print("entered price")
             # Settings.debug_delay_check()
             Settings.dev_print("saving price")
-            self.find_element_to_click("priceClick").click()    
+            self.find_element_to_click("priceSave").click()    
             Settings.dev_print("successfully saved price")
             return True
         except Exception as e:
@@ -1461,10 +1461,10 @@ class Driver:
             # auth_ = self.auth()
             # if not auth_: return False
             # self.go_to_page(ONLYFANS_HOME_URL)
-            if not text or text == None or str(text) == "None":
-                Settings.err_print("missing text")
+            if not text or text == None or str(text) == "None" or text == "":
+                Settings.warn_print("missing text for message")
                 return False
-            Settings.print("Enter text: {}".format(text))
+            # Settings.print("text: {}".format(text))
             Settings.dev_print("finding text area")
             # message = self.find_element_by_name("messageText")     
             message = self.browser.find_element_by_id("new_post_text_input")     
@@ -1863,7 +1863,6 @@ class Driver:
             ## Files
             successful_upload = False
             try:
-                Settings.dev_print("uploading files")
                 successful_upload = self.upload_files(files) or False
             except Exception as e:
                 Settings.print(e)
@@ -2905,8 +2904,8 @@ class Driver:
                   }
                 }  
                 service_args = []
-                # if Settings.is_debug():
-                    # service_args = ["--verbose", "--log-path=/var/log/onlysnarf/chromedriver.log"]
+                if Settings.is_debug("google"):
+                    service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
                 # desired_capabilities = capabilities
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
@@ -2943,13 +2942,13 @@ class Driver:
                     opts.log.level = "trace"
                 if Settings.is_show_window() == "False":
                     opts.add_argument("--headless")
-
-                opts.add_argument("--user-data-dir=/tmp")
-
+                # BUG: cookies
+                # added for cookies, doesn't seem to help
+                # opts.add_argument("--user-data-dir=/tmp")
                 # browser = webdriver.Firefox(options=opts, log_path='/var/log/onlysnarf/geckodriver.log')
                 # browser = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
-                # browser = webdriver.Firefox(options=opts, desired_capabilities=d, log_path='/var/log/onlysnarf/geckodriver.log')
-                browser = webdriver.Firefox(options=opts, desired_capabilities=d)
+                browser = webdriver.Firefox(options=opts, desired_capabilities=d, service_log_path=Settings.get_logs_path("firefox"))
+                # browser = webdriver.Firefox(options=opts, desired_capabilities=d)
                 Settings.print("Browser Created - Firefox")
                 Settings.dev_print("successful browser - firefox")
                 return browser
@@ -3175,6 +3174,7 @@ class Driver:
 
         """
 
+        Settings.dev_print("uploading files...")
         if Settings.is_skip_download() == "True": 
             Settings.print("Skipping Upload (download)")
             return True
@@ -3197,20 +3197,20 @@ class Driver:
 
         def prepare(file):
             uploadable = file.prepare() # downloads if Google_File
-            if not uploadable:
-                Settings.err_print("unable to upload - {}".format(file.get_title()))
+            if not uploadable: Settings.err_print("unable to upload - {}".format(file.get_title()))
             else: files_.append(file)    
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
             executor.map(prepare, files)
 
         Settings.dev_print("files prepared: {}".format(len(files_)))
+        if len(files_) == 0: return False
 
         ####
 
         i = 1
         for file in files_:
-            Settings.print('Uploading: {} - {}/{}'.format(file.get_title(), i, len(files)))
+            Settings.print('>>> {} - {}/{}'.format(file.get_title(), i, len(files)))
             i += 1
             enter_file = self.browser.find_element_by_id("fileupload_photo")
             enter_file.send_keys(str(file.get_path()))

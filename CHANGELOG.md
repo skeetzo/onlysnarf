@@ -495,13 +495,14 @@
 
 - finish debugging test_message
 
-
 ## Not Working
 
 - cookies: currently prevents saving login session
 - google login: unsafe browser warning
 
 ## TODO
+
+- fix / test reconnecting to browser, retaining session
 
 - add arg: -profile for user data
 

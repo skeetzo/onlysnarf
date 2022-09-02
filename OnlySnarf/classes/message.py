@@ -223,8 +223,8 @@ class Message():
 
         """
 
-        if str(self.files) == "unset": return []
-        if len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
+        # if str(self.files) == "unset": return []
+        if isinstance(self.files, list) and len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
         if len(Settings.get_input_as_files()) > 0:
             self.files = Settings.get_input_as_files()
             return self.files

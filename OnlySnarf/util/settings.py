@@ -2,6 +2,7 @@ import pkg_resources
 import time
 import PyInquirer
 import os, json, sys
+from pathlib import Path
 ##
 from .colorize import colorize
 from .config import config
@@ -165,9 +166,14 @@ class Settings:
         if Settings.FILES: return Settings.FILES
         from ..classes.file import File
         files = []
-        for file_path in config["input"]:
+        if isinstance(config["input"], list):
+            for file_path in config["input"]:
+                file = File()
+                setattr(file, "path", file_path)
+                files.append(file)
+        else:
             file = File()
-            setattr(file, "path", file_path)
+            setattr(file, "path", config["input"])
             files.append(file)
         Settings.FILES = files
         return files
@@ -176,6 +182,17 @@ class Settings:
         keywords = config["keywords"] or []
         keywords = [n.strip() for n in keywords]
         return keywords
+
+    def get_logs_path(process):
+        if process == "firefox":
+            path_ = os.path.join(Settings.get_base_directory(), "log")
+            Path(path_).mkdir(parents=True, exist_ok=True)
+            return os.path.join(path_, "geckodriver.log")
+        elif process == "google":
+            path_ = os.path.join(Settings.get_base_directory(), "log")
+            Path(path_).mkdir(parents=True, exist_ok=True)
+            return os.path.join(path_, "chromedriver.log")
+        return ""
 
     def get_message_choices():
         return DEFAULT.MESSAGE_CHOICES
@@ -310,7 +327,7 @@ class Settings:
         return config["questions"] or []
         
     def get_upload_max():
-        return config["upload_max"] or DEFAULT.IMAGE_LIMIT
+        return config["image_limit"] or DEFAULT.IMAGE_LIMIT
         
     # def get_upload_max_messages():
         # return config["upload_max_messages"] or UPLOAD_MAX_MESSAGES
@@ -426,6 +443,7 @@ class Settings:
 
     def is_debug(process=None):
         if process == "firefox": return config["debug_firefox"]
+        elif process == "google": return config["debug_google"]
         elif process == "selenium": return config["debug_selenium"]
         return config["debug"] or False
 
