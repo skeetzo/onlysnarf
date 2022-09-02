@@ -11,7 +11,6 @@
 # SEND_BUTTON_XPATH = "//button[@type='submit' and @class='g-btn m-rounded']"
 # SEND_BUTTON_CLASS2 = "button.g-btn.m-rounded"
 # LIVE_BUTTON_CLASS = "b-make-post__streaming-link"
-# MESSAGE_CONFIRM = "g-btn.m-rounded.b-chat__btn-submit"
 # DISCOUNT_INPUT = "form-control.b-fans__trial__select-wrapper"
 # ONLYFANS_PRICE2 = "button.b-chat__btn-set-price"
 

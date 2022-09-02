@@ -193,6 +193,7 @@ class File():
 
         if self.ext: return self.ext
         self.get_title()
+        return self.ext
 
     def get_path(self):
         """
@@ -1147,7 +1148,7 @@ class Image(File):
         pass
 
     def prepare(self):
-        Settings.maybe_print("preparingi: {}".format(self.get_title()))
+        Settings.maybe_print("preparing image: {}".format(self.get_title()))
         return super()
 
 ###################################################################################
@@ -1183,7 +1184,7 @@ class Video(File):
         self.screenshots = ffmpeg.frames(path)
 
     def prepare(self):
-        Settings.maybe_print("preparingv: {}".format(self.get_title()))
+        Settings.maybe_print("preparing video: {}".format(self.get_title()))
         self.reduce()
         self.repair()
         self.watermark()

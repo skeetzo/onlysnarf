@@ -50,7 +50,7 @@ class TestSnarf(unittest.TestCase):
 
     def test_message(self):
         config["prefer_local"] = True
-        config["image"] = "public/images/shnarf.jpg"
+        config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["text"] = "test balls"
         config["user"] = "ddezeht"

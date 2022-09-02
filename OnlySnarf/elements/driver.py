@@ -219,7 +219,13 @@ ELEMENTS = [
     # price add
     {
         "name": "priceClick",
-        "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded"], # "b-chat__btn-set-price", "button.g-btn.m-rounded"
+        "classes": ["g-btn.m-flat.has-tooltip"],
+        "text": [],
+        "id": []
+    },
+    {
+        "name": "priceSave",
+        "classes": ["g-btn.m-flat.m-btn-gaps.m-reset-width", "g-btn.m-transparent-bg", "g-btn.m-rounded"], # "b-chat__btn-set-price", "button.g-btn.m-rounded"
         "text": ["Save"],
         "id": []
     },
@@ -312,11 +318,12 @@ ELEMENTS = [
     },
     # message upload image
     {
-        "name": "uploadImageMessage",
+        "name": "uploadMessageConfirm",
         "classes": ["g-btn.m-rounded.b-chat__btn-submit"],
         "text": [],
         "id": ["fileupload_photo"]
     },
+
     # upload error window close
     # tab probably closes error windows...
     {
