@@ -27,3 +27,4 @@ yarn-error.log*
 __pycache__
 
 OnlySnarf/conf/users/alexdicksdown.conf
+log/
