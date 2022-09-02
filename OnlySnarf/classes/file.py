@@ -209,7 +209,7 @@ class File():
         if not self.path:
             Settings.err_print("missing file path")
             return  ""
-        return self.path
+        return str(self.path)
 
     def get_title(self):
         """
@@ -228,7 +228,7 @@ class File():
             Settings.err_print("missing file title")
             return ""
         title, ext = os.path.splitext(path)
-        self.ext = ext
+        self.ext = ext.replace(".","")
         self.title = "{}{}".format(os.path.basename(title), ext)
         return self.title
 
@@ -281,8 +281,8 @@ class File():
 
         """
 
-        # Settings.maybe_print("preparing: {}".format(self.get_title()))
-        self.get_type().prepare()
+        Settings.maybe_print("preparing: {}".format(self.get_title()))
+        # self.get_type().prepare()
         if not self.check_size():
             return False
         return True

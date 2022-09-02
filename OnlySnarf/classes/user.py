@@ -94,14 +94,14 @@ class User:
         """
 
         if not self.get_username() and not self.get_id(): return Settings.error("Missing user identifiers")
-        Settings.print("Messaging: {} - {}".format(self.username, self.id))
+        Settings.print("messaging: {} - {}".format(self.username, self.id))
         successful = Driver.get_driver().message(username=self.username, user_id=self.id)
         if not successful: return False
 
         successful = self.enter_message(message=message)
         if not successful: return False
 
-        Settings.print("Messaged: {}".format(self.username))
+        Settings.print("messaged: {}".format(self.username))
         return True
 
     @staticmethod
@@ -136,7 +136,7 @@ class User:
         """
 
         try:
-            Settings.print("Entering Message: {} - ${}".format(message.text, message.price or 0))
+            Settings.print("entering message: {} - ${}".format(message.text, message.price or 0))
 
             # enter the text of the message
             def enter_text(text):
@@ -157,9 +157,10 @@ class User:
                     file_name = file.get_title()
                     if str(file_name) in self.sent_files:
                         Settings.err_print("file already sent to user: {} <-- {}".format(self.username, file_name))
-                        return False
+                        # return False
+                        continue
                     self.sent_files.append(file_name)
-                return Driver.get_driver().message_files(files)
+                return Driver.get_driver().upload_files(files=files)
                 
             def confirm():
                 return Driver.get_driver().message_confirm()
@@ -169,14 +170,12 @@ class User:
             successful.append(enter_price(message.price))
             successful.append(enter_files(message.files))
             if all(successful):
-                successful = confirm()
-                Settings.print("Message Entered")
-                return True
+                return confirm()
 
         except Exception as e:
             Settings.dev_print(e)
 
-        Settings.print("Message Failed")
+        Settings.print("message failed")
         return False
 
     def equals(self, user):
@@ -219,7 +218,7 @@ class User:
         Read the chat of the user.
         """
 
-        Settings.print("Reading User Chat: {} - {}".format(self.username, self.id))
+        Settings.print("reading user chat: {} - {}".format(self.username, self.id))
         messages, messages_received, messages_sent = Driver.read_user_messages(username=self.username, user_id=self.id)
         self.messages = messages
         self.messages_received = messages_received
@@ -248,7 +247,7 @@ class User:
 
         if len(users) == 0:
             users = User.get_all_users()
-        Settings.print("Updating Chat Logs: {}".format(len(users)))
+        Settings.print("updating chat logs: {}".format(len(users)))
         for user in users:
             user.read_messages()
         User.write_users_local(users=users)
@@ -637,7 +636,7 @@ class User:
 
 
     def send_dick_pics(self, num):
-        Settings.print("Sending Dick Pics: {}".format(num))
+        Settings.print("sending dick pics: {}".format(num))
         # pass
         # downloads a dick pic from configured source and sends to user
 

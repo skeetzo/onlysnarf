@@ -93,9 +93,9 @@ ELEMENTS = [
     # upload image file
     {
         "name": "image_upload",
-        "classes": ["button.g-btn.m-rounded.b-chat__btn-submit", "g-btn.m-rounded.b-chat__btn-submit"],
+        "classes": ["attach_file"],
         "text": [],
-        "id": ["fileupload_photo"]
+        "id": ["attach_file_photo"]
     },
     # show more options # unnecessary w/ tabbing
     {

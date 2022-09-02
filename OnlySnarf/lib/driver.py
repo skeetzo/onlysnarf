@@ -493,7 +493,8 @@ class Driver:
             Settings.dev_print("finding text")
             enterText = Element.get_element_by_name("enterText").getId()
             sendText = self.browser.find_element_by_id(enterText)
-            action = webdriver.common.action_chains.ActionChains(self.browser)
+            # action = webdriver.common.action_chains.ActionChains(self.browser)
+            action = ActionChains(self.browser)
             action.move_to_element(sendText)
             action.click()
             action.perform()
@@ -1099,7 +1100,8 @@ class Driver:
                         el = self.browser.find_element_by_name("password")
                         if not el: return # likely logged in without captcha
                         Settings.dev_print("waiting for captcha completion by user...")
-                        action = webdriver.common.action_chains.ActionChains(self.browser)
+                        # action = webdriver.common.action_chains.ActionChains(self.browser)
+                        action = ActionChains(self.browser)
                         action.move_to_element_with_offset(el, 40, 100)
                         action.click()
                         action.perform()
@@ -1359,36 +1361,32 @@ class Driver:
             Settings.dev_print("### Message Failure ###")
             return False
 
-    def message_files(self, files=[]):
-        """
-        Enter the provided files into the message on the page
+    # def message_files(self, files=[]):
+    #     """
+    #     Enter the provided files into the message on the page
 
-        Parameters
-        ----------
-        files : list
-            List of File objects to upload
+    #     Parameters
+    #     ----------
+    #     files : list
+    #         List of File objects to upload
         
-        Returns
-        -------
-        bool
-            Whether or not the upload was successful
+    #     Returns
+    #     -------
+    #     bool
+    #         Whether or not the upload was successful
 
-        """
+    #     """
 
-        if len(files) == 0: return True
-        try:
-            self.upload_files(files=files)
-            Settings.maybe_print("successfully began file uploads")
-            Settings.debug_delay_check()
-            return True
-        except Exception as e:
-            Driver.error_checker(e)
-            Settings.err_print("failure to upload file(s)")
-            return False
-
-
-
-
+    #     if len(files) == 0: return True
+    #     try:
+    #         self.upload_files(files=files)
+    #         Settings.maybe_print("successfully began file uploads")
+    #         Settings.debug_delay_check()
+    #         return True
+    #     except Exception as e:
+    #         Driver.error_checker(e)
+    #         Settings.err_print("failure to upload file(s)")
+    #         return False
 
     def message_price(self, price):
         """
@@ -1883,7 +1881,7 @@ class Driver:
                     #     # check for existence of "thumbnail is fucked up" modal and hit ok button
                     #     # haven't seen in long enough time to properly add
                     #     self.browser.switchTo().frame("iframe");
-                    #     self.browser.find_element_by_class("g-btn m-rounded m-border").send_keys(Keys.ENTER)
+                    #     self.browser.find_element_by_class_name("g-btn m-rounded m-border").send_keys(Keys.ENTER)
                     #     Settings.err_print("thumbnail missing")
                     #     break
                     # except Exception as ef:
@@ -2854,7 +2852,7 @@ class Driver:
 
             """
 
-            Settings.maybe_print("spawning chrome browser...")
+            Settings.maybe_print("attempting chrome web browser...")
             try:
                 options = webdriver.ChromeOptions()
                 options.add_argument("--no-sandbox") # Bypass OS security model
@@ -2910,8 +2908,7 @@ class Driver:
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
                 browser = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
-                Settings.print("Browser Created - Chrome")
-                Settings.dev_print("successful browser - chrome")
+                Settings.print("browser created - chrome")
                 return browser
             except Exception as e:
                 Settings.maybe_print(e)
@@ -2929,7 +2926,7 @@ class Driver:
 
             """
 
-            Settings.maybe_print("spawning firefox browser...")
+            Settings.maybe_print("attempting firefox web browser...")
             # firefox needs non root
             if os.geteuid() == 0:
                 Settings.print("You must run `onlysnarf` as non-root for Firefox to work correctly!")
@@ -2937,20 +2934,24 @@ class Driver:
             try:
                 d = DesiredCapabilities.FIREFOX
                 # d['loggingPrefs'] = {'browser': 'ALL'}
-                opts = FirefoxOptions()
+                options = FirefoxOptions()
                 if Settings.is_debug("firefox") == "True":
-                    opts.log.level = "trace"
+                    options.log.level = "trace"
                 if Settings.is_show_window() == "False":
-                    opts.add_argument("--headless")
+                    options.add_argument("--headless")
+                
+                options.add_argument("--enable-file-cookies")
+
                 # BUG: cookies
                 # added for cookies, doesn't seem to help
                 # opts.add_argument("--user-data-dir=/tmp")
-                # browser = webdriver.Firefox(options=opts, log_path='/var/log/onlysnarf/geckodriver.log')
-                # browser = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=opts, capabilities=d)
-                browser = webdriver.Firefox(options=opts, desired_capabilities=d, service_log_path=Settings.get_logs_path("firefox"))
-                # browser = webdriver.Firefox(options=opts, desired_capabilities=d)
-                Settings.print("Browser Created - Firefox")
-                Settings.dev_print("successful browser - firefox")
+
+
+                # browser = webdriver.Firefox(options=options, log_path='/var/log/onlysnarf/geckodriver.log')
+                # browser = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, capabilities=d)
+                browser = webdriver.Firefox(options=options, desired_capabilities=d, service_log_path=Settings.get_logs_path("firefox"))
+                # browser = webdriver.Firefox(options=options, desired_capabilities=d)
+                Settings.print("browser created - firefox")
                 return browser
             except Exception as e:
                 Settings.maybe_print(e)
@@ -2976,7 +2977,7 @@ class Driver:
             """
 
             if reconnect_id and url:
-                Settings.maybe_print("reconnecting browser...")
+                Settings.maybe_print("reconnecting to web browser...")
                 Settings.dev_print("reconnect id: {}".format(reconnect_id))
                 Settings.dev_print("reconnect url: {}".format(url))
                 # executor_url = browser.command_executor._url
@@ -3044,8 +3045,7 @@ class Driver:
                        command_executor=link,
                        desired_capabilities=dC,
                        options=firefox_options)
-                    Settings.print("Remote Browser Created - Firefox")
-                    Settings.maybe_print("successful remote - firefox")
+                    Settings.print("remote browser created - firefox")
                     return browser
                 except Exception as e:
                     Settings.dev_print(e)
@@ -3060,8 +3060,7 @@ class Driver:
                        command_executor=link,
                        desired_capabilities=dC,
                        options=chrome_options)
-                    Settings.print("Remote Browser Created - Chrome")
-                    Settings.maybe_print("successful remote - chrome")
+                    Settings.print("remote browser created - chrome")
                     return browser
                 except Exception as e:
                     Settings.dev_print(e)
@@ -3104,7 +3103,7 @@ class Driver:
                     browser_ = google()
             return browser_
 
-        Settings.print("spawning web browser...")
+        Settings.print("creating web browser...")
 
         if BROWSER_TYPE == "google":
             browser = google()
@@ -3114,7 +3113,7 @@ class Driver:
             try:
                 browser = reconnect()
                 browser.title # fails check with: 'NoneType' object has no attribute 'title'
-                Settings.print("Browser Reconnected")
+                Settings.print("browser reconnected")
                 Settings.maybe_print("successful reconnect")
                 browser = auto(browser)
             except Exception as e:
@@ -3128,7 +3127,7 @@ class Driver:
             try:
                 browser = reconnect()
                 browser.title # fails check with: 'NoneType' object has no attribute 'title'
-                Settings.print("Browser Reconnected")
+                Settings.print("browser reconnected")
                 Settings.maybe_print("successful reconnect")
             except Exception as e:
                 Settings.maybe_print("failed to reconnect")
@@ -3174,7 +3173,6 @@ class Driver:
 
         """
 
-        Settings.dev_print("uploading files...")
         if Settings.is_skip_download() == "True": 
             Settings.print("Skipping Upload (download)")
             return True
@@ -3186,7 +3184,7 @@ class Driver:
             Settings.print("Skipping Upload: Disabled")
             return False
         files = files[:int(Settings.get_upload_max())]
-        Settings.print("Uploading file(s): {}".format(len(files)))
+        Settings.print("uploading file(s): {}".format(len(files)))
 
         ####
 
@@ -3210,10 +3208,44 @@ class Driver:
 
         i = 1
         for file in files_:
-            Settings.print('>>> {} - {}/{}'.format(file.get_title(), i, len(files)))
+            Settings.print('> {} - {}/{}'.format(file.get_title(), i, len(files)))
             i += 1
-            enter_file = self.browser.find_element_by_id("fileupload_photo")
-            enter_file.send_keys(str(file.get_path()))
+
+            # these both result in the bug below
+            enter_file = self.browser.find_element_by_id(Element.get_element_by_name("image_upload").getId())
+            # enter_file = self.browser.find_element_by_class_name(Element.get_element_by_name("image_upload").getClass())
+
+            ## BUG: ele search is returning the 1st child of the ele instead of the ele itself; happens to be an svg element
+            # which sucks to interact with
+            ## FIX: get parent?
+
+            # try:
+            enter_file = enter_file.find_element(By.XPATH, "..")
+            # enter_file = enter_file.find_element(By.CSS_SELECTOR, "button")
+            print(enter_file.get_attribute("innerHTML"))
+            enter_file.send_keys(file.get_path())
+            # except Exception as e:
+            #     print(e)
+
+            # try:
+            #     enter_file = self.browser.find_element_by_id(Element.get_element_by_name("image_upload").getId())
+            #     enter_file = enter_file.find_element(By.XPATH, "..")
+            #     enter_file = enter_file.find_element_by_class_name("button")
+            #     print(enter_file.get_attribute("innerHTML"))
+            #     enter_file.send_keys(file.get_path())
+            # except Exception as e:
+            #     print(e)
+
+            # try:
+            #     enter_file = self.browser.find_element_by_class_name("g-btn.m-flat.m-gray.m-with-round-hover.m-size-md-hover.m-default-icon-size.m-reset-width.attach_file.has-tooltip")
+            #     print(enter_file.get_attribute("innerHTML"))
+            #     enter_file.send_keys(file.get_path())
+            # except Exception as e:
+            #     print(e)
+
+            # ActionChains(self.browser).move_to_element(enter_file).send_keys(file.get_path()).perform()
+
+            # enter_file.send_keys(file.get_path())
             time.sleep(1)
             self.error_window_upload()
             ###

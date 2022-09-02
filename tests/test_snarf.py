@@ -57,19 +57,25 @@ class TestSnarf(unittest.TestCase):
         assert self.test_snarf.message(), "unable to send message"
 
     # def test_post(self):
+    #     # config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
+    #     config["price"] = DEFAULT.PRICE_MINIMUM
+    #     config["text"] = "test balls"
     #     assert self.test_snarf.post(), "unable to post message"
 
     # def test_poll(self):
-    #     config["duration"] = 99
-    #     config["expiration"] = 99
-    #     config["questions"] = ["suck","my","dick"]
+    #     config["duration"] = DEFAULT.DURATION_ALLOWED[0]
+    #     config["expiration"] = DEFAULT.EXPIRATION_ALLOWED[0]
+    #     config["questions"] = ["suck","my","dick","please?"]
     #     assert self.test_snarf.post(), "unable to post poll"
 
     # def test_schedule(self):
-    #     today = datetime.datetime()
-    #     today = today + datetime.timedelta(1) # +1 day
+    #     today = datetime.date.today()
+    #     tomorrow = today + datetime.timedelta(1) # +1 day
     #     config["schedule"] = today.strftime("%m-%d-%Y:%H:%M") # "MM-DD-YYYY:HH:MM"
     #     assert self.test_snarf.post(), "unable to post schedule"
+
+    ## TODO ##
+    ## less important features, test these later
 
     # def test_profile_backup(self):
     #     config["profile_method"] = "backup"
