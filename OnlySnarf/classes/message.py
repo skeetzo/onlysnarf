@@ -18,39 +18,66 @@ class Message():
         """
         OnlyFans message and post object
 
-        A post is just a message on a profile with different options made available.
+        A post is just a message on a profile with different options made available. So all posts are messages, as all messages are messages.
+            Squares and rectangles.
 
         """
 
         # universal message variables
-        self.text = None
+        self.text = ""
         self.files = []
         self.keywords = []
         self.performers = []
+        self.price = 0 # $3 - $100
+        
+        # TODO: check if this is necessary
         self.hasPerformers = False # used to flag files from performer folders
+
         ## message only variables
-        self.price = None # $3 - $100
         self.users = [] # users to send to
+        self.user_id = 0
+
         ## post only variables
-        self.expiration = None
+        self.expiration = 0
         self.poll = None
         self.schedule = None
         ##
-        self.gotten = False
+
+        self.__initialized__ = False
+
+    def __str__(self):
+        return "foo"
+
+
+    def init(type_=Type.POST)
+        """Initialize."""
+
+        self.get_text()
+        self.get_tags()
+        self.get_price()
+        self.get_files()
+        self.get_recipients()
+        self.get_performers()
+
+        if type_ == Type.POST:
+
+        elif type_ == Type.MESSAGE:
+        self.get_poll()
+        self.get_schedule()
+        self.get_expiration()
+
 
     def backup_files(self):
         """Backs up files"""
 
-        for file in self.get_files():
-            file.backup()
+        for file in self.get_files(): file.backup()
 
     def delete_files(self):
         """Deletes files"""
 
-        for file in self.get_files():
-            file.delete()
+        for file in self.get_files(): file.delete()
 
-    def cleanup_files(self):
+    def cleanup():
         """Processes files after a successful message or post by backing them up then deleting them"""
 
         self.backup_files()
@@ -59,7 +86,7 @@ class Message():
     @staticmethod
     def format_keywords(keywords):
         """
-        Formats the list provided into a combined string with a # in front of each value
+        Formats the list provided into a combined string with a # in front of each value.
 
         Parameters
         ----------
@@ -72,13 +99,14 @@ class Message():
             The generated keywords into a string
         """
 
-        if len(keywords) > 0: return " #{}".format(" #".join(keywords))
-        return ""
+        # ternary: a if condition else b
+        return " #{}".format(" #".join(keywords)) if len(keywords) > 0 else ""
 
     @staticmethod
-    def format_performers(performers): # spaced added after @ to close performer search modal
+    def format_performers(performers):
         """
-        Formats the list provided into a combined string with an @ in front of each value
+        Formats the list provided into a combined string with an @ in front of each value.
+            A space is added before @ to close performer search modal (???).
 
         Parameters
         ----------
@@ -91,20 +119,38 @@ class Message():
             The generated performers into a string
         """
 
-        if len(performers) > 0: return " w/ @{} ".format(" @".join(performers))
-        return ""
-            
+        # ternary: a if condition else b
+        return " w/ @{} ".format(" @".join(performers)) if len(performers) > 0 else ""
+
 
     def format_text(self):
-        """Formats self.text with the provided keywords and performers"""
+        """Formats self.text with the provided keywords and performers
 
-        return "{}{}{}".format(self.get_text(),
-            Message.format_performers(self.get_performers()),
-            Message.format_keywords(self.get_keywords())).strip()
+        
+        Returns
+        -------
+        str
+            The generated text into a string. Example:
+            "This is the text. w/ @name, @name, and @name #keyword0 #keyword1"
 
-    def get_keywords(self):
         """
-        Gets the keywords value if not none else sets it from args or prompts.
+
+        return "{}{}{}".format(self.get_text(),Message.format_performers(self.get_performers()),Message.format_keywords(self.get_tags())).strip()
+
+    def get_tags(self, performers=True, again=True):
+        """
+        Gets the keywords (or performers) value if not none else sets it from args or prompts from script runner.
+            If "performers" is equal to true then the prompt knows to fetch performers instead of keywords.
+            If "again" is equal to true then the prompt knows that the user might be unsure. 
+        
+        Parameters
+        ----------
+        performers : bool
+            Signal to get performers instead of keywords.
+
+        again : bool
+            Whether or not it is the script user's first time around.
+
 
         Returns
         -------
@@ -113,69 +159,32 @@ class Message():
 
         """
 
-        if str(self.keywords) == "unset": return []
-        # if self.keywords: return self.keywords
-        if len(self.keywords) > 0: return self.keywords
-        # retrieve from args and return if exists
-        keywords = Settings.get_keywords() or []
-        if len(keywords) > 0: return keywords
-        if not Settings.prompt("keywords"):
-            self.keywords = "unset" # used to skip prompting for value in future
-            return []
+        variable = "keywords"
+        if performers: variable = "performers"
+        # retrieve if set already
+        if len(self[variable]) > 0: return self[variable]
+        # else retrieve from args and return if exists
+        variables = []
+        if variable = "keywords": variables = Settings.get_tags()
+        elif variable = "performers": variables = Settings.get_performers()
+        if len(variables) > 0: 
+            self[variable] = variables
+            return variables
+        # skip prompt
+        if not Settings.prompt(variable): return []
         question = {
             'type': 'input',
             'name': 'keywords',
-            'message': 'Keywords:',
+            'message': '{}:'.format(variable.camelCase()),
             'validate': ListValidator
         }
-        keywords = prompt(question)["keywords"]
-        keywords = [n.strip() for n in keywords.split(",")]
-        # confirm keywords
-        if not Settings.confirm(keywords): return self.get_keywords()
-        self.keywords = keywords
-        return self.keywords
-
-    def get_performers(self):
-        """
-        Gets the performers value if not none else sets it from args or prompts.
-
-        Returns
-        -------
-        list
-            The performer usernames as strings in a list
-
-        """
-
-        if str(self.performers) == "unset": return []
-        if len(self.performers) > 0: return self.performers
-        # retrieve from args and return if exists
-        performers = Settings.get_performers() or []
-        # ensures all performers from files are included
-        if len(self.files) > 0:
-            for file in self.files:
-                if hasattr(file, "performer"):
-                    performer = getattr(file, "performer")
-                    if performer not in performers:
-                        performers.append(performer)
-        if len(performers) > 0: 
-            self.performers = performers
-            return performers
-        # prompt skip
-        if not Settings.prompt("performers"):
-            self.performers = "unset"
-            return []
-        question = {
-            'type': 'input',
-            'name': 'performers',
-            'message': 'Performers:',
-            'validate': ListValidator
-        }
-        performers = prompt(question)["performers"]
-        performers = [n.strip() for n in performers.split(",")]
-        # confirm performers
-        if not Settings.confirm(performers): return self.get_performers()
-        self.performers = performers
-        return self.performers
+        if again: Settings.print("are you sure you've done this before, {}? ;)".format(Settings.get_username()))
+        variables = prompt(question)[variable]
+        variables = [n.strip() for n in variables.split(",")]
+        # confirm variables or go in a circle
+        if not Settings.confirm(variables): return self.get_tags(performers=performers, again=True)
+        self[variable] = variables
+        return variables
 
     @staticmethod
     def is_tip(text):
@@ -196,26 +205,28 @@ class Message():
 
         """
 
-        amount = 0
         if re.search(r'I sent you a \$[0-9]*\.00 tip ♥', text):
             amount = re.match(r'I sent you a \$([0-9]*)\.00 tip ♥', text).group(1)
-            Settings.maybe_print("successfully found tip")
-            Settings.dev_print("amount: {}".format(amount))
+            Settings.maybe_print("message contains (tip): {}".format(amount))
             return True, int(amount)
         elif re.search(r"I\'ve contributed \$[0-9]*\.00 to your Campaign", text):
             amount = re.match(r'I\'ve contributed \$([0-9]*)\.00 to your Campaign', text).group(1)
-            Settings.maybe_print("successfully found campaign donation")
-            Settings.dev_print("amount: {}".format(amount))
+            Settings.maybe_print("message contains (campaign): {}".format(amount))
             return True, int(amount)
-        return False, int(amount)
+        return False, 0
 
     def get_files(self):
         """
         Gets files from args specified source or prompts as necessary.
 
         Uses appropriate file select method as specified by runtime args:
-        - remote
+        - remote (server, ipfs)
         - local
+
+        Parameters
+        ----------
+        again : bool
+            Whether or not it is the script user's first time around.
 
         Returns
         -------
@@ -224,53 +235,53 @@ class Message():
 
         """
 
-        # if str(self.files) == "unset": return []
-        if isinstance(self.files, list) and len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
-        if len(Settings.get_input_as_files()) > 0:
-            self.files = Settings.get_input_as_files()
-            return self.files
+        if len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
+        files = Settings.get_input_as_files()
+        if len(files) > 0:
+            self.files = files
+            return files
         # prompt skip
-        if not Settings.is_prompt() and Settings.get_category() == None:
-            self.files = "unset"
-            return []
-        files = []
-        if len(self.files) == 0:
-            files = File.select_file_upload_method()
-            if str(files[0]) == "unset" or str(files) == "unset":
-                self.files = "unset"
-                files = []
-                if Settings.is_prompt(): return []
-        if files == None: files = []
+        if not Settings.is_prompt(): return []
+        # try menu prompts first
+        files = File.select_file_upload_method()
+        if len(files) > 0:
+            self.files = files
+            return files
         # get files from appropriate source's menu selection
-        if Settings.get_source() == "remote":
-            remoteFiles = Remote.get_files()
-            if len(remoteFiles) > 0:
-                files = Remote.select_files()
-            elif len(files) == 0 and len(remoteFiles) == 0:
-                self.files = "unset"
-                return []
-        elif Settings.get_source() == "local":
-            localFiles = File.get_files()
-            if len(files) == 0 and len(localFiles) > 0:
-                files = File.select_files()
-            elif len(files) == 0 and len(localFiles) == 0:
-                self.files = "unset"
-                return []
+        if Settings.get_source() == Source.REMOTE:
+            files = Remote.get_files()
+            if len(files) > 0:
+                self.files = files
+                return files
+        elif Settings.get_source() == Source.LOCAL:
+            files = File.get_files()
+            if len(files) > 0:
+                self.files = files
+                return files
+        # if files is empty this all basically just skips to the end and returns blank 
         filed = []
         for file in files:
             # turn all folders into their files
             if isinstance(file, Folder): filed.extend(file.get_files())
             else:
-                # flag that the files include a performer
-                if hasattr(file, "performer"):
-                    self.performers.append(getattr("performer", file))
                 filed.append(file)
-        self.files = filed[:int(Settings.get_upload_max())]
+                # TODO
+                # this goes elsewhere
+                # flag that the files include a performer
+                # if hasattr(file, "performer"):
+                    # self.performers.append(getattr("performer", file))
+        self.files = filed[:int(Settings.get_upload_max())] # reduce by max
         return self.files
 
-    def get_expiration(self):
+    def get_expiration(self, again=True):
         """
         Gets the expiration value if not none else sets it from args or prompts.
+        
+        Parameters
+        ----------
+        again : bool
+            Whether or not it is the script user's first time around.
+
 
         Returns
         -------
@@ -279,17 +290,14 @@ class Message():
 
         """
 
-        if str(self.expiration) == "unset": return None
         if self.expiration: return self.expiration
         # retrieve from args and return if exists
-        expires = Settings.get_expiration() or None
+        expires = Settings.get_expiration() or 0
         if expires: 
             self.expiration = expires
             return expires
         # prompt skip
-        if not Settings.prompt("expiration"):
-            self.expiration = "unset"
-            return None
+        if not Settings.prompt("expiration"): return 0
         question = {
             'type': 'input',
             'name': 'expiration',
@@ -298,13 +306,19 @@ class Message():
         }
         expiration = prompt(question)["expiration"]
         # confirm expiration
-        if not Settings.confirm(expiration): return self.get_expiration()
+        if not Settings.confirm(expiration): return self.get_expiration(again=again)
         self.expiration = expiration
         return self.expiration
 
-    def get_poll(self):
+    def get_poll(self, again=True):
         """
         Gets the poll value if not none else sets it from args or prompts.
+        
+        Parameters
+        ----------
+        again : bool
+            Whether or not it is the script user's first time around.
+
 
         Returns
         -------
@@ -313,24 +327,28 @@ class Message():
 
         """
 
-        if str(self.poll) == "unset": return None
         # check if poll is ready
         if self.poll and self.poll.check(): return self.poll
+        else: return None
         # prompt skip
-        if Settings.is_prompt() and not Settings.prompt("poll"):
-            self.poll = "unset"
-            return None
+        if not Settings.prompt("poll"): return None
         poll = Poll()
         # ensure the poll has non default values
         poll.get()
-        # check if valid poll
-        if not poll.check(): return None
+        # checks if poll is valid, uses Settings.confirm
+        if not poll.check(): return self.get_poll(again=again)
         self.poll = poll
         return poll
 
-    def get_price(self):
+    def get_price(self, again=True):
         """
         Gets the price value if not none else sets it from args or prompts.
+
+
+        Parameters
+        ----------
+        again : bool
+            Whether or not it is the script user's first time around.
 
         Returns
         -------
@@ -339,13 +357,13 @@ class Message():
 
         """
 
-        if self.price: return self.price
+        if self.price: return int(self.price)
         # retrieve from args and return if exists
-        price = Settings.get_price() or None
+        price = Settings.get_price() or 0
         if price: 
             self.price = price
-            return price
-        if not Settings.prompt("price"): return ""
+            return int(price)
+        if not Settings.prompt("price"): return 0
         question = {
             'type': 'input',
             'name': 'price',
@@ -354,13 +372,13 @@ class Message():
             'filter': lambda val: int(val)
         }
         price = prompt(question)["price"]
-        if not Settings.confirm(price): return self.get_price()
-        self.price = price
-        return self.price
+        if not Settings.confirm(price): return self.get_price(again=again)
+        self.price = int(price)
+        return int(price)
 
-    def get_recipients(self):
+    def get_recipients(self, again=True):
         """
-        Gets the recipients value if not none else sets it from args or prompts.
+        Gets the recipients value if not none else sets it from args or prompts. Users 'user' from config if provided as base for list otherwise 'users'.
 
         Returns
         -------
@@ -371,18 +389,25 @@ class Message():
 
         if len(self.users) > 0: return self.users
         # if no recipients, prompt for them
-        if len(self.users) == 0 and len(Settings.get_users()) > 0: 
-            self.users = Settings.get_users()
-        elif len(self.users) == 0 and Settings.get_user(): 
-            self.users = [Settings.get_user()]
-        # select users
-        elif len(self.users) == 0:
-            self.users = User.select_users()
-        return self.users
+        users = Settings.get_users()
+        if len(users) > 0: 
+            self.users = users
+        elif len(users) == 0 and Settings.get_user():
+            user = Settings.get_user()
+            users = [Settings.get_user()]
+            self.users = users
+        if not Settings.confirm(users): return self.get_recipients(again=again)
+        return users
 
-    def get_schedule(self):
+    def get_schedule(self, again=True):
         """
         Gets the schedule value if not none else sets it from args or prompts.
+        
+        Parameters
+        ----------
+        again : bool
+            Whether or not it is the script user's first time around.
+
 
         Returns
         -------
@@ -391,22 +416,25 @@ class Message():
 
         """
 
-        if str(self.schedule) == "unset": return None
         if self.schedule: return self.schedule
         # prompt skip
-        if Settings.is_prompt() and not Settings.prompt("schedule"):
-            self.schedule = "unset"
-            return None
+        if not Settings.prompt("schedule"): return None
         schedule = Schedule()
         schedule.get()
-        # checks if schedule is valid
-        if not schedule.check(): return None
+        # checks if schedule is valid, uses Settings.confirm
+        if not schedule.check(): return self.get_schedule(again=again)
         self.schedule = schedule
         return schedule
         
-    def get_text(self):
+    def get_text(self, again=True):
         """
         Gets the text value if not none else sets it from args or prompts.
+
+
+        Parameters
+        ----------
+        again : bool
+            Whether or not it is the script user's first time around.
 
         Returns
         -------
@@ -415,14 +443,18 @@ class Message():
 
         """
 
-        if self.text: return self.text
+        if self.text != "": return self.text
         # retrieve from args and return if exists
-        text = Settings.get_text() or None
-        if text: 
+        text = Settings.get_text()
+        if text != "": 
+            self.text = text
+            return text
+        text = self.get_text_from_filename()
+        if text != "":
             self.text = text
             return text
         # prompt skip
-        if not Settings.prompt("text"): return None
+        if not Settings.prompt("text"): return ""
         question = {
             'type': 'input',
             'name': 'text',
@@ -430,141 +462,112 @@ class Message():
         }
         text = prompt(question)["text"]
         # confirm text
-        if not Settings.confirm(text): return self.get_text()
+        if not Settings.confirm(text): return self.get_text(again=again)
         self.text = text
         return self.text
 
-    def get(self):
-        """Gets all values"""
 
-        if self.gotten: return
-        self.get_text()
-        self.get_keywords()
-        self.get_price()
-        self.get_poll()
-        self.get_schedule()
-        self.get_expiration()
-        self.get_files()
-        self.get_recipients()
-        self.set_text()
+    def get_text_from_filename(self):
+        """Gets text from this object's file's title"""
 
-        self.get_performers()
-
-        self.gotten = True
-
-    def get_post(self):
-        """Gets values to populate as a post"""
-
-        if self.gotten: return
-        self.get_text()
-        self.get_keywords()
-        self.get_poll()
-        self.get_schedule()
-        self.get_expiration()
-        self.get_files()
-        self.set_text()
-
-        self.get_performers()
-
-        self.gotten = True
-
-    def get_message(self):
-        """Gets values to populate as a message"""
-
-        if self.gotten: return
-        self.get_recipients()
-        self.get_text()
-        self.get_price()
-        self.get_files()
-        self.set_text()
-
-        self.get_performers()
-
-        self.gotten = True
+        if not self.get_files(): return ""
+        text = self.files[0].get_title()
+        # if "_" in str(self.text):
+        if re.match("[0-9]_[0-9]", text) is not None:
+            texttext = self.files[0].get_parent()["title"]
+        else:
+            try: 
+                int(text)
+                # is a simple int
+                if int(text) > 20:
+                    text = self.files[0].get_parent()["title"]
+            except Exception as e:
+                # not a simple int
+                # do nothing cause probably set already
+                pass
+        text = text.replace("_", " ")
+        # redo keyword parsing (unsure if necessary call)
+        text = self.update_tags(text)
+        return text
 
     def send_message(self):
+        """
+        Sends a message.
+
+
+        Returns
+        -------
+        bool
+            Whether or not sending the message was successful.
+
+        """
         try:
-            self.get_message()
-            if Settings.is_prompt():
-                if not Settings.prompt("Send"): return
-            if self.get_files() != "unset" and len(self.get_files()) == 0 and not self.get_text():
-                Settings.err_print("Missing Files and Text")
+            self.init(type_=Types.MESSAGE)
+            Settings.print("> {}".format(self))
+            if not Settings.confirm("Send message?"): return False
+            if not self.get_files() and self.get_text() == "":
+                Settings.err_print("Missing files and text!")
                 return False
-            successes = 0
-            failures = 0
             try: 
+                successes = 0
+                failures = 0
                 for user in self.users:
-                    successful = False
-                    if isinstance(user, User):
-                        successful = User.message_user(username=user.username, message=self)
-                    else:
-                        successful = User.message_user(username=user, message=self)
+                    successful = User.message_user(self)
                     if successful: successes+=1
                     else: failures+=1
             except Exception as e:
                 Settings.dev_print(e)
                 failures+=1
-            if failures >= successes:
-                Settings.print("Successful | Failed: {} | {}".format(successes, failures))
-                return False
-            self.cleanup_files()
-            return True
+            Settings.maybe_print("successful: {}".format(successes))
+            Settings.maybe_print("failed: {}".format(failures))
+            if successes > failures: return True
         except Exception as e:
             Settings.dev_print(e)
+        Settings.print("something went wrong! shnarrnf!")
         return False
 
     def send_post(self):
+        """
+        Sends a post.
+
+
+        Returns
+        -------
+        bool
+            Whether or not sending the post was successful.
+
+        """
         try:
-            self.get_post()
-            if Settings.is_prompt():
-                if not Settings.prompt("Post"): return False
-            if self.get_files() != "unset" and len(self.get_files()) == 0 and not self.get_text():
-                Settings.err_print("Missing Files and Text")
+            self.init(type_=Types.POST)
+            Settings.print("> {}".format(self))
+            if not Settings.confirm("Send post?"): return False
+
+            if not self.get_files() and self.get_text() == "":
+                Settings.err_print("Missing files and text!")
                 return False
-            successes = 0
-            failures = 0
             try:
-                successful = Driver.get_driver().post(message=self)
+                successes = 0
+                failures = 0
+                successful = Driver.post(self)
                 if successful: successes+=1
                 else: failures+=1
             except Exception as e:
                 Settings.dev_print(e)
                 failures+=1
-            if failures >= successes:
-                Settings.print("Successful | Failed: {} | {}".format(successes, failures))
-                return False
-            self.cleanup_files()
-            return True
+            Settings.maybe_print("successful: {}".format(successes))
+            Settings.maybe_print("failed: {}".format(failures))
+            if successes > failures: return True
         except Exception as e:
             Settings.dev_print(e)
+        Settings.print("something went wrong! shnarrnf!")
         return False
 
-    def set_keywords(self):
+    def update_keywords(self, text):
         """Sets keywords from this object's file's title"""
 
-        if len(self.get_keywords()) == 0 and len(self.get_files()) > 0:
+        if len(self.get_tags()) == 0 and len(self.get_files()) > 0:
             self.keywords = self.files[0].get_parent()["title"].split(" ")
             for keyword in self.keywords:
                 if str(keyword) in str(self.text):
                     self.keywords = []
             
-    def set_text(self):
-        """Sets text from this object's file's title"""
-
-        if not self.text and len(self.get_files()) > 0:
-            self.text = self.files[0].get_title()
-            # if "_" in str(self.text):
-            if re.match("[0-9]_[0-9]", self.text) is not None:
-                self.text = self.files[0].get_parent()["title"]
-            else:
-                try: 
-                    int(self.text)
-                    # is a simple int
-                    if int(self.text) > 20:
-                        self.text = self.files[0].get_parent()["title"]
-                except Exception as e:
-                    # not a simple int
-                    # do nothing cause probably set already
-                    pass
-            self.text = self.text.replace("_", " ")
-            self.set_keywords()

@@ -812,6 +812,9 @@ class File():
                     return parse_categories(cat, categoryFolder=performerFolder)
         return parse_categories(cat)
 
+
+        ## TODO
+        ## double check that i didn't erase this function being used at all
     @staticmethod
     def select_file(category, performer=None):
         """
@@ -919,7 +922,7 @@ class File():
         Returns
         -------
         list
-            The appropriately selected files
+            The appropriately selected files (via prompts).
 
         """
 
