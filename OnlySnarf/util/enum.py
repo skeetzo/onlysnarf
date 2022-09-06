@@ -7,4 +7,8 @@ class Source(Enum):
      GOOGLE = "google"
      ONLYFANS = "onlyfans"
      ONLYSNARF = "onlyfans"
-     
+
+
+class Types(Enum):
+	POST = "post"
+	MESSAGE = "message"

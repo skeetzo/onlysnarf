@@ -25,33 +25,31 @@ MIMETYPES_ALL_LIST.extend(MIMETYPES_VIDEOS_LIST)
 ###############################################################
 
 class File():
-    """File class"""
-
-    FILES = None
+    """File class for manipulating files."""
 
     def __init__(self):
         """File object represents local image/video file"""
 
         # the path to the file locally
-        self.path = None
+        self.path = ""
         # the file extension
-        self.ext = None
-        # image|video
-        self.type = None
+        self.ext = ""
+        # image|video, default image
+        self.type = "image"
         ##
         # file title reference
-        self.title = None
-        # [image, gallery, video, performer]
-        self.category = None
+        self.title = ""
+        # [image, gallery, video, performer], default image
+        self.category = "image"
         # file size
-        self.size = None
+        self.size = 0
 
     ######################################################################################
 
     def backup(self):
         """Backup file to appropriate destination source"""
 
-        if not File.backup_text(self.get_title()): return
+        if not self.backup_check(): return
         if Settings.get_destination() == "remote":
             Remote.upload_file(self)
         else:
@@ -60,8 +58,7 @@ class File():
             backupPath = os.path.join(backupPath, self.category, self.get_title())
             shutil.move(self.get_path(), backupPath)
 
-    @staticmethod
-    def backup_text(title):
+    def backup_check():
         """
         Print applicable backup text
 
@@ -76,19 +73,19 @@ class File():
             Settings.warn_print("skipping backup, skipped download")
             return False
         if Settings.is_force_backup():
-            Settings.maybe_print("backing up (forced): {}".format(title))
+            Settings.maybe_print("backing up (forced): {}".format(self.get_title()))
         elif not Settings.is_backup():
-            Settings.maybe_print("skipping backup (disabled): {}".format(title))
+            Settings.maybe_print("skipping backup (disabled): {}".format(self.get_title()))
             return False
         elif Settings.is_debug():
-            Settings.maybe_print("skipping backup (debug): {}".format(title))
+            Settings.maybe_print("skipping backup (debug): {}".format(self.get_title()))
             return False
         else:
-            Settings.maybe_print("backing up: {}".format(title))
+            Settings.maybe_print("backing up: {}".format(self.get_title()))
         return True
 
-    @staticmethod
-    def backup_files(files=[]):
+
+    def backup_files():
         """
         Backup files provided to appropriate destinations
 
@@ -99,13 +96,21 @@ class File():
 
         """
 
-        if not File.backup_text(self.get_title()): return
-        if Settings.get_destination() == "remote":
-            Remote.upload_files(files)
+        if not self.backup_check(): return
+        if Settings.get_destination() == Source.REMOTE:
+            Remote.upload_files(self.files)
+        elif Settings.get_destination() == Source.IPFS:
+            IPFS.upload_files(self.files)
         else:
-            for file in files:
-                file.backup()
-        return True
+            successfuls = 0
+            failures = 0
+            for file in self.files:
+                if file.backup(): successfuls+=1
+                else: failures+=1
+            if successfuls > failures:
+                Settings.shnarf()
+                return True
+        return False
 
     def check_size(self):
         """
@@ -118,34 +123,34 @@ class File():
 
         """
 
-        if not self.size:
-            if not os.path.exists(self.get_path()): return False
-            size = os.path.getsize(self.get_path())
-        else: size = self.size
+        size = self.size
+        if not size and if not os.path.exists(self.get_path()):
+            return False
+        if size: return True
+        size = os.path.getsize(self.get_path())
         Settings.maybe_print("file size: {}kb - {}mb".format(size/1000, size/1000000))
-        global ONE_MEGABYTE
-        if size <= ONE_MEGABYTE:
-            Settings.warn_print("small file size")
-        global ONE_HUNDRED_KILOBYTES
-        if size <= ONE_HUNDRED_KILOBYTES:
+        if size <= Files.ONE_HUNDRED_KILOBYTES:
             Settings.warn_print("tiny file size")
-        self.size = size
-        if size == 0:
+        elif size <= Files.ONE_MEGABYTE:
+            Settings.warn_print("small file size")
+        elif size:
+            Settings.maybe_print("normal file size")
+        else:
             Settings.err_print("empty file size")
             return False
+        self.size = size
         return True
 
     def delete(self):
         """Delete file"""
 
-        if not File.delete_text(self.get_title()): return
+        if not self.delete_text(): return
         try: 
             os.remove(self.get_path())
-            Settings.print('File Deleted: {}'.format(self.get_title()))
+            Settings.print('File deleted: {}'.format(self.get_title()))
         except Exception as e: Settings.dev_print(e)
 
-    @staticmethod
-    def delete_text(title):
+    def delete_text(self):
         """
         Print applicable deletion text
         
@@ -160,17 +165,16 @@ class File():
             Settings.warn_print("skipping delete, skipped download")
             return False
         if not Settings.is_delete():
-            Settings.maybe_print("skipping delete (disabled): {}".format(title))
+            Settings.maybe_print("skipping delete (disabled): {}".format(self.title))
             return False
         elif Settings.is_debug():
-            Settings.maybe_print("skipping delete (debug): {}".format(title))
+            Settings.maybe_print("skipping delete (debug): {}".format(self.title))
             return False
         else:
-            Settings.maybe_print("deleting: {}".format(title))
+            Settings.maybe_print("deleting: {}".format(self.title))
         return True
 
-    @staticmethod
-    def download_text(title):
+    def download_text():
         """
         Print applicable download text.
         
@@ -191,7 +195,7 @@ class File():
     def get_ext(self):
         """Get the file's extension"""
 
-        if self.ext: return self.ext
+        if self.ext != "": return self.ext
         self.get_title()
         return self.ext
 
@@ -206,7 +210,7 @@ class File():
 
         """
 
-        if not self.path:
+        if self.path == "":
             Settings.err_print("missing file path")
             return  ""
         return str(self.path)
@@ -222,10 +226,10 @@ class File():
 
         """
 
-        if self.title: return self.title
+        if self.title != "": return self.title
         path = self.get_path()
         if str(path) == "": 
-            Settings.err_print("missing file title")
+            Settings.err_print("missing file title!")
             return ""
         title, ext = os.path.splitext(path)
         self.ext = ext.replace(".","")
@@ -236,17 +240,9 @@ class File():
     def get_tmp():
         """Creates / gets the default temporary download directory"""
 
-        # tmp = os.getcwd()
-        # if Settings.get_download_path() != "":
-        #     tmp = os.path.join(Settings.get_download_path(), "tmp")
-        # else:
-        #     tmp = os.path.join(tmp, "tmp")
-        # if not os.path.exists(str(tmp)):
-        #     os.mkdir(str(tmp))
-        # return tmp
         download_path = Settings.get_download_path()
-        if not os.path.exists(str(download_path)):
-            os.mkdir(str(download_path))
+        if not os.path.exists(download_path):
+            os.mkdir(download_path)
         return download_path
 
     def get_type(self):
@@ -295,17 +291,14 @@ class File():
         """
 
         try:
-            # if str(Settings.SKIP_DELETE) == "True":
-                # Settings.maybe_print("skipping local remove")
-                # return
-            # Settings.print('Deleting Local File(s)')
+            Settings.maybePrint('deleting local files...')
             # delete /tmp
             tmp = File.get_tmp()
             if os.path.exists(tmp):
                 shutil.rmtree(tmp)
-                Settings.print('Local File(s) Removed')
+                Settings.print('local files removed')
             else:
-                Settings.print('Local Files Not Found')
+                Settings.print('no local files found to remove')
         except Exception as e:
             Settings.dev_print(e)
 
@@ -321,17 +314,15 @@ class File():
 
         """
 
-        if File.FILES: return File.FILES
         category = Settings.get_category()
-        if not category: category = Settings.select_category()
-        if not category: Settings.warn_print("missing category")
+        # if not category: category = Settings.select_category()
         files = File.get_files_by_category(category)
-        if Settings.get_title() and str(files) != "unset":
+        # if args for 'title' provided: return file matching provided title
+        if Settings.get_title():
             for file in files:
                 if str(Settings.get_title()) == str(file.get_title()):
                     files = [file]
                     break
-        File.FILES = files
         return files
 
     @staticmethod
@@ -388,178 +379,6 @@ class File():
             break
         return None
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @staticmethod
     def get_folders_of_folder_by_keywords(categoryFolder):
         """
@@ -599,11 +418,16 @@ class File():
             folders_.append(folder)
         return folders_
 
-    @staticmethod
-    def get_random_file():
+    # @staticmethod
+    # def get_random_file():
+    #     """Get random file from all files"""
+
+    #     return random.choice(File.get_files())
+
+    def get_random_file(self):
         """Get random file from all files"""
 
-        return random.choice(File.get_files())
+        return random.choice(self.get_files())
 
     @staticmethod
     def get_images_of_folder(folder):
@@ -666,6 +490,9 @@ class File():
         if not folder: return []
         videos = []
         files = []
+
+        ## TODO: change this to mimetypes
+
         valid_videos = [".mp4",".mov"]
         for f in os.listdir(folder.get_path()):
             ext = os.path.splitext(f)[1]
@@ -760,7 +587,7 @@ class File():
 
             files = []
             # return File.get_files_by_category(cat)
-            if "image" in str(category):
+            if Types.IMAGE in str(category):
                 categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
                 for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
                     if not folder: continue
@@ -769,7 +596,7 @@ class File():
                         setattr(file, "path", imageget_path())
                         setattr(file, "category", folder.get_title())
                         files.append(file)
-            elif "video" in str(category):
+            elif Types.VIDEO in str(category):
                 categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
                 for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
                     if not folder: continue
@@ -781,7 +608,7 @@ class File():
                         setattr(file, "path", video.get_path())
                         setattr(file, "category", folder.get_title())
                         files.append(file)
-            elif "performer" in str(category):
+            elif Types.PERFORMER in str(category):
                 categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
                 for performer_ in File.get_folders_of_folder_by_keywords(categoryFolder):
                     # for performer in File.get_folders_of_folder(folder):
@@ -949,20 +776,6 @@ class File():
             return Remote.select_files()
         return File.select_files()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def upload(self):
         """
         Process ran by a file after it has been uploaded.
@@ -982,73 +795,9 @@ class File():
         self.delete()
         return True
 
-##
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class Remote_File(File):
-    def __init__(self):
-        File.__init__(self)
-
-    def backup(self):
-        if not File.backup_text(self.get_title()): return
-        if Settings.get_destination() == "remote":
-            Remote.backup_file(self)
-        else:
-            file = self.download()
-            file.backup()
-            self.delete()
-
-    def delete(self):
-        if not File.delete_text(self.get_title()): return
-        try: 
-            Remote.delete_file(self)
-            Settings.print('File Deleted: {}'.format(self.get_title()))
-        except Exception as e: Settings.dev_print(e)
-
-    def download(self):
-        if not File.download_text(self.get_title()): return False
-        file = Remote.download_file(self)
-        if not file: return False
-        ### Finish ###
-        if not file.check_size():
-            Settings.err_print("missing downloaded file")
-            return False
-        Settings.print("Downloaded: {}".format(file.get_title()))
-        return file
-
-##
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
 
 class Folder(File):
     def __init__(self):
@@ -1056,7 +805,7 @@ class Folder(File):
         self.files = None
 
     def backup(self):
-        if File.backup_text(self.get_title()): return
+        if File.backup_check(self.get_title()): return
 
     def check_size(self):
         for file in self.get_files():
@@ -1144,7 +893,9 @@ class Folder(File):
             if prepared_: prepared = prepared_
         return prepared
 
-###################################################################################
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
 
 class Image(File):
     def __init__(self):
@@ -1154,7 +905,9 @@ class Image(File):
         Settings.maybe_print("preparing image: {}".format(self.get_title()))
         return super()
 
-###################################################################################
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
 
 class Video(File):
     def __init__(self):
@@ -1215,4 +968,37 @@ class Video(File):
         Settings.dev_print("repair: {}".format(self.get_title()))
         self.path = ffmpeg.repair(path)
 
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
 
+class Remote_File(File):
+    def __init__(self):
+        File.__init__(self)
+
+    def backup(self):
+        if not File.backup_check(self.get_title()): return
+        if Settings.get_destination() == "remote":
+            Remote.backup_file(self)
+        else:
+            file = self.download()
+            file.backup()
+            self.delete()
+
+    def delete(self):
+        if not File.delete_text(self.get_title()): return
+        try: 
+            Remote.delete_file(self)
+            Settings.print('File Deleted: {}'.format(self.get_title()))
+        except Exception as e: Settings.dev_print(e)
+
+    def download(self):
+        if not File.download_text(self.get_title()): return False
+        file = Remote.download_file(self)
+        if not file: return False
+        ### Finish ###
+        if not file.check_size():
+            Settings.err_print("missing downloaded file")
+            return False
+        Settings.print("Downloaded: {}".format(file.get_title()))
+        return file

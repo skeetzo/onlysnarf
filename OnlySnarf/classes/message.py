@@ -10,6 +10,7 @@ from ..lib import remote as Remote
 from .file import File, Folder
 from .poll import Poll
 from .schedule import Schedule
+from ..util.enum import Source, Types
 
 class Message():
     """OnlyFans message (and post) class"""
@@ -52,6 +53,8 @@ class Message():
     def init(type_=Type.POST)
         """Initialize."""
 
+        if (__initialized__): return
+
         self.get_text()
         self.get_tags()
         self.get_price()
@@ -59,13 +62,13 @@ class Message():
         self.get_recipients()
         self.get_performers()
 
-        if type_ == Type.POST:
-
+        if type_ == Type.POST: pass # all above
         elif type_ == Type.MESSAGE:
-        self.get_poll()
-        self.get_schedule()
-        self.get_expiration()
+            self.get_poll()
+            self.get_schedule()
+            self.get_expiration()
 
+        self.__initialized__ = True
 
     def backup_files(self):
         """Backs up files"""
@@ -255,6 +258,11 @@ class Message():
                 return files
         elif Settings.get_source() == Source.LOCAL:
             files = File.get_files()
+            if len(files) > 0:
+                self.files = files
+                return files
+        elif Settings.get_source() == Source.IPFS:
+            files = IPFS.get_files()
             if len(files) > 0:
                 self.files = files
                 return files
@@ -520,6 +528,7 @@ class Message():
                 failures+=1
             Settings.maybe_print("successful: {}".format(successes))
             Settings.maybe_print("failed: {}".format(failures))
+            self.cleanup()
             if successes > failures: return True
         except Exception as e:
             Settings.dev_print(e)
@@ -556,6 +565,7 @@ class Message():
                 failures+=1
             Settings.maybe_print("successful: {}".format(successes))
             Settings.maybe_print("failed: {}".format(failures))
+            self.cleanup()
             if successes > failures: return True
         except Exception as e:
             Settings.dev_print(e)
