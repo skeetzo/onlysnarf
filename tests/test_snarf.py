@@ -56,11 +56,11 @@ class TestSnarf(unittest.TestCase):
         config["user"] = "ddezeht"
         assert self.test_snarf.message(), "unable to send message"
 
-    # def test_post(self):
-    #     # config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
-    #     config["price"] = DEFAULT.PRICE_MINIMUM
-    #     config["text"] = "test balls"
-    #     assert self.test_snarf.post(), "unable to post message"
+    def test_post(self):
+        # config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
+        config["price"] = DEFAULT.PRICE_MINIMUM
+        config["text"] = "test balls"
+        assert self.test_snarf.post(), "unable to post message"
 
     # def test_poll(self):
     #     config["duration"] = DEFAULT.DURATION_ALLOWED[0]
@@ -105,6 +105,16 @@ class TestSnarf(unittest.TestCase):
     # def test_promotion_grandfather(self):
     #     config["promotion_method"] = "grandfather"
     #     assert self.test_snarf.promotion(), "unable to apply promotion: grandfather"
+
+    def test_backup_to_ipfs(self):
+        assert self.test_snarf.post(), "unable to backup content to ipfs"
+
+    def test_post_from_ipfs(self):
+        config["input"] = "CID" # recognize CID format and automatically attempt to use IPFS
+        config["price"] = DEFAULT.PRICE_MINIMUM
+        config["text"] = "test balls"
+        assert self.test_snarf.post(), "unable to post content from ipfs"
+
 
 ############################################################################################
 

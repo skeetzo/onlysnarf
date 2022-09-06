@@ -503,6 +503,8 @@
 
 ## TODO
 
+- add IPFS integration
+
 - fix / test reconnecting to browser, retaining session
 
 - add arg: -profile for user data

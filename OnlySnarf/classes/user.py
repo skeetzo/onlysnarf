@@ -105,25 +105,21 @@ class User:
         return True
 
     @staticmethod
-    def message_user(username=None, user_id=None, message=None):
+    def message_user(message):
 
         """
-        Message the user by their available username or id with the provided message.
+        Message the user by their available username or id with the provided message data.
 
         Parameters
         ----------
-        username : text
-            The username of the user.
-        user_id : text
-            The id of the user.
         message : classes.Message
             The message to send.
         """
 
-        user = User({"username":username,"id":user_id})
+        user = User({"username":message.username,"id":message.user_id})
         user.message(message=message)    
 
-    def enter_message(self, message=None):
+    def enter_message(self, message):
 
         """
         Complete the various components of sending a message to a user.
