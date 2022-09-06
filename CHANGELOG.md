@@ -488,8 +488,12 @@
   - added 'debug-selenium' to control logging
   - finished test_users
   - added temporary fix for boolean bug: using "True" and "False" strings instead of booleans
-**4.1.6 : 9/1/2022**
+  **4.1.6 : 9/1/2022**
   - finished debugging test_discount
+**4.1.7 : 9/5/2022**
+  - updates code and docstrings in messages.py; left off in file.py 
+  - added classes for enums
+  - added beginnings of IPFS 
 
 ------------------------------------------------------------------------------------
 
@@ -503,7 +507,17 @@
 
 ## TODO
 
-- add IPFS integration
+- add IPFS integration; dev scripts
+- add to "source" variable "ipfs" for sourcing from IPFS 
+- add to "backup" variable "ipfs" for uploading content to IPFS to host / backup / disseminate
+- integrate IPFS process in such a way as to not "offend" via links ergo pull from IPFS -> upload to OnlyFans (etc) 
+
+
+
+
+
+
+
 
 - fix / test reconnecting to browser, retaining session
 
