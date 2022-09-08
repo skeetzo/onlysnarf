@@ -6,7 +6,7 @@ import sys
 from OnlySnarf.lib.driver import Driver
 from OnlySnarf.util.settings import Settings
 from OnlySnarf.classes.discount import Discount
-from OnlySnarf.classes.message import Message
+from OnlySnarf.classes.message import Message, Post
 from OnlySnarf.classes.profile import Profile
 from OnlySnarf.classes.promotion import Promotion
 # from OnlySnarf.classes.user import User
@@ -58,12 +58,12 @@ class Snarf:
         ----------
         message : classes.Message
             A message consisting of text, recipient(s), and possibly also files, keywords, tags, 
-                performers, and/or price 
+                performers, and/or price.
         
         """
 
         message = Message()
-        try: return message.send_message()
+        try: return message.send()
         except Exception as e: Settings.dev_print(e)
         return False
                 
@@ -75,14 +75,13 @@ class Snarf:
 
         Parameters
         ----------
-        message : classes.Post
-            A post consisting of text and possibly also files, keywords, tags, performers,
-                expiration, poll, and/or schedule
+        post : classes.Message.Post
+            A message is a post plus also possibly also, expiration, poll, and/or schedule.
         
         """
 
-        message = Message()
-        try: return message.send_post()
+        post = Post()
+        try: return post.send()
         except Exception as e: Settings.dev_print(e)
         return False
 

@@ -490,11 +490,13 @@
   - added temporary fix for boolean bug: using "True" and "False" strings instead of booleans
   **4.1.6 : 9/1/2022**
   - finished debugging test_discount
-**4.1.7 : 9/5/2022**
+  **4.1.7 : 9/5/2022**
   - updates code and docstrings in messages.py; left off in file.py 
   - added classes for enums
   - added beginnings of IPFS 
-
+**4.1.8 : 9/7/2022**
+  - more code cleanup; debugging process for messages & posts uploading files
+  
 ------------------------------------------------------------------------------------
 
 - finish debugging test_message --> fucking svgs preventing file uploads (for Post as well)
@@ -503,85 +505,58 @@
 
 - cookies: currently prevents saving login session
 - google login: unsafe browser warning
-- browser reconnect / keep open
+- browser reconnect / keep open; doesn't reconnect to browser or retain session
+
+------------------------------------------------------------------------------------
 
 ## TODO
 
+- add arg: -profile for user data; or add as a config template
+- add to upload scheme (probably also as a config value): least to greatest (folder sizes)
+- update: backup function to include original folder name -> posted/galleries/$file
+- finish adding docstrings to classes/user.py (doublecheck all others)
+- copy & cleanup all dir structure references
+- add / ensure all default values to config.conf
+- finish / update tests
+
+(once successfully done testing uploading a file)
+-> IPFS
 - add IPFS integration; dev scripts
 - add to "source" variable "ipfs" for sourcing from IPFS 
 - add to "backup" variable "ipfs" for uploading content to IPFS to host / backup / disseminate
 - integrate IPFS process in such a way as to not "offend" via links ergo pull from IPFS -> upload to OnlyFans (etc) 
 
-
-
-
-
-
-
-
-- fix / test reconnecting to browser, retaining session
-
-- add arg: -profile for user data
-
-- add to upload scheme: least to greatest (folder sizes)
-- add default values to config.conf
-
-- finish / update tests -> must update main module to accomodate mass changes to file struct
-
-- update: backup function to include original folder name -> posted/galleries/$file
-
-- finish adding docstrings to classes/user.py
-- copy & cleanup dir structure for inclusion into next iteration content release project
-
-----------------------------------------
-  END OF LIFE PHASE
-----------------------------------------
-
--> Profile - REVIEW USABILITY
+(review usability)
+-> Profile
 - new - setup - Twitter -> profile, banner; Price and Settings
 - new - advertise
 - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
 - need to add 'create' to Profile for asking for profile settings when syncing to
 
--> Twitter - ENABLE AND EMPHASIZE w/ FREE MODEL MARCH
-- tweet reminders
-- can enter text that is tweeted
-- include media attachments
--- check for previously existing tweet
+-> Twitter
+- needs a dummy account to test actual tweeting w/
+- tweet reminders from inlaid config behavior
+- can enter and edit the final text that is tweeted
+- can include media attachments
+-- add checks for previously existing tweets
+-- keep track of tweets (somehow)
 
--> Remote
--- need to reproduce --
-- debug / add error catch for uploads: ('Connection aborted.', BrokenPipeError(32, 'Broken pipe'))
+## Tests
 
-Final Missing Test notes:
-- window boot w/ config commands (what even was this? oh missing tests)
+Add stuff for:
 - ffmpeg input/outputs results
 - file server upload/downloads & functionality
-- google functionality
-- any weird specific things in settings
-- user functionality
-
-
+- google functionality (if keeping it at all)
+- any weird specific things in profile settings or snarf settings
+- unittests for user class (and others) functionality
 
 ------------------------------------------------------------------------------------  
 
-
-
 # Bugs
 
-  - empty messages bug: Type a message below to start a conversation with 
-
-  **x.x.x**
-  - test Profile: check
-  - test Profile: posts
-  |- advertise - tweet to advertise new account, tweet to ask about what you should post
-  - test Profile: setup
-  
-  - finish debugging `onlysnarf-config`
-  - updated: images & demo gifs
-
-  **x.x.x**
-  - Profile options completely "functional" / debugged
+**?.?.?**
+-> Remote
+- debug / add error catch for uploads: ('Connection aborted.', BrokenPipeError(32, 'Broken pipe'))
 
 **4.1.4**
   - boolean checks from "Settings.is_" functions are failing: replaced with redundant "== True"

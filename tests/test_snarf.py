@@ -11,8 +11,9 @@ from OnlySnarf.util.config import config
 from OnlySnarf.lib.driver import Driver
 from OnlySnarf.util.settings import Settings
 from OnlySnarf.util import defaults as DEFAULT
+
 Settings.set_prompt(False)
-Settings.set_confirm(False)
+config["confirm"] = False
 
 # import warnings
 
@@ -48,16 +49,16 @@ class TestSnarf(unittest.TestCase):
     #     config["user"] = "ddezeht"
     #     assert self.test_snarf.discount(), "unable to apply discount"
 
-    def test_message(self):
-        config["prefer_local"] = True
-        config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
-        config["price"] = DEFAULT.PRICE_MINIMUM
-        config["text"] = "test balls"
-        config["user"] = "ddezeht"
-        assert self.test_snarf.message(), "unable to send message"
+    # def test_message(self):
+    #     config["prefer_local"] = True
+    #     config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
+    #     config["price"] = DEFAULT.PRICE_MINIMUM
+    #     config["text"] = "test balls"
+    #     config["user"] = "ddezeht"
+    #     assert self.test_snarf.message(), "unable to send message"
 
     def test_post(self):
-        # config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
+        config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["text"] = "test balls"
         assert self.test_snarf.post(), "unable to post message"
@@ -106,14 +107,19 @@ class TestSnarf(unittest.TestCase):
     #     config["promotion_method"] = "grandfather"
     #     assert self.test_snarf.promotion(), "unable to apply promotion: grandfather"
 
-    def test_backup_to_ipfs(self):
-        assert self.test_snarf.post(), "unable to backup content to ipfs"
+    # def test_backup_to_ipfs(self):
+    #     config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
+    #     config["text"] = "shnarf!"
+    #     config["backup"] = True
+    #     # config["force_backup"] = True
+    #     config["destination"] = "IPFS"
+    #     assert self.test_snarf.post(), "unable to backup content to ipfs"
 
-    def test_post_from_ipfs(self):
-        config["input"] = "CID" # recognize CID format and automatically attempt to use IPFS
-        config["price"] = DEFAULT.PRICE_MINIMUM
-        config["text"] = "test balls"
-        assert self.test_snarf.post(), "unable to post content from ipfs"
+    # def test_post_from_ipfs(self):
+    #     config["input"] = "CID" # recognize CID format and automatically attempt to use IPFS
+    #     config["price"] = DEFAULT.PRICE_MINIMUM
+    #     config["text"] = "test balls"
+    #     assert self.test_snarf.post(), "unable to post content from ipfs"
 
 
 ############################################################################################

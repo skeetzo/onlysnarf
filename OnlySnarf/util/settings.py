@@ -498,7 +498,8 @@ class Settings:
             if text == None: return False
             if list(text) == []: return False
             if str(text) == "": return False
-            if not Settings.CONFIRM: return True
+            # if config["confirm"] == "True": return True
+            # if 
         except: pass
         questions = [
             {
@@ -684,7 +685,7 @@ class Settings:
         config["category"] = cat
 
     def set_confirm(value):
-        Settings.CONFIRM = bool(value)
+        config["confirm"] = value
 
     def set_email(email):
         config["email"] = str(email)
