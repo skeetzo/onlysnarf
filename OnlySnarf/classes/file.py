@@ -7,25 +7,25 @@ from ..lib import remote as Remote
 from ..lib.ffmpeg import ffmpeg
 from ..util.settings import Settings
 
-ONE_GIGABYTE = 1000000000
-ONE_MEGABYTE = 1000000
-FIFTY_MEGABYTES = 50000000
-ONE_HUNDRED_KILOBYTES = 100000
-
-MIMETYPES_IMAGES = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"
-MIMETYPES_VIDEOS = "(mimeType contains 'video/mp4' or mimeType contains 'video/quicktime' or mimeType contains 'video/x-ms-wmv' or mimeType contains 'video/x-flv')"
-MIMETYPES_ALL = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or mimeType contains 'video/mp4' or mimeType contains 'video/quicktime')"
-
-MIMETYPES_IMAGES_LIST = ["image/jpeg","image/jpg","image/png"]
-MIMETYPES_VIDEOS_LIST = ["video/mp4","video/quicktime","video/x-ms-wmv","video/x-flv"]
-MIMETYPES_ALL_LIST = []
-MIMETYPES_ALL_LIST.extend(MIMETYPES_IMAGES_LIST)
-MIMETYPES_ALL_LIST.extend(MIMETYPES_VIDEOS_LIST)
 
 ###############################################################
 
 class File():
     """File class for manipulating files."""
+
+    ONE_GIGABYTE = 1000000000
+    ONE_MEGABYTE = 1000000
+    FIFTY_MEGABYTES = 50000000
+    ONE_HUNDRED_KILOBYTES = 100000
+    
+    MIMETYPES_IMAGES = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png')"
+    MIMETYPES_VIDEOS = "(mimeType contains 'video/mp4' or mimeType contains 'video/quicktime' or mimeType contains 'video/x-ms-wmv' or mimeType contains 'video/x-flv')"
+    MIMETYPES_ALL = "(mimeType contains 'image/jpeg' or mimeType contains 'image/jpg' or mimeType contains 'image/png' or mimeType contains 'video/mp4' or mimeType contains 'video/quicktime')"
+    MIMETYPES_IMAGES_LIST = ["image/jpeg","image/jpg","image/png"]
+    MIMETYPES_VIDEOS_LIST = ["video/mp4","video/quicktime","video/x-ms-wmv","video/x-flv"]
+    MIMETYPES_ALL_LIST = []
+    MIMETYPES_ALL_LIST.extend(MIMETYPES_IMAGES_LIST)
+    MIMETYPES_ALL_LIST.extend(MIMETYPES_VIDEOS_LIST)
 
     def __init__(self):
         """File object represents local image/video file"""
@@ -58,7 +58,7 @@ class File():
             backupPath = os.path.join(backupPath, self.category, self.get_title())
             shutil.move(self.get_path(), backupPath)
 
-    def backup_check():
+    def backup_check(self):
         """
         Print applicable backup text
 
@@ -85,7 +85,7 @@ class File():
         return True
 
 
-    def backup_files():
+    def backup_files(self):
         """
         Backup files provided to appropriate destinations
 
@@ -124,16 +124,16 @@ class File():
         """
 
         size = self.size
-        if not size and if not os.path.exists(self.get_path()):
+        if not size and not os.path.exists(self.get_path()):
             return False
         if size: return True
         size = os.path.getsize(self.get_path())
         Settings.maybe_print("file size: {}kb - {}mb".format(size/1000, size/1000000))
-        if size <= Files.ONE_HUNDRED_KILOBYTES:
+        if size <= File.ONE_HUNDRED_KILOBYTES:
             Settings.warn_print("tiny file size")
-        elif size <= Files.ONE_MEGABYTE:
+        elif size <= File.ONE_MEGABYTE:
             Settings.warn_print("small file size")
-        elif size:
+        elif size > 0:
             Settings.maybe_print("normal file size")
         else:
             Settings.err_print("empty file size")
@@ -257,9 +257,9 @@ class File():
         """
 
         if self.type: return self.type
-        if str(self.get_ext()) in str(MIMETYPES_VIDEOS_LIST):
+        if str(self.get_ext()) in str(File.MIMETYPES_VIDEOS_LIST):
             self.type = Video()
-        elif str(self.get_ext()) in str(MIMETYPES_IMAGES_LIST):
+        elif str(self.get_ext()) in str(File.MIMETYPES_IMAGES_LIST):
             self.type = Image()
         else: Settings.warn_print("unable to parse file type")
         return self.type
@@ -277,11 +277,9 @@ class File():
 
         """
 
-        Settings.maybe_print("preparing: {}".format(self.get_title()))
+        Settings.maybe_print("preparing file: {}".format(self.get_title()))
         # self.get_type().prepare()
-        if not self.check_size():
-            return False
-        return True
+        return self.check_size()
 
     @staticmethod
     def remove_local():
@@ -305,7 +303,7 @@ class File():
     @staticmethod
     def get_files():
         """
-        Get files from the runtime category folder.
+        Get files from the runtime source.
 
         Returns
         -------
@@ -314,15 +312,15 @@ class File():
 
         """
 
-        category = Settings.get_category()
-        # if not category: category = Settings.select_category()
-        files = File.get_files_by_category(category)
-        # if args for 'title' provided: return file matching provided title
-        if Settings.get_title():
-            for file in files:
-                if str(Settings.get_title()) == str(file.get_title()):
-                    files = [file]
-                    break
+        
+        files = []
+        # get files from appropriate source's menu selection
+        if Settings.get_source() == Source.REMOTE:
+            files = Remote.get_files()
+        elif Settings.get_source() == Source.LOCAL:
+            files = File.get_files()
+        elif Settings.get_source() == Source.IPFS:
+            files = IPFS.get_files()    
         return files
 
     @staticmethod
@@ -716,7 +714,7 @@ class File():
 
         """
 
-        if not Settings.is_prompt(): return [File.get_random_file()]
+        # if not Settings.is_prompt(): return [File.get_random_file()]
         category = Settings.select_category()
         if not category: return File.select_file_upload_method()
         # if not Settings.confirm(category): return File.select_files()
@@ -742,9 +740,9 @@ class File():
         return files
 
     @staticmethod
-    def select_file_upload_method():
+    def select_source():
         """
-        Menu to select the method to upload a file.
+        Menu to select the source to access a file.
 
         Returns
         -------
@@ -753,15 +751,11 @@ class File():
 
         """
 
-        if not Settings.prompt("upload files"): 
-            return "unset"
-        Settings.print("Select an upload source")
-        sources = Settings.get_source_options()
         question = {
             'type': 'list',
             'name': 'upload',
-            'message': 'Upload:',
-            'choices': [src.title() for src in sources]
+            'message': 'Source:',
+            'choices': [src.title() for src in Sources.get_source_options()] # fix this later so it works better
         }
         upload = PyInquirer.prompt(question)["upload"]
 
@@ -848,7 +842,7 @@ class Folder(File):
         ## video preference
         videos = []
         for file in file_list:
-            if str(file.get_mimetype()) in MIMETYPES_VIDEOS_LIST:
+            if str(file.get_mimetype()) in File.MIMETYPES_VIDEOS_LIST:
                 videos.append(file)
         if len(videos) > 0: file_list = [random.choice(videos)]
         ##
@@ -887,6 +881,7 @@ class Folder(File):
         return self.title
 
     def prepare():
+        Settings.maybe_print("preparing folder: {}".format(self.get_title()))
         prepared = False
         for file in self.get_files():
             prepared_ = file.prepare()
@@ -903,7 +898,7 @@ class Image(File):
 
     def prepare(self):
         Settings.maybe_print("preparing image: {}".format(self.get_title()))
-        return super()
+        return super().prepare()
 
 ######################################################################################################################
 ######################################################################################################################
@@ -944,15 +939,14 @@ class Video(File):
         self.reduce()
         self.repair()
         self.watermark()
-        return super()
+        return super().prepare()
 
     def reduce(self):
         if not Settings.is_reduce(): 
             Settings.maybe_print("skipping: video reduction")
             return
         path = self.get_path()
-        global FIFTY_MEGABYTES
-        if (int(os.stat(str(path)).st_size) < FIFTY_MEGABYTES or str(Settings.is_reduce()) == "False"):
+        if (int(os.stat(str(path)).st_size) < File.FIFTY_MEGABYTES or str(Settings.is_reduce()) == "False"):
             return
         Settings.dev_print("reduce: {}".format(self.get_title()))
         self.path = ffmpeg.reduce(path)

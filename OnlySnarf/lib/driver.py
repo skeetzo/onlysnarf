@@ -1820,19 +1820,18 @@ class Driver:
         """
 
         if not message:
+            print(1)
             Settings.err_print("missing message")
             return False
         auth_ = self.auth()
         if not auth_: return False
         Settings.dev_print("posting")
         try:
-            WEB_DRIVER = Driver.get_driver()
+            # WEB_DRIVER = Driver.get_driver()
             self.go_to_home()
-            # message.get_post()
+            message.init()
             files = message.get_files()
             text = message.format_text()
-            keywords = message.get_keywords()
-            performers = message.get_performers()
             expires = message.get_expiration()
             schedule = message.get_schedule()
             poll = message.get_poll()
@@ -1840,58 +1839,70 @@ class Driver:
             Settings.print("====================")
             Settings.print("Posting:")
             Settings.print("- Files: {}".format(len(files)))
-            Settings.print("- Keywords: {}".format(keywords))
-            Settings.print("- Performers: {}".format(performers))
+            # Settings.print("- Keywords: {}".format(message.get_keywords()))
+            # Settings.print("- Performers: {}".format(message.get_performers()))
             Settings.print("- Text: {}".format(text))
             Settings.print("- Tweeting: {}".format(Settings.is_tweeting()))
-            Settings.print("====================")
+            # Settings.print("====================")
             ## Expires, Schedule, Poll
             if expires:
-                if not self.expires(expiration=expires): return False
+                if not self.expires(expiration=expires):
+                    Settings.print("- Expires: False".format(text))
+                    return False
+                Settings.print("- Expires: True".format(text))
             if schedule:
-                if not self.schedule(schedule=schedule): return False
+                if not self.schedule(schedule=schedule):
+                    Settings.print("- Scheduled: False".format(text))
+                    return False
+                Settings.print("- Scheduled: True".format(text))
             if poll:
-                if not self.poll(poll=poll): return False
+                if not self.poll(poll=poll):
+                    Settings.print("- Poll: False".format(text))
+                    return False
+                Settings.print("- Poll: True".format(text))
+            Settings.print("====================")
             WAIT = WebDriverWait(self.browser, 600, poll_frequency=10)
             ## Tweeting
             if Settings.is_tweeting() == "True":
                 Settings.dev_print("tweeting")
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, Element.get_element_by_name("tweet").getXPath()))).click()
             else: Settings.dev_print("not tweeting")
-            ## Files
-            successful_upload = False
+            
+            ## Upload Files
             try:
-                successful_upload = self.upload_files(files) or False
+                successful_upload = self.upload_files(files) or False # neither of these are supposed to fail
+                ## Text
+                successful_text = self.enter_text(text) or False # neither of these are supposed to fail
+                if not successful_text or not successful_upload:
+                    Settings.err_print("unable to post")
+                    return False
+                ## Upload
+                i = 0
+                while True:
+                    try:
+                        WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("sendButton").getClass())))
+                        Settings.dev_print("upload complete")
+                        break
+                    except Exception as e:
+                        # try: 
+                        #     # check for existence of "thumbnail is fucked up" modal and hit ok button
+                        #     # haven't seen in long enough time to properly add
+                        #     self.browser.switchTo().frame("iframe");
+                        #     self.browser.find_element_by_class_name("g-btn m-rounded m-border").send_keys(Keys.ENTER)
+                        #     Settings.err_print("thumbnail missing")
+                        #     break
+                        # except Exception as ef:
+                        #     Settings.maybe_print(ef)
+                        Settings.print('uploading...')
+                        Driver.error_checker(e)
+                        i+=1
+                        if i == int(Settings.get_upload_max_duration()) and Settings.is_force_upload() == "False":
+                            Settings.err_print("max upload time reached")
+                            return False
+
             except Exception as e:
                 Settings.print(e)
-            ## Text
-            successful_text = self.enter_text(text)
-            if not successful_text:
-                Settings.err_print("unable to enter text")
-                return False
-            ## Upload
-            i = 0
-            while successful_upload:
-                try:
-                    WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("sendButton").getClass())))
-                    Settings.dev_print("upload complete")
-                    break # or successful_upload = False
-                except Exception as e:
-                    # try: 
-                    #     # check for existence of "thumbnail is fucked up" modal and hit ok button
-                    #     # haven't seen in long enough time to properly add
-                    #     self.browser.switchTo().frame("iframe");
-                    #     self.browser.find_element_by_class_name("g-btn m-rounded m-border").send_keys(Keys.ENTER)
-                    #     Settings.err_print("thumbnail missing")
-                    #     break
-                    # except Exception as ef:
-                    #     Settings.maybe_print(ef)
-                    Settings.print('uploading...')
-                    Driver.error_checker(e)
-                    i+=1
-                    if i == int(Settings.get_upload_max_duration()) and Settings.is_force_upload() == "False":
-                        Settings.err_print("max upload time reached")
-                        return False
+
             ## Confirm
             try:
                 send = self.find_element_to_click("new_post")
@@ -1904,6 +1915,7 @@ class Driver:
                         return True
                     Settings.dev_print("confirming upload")
                     send.click()
+                    # send[1].click() # the 0th one is disabled
                 else:
                     Settings.err_print("unable to locate 'Send Post' button")
                     return False
@@ -1911,8 +1923,8 @@ class Driver:
                 Settings.err_print("unable to send post")
                 Settings.dev_print(e)
                 return False
-            # send[1].click() # the 0th one is disabled
-            Settings.print('OnlyFans Post Complete')
+
+            Settings.print('posted to OnlyFans!')
             return True
         except Exception as e:
             Driver.error_checker(e)
@@ -3151,6 +3163,26 @@ class Driver:
         Driver.BROWSERS.append(browser)
         return browser
 
+    #####
+
+    #####
+
+
+    def tryDriverFunction(function, objecto):
+        try:
+            successes = 0
+            failures = 0
+            successful = Driver[function](objecto)
+            if successful: successes+=1
+            else: failures+=1
+        except Exception as e:
+            Settings.dev_print(e)
+            failures+=1
+        Settings.maybe_print("successful: {}".format(successes))
+        Settings.maybe_print("failed: {}".format(failures))
+        if successes > failures: return True
+
+
     ##################
     ##### Upload #####
     ##################
@@ -3202,7 +3234,9 @@ class Driver:
             executor.map(prepare, files)
 
         Settings.dev_print("files prepared: {}".format(len(files_)))
-        if len(files_) == 0: return False
+        if len(files_) == 0:
+            Settings.err_print("skipping upload, unable to prepare files")
+            return False
 
         ####
 

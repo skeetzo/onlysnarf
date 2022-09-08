@@ -34,40 +34,26 @@ class Message():
         # TODO: check if this is necessary
         self.hasPerformers = False # used to flag files from performer folders
 
-        ## message only variables
-        self.users = [] # users to send to
-        self.user_id = 0
-
-        ## post only variables
-        self.expiration = 0
-        self.poll = None
-        self.schedule = None
-        ##
+        # typically related to messages only
+        self.users = [] # users to send to as username or user id
+        self.user_id = 0 # user to send's to known user id
 
         self.__initialized__ = False
 
-    def __str__(self):
-        return "foo"
+    # def __str__(self):
+    #     return "foo"
 
 
-    def init(type_=Type.POST)
+    def init(self):
         """Initialize."""
 
-        if (__initialized__): return
-
+        if self.__initialized__: return
         self.get_text()
-        self.get_tags()
+        # self.get_tags()
         self.get_price()
         self.get_files()
         self.get_recipients()
-        self.get_performers()
-
-        if type_ == Type.POST: pass # all above
-        elif type_ == Type.MESSAGE:
-            self.get_poll()
-            self.get_schedule()
-            self.get_expiration()
-
+        # self.get_performers()
         self.__initialized__ = True
 
     def backup_files(self):
@@ -80,7 +66,7 @@ class Message():
 
         for file in self.get_files(): file.delete()
 
-    def cleanup():
+    def cleanup(self):
         """Processes files after a successful message or post by backing them up then deleting them"""
 
         self.backup_files()
@@ -138,7 +124,8 @@ class Message():
 
         """
 
-        return "{}{}{}".format(self.get_text(),Message.format_performers(self.get_performers()),Message.format_keywords(self.get_tags())).strip()
+        return self.get_text().strip()
+        # return "{}{}{}".format(self.get_text(),Message.format_performers(self.get_performers()),Message.format_keywords(self.get_tags())).strip()
 
     def get_tags(self, performers=True, again=True):
         """
@@ -165,13 +152,13 @@ class Message():
         variable = "keywords"
         if performers: variable = "performers"
         # retrieve if set already
-        if len(self[variable]) > 0: return self[variable]
+        if len(dict(self)[variable]) > 0: return dict(self)[variable]
         # else retrieve from args and return if exists
         variables = []
-        if variable = "keywords": variables = Settings.get_tags()
-        elif variable = "performers": variables = Settings.get_performers()
+        if variable == "keywords": variables = Settings.get_tags()
+        elif variable == "performers": variables = Settings.get_performers()
         if len(variables) > 0: 
-            self[variable] = variables
+            dict(self)[variable] = variables
             return variables
         # skip prompt
         if not Settings.prompt(variable): return []
@@ -185,8 +172,8 @@ class Message():
         variables = prompt(question)[variable]
         variables = [n.strip() for n in variables.split(",")]
         # confirm variables or go in a circle
-        if not Settings.confirm(variables): return self.get_tags(performers=performers, again=True)
-        self[variable] = variables
+        # if not Settings.confirm(variables): return self.get_tags(performers=performers, again=True)
+        dict(self)[variable] = variables
         return variables
 
     @staticmethod
@@ -241,31 +228,12 @@ class Message():
         if len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
         files = Settings.get_input_as_files()
         if len(files) > 0:
+            Settings.dev_print("fetched input files for upload")
             self.files = files
             return files
         # prompt skip
         if not Settings.is_prompt(): return []
-        # try menu prompts first
-        files = File.select_file_upload_method()
-        if len(files) > 0:
-            self.files = files
-            return files
-        # get files from appropriate source's menu selection
-        if Settings.get_source() == Source.REMOTE:
-            files = Remote.get_files()
-            if len(files) > 0:
-                self.files = files
-                return files
-        elif Settings.get_source() == Source.LOCAL:
-            files = File.get_files()
-            if len(files) > 0:
-                self.files = files
-                return files
-        elif Settings.get_source() == Source.IPFS:
-            files = IPFS.get_files()
-            if len(files) > 0:
-                self.files = files
-                return files
+        files = File.get_files()
         # if files is empty this all basically just skips to the end and returns blank 
         filed = []
         for file in files:
@@ -280,73 +248,6 @@ class Message():
                     # self.performers.append(getattr("performer", file))
         self.files = filed[:int(Settings.get_upload_max())] # reduce by max
         return self.files
-
-    def get_expiration(self, again=True):
-        """
-        Gets the expiration value if not none else sets it from args or prompts.
-        
-        Parameters
-        ----------
-        again : bool
-            Whether or not it is the script user's first time around.
-
-
-        Returns
-        -------
-        int
-            The expiration as an int
-
-        """
-
-        if self.expiration: return self.expiration
-        # retrieve from args and return if exists
-        expires = Settings.get_expiration() or 0
-        if expires: 
-            self.expiration = expires
-            return expires
-        # prompt skip
-        if not Settings.prompt("expiration"): return 0
-        question = {
-            'type': 'input',
-            'name': 'expiration',
-            'message': 'Expiration [1, 3, 7, 99 (\'No Limit\')]',
-            'validate': ExpirationValidator
-        }
-        expiration = prompt(question)["expiration"]
-        # confirm expiration
-        if not Settings.confirm(expiration): return self.get_expiration(again=again)
-        self.expiration = expiration
-        return self.expiration
-
-    def get_poll(self, again=True):
-        """
-        Gets the poll value if not none else sets it from args or prompts.
-        
-        Parameters
-        ----------
-        again : bool
-            Whether or not it is the script user's first time around.
-
-
-        Returns
-        -------
-        Poll
-            Poll object with proper values
-
-        """
-
-        # check if poll is ready
-        if self.poll and self.poll.check(): return self.poll
-        else: return None
-        # prompt skip
-        if not Settings.prompt("poll"): return None
-        poll = Poll()
-        # ensure the poll has non default values
-        poll.get()
-        # checks if poll is valid, uses Settings.confirm
-        if not poll.check(): return self.get_poll(again=again)
-        self.poll = poll
-        return poll
 
     def get_price(self, again=True):
         """
@@ -380,7 +281,7 @@ class Message():
             'filter': lambda val: int(val)
         }
         price = prompt(question)["price"]
-        if not Settings.confirm(price): return self.get_price(again=again)
+        # if not Settings.confirm(price): return self.get_price(again=again)
         self.price = int(price)
         return int(price)
 
@@ -404,36 +305,46 @@ class Message():
             user = Settings.get_user()
             users = [Settings.get_user()]
             self.users = users
-        if not Settings.confirm(users): return self.get_recipients(again=again)
+        # if not Settings.confirm(users): return self.get_recipients(again=again)
         return users
-
-    def get_schedule(self, again=True):
-        """
-        Gets the schedule value if not none else sets it from args or prompts.
         
-        Parameters
-        ----------
-        again : bool
-            Whether or not it is the script user's first time around.
+    def send(self):
+        """
+        Sends a message.
 
 
         Returns
         -------
-        Schedule
-            Schedule object with proper values
+        bool
+            Whether or not sending the message was successful.
 
         """
+        try:
+            self.init()
+            Settings.print("message > {}".format(self))
+            # if not Settings.confirm("Send message?"): return False
+            if not self.get_files() and self.get_text() == "":
+                Settings.err_print("Missing files and text!")
+                return False
+            try: 
+                successes = 0
+                failures = 0
+                for user in self.get_users():
+                    successful = User.message_user(self)
+                    if successful: successes+=1
+                    else: failures+=1
+            except Exception as e:
+                Settings.dev_print(e)
+                failures+=1
+            Settings.maybe_print("successful: {}".format(successes))
+            Settings.maybe_print("failed: {}".format(failures))
+            self.cleanup()
+            if successes > failures: return True
+        except Exception as e:
+            Settings.dev_print(e)
+        Settings.print("something went wrong! shnarrnf!")
+        return False
 
-        if self.schedule: return self.schedule
-        # prompt skip
-        if not Settings.prompt("schedule"): return None
-        schedule = Schedule()
-        schedule.get()
-        # checks if schedule is valid, uses Settings.confirm
-        if not schedule.check(): return self.get_schedule(again=again)
-        self.schedule = schedule
-        return schedule
-        
     def get_text(self, again=True):
         """
         Gets the text value if not none else sets it from args or prompts.
@@ -470,7 +381,7 @@ class Message():
         }
         text = prompt(question)["text"]
         # confirm text
-        if not Settings.confirm(text): return self.get_text(again=again)
+        # if not Settings.confirm(text): return self.get_text(again=again)
         self.text = text
         return self.text
 
@@ -498,44 +409,146 @@ class Message():
         text = self.update_tags(text)
         return text
 
-    def send_message(self):
+    def get_users():
+        users = self.users
+    
+
+    def update_keywords(self, text):
+        """Sets keywords from this object's file's title"""
+
+        return
+        if len(self.get_tags()) == 0 and len(self.get_files()) > 0:
+            self.keywords = self.files[0].get_parent()["title"].split(" ")
+            for keyword in self.keywords:
+                if str(keyword) in str(self.text):
+                    self.keywords = []
+            
+
+class Post(Message):
+    """OnlyFans message (and post) class"""
+
+    def __init__(self):
         """
-        Sends a message.
+        OnlyFans post object
+
+        A post is just a message on a profile with different options made available. So all posts are messages, as all messages are messages.
+            Squares and rectangles.
+
+        """
+
+        super().__init__()
+        self.expiration = 0
+        self.poll = None
+        self.schedule = None
+
+    # def __str__(self):
+    #     return "fooPost"
+
+    def init(self):
+        """Initialize."""
+
+        super().init()
+        self.__initialized__ = False
+        self.get_poll()
+        self.get_schedule()
+        self.get_expiration()
+        self.__initialized__ = True
+
+    def get_expiration(self, again=True):
+        """
+        Gets the expiration value if not none else sets it from args or prompts.
+        
+        Parameters
+        ----------
+        again : bool
+            Whether or not it is the script user's first time around.
 
 
         Returns
         -------
-        bool
-            Whether or not sending the message was successful.
+        int
+            The expiration as an int
 
         """
-        try:
-            self.init(type_=Types.MESSAGE)
-            Settings.print("> {}".format(self))
-            if not Settings.confirm("Send message?"): return False
-            if not self.get_files() and self.get_text() == "":
-                Settings.err_print("Missing files and text!")
-                return False
-            try: 
-                successes = 0
-                failures = 0
-                for user in self.users:
-                    successful = User.message_user(self)
-                    if successful: successes+=1
-                    else: failures+=1
-            except Exception as e:
-                Settings.dev_print(e)
-                failures+=1
-            Settings.maybe_print("successful: {}".format(successes))
-            Settings.maybe_print("failed: {}".format(failures))
-            self.cleanup()
-            if successes > failures: return True
-        except Exception as e:
-            Settings.dev_print(e)
-        Settings.print("something went wrong! shnarrnf!")
-        return False
 
-    def send_post(self):
+        if self.expiration: return self.expiration
+        # retrieve from args and return if exists
+        expires = Settings.get_expiration() or 0
+        if expires: 
+            self.expiration = expires
+            return expires
+        # prompt skip
+        if not Settings.prompt("expiration"): return 0
+        question = {
+            'type': 'input',
+            'name': 'expiration',
+            'message': 'Expiration [1, 3, 7, 99 (\'No Limit\')]',
+            'validate': ExpirationValidator
+        }
+        expiration = prompt(question)["expiration"]
+        # confirm expiration
+        # if not Settings.confirm(expiration): return self.get_expiration(again=again)
+        self.expiration = expiration
+        return self.expiration
+
+    def get_poll(self, again=True):
+        """
+        Gets the poll value if not none else sets it from args or prompts.
+        
+        Parameters
+        ----------
+        again : bool
+            Whether or not it is the script user's first time around.
+
+
+        Returns
+        -------
+        Poll
+            Poll object with proper values
+
+        """
+
+        # check if poll is ready
+        if self.poll and self.poll.check(): return self.poll
+        else: return None
+        # prompt skip
+        if not Settings.prompt("poll"): return None
+        poll = Poll()
+        # ensure the poll has non default values
+        poll.get()
+        # checks if poll is valid, uses Settings.confirm
+        # if not poll.check(): return self.get_poll(again=again)
+        self.poll = poll
+        return poll
+
+    def get_schedule(self, again=True):
+        """
+        Gets the schedule value if not none else sets it from args or prompts.
+        
+        Parameters
+        ----------
+        again : bool
+            Whether or not it is the script user's first time around.
+
+
+        Returns
+        -------
+        Schedule
+            Schedule object with proper values
+
+        """
+
+        if self.schedule: return self.schedule
+        # prompt skip
+        if not Settings.prompt("schedule"): return None
+        schedule = Schedule()
+        schedule.get()
+        # checks if schedule is valid, uses Settings.confirm
+        # if not schedule.check(): return self.get_schedule(again=again)
+        self.schedule = schedule
+        return schedule
+
+    def send(self):
         """
         Sends a post.
 
@@ -547,17 +560,16 @@ class Message():
 
         """
         try:
-            self.init(type_=Types.POST)
-            Settings.print("> {}".format(self))
-            if not Settings.confirm("Send post?"): return False
-
+            self.init()
+            Settings.print("post > {}".format(self.get_text()))
+            # if not Settings.confirm("Send post?"): return False
             if not self.get_files() and self.get_text() == "":
                 Settings.err_print("Missing files and text!")
                 return False
             try:
                 successes = 0
                 failures = 0
-                successful = Driver.post(self)
+                successful = Driver.get_driver().post(message=self)
                 if successful: successes+=1
                 else: failures+=1
             except Exception as e:
@@ -569,15 +581,6 @@ class Message():
             if successes > failures: return True
         except Exception as e:
             Settings.dev_print(e)
+            print(e)
         Settings.print("something went wrong! shnarrnf!")
         return False
-
-    def update_keywords(self, text):
-        """Sets keywords from this object's file's title"""
-
-        if len(self.get_tags()) == 0 and len(self.get_files()) > 0:
-            self.keywords = self.files[0].get_parent()["title"].split(" ")
-            for keyword in self.keywords:
-                if str(keyword) in str(self.text):
-                    self.keywords = []
-            
