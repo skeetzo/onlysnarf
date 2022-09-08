@@ -496,7 +496,8 @@
   - added beginnings of IPFS 
 **4.1.8 : 9/7/2022**
   - more code cleanup; debugging process for messages & posts uploading files
-  
+  - switched git branch to development to break things less
+
 ------------------------------------------------------------------------------------
 
 - finish debugging test_message --> fucking svgs preventing file uploads (for Post as well)
@@ -510,6 +511,8 @@
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- update rest of old sh test scripts into python test scripts
 
 - add arg: -profile for user data; or add as a config template
 - add to upload scheme (probably also as a config value): least to greatest (folder sizes)
