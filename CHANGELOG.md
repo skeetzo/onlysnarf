@@ -517,13 +517,15 @@
 ## TODO
 
 - add arg: -profile for user data; or add as a config template
-- add to upload scheme (probably also as a config value): least to greatest (folder sizes)
-- update: backup function to include original folder name -> posted/galleries/$file
-- finish adding docstrings to classes/user.py (doublecheck all others)
 - copy & cleanup all dir structure references
 - add / ensure all default values to config.conf
+- finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleanuping up code
 
+(once downloads and uploads function again)
+- update: backup function to include original folder name -> posted/galleries/$file
+- add to upload scheme (probably also as a config value): least to greatest (folder sizes)
 - add tests for additional config variables such as browser and image options
+
 - finish xmas tests
 - finish / update tests
 
@@ -541,6 +543,7 @@
 - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
 - need to add 'create' to Profile for asking for profile settings when syncing to
 
+(once app works again)
 -> Twitter
 - needs a dummy account to test actual tweeting w/
 - tweet reminders from inlaid config behavior
