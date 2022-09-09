@@ -5,9 +5,6 @@ from pathlib import Path
 # Defaults 
 ##
 
-ACTIONS = [ "discount", "message", "post", "profile", "promotion" ]
-	# "bot",
-
 SOURCES = [ "local","remote" ]
 
 CATEGORIES = [ "images", "galleries", "videos", "performers" ]

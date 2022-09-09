@@ -497,10 +497,16 @@
   **4.1.8 : 9/7/2022**
   - more code cleanup; debugging process for messages & posts uploading files
   - switched git branch to development to break things less
-**4.1.9 : 9/8/2022 : God save the Queen**
+  **4.1.9 : 9/8/2022 : God save the Queen**
   - added xmas test; need to add xmas shnarfs for testing
   - cleaned up more test code, still not much headway on uplading a file
   - began updates for rest of old sh test scripts into python test scripts
+**4.1.10 : 9/9/2022**
+  - updated menu.md, updated removed_args.py
+  - cleaned up args & commands & docs of such
+  - add / ensure all default values to config.conf
+  - cleand up config files and example
+  - cleaned up dir structure references across project
 
 ------------------------------------------------------------------------------------
 
@@ -508,23 +514,26 @@
 
 ## Not Working
 
-- cookies: currently prevents saving login session
-- google login: unsafe browser warning
 - browser reconnect / keep open; doesn't reconnect to browser or retain session
+- cookies: currently prevents saving login session
+
+(unlikely to be fixed soon)
+- google login: unsafe browser warning --> possibly end of usability
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- add arg: -profile for user data; or add as a config template
-- copy & cleanup all dir structure references
-- add / ensure all default values to config.conf
+- test changes made from removing / cleaning up args and commands
 - finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleanuping up code
 
 (once downloads and uploads function again)
+- change deletion behavior to preserve better
 - update: backup function to include original folder name -> posted/galleries/$file
 - add to upload scheme (probably also as a config value): least to greatest (folder sizes)
 - add tests for additional config variables such as browser and image options
+
+------------------------------------------------------------------------------------
 
 - finish xmas tests
 - finish / update tests
@@ -542,6 +551,7 @@
 - new - advertise
 - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
 - need to add 'create' to Profile for asking for profile settings when syncing to
+- add config for profile templates when testing profile features again
 
 (once app works again)
 -> Twitter
