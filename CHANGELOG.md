@@ -494,9 +494,13 @@
   - updates code and docstrings in messages.py; left off in file.py 
   - added classes for enums
   - added beginnings of IPFS 
-**4.1.8 : 9/7/2022**
+  **4.1.8 : 9/7/2022**
   - more code cleanup; debugging process for messages & posts uploading files
   - switched git branch to development to break things less
+**4.1.9 : 9/8/2022 : God save the Queen**
+  - added xmas test; need to add xmas shnarfs for testing
+  - cleaned up more test code, still not much headway on uplading a file
+  - began updates for rest of old sh test scripts into python test scripts
 
 ------------------------------------------------------------------------------------
 
@@ -512,24 +516,25 @@
 
 ## TODO
 
-- update rest of old sh test scripts into python test scripts
-
 - add arg: -profile for user data; or add as a config template
 - add to upload scheme (probably also as a config value): least to greatest (folder sizes)
 - update: backup function to include original folder name -> posted/galleries/$file
 - finish adding docstrings to classes/user.py (doublecheck all others)
 - copy & cleanup all dir structure references
 - add / ensure all default values to config.conf
+
+- add tests for additional config variables such as browser and image options
+- finish xmas tests
 - finish / update tests
 
-(once successfully done testing uploading a file)
+(once successfully done testing uploading a file, otherwise pointless endeavor)
 -> IPFS
 - add IPFS integration; dev scripts
 - add to "source" variable "ipfs" for sourcing from IPFS 
 - add to "backup" variable "ipfs" for uploading content to IPFS to host / backup / disseminate
 - integrate IPFS process in such a way as to not "offend" via links ergo pull from IPFS -> upload to OnlyFans (etc) 
 
-(review usability)
+(review usability and code)
 -> Profile
 - new - setup - Twitter -> profile, banner; Price and Settings
 - new - advertise
