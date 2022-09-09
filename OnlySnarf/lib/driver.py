@@ -3303,10 +3303,31 @@ class Driver:
         """
 
         def drag_and_drop_file(drop_target, path):
-            Settings.maybe_print("dragging and dropping...")
-            Settings.dev_print("drop target: {}".format(drop_target.get_attribute("innerHTML")))
-            file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 50, 50)
-            file_input.send_keys(path)
+            try:
+                Settings.maybe_print("dragging and dropping...")
+                Settings.dev_print("drop target: {}".format(drop_target.get_attribute("innerHTML")))
+                print(0)
+                file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 0, 0)
+                file_input.send_keys(path)
+                time.sleep(4)
+                print(1)
+                file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 50, 50)
+                file_input.send_keys(path)
+                time.sleep(4)
+                print(2)
+                file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 100, 100)
+                file_input.send_keys(path)
+                time.sleep(4)
+                print(3)
+                file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 200, 200)
+                file_input.send_keys(path)
+                time.sleep(4)
+                print(4)
+                file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 500, 500)
+                file_input.send_keys(path)
+                time.sleep(4)
+            except Exception as e:
+                print(e) 
 
 
         # enter_file = self.browser.find_element_by_id(Element.get_element_by_name("image_upload").getId())

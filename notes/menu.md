@@ -4,33 +4,54 @@
 
 ## Action
 
+An action is performed by including the required forms of input.
+
 ### Discount
-user: all | recent | new | select | username   
+user: "all" | "recent" | "new" | "select" | "username"   
 amount (%): 0-55  
 months: 1-12  
 
 ### Message
-user: all | recent | new | select | username  
+user: "all" | "recent" | "new" | "select" | "username"
 text: ""  
-image: "/path/to/file"  
+
+(optional)
+category: "image" | "gallery" | "video"
+input: "/path/to/folderOrFile"
+source: "[local, remote, ipfs]"
+destination: "[local, remote, ipfs]"
+
+(optional, requires image)
 price ($): "0.00"  
 
-Message [all, recent, new, username] users $message with $image for $price.
+Message $user users $text possibly with $image for $price.
 
 ### Post
-category: **image** | **gallery** | **video** | **performer**  
 text: ""  
-schedule: "mm/dd/YYYY:HH:MM"  
+
+(optional, "date" & "time" or only "schedule")
 date: "mm/dd/YYYY"  
-time: "HH:MM"  
+time: "HH:MM"
+schedule: "mm/dd/YYYY:HH:MM"  
+
+(optional)
+category: "image" | "gallery" | "video"
+input: "/path/to/folderOrFile"
+source: "[local, remote, ipfs]"
+destination: "[local, remote, ipfs]"
+
 questions: "your mom", "is very hot", "today"  
 duration (poll): 1, 3, 7, 99 or "No limit"  
 expires: 1, 3, 7, 99 or "No limit"  
-keywords: key, words -> #key #words  
+tags: key, words -> #key #words  
 performers: performerName1, performerName2 -> w/ @performerName1 @performerName2  
 
-Upload $category of content from $source as a post with $text, $keywords, and tagged $performers.
-  
+(optional, in development)
+performerIds: performerId1 -> performerName1 -> w/ @performerName1
+
+Upload $category of content from $source as a post with $text, $tags, and detected (or provided) $performers.
+  If provided: enters questions as provided in order, enter's poll duration, expiration, and/or scheduling.
+
 ### User
 **All**: all users  
 **Recent**: users subscribed within last 5 days  
@@ -38,203 +59,137 @@ Upload $category of content from $source as a post with $text, $keywords, and ta
 **Select**: selects User from list  
 **Username**: enter User by username  
 
+### Profile
 
-## Profile
-
-### Backup
+Backup:
 **Content**: Downloads all posted content
 **Messages**: Downloads (roughly) all messaged content
 **Content & Messages**: both of above
 
-### Sync From
-Gets / reads settings from OnlyFans profile and saves locally.
-### Sync To
-Updates / writes settings to OnlyFans profile from local save.
-
 ## args
-OnlySnarf can be run as a promptless script via:
-`onlysnarfpy *args`
+OnlySnarf actions can be fulfilled as a promptless script via:
+`onlysnarfpy /path/to/fileOrDirectory` aka `onlysnarfpy -help`
 
--action [discount|message|post|promotion]
-The action to take.
+/path/to/fileOrDirectory
+The file or folder of content to use.
+
+### General
+
+-config-path /path/to/file
+The path to the config file.
+
+-login [onlyfans|twitter]
+The method to use to log in.
+
+-username
+The OnlyFans username to login as.
+
+### Content
+
+-backup
+Backup uploaded content after upload.
+
+-category [image | gallery | video]
+The category of content to use.
+
+-delete
+Delete content after uploading (instead of backing up).
+
+-destination [local, remote, ipfs]
+Destination for backed up content.
+
+-performers [performerNames or Ids ...]
+The performers to tag with "@" symbols.
+
+-sort [ordered, random, least, greatest]
+The sort method to use when fetching content files.
+
+-source [local, remote, ipfs]
+Source to search for content files.
+
+### OnlySnarf
+
 -amount %
 The amount in percent to discount.
--backup
-Backup uploaded content after upload
--browser [auto|firefox|google|reconnect|remote]
-Browser to connect to. Remote requires $remote-host &| $remote-port or a local session.json file 
--category image  
-Uploads a random image labeled: 'fileName'  
--category gallery  
-Uploads a random gallery labeled: 'folderName'  
--category video  
-Uploads a random video labeled: 'fileName'  
--categories
-The categories / folders to include in searches.
--create-drive
-Enables creating missing folders in Google Drive.
--cron
-Flags the script as a cron operation.
--cron-user
-The user to run cron script as.
--date
+
+-date "01/01/2000"
 The date required for a scheduled post.
--delete-empty
-Delete empty folders when searching for content.
--delete-google
-Enable deleting Google files after upload (after backup if enabled).
--destination
-Destination for backed up content
--download-path
-The download path for files.
--drive-path
-The Google Drive path to the main OnlySnarf content folder.
+
 -duration [0,3,7,99]
 The duration for a post.
--email
-The email to send a promotion to.
+
 -expiration [0,3,7,99]
 The expiration to use for a post.
--force-backup
-Enable forcing backup.
--force-upload
-Enable forcing upload despite long upload time.
--download-max #
-The maximum number of files to download.
--upload-max #
-The maximum number of files to upload.
--keep
-Keep the browser open when finished (allows for reconnect).
--keywords
-The folder by keyword to download & upload.
--promotion-limit
-The max number of subscribers for a promotion.
--login [OnlyFans|Twitter|Google]
-The method to use to log in.
+
 -months
 The number of months to specify for a schedule.
--mount-path
-The location of local data.
--bykeyword
-The keyword to search for content by location.
--notbykeyword
-The keyword to ignore when searching for content by location.
--password
-The password to log in for OnlyFans.
--password_google
-The password to log in for Google.
--password_twitter
-The password to log in for Twitter.
--performers
-The performers to specificy for upload.
--perfer-local
-Whether or not to use local file for referencing users.
+
 -price
 The price to specify for file uploads / messages.
--profile-backup
-Enabled profile backup w/ 'profile' action.
--profile-syncto
-Enabled profile sync to w/ 'profile' action.
--profile-syncfrom
-Enabled profile sync from w/ 'profile' action.
--promotion-user
-Enables user method..
--promotion-trial
--config-path
-The path to the config file.
--google-creds
-The path to the google_credentials.txt file.
--client-secret
-The path to the client_secrets.json file.
--users-path
-The path to the users file.
--profile-path
-The path to the profile file.
--remote-host
-The remote host to connect to for a reconnect.
--remote-port
-The remote port to use for connecting to a reconnect.
--remote-username
-The remote host username for accessing remote content.
--remote-password
-The remote host password for accessing remote content.
--remote-host
-The remote host for accessing remote content.
--remote-port
-The remote port for accessing remote content.
--question
+
+-promotion-expiration
+The expiration to use for a promotion.
+
+-promotion-limit
+The max number of subscribers for a promotion.
+
+-question "text"
 A question to include when posting a questions response. Can be provided in multiple up to 5.
--recent-users-count
--reduce
-Reduce the file size before uploading.
--drive-root
-The Google Drive root folder path.
--save-users
-Enable saving users before exiting browser.
+
 -schedule
 Schedule post for upload via $date and $time
--session-id
-The session id to use for reconnecting.
--session-url
-The session url to use for reconnecting.
--skip-download
-Skip file downloads.
--skip-upload
-Skip file uploads.
--show
-Show web browser.
--source [local, remote, google, dropbox]
-Source to search for content.
+
 -tags
-Tags to @ when creating text.
+Tags to become #tags when creating text.
+
 -text
 Text to be entered upon upload / message.
+
 -time
 Time for scheduled posts.
--title
-Specific title of file to search for remotely. 
--thumbnail
-Fix thumbnail before uploading.
--tweeting
+
+-tweet
 Enable Tweeting (if Twitter connected).
--upload-max-duration
-The number of 10 minute intervals to wait while uploading a file.
+
 -user
 The user by username to specify for operations.
+
 -users
 The users by username to specify for operations.
--users-favorite
-The favorite users by username to specify for favorite operations.
--username
-The OnlyFans username to log in as.
--password
-OnlyFans password for login
--username-google
-Google username for login
--password-google
-OnlyFans password for login
--username_twitter
-Twitter username for login
--password_twitter
-Twitter password for login
--reduce
-Reduce mp4s before uploading
--source [local, google]
-Uses the provided source to search for files.
-/path/to/fileOrDirectory
-Uploads a file or directory of files at path.  
 
 Example:
   `onlysnarfpy -category video -date "12/25/2019" -expires 7`  
 Uploads a random video, schedules it to release at midnight on Christmas, and sets the post to expire after 7 days.  
 
-## Debugging
+## more args
+
+### Selenium
+
+-browser [auto|firefox|google|reconnect|remote]
+Browser to connect to. Remote requires $remote-host &| $remote-port or a local session.json file.
+
+-keep
+Keep the browser open when finished (allows for reconnect).
+
+-save-users
+Enable saving users before exiting browser.
+
+-upload-max-duration
+The number of 10 minute intervals to wait while uploading a file.
+
+### Debugging
 
 -debug  
 Tests configuration. Does not upload or remove from Google Drive.
 
--debug-delay
-Delays certain portions for visual monitoring.
+-force-backup
+Enable forcing backup.
+
+-force-upload
+Enable forcing upload despite long upload time.
+
+-show
+Show web browser.
 
 -verbose
 Shows additional log output (up to 3)
@@ -244,3 +199,65 @@ Prints the version
 
 Complete Debugging:
   `onlysnarfpy -debug -verbose -verbose -verbose -show -debug-delay`
+
+## Config File Only
+
+### Debugging
+
+-debug-delay
+Delays certain portions for visual monitoring.
+
+-debug-firefox
+Enable debugging of Firefox.
+
+-debug-google
+Enable debugging of google chrome.
+
+-download-path
+The download path for files.
+
+-prefer-local: default True
+Whether or not to use local file for referencing users.
+
+-repair
+Try to repair video files.
+
+-skip-download
+Skip file downloads.
+
+-skip-upload
+Skip file uploads.
+
+-skip-users
+Skip specific users by username or id.
+
+-users-read
+The number of users to count when reading messages.
+
+### General
+
+-image-download-max #
+The maximum number of files to download.
+
+-image-upload-max #
+The maximum number of files to upload.
+
+-recent-users-count #
+The number of users to count as "recent".
+
+-reduce
+Reduce the file size before uploading.
+
+## In Development Hell
+
+Sync From: Gets / reads relevant settings from OnlyFans profile and saves locally.
+Sync To: Updates / writes relevant settings to OnlyFans profile from local save.
+
+### Not In Use
+(possibly ever)
+
+-email
+The email to send a promotion to.
+
+-thumbnail
+Fix thumbnail before uploading.

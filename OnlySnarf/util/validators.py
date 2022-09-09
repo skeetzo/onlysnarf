@@ -42,7 +42,7 @@ def valid_promo_duration(s):
 	try:
 		if str(s) in DEFAULT.PROMOTION_DEFAULT.DURATION_ALLOWED: return str(s)
 	except ValueError:
-		msg = "Not a valid duration: '{0}'.".format(s)
+		msg = "Not a valid promo duration: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
 	return int(s)
 
@@ -51,6 +51,13 @@ def valid_expiration(s):
 		if int(s) in DEFAULT.EXPIRATION_ALLOWED: return int(s)
 	except ValueError:
 		msg = "Not a valid expiration: '{0}'.".format(s)
+		raise argparse.ArgumentTypeError(msg)
+
+def valid_promo_expiration(s):
+	try:
+		if int(s) in DEFAULT.PROMOTION_EXPIRATION_ALLOWED: return int(s)
+	except ValueError:
+		msg = "Not a valid promo expiration: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
 
 def valid_limit(s):
