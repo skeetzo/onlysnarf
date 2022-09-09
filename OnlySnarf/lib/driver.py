@@ -3,7 +3,6 @@ import random
 import os
 import shutil
 import json
-# import sys
 import pathlib
 import chromedriver_binary
 import time
@@ -58,7 +57,7 @@ class Driver:
     NOT_INFORMED_KEPT = False # whether or not "Keep"ing the self.browser session has been printed once upon exit
     NOT_INFORMED_CLOSED = False # same dumb shit as above
 
-    def __init__(self, browser=None):
+    def __init__(self):
         """
         Driver object
 
@@ -80,10 +79,23 @@ class Driver:
         # web browser session id and url for reconnecting
         self.session_id = None
         self.session_url = None
-        ##
-        # spawn browser on creation
-        if not self.browser:
-            self.browser = self.spawn()
+
+    def init(self, browser=None):
+        """
+        Initiliaze the web driver aspect.
+
+        Parameters
+        ----------
+        browser : Selenium.webdriver
+            An existing selenium webdriver object / web browser
+
+        """
+
+        self.browser = Driver.spawn_browser(Settings.get_browser_type(), driver=self)
+        ## Cookies
+        if Settings.is_cookies() == "True": self.cookies_load()
+        self.tabs.append([browser.current_url, browser.current_window_handle, 0])
+
         
     def auth(self):
         """
@@ -98,12 +110,8 @@ class Driver:
 
         """
 
-        if not self.logged_in:
-            if not self.login():
-                Settings.err_print("failure to login")
-                return False
-        self.logged_in = True
-        return True
+        if self.logged_in: return True
+        return self.login()
 
     ###################
     ##### Cookies #####
@@ -761,7 +769,7 @@ class Driver:
     ######################################################################
 
     @staticmethod
-    def get_driver():
+    def get_browser():
         """
         Get the default WebDriver object in use or create one
 
@@ -772,8 +780,7 @@ class Driver:
 
         """
         try:
-            if not Driver.DRIVER:
-                Driver.DRIVER = Driver(browser=Driver.BROWSER)
+            if not Driver.DRIVER: Driver.DRIVER = Driver()
             return Driver.DRIVER
         except Exception as e:
             print(e)
@@ -1013,13 +1020,13 @@ class Driver:
         """
 
         def loggedin_check():
-            """Check if already logged in before logging in again"""
+            """Check if already logged in before attempting to login again"""
 
             self.go_to_home(force=True)
             try:
                 ele = self.browser.find_element_by_class_name(Element.get_element_by_name("loginCheck").getClass())
                 if ele: 
-                    Settings.print("Logged into OnlyFans")
+                    Settings.print("already logged into OnlyFans!")
                     return True
             except Exception as e:
                 Settings.dev_print(e)
@@ -1037,9 +1044,9 @@ class Driver:
             """
 
             try:
-                Settings.dev_print("waiting for logincheck")
+                Settings.dev_print("waiting for logincheck...")
                 WebDriverWait(self.browser, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
-                Settings.print("OnlyFans Login Successful")
+                Settings.print("OnlyFans login successful!")
                 Settings.dev_print("login successful - {}".format(which))
                 return True
             except TimeoutException as te:
@@ -1049,7 +1056,7 @@ class Driver:
                 return False
             except Exception as e:
                 Driver.error_checker(e)
-                Settings.print("Google Login Failure: OnlySnarf may require an update")
+                Settings.print("OnlyFans login failure: OnlySnarf may require an update")
                 return False
             return True
         
@@ -1068,38 +1075,27 @@ class Driver:
                 Settings.maybe_print("logging in via form")
                 username = str(Settings.get_username_onlyfans())
                 password = str(Settings.get_password())
-                if not username or username == "":
-                    username = Settings.prompt_email()
-                if not password or password == "":
-                    password = Settings.prompt_password()
+                if not username or username == "": username = Settings.prompt_email()
+                if not password or password == "": password = Settings.prompt_password()
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing onlyfans login info")
                     return False
                 self.go_to_home()
-                # self.browser.find_element_by_xpath("//input[@id='username']").send_keys(username)
                 Settings.dev_print("finding username")
                 self.browser.find_element_by_name("email").send_keys(username)
                 Settings.dev_print("username entered")
                 # fill in password and hit the login button 
-                # password_ = self.browser.find_element_by_xpath("//input[@id='password']")
                 Settings.dev_print("finding password")
                 password_ = self.browser.find_element_by_name("password")
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
-                # time.sleep(10) # wait for potential captcha
-
-                # captcha = self.browser.find_elements_by_id("recaptcha-anchor")
-                # captcha2 = self.browser.find_elements_by_class_name("recaptcha-checkbox")
-                # Settings.print(captcha)
-                # Settings.print(captcha2)
-
                 def check_captcha():
                     try:
                         time.sleep(10) # wait extra long to make sure it doesn't verify obnoxiously
                         el = self.browser.find_element_by_name("password")
                         if not el: return # likely logged in without captcha
-                        Settings.dev_print("waiting for captcha completion by user...")
+                        Settings.print("waiting for captcha completion by user...")
                         # action = webdriver.common.action_chains.ActionChains(self.browser)
                         action = ActionChains(self.browser)
                         action.move_to_element_with_offset(el, 40, 100)
@@ -1118,18 +1114,16 @@ class Driver:
                     except Exception as e:
                         if "Unable to locate element: [name=\"password\"]" not in str(e):
                             Settings.dev_print(e)
-
                 check_captcha()
                 return login_check("form")
             except Exception as e:
                 Settings.dev_print("form login failure")
                 Driver.error_checker(e)
-                Settings.print(e)
             return False
 
         def via_google():
             """
-            Logs in via linked Google account
+            Logs in via linked Google account. (doesn't work)
             
             Returns
             -------
@@ -1154,17 +1148,6 @@ class Driver:
                 [elem for elem in elements if '/auth/google' in str(elem.get_attribute('href'))][0].click()
                 time.sleep(5)
                 username_ = self.browser.switch_to.active_element
-
-                # find part on page with connected user email
-                ## this doesn't appear unless browser is logged into multiple accounts which it isn't cause its new
-                # Settings.get_email()
-                # usernames = self.browser.find_elements_by_xpath("//*[contains(text(), '{}')]".format(Settings.get_email()))
-                # # 2nd mention should be correct place
-                # if len(usernames) == 0:
-                #     Settings.err_print("missing google usernames")
-                #     return False
-                # username = usernames[1]
-                # # self.browser.find("session[username_or_email]").send_keys(username)
                 # then click username spot
                 username_.send_keys(username)
                 username_.send_keys(Keys.ENTER)
@@ -1172,8 +1155,6 @@ class Driver:
                 time.sleep(2)
                 password_ = self.browser.switch_to.active_element
                 # fill in password and hit the login button 
-                # password_ = self.browser.find_element_by_xpath("//input[@id='password']")
-                # password_ = self.browser.find_element_by_name("session[password]")
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
@@ -1198,16 +1179,12 @@ class Driver:
                 Settings.maybe_print("logging in via twitter")
                 username = str(Settings.get_username_twitter())
                 password = str(Settings.get_password_twitter())
-                if not username or username == "":
-                    username = Settings.prompt_username_twitter()
-                if not password or password == "":
-                    password = Settings.prompt_password_twitter()
+                if not username or username == "": username = Settings.prompt_username_twitter()
+                if not password or password == "": password = Settings.prompt_password_twitter()
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing twitter login info")
                     return False
                 self.go_to_home()
-                # twitter = self.browser.find_element_by_xpath(TWITTER_LOGIN3).click()
-                # Settings.dev_print("twitter login clicked")
                 # rememberMe checkbox doesn't actually cause login to be remembered
                 # rememberMe = self.browser.find_element_by_xpath(Element.get_element_by_name("rememberMe").getXPath())
                 # if not rememberMe.is_selected():
@@ -1216,12 +1193,9 @@ class Driver:
                     # Settings.print("Please Login")
                 elements = self.browser.find_elements_by_tag_name("a")
                 [elem for elem in elements if '/twitter/auth' in str(elem.get_attribute('href'))][0].click()
-                # twitter = self.browser.find_element_by_xpath("//a[@class='g-btn m-rounded m-flex m-lg m-with-icon']").click()    
-                # self.browser.find_element_by_xpath("//input[@id='username_or_email']").send_keys(username)
                 self.browser.find_element_by_name("session[username_or_email]").send_keys(username)
                 Settings.dev_print("username entered")
                 # fill in password and hit the login button 
-                # password_ = self.browser.find_element_by_xpath("//input[@id='password']")
                 password_ = self.browser.find_element_by_name("session[password]")
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
@@ -1238,24 +1212,24 @@ class Driver:
             ## Cookies
             if Settings.is_cookies() == "True":
                 self.cookies_save()
+            self.logged_in = True
             return True
 
         successful = loggedin_check()
         if successful: return yasssss() # already logged in
         Settings.print('logging into OnlyFans...')
         try:
-            if Settings.get_login_method() == "auto":
-                successful = via_form()
-                if not successful:
+            match Settings.get_login_method():
+                case Type.AUTO:
+                    successful = via_form()
+                    if not successful: successful = via_twitter()
+                    if not successful: successful = via_google()
+                case Type.ONLYFANS:
+                    successful = via_form()
+                case Type.TWITTER:
                     successful = via_twitter()
-                if not successful:
+                case Type.GOOGLE:
                     successful = via_google()
-            elif Settings.get_login_method() == "onlyfans":
-                successful = via_form()
-            elif Settings.get_login_method() == "twitter":
-                successful = via_twitter()
-            elif Settings.get_login_method() == "google":
-                successful = via_google()
             if not successful:
                 Settings.print("OnlyFans login failed!")
                 return False
@@ -1865,7 +1839,6 @@ class Driver:
         if not auth_: return False
         Settings.dev_print("posting")
         try:
-            # WEB_DRIVER = Driver.get_driver()
             self.go_to_home()
             message.init()
             files = message.get_files()
@@ -2841,29 +2814,8 @@ class Driver:
     ##### Spawn #####
     #################
 
-    def spawn(self):
-        """
-        Spawn browser.
-
-        Returns
-        -------
-        Selenium.WebDriver
-            The created WebDriver browser element
-
-        """
-
-        browser = Driver.spawn_browser(driver=self)
-        if not browser: return None
-        self.browser = browser
-        ## Cookies
-        if Settings.is_cookies() == "True":
-            self.cookies_load()
-        self.tabs.append([browser.current_url, browser.current_window_handle, 0])
-        Driver.DRIVERS.append(self)
-        return self.browser
-
     @staticmethod
-    def spawn_browser(driver=None):
+    def spawn_browser(browserType, driver=None):
         """
         Spawns a browser according to args.
 
@@ -2881,8 +2833,129 @@ class Driver:
 
         """
 
-        type_ = None
-        def google():
+        if Settings.is_debug("selenium") == "False":
+            import logging
+            from selenium.webdriver.remote.remote_connection import LOGGER
+            LOGGER.setLevel(logging.WARNING)
+            # logging.getLogger("requests").setLevel(logging.WARNING)
+            logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+        def attempt_reconnect(reconnect_id=None, url=None):
+            """
+            Reconnect to the corresponding session id and url.
+
+            Parameters
+            ----------
+            reconnect_id : int
+                The saved reconnect id to use
+            url : str
+                The saved url to reconnect with
+
+            Returns
+            -------
+            bool
+                Whether or not the reconnect was successful
+
+            """
+
+            if reconnect_id and url:
+                Settings.maybe_print("reconnecting to web browser...")
+                Settings.dev_print("reconnect id: {}".format(reconnect_id))
+                Settings.dev_print("reconnect url: {}".format(url))
+                # https://stackoverflow.com/questions/8344776/can-selenium-interact-with-an-existing-browser-session
+                original_execute = WebDriver.execute
+                def new_command_execute(self, command, params=None):
+                    if command == "newSession":
+                        # Mock the response
+                        return {'success': 0, 'value': None, 'sessionId': reconnect_id}
+                    else:
+                        return original_execute(self, command, params)
+                # Patch the function before creating the browser object
+                WebDriver.execute = new_command_execute
+                browser = webdriver.Remote(command_executor=url, desired_capabilities={})
+                browser.session_id = reconnect_id
+                # Replace the patched function with original function
+                WebDriver.execute = original_execute
+
+                browser.title # fails check with: 'NoneType' object has no attribute 'title'
+                Settings.print("browser reconnected")
+
+
+                return browser
+            except Exception as e:
+                if str(e) != "'NoneType' object has no attribute 'title'":
+                    Settings.dev_print(e)
+                else:
+                    Settings.maybe_print(e)
+                Settings.err_print("unable to reconnect")
+                return None
+            else:     
+                Settings.dev_print("missing reconnect id or url")
+            return None
+
+        def attempt_remote():
+            """
+            Connect to remote Selenium webdriver
+
+            Returns
+            -------
+            bool
+                Whether or not the remote connection was successful
+
+            """
+
+            def attempt_firefox():
+                Settings.dev_print("attempting remote: firefox")
+                try:
+                    firefox_options = webdriver.FirefoxOptions()
+                    if Settings.is_show_window() == "False":
+                        firefox_options.add_argument('--headless')
+                    dC = DesiredCapabilities.FIREFOX
+                    browser = webdriver.Remote(
+                       command_executor=link,
+                       desired_capabilities=dC,
+                       options=firefox_options)
+                    Settings.print("remote browser created - firefox")
+                    return browser
+                except Exception as e:
+                    Settings.dev_print(e)
+            def attempt_chrome():
+                Settings.dev_print("attempting remote: chrome")
+                try:
+                    chrome_options = webdriver.ChromeOptions()
+                    if Settings.is_show_window() == "False":
+                        chrome_options.add_argument('--headless')
+                    dC = DesiredCapabilities.CHROME
+                    browser = webdriver.Remote(
+                       command_executor=link,
+                       desired_capabilities=dC,
+                       options=chrome_options)
+                    Settings.print("remote browser created - chrome")
+                    return browser
+                except Exception as e:
+                    Settings.dev_print(e)
+            try:
+                host = Settings.get_remote_browser_host()
+                port = Settings.get_remote_browser_port()
+                link = 'http://{}:{}/wd/hub'.format(host, port)
+                Settings.dev_print(link)
+                if Settings.get_browser_type() == "remote-firefox":
+                    successful_driver = attempt_firefox()
+                elif Settings.get_browser_type() == "remote-chrome":
+                    successful_driver = attempt_chrome()
+                else:
+                    successful_driver = attempt_firefox()
+                    if not successful_driver or successful_driver == None:
+                        successful_driver = attempt_chrome()
+                if not successful_driver or successful_driver == None:
+                    Settings.err_print("unable to connect remotely")
+                return successful_driver
+            except Exception as e:
+                Settings.maybe_print(e)
+                Settings.err_print("unable to connect remotely")
+                return False
+
+        def spawn_chrome():
             """
             Spawn a Google browser
             
@@ -2956,7 +3029,7 @@ class Driver:
                 Settings.warn_print("missing chromedriver")
                 return False
 
-        def firefox():
+        def spawn_geckodriver():
             """
             Spawn a Firefox browser
             
@@ -2999,195 +3072,48 @@ class Driver:
                 Settings.warn_print("missing geckodriver")
                 return False
 
-        def reconnect(reconnect_id=None, url=None):
-            """
-            Reconnect to the corresponding session id and url.
+        ################################################################################################################################################
+        ################################################################################################################################################
+        ################################################################################################################################################
 
-            Parameters
-            ----------
-            reconnect_id : int
-                The saved reconnect id to use
-            url : str
-                The saved url to reconnect with
+        Settings.print("spawning web browser...")
 
-            Returns
-            -------
-            bool
-                Whether or not the reconnect was successful
-
-            """
-
-            if reconnect_id and url:
-                Settings.maybe_print("reconnecting to web browser...")
-                Settings.dev_print("reconnect id: {}".format(reconnect_id))
-                Settings.dev_print("reconnect url: {}".format(url))
-                # executor_url = browser.command_executor._url
-                # session_id = browser.session_id
-                # https://stackoverflow.com/questions/8344776/can-selenium-interact-with-an-existing-browser-session
-                # def attach_to_session(executor_url, session_id):
-                original_execute = WebDriver.execute
-                def new_command_execute(self, command, params=None):
-                    if command == "newSession":
-                        # Mock the response
-                        return {'success': 0, 'value': None, 'sessionId': reconnect_id}
-                    else:
-                        return original_execute(self, command, params)
-                # Patch the function before creating the browser object
-                WebDriver.execute = new_command_execute
-                browser = webdriver.Remote(command_executor=url, desired_capabilities={})
-                browser.session_id = reconnect_id
-                # Replace the patched function with original function
-                WebDriver.execute = original_execute
-                # if Settings.use_tabs():
-                #     tabs = len(driver.window_handles) - 1
-                #     tabNumber = int(Settings.use_tabs())
-                #     Settings.dev_print("tabs: {} " {} :tabNumber".format(tabs, tabNumber))
-                #     if int(tabNumber) == 0: pass # nothing required
-                #     if int(tabNumber) > int(tabs):
-                #         browser.execute_script('''window.open("{}","_blank");'''.format(ONLYFANS_HOME_URL))
-                #     elif int(tabNumber) <= int(tabs):
-                #         browser.switch_to.window(browser.window_handles[tabNumber])
-                #     time.sleep(2)
-                return browser
-            if driver and driver.session_id and driver.session_url:
-                return reconnect(reconnect_id=driver.session_id, url=driver.session_url)
-            elif Settings.get_reconnect_id() and Settings.get_reconnect_url():
-                return reconnect(reconnect_id=Settings.get_reconnect_id(), url=Settings.get_reconnect_url())
-            try:
-                id_, url_ = Settings.read_session_data()
-                if id_ and url_: return reconnect(reconnect_id=id_, url=url_)
-            except Exception as e:
-                Settings.maybe_print(e)
-                Settings.err_print("unable to connect to remote server")
-                return None        
-            Settings.dev_print("missing reconnect id or url")
-            return None
-
-        def remote():
-            """
-            Connect to remote Selenium webdriver
-
-            Returns
-            -------
-            bool
-                Whether or not the remote connection was successful
-
-            """
-
-            Settings.maybe_print("spawning remote browser...")
-            def attempt_firefox():
-                Settings.dev_print("attempting remote: firefox")
-                try:
-                    firefox_options = webdriver.FirefoxOptions()
-                    if Settings.is_show_window() == "False":
-                        firefox_options.add_argument('--headless')
-                    dC = DesiredCapabilities.FIREFOX
-                    browser = webdriver.Remote(
-                       command_executor=link,
-                       desired_capabilities=dC,
-                       options=firefox_options)
-                    Settings.print("remote browser created - firefox")
-                    return browser
+        browser = None
+        match browserType:
+            case Type.AUTO:
+                try:                
+                    id_, url_ = Settings.read_session_data()
+                    browser = attempt_reconnect(reconnect_id=id_, url=url_)
+                    if not browser: browser = attempt_remote()
+                    if not browser: browser = spawn_chrome()
+                    if not browser: browser = spawn_geckodriver()
                 except Exception as e:
-                    Settings.dev_print(e)
-            def attempt_chrome():
-                Settings.dev_print("attempting remote: chrome")
-                try:
-                    chrome_options = webdriver.ChromeOptions()
-                    if Settings.is_show_window() == "False":
-                        chrome_options.add_argument('--headless')
-                    dC = DesiredCapabilities.CHROME
-                    browser = webdriver.Remote(
-                       command_executor=link,
-                       desired_capabilities=dC,
-                       options=chrome_options)
-                    Settings.print("remote browser created - chrome")
-                    return browser
-                except Exception as e:
-                    Settings.dev_print(e)
-            try:
-                host = Settings.get_remote_browser_host()
-                port = Settings.get_remote_browser_port()
-                link = 'http://{}:{}/wd/hub'.format(host, port)
-                Settings.dev_print(link)
-                if Settings.get_browser_type() == "remote-firefox":
-                    successful_driver = attempt_firefox()
-                elif Settings.get_browser_type() == "remote-chrome":
-                    successful_driver = attempt_chrome()
-                else:
-                    successful_driver = attempt_firefox()
-                    if not successful_driver or successful_driver == None:
-                        successful_driver = attempt_chrome()
-                if not successful_driver or successful_driver == None:
-                    Settings.err_print("unable to connect remotely")
-                return successful_driver
-            except Exception as e:
-                Settings.maybe_print(e)
-                Settings.err_print("unable to connect remotely")
-                return False
+                    Settings.maybe_print("failed to reconnect")
+                    if str(e) != "'NoneType' object has no attribute 'title'":
+                        Settings.dev_print(e)
+            case Type.RECONNECT:
+                 id_, url_ = Settings.read_session_data()
+                browser = attempt_reconnect(reconnect_id=id_, url=url_)
+            case Type.REMOTE:
+                browser = attempt_remote()
+            case Type.GOOGLE:
+                browser = spawn_chrome()
+            case Type.FIREFOX:
+                browser = spawn_geckodriver()
 
-        BROWSER_TYPE = Settings.get_browser_type()
-
-        if Settings.is_debug("selenium") == "False":
-            import logging
-            from selenium.webdriver.remote.remote_connection import LOGGER
-            LOGGER.setLevel(logging.WARNING)
-            # logging.getLogger("requests").setLevel(logging.WARNING)
-            logging.getLogger("urllib3").setLevel(logging.WARNING)
-
-        def auto(browser_):
-            if "remote" in BROWSER_TYPE and not browser_:
-                browser_ = remote()
-            if not browser:
-                browser_ = firefox()
-                if not browser_:
-                    browser_ = google()
-            return browser_
-
-        Settings.print("creating web browser...")
-
-        if BROWSER_TYPE == "google":
-            browser = google()
-        elif BROWSER_TYPE == "firefox":
-            browser = firefox()
-        elif "auto" in BROWSER_TYPE:
-            try:
-                browser = reconnect()
-                browser.title # fails check with: 'NoneType' object has no attribute 'title'
-                Settings.print("browser reconnected")
-                Settings.maybe_print("successful reconnect")
-                browser = auto(browser)
-            except Exception as e:
-                Settings.maybe_print("failed to reconnect")
-                if str(e) != "'NoneType' object has no attribute 'title'":
-                    Settings.dev_print(e)
-                browser = auto(None)
-        elif "remote" in str(BROWSER_TYPE):
-            browser = remote()
-        elif BROWSER_TYPE == "reconnect":
-            try:
-                browser = reconnect()
-                browser.title # fails check with: 'NoneType' object has no attribute 'title'
-                Settings.print("browser reconnected")
-                Settings.maybe_print("successful reconnect")
-            except Exception as e:
-                Settings.maybe_print("failed to reconnect")
-                if str(e) != "'NoneType' object has no attribute 'title'":
-                    Settings.dev_print(e)
-                browser = None
-        else: browser = None
         if Settings.is_keep() == "True":
             Settings.write_session_data(browser.session_id, browser.command_executor._url)
             if driver:
                 driver.session_id = browser.session_id
                 driver.session_url = browser.command_executor._url
+
         if not browser:
-            Settings.err_print("unable to spawn browser")
-            # sys.exit(1)
+            Settings.err_print("unable to spawn browser!")
             os._exit(1)
+
         browser.implicitly_wait(30) # seconds
         browser.set_page_load_timeout(1200)
-        browser.file_detector = LocalFileDetector()
+        browser.file_detector = LocalFileDetector() # for uploading via remote sessions
         if not Driver.BROWSER: Driver.BROWSER = browser
         Driver.BROWSERS.append(browser)
         return browser

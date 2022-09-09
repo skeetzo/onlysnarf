@@ -1,5 +1,5 @@
 
-from .validators import valid_amount, valid_price,
+from .validators import valid_amount, valid_price
 from .validators import valid_date, valid_month, valid_schedule, valid_time
 from .validators import valid_duration, valid_expiration, valid_limit
 from .validators import valid_promo_duration, valid_promo_expiration
