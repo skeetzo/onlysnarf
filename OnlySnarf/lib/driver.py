@@ -1647,6 +1647,44 @@ class Driver:
         return users
 
 
+    def move_to_then_click_element(self, element):
+        """
+        Move to then click element.
+        
+        From: https://stackoverflow.com/questions/44777053/selenium-movetargetoutofboundsexception-with-firefox
+
+        Parameters
+        ----------
+        element : Selenium.WebDriver.WebElement
+            The element to move to then click
+
+        """
+
+        def scroll_shim(passed_in_driver, object):
+            x = object.location['x']
+            y = object.location['y']
+            scroll_by_coord = 'window.scrollTo(%s,%s);' % (
+                x,
+                y
+            )
+            scroll_nav_out_of_way = 'window.scrollBy(0, -120);'
+            passed_in_driver.execute_script(scroll_by_coord)
+            passed_in_driver.execute_script(scroll_nav_out_of_way)
+        #
+        try:
+            ActionChains(self.browser).move_to_element(element).click().perform()
+        except Exception as e:
+            Settings.dev_print(e)
+            if 'firefox' in self.browser.capabilities['browserName']:
+                scroll_shim(self.browser, element)
+            try:
+                ActionChains(self.browser).move_to_element(element).click().perform()
+            except Exception as e:
+                Settings.dev_print(e)
+            # self.browser.execute_script("arguments[0].scrollIntoView();", ele)
+                self.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
+                ActionChains(self.browser).move_to_element(element).click().perform()
+
 
     ####################################################################################################
     ####################################################################################################
@@ -2181,16 +2219,7 @@ class Driver:
             # enter copied paste into new post
             # get text in new post
             # email link to user
-            
-            # Actions actions = new Actions(Driver.driver);
-            # actions.sendKeys(Keys.chord(Keys.LEFT_CONTROL, "v")).build().perform();
-            # sendemail(from_addr    = 'python@RC.net', 
-            #   to_addr_list = ['RC@gmail.com'],
-            #   cc_addr_list = ['RC@xx.co.uk'], 
-            #   subject      = 'Howdy', 
-            #   message      = 'Howdy from a python function', 
-            #   login        = 'pythonuser', 
-            #   password     = 'XXXXX')
+
             Settings.dev_print("successful promotion trial")
             Settings.debug_delay_check()
             return link
@@ -3240,13 +3269,59 @@ class Driver:
 
         ####
 
+
+        ## TODO
+        ## finish adding / getting the drag and drop to work for files to continue
+        ## being able to upload files; since the svg / button issue doesn't want to allow entering text directly into an input anymore
+
+        JS_DROP_FILE = """
+            var target = arguments[0],
+                offsetX = arguments[1],
+                offsetY = arguments[2],
+                document = target.ownerDocument || document,
+                window = document.defaultView || window;
+
+            var input = document.createElement('INPUT');
+            input.type = 'file';
+            input.onchange = function () {
+              var rect = target.getBoundingClientRect(),
+                  x = rect.left + (offsetX || (rect.width >> 1)),
+                  y = rect.top + (offsetY || (rect.height >> 1)),
+                  dataTransfer = { files: this.files };
+
+              ['dragenter', 'dragover', 'drop'].forEach(function (name) {
+                var evt = document.createEvent('MouseEvent');
+                evt.initMouseEvent(name, !0, !0, window, 0, 0, 0, x, y, !1, !1, !1, !1, 0, null);
+                evt.dataTransfer = dataTransfer;
+                target.dispatchEvent(evt);
+              });
+
+              setTimeout(function () { document.body.removeChild(input); }, 25);
+            };
+            document.body.appendChild(input);
+            return input;
+        """
+
+        def drag_and_drop_file(drop_target, path):
+            Settings.maybe_print("dragging and dropping...")
+            Settings.dev_print("drop target: {}".format(drop_target.get_attribute("innerHTML")))
+            file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 50, 50)
+            file_input.send_keys(path)
+
+
+        # enter_file = self.browser.find_element_by_id(Element.get_element_by_name("image_upload").getId())
+        enter_file = self.browser.find_element_by_id("attach_file_photo")
+
         i = 1
         for file in files_:
             Settings.print('> {} - {}/{}'.format(file.get_title(), i, len(files)))
             i += 1
 
-            # these both result in the bug below
-            enter_file = self.browser.find_element_by_id(Element.get_element_by_name("image_upload").getId())
+            # ActionChains(self.browser).drag_and_drop(enter_file, file.get_path()).perform()
+
+            # textarea = self.browser.find_element_by_id(Element.get_element_by_name("enterText").getId())
+            drag_and_drop_file(enter_file , file.get_path())
+
             # enter_file = self.browser.find_element_by_class_name(Element.get_element_by_name("image_upload").getClass())
 
             ## BUG: ele search is returning the 1st child of the ele instead of the ele itself; happens to be an svg element
@@ -3254,10 +3329,10 @@ class Driver:
             ## FIX: get parent?
 
             # try:
-            enter_file = enter_file.find_element(By.XPATH, "..")
+            # enter_file = enter_file.find_element(By.XPATH, "..")
             # enter_file = enter_file.find_element(By.CSS_SELECTOR, "button")
-            print(enter_file.get_attribute("innerHTML"))
-            enter_file.send_keys(file.get_path())
+            # print(enter_file.get_attribute("innerHTML"))
+            # enter_file.send_keys(file.get_path())
             # except Exception as e:
             #     print(e)
 
@@ -3756,7 +3831,7 @@ class Driver:
                 # Settings.print("{} {}".format(link.get_attribute("href"), link.get_attribute("innerHTML")))
                 if str("/my/lists/"+listNumber) in str(link.get_attribute("href")):
                     Settings.dev_print("clicking list")
-                    move_to_then_click_element(self.browser, link)
+                    self.move_to_then_click_element(link)
                     time.sleep(0.5)
                     Settings.dev_print("successfully clicked list")
             Settings.dev_print("searching for list save")
@@ -3825,7 +3900,7 @@ class Driver:
                         if str(user.username) in str(ele.get_attribute("href")):
                             Settings.maybe_print("found user: {}".format(user.username))
                             # time.sleep(2)
-                            move_to_then_click_element(self.browser, ele)
+                            self.move_to_then_click_element(ele)
                             users.remove(user)
                             clicked = True
                 Settings.print_same_line("({}/{}) scrolling...".format(len(eles), len(users)))
@@ -3853,7 +3928,7 @@ class Driver:
                 return True
             Settings.dev_print("saving list")
             save = self.find_element_by_name("listSave")
-            move_to_then_click_element(self.browser, save)
+            self.move_to_then_click_element(save)
             Settings.dev_print("### successfully added users to list")
         except Exception as e:
             Settings.print(e)
@@ -4000,67 +4075,7 @@ def parse_users(user_ids, starteds, users, usernames):
 
 
 
-import smtplib
-
-def sendemail(from_addr, to_addr_list, cc_addr_list,
-              subject, message,
-              login, password,
-              smtpserver='smtp.gmail.com:587'):
-    header  = 'From: %s\n' % from_addr
-    header += 'To: %s\n' % ','.join(to_addr_list)
-    header += 'Cc: %s\n' % ','.join(cc_addr_list)
-    header += 'Subject: %s\n\n' % subject
-    message = header + message
- 
-    server = smtplib.SMTP(smtpserver)
-    server.starttls()
-    server.login(login,password)
-    problems = server.sendmail(from_addr, to_addr_list, message)
-    server.quit()
-    return problems
 
 
 
 
-
-
-
-def move_to_then_click_element(browser, element):
-    """
-    Move to then click element.
-    
-    From: https://stackoverflow.com/questions/44777053/selenium-movetargetoutofboundsexception-with-firefox
-
-    Parameters
-    ----------
-    browser : Selenium.WebDriver
-        The browser object to use
-    element : Selenium.WebDriver.WebElement
-        The element to move to then click
-
-    """
-
-    def scroll_shim(passed_in_driver, object):
-        x = object.location['x']
-        y = object.location['y']
-        scroll_by_coord = 'window.scrollTo(%s,%s);' % (
-            x,
-            y
-        )
-        scroll_nav_out_of_way = 'window.scrollBy(0, -120);'
-        passed_in_driver.execute_script(scroll_by_coord)
-        passed_in_driver.execute_script(scroll_nav_out_of_way)
-    #
-    try:
-        ActionChains(browser).move_to_element(element).click().perform()
-    except Exception as e:
-        Settings.dev_print(e)
-        if 'firefox' in browser.capabilities['browserName']:
-            scroll_shim(browser, element)
-        try:
-            ActionChains(browser).move_to_element(element).click().perform()
-        except Exception as e:
-            Settings.dev_print(e)
-        # self.browser.execute_script("arguments[0].scrollIntoView();", ele)
-            browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
-            ActionChains(browser).move_to_element(element).click().perform()
