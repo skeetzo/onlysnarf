@@ -510,6 +510,8 @@
 
 ------------------------------------------------------------------------------------
 
+- either upgrade python version to 3.10 or remove switches in util/driver
+
 - finish debugging test_message --> fucking svgs preventing file uploads (for Post as well)
 
 ## Not Working
