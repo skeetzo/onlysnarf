@@ -127,13 +127,11 @@ class User:
 
         """
 
+        Settings.print("entering message: {} - ${}".format(message["text"], message["price"] or 0))
         try:
-            Settings.print("entering message: {} - ${}".format(message["text"], message["price"] or 0))
-
             # enter the text of the message
             def enter_text(text):
                 return Driver.message_text(text)
-            
             # enter the price to send the message to the user
             def enter_price(price):
                 if not price: return True
@@ -141,7 +139,6 @@ class User:
                     Settings.warn_print("price too low; {} < {}".format(price, Settings.get_price_minimum()))
                     return False
                 return Driver.message_price(price)
-            
             # enter files by filepath while checking for already sent files
             def enter_files(files):
                 # if isinstance(files, str) and str(files) == "unset": return True
@@ -153,21 +150,16 @@ class User:
                         continue
                     self.sent_files.append(file_name)
                 return Driver.upload_files(files)
-                
-            def confirm():
+            def confirm_message():
                 return Driver.message_confirm()
-
             successful = []
             successful.append(enter_text(message["text"]))
             successful.append(enter_price(message["price"]))
             successful.append(enter_files(message["files"]))
-            if all(successful):
-                return confirm()
-
+            if all(successful): return confirm_message()
         except Exception as e:
+            Settings.err_print("message failed!")
             Settings.dev_print(e)
-
-        Settings.print("message failed")
         return False
 
     def equals(self, user):
@@ -211,7 +203,7 @@ class User:
         """
 
         Settings.print("reading user chat: {} - {}".format(self.username, self.id))
-        messages, messages_received, messages_sent = Driver.read_user_messages(username=self.username, user_id=self.id)
+        messages, messages_received, messages_sent = Driver.read_user_messages(self.username, user_id=self.id)
         self.messages = messages
         self.messages_received = messages_received
         self.messages_sent = messages_sent
