@@ -266,11 +266,11 @@ class Profile:
 
     def sync_from_tab(self, tab):
         # syncs profile settings from the specificed tab
-        Driver.get_driver().sync_from_settings_page(profile=self, page=tab)
+        Driver.sync_from_settings_page(profile=self, page=tab)
 
     def sync_to_tab(self, tab):
         # syncs profile settings to the specificed tab
-        Driver.get_driver().sync_to_settings_page(profile=self, page=tab)
+        Driver.sync_to_settings_page(profile=self, page=tab)
 
     @staticmethod
     def get_country_list():

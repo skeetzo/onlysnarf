@@ -63,7 +63,7 @@ class Promotion:
             if not Settings.prompt("Promotion"): return False
         from .driver import Driver
         # get default driver and apply the promotion directly
-        Driver.get_driver().promotion_user_directly(promotion=p)
+        Driver.promotion_user_directly(promotion=p)
         return True
 
     @staticmethod
@@ -101,7 +101,7 @@ class Promotion:
             if not Settings.prompt("Promotion"): return False
         from .driver import Driver
         # get the default driver and enter the promotion campaign
-        Driver.get_driver().promotional_campaign(promotion=p)
+        Driver.promotional_campaign(promotion=p)
         return True
 
     # requires the copy/paste and email steps
@@ -140,7 +140,7 @@ class Promotion:
             if not Settings.prompt("Promotion"): return False
         # limit, expiration, months, user
         from .driver import Driver
-        link = Driver.get_driver().promotional_trial_link(promotion=p)
+        link = Driver.promotional_trial_link(promotion=p)
         # text = "Here's your free trial link!\n"+link
         # Settings.dev_print("Link: "+str(text))
         # Settings.send_email(email, text)
@@ -351,7 +351,7 @@ class Promotion:
         users = User.get_all_users()
         from .driver import Driver
         # get all users from logged in user's 'grandfathered' list
-        users_, name, number = Driver.get_driver().get_list(name="grandfathered")
+        users_, name, number = Driver.get_list(name="grandfathered")
         # remove all users that have already been grandfathered from the list of all users
         # users = [user for user in users if user not in users_] # i guess doesn't work?
         for i, user in enumerate(users[:]):
@@ -374,7 +374,7 @@ class Promotion:
             # add users to 'grandfathered' list prior to discounting
             Settings.maybe_print("grandfathering: {}".format(len(userChunk)))
             try:
-                successful = Driver.get_driver().add_users_to_list(users=userChunk, number=number, name="grandfathered")
+                successful = Driver.add_users_to_list(users=userChunk, number=number, name="grandfathered")
                 # if successful then discount
                 if not successful: return
                 d = Discount() # discount will fill defaults with promotion values

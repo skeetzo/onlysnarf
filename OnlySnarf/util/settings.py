@@ -133,7 +133,7 @@ class Settings:
         return DEFAULT.DISCOUNT_MIN_MONTHS or 0
 
     def get_download_max():
-        return config["image_limit"] or DEFAULT.IMAGE_LIMIT
+        return config["download_limit"] or DEFAULT.IMAGE_LIMIT
         
     def get_drive_ignore():
         return config["notkeyword"] or None
@@ -209,7 +209,7 @@ class Settings:
         return performers
 
     def get_profile_path():
-        return config["profile_path"] or DEFAULT.PROFILE_PATH
+        return config["path_profile"] or DEFAULT.PROFILE_PATH
 
     def get_recent_user_count():
         return config["recent_users_count"] or 0
@@ -327,7 +327,7 @@ class Settings:
         return config["questions"] or []
         
     def get_upload_max():
-        return config["image_limit"] or DEFAULT.IMAGE_LIMIT
+        return config["upload_max"] or DEFAULT.IMAGE_LIMIT
         
     # def get_upload_max_messages():
         # return config["upload_max_messages"] or UPLOAD_MAX_MESSAGES
@@ -341,15 +341,18 @@ class Settings:
     # comma separated string of usernames
     def get_users():
         users = config["users"] or []
+        if str(config["user"]) != "None": users.append(str(config["user"]))
         users = [n.strip() for n in users]
         from ..classes.user import User
         users_ = []
         for user in users:
-            # user = User({})
-            user = User({"username":config["user"]})
-            # setattr(user, "username", config["user"])
-            from ..lib.driver import Driver
-            setattr(user, "driver", Driver.get_driver())
+            if isinstance(user, User):
+                pass
+            elif isinstance(user, str):
+                user = User({"username":user})
+            # BUG (potential): might bug out if the username is for whatever reason all numbers
+            elif isinstance(user, int):
+                user = User({"id":config["user"]})
             users_.append(user)
         return users_
 
@@ -430,21 +433,22 @@ class Settings:
     # Bools
 
     def is_confirm():
-        return Settings.CONFIRM or False
+        return Settings.CONFIRM or config["confirm"] or False
 
     def is_cookies():
         return config["cookies"] or False
 
+    def is_delete():
+        return config["delete"] or False
+
     def is_delete_empty():
         return config["delete_empty"] or False
-
-    def is_prompt():
-        return Settings.PROMPT or False
 
     def is_debug(process=None):
         if process == "firefox": return config["debug_firefox"]
         elif process == "google": return config["debug_google"]
         elif process == "selenium": return config["debug_selenium"]
+        # elif process == "tests": return 
         return config["debug"] or False
 
     def is_debug_delay():
@@ -461,6 +465,9 @@ class Settings:
 
     def is_prefer_local():
         return config["prefer_local"] or False
+
+    def is_prompt():
+        return Settings.PROMPT or config["prompt"] or False
 
     def is_save_users():
         return config["save_users"] or False
@@ -690,6 +697,15 @@ class Settings:
     def set_email(email):
         config["email"] = str(email)
 
+    def set_debug(newValue):
+        if str(newValue) == "tests":
+            # config["confirm"] = False
+            # config["prompt"] = False
+            Settings.CONFIRM = False
+            Settings.PROMPT = False
+        else:
+            config["debug"] = newValue
+
     def set_username(username):
         config["username"] = str(username)
 
@@ -709,13 +725,13 @@ class Settings:
         config["password_twitter"] = str(password)
 
     def set_prefer_local(buul):
-        config["prefer_local"] = bool(buul)
+        config["prefer_local"] = buul
     
     def set_prefer_local_following(buul):
-        config["prefer_local_following"] = bool(buul)
+        config["prefer_local_following"] = buul
 
     def set_prompt(value):
-        Settings.PROMPT = bool(value)
+        Settings.PROMPT = value
 
     def set_setting(key):
         try:

@@ -1,144 +1,58 @@
 import os
 os.environ['ENV'] = "test"
-
 import unittest
 import datetime
-from decimal import Decimal
 
-from OnlySnarf.snarf import Snarf
 from OnlySnarf.util.config import config
+from OnlySnarf.util import defaults as DEFAULT
 from OnlySnarf.lib.driver import Driver
 from OnlySnarf.util.settings import Settings
-from OnlySnarf.util import defaults as DEFAULT
-
-Settings.set_prompt(False)
-config["confirm"] = False
-
-# import warnings
+from OnlySnarf.snarf import Snarf
+# from OnlySnarf.classes.user import User
 
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
+        Settings.set_debug("tests")
         self.test_snarf = Snarf()
-        self.driver = Driver()
-        
-    # @classmethod
-    # def setUpClass(cls):
-    #     ...
 
-        # @classmethod
-        # def tearDownClass(cls):
-        #     ...
-        
     def tearDown(self):
-        Driver.exit_all()
+        Driver.exit()
 
-    def test_login(self):
-        assert self.driver.auth(), "unable to login"
-
-    def test_users(self):
-        config["prefer_local"] = False
-        from OnlySnarf.classes.user import User
-        assert User.get_all_users(), "unable to read users"
-
-    @unittest.skip("broken")
+    @unittest.skip("todo")
     def test_discount(self):
-        config["prefer_local"] = True
         config["amount"] = DEFAULT.DISCOUNT_MIN_AMOUNT
         config["months"] = DEFAULT.DISCOUNT_MIN_MONTHS
-        config["user"] = "zyuzyu22"
+        config["user"] = "randomficus"
         assert self.test_snarf.discount(), "unable to apply discount"
 
-    @unittest.skip("broken")
     def test_message(self):
-        config["prefer_local"] = True
         config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["text"] = "test balls"
-        config["user"] = "zyuzyu22"
+        config["user"] = "randomficus"
         assert self.test_snarf.message(), "unable to send message"
 
-    @unittest.skip("broken")
+    @unittest.skip("works")
     def test_post(self):
         config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["text"] = "test balls"
         assert self.test_snarf.post(), "unable to post message"
 
-    @unittest.skip("broken")
+    @unittest.skip("todo")
     def test_poll(self):
         config["duration"] = DEFAULT.DURATION_ALLOWED[0]
         config["expiration"] = DEFAULT.EXPIRATION_ALLOWED[0]
         config["questions"] = ["suck","my","dick","please?"]
         assert self.test_snarf.post(), "unable to post poll"
 
-    @unittest.skip("broken")
+    @unittest.skip("todo")
     def test_schedule(self):
         today = datetime.date.today()
         tomorrow = today + datetime.timedelta(1) # +1 day
         config["schedule"] = today.strftime("%m-%d-%Y:%H:%M") # "MM-DD-YYYY:HH:MM"
         assert self.test_snarf.post(), "unable to post schedule"
-
-    ## TODO ##
-    ## less important features, test these later
-
-    @unittest.skip("unnecessary")
-    def test_profile_backup(self):
-        config["profile_method"] = "backup"
-        assert self.test_snarf.profile(), "unable to backup profile"
-
-    @unittest.skip("unnecessary")
-    def test_profile_syncfrom(self):
-        config["profile_method"] = "syncfrom"
-        assert self.test_snarf.profile(), "unable to sync from profile"
-
-    @unittest.skip("unnecessary")
-    def test_profile_syncto(self):
-        config["profile_method"] = "syncto"
-        assert self.test_snarf.profile(), "unable to sync to profile"
-
-    @unittest.skip("unnecessary")
-    def test_promotion_campaign(self):
-        config["promotion_method"] = "campaign"
-        assert self.test_snarf.promotion(), "unable to apply promotion: campaign"
-
-    @unittest.skip("unnecessary")
-    def test_promotion_trial(self):
-        config["promotion_method"] = "trial"
-        assert self.test_snarf.promotion(), "unable to apply promotion: trial"
-
-    @unittest.skip("unnecessary")
-    def test_promotion_user(self):
-        config["promotion_method"] = "user"
-        assert self.test_snarf.promotion(), "unable to apply promotion: user"
-
-    @unittest.skip("unnecessary")
-    def test_promotion_grandfather(self):
-        config["promotion_method"] = "grandfather"
-        assert self.test_snarf.promotion(), "unable to apply promotion: grandfather"
-
-    ## TODO ##
-    ## IPFS tests
-
-    @unittest.skip("notready")
-    def test_backup_to_ipfs(self):
-        config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
-        config["text"] = "shnarf!"
-        config["backup"] = True
-        # config["force_backup"] = True
-        config["destination"] = "IPFS"
-        assert self.test_snarf.post(), "unable to backup content to ipfs"
-
-    @unittest.skip("notready")
-    def test_post_from_ipfs(self):
-        config["input"] = "CID" # recognize CID format and automatically attempt to use IPFS
-        config["price"] = DEFAULT.PRICE_MINIMUM
-        config["text"] = "test balls"
-        assert self.test_snarf.post(), "unable to post content from ipfs"
-
-    ## TODO ##
-    ## add tests that include variations of variables such as image limits, download limits, upload limits, 
-    ## add tests for trying different browsers, reconnecting, keeping open, remote sessions
 
 ############################################################################################
 

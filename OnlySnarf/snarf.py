@@ -149,7 +149,7 @@ class Snarf:
 def exit_handler():
     """Exit cleanly"""
 
-    Driver.exit_all()
+    Driver.exit()
     Settings.print("Shnarrf!")
     sys.exit(0)
 
