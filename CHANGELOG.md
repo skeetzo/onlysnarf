@@ -501,7 +501,7 @@
   - added xmas test; need to add xmas shnarfs for testing
   - cleaned up more test code, still not much headway on uplading a file
   - began updates for rest of old sh test scripts into python test scripts
-**4.1.10 : 9/9/2022**
+  **4.1.10 : 9/9/2022**
   - updated menu.md, updated removed_args.py
   - cleaned up args & commands & docs of such
   - add / ensure all default values to config.conf
@@ -530,6 +530,8 @@
 
 - debug: discover the cause of the super slow web scraping
 -- not: debug_delay
+
+- debug: issue in lib/driver with media upload popup from multiple of the same file, maybe Escape out?
 
 ------------------------------------------------------------------------------------
 

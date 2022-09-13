@@ -25,6 +25,7 @@ from selenium.common.exceptions import WebDriverException
 from pathlib import Path
 ##
 from ..classes.element import Element
+from ..util.config import config
 from ..util.settings import Settings
 
 ###################
@@ -32,13 +33,17 @@ from ..util.settings import Settings
 ###################
 
 # Urls
-ONLYFANS_HOME_URL = 'https://onlyfans.com'
-ONLYFANS_MESSAGES_URL = "/my/chats/"
+ONLYFANS_HOME_URL = "https://onlyfans.com"
+ONLYFANS_HOME_URL2 = "https://onlyfans.com/"
+# ONLYFANS_MESSAGES_URL = "/my/chats/"
 ONLYFANS_NEW_MESSAGE_URL = "/my/chats/send"
-ONLYFANS_CHAT_URL = "/my/chats/chat"
+ONLYFANS_CHAT_URL = "/my/chats/chat/"
 ONLYFANS_SETTINGS_URL = "/my/settings/"
 ONLYFANS_USERS_ACTIVE_URL = "/my/subscribers/active"
 ONLYFANS_USERS_FOLLOWING_URL = "/my/subscriptions/active"
+ONLYFANS_LISTS_URL = "/my/lists/"
+# ONLYFANS_CHATS_URL_FULL = "{}{}".format(ONLYFANS_HOME_URL, ONLYFANS_CHAT_URL)
+# ONLYFANS_LISTS_URL_FULL = "{}{}".format(ONLYFANS_HOME_URL, ONLYFANS_LISTS_URL)
 
 class Driver:
     """Driver class for Selenium management"""
@@ -419,7 +424,7 @@ class Driver:
                 # from OnlySnarf.classes.user import User
                 from ..classes.user import User
                 user = random.choice(User.get_all_users())
-            Driver.message_user(username=user.username)
+            Driver.message_user(user.username)
             contentCount = 0
             while True:
                 Driver.browser.execute_script("document.querySelector('div[id=chatslist]').scrollTop=1e100")
@@ -595,6 +600,7 @@ class Driver:
             element = Element.get_element_by_name("errorUpload")
             error_buttons = Driver.browser.find_elements_by_class_name(element.getClass())
             Settings.dev_print("errors btns: {}".format(len(error_buttons)))
+            if len(error_buttons) == 0: return True
             for butt in error_buttons:
                 if butt.get_attribute("innerHTML").strip() == "Close" and butt.is_enabled():
                     Settings.maybe_Settings.warn_print("upload error message, closing")
@@ -604,7 +610,7 @@ class Driver:
             return False
         except Exception as e:
             Driver.error_checker(e)
-            return False
+        return False
 
     ######################
     ##### Expiration #####
@@ -870,7 +876,7 @@ class Driver:
         def goto():
             Settings.maybe_print("goto -> onlyfans.com")
             Driver.browser.get(ONLYFANS_HOME_URL)
-            # Driver.open_tab(url=ONLYFANS_HOME_URL)
+            # Driver.open_tab(ONLYFANS_HOME_URL)
             Driver.handle_alert()
             Driver.get_page_load()
         if force: return goto()
@@ -905,7 +911,7 @@ class Driver:
             Driver.browser.execute_script("window.scrollTo(0, 0);")
         else:
             Settings.maybe_print("goto -> {}".format(page))
-            Driver.open_tab(url=page)
+            Driver.open_tab(page)
             Driver.handle_alert()
             Driver.get_page_load()
 
@@ -926,7 +932,7 @@ class Driver:
         else:
             Settings.maybe_print("goto -> {}".format(username))
             # Driver.browser.get("{}{}".format(ONLYFANS_HOME_URL, username))
-            Driver.open_tab(url=page)
+            Driver.open_tab(page)
             # Driver.handle_alert()
             # Driver.get_page_load()
 
@@ -945,10 +951,10 @@ class Driver:
         """
 
         Driver.auth()
-        if Driver.search_for_tab("{}/settings/{}".format(ONLYFANS_SETTINGS_URL, settingsTab)):  
+        if Driver.search_for_tab("{}{}".format(ONLYFANS_SETTINGS_URL, settingsTab)):  
             Settings.maybe_print("found -> settings/{}".format(settingsTab))
             return
-        if str(Driver.browser.current_url) == str(ONLYFANS_SETTINGS_URL) and str(settingsTab) == "profile":
+        if str(ONLYFANS_SETTINGS_URL) in str(Driver.browser.current_url) and str(settingsTab) == "profile":
             Settings.maybe_print("at -> onlyfans.com/settings/{}".format(settingsTab))
             Driver.browser.execute_script("window.scrollTo(0, 0);")
         else:
@@ -1000,7 +1006,7 @@ class Driver:
                 Settings.dev_print(e)
         return False
 
-    def open_tab(url=None):
+    def open_tab(url):
         """
         Open new tab of url
 
@@ -1016,9 +1022,6 @@ class Driver:
 
         """
 
-        if not url:
-            Settings.err_print("missing url")
-            return False
         Settings.maybe_print("tab -> {}".format(url))
         # Driver.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 't')
         # Driver.browser.get(url)
@@ -1038,14 +1041,13 @@ class Driver:
         Driver.browser.switch_to.window(new_window)
         Settings.dev_print("page title after tab switching is : %s" %Driver.browser.title)
         Settings.dev_print("new window handle is : %s" %new_window)
-        if len(Driver.tabs) >= Driver.MAX_TABS:
-            least = Driver.tabs[0]
-            for i, tab in enumerate(Driver.tabs):
-                if int(tab[2]) < int(least[2]):
-                    least = tab
-            Driver.tabs.remove(least)
-        Driver.tabs.append([url, new_window, 0]) # url, window_handle, use count
-        return True
+        # if len(Driver.tabs) >= Driver.MAX_TABS:
+        #     least = Driver.tabs[0]
+        #     for i, tab in enumerate(Driver.tabs):
+        #         if int(tab[2]) < int(least[2]):
+        #             least = tab
+        #     Driver.tabs.remove(least)
+        # Driver.tabs.append([url, new_window, 0]) # url, window_handle, use count
     
     ##################
     ###### Login #####
@@ -1064,7 +1066,7 @@ class Driver:
 
         """
 
-        if Driver.logged_in: return
+        if Driver.logged_in: return True
         Settings.print('logging into OnlyFans for {}...'.format(Settings.get_username()))
 
         def loggedin_check():
@@ -1318,6 +1320,7 @@ class Driver:
             Settings.err_print("missing user to message")
             return False
         try:
+            Settings.dev_print("attempting to start message for {}...".format(username))
             type__ = None # default
             # if the username is a key string it will behave differently
             if str(username).lower() == "all": type__ = "messageAll"
@@ -1331,8 +1334,8 @@ class Driver:
                 Driver.find_element_to_click(type__).click()
                 successful = True
             else:
-                successful = Driver.message_user(username=username, user_id=user_id)
-            Settings.dev_print("successfully started message: {}".format(username))
+                successful = Driver.message_user(username, user_id=user_id)
+            Settings.dev_print("successfully started message for {}".format(username))
             return successful
         except Exception as e:
             Driver.error_checker(e)
@@ -1383,7 +1386,7 @@ class Driver:
             Driver.error_checker(e)
             Settings.err_print("failure to confirm message")
             Settings.dev_print("### Message Failure ###")
-            return False
+        return False
 
     def message_price(price):
         """
@@ -1492,14 +1495,15 @@ class Driver:
             Settings.warn_print("missing user id")
             return False
         try:
-            Driver.go_to_page("{}/{}".format(ONLYFANS_CHAT_URL, user_id))
+            Driver.go_to_page("{}{}".format(ONLYFANS_CHAT_URL, user_id))
+            Settings.dev_print("successfully messaging user id: {}".format(user_id))
             return True
         except Exception as e:
             Driver.error_checker(e)
-            Settings.err_print("failure to goto user - {}".format(user_id))
+            Settings.err_print("failed to message user by id")
             return False
 
-    def message_user(username=None, user_id=None):
+    def message_user(username, user_id=None):
         """
         Message the matching username or user id
 
@@ -1527,7 +1531,7 @@ class Driver:
             time.sleep(5) # for whatever reason this constantly errors out from load times
             elements = Driver.browser.find_elements_by_tag_name("a")
             ele = [ele for ele in elements
-                    if "/my/chats/chat/" in str(ele.get_attribute("href"))]
+                    if ONLYFANS_CHAT_URL in str(ele.get_attribute("href"))]
             if len(ele) == 0:
                 Settings.warn_print("user cannot be messaged - unable to locate id")
                 return False
@@ -1537,9 +1541,10 @@ class Driver:
             # Settings.dev_print("clicking send message")
             # ele.click()
             # Settings.dev_print(ele.get_attribute("href"))
-            Settings.dev_print(ele)
-            Settings.dev_print("successfully messaging username: {}".format(username))
+            Settings.maybe_print("user id found: {}".format(ele.replace(ONLYFANS_HOME_URL2, "")))
             Driver.go_to_page(ele)
+            Settings.dev_print("successfully messaging username: {}".format(username))
+            # return True
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failed to message user")
@@ -1614,9 +1619,9 @@ class Driver:
 
             # for user in users_:
             #     if not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
-            #     Settings.print(str(user.get_attribute("href")).replace("https://onlyfans.com/", ""))
+            #     Settings.print(str(user.get_attribute("href")).replace(ONLYFANS_HOME_URL2, ""))
 
-            #     users.append(str(user.get_attribute("href")).replace("https://onlyfans.com/", ""))
+            #     users.append(str(user.get_attribute("href")).replace(ONLYFANS_HOME_URL2, ""))
 
             for user in user_ids:
                 if not user or not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
@@ -2299,7 +2304,7 @@ class Driver:
 
     ######################################################################
 
-    def read_user_messages(username=None, user_id=None):
+    def read_user_messages(username, user_id=None):
         """
         Read the messages of the target user by username or user id.
 
@@ -2319,7 +2324,7 @@ class Driver:
 
         try:
             # go to onlyfans.com/my/subscribers/active
-            Driver.message_user(username=username, user_id=user_id)
+            Driver.message_user(username, user_id=user_id)
             messages_sent_ = []
             try:
                 messages_sent_ = Driver.find_elements_by_name("messagesFrom")
@@ -2827,129 +2832,18 @@ class Driver:
 
         """
 
+        # if Driver.browser:
+        #     Settings.dev_print("closing existing browser...")
+        #     Driver.browser.quit()
+
         if Settings.is_debug("selenium") == "False":
             import logging
             from selenium.webdriver.remote.remote_connection import LOGGER
             LOGGER.setLevel(logging.WARNING)
             # logging.getLogger("requests").setLevel(logging.WARNING)
-            logging.getLogger("urllib3").setLevel(logging.WARNING)
+            logging.getLogger("urllib3").setLevel(logging.ERROR)
 
-        def attempt_reconnect(reconnect_id=None, url=None):
-            """
-            Reconnect to the corresponding session id and url.
-
-            Parameters
-            ----------
-            reconnect_id : int
-                The saved reconnect id to use
-            url : str
-                The saved url to reconnect with
-
-            Returns
-            -------
-            bool
-                Whether or not the reconnect was successful
-
-            """
-
-            if reconnect_id and url:
-                Settings.maybe_print("reconnecting to web browser...")
-                Settings.dev_print("reconnect id: {}".format(reconnect_id))
-                Settings.dev_print("reconnect url: {}".format(url))
-                # https://stackoverflow.com/questions/8344776/can-selenium-interact-with-an-existing-browser-session
-                original_execute = WebDriver.execute
-                def new_command_execute(command, params=None):
-                    if command == "newSession":
-                        # Mock the response
-                        return {'success': 0, 'value': None, 'sessionId': reconnect_id}
-                    else:
-                        return original_execute(command, params)
-                # Patch the function before creating the browser object
-                WebDriver.execute = new_command_execute
-                browser = webdriver.Remote(command_executor=url, desired_capabilities={})
-                browser.session_id = reconnect_id
-                # Replace the patched function with original function
-                WebDriver.execute = original_execute
-
-                browser.title # fails check with: 'NoneType' object has no attribute 'title'
-                Settings.print("browser reconnected")
-
-
-                return browser
-            # except Exception as e:
-            #     if str(e) != "'NoneType' object has no attribute 'title'":
-            #         Settings.dev_print(e)
-            #     else:
-            #         Settings.maybe_print(e)
-            #     Settings.err_print("unable to reconnect")
-            #     return None
-            else:     
-                Settings.dev_print("missing reconnect id or url")
-            return None
-
-        def attempt_remote():
-            """
-            Connect to remote Selenium webdriver
-
-            Returns
-            -------
-            bool
-                Whether or not the remote connection was successful
-
-            """
-
-            def attempt_firefox():
-                Settings.dev_print("attempting remote: firefox")
-                try:
-                    firefox_options = webdriver.FirefoxOptions()
-                    if Settings.is_show_window() == "False":
-                        firefox_options.add_argument('--headless')
-                    dC = DesiredCapabilities.FIREFOX
-                    browser = webdriver.Remote(
-                       command_executor=link,
-                       desired_capabilities=dC,
-                       options=firefox_options)
-                    Settings.print("remote browser created - firefox")
-                    return browser
-                except Exception as e:
-                    Settings.dev_print(e)
-            def attempt_chrome():
-                Settings.dev_print("attempting remote: chrome")
-                try:
-                    chrome_options = webdriver.ChromeOptions()
-                    if Settings.is_show_window() == "False":
-                        chrome_options.add_argument('--headless')
-                    dC = DesiredCapabilities.CHROME
-                    browser = webdriver.Remote(
-                       command_executor=link,
-                       desired_capabilities=dC,
-                       options=chrome_options)
-                    Settings.print("remote browser created - chrome")
-                    return browser
-                except Exception as e:
-                    Settings.dev_print(e)
-            try:
-                host = Settings.get_remote_browser_host()
-                port = Settings.get_remote_browser_port()
-                link = 'http://{}:{}/wd/hub'.format(host, port)
-                Settings.dev_print(link)
-                if Settings.get_browser_type() == "remote-firefox":
-                    successful_driver = attempt_firefox()
-                elif Settings.get_browser_type() == "remote-chrome":
-                    successful_driver = attempt_chrome()
-                else:
-                    successful_driver = attempt_firefox()
-                    if not successful_driver or successful_driver == None:
-                        successful_driver = attempt_chrome()
-                if not successful_driver or successful_driver == None:
-                    Settings.err_print("unable to connect remotely")
-                return successful_driver
-            except Exception as e:
-                Settings.maybe_print(e)
-                Settings.err_print("unable to connect remotely")
-                return False
-
-        def spawn_chrome():
+        def attempt_chrome():
             """
             Spawn a Google browser
             
@@ -2964,41 +2858,16 @@ class Driver:
             try:
                 options = webdriver.ChromeOptions()
                 options.add_argument("--no-sandbox") # Bypass OS security model
-                # options.add_argument("--disable-setuid-sandbox")
-                # options.add_argument("--disable-dev-shm-usage") # overcome limited resource problems
-                # options.add_argument("--disable-gpu") # applicable to windows os only
                 options.add_argument('--disable-software-rasterizer')
                 if not Settings.is_show_window() == "True":
                     options.add_argument('--headless')
-                    # options.add_argument('--disable-smooth-scrolling')
-                #
                 options.add_argument("--disable-extensions") # disabling extensions
                 options.add_argument("--disable-infobars") # disabling infobars
-                # options.add_argument("--start-maximized")
-                # options.add_argument("--window-size=1920,1080")
-                # options.add_argument("--user-data-dir=/tmp/")
                 options.add_argument("user-data-dir=selenium") 
-                # options.add_argument('--disable-login-animations')
-                # options.add_argument('--disable-modal-animations')
-                # options.add_argument('--disable-sync')
-                # options.add_argument('--disable-background-networking')
-                # options.add_argument('--disable-web-resources')
                 options.add_argument('--ignore-certificate-errors')
-                # options.add_argument('--disable-logging')
-                # options.add_argument('--no-experiments')
-                # options.add_argument('--incognito')
-                # options.add_argument('--user-agent=MozillaYerMomFox')
-                options.add_argument("--remote-debugging-address=localhost")
+                options.add_argument("--remote-debugging-address=localhost")    
                 options.add_argument("--remote-debugging-port=9223")
                 options.add_argument("--allow-insecure-localhost")                
-                # options.add_argument("--acceptInsecureCerts")
-                #
-                # options.add_experimental_option("prefs", {
-                  # "download.default_directory": str(DOWNLOAD_PATH),
-                  # "download.prompt_for_download": False,
-                  # "download.directory_upgrade": True,
-                  # "safebrowsing.enabled": True
-                # })
                 capabilities = {
                   'browserName': 'chrome',
                   'platform': 'LINUX',
@@ -3012,18 +2881,17 @@ class Driver:
                 service_args = []
                 if Settings.is_debug("google"):
                     service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
-                # desired_capabilities = capabilities
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
                 browser = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
                 Settings.print("browser created - chrome")
                 return browser
             except Exception as e:
-                Settings.maybe_print(e)
-                Settings.warn_print("missing chromedriver")
-                return False
+                Settings.warn_print("unable to launch chrome!")
+                Settings.dev_print(e)
+            return None
 
-        def spawn_geckodriver():
+        def attempt_firefox():
             """
             Spawn a Firefox browser
             
@@ -3041,99 +2909,211 @@ class Driver:
                 return False
             try:
                 d = DesiredCapabilities.FIREFOX
-                # d['loggingPrefs'] = {'browser': 'ALL'}
                 options = FirefoxOptions()
                 if Settings.is_debug("firefox") == "True":
                     options.log.level = "trace"
                 if Settings.is_show_window() == "False":
                     options.add_argument("--headless")
-                
                 options.add_argument("--enable-file-cookies")
 
                 # BUG: cookies
                 # added for cookies, doesn't seem to help
                 # opts.add_argument("--user-data-dir=/tmp")
 
-
                 # browser = webdriver.Firefox(options=options, log_path='/var/log/onlysnarf/geckodriver.log')
                 # browser = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, capabilities=d)
                 browser = webdriver.Firefox(options=options, desired_capabilities=d, service_log_path=Settings.get_logs_path("firefox"))
-                # browser = webdriver.Firefox(options=options, desired_capabilities=d)
                 Settings.print("browser created - firefox")
                 return browser
             except Exception as e:
-                Settings.maybe_print(e)
-                Settings.warn_print("missing geckodriver")
-                return False
+                Settings.warn_print("unable to launch firefox!")
+                Settings.dev_print(e)
+            return None
+
+        def attempt_reconnect(driver):
+            """
+            Reconnect to the corresponding session id and url.
+
+            Notes:
+            https://stackoverflow.com/questions/8344776/can-selenium-interact-with-an-existing-browser-session
+            https://stackoverflow.com/questions/47861813/how-can-i-reconnect-to-the-browser-opened-by-webdriver-with-selenium
+
+            Parameters
+            ----------
+            browser : WebDriver
+                An existing (for the running script) WebDriver browser to reconnect the session to, if it exists.
+            reconnect_id : int
+                The saved reconnect id to use
+            url : str
+                The saved url to reconnect with
+
+            Returns
+            -------
+            bool
+                Whether or not the reconnect was successful
+
+            """
+
+            reconnect_id, url = Driver.read_session_data()
+            if not reconnect_id and not url:
+                Settings.maybe_print("unable to read session data")
+                return driver
+            Settings.maybe_print("reconnecting to web browser...")
+            Settings.dev_print("reconnect id: {}".format(reconnect_id))
+            Settings.dev_print("reconnect url: {}".format(url))
+            try:
+                # original_execute = WebDriver.execute
+                # def new_command_execute(command, params=None):
+                #     if command == "newSession":
+                #         # Mock the response
+                #         return {'success': 0, 'value': None, 'sessionId': reconnect_id}
+                #     else:
+                #         return original_execute(command, params)
+                # Patch the function before creating the browser object
+                # WebDriver.execute = new_command_execute
+                browserAttempt = webdriver.Remote(command_executor=url, desired_capabilities={})
+                if browserAttempt.session_id != reconnect_id:   # this is pretty much guaranteed to be the case
+                    browserAttempt.close()   # this closes the session's window - it is currently the only one, thus the session itself will be auto-killed, yet:
+                    browserAttempt.quit()    # for remote connections (like ours), this deletes the session, but does not stop the SE server
+                # take the session that's already running
+                browserAttempt.session_id = reconnect_id
+                # Replace the patched function with original function
+                # WebDriver.execute = original_execute
+                # necessary?
+                driver.title # fails check with: 'NoneType' object has no attribute 'title'
+                Settings.print("browser reconnected!")
+            except Exception as e:
+                Settings.warn_print("unable to reconnect!")
+                Settings.dev_print(e)
+            return driver
+
+        def attempt_remote():
+            """
+            Connect to remote Selenium webdriver
+
+            Returns
+            -------
+            bool
+                Whether or not the remote connection was successful
+
+            """
+
+            link = 'http://{}:{}/wd/hub'.format(config["remote_browser_host"], config["remote_browser_port"])
+            Settings.dev_print("remote url: {}".format(link))
+
+            def attempt(dc, opts):
+                try:
+                    browserAttempt = webdriver.Remote(command_executor=link, desired_capabilities=dc, options=opts)
+                    Settings.print("remote browser created - {}".format(browserType))
+                    return browserAttempt
+                except Exception as e:
+                    Settings.warn_print("unable to connect remotely!")
+                    Settings.dev_print(e)
+                return None
+
+            def chrome_options():
+                try:
+                    Settings.dev_print("attempting remote: chrome")
+                    dC = DesiredCapabilities.CHROME
+                    options = webdriver.ChromeOptions()
+                    if Settings.is_show_window() == "False":
+                        options.add_argument('--headless')
+                    return dC, options
+                except Exception as e:
+                    Settings.dev_print(e)
+                return None, None
+
+            def firefox_options():
+                try:
+                    Settings.dev_print("attempting remote: firefox")
+                    dC = DesiredCapabilities.FIREFOX
+                    options = webdriver.FirefoxOptions()
+                    if Settings.is_show_window() == "False":
+                        options.add_argument('--headless')
+                    return dC, options
+                except Exception as e:
+                    Settings.dev_print(e)
+                return None, None
+
+            if "chrome" in browserType: return attempt(*chrome_options())
+            elif "firefox" in browserType: return attempt(*firefox_options())
+            else: # auto
+                # alphabetical
+                try:
+                    return attempt(*chrome_options())
+                except Exception as e:
+                    Settings.warn_print("unable to connect remotely via chrome!")
+                    Settings.dev_print(e)
+                try:
+                    return attempt(*firefox_options())
+                except Exception as e:
+                    Settings.warn_print("unable to connect remotely via firefox!")
+                    Settings.dev_print(e)
+            return None
 
         ################################################################################################################################################
         ################################################################################################################################################
         ################################################################################################################################################
 
         Settings.print("spawning web browser...")
-
         browser = None
-        # TODO: another case statement for python3.10+
-        # match browserType:
-        #     case "auto":
-        #         try:                
-        #             id_, url_ = Settings.read_session_data()
-        #             browser = attempt_reconnect(reconnect_id=id_, url=url_)
-        #             if not browser: browser = attempt_remote()
-        #             if not browser: browser = spawn_chrome()
-        #             if not browser: browser = spawn_geckodriver()
-        #         except Exception as e:
-        #             Settings.maybe_print("failed to reconnect")
-        #             if str(e) != "'NoneType' object has no attribute 'title'":
-        #                 Settings.dev_print(e)
-        #     case "reconnect":
-        #          id_, url_ = Settings.read_session_data()
-        #         browser = attempt_reconnect(reconnect_id=id_, url=url_)
-        #     case "remote":
-        #         browser = attempt_remote()
-        #     case "google":
-        #         browser = spawn_chrome()
-        #     case "firefox":
-        #         browser = spawn_geckodriver()
-
-        if browserType == "auto":
-            try:                
-                id_, url_ = Settings.read_session_data()
-                browser = attempt_reconnect(reconnect_id=id_, url=url_)
-                if not browser: browser = attempt_remote()
-                if not browser: browser = spawn_chrome()
-                if not browser: browser = spawn_geckodriver()
-            except Exception as e:
-                Settings.maybe_print("failed to reconnect")
-                if str(e) != "'NoneType' object has no attribute 'title'":
-                    Settings.dev_print(e)
-        elif browserType == "reconnect":
-            id_, url_ = Settings.read_session_data()
-            browser = attempt_reconnect(reconnect_id=id_, url=url_)
-        elif browserType == "remote":
+        if "auto" in browserType:
+            # alphabetical
+            browser = attempt_chrome() or attempt_firefox()
+        elif "remote" in browserType:
             browser = attempt_remote()
-        elif browserType == "google":
-            browser = spawn_chrome()
-        elif browserType == "firefox":
-            browser = spawn_geckodriver()
-        else: Settings.print("missing browser type: {}".format(browserType))
-
-        if Settings.is_keep() == "True":
-            Settings.write_session_data(browser.session_id, browser.command_executor._url)
-            # if driver:
-            #     driver.session_id = browser.session_id
-            #     driver.session_url = browser.command_executor._url
+        elif "chrome" in browserType:
+            browser = attempt_chrome()
+        elif "firefox" in browserType:
+            browser = attempt_firefox()
+        if "reconnect" in browserType:
+            if not browser: browser = attempt_chrome() or attempt_firefox()
+            browser = attempt_reconnect(browser)
+        if browser and Settings.is_keep() == "True":
+            Driver.write_session_data(browser.session_id, browser.command_executor._url)
 
         if not browser:
-            Settings.err_print("unable to spawn browser!")
+            Settings.err_print("unable to spawn a web browser!")
             os._exit(1)
-
         browser.implicitly_wait(30) # seconds
         browser.set_page_load_timeout(1200)
         browser.file_detector = LocalFileDetector() # for uploading via remote sessions
         Driver.browser = browser
         Driver.browsers.append(browser)
-        # return browser
+
+    ## possibly move these functions elsewhere (again)
+    def read_session_data():
+        Settings.maybe_print("reading local session")
+        path_ = os.path.join(Settings.get_base_directory(), "session.json")
+        Settings.dev_print("local session path: "+str(path_))
+        id_ = None
+        url = None
+        try:
+            with open(str(path_)) as json_file:  
+                data = json.load(json_file)
+                id_ = data['id']
+                url = data['url']
+            Settings.maybe_print("loaded local users")
+        except Exception as e:
+            Settings.dev_print(e)
+        return (id_, url)
+
+    def write_session_data(id_, url):
+        Settings.maybe_print("writing local session")
+        Settings.dev_print("saving session id: {}".format(id_))        
+        Settings.dev_print("saving session url: {}".format(url))
+        path_ = os.path.join(Settings.get_base_directory(), "session.json")
+        Settings.dev_print("local session path: "+str(path_))
+        data = {}
+        data['id'] = id_
+        data['url'] = url
+        try:
+            with open(str(path_), 'w') as outfile:  
+                json.dump(data, outfile, indent=4, sort_keys=True)
+        except FileNotFoundError:
+            Settings.err_print("Missing Session File")
+        except OSError:
+            Settings.err_print("Missing Session Path")
 
     #####
 
@@ -3222,7 +3202,6 @@ class Driver:
             i += 1
             Driver.drag_and_drop_file(enter_file , file.get_path())
             time.sleep(1)
-            Driver.error_window_upload()
             ###
             def fix_filename(file):
                 # move file to change its name
@@ -3241,9 +3220,9 @@ class Driver:
                 # if this doesn't force it then it'll loop forever without a stopper
             ###
         # one last final check
-        # Driver.error_window_upload()
         Settings.debug_delay_check()
-        Settings.dev_print("### Files Upload Successful ###")
+        if Driver.error_window_upload(): Settings.dev_print("### Files Upload Successful ###")
+        else: Settings.dev_print("### Files Upload Successful (probably) ###")
         return True
 
     #################
@@ -3275,7 +3254,7 @@ class Driver:
             if len(eles) == 0:
                 Settings.err_print("unable to find username")
                 return None
-            username = str(eles[0].get_attribute("href")).replace("https://onlyfans.com/","")
+            username = str(eles[0].get_attribute("href")).replace(ONLYFANS_HOME_URL2,"")
             Settings.dev_print("successfully got username: {}".format(username))
         except Exception as e:
             Driver.error_checker(e)

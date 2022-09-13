@@ -28,7 +28,7 @@ def apply_args(parser):
     help='enables backup processes')
   ##
   # -browser
-  parser.add_argument('-browser', type=str, default="auto", choices=["auto","google","firefox","auto-remote","remote","remote-chrome","remote-firefox","reconnect"], dest='browser',
+  parser.add_argument('-browser', type=str, default="auto", choices=["auto","chrome","firefox","remote", "remote-chrome","remote-firefox","reconnect","reconnect-chrome","reconnect-firefox"], dest='browser',
     help='the web browser to use')
   ##
   # -category
@@ -283,4 +283,48 @@ def apply_args(parser):
   parser.add_argument('-v', '-verbose', dest="verbose", action='count', default=0, 
     help="verbosity level (max 3)")
 
+  ############
+  ## Remote ##
+  ############
 
+  ##
+  # -remote-path
+  # root remote folder. can be set in profile.conf
+  parser.add_argument('-remote-path', type=str, default=DEFAULT.REMOTE_PATH, dest='remote_path',
+    help='the root remote file sharing folder name')
+
+  ##
+  # -remote-host
+  # the remote host to connect to
+  parser.add_argument('-remote-host', type=str, dest='remote_host',
+    help='the remote host to connect to for file sharing', default="127.0.0.1")
+
+  ##
+  # -remote-host
+  # the remote host to connect to
+  parser.add_argument('-remote-browser-host', type=str, dest='remote_browser_host',
+    help='the remote host to connect to for remote browser', default="127.0.0.1")
+
+  ##
+  # -remote-port
+  # the remote port to connect to
+  parser.add_argument('-remote-port', type=int, dest='remote_port',
+    help='the remote port to connect to for file sharing', default=22)
+
+  ##
+  # -remote-browser-port
+  # the remote port to connect to
+  parser.add_argument('-remote-browser-port', type=int, dest='remote_browser_port',
+    help='the remote port to connect to for remote browser', default=4444)
+
+  ##
+  # -remote-username
+  # the remote username to use
+  parser.add_argument('-remote-username', type=str, dest='remote_username',
+    help='the remote username to use', default=None)
+
+  ##
+  # -remote-password
+  # the remote password to use
+  parser.add_argument('-remote-password', type=int, dest='remote_password',
+    help='the remote password to use', default=None)
