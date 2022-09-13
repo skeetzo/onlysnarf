@@ -115,12 +115,10 @@ Specific title of file to search for remotely.
 
 # Removed from Conf file
 
-image_limit = 
 notkeyword = 
 bykeyword = 
 keywords = 
 root_path = 
-profile_path = 
 profile_method = 
 title = 
 delete_empty = False

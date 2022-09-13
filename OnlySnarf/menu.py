@@ -180,7 +180,7 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
   
 def exit():
-    Driver.exit_all()
+    Driver.exit()
     sys.exit(0)
 
 ######################################################

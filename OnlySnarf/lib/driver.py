@@ -24,8 +24,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 from pathlib import Path
 ##
-from OnlySnarf.classes.element import Element
-from OnlySnarf.util.settings import Settings
+from ..classes.element import Element
+from ..util.settings import Settings
 
 ###################
 ##### Globals #####
@@ -51,36 +51,27 @@ class Driver:
     DOWNLOAD_MAX_IMAGES = 1000
     DOWNLOAD_MAX_VIDEOS = 1000
     #
-    DRIVER = None
-    DRIVERS = []
     MAX_TABS = 20
-    NOT_INFORMED_KEPT = False # whether or not "Keep"ing the self.browser session has been printed once upon exit
+    NOT_INFORMED_KEPT = False # whether or not "Keep"ing the Driver.browser session has been printed once upon exit
     NOT_INFORMED_CLOSED = False # same dumb shit as above
 
-    def __init__(self):
-        """
-        Driver object
+    # selenium web driver
+    browser = None
+    browsers = []
 
-        Parameters
-        ----------
-        browser : Selenium.webdriver
-            Selenium webdriver object / web browser
+    # browser tabs cache
+    tabs = []
+    # OnlyFans discovered lists cache
+    lists = []
+    # save login state
+    logged_in = False
+    # web browser session id and url for reconnecting
+    session_id = None
+    session_url = None
 
-        """
+    _initialized_ = False
 
-        # selenium web driver
-        self.browser = browser
-        # browser tabs cache
-        self.tabs = []
-        # OnlyFans discovered lists cache
-        self.lists = []
-        # save login state
-        self.logged_in = False
-        # web browser session id and url for reconnecting
-        self.session_id = None
-        self.session_url = None
-
-    def init(self, browser=None):
+    def init():
         """
         Initiliaze the web driver aspect.
 
@@ -91,13 +82,15 @@ class Driver:
 
         """
 
-        self.browser = Driver.spawn_browser(Settings.get_browser_type(), driver=self)
+        if Driver._initialized_: return
+        Driver.spawn_browser(Settings.get_browser_type())
         ## Cookies
-        if Settings.is_cookies() == "True": self.cookies_load()
-        self.tabs.append([browser.current_url, browser.current_window_handle, 0])
+        if Settings.is_cookies() == "True": Driver.cookies_load()
+        Driver.tabs.append([Driver.browser.current_url, Driver.browser.current_window_handle, 0])
+        Driver._initialized_ = True
 
         
-    def auth(self):
+    def auth():
         """
         Authorization check
 
@@ -110,38 +103,42 @@ class Driver:
 
         """
 
-        if self.logged_in: return True
-        return self.login()
+        Driver.init()
+        if not Driver.login(): os._exit(1)
+        ## Cookies
+        if Settings.is_cookies() == "True":
+            Driver.cookies_save()
+        return True
 
     ###################
     ##### Cookies #####
     ###################
 
-    def cookies_load(self):
+    def cookies_load():
         """Loads existing web browser cookies from local source"""
 
         if os.path.exists(Settings.get_cookies_path()):
             # must be at onlyfans.com to load cookies of onlyfans.com
-            self.go_to_home()
+            Driver.go_to_home()
             file = open(Settings.get_cookies_path(), "rb")
             cookies = pickle.load(file)
             file.close()
             for cookie in cookies:
-                self.browser.add_cookie(cookie)
+                Driver.browser.add_cookie(cookie)
             Settings.dev_print("successfully loaded cookies")
-            self.refresh()
+            Driver.refresh()
         else: 
             Settings.dev_print("failed to load cookies")
             Settings.dev_print(e)
 
-    def cookies_save(self):
+    def cookies_save():
         """Saves existing web browser cookies to local source"""
 
         try:
             # must be at onlyfans.com to save cookies of onlyfans.com
-            self.go_to_home()
+            Driver.go_to_home()
             file = open(Settings.get_cookies_path(), "wb")
-            pickle.dump(self.browser.get_cookies(), file) # "cookies.pkl"
+            pickle.dump(Driver.browser.get_cookies(), file) # "cookies.pkl"
             file.close()
             Settings.dev_print("successfully saved cookies")
         except Exception as e:
@@ -152,7 +149,7 @@ class Driver:
     ##### Discount #####
     ####################
 
-    def discount_user(self, discount=None):
+    def discount_user(discount=None):
         """
         Enter and apply discount to user
 
@@ -176,8 +173,6 @@ class Driver:
         if not discount:
             Settings.err_print("missing discount")
             return False
-        auth_ = self.auth()
-        if not auth_: return False
         try:
             discount.get()
             months = int(discount.get_months())
@@ -202,25 +197,25 @@ class Driver:
                 Settings.warn_print("amount too low, min -> {}%".format(Settings.get_discount_min_months()))
                 amount = int(Settings.get_discount_min_amount())
             Settings.print("Discounting: {}".format(username))
-            self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
+            Driver.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
             end_ = True
             count = 0
             user_ = None
             Settings.print("searching for user...")
             # scroll through users on page until user is found
             while end_:
-                elements = self.browser.find_elements_by_class_name("m-fans")
+                elements = Driver.browser.find_elements_by_class_name("m-fans")
                 for ele in elements:
                     username_ = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
                     if str(username) == str(username_).replace("@",""):
-                        self.browser.execute_script("arguments[0].scrollIntoView();", ele)
+                        Driver.browser.execute_script("arguments[0].scrollIntoView();", ele)
                         user_ = ele
                         end_ = False
                 if not end_: continue
                 if len(elements) == int(count): break
                 Settings.print_same_line("({}/{}) scrolling...".format(count, len(elements)))
                 count = len(elements)
-                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                Driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
             Settings.print("")
             Settings.dev_print("successfully found fans")
@@ -228,7 +223,7 @@ class Driver:
                 Settings.err_print("unable to find user - {}".format(username))
                 return False
             Settings.maybe_print("found: {}".format(username))
-            ActionChains(self.browser).move_to_element(user_).perform()
+            ActionChains(Driver.browser).move_to_element(user_).perform()
             Settings.dev_print("successfully moved to user")
             Settings.dev_print("finding discount btn")
             buttons = user_.find_elements_by_class_name(Element.get_element_by_name("discountUser").getClass())
@@ -254,14 +249,14 @@ class Driver:
             from OnlySnarf.util.defaults import DISCOUNT_MAX_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_AMOUNT, DISCOUNT_MIN_MONTHS
             discountAmount = DISCOUNT_MIN_AMOUNT
             monthsAmount = DISCOUNT_MIN_MONTHS
-            print(self.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserAmount").getClass()))
-            discountEle = self.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserAmount").getClass())[0]
-            monthsEle = self.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserMonths").getClass())[1]
+            print(Driver.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserAmount").getClass()))
+            discountEle = Driver.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserAmount").getClass())[0]
+            monthsEle = Driver.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserMonths").getClass())[1]
             Settings.dev_print("found months and discount amount")
 
             def apply_discount():
                 Settings.dev_print("attempting discount")
-                # eles = self.browser.find_elements_by_class_name("v-select__selection.v-select__selection--comma")
+                # eles = Driver.browser.find_elements_by_class_name("v-select__selection.v-select__selection--comma")
                 # for ele in eles:
                     # if str("% discount") in ele.get_attribute("innerHTML"):
                 discountAmount = int(discountEle.get_attribute("innerHTML").replace("% discount", ""))
@@ -276,7 +271,7 @@ class Driver:
                     down_ = int((int(amount) / 5) - 1)
                     Settings.dev_print("up: {}".format(up_))
                     Settings.dev_print("down: {}".format(down_))
-                    action = ActionChains(self.browser)
+                    action = ActionChains(Driver.browser)
                     action.click(on_element=discountEle)
                     action.pause(1)
                     for n in range(up_):
@@ -295,7 +290,7 @@ class Driver:
                     down_ = int(int(months) - 1)
                     Settings.dev_print("up: {}".format(up_))
                     Settings.dev_print("down: {}".format(down_))
-                    action = ActionChains(self.browser)
+                    action = ActionChains(Driver.browser)
                     action.click(on_element=monthsEle)
                     action.pause(1)
                     for n in range(up_):
@@ -318,17 +313,17 @@ class Driver:
             Settings.debug_delay_check()
             ## apply
             Settings.dev_print("applying discount")
-            buttons_ = self.find_elements_by_name("discountUserButton")
+            buttons_ = Driver.find_elements_by_name("discountUserButton")
             for button in buttons_:
                 if not button.is_enabled() and not button.is_displayed(): continue
                 if "Cancel" in button.get_attribute("innerHTML") and int(discountAmount) == int(amount) and int(monthsAmount) == int(months):
-                    Settings.print("Skipping: Existing Discount")
+                    Settings.print("skipping: Existing Discount")
                     button.click()
                     Settings.dev_print("successfully skipped existing discount")
                     Settings.dev_print("### Discount Successful ###")
                     return True
                 if "Cancel" in button.get_attribute("innerHTML") and Settings.is_debug() == "True":
-                    Settings.print("Skipping: Save Discount (Debug)")
+                    Settings.print("skipping: Save Discount (Debug)")
                     button.click()
                     Settings.dev_print("successfully canceled discount")
                     Settings.dev_print("### Discount Successful ###")
@@ -344,7 +339,7 @@ class Driver:
         except Exception as e:
             Settings.print(e)
             Driver.error_checker(e)
-            buttons_ = self.find_elements_by_name("discountUserButton")
+            buttons_ = Driver.find_elements_by_name("discountUserButton")
             for button in buttons_:
                 if "Cancel" in button.get_attribute("innerHTML"):
                     button.click()
@@ -353,37 +348,37 @@ class Driver:
             Settings.dev_print("### Discount Failure ###")
             return False
 
-    def download_content(self):
+    def download_content():
         """Downloads all content (images and video) from the user's profile page"""
 
-        Settings.print("Downloading Content")
+        Settings.print("downloading content...")
         def scroll_to_bottom():
             try:
                 # go to profile page and scroll to bottom
-                self.go_to_profile()
+                Driver.go_to_profile()
                 # count number of content elements to scroll to bottom
-                num = self.browser.find_element_by_class_name("b-profile__sections__count").get_attribute("innerHTML")
+                num = Driver.browser.find_element_by_class_name("b-profile__sections__count").get_attribute("innerHTML")
                 Settings.maybe_print("content count: {}".format(num))
                 for n in range(int(int(int(num)/5)+1)):
                     Settings.print_same_line("({}/{}) scrolling...".format(n,int(int(int(num)/5)+1)))
-                    self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                    Driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                     time.sleep(1)
                 Settings.print("")
             except Exception as e:
                 Settings.print(e)
                 Settings.err_print("failed to find content to scroll")
         scroll_to_bottom()
-        imagesDownloaded = self.download_images()
-        videosDownloaded = self.download_videos()
-        Settings.print("Downloaded Content")
-        Settings.print("Count: {}".format(len(imagesDownloaded)+len(videosDownloaded)))
+        imagesDownloaded = Driver.download_images()
+        videosDownloaded = Driver.download_videos()
+        Settings.print("downloaded content")
+        Settings.print("count: {}".format(len(imagesDownloaded)+len(videosDownloaded)))
 
-    def download_images(self):
+    def download_images():
         """Downloads all images on the page"""
 
         imagesDownloaded = []
         try:
-            images = self.browser.find_elements_by_tag_name("img")
+            images = Driver.browser.find_elements_by_tag_name("img")
             downloadPath = os.path.join(Settings.get_download_path(), "images")
             Path(downloadPath).mkdir(parents=True, exist_ok=True)
             i=1
@@ -391,7 +386,7 @@ class Driver:
                 if Driver.DOWNLOADING_MAX and i > Driver.DOWNLOAD_MAX_IMAGES: break
                 src = str(image.get_attribute("src"))
                 if not src or src == "" or src == "None" or "/thumbs/" in src or "_frame_" in src or "http" not in src: continue
-                Settings.print_same_line("Downloading Image: {}/{}".format(i, len(images)))
+                Settings.print_same_line("downloading image: {}/{}".format(i, len(images)))
                 # Settings.print("Image: {}".format(src[:src.find(".jpg")+4]))
                 # Settings.print("Image: {}".format(src))
                 if Driver.DOWNLOADING:
@@ -407,7 +402,7 @@ class Driver:
             Settings.print(e)
         return imagesDownloaded
 
-    def download_messages(self, user="all"):
+    def download_messages(user="all"):
         """
         Downloads all content in messages with the user
 
@@ -418,41 +413,41 @@ class Driver:
 
         """
 
-        Settings.print("Downloading Messages: {}".format(user))
+        Settings.print("downloading messages: {}".format(user))
         try:
             if str(user) == "all":
                 # from OnlySnarf.classes.user import User
                 from ..classes.user import User
                 user = random.choice(User.get_all_users())
-            self.message_user(username=user.username)
+            Driver.message_user(username=user.username)
             contentCount = 0
             while True:
-                self.browser.execute_script("document.querySelector('div[id=chatslist]').scrollTop=1e100")
+                Driver.browser.execute_script("document.querySelector('div[id=chatslist]').scrollTop=1e100")
                 time.sleep(1)
-                self.browser.execute_script("document.querySelector('div[id=chatslist]').scrollTop=1e100")
+                Driver.browser.execute_script("document.querySelector('div[id=chatslist]').scrollTop=1e100")
                 time.sleep(1)
-                self.browser.execute_script("document.querySelector('div[id=chatslist]').scrollTop=1e100")
+                Driver.browser.execute_script("document.querySelector('div[id=chatslist]').scrollTop=1e100")
                 time.sleep(1)
-                images = self.browser.find_elements_by_tag_name("img")
-                videos = self.browser.find_elements_by_tag_name("video")
+                images = Driver.browser.find_elements_by_tag_name("img")
+                videos = Driver.browser.find_elements_by_tag_name("video")
                 # Settings.print((len(images)+len(videos)))
                 if contentCount == len(images)+len(videos): break
                 contentCount = len(images)+len(videos)
             # download all images and videos
-            imagesDownloaded = self.download_images()
-            videosDownloaded = self.download_videos()
-            Settings.print("Downloaded Messages")
-            Settings.print("Count: {}".format(len(imagesDownloaded)+len(videosDownloaded)))
+            imagesDownloaded = Driver.download_images()
+            videosDownloaded = Driver.download_videos()
+            Settings.print("downloaded messages")
+            Settings.print("count: {}".format(len(imagesDownloaded)+len(videosDownloaded)))
         except Exception as e:
             Settings.maybe_print(e)
 
-    def download_videos(self):
+    def download_videos():
         """Downloads all videos on the page"""
 
         videosDownloaded = []
         try:
             # find all video elements on page
-            videos = self.browser.find_elements_by_tag_name("video")
+            videos = Driver.browser.find_elements_by_tag_name("video")
             downloadPath = os.path.join(Settings.get_download_path(), "videos")
             Path(downloadPath).mkdir(parents=True, exist_ok=True)
             i=1
@@ -461,7 +456,7 @@ class Driver:
                 if Driver.DOWNLOADING_MAX and i > Driver.DOWNLOAD_MAX_VIDEOS: break
                 src = str(video.get_attribute("src"))
                 if not src or src == "" or src == "None" or "http" not in src: continue
-                Settings.print_same_line("Downloading Video: {}/{}".format(i, len(videos)))
+                Settings.print_same_line("downloading video: {}/{}".format(i, len(videos)))
                 # Settings.print("Video: {}".format(src[:src.find(".mp4")+4]))
                 # Settings.print("Video: {}".format(src))
                 if Driver.DOWNLOADING:
@@ -477,7 +472,64 @@ class Driver:
             Settings.print(e)
         return videosDownloaded
 
-    def enter_text(self, text):
+
+    def drag_and_drop_file(drop_target, path):
+        """
+        Drag and drop the provided file path onto the provided element target.
+
+
+        Parameters
+        ----------
+        drop_target : WebElement
+            The web element to drop the file at path on
+
+        path : str
+            The file path to drag onto the web element
+
+
+        """
+
+        # https://stackoverflow.com/questions/43382447/python-with-selenium-drag-and-drop-from-file-system-to-webdriver
+        JS_DROP_FILE = """
+            var target = arguments[0],
+                offsetX = arguments[1],
+                offsetY = arguments[2],
+                document = target.ownerDocument || document,
+                window = document.defaultView || window;
+
+            var input = document.createElement('INPUT');
+            input.type = 'file';
+            input.onchange = function () {
+              var rect = target.getBoundingClientRect(),
+                  x = rect.left + (offsetX || (rect.width >> 1)),
+                  y = rect.top + (offsetY || (rect.height >> 1)),
+                  dataTransfer = { files: this.files };
+
+              ['dragenter', 'dragover', 'drop'].forEach(function (name) {
+                var evt = document.createEvent('MouseEvent');
+                evt.initMouseEvent(name, !0, !0, window, 0, 0, 0, x, y, !1, !1, !1, !1, 0, null);
+                evt.dataTransfer = dataTransfer;
+                target.dispatchEvent(evt);
+              });
+
+              setTimeout(function () { document.body.removeChild(input); }, 25);
+            };
+            document.body.appendChild(input);
+            return input;
+        """
+        try:
+            Settings.maybe_print("dragging and dropping...")
+            Settings.dev_print("drop target: {}".format(drop_target.get_attribute("innerHTML")))
+            # BUG: requires double to register file upload
+            file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 0, 0)
+            file_input.send_keys(path)
+            file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 50, 50)
+            file_input.send_keys(path)
+            Settings.debug_delay_check()
+        except Exception as e:
+            Settings.err_print(e) 
+
+    def enter_text(text):
         """
         Enter the provided text into the page's text area
 
@@ -500,14 +552,14 @@ class Driver:
             # click on open text area
             Settings.dev_print("finding text")
             enterText = Element.get_element_by_name("enterText").getId()
-            sendText = self.browser.find_element_by_id(enterText)
-            # action = webdriver.common.action_chains.ActionChains(self.browser)
-            action = ActionChains(self.browser)
+            sendText = Driver.browser.find_element_by_id(enterText)
+            # action = webdriver.common.action_chains.ActionChains(Driver.browser)
+            action = ActionChains(Driver.browser)
             action.move_to_element(sendText)
             action.click()
             action.perform()
             # action seperated for debugging
-            sendText = self.browser.find_element_by_id(enterText)
+            sendText = Driver.browser.find_element_by_id(enterText)
             Settings.dev_print("found text")
             sendText.clear()
             Settings.dev_print("sending text")
@@ -536,12 +588,12 @@ class Driver:
         Settings.dev_print(e)
         Settings.dev_print(e)
 
-    def error_window_upload(self):
+    def error_window_upload():
         """Closes error window that appears during uploads for 'duplicate' files"""
 
         try:
             element = Element.get_element_by_name("errorUpload")
-            error_buttons = self.browser.find_elements_by_class_name(element.getClass())
+            error_buttons = Driver.browser.find_elements_by_class_name(element.getClass())
             Settings.dev_print("errors btns: {}".format(len(error_buttons)))
             for butt in error_buttons:
                 if butt.get_attribute("innerHTML").strip() == "Close" and butt.is_enabled():
@@ -558,7 +610,7 @@ class Driver:
     ##### Expiration #####
     ######################
 
-    def expires(self, expiration=None):
+    def expires(expiration=None):
         """
         Enters the provided expiration duration for a post
 
@@ -579,19 +631,17 @@ class Driver:
         if not expiration:
             Settings.err_print("missing expiration")
             return False
-        auth_ = self.auth()
-        if not auth_: return False
         Settings.dev_print("expires")
         try:
             Settings.print("Expiration:")
             Settings.print("- Period: {}".format(expiration))
-            self.open_more_options()
+            Driver.open_more_options()
             # open expires window
             Settings.dev_print("adding expires")
-            self.find_element_to_click("expiresAdd").click()
+            Driver.find_element_to_click("expiresAdd").click()
             # select duration
             Settings.dev_print("selecting expires")
-            nums = self.find_elements_by_name("expiresPeriods")
+            nums = Driver.find_elements_by_name("expiresPeriods")
             for num in nums:
                 inner = num.get_attribute("innerHTML")
                 if ">1<" in str(inner) and int(expiration) == 1: num.click()
@@ -603,14 +653,14 @@ class Driver:
             Settings.debug_delay_check()
             # save
             if Settings.is_debug() == "True":
-                Settings.print("Skipping: Expiration (debug)")
+                Settings.print("skipping: Expiration (debug)")
                 Settings.dev_print("skipping expires")
-                self.find_element_to_click("expiresCancel").click()
+                Driver.find_element_to_click("expiresCancel").click()
                 Settings.dev_print("successfully canceled expires")
                 Settings.dev_print("### Expiration Successfully Canceled ###")
             else:
                 Settings.dev_print("saving expires")
-                self.find_element_to_click("expiresSave").click()
+                Driver.find_element_to_click("expiresSave").click()
                 Settings.dev_print("successfully saved expires")
                 Settings.print("Expiration Entered")
                 Settings.dev_print("### Expiration Successful ###")
@@ -620,7 +670,7 @@ class Driver:
             Settings.err_print("failed to enter expiration")
             try:
                 Settings.dev_print("canceling expires")
-                self.find_element_to_click("expiresCancel").click()
+                Driver.find_element_to_click("expiresCancel").click()
                 Settings.dev_print("successfully canceled expires")
                 Settings.dev_print("### Expiration Successful Failure ###")
             except: 
@@ -629,7 +679,7 @@ class Driver:
 
     ######################################################################
 
-    def find_element_by_name(self, name):
+    def find_element_by_name(name):
         """
         Find element on page by name
 
@@ -652,26 +702,24 @@ class Driver:
             return False
         # prioritize id over class name
         eleID = None
-        try: eleID = self.browser.find_element_by_id(element.getId())
+        try: eleID = Driver.browser.find_element_by_id(element.getId())
         except: eleID = None
         if eleID: return eleID
         for className in element.getClasses():
             ele = None
             eleCSS = None
-            try: ele = self.browser.find_element_by_class_name(className)
+            try: ele = Driver.browser.find_element_by_class_name(className)
             except: ele = None
-            try: eleCSS = self.browser.find_element_by_css_selector(className)
+            try: eleCSS = Driver.browser.find_element_by_css_selector(className)
             except: eleCSS = None
             Settings.dev_print("class: {} - {}:css".format(ele, eleCSS))
             if ele: return ele
             if eleCSS: return eleCSS
         raise Exception("unable to locate element")
 
-    def find_elements_by_name(self, name):
+    def find_elements_by_name(name):
         """
-        Find elements on page by name
-
-        Does not auth check or otherwise change the focus
+        Find elements on page by name. Does not change window focus.
 
         Parameters
         ----------
@@ -694,9 +742,9 @@ class Driver:
         for className in element.getClasses():
             eles_ = []
             elesCSS_ = []
-            try: eles_ = self.browser.find_elements_by_class_name(className)
+            try: eles_ = Driver.browser.find_elements_by_class_name(className)
             except: eles_ = []
-            try: elesCSS_ = self.browser.find_elements_by_css_selector(className)
+            try: elesCSS_ = Driver.browser.find_elements_by_css_selector(className)
             except: elesCSS_ = []
             Settings.dev_print("class: {} - {}:css".format(len(eles_), len(elesCSS_)))
             eles.extend(eles_)
@@ -711,7 +759,7 @@ class Driver:
             raise Exception("unable to locate elements")
         return eles_
 
-    def find_element_to_click(self, name):
+    def find_element_to_click(name):
         """
         Find element on page by name to click
 
@@ -738,9 +786,9 @@ class Driver:
         for className in element.getClasses():
             eles = []
             elesCSS = []
-            try: eles = self.browser.find_elements_by_class_name(className)
+            try: eles = Driver.browser.find_elements_by_class_name(className)
             except: eles = []
-            try: elesCSS = self.browser.find_elements_by_css_selector(className)
+            try: elesCSS = Driver.browser.find_elements_by_css_selector(className)
             except: elesCSS = []
             Settings.dev_print("class: {} - {}:css".format(len(eles), len(elesCSS)))
             eles.extend(elesCSS)
@@ -780,24 +828,24 @@ class Driver:
 
         """
         try:
-            if not Driver.DRIVER: Driver.DRIVER = Driver()
-            return Driver.DRIVER
+            if not Driver.browser: Driver.browser = Driver.spawn_browser()
+            return Driver.browser
         except Exception as e:
             print(e)
 
     # waits for page load
-    def get_page_load(self):
+    def get_page_load():
         """Attempt to generic page load"""
 
         time.sleep(2)
-        try: WebDriverWait(self.browser, 60*3, poll_frequency=10).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
+        try: WebDriverWait(Driver.browser, 60*3, poll_frequency=10).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
         except Exception as e: Settings.dev_print(e)
 
-    def handle_alert(self):
+    def handle_alert():
         """Switch to alert pop up"""
 
         try:
-            alert_obj = self.browser.switch_to.alert or None
+            alert_obj = Driver.browser.switch_to.alert or None
             if alert_obj:
                 alert_obj.accept()
         except: pass
@@ -806,7 +854,7 @@ class Driver:
     ### Go Tos ###
     ##############
 
-    def go_to_home(self, force=False):
+    def go_to_home(force=False):
         """
         Go to home page
 
@@ -821,21 +869,21 @@ class Driver:
 
         def goto():
             Settings.maybe_print("goto -> onlyfans.com")
-            self.browser.get(ONLYFANS_HOME_URL)
-            # self.open_tab(url=ONLYFANS_HOME_URL)
-            self.handle_alert()
-            self.get_page_load()
+            Driver.browser.get(ONLYFANS_HOME_URL)
+            # Driver.open_tab(url=ONLYFANS_HOME_URL)
+            Driver.handle_alert()
+            Driver.get_page_load()
         if force: return goto()
-        if self.search_for_tab(ONLYFANS_HOME_URL):
+        if Driver.search_for_tab(ONLYFANS_HOME_URL):
             Settings.maybe_print("found -> /")
             return
-        Settings.dev_print("current url: {}".format(self.browser.current_url))
-        if str(self.browser.current_url) == str(ONLYFANS_HOME_URL):
+        Settings.dev_print("current url: {}".format(Driver.browser.current_url))
+        if str(Driver.browser.current_url) == str(ONLYFANS_HOME_URL):
             Settings.maybe_print("at -> onlyfans.com")
-            self.browser.execute_script("window.scrollTo(0, 0);")
+            Driver.browser.execute_script("window.scrollTo(0, 0);")
         else: goto()
         
-    def go_to_page(self, page):
+    def go_to_page(page):
         """
         Go to page
 
@@ -848,44 +896,42 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return False
-        if self.search_for_tab(page):
+        Driver.auth()
+        if Driver.search_for_tab(page):
             Settings.maybe_print("found -> {}".format(page))
             return
-        if str(self.browser.current_url) == str(page) or str(page) in str(self.browser.current_url):
+        if str(Driver.browser.current_url) == str(page) or str(page) in str(Driver.browser.current_url):
             Settings.maybe_print("at -> {}".format(page))
-            self.browser.execute_script("window.scrollTo(0, 0);")
+            Driver.browser.execute_script("window.scrollTo(0, 0);")
         else:
             Settings.maybe_print("goto -> {}".format(page))
-            self.open_tab(url=page)
-            self.handle_alert()
-            self.get_page_load()
+            Driver.open_tab(url=page)
+            Driver.handle_alert()
+            Driver.get_page_load()
 
-    def go_to_profile(self):
+    def go_to_profile():
         """Go to OnlyFans profile page"""
 
-        auth_ = self.auth()
-        if not auth_: return False
+        Driver.auth()
         username = Settings.get_username()
         if str(username) == "":
-            username = self.get_username()
+            username = Driver.get_username()
         page = "{}/{}".format(ONLYFANS_HOME_URL, username)
-        if self.search_for_tab(page):
+        if Driver.search_for_tab(page):
             Settings.maybe_print("found -> /{}".format(username))
             return
-        if str(username) in str(self.browser.current_url):
+        if str(username) in str(Driver.browser.current_url):
             Settings.maybe_print("at -> {}".format(username))
-            self.browser.execute_script("window.scrollTo(0, 0);")
+            Driver.browser.execute_script("window.scrollTo(0, 0);")
         else:
             Settings.maybe_print("goto -> {}".format(username))
-            # self.browser.get("{}{}".format(ONLYFANS_HOME_URL, username))
-            self.open_tab(url=page)
-            # self.handle_alert()
-            # self.get_page_load()
+            # Driver.browser.get("{}{}".format(ONLYFANS_HOME_URL, username))
+            Driver.open_tab(url=page)
+            # Driver.handle_alert()
+            # Driver.get_page_load()
 
     # onlyfans.com/my/settings
-    def go_to_settings(self, settingsTab):
+    def go_to_settings(settingsTab):
         """
         Go to settings tab on settings page
 
@@ -898,20 +944,19 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return False
-        if self.search_for_tab("{}/settings/{}".format(ONLYFANS_SETTINGS_URL, settingsTab)):  
+        Driver.auth()
+        if Driver.search_for_tab("{}/settings/{}".format(ONLYFANS_SETTINGS_URL, settingsTab)):  
             Settings.maybe_print("found -> settings/{}".format(settingsTab))
             return
-        if str(self.browser.current_url) == str(ONLYFANS_SETTINGS_URL) and str(settingsTab) == "profile":
+        if str(Driver.browser.current_url) == str(ONLYFANS_SETTINGS_URL) and str(settingsTab) == "profile":
             Settings.maybe_print("at -> onlyfans.com/settings/{}".format(settingsTab))
-            self.browser.execute_script("window.scrollTo(0, 0);")
+            Driver.browser.execute_script("window.scrollTo(0, 0);")
         else:
             if str(settingsTab) == "profile": settingsTab = ""
             Settings.maybe_print("goto -> onlyfans.com/settings/{}".format(settingsTab))
-            self.go_to_page("{}{}".format(ONLYFANS_SETTINGS_URL, settingsTab))
+            Driver.go_to_page("{}{}".format(ONLYFANS_SETTINGS_URL, settingsTab))
 
-    def search_for_tab(self, page):
+    def search_for_tab(page):
         """
         Search for (and goto if exists) tab in Driver.tabs cache
 
@@ -928,34 +973,34 @@ class Driver:
 
         """
 
-        original_handle = self.browser.current_window_handle
-        Settings.dev_print("tabs: {}".format(self.tabs))
+        original_handle = Driver.browser.current_window_handle
+        Settings.dev_print("tabs: {}".format(Driver.tabs))
         try:
-            for page_, handle, value in self.tabs:
+            for page_, handle, value in Driver.tabs:
                 # Settings.dev_print("{} = {}".format(page_, page))
                 if str(page_) == str(page):
-                    self.browser.switch_to.window(handle)
+                    Driver.browser.switch_to.window(handle)
                     value += 1
                     Settings.dev_print("successfully located tab in cache: {}".format(page))
                     return True
-            for handle in self.browser.window_handles[0]:
-                self.browser.switch_to.window(handle)
-                if str(page) in str(self.browser.current_url):
+            for handle in Driver.browser.window_handles[0]:
+                Driver.browser.switch_to.window(handle)
+                if str(page) in str(Driver.browser.current_url):
                     Settings.dev_print("successfully located tab: {}".format(page))
                     return True
-            for handle in self.browser.window_handles:
-                self.browser.switch_to.window(handle)
-                if str(page) in str(self.browser.current_url):
+            for handle in Driver.browser.window_handles:
+                Driver.browser.switch_to.window(handle)
+                if str(page) in str(Driver.browser.current_url):
                     Settings.dev_print("successfully located tab in windows: {}".format(page))
                     return True
             Settings.dev_print("failed to locate tab: {}".format(page))
-            self.browser.switch_to.window(original_handle)
+            Driver.browser.switch_to.window(original_handle)
         except Exception as e:
             if "Unable to locate window" not in str(e):
                 Settings.dev_print(e)
         return False
 
-    def open_tab(self, url=None):
+    def open_tab(url=None):
         """
         Open new tab of url
 
@@ -975,38 +1020,38 @@ class Driver:
             Settings.err_print("missing url")
             return False
         Settings.maybe_print("tab -> {}".format(url))
-        # self.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 't')
-        # self.browser.get(url)
+        # Driver.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 't')
+        # Driver.browser.get(url)
         # https://stackoverflow.com/questions/50844779/how-to-handle-multiple-windows-in-python-selenium-with-firefox-driver
-        windows_before  = self.browser.current_window_handle
+        windows_before  = Driver.browser.current_window_handle
         Settings.dev_print("current window handle is : %s" %windows_before)
-        windows = self.browser.window_handles
-        self.browser.execute_script('''window.open("{}","_blank");'''.format(url))
-        # self.browser.execute_script("window.open('{}')".format(url))
-        self.handle_alert()
-        self.get_page_load()
-        # self.browser.execute_script("window.open('https://www.yahoo.com')")
-        WebDriverWait(self.browser, 10).until(EC.number_of_windows_to_be(len(windows)+1))
-        windows_after = self.browser.window_handles
+        windows = Driver.browser.window_handles
+        Driver.browser.execute_script('''window.open("{}","_blank");'''.format(url))
+        # Driver.browser.execute_script("window.open('{}')".format(url))
+        Driver.handle_alert()
+        Driver.get_page_load()
+        # Driver.browser.execute_script("window.open('https://www.yahoo.com')")
+        WebDriverWait(Driver.browser, 10).until(EC.number_of_windows_to_be(len(windows)+1))
+        windows_after = Driver.browser.window_handles
         new_window = [x for x in windows_after if x not in windows][0]
-        # self.browser.switch_to.window(new_window) <!---deprecated>
-        self.browser.switch_to.window(new_window)
-        Settings.dev_print("page title after tab switching is : %s" %self.browser.title)
+        # Driver.browser.switch_to.window(new_window) <!---deprecated>
+        Driver.browser.switch_to.window(new_window)
+        Settings.dev_print("page title after tab switching is : %s" %Driver.browser.title)
         Settings.dev_print("new window handle is : %s" %new_window)
-        if len(self.tabs) >= Driver.MAX_TABS:
-            least = self.tabs[0]
-            for i, tab in enumerate(self.tabs):
+        if len(Driver.tabs) >= Driver.MAX_TABS:
+            least = Driver.tabs[0]
+            for i, tab in enumerate(Driver.tabs):
                 if int(tab[2]) < int(least[2]):
                     least = tab
-            self.tabs.remove(least)
-        self.tabs.append([url, new_window, 0]) # url, window_handle, use count
+            Driver.tabs.remove(least)
+        Driver.tabs.append([url, new_window, 0]) # url, window_handle, use count
         return True
     
     ##################
     ###### Login #####
     ##################
 
-    def login(self):
+    def login():
         """
         Logs into OnlyFans account provided via args and chosen method.
 
@@ -1019,12 +1064,15 @@ class Driver:
 
         """
 
+        if Driver.logged_in: return
+        Settings.print('logging into OnlyFans for {}...'.format(Settings.get_username()))
+
         def loggedin_check():
             """Check if already logged in before attempting to login again"""
 
-            self.go_to_home(force=True)
+            Driver.go_to_home(force=True)
             try:
-                ele = self.browser.find_element_by_class_name(Element.get_element_by_name("loginCheck").getClass())
+                ele = Driver.browser.find_element_by_class_name(Element.get_element_by_name("loginCheck").getClass())
                 if ele: 
                     Settings.print("already logged into OnlyFans!")
                     return True
@@ -1045,7 +1093,7 @@ class Driver:
 
             try:
                 Settings.dev_print("waiting for logincheck...")
-                WebDriverWait(self.browser, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
+                WebDriverWait(Driver.browser, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
                 Settings.print("OnlyFans login successful!")
                 Settings.dev_print("login successful - {}".format(which))
                 return True
@@ -1080,30 +1128,30 @@ class Driver:
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing onlyfans login info")
                     return False
-                self.go_to_home()
+                Driver.go_to_home()
                 Settings.dev_print("finding username")
-                self.browser.find_element_by_name("email").send_keys(username)
+                Driver.browser.find_element_by_name("email").send_keys(username)
                 Settings.dev_print("username entered")
                 # fill in password and hit the login button 
                 Settings.dev_print("finding password")
-                password_ = self.browser.find_element_by_name("password")
+                password_ = Driver.browser.find_element_by_name("password")
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
                 def check_captcha():
                     try:
                         time.sleep(10) # wait extra long to make sure it doesn't verify obnoxiously
-                        el = self.browser.find_element_by_name("password")
+                        el = Driver.browser.find_element_by_name("password")
                         if not el: return # likely logged in without captcha
                         Settings.print("waiting for captcha completion by user...")
-                        # action = webdriver.common.action_chains.ActionChains(self.browser)
-                        action = ActionChains(self.browser)
+                        # action = webdriver.common.action_chains.ActionChains(Driver.browser)
+                        action = ActionChains(Driver.browser)
                         action.move_to_element_with_offset(el, 40, 100)
                         action.click()
                         action.perform()
                         time.sleep(10)
                         sub = None
-                        submit = self.browser.find_elements_by_class_name("g-btn.m-rounded.m-flex.m-lg")
+                        submit = Driver.browser.find_elements_by_class_name("g-btn.m-rounded.m-flex.m-lg")
                         for ele in submit:
                             if str(ele.get_attribute("innerHTML")) == "Login":
                                 sub = ele
@@ -1143,17 +1191,17 @@ class Driver:
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing google login info")
                     return False
-                self.go_to_home()
-                elements = self.browser.find_elements_by_tag_name("a")
+                Driver.go_to_home()
+                elements = Driver.browser.find_elements_by_tag_name("a")
                 [elem for elem in elements if '/auth/google' in str(elem.get_attribute('href'))][0].click()
                 time.sleep(5)
-                username_ = self.browser.switch_to.active_element
+                username_ = Driver.browser.switch_to.active_element
                 # then click username spot
                 username_.send_keys(username)
                 username_.send_keys(Keys.ENTER)
                 Settings.dev_print("username entered")
                 time.sleep(2)
-                password_ = self.browser.switch_to.active_element
+                password_ = Driver.browser.switch_to.active_element
                 # fill in password and hit the login button 
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
@@ -1184,19 +1232,19 @@ class Driver:
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing twitter login info")
                     return False
-                self.go_to_home()
+                Driver.go_to_home()
                 # rememberMe checkbox doesn't actually cause login to be remembered
-                # rememberMe = self.browser.find_element_by_xpath(Element.get_element_by_name("rememberMe").getXPath())
+                # rememberMe = Driver.browser.find_element_by_xpath(Element.get_element_by_name("rememberMe").getXPath())
                 # if not rememberMe.is_selected():
                     # rememberMe.click()
                 # if str(Settings.MANUAL) == "True":
                     # Settings.print("Please Login")
-                elements = self.browser.find_elements_by_tag_name("a")
+                elements = Driver.browser.find_elements_by_tag_name("a")
                 [elem for elem in elements if '/twitter/auth' in str(elem.get_attribute('href'))][0].click()
-                self.browser.find_element_by_name("session[username_or_email]").send_keys(username)
+                Driver.browser.find_element_by_name("session[username_or_email]").send_keys(username)
                 Settings.dev_print("username entered")
                 # fill in password and hit the login button 
-                password_ = self.browser.find_element_by_name("session[password]")
+                password_ = Driver.browser.find_element_by_name("session[password]")
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
@@ -1206,45 +1254,49 @@ class Driver:
                 Driver.error_checker(e)
             return False
 
-        def yasssss():
-            """Succesful login"""
-
-            ## Cookies
-            if Settings.is_cookies() == "True":
-                self.cookies_save()
-            self.logged_in = True
+        successful = loggedin_check()
+        if successful:
+            Driver.logged_in = True
             return True
 
-        successful = loggedin_check()
-        if successful: return yasssss() # already logged in
-        Settings.print('logging into OnlyFans...')
         try:
-            match Settings.get_login_method():
-                case Type.AUTO:
-                    successful = via_form()
-                    if not successful: successful = via_twitter()
-                    if not successful: successful = via_google()
-                case Type.ONLYFANS:
-                    successful = via_form()
-                case Type.TWITTER:
-                    successful = via_twitter()
-                case Type.GOOGLE:
-                    successful = via_google()
+            # TODO: use after upgrading python version to 3.10?
+            # match Settings.get_login_method():
+            #     case "auto":
+            #         successful = via_form()
+            #         if not successful: successful = via_twitter()
+            #         if not successful: successful = via_google()
+            #     case "onlyfans":
+            #         successful = via_form()
+            #     case "twitter":
+            #         successful = via_twitter()
+            #     case "google":
+            #         successful = via_google()
+            if Settings.get_login_method() == "auto":
+                successful = via_form()
+                if not successful: successful = via_twitter()
+                if not successful: successful = via_google()
+            elif Settings.get_login_method() == "onlyfans":
+                successful = via_form()
+            elif Settings.get_login_method() == "twitter":
+                successful = via_twitter()
+            elif Settings.get_login_method() == "google":
+                successful = via_google()
             if not successful:
                 Settings.print("OnlyFans login failed!")
-                return False
-            return yasssss()
+            Driver.logged_in = True
+            return True
         except Exception as e:
             Settings.dev_print("login failure")
             Driver.error_checker(e)
             Settings.print("OnlyFans login failed!")
-            return False
+        return False
 
     ####################
     ##### Messages #####
     ####################
 
-    def message(self, username=None, user_id=None):
+    def message(username, user_id=None):
         """
         Start a message to the username (or group of users) or user_id.
 
@@ -1265,8 +1317,6 @@ class Driver:
         if not username and not user_id:
             Settings.err_print("missing user to message")
             return False
-        auth_ = self.auth()
-        if not auth_: return False
         try:
             type__ = None # default
             # if the username is a key string it will behave differently
@@ -1276,12 +1326,12 @@ class Driver:
             elif str(username).lower() == "renew on": type__ = "messageRenewers"
             successful = False
             if type__ != None:
-                self.go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+                Driver.go_to_page(ONLYFANS_NEW_MESSAGE_URL)
                 Settings.dev_print("clicking message type: {}".format(username))
-                self.find_element_to_click(type__).click()
+                Driver.find_element_to_click(type__).click()
                 successful = True
             else:
-                successful = self.message_user(username=username, user_id=user_id)
+                successful = Driver.message_user(username=username, user_id=user_id)
             Settings.dev_print("successfully started message: {}".format(username))
             return successful
         except Exception as e:
@@ -1289,7 +1339,7 @@ class Driver:
             Settings.err_print("failure to message - {}".format(username))
             return False
      
-    def message_confirm(self):
+    def message_confirm():
         """
         Wait for the message open on the page's Confirm button to be clickable and click it
 
@@ -1301,7 +1351,7 @@ class Driver:
         """
 
         try:
-            WAIT = WebDriverWait(self.browser, 600, poll_frequency=10)
+            WAIT = WebDriverWait(Driver.browser, 600, poll_frequency=10)
             i = 0
             Settings.dev_print("waiting for message confirm to be clickable")
             while True:
@@ -1317,12 +1367,12 @@ class Driver:
                         Settings.err_print("max upload time reached")
                         return False
             Settings.dev_print("getting confirm to click")
-            confirm = self.find_element_to_click("new_post")
+            confirm = Driver.find_element_to_click("new_post")
             if Settings.is_debug() == "True":
                 Settings.print('OnlyFans Message: Skipped (debug)')
                 Settings.dev_print("### Message Successful (debug) ###")
                 Settings.debug_delay_check()
-                self.go_to_home()
+                Driver.go_to_home()
                 return True
             Settings.dev_print("clicking confirm")
             confirm.click()
@@ -1335,34 +1385,7 @@ class Driver:
             Settings.dev_print("### Message Failure ###")
             return False
 
-    # def message_files(self, files=[]):
-    #     """
-    #     Enter the provided files into the message on the page
-
-    #     Parameters
-    #     ----------
-    #     files : list
-    #         List of File objects to upload
-        
-    #     Returns
-    #     -------
-    #     bool
-    #         Whether or not the upload was successful
-
-    #     """
-
-    #     if len(files) == 0: return True
-    #     try:
-    #         self.upload_files(files=files)
-    #         Settings.maybe_print("successfully began file uploads")
-    #         Settings.debug_delay_check()
-    #         return True
-    #     except Exception as e:
-    #         Driver.error_checker(e)
-    #         Settings.err_print("failure to upload file(s)")
-    #         return False
-
-    def message_price(self, price):
+    def message_price(price):
         """
         Enter the provided price into the message on the page
 
@@ -1386,7 +1409,7 @@ class Driver:
             # Settings.print("price: {}".format(price))
             Settings.dev_print("waiting for price area to enter price")
             # finds the button on the page with the #icon-price text
-            priceElements = self.browser.find_elements_by_class_name(Element.get_element_by_name("priceClick").getClass())
+            priceElements = Driver.browser.find_elements_by_class_name(Element.get_element_by_name("priceClick").getClass())
             priceElement = None
             for ele in priceElements:
                 # Settings.dev_print("{}  {}".format(ele.get_attribute("value")))
@@ -1396,16 +1419,16 @@ class Driver:
                 Settings.dev_print("failed to find price button")
                 Settings.err_print("failure to enter price")
                 return False
-            # priceElement = WebDriverWait(self.browser, 60, poll_frequency=10).until(EC.element_to_be_clickable(priceElement))
+            # priceElement = WebDriverWait(Driver.browser, 60, poll_frequency=10).until(EC.element_to_be_clickable(priceElement))
             Settings.dev_print("entering price")
             priceElement.click()
-            actions = ActionChains(self.browser)
+            actions = ActionChains(Driver.browser)
             actions.send_keys(str(price)) 
             actions.perform()
             Settings.dev_print("entered price")
             # Settings.debug_delay_check()
             Settings.dev_print("saving price")
-            self.find_element_to_click("priceSave").click()    
+            Driver.find_element_to_click("priceSave").click()    
             Settings.dev_print("successfully saved price")
             return True
         except Exception as e:
@@ -1413,7 +1436,7 @@ class Driver:
             Settings.err_print("failure to enter price")
             return False
 
-    def message_text(self, text):
+    def message_text(text):
         """
         Enter the provided text into the message on the page
 
@@ -1430,17 +1453,15 @@ class Driver:
         """
 
         try:
-            # auth_ = self.auth()
-            # if not auth_: return False
-            # self.go_to_page(ONLYFANS_HOME_URL)
+            # Driver.go_to_page(ONLYFANS_HOME_URL)
             if not text or text == None or str(text) == "None" or text == "":
                 Settings.warn_print("missing text for message")
                 return False
             # Settings.print("text: {}".format(text))
             Settings.dev_print("finding text area")
-            # message = self.find_element_by_name("messageText")     
-            message = self.browser.find_element_by_id("new_post_text_input")     
-            # message = self.browser.find_element_by_name("message")     
+            # message = Driver.find_element_by_name("messageText")     
+            message = Driver.browser.find_element_by_id("new_post_text_input")     
+            # message = Driver.browser.find_element_by_name("message")     
             Settings.dev_print("entering text")
             message.send_keys(str(text))
             Settings.dev_print("successfully entered text")
@@ -1450,7 +1471,7 @@ class Driver:
             Settings.err_print("failure to enter message")
             return False
 
-    def message_user_by_id(self, user_id=None):
+    def message_user_by_id(user_id=None):
         """
         Message the provided user id
 
@@ -1471,16 +1492,14 @@ class Driver:
             Settings.warn_print("missing user id")
             return False
         try:
-            auth_ = self.auth()
-            if not auth_: return False
-            self.go_to_page("{}/{}".format(ONLYFANS_CHAT_URL, user_id))
+            Driver.go_to_page("{}/{}".format(ONLYFANS_CHAT_URL, user_id))
             return True
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failure to goto user - {}".format(user_id))
             return False
 
-    def message_user(self, username=None, user_id=None):
+    def message_user(username=None, user_id=None):
         """
         Message the matching username or user id
 
@@ -1498,17 +1517,15 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return None
         Settings.dev_print("username: {} : {}: user_id".format(username, user_id))
-        if user_id and str(user_id) != "None": return self.message_user_by_id(user_id=user_id)
+        if user_id and str(user_id) != "None": return Driver.message_user_by_id(user_id=user_id)
         if not username:
             Settings.err_print("missing username to message")
             return False
         try:
-            self.go_to_page(username)
+            Driver.go_to_page(username)
             time.sleep(5) # for whatever reason this constantly errors out from load times
-            elements = self.browser.find_elements_by_tag_name("a")
+            elements = Driver.browser.find_elements_by_tag_name("a")
             ele = [ele for ele in elements
                     if "/my/chats/chat/" in str(ele.get_attribute("href"))]
             if len(ele) == 0:
@@ -1516,19 +1533,20 @@ class Driver:
                 return False
             ele = ele[0]
             ele = ele.get_attribute("href").replace("https://onlyfans.com", "")
-            # clicking no longer works? just open href in self.browser
+            # clicking no longer works? just open href in Driver.browser
             # Settings.dev_print("clicking send message")
             # ele.click()
+            # Settings.dev_print(ele.get_attribute("href"))
+            Settings.dev_print(ele)
             Settings.dev_print("successfully messaging username: {}".format(username))
-            # Settings.print(ele.get_attribute("href"))
-            self.go_to_page(ele)
+            Driver.go_to_page(ele)
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failed to message user")
             return False
         return True
 
-    def messages_scan(self, num=0):
+    def messages_scan(num=0):
         """
         Scan messages page for recent users
 
@@ -1557,42 +1575,40 @@ class Driver:
         # if int(num) == 0: num = Settings.get_user_num()
         users = []
         try:
-            auth_ = self.auth()
-            if not auth_: return False
-            self.go_to_page("/my/chats")
+            Driver.go_to_page("/my/chats")
 
             # num += len(notusers)
 
             ## so none of the scrolling is working, might as well only return the top 10 every time
             # count = 0
             # while True:
-                # elements = self.browser.find_elements_by_class_name("b-chats__item__link")
+                # elements = Driver.browser.find_elements_by_class_name("b-chats__item__link")
                 # if len(elements) <= int(num): break
                 # if len(elements) <= int(count): break
                 # Settings.print_same_line("({}/{}) scrolling...".format(count, len(elements)))
                 # count = len(elements)
-                # elementToFocus = self.browser.find_element_by_class_name("g-section-title")
+                # elementToFocus = Driver.browser.find_element_by_class_name("g-section-title")
                 # elementToFocus = elements[0]
                 # Settings.print(elementToFocus.get_attribute("innerHTML"))
-                # self.browser.execute_script("arguments[0].focus();", elementToFocus)
-                # actions = ActionChains(self.browser)
+                # Driver.browser.execute_script("arguments[0].focus();", elementToFocus)
+                # actions = ActionChains(Driver.browser)
                 # actions.send_keys(Keys.PAGE_DOWN) 
                 # actions.perform()
-                # self.browser.execute_script("window.scrollBy(0,250)", "");
-                # self.browser.execute_script("scroll(0, 250);");
+                # Driver.browser.execute_script("window.scrollBy(0,250)", "");
+                # Driver.browser.execute_script("scroll(0, 250);");
                 # elementToFocus.send_keys(Keys.END)
                 # elementToFocus.sendKeys(Keys.PAGE_DOWN);
                 # elementToFocus.sendKeys(Keys.PAGE_DOWN);
                 # elementToFocus.sendKeys(Keys.PAGE_DOWN);
                 # elementToFocus = elements[0]
                 # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                # self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                # Driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 # time.sleep(2)
 
-            users_ = self.browser.find_elements_by_class_name("g-user-username")
+            users_ = Driver.browser.find_elements_by_class_name("g-user-username")
             Settings.dev_print("users: {}".format(len(users_)))
 
-            user_ids = self.browser.find_elements_by_class_name("b-chats__item__link")
+            user_ids = Driver.browser.find_elements_by_class_name("b-chats__item__link")
             Settings.dev_print("ids: {}".format(len(user_ids)))
 
 
@@ -1621,7 +1637,7 @@ class Driver:
         return users
 
 
-    def move_to_then_click_element(self, element):
+    def move_to_then_click_element(element):
         """
         Move to then click element.
         
@@ -1646,18 +1662,18 @@ class Driver:
             passed_in_driver.execute_script(scroll_nav_out_of_way)
         #
         try:
-            ActionChains(self.browser).move_to_element(element).click().perform()
+            ActionChains(Driver.browser).move_to_element(element).click().perform()
         except Exception as e:
             Settings.dev_print(e)
-            if 'firefox' in self.browser.capabilities['browserName']:
-                scroll_shim(self.browser, element)
+            if 'firefox' in Driver.browser.capabilities['browserName']:
+                scroll_shim(Driver.browser, element)
             try:
-                ActionChains(self.browser).move_to_element(element).click().perform()
+                ActionChains(Driver.browser).move_to_element(element).click().perform()
             except Exception as e:
                 Settings.dev_print(e)
-            # self.browser.execute_script("arguments[0].scrollIntoView();", ele)
-                self.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
-                ActionChains(self.browser).move_to_element(element).click().perform()
+            # Driver.browser.execute_script("arguments[0].scrollIntoView();", ele)
+                Driver.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
+                ActionChains(Driver.browser).move_to_element(element).click().perform()
 
 
     ####################################################################################################
@@ -1665,7 +1681,7 @@ class Driver:
     ####################################################################################################
 
     # tries both and throws error for not found element internally
-    def open_more_options(self):
+    def open_more_options():
         """
         Click to open more options on a post.
 
@@ -1680,7 +1696,7 @@ class Driver:
             """Click on '...' element"""
 
             Settings.dev_print("opening options (1)")
-            moreOptions = self.find_element_to_click("moreOptions")
+            moreOptions = Driver.find_element_to_click("moreOptions")
             if not moreOptions: return False    
             moreOptions.click()
             Settings.dev_print("successfully opened more options (1)")
@@ -1689,7 +1705,7 @@ class Driver:
             """Click in empty space"""
 
             Settings.dev_print("opening options (2)")
-            moreOptions = self.browser.find_element_by_id(Element.get_element_by_name("enterText").getId())
+            moreOptions = Driver.browser.find_element_by_id(Element.get_element_by_name("enterText").getId())
             if not moreOptions: return False    
             moreOptions.click()
             Settings.dev_print("successfully opened more options (2)")
@@ -1708,7 +1724,7 @@ class Driver:
     ##### Poll #####
     ################
 
-    def poll(self, poll=None):
+    def poll(poll=None):
         """
         Enter the Poll object into the current post
 
@@ -1727,8 +1743,6 @@ class Driver:
         if not poll:
             Settings.err_print("missing poll")
             return False
-        auth_ = self.auth()
-        if not auth_: return False
         Settings.dev_print("poll")
         poll.get()
         duration = poll.get_duration()
@@ -1738,17 +1752,17 @@ class Driver:
             Settings.print("- Duration: {}".format(duration))
             Settings.print("- Questions:\n> {}".format("\n> ".join(questions)))
             # make sure the extra options are shown
-            self.open_more_options()
+            Driver.open_more_options()
             # add a poll
             Settings.dev_print("adding poll")
-            self.find_element_to_click("poll").click()
+            Driver.find_element_to_click("poll").click()
             # open the poll duration
             Settings.dev_print("adding duration")
-            self.find_element_to_click("pollDuration").click()
+            Driver.find_element_to_click("pollDuration").click()
             # click on the correct duration number
             Settings.dev_print("setting duration")
-            # nums = self.browser.find_elements_by_class_name(Element.get_element_by_name("pollDurations").getClass())
-            nums = self.find_elements_by_name("pollDurations")
+            # nums = Driver.browser.find_elements_by_class_name(Element.get_element_by_name("pollDurations").getClass())
+            nums = Driver.find_elements_by_name("pollDurations")
             for num in nums:
                 ##
                 # <span class="g-first-letter">1</span> day
@@ -1765,17 +1779,17 @@ class Driver:
                 if ">o limit<" in str(inner) and int(duration) == 99: num.click()
             # save the duration
             Settings.dev_print("saving duration")
-            self.find_element_to_click("pollSave").click()
+            Driver.find_element_to_click("pollSave").click()
             Settings.dev_print("successfully saved duration")
             # add extra question space
             if len(questions) > 2:
                 for question in questions[2:]:
                     Settings.dev_print("adding question")
-                    question_ = self.find_element_to_click("pollQuestionAdd").click()
+                    question_ = Driver.find_element_to_click("pollQuestionAdd").click()
                     Settings.dev_print("added question")
             # find the question inputs
             Settings.dev_print("locating question paths")
-            questions_ = self.browser.find_elements_by_xpath(Element.get_element_by_name("pollInput").getXPath())
+            questions_ = Driver.browser.find_elements_by_xpath(Element.get_element_by_name("pollInput").getXPath())
             Settings.dev_print("question paths: {}".format(len(questions_)))
             # enter the questions
             i = 0
@@ -1789,8 +1803,8 @@ class Driver:
             Settings.dev_print("successfully entered questions")
             Settings.debug_delay_check()
             if Settings.is_debug() == "True":
-                Settings.print("Skipping: Poll (debug)")
-                cancel = self.find_element_to_click("pollCancel")
+                Settings.print("skipping: Poll (debug)")
+                cancel = Driver.find_element_to_click("pollCancel")
                 cancel.click()
                 Settings.dev_print("### Poll Successfully Canceled ###")
             else:
@@ -1807,7 +1821,7 @@ class Driver:
     ##### Post #####
     ################
 
-    def post(self, message=None):
+    def post(message):
         """
         Post the message to OnlyFans.
 
@@ -1832,15 +1846,11 @@ class Driver:
         """
 
         if not message:
-            print(1)
             Settings.err_print("missing message")
             return False
-        auth_ = self.auth()
-        if not auth_: return False
         Settings.dev_print("posting")
         try:
-            self.go_to_home()
-            message.init()
+            Driver.go_to_home()
             files = message.get_files()
             text = message.format_text()
             expires = message.get_expiration()
@@ -1857,22 +1867,22 @@ class Driver:
             # Settings.print("====================")
             ## Expires, Schedule, Poll
             if expires:
-                if not self.expires(expiration=expires):
+                if not Driver.expires(expiration=expires):
                     Settings.print("- Expires: False".format(text))
                     return False
                 Settings.print("- Expires: True".format(text))
             if schedule:
-                if not self.schedule(schedule=schedule):
+                if not Driver.schedule(schedule=schedule):
                     Settings.print("- Scheduled: False".format(text))
                     return False
                 Settings.print("- Scheduled: True".format(text))
             if poll:
-                if not self.poll(poll=poll):
+                if not Driver.poll(poll=poll):
                     Settings.print("- Poll: False".format(text))
                     return False
                 Settings.print("- Poll: True".format(text))
             Settings.print("====================")
-            WAIT = WebDriverWait(self.browser, 600, poll_frequency=10)
+            WAIT = WebDriverWait(Driver.browser, 600, poll_frequency=10)
             ## Tweeting
             if Settings.is_tweeting() == "True":
                 Settings.dev_print("tweeting")
@@ -1881,9 +1891,9 @@ class Driver:
             
             ## Upload Files
             try:
-                successful_upload = self.upload_files(files) or False # neither of these are supposed to fail
+                successful_upload = Driver.upload_files(files) or False # neither of these are supposed to fail
                 ## Text
-                successful_text = self.enter_text(text) or False # neither of these are supposed to fail
+                successful_text = Driver.enter_text(text) or False # neither of these are supposed to fail
                 if not successful_text or not successful_upload:
                     Settings.err_print("unable to post")
                     return False
@@ -1891,15 +1901,15 @@ class Driver:
                 i = 0
                 while True:
                     try:
-                        WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("sendButton").getClass())))
+                        WebDriverWait(Driver.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("sendButton").getClass())))
                         Settings.dev_print("upload complete")
                         break
                     except Exception as e:
                         # try: 
                         #     # check for existence of "thumbnail is fucked up" modal and hit ok button
                         #     # haven't seen in long enough time to properly add
-                        #     self.browser.switchTo().frame("iframe");
-                        #     self.browser.find_element_by_class_name("g-btn m-rounded m-border").send_keys(Keys.ENTER)
+                        #     Driver.browser.switchTo().frame("iframe");
+                        #     Driver.browser.find_element_by_class_name("g-btn m-rounded m-border").send_keys(Keys.ENTER)
                         #     Settings.err_print("thumbnail missing")
                         #     break
                         # except Exception as ef:
@@ -1916,13 +1926,13 @@ class Driver:
 
             ## Confirm
             try:
-                send = self.find_element_to_click("new_post")
+                send = Driver.find_element_to_click("new_post")
                 if send:
                     Settings.debug_delay_check()
                     if Settings.is_debug() == "True":
                         Settings.print('Skipped: OnlyFans Post (debug)')
                         Settings.debug_delay_check()
-                        self.go_to_home(force=True)
+                        Driver.go_to_home(force=True)
                         return True
                     Settings.dev_print("confirming upload")
                     send.click()
@@ -1946,7 +1956,7 @@ class Driver:
     ##### Promotions #####
     ######################
 
-    def promotional_campaign(self, promotion=None):
+    def promotional_campaign(promotion=None):
         """
         Enter the promotion as a campaign.
 
@@ -1965,8 +1975,6 @@ class Driver:
         if not promotion:
             Settings.err_print("missing promotion")
             return False
-        auth_ = self.auth()
-        if not auth_: return False
         # go to onlyfans.com/my/subscribers/active
         try:
             promotion.get()
@@ -1977,9 +1985,9 @@ class Driver:
             amount = promotion.get_amount()
             text = promotion.get_message()
             Settings.maybe_print("goto -> /my/promotions")
-            self.browser.get(('https://onlyfans.com/my/promotions'))
+            Driver.go_to_page("my/promotions")
             Settings.dev_print("checking existing promotion")
-            copies = self.browser.find_elements_by_class_name("g-btn.m-rounded.m-uppercase")
+            copies = Driver.browser.find_elements_by_class_name("g-btn.m-rounded.m-uppercase")
             for copy in copies:
                 if "copy link to profile" in str(copy.get_attribute("innerHTML")).lower():
                 # Settings.print("{}".format(copy.get_attribute("innerHTML")))
@@ -1989,13 +1997,13 @@ class Driver:
                     Settings.print("Copied existing promotion")
                     return True
             Settings.dev_print("clicking promotion campaign")
-            self.find_element_to_click("promotionalCampaign").click()
+            Driver.find_element_to_click("promotionalCampaign").click()
             Settings.dev_print("successfully clicked promotion campaign")
             # Settings.debug_delay_check()
             time.sleep(10)
             # limit dropdown
             Settings.dev_print("setting campaign count")
-            limitDropwdown = self.find_element_by_name("promotionalTrialCount")
+            limitDropwdown = Driver.find_element_by_name("promotionalTrialCount")
             for n in range(11): # 11 max subscription limits
                 limitDropwdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
@@ -2006,7 +2014,7 @@ class Driver:
             Settings.debug_delay_check()
             # expiration dropdown
             Settings.dev_print("settings campaign expiration")
-            expirationDropdown = self.find_element_by_name("promotionalTrialExpiration")
+            expirationDropdown = Driver.find_element_by_name("promotionalTrialExpiration")
             for n in range(11): # 31 max days
                 expirationDropdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
@@ -2017,7 +2025,7 @@ class Driver:
             Settings.debug_delay_check()
             # duration dropdown
             # LIMIT_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
-            durationDropdown = self.find_element_by_name("promotionalCampaignAmount")
+            durationDropdown = Driver.find_element_by_name("promotionalCampaignAmount")
             Settings.dev_print("entering discount amount")
             for n in range(11):
                 durationDropdown.send_keys(str(Keys.UP))
@@ -2025,7 +2033,7 @@ class Driver:
                 durationDropdown.send_keys(Keys.DOWN)
             Settings.dev_print("successfully entered discount amount")
             # todo: add message to users
-            message = self.find_element_by_name("promotionalTrialMessage")
+            message = Driver.find_element_by_name("promotionalTrialMessage")
             Settings.dev_print("found message text")
             message.clear()
             Settings.dev_print("sending text")
@@ -2035,14 +2043,14 @@ class Driver:
             # find and click promotionalTrialConfirm
             if Settings.is_debug() == "True":
                 Settings.dev_print("finding campaign cancel")
-                self.find_element_to_click("promotionalTrialCancel").click()
-                Settings.print("Skipping: Promotion (debug)")
+                Driver.find_element_to_click("promotionalTrialCancel").click()
+                Settings.print("skipping: Promotion (debug)")
                 Settings.dev_print("successfully cancelled promotion campaign")
                 return True
             Settings.dev_print("finding campaign save")
-            save_ = self.find_element_to_click("promotionalTrialConfirm")
-            # save_ = self.find_element_to_click("promotionalCampaignConfirm")
-            save_ = self.browser.find_elements_by_class_name("g-btn.m-rounded")
+            save_ = Driver.find_element_to_click("promotionalTrialConfirm")
+            # save_ = Driver.find_element_to_click("promotionalCampaignConfirm")
+            save_ = Driver.browser.find_elements_by_class_name("g-btn.m-rounded")
             for save__ in save_:
                 Settings.print(save__.get_attribute("innerHTML"))
             if len(save_) == 0:
@@ -2060,7 +2068,7 @@ class Driver:
             # todo: add copy link to profile
             Settings.debug_delay_check()
             Settings.dev_print("clicking copy")
-            copies = self.browser.find_elements_by_class_name("g-btn.m-rounded.m-uppercase")
+            copies = Driver.browser.find_elements_by_class_name("g-btn.m-rounded.m-uppercase")
             for copy in copies:
                 Settings.print("{}".format(copy.get_attribute("innerHTML")))
                 if "copy link to profile" in str(copy.get_attribute("innerHTML")).lower():
@@ -2073,7 +2081,7 @@ class Driver:
             return None
 
     # or email
-    def promotional_trial_link(self, promotion=None):
+    def promotional_trial_link(promotion=None):
         """
         Enter the promotion as a trial link
 
@@ -2092,8 +2100,6 @@ class Driver:
         if not promotion:
             Settings.err_print("missing promotion")
             return False
-        auth_ = self.auth()
-        if not auth_: return False
         # go to onlyfans.com/my/subscribers/active
         try:
             promotion.get()
@@ -2102,16 +2108,16 @@ class Driver:
             duration = promotion.get_duration()
             user = promotion.get_user()
             Settings.maybe_print("goto -> /my/promotions")
-            self.browser.get(('https://onlyfans.com/my/promotions'))
+            Driver.go_to_page("/my/promotions")
             Settings.dev_print("showing promotional trial link")
-            self.find_element_to_click("promotionalTrialShow").click()
+            Driver.find_element_to_click("promotionalTrialShow").click()
             Settings.dev_print("successfully showed promotional trial link")
             Settings.dev_print("creating promotional trial")
-            self.find_element_to_click("promotionalTrial").click()
+            Driver.find_element_to_click("promotionalTrial").click()
             Settings.dev_print("successfully clicked promotional trial")
             # limit dropdown
             Settings.dev_print("setting trial count")
-            limitDropwdown = self.find_element_by_name("promotionalTrialCount")
+            limitDropwdown = Driver.find_element_by_name("promotionalTrialCount")
             for n in range(11): # 11 max subscription limits
                 limitDropwdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
@@ -2122,7 +2128,7 @@ class Driver:
             Settings.debug_delay_check()
             # expiration dropdown
             Settings.dev_print("settings trial expiration")
-            expirationDropdown = self.find_element_by_name("promotionalTrialExpiration")
+            expirationDropdown = Driver.find_element_by_name("promotionalTrialExpiration")
             for n in range(11): # 31 max days
                 expirationDropdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
@@ -2134,7 +2140,7 @@ class Driver:
             # duration dropdown
             # LIMIT_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
             Settings.dev_print("settings trial duration")
-            durationDropwdown = self.find_element_by_name("promotionalTrialDuration")
+            durationDropwdown = Driver.find_element_by_name("promotionalTrialDuration")
             for n in range(11):
                 durationDropwdown.send_keys(str(Keys.UP))
             Settings.debug_delay_check()
@@ -2154,15 +2160,15 @@ class Driver:
             # find and click promotionalTrialConfirm
             # if Settings.is_debug():
             #     Settings.dev_print("finding trial cancel")
-            #     self.find_element_to_click("promotionalTrialCancel").click()
-            #     Settings.print("Skipping: Promotion (debug)")
+            #     Driver.find_element_to_click("promotionalTrialCancel").click()
+            #     Settings.print("skipping: Promotion (debug)")
             #     Settings.dev_print("successfully cancelled promotion trial")
             #     return True
             Settings.dev_print("finding trial save")
-            save_ = self.find_element_to_click("promotionalTrialConfirm")
+            save_ = Driver.find_element_to_click("promotionalTrialConfirm")
             # "g-btn.m-rounded"
 
-            save_ = self.browser.find_elements_by_class_name("g-btn.m-rounded")
+            save_ = Driver.browser.find_elements_by_class_name("g-btn.m-rounded")
             for save__ in save_:
                 Settings.print(save__.get_attribute("innerHTML"))
             if len(save_) == 0:
@@ -2177,9 +2183,10 @@ class Driver:
             save_.click()
             Settings.dev_print("successfully saved promotion")
             ## TODO ##
+            # finish this
             link = ""
             # Settings.dev_print("copying trial link")
-            # self.find_element_by_name("promotionalTrialLink").click()
+            # Driver.find_element_by_name("promotionalTrialLink").click()
             # Settings.dev_print("successfully copied trial link")
 
             # in order for this to work accurately i need to figure out the number of trial things already on the page
@@ -2201,7 +2208,7 @@ class Driver:
             Settings.err_print("failed to apply promotion")
             return None
 
-    def promotion_user_directly(self, promotion=None):
+    def promotion_user_directly(promotion=None):
         """
         Apply the promotion directly to the user.
 
@@ -2220,8 +2227,6 @@ class Driver:
         if not promotion:
             Settings.err_print("missing promotion")
             return False
-        auth_ = self.auth()
-        if not auth_: return False
         # go to onlyfans.com/my/subscribers/active
         promotion.get()
         expiration = promotion.get_expiration()
@@ -2242,15 +2247,15 @@ class Driver:
             months = Settings.get_discount_min_months()
         try:
             Settings.maybe_print("goto -> /{}".format(user))
-            self.go_to_page(user)
+            Driver.go_to_page(user)
             # click discount button
-            self.find_element_to_click("discountUserPromotion").click()
+            Driver.find_element_to_click("discountUserPromotion").click()
             # enter expiration
-            expirations = self.find_element_by_name("promotionalTrialExpirationUser")
+            expirations = Driver.find_element_by_name("promotionalTrialExpirationUser")
             # enter duration
-            durations = self.find_element_by_name("promotionalTrialDurationUser")
+            durations = Driver.find_element_by_name("promotionalTrialDurationUser")
             # enter message
-            message = self.find_element_by_name("promotionalTrialMessageUser")
+            message = Driver.find_element_by_name("promotionalTrialMessageUser")
             # save
             Settings.dev_print("entering expiration")
             for n in range(11):
@@ -2270,10 +2275,10 @@ class Driver:
             message.send_keys(message)
             Settings.dev_print("successfully entered message")
             Settings.dev_print("applying discount")
-            save = self.find_element_by_name("promotionalTrialApply")
+            save = Driver.find_element_by_name("promotionalTrialApply")
             if Settings.is_debug() == "True":
-                self.find_element_by_name("promotionalTrialCancel").click()
-                Settings.print("Skipping: Save Discount (Debug)")
+                Driver.find_element_by_name("promotionalTrialCancel").click()
+                Settings.print("skipping: Save Discount (Debug)")
                 Settings.dev_print("successfully canceled discount")
                 cancel.click()
                 return True
@@ -2284,7 +2289,7 @@ class Driver:
         except Exception as e:
             Driver.error_checker(e)
             try:
-                self.find_element_by_name("promotionalTrialCancel").click()
+                Driver.find_element_by_name("promotionalTrialCancel").click()
                 Settings.dev_print("### Discount Successful Failure ###")
                 return False
             except Exception as e:
@@ -2294,7 +2299,7 @@ class Driver:
 
     ######################################################################
 
-    def read_user_messages(self, username=None, user_id=None):
+    def read_user_messages(username=None, user_id=None):
         """
         Read the messages of the target user by username or user id.
 
@@ -2312,14 +2317,12 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return False
         try:
             # go to onlyfans.com/my/subscribers/active
-            self.message_user(username=username, user_id=user_id)
+            Driver.message_user(username=username, user_id=user_id)
             messages_sent_ = []
             try:
-                messages_sent_ = self.find_elements_by_name("messagesFrom")
+                messages_sent_ = Driver.find_elements_by_name("messagesFrom")
             except Exception as e:
                 if "Unable to locate elements" in str(e):
                     pass
@@ -2328,7 +2331,7 @@ class Driver:
             # messages_received_.pop(0) # drop self user at top of page
             messages_all_ = []
             try:
-                messages_all_ = self.find_elements_by_name("messagesAll")
+                messages_all_ = Driver.find_elements_by_name("messagesAll")
             except Exception as e:
                 if "Unable to locate elements" in str(e):
                     pass
@@ -2336,7 +2339,7 @@ class Driver:
             messages_all = []
             messages_received = []
             messages_sent = []
-            # timestamps_ = self.browser.find_elements_by_class_name("b-chat__message__time")
+            # timestamps_ = Driver.browser.find_elements_by_class_name("b-chat__message__time")
             # timestamps = []
             # for timestamp in timestamps_:
                 # Settings.maybe_print("timestamp1: {}".format(timestamp))
@@ -2400,17 +2403,17 @@ class Driver:
     ##### Refresh #####
     ###################
 
-    def refresh(self):
+    def refresh():
         """Refresh the web browser"""
 
         Settings.dev_print("refreshing browser...")
-        self.browser.refresh()
+        Driver.browser.refresh()
 
     #################
     ##### Reset #####
     #################
 
-    def reset(self):
+    def reset():
         """
         Reset the web browser to home page
 
@@ -2421,11 +2424,11 @@ class Driver:
 
         """
 
-        if not self.browser:
-            Settings.print('OnlyFans Not Open, Skipping Reset')
+        if not Driver.browser:
+            Settings.print('OnlyFans Not Open, skipping Reset')
             return True
         try:
-            self.go_to_home()
+            Driver.go_to_home()
             Settings.print('OnlyFans Reset')
             return True
         except Exception as e:
@@ -2437,7 +2440,7 @@ class Driver:
     ##### Schedule #####
     ####################
 
-    def schedule(self, schedule=None):
+    def schedule(schedule=None):
         """
         Enter the provided schedule
 
@@ -2456,8 +2459,6 @@ class Driver:
         if not schedule:
             Settings.err_print("missing schedule")
             return False
-        auth_ = self.auth()
-        if not auth_: return False
         try:
             schedule.get()
             month_ = schedule.month
@@ -2487,23 +2488,23 @@ class Driver:
             Settings.print("Schedule:")
             Settings.print("- Date: {}".format(schedule.date))
             Settings.print("- Time: {}".format(schedule.time))
-            self.open_more_options()
+            Driver.open_more_options()
             # click schedule
             Settings.dev_print("opening schedule")
-            self.find_element_to_click("scheduleAdd").click()
+            Driver.find_element_to_click("scheduleAdd").click()
             Settings.dev_print("successfully opened schedule")
 
             # find and click month w/ correct date
             while True:
                 Settings.dev_print("getting date")
-                existingDate = self.find_element_by_name("scheduleDate").get_attribute("innerHTML")
+                existingDate = Driver.find_element_by_name("scheduleDate").get_attribute("innerHTML")
                 Settings.dev_print("date: {} - {} {}".format(existingDate, month_, year_))
                 if str(month_) in str(existingDate) and str(year_) in str(existingDate): break
-                else: self.find_element_to_click("scheduleNextMonth").click()
+                else: Driver.find_element_to_click("scheduleNextMonth").click()
             Settings.dev_print("successfully set month")
             # set day in month
             Settings.dev_print("setting days")
-            days = self.find_elements_by_name("scheduleDays")
+            days = Driver.find_elements_by_name("scheduleDays")
             for day in days:
                 inner = day.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>","")
                 if str(day_) == str(inner):
@@ -2513,14 +2514,13 @@ class Driver:
             Settings.debug_delay_check()
             
             # save schedule date
-            saves = self.find_element_to_click("scheduleNext")
+            saves = Driver.find_element_to_click("scheduleNext")
             Settings.dev_print("found next button, clicking")
             saves.click()
             Settings.dev_print("successfully saved date")
             # set hours
             # try:
-            #     Settings.print(1)
-            #     hours = self.browser.find_element_by_class_name("vdatetime-time-picker.vdatetime-time-picker__with-suffix")
+            #     hours = Driver.browser.find_element_by_class_name("vdatetime-time-picker.vdatetime-time-picker__with-suffix")
             #     Settings.print(hours)
             #     for hour in hours:
             #         Settings.print(hour.get_attribute("class"))
@@ -2530,7 +2530,7 @@ class Driver:
 
                 # try:
                 #     Settings.print(2)
-                #     hours = self.browser.find_element_by_class_name("vdatetime-time-picker__list--hours")
+                #     hours = Driver.browser.find_element_by_class_name("vdatetime-time-picker__list--hours")
                 #     Settings.print(hours)
                 #     for hour in hours:
                 #         Settings.print(hour.get_attribute("class"))
@@ -2542,7 +2542,7 @@ class Driver:
                 # return False
 
             Settings.dev_print("setting hours")
-            hours = self.find_elements_by_name("scheduleHours")
+            hours = Driver.find_elements_by_name("scheduleHours")
             # this finds both hours and minutes so just cut off first 12
             hours = hours[:12]
             for hour in hours:
@@ -2553,7 +2553,7 @@ class Driver:
                     break
             # set minutes
             Settings.dev_print("setting minutes")
-            minutes = self.find_elements_by_name("scheduleMinutes")
+            minutes = Driver.find_elements_by_name("scheduleMinutes")
             # and get ones after first 12 hours
             minutes = minutes[12:]
             for minute in minutes:
@@ -2564,8 +2564,8 @@ class Driver:
                     break
             # set am/pm
             Settings.dev_print("setting suffix")
-            # suffixes = self.find_elements_by_name("scheduleAMPM")
-            suffixes = self.find_elements_by_name("scheduleMinutes")
+            # suffixes = Driver.find_elements_by_name("scheduleAMPM")
+            suffixes = Driver.find_elements_by_name("scheduleMinutes")
             for suffix in suffixes:
                 inner = suffix.get_attribute("innerHTML")
                 if str(schedule.suffix).lower() in str(inner).lower() and suffix.is_enabled():
@@ -2576,11 +2576,11 @@ class Driver:
             Settings.dev_print("saving schedule")
             Settings.debug_delay_check()
             if Settings.is_debug() == "True":
-                Settings.print("Skipping: Schedule (debug)")
-                self.find_element_to_click("scheduleCancel").click()
+                Settings.print("skipping: Schedule (debug)")
+                Driver.find_element_to_click("scheduleCancel").click()
                 Settings.dev_print("successfully canceled schedule")
             else:
-                self.find_element_to_click("scheduleSave").click()
+                Driver.find_element_to_click("scheduleSave").click()
                 Settings.dev_print("successfully saved schedule")
                 Settings.print("Schedule Entered")
             Settings.dev_print("### Schedule Successful ###")
@@ -2616,7 +2616,7 @@ class Driver:
     #         Driver.error_checker(e)
     #     return profile
 
-    def sync_from_settings_page(self, profile=None, page=None):
+    def sync_from_settings_page(profile=None, page=None):
         """
         Sync values from settings page.
 
@@ -2634,14 +2634,12 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return False
         Settings.print("Getting Settings: {}".format(page))
         from ..classes.profile import Profile
         try:
             variables = Profile.get_variables_for_page(page)
             Settings.dev_print("going to settings page: {}".format(page))
-            self.go_to_settings(page)
+            Driver.go_to_settings(page)
             Settings.dev_print("reached settings: {}".format(page))
             if profile == None:
                 profile = Profile()
@@ -2652,7 +2650,7 @@ class Driver:
                 status = None
                 Settings.dev_print("searching: {} - {}".format(name, type_))
                 try:
-                    element = self.find_element_by_name(name)
+                    element = Driver.find_element_by_name(name)
                     Settings.dev_print("successful ele: {}".format(name))
                 except Exception as e:
                     Driver.error_checker(e)
@@ -2667,8 +2665,8 @@ class Driver:
                     # get state true|false
                     status = element.is_selected()
                 elif str(type_) == "dropdown":
-                    ele = self.find_element_by_name(name)
-                    Select(self.browser.find_element_by_id(ele.getId()))
+                    ele = Driver.find_element_by_name(name)
+                    Select(Driver.browser.find_element_by_id(ele.getId()))
                     status = element.first_selected_option
                 elif str(type_) == "list":
                     status = element.get_attribute("innerHTML")
@@ -2689,7 +2687,7 @@ class Driver:
             Driver.error_checker(e)
 
     # goes through each page and sets all the values
-    def sync_to_settings_page(self, profile=None, page=None):
+    def sync_to_settings_page(profile=None, page=None):
         """
         Sync values to settings page.
 
@@ -2707,14 +2705,12 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return False
         Settings.print("Updating Page Settings: {}".format(page))
         from ..classes.profile import Profile
         try:
             variables = Profile.get_variables_for_page(page)
             Settings.dev_print("going to settings page: {}".format(page))
-            self.go_to_settings(page)
+            Driver.go_to_settings(page)
             Settings.dev_print("reached settings: {}".format(page))
             if profile == None:
                 profile = Profile()
@@ -2725,7 +2721,7 @@ class Driver:
                 status = None
                 Settings.dev_print("searching: {} - {}".format(name, type_))
                 try:
-                    element = self.find_element_by_name(name)
+                    element = Driver.find_element_by_name(name)
                     Settings.dev_print("successful ele: {}".format(name))
                 except Exception as e:
                     Driver.error_checker(e)
@@ -2737,8 +2733,8 @@ class Driver:
                     # somehow set the other toggle state
                     pass
                 elif str(type_) == "dropdown":
-                    ele = self.find_element_by_name(name)
-                    Select(self.browser.find_element_by_id(ele.getId()))
+                    ele = Driver.find_element_by_name(name)
+                    Select(Driver.browser.find_element_by_id(ele.getId()))
                     # go to top
                     # then go to matching value
                     pass
@@ -2751,7 +2747,7 @@ class Driver:
             if Settings.is_debug() == "True":
                 Settings.dev_print("successfully cancelled settings page: {}".format(page))
             else:
-                self.settings_save(page=page)
+                Driver.settings_save(page=page)
                 Settings.dev_print("successfully set settings page: {}".format(page))
             Settings.print("Settings Page Updated: {}".format(page))
         except Exception as e:
@@ -2759,8 +2755,6 @@ class Driver:
 
     # @staticmethod
     # def settings_set_all(Profile):
-    #     auth_ = self.auth()
-    #     if not auth_: return False
     #     Settings.print("Updating All Settings")
     #     try:
     #         pages = Profile.TABS
@@ -2781,7 +2775,7 @@ class Driver:
         # story
         # notifications
         # other
-    def settings_save(self, page=None):
+    def settings_save(page=None):
         """
         Save the provided settings page if it is a page that saves
 
@@ -2797,12 +2791,12 @@ class Driver:
             return
         try:
             Settings.dev_print("saving: {}".format(page))
-            element = self.find_element_by_name("profileSave")
+            element = Driver.find_element_by_name("profileSave")
             Settings.dev_print("derp")
-            element = self.find_element_to_click("profileSave")
+            element = Driver.find_element_to_click("profileSave")
             Settings.dev_print("found page save")
             if Settings.is_debug() == "True":
-                Settings.print("Skipping: Save (debug)")
+                Settings.print("skipping: Save (debug)")
             else:
                 Settings.dev_print("saving page")
                 element.click()
@@ -2815,7 +2809,7 @@ class Driver:
     #################
 
     @staticmethod
-    def spawn_browser(browserType, driver=None):
+    def spawn_browser(browserType):
         """
         Spawns a browser according to args.
 
@@ -2864,12 +2858,12 @@ class Driver:
                 Settings.dev_print("reconnect url: {}".format(url))
                 # https://stackoverflow.com/questions/8344776/can-selenium-interact-with-an-existing-browser-session
                 original_execute = WebDriver.execute
-                def new_command_execute(self, command, params=None):
+                def new_command_execute(command, params=None):
                     if command == "newSession":
                         # Mock the response
                         return {'success': 0, 'value': None, 'sessionId': reconnect_id}
                     else:
-                        return original_execute(self, command, params)
+                        return original_execute(command, params)
                 # Patch the function before creating the browser object
                 WebDriver.execute = new_command_execute
                 browser = webdriver.Remote(command_executor=url, desired_capabilities={})
@@ -2882,13 +2876,13 @@ class Driver:
 
 
                 return browser
-            except Exception as e:
-                if str(e) != "'NoneType' object has no attribute 'title'":
-                    Settings.dev_print(e)
-                else:
-                    Settings.maybe_print(e)
-                Settings.err_print("unable to reconnect")
-                return None
+            # except Exception as e:
+            #     if str(e) != "'NoneType' object has no attribute 'title'":
+            #         Settings.dev_print(e)
+            #     else:
+            #         Settings.maybe_print(e)
+            #     Settings.err_print("unable to reconnect")
+            #     return None
             else:     
                 Settings.dev_print("missing reconnect id or url")
             return None
@@ -3079,33 +3073,56 @@ class Driver:
         Settings.print("spawning web browser...")
 
         browser = None
-        match browserType:
-            case Type.AUTO:
-                try:                
-                    id_, url_ = Settings.read_session_data()
-                    browser = attempt_reconnect(reconnect_id=id_, url=url_)
-                    if not browser: browser = attempt_remote()
-                    if not browser: browser = spawn_chrome()
-                    if not browser: browser = spawn_geckodriver()
-                except Exception as e:
-                    Settings.maybe_print("failed to reconnect")
-                    if str(e) != "'NoneType' object has no attribute 'title'":
-                        Settings.dev_print(e)
-            case Type.RECONNECT:
-                 id_, url_ = Settings.read_session_data()
+        # TODO: another case statement for python3.10+
+        # match browserType:
+        #     case "auto":
+        #         try:                
+        #             id_, url_ = Settings.read_session_data()
+        #             browser = attempt_reconnect(reconnect_id=id_, url=url_)
+        #             if not browser: browser = attempt_remote()
+        #             if not browser: browser = spawn_chrome()
+        #             if not browser: browser = spawn_geckodriver()
+        #         except Exception as e:
+        #             Settings.maybe_print("failed to reconnect")
+        #             if str(e) != "'NoneType' object has no attribute 'title'":
+        #                 Settings.dev_print(e)
+        #     case "reconnect":
+        #          id_, url_ = Settings.read_session_data()
+        #         browser = attempt_reconnect(reconnect_id=id_, url=url_)
+        #     case "remote":
+        #         browser = attempt_remote()
+        #     case "google":
+        #         browser = spawn_chrome()
+        #     case "firefox":
+        #         browser = spawn_geckodriver()
+
+        if browserType == "auto":
+            try:                
+                id_, url_ = Settings.read_session_data()
                 browser = attempt_reconnect(reconnect_id=id_, url=url_)
-            case Type.REMOTE:
-                browser = attempt_remote()
-            case Type.GOOGLE:
-                browser = spawn_chrome()
-            case Type.FIREFOX:
-                browser = spawn_geckodriver()
+                if not browser: browser = attempt_remote()
+                if not browser: browser = spawn_chrome()
+                if not browser: browser = spawn_geckodriver()
+            except Exception as e:
+                Settings.maybe_print("failed to reconnect")
+                if str(e) != "'NoneType' object has no attribute 'title'":
+                    Settings.dev_print(e)
+        elif browserType == "reconnect":
+            id_, url_ = Settings.read_session_data()
+            browser = attempt_reconnect(reconnect_id=id_, url=url_)
+        elif browserType == "remote":
+            browser = attempt_remote()
+        elif browserType == "google":
+            browser = spawn_chrome()
+        elif browserType == "firefox":
+            browser = spawn_geckodriver()
+        else: Settings.print("missing browser type: {}".format(browserType))
 
         if Settings.is_keep() == "True":
             Settings.write_session_data(browser.session_id, browser.command_executor._url)
-            if driver:
-                driver.session_id = browser.session_id
-                driver.session_url = browser.command_executor._url
+            # if driver:
+            #     driver.session_id = browser.session_id
+            #     driver.session_url = browser.command_executor._url
 
         if not browser:
             Settings.err_print("unable to spawn browser!")
@@ -3114,9 +3131,9 @@ class Driver:
         browser.implicitly_wait(30) # seconds
         browser.set_page_load_timeout(1200)
         browser.file_detector = LocalFileDetector() # for uploading via remote sessions
-        if not Driver.BROWSER: Driver.BROWSER = browser
-        Driver.BROWSERS.append(browser)
-        return browser
+        Driver.browser = browser
+        Driver.browsers.append(browser)
+        # return browser
 
     #####
 
@@ -3142,7 +3159,7 @@ class Driver:
     ##### Upload #####
     ##################
 
-    def upload_files(self, files=[]):
+    def upload_files(files):
         """
         Upload the files to a post or message.
 
@@ -3161,14 +3178,16 @@ class Driver:
         """
 
         if Settings.is_skip_download() == "True": 
-            Settings.print("Skipping Upload (download)")
+            Settings.print("skipping upload (download)")
             return True
         elif Settings.is_skip_upload() == "True": 
-            Settings.print("Skipping Upload (upload)")
+            Settings.print("skipping upload (upload)")
             return True
-        if len(files) == 0: return False
+        if len(files) == 0:
+            Settings.maybe_print("skipping upload, empty file list")
+            return False
         if Settings.is_skip_upload() == "True":
-            Settings.print("Skipping Upload: Disabled")
+            Settings.print("skipping upload: Disabled")
             return False
         files = files[:int(Settings.get_upload_max())]
         Settings.print("uploading file(s): {}".format(len(files)))
@@ -3195,115 +3214,15 @@ class Driver:
 
         ####
 
-
-        ## TODO
-        ## finish adding / getting the drag and drop to work for files to continue
-        ## being able to upload files; since the svg / button issue doesn't want to allow entering text directly into an input anymore
-
-        JS_DROP_FILE = """
-            var target = arguments[0],
-                offsetX = arguments[1],
-                offsetY = arguments[2],
-                document = target.ownerDocument || document,
-                window = document.defaultView || window;
-
-            var input = document.createElement('INPUT');
-            input.type = 'file';
-            input.onchange = function () {
-              var rect = target.getBoundingClientRect(),
-                  x = rect.left + (offsetX || (rect.width >> 1)),
-                  y = rect.top + (offsetY || (rect.height >> 1)),
-                  dataTransfer = { files: this.files };
-
-              ['dragenter', 'dragover', 'drop'].forEach(function (name) {
-                var evt = document.createEvent('MouseEvent');
-                evt.initMouseEvent(name, !0, !0, window, 0, 0, 0, x, y, !1, !1, !1, !1, 0, null);
-                evt.dataTransfer = dataTransfer;
-                target.dispatchEvent(evt);
-              });
-
-              setTimeout(function () { document.body.removeChild(input); }, 25);
-            };
-            document.body.appendChild(input);
-            return input;
-        """
-
-        def drag_and_drop_file(drop_target, path):
-            try:
-                Settings.maybe_print("dragging and dropping...")
-                Settings.dev_print("drop target: {}".format(drop_target.get_attribute("innerHTML")))
-                print(0)
-                file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 0, 0)
-                file_input.send_keys(path)
-                time.sleep(4)
-                print(1)
-                file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 50, 50)
-                file_input.send_keys(path)
-                time.sleep(4)
-                print(2)
-                file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 100, 100)
-                file_input.send_keys(path)
-                time.sleep(4)
-                print(3)
-                file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 200, 200)
-                file_input.send_keys(path)
-                time.sleep(4)
-                print(4)
-                file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 500, 500)
-                file_input.send_keys(path)
-                time.sleep(4)
-            except Exception as e:
-                print(e) 
-
-
-        # enter_file = self.browser.find_element_by_id(Element.get_element_by_name("image_upload").getId())
-        enter_file = self.browser.find_element_by_id("attach_file_photo")
+        enter_file = Driver.browser.find_element_by_id("attach_file_photo")
 
         i = 1
         for file in files_:
             Settings.print('> {} - {}/{}'.format(file.get_title(), i, len(files)))
             i += 1
-
-            # ActionChains(self.browser).drag_and_drop(enter_file, file.get_path()).perform()
-
-            # textarea = self.browser.find_element_by_id(Element.get_element_by_name("enterText").getId())
-            drag_and_drop_file(enter_file , file.get_path())
-
-            # enter_file = self.browser.find_element_by_class_name(Element.get_element_by_name("image_upload").getClass())
-
-            ## BUG: ele search is returning the 1st child of the ele instead of the ele itself; happens to be an svg element
-            # which sucks to interact with
-            ## FIX: get parent?
-
-            # try:
-            # enter_file = enter_file.find_element(By.XPATH, "..")
-            # enter_file = enter_file.find_element(By.CSS_SELECTOR, "button")
-            # print(enter_file.get_attribute("innerHTML"))
-            # enter_file.send_keys(file.get_path())
-            # except Exception as e:
-            #     print(e)
-
-            # try:
-            #     enter_file = self.browser.find_element_by_id(Element.get_element_by_name("image_upload").getId())
-            #     enter_file = enter_file.find_element(By.XPATH, "..")
-            #     enter_file = enter_file.find_element_by_class_name("button")
-            #     print(enter_file.get_attribute("innerHTML"))
-            #     enter_file.send_keys(file.get_path())
-            # except Exception as e:
-            #     print(e)
-
-            # try:
-            #     enter_file = self.browser.find_element_by_class_name("g-btn.m-flat.m-gray.m-with-round-hover.m-size-md-hover.m-default-icon-size.m-reset-width.attach_file.has-tooltip")
-            #     print(enter_file.get_attribute("innerHTML"))
-            #     enter_file.send_keys(file.get_path())
-            # except Exception as e:
-            #     print(e)
-
-            # ActionChains(self.browser).move_to_element(enter_file).send_keys(file.get_path()).perform()
-
-            # enter_file.send_keys(file.get_path())
+            Driver.drag_and_drop_file(enter_file , file.get_path())
             time.sleep(1)
-            self.error_window_upload()
+            Driver.error_window_upload()
             ###
             def fix_filename(file):
                 # move file to change its name
@@ -3322,7 +3241,7 @@ class Driver:
                 # if this doesn't force it then it'll loop forever without a stopper
             ###
         # one last final check
-        # self.error_window_upload()
+        # Driver.error_window_upload()
         Settings.debug_delay_check()
         Settings.dev_print("### Files Upload Successful ###")
         return True
@@ -3331,7 +3250,7 @@ class Driver:
     ##### Users #####
     #################
 
-    def get_username(self):
+    def get_username():
         """
         Gets the username of the logged in user.
 
@@ -3342,12 +3261,10 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return False
         username = None
         try:
-            self.go_to_home()
-            eles = self.browser.find_elements_by_tag_name("a")
+            Driver.go_to_home()
+            eles = Driver.browser.find_elements_by_tag_name("a")
             eles = [ele for ele in eles 
                     if "@" in str(ele.get_attribute("innerHTML"))
                     and "onlyfans" not in str(ele.get_attribute("innerHTML"))
@@ -3365,7 +3282,7 @@ class Driver:
             Settings.err_print("failed to find username")
         return username
 
-    def following_get(self):
+    def following_get():
         """
         Return lists of accounts followed by the logged in user.
 
@@ -3376,21 +3293,19 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return False
         users = []
         try:
-            self.go_to_page(ONLYFANS_USERS_FOLLOWING_URL)
+            Driver.go_to_page(ONLYFANS_USERS_FOLLOWING_URL)
             count = 0
             while True:
-                elements = self.browser.find_elements_by_class_name("m-subscriptions")
+                elements = Driver.browser.find_elements_by_class_name("m-subscriptions")
                 if len(elements) == count: break
                 Settings.print_same_line("({}/{}) scrolling...".format(count, len(elements)))
                 count = len(elements)
-                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                Driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
             Settings.print("")
-            elements = self.browser.find_elements_by_class_name("m-subscriptions")
+            elements = Driver.browser.find_elements_by_class_name("m-subscriptions")
             Settings.dev_print("successfully found subscriptions")
             for ele in elements:
                 username = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
@@ -3410,7 +3325,7 @@ class Driver:
         Settings.dev_print("successfully found following users")
         return users
 
-    def users_get(self, page=ONLYFANS_USERS_ACTIVE_URL):
+    def users_get(page=ONLYFANS_USERS_ACTIVE_URL):
         """
         Return lists of accounts subscribed to the logged in user.
 
@@ -3421,13 +3336,11 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return []
         users = []
         try:
-            self.go_to_page(page)
-            # user_count = int(self.browser.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML").strip())
-            user_count = self.browser.find_elements_by_tag_name("a")
+            Driver.go_to_page(page)
+            # user_count = int(Driver.browser.find_element_by_class_name("l-sidebar__user-data__item__count").get_attribute("innerHTML").strip())
+            user_count = Driver.browser.find_elements_by_tag_name("a")
             # for debugging new regexes:
             # for ele in user_count:
             #     Settings.print("{}  -  {}".format(ele.get_attribute("href"), ele.get_attribute("innerHTML")))
@@ -3442,17 +3355,17 @@ class Driver:
             thirdTime = 0
             count = 0
             while True:
-                elements = self.browser.find_elements_by_class_name("m-fans")
+                elements = Driver.browser.find_elements_by_class_name("m-fans")
                 if len(elements) == int(user_count): break
                 if len(elements) == int(count) and thirdTime >= 3: break
                 Settings.print_same_line("({}/{}) scrolling...".format(count, user_count))
                 count = len(elements)
-                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                Driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
                 if thirdTime >= 3 and len(elements) == 0: break
                 thirdTime += 1
             Settings.print("")
-            elements = self.browser.find_elements_by_class_name("m-fans")
+            elements = Driver.browser.find_elements_by_class_name("m-fans")
             Settings.dev_print("successfully found fans")
             Settings.dev_print("finding users")
             for ele in elements:
@@ -3505,7 +3418,7 @@ class Driver:
             Settings.err_print("failed to find users")
         return users
 
-    def user_get_id(self, username):
+    def user_get_id(username):
         """
         Get the user id of the user by username.
 
@@ -3521,13 +3434,11 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return None
         user_id = None
         try:
-            self.go_to_page(username)
+            Driver.go_to_page(username)
             time.sleep(3) # this should realistically only fail if they're no longer subscribed but it fails often from loading
-            elements = self.browser.find_elements_by_tag_name("a")
+            elements = Driver.browser.find_elements_by_tag_name("a")
             ele = [ele.get_attribute("href") for ele in elements
                     if "/my/chats/chat/" in str(ele.get_attribute("href"))]
             if len(ele) == 0: 
@@ -3543,7 +3454,7 @@ class Driver:
             Settings.err_print("failed to find user id")
         return user_id
 
-    def search_for_list(self, name=None, number=None):
+    def search_for_list(name=None, number=None):
         """
         Search for list in Driver.lists cache by name or number.
 
@@ -3563,9 +3474,9 @@ class Driver:
 
         """
 
-        Settings.dev_print("lists: {}".format(self.lists))
+        Settings.dev_print("lists: {}".format(Driver.lists))
         try:
-            for list_ in self.lists:
+            for list_ in Driver.lists:
                 if list_[0] == name or list_[1] == number:
                     return list_[0], list_[1]
             Settings.dev_print("failed to locate list: {} - {}".format(name, number))
@@ -3574,7 +3485,7 @@ class Driver:
                 Settings.dev_print(e)
         return name, number
 
-    def get_list(self, name=None, number=None):
+    def get_list(name=None, number=None):
         """
         Search for list by name or number on OnlyFans.
 
@@ -3597,25 +3508,23 @@ class Driver:
         """
 
         # gets members from list
-        auth_ = self.auth()
-        if not auth_: return None
         users = []
         Settings.maybe_print("getting list: {} - {}".format(name, number))
-        name, number = self.search_for_list(name=name, number=number)
+        name, number = Driver.search_for_list(name=name, number=number)
         try:
             if not name or not number:
-                for list_ in self.get_lists():
+                for list_ in Driver.get_lists():
                     if name and str(list_[1]).lower() == str(name).lower():
                         number = list_[0]
                     if number and str(list_[0]).lower() == str(number).lower():
                         name = list_[1]
-            users = self.users_get(page="/my/lists/{}".format(number))
+            users = Driver.users_get(page="/my/lists/{}".format(number))
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failed to find list members")
         return users, name, number
 
-    def get_lists(self):
+    def get_lists():
         """
         Search and return all lists from OnlyFans.
 
@@ -3626,14 +3535,12 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return None
         lists = []
         try:
             Settings.maybe_print("getting lists")
-            self.go_to_page("/my/lists")
+            Driver.go_to_page("/my/lists")
 
-            elements = self.browser.find_elements_by_class_name("b-users-lists__item")
+            elements = Driver.browser.find_elements_by_class_name("b-users-lists__item")
 
             # find favorites
             # find bookmarks
@@ -3681,7 +3588,7 @@ class Driver:
             Settings.err_print("failed to find lists")
         return lists
 
-    def get_list_members(self, list):
+    def get_list_members(list):
         """
         Get the members of a list.
 
@@ -3697,17 +3604,15 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return None
         users = []
         try:
-            users = self.users_get(page="/my/lists/{}".format(int(list_)))
+            users = Driver.users_get(page="/my/lists/{}".format(int(list_)))
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failed to find list members")
         return users
 
-    def add_user_to_list(self, username=None, listNumber=None):
+    def add_user_to_list(username=None, listNumber=None):
         """
         Add user by username to list by number.
 
@@ -3732,27 +3637,25 @@ class Driver:
         if not listNumber:
             Settings.err_print("missing list number")
             return False
-        auth_ = self.auth()
-        if not auth_: return False
         users = []
         try:
-            self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
+            Driver.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
             end_ = True
             count = 0
             user_ = None
             while end_:
-                elements = self.browser.find_elements_by_class_name("m-fans")
+                elements = Driver.browser.find_elements_by_class_name("m-fans")
                 for ele in elements:
                     username_ = ele.find_element_by_class_name("g-user-username").get_attribute("innerHTML").strip()
                     if str(username) == str(username_).replace("@",""):
-                        self.browser.execute_script("arguments[0].scrollIntoView();", ele)
+                        Driver.browser.execute_script("arguments[0].scrollIntoView();", ele)
                         user_ = ele
                         end_ = False
                 if not end_: continue
                 if len(elements) == int(count): break
                 Settings.print_same_line("({}/{}) scrolling...".format(count, len(elements)))
                 count = len(elements)
-                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                Driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
             Settings.print("")
             Settings.dev_print("successfully found fans")
@@ -3760,29 +3663,29 @@ class Driver:
                 Settings.err_print("unable to find user - {}".format(username))
                 return False
             Settings.maybe_print("found: {}".format(username))
-            ActionChains(self.browser).move_to_element(user_).perform()
+            ActionChains(Driver.browser).move_to_element(user_).perform()
             Settings.dev_print("finding list add")
             listAdds = user_.find_elements_by_class_name("g-btn.m-add-to-lists")
             listAdd_ = None
             for listAdd in listAdds:
                 if str("/my/lists/"+listNumber) in str(listAdd.get_attribute("href")):
-                    Settings.print("Skipping: User already on list - {}".format(listNumber))
+                    Settings.print("skipping: User already on list - {}".format(listNumber))
                     return True
                 if " lists " in str(listAdd.get_attribute("innerHTML")).lower():
                     Settings.dev_print("found list add")
                     listAdd_ = listAdd
             Settings.dev_print("clicking list add")
             listAdd_.click()
-            links = self.browser.find_elements_by_class_name("b-users-lists__item")
+            links = Driver.browser.find_elements_by_class_name("b-users-lists__item")
             for link in links:
                 # Settings.print("{} {}".format(link.get_attribute("href"), link.get_attribute("innerHTML")))
                 if str("/my/lists/"+listNumber) in str(link.get_attribute("href")):
                     Settings.dev_print("clicking list")
-                    self.move_to_then_click_element(link)
+                    Driver.move_to_then_click_element(link)
                     time.sleep(0.5)
                     Settings.dev_print("successfully clicked list")
             Settings.dev_print("searching for list save")
-            close = self.find_element_to_click("listSingleSave")
+            close = Driver.find_element_to_click("listSingleSave")
             Settings.dev_print("clicking save list")
             close.click()
             Settings.dev_print("successfully added user to list - {}".format(listNumber))
@@ -3792,7 +3695,7 @@ class Driver:
             Settings.err_print("failed to add user to list")
         return False
 
-    def add_users_to_list(self, users=[], number=None, name=None):
+    def add_users_to_list(users=[], number=None, name=None):
         """
         Add the users to the list by name or number.
 
@@ -3812,11 +3715,9 @@ class Driver:
 
         """
 
-        auth_ = self.auth()
-        if not auth_: return False
         try:
             users = users.copy()
-            users_, name, number = self.get_list(number=number, name=name)
+            users_, name, number = Driver.get_list(number=number, name=name)
             # users = [user for user in users if user not in users_]
             for i, user in enumerate(users[:]):
                 for user_ in users_:
@@ -3826,56 +3727,56 @@ class Driver:
             Settings.maybe_print("adding users to list: {} - {} - {}".format(len(users), number, name))
             try:
                 Settings.dev_print("opening toggle options")
-                toggle = self.browser.find_element_by_class_name("b-users__list__add-btn")
+                toggle = Driver.browser.find_element_by_class_name("b-users__list__add-btn")
                 Settings.dev_print("clicking toggle options")
                 toggle.click()
                 Settings.dev_print("toggle options opened")
             except Exception as e:
                 Settings.dev_print("no options to toggle - users already available")
                 # Settings.print("weird fuckup")
-                # return self.add_users_to_list(users=users, number=number, name=name)
+                # return Driver.add_users_to_list(users=users, number=number, name=name)
             time.sleep(1)
-            original_handle = self.browser.current_window_handle
+            original_handle = Driver.browser.current_window_handle
             clicked = False
             Settings.maybe_print("searching for users")
             while len(users) > 0:
                 # find user thing
-                eles = self.browser.find_elements_by_class_name("b-chats__available-users__item.m-search")
+                eles = Driver.browser.find_elements_by_class_name("b-chats__available-users__item.m-search")
                 for ele in eles:
                     for user in users.copy():
                         # Settings.print("{} - {}".format(i, user.username))
                         if str(user.username) in str(ele.get_attribute("href")):
                             Settings.maybe_print("found user: {}".format(user.username))
                             # time.sleep(2)
-                            self.move_to_then_click_element(ele)
+                            Driver.move_to_then_click_element(ele)
                             users.remove(user)
                             clicked = True
                 Settings.print_same_line("({}/{}) scrolling...".format(len(eles), len(users)))
-                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                Driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 if len(eles) > 100:
                     Settings.maybe_print("adding users to list individually")
                     for user in users.copy():
-                        successful = self.add_user_to_list(username=user.username, listNumber=number)
+                        successful = Driver.add_user_to_list(username=user.username, listNumber=number)
                         if successful: users.remove(user)
                 # if current window has changed, switch back
-                if self.browser.current_window_handle != original_handle:
-                    self.browser.switch_to.window(original_handle)
+                if Driver.browser.current_window_handle != original_handle:
+                    Driver.browser.switch_to.window(original_handle)
             Settings.print("")
             if not clicked:
-                Settings.print("Skipping: List Add (none)")
+                Settings.print("skipping: List Add (none)")
                 Settings.dev_print("skipping list save")
-                self.browser.refresh()
+                Driver.browser.refresh()
                 Settings.dev_print("### List Add Successfully Skipped ###")
                 return True
             if Settings.is_debug() == "True":
-                Settings.print("Skipping: List Add (debug)")
+                Settings.print("skipping: List Add (debug)")
                 Settings.dev_print("skipping list save")
-                self.browser.refresh()
+                Driver.browser.refresh()
                 Settings.dev_print("### List Add Successfully Canceled ###")
                 return True
             Settings.dev_print("saving list")
-            save = self.find_element_by_name("listSave")
-            self.move_to_then_click_element(save)
+            save = Driver.find_element_by_name("listSave")
+            Driver.move_to_then_click_element(save)
             Settings.dev_print("### successfully added users to list")
         except Exception as e:
             Settings.print(e)
@@ -3888,10 +3789,10 @@ class Driver:
     ##### Exit #####
     ################
 
-    def exit(self):
+    def exit():
         """Save and exit"""
 
-        if self.browser == None: return
+        if Driver.browser == None: return
         if Settings.is_save_users() == "True":
             Settings.print("Saving and Exiting OnlyFans")
             # from OnlySnarf.classes.user import User
@@ -3899,8 +3800,8 @@ class Driver:
             User.write_users_local()
         if Settings.is_keep() == "True":
             Settings.maybe_print("keeping browser open")
-            # self.go_to_home(force=True)
-            self.go_to_home()
+            # Driver.go_to_home(force=True)
+            Driver.go_to_home()
             Settings.dev_print("reset to home page")
             if not Driver.NOT_INFORMED_KEPT:
                 Settings.print("Kept Browser Open")
@@ -3909,19 +3810,8 @@ class Driver:
             return
         else:
             Settings.print("Exiting OnlyFans")
-        self.browser.quit()
-        # Driver.BROWSER = None
+        Driver.browser.quit()
         Settings.print("Browser Closed")
-
-    @staticmethod
-    def exit_all():
-        """Save and exit all browsers"""
-
-        for driver in Driver.DRIVERS:
-            driver.exit()
-        if not Driver.NOT_INFORMED_CLOSED:
-            Settings.print("All Browsers Closed")
-        Driver.NOT_INFORMED_CLOSED = True
 
 ##################################################################################
 

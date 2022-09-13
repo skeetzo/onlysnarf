@@ -15,15 +15,15 @@ class TestXMAS(unittest.TestCase):
         
     def tearDown(self):
         from OnlySnarf.lib.driver import Driver
-        Driver.exit_all()
+        Driver.exit()
 
     def test_teaser(self):
         config["input"] = "./public/images/xmas-shnarf-tease.jpg"
         config["bykeyword"] = "xmas tease"
-        config["image_limit"] = int(DEFAULT.IMAGE_LIMIT / 5)
+        config["upload_max"] = int(DEFAULT.IMAGE_LIMIT / 5)
         config["text"] = "xmas tease"
         assert self.test_snarf.post(), "unable to send xmas tease"
-        config["image_limit"] = int(DEFAULT.IMAGE_LIMIT)
+        config["upload_max"] = int(DEFAULT.IMAGE_LIMIT)
 
     def test_xmas_message(self):
         config["input"] = "./public/images/xmas-shnarf.jpg"

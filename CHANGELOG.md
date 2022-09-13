@@ -507,27 +507,39 @@
   - add / ensure all default values to config.conf
   - cleand up config files and example
   - cleaned up dir structure references across project
+**4.2.0 : 9/12/2022**
+  - finished debugging test_message & test_post; uploading files works again
+  - tested changes made from removing / cleaning up args and commands
+  - cleaned up tests (broke again)
 
 ------------------------------------------------------------------------------------
 
-- either upgrade python version to 3.10 or remove switches in util/driver
+- finish debugging (again): test_message
+- finish testing: poll, schedule, discount (again), all profile tests (eventually)
 
-- finish debugging test_message --> fucking svgs preventing file uploads (for Post as well)
+## Fix / Debug
 
-## Not Working
+- keep open might be working now
 
-- browser reconnect / keep open; doesn't reconnect to browser or retain session
+- browser reconnect; doesn't reconnect to browser or retain session
 - cookies: currently prevents saving login session
 
 (unlikely to be fixed soon)
-- google login: unsafe browser warning --> possibly end of usability
+- google login: unsafe browser warning --> possibly end of usability --> should I just remove this? form login works, twitter login works (i think)
+-- maybe just cut out / leave as is until can debug "unsafe browser" issue?
+
+- debug: discover the cause of the super slow web scraping
+-- not: debug_delay
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- test changes made from removing / cleaning up args and commands
+- finish cleaning up class/user
 - finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleanuping up code
+
+- add tests that include variations of variables such as image limits, download limits, upload limits, 
+- add tests for trying different browsers, reconnecting, keeping open, remote sessions
 
 (once downloads and uploads function again)
 - change deletion behavior to preserve better
@@ -563,6 +575,9 @@
 - can include media attachments
 -- add checks for previously existing tweets
 -- keep track of tweets (somehow)
+
+(after python version upgraded to 3.10+)
+- possibly use switch statement in lib/driver
 
 ## Tests
 

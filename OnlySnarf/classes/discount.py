@@ -43,22 +43,21 @@ class Discount:
             if not Settings.prompt("Discount"): return
         Settings.maybe_print("discounting: {}".format(self.username))
         # create new or find default browser
-        driver = Driver.get_driver()
         if self.username.lower() == "all":
-            users = User.get_all_users(driver=driver)
+            users = User.get_all_users()
         elif self.username.lower() == "recent":
-            users = User.get_recent_users(driver=driver)
+            users = User.get_recent_users()
         elif self.username.lower() == "favorite":
-            users = User.get_favorite_users(driver=driver)
+            users = User.get_favorite_users()
         elif self.username.lower() == "new":
-            users = User.get_new_users(driver=driver)
+            users = User.get_new_users()
         else: users = [self]
         successes = 0
         failures = 0
         for user in users:
             try:
                 self.username = user.username
-                successful = driver.discount_user(discount=self)
+                successful = Driver.discount_user(discount=self)
                 if successful: successes+=1
                 else: failures+=1
             except Exception as e:
@@ -188,7 +187,7 @@ class Discount:
         """
 
         if len(users) == 0:
-            users = User.get_users_by_list(name="grandfathered", driver=Driver.get_driver())
+            users = User.get_users_by_list(name="grandfathered")
         print("Discount - Grandfathering: {} users".format(len(users)))
         from .validators import DISCOUNT_MAX_MONTHS, DISCOUNT_MAX_AMOUNT
         self.months = DISCOUNT_MAX_MONTHS
@@ -198,6 +197,6 @@ class Discount:
             self.username = user.username
             print("Grandfathering: {}".format(self.username))
             try:
-                Driver.get_driver().discount_user(discount=self)
+                Driver.discount_user(discount=self)
             except Exception as e:
                 print(e)

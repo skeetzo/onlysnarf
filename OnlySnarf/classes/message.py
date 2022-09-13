@@ -10,7 +10,6 @@ from ..lib import remote as Remote
 from .file import File, Folder
 from .poll import Poll
 from .schedule import Schedule
-from ..util.enum import Source, Types
 
 class Message():
     """OnlyFans message (and post) class"""
@@ -249,6 +248,25 @@ class Message():
         self.files = filed[:int(Settings.get_upload_max())] # reduce by max
         return self.files
 
+    def get_message(self):
+        """
+        Gets the message as a serialized JSON object.
+
+
+        Returns
+        -------
+        Object
+            The message as an object.
+
+        """
+
+        return dict({
+            "text": self.format_text(),
+            "files": self.get_files(),
+            "price": self.get_price()
+        })
+
+
     def get_price(self, again=True):
         """
         Gets the price value if not none else sets it from args or prompts.
@@ -262,7 +280,7 @@ class Message():
         Returns
         -------
         int
-            The price as an int
+            The price as an int.
 
         """
 
@@ -297,53 +315,8 @@ class Message():
         """
 
         if len(self.users) > 0: return self.users
-        # if no recipients, prompt for them
-        users = Settings.get_users()
-        if len(users) > 0: 
-            self.users = users
-        elif len(users) == 0 and Settings.get_user():
-            user = Settings.get_user()
-            users = [Settings.get_user()]
-            self.users = users
-        # if not Settings.confirm(users): return self.get_recipients(again=again)
-        return users
-        
-    def send(self):
-        """
-        Sends a message.
-
-
-        Returns
-        -------
-        bool
-            Whether or not sending the message was successful.
-
-        """
-        try:
-            self.init()
-            Settings.print("message > {}".format(self))
-            # if not Settings.confirm("Send message?"): return False
-            if not self.get_files() and self.get_text() == "":
-                Settings.err_print("Missing files and text!")
-                return False
-            try: 
-                successes = 0
-                failures = 0
-                for user in self.get_users():
-                    successful = User.message_user(self)
-                    if successful: successes+=1
-                    else: failures+=1
-            except Exception as e:
-                Settings.dev_print(e)
-                failures+=1
-            Settings.maybe_print("successful: {}".format(successes))
-            Settings.maybe_print("failed: {}".format(failures))
-            self.cleanup()
-            if successes > failures: return True
-        except Exception as e:
-            Settings.dev_print(e)
-        Settings.print("something went wrong! shnarrnf!")
-        return False
+        self.users = Settings.get_users()
+        return self.users
 
     def get_text(self, again=True):
         """
@@ -358,7 +331,7 @@ class Message():
         Returns
         -------
         str
-            The text to enter
+            The text to enter.
 
         """
 
@@ -409,9 +382,43 @@ class Message():
         text = self.update_tags(text)
         return text
 
-    def get_users():
-        users = self.users
-    
+    def send(self):
+        """
+        Sends a message.
+
+
+        Returns
+        -------
+        bool
+            Whether or not sending the message was successful.
+
+        """
+        try:
+            self.init()
+            # if not Settings.confirm("Send message?"): return False
+            # if not self.get_files() and self.get_text() == "":
+            #     Settings.err_print("Missing files and text!")
+            #     return False
+            try: 
+                successes = 0
+                failures = 0
+                recipients = self.get_recipients()
+                Settings.maybe_print("messaging users: {}".format(len(recipients)))
+                for user in recipients:
+                    successful = User.message_user(self.get_message(), user.username, user_id=user.id)
+                    if successful: successes+=1
+                    else: failures+=1
+            except Exception as e:
+                Settings.dev_print(e)
+                failures+=1
+            Settings.maybe_print("successful: {}".format(successes))
+            Settings.maybe_print("failed: {}".format(failures))
+            self.cleanup()
+            if successes > failures: return True
+        except Exception as e:
+            Settings.dev_print(e)
+        Settings.print("something went wrong! shnarrnf!")
+        return False
 
     def update_keywords(self, text):
         """Sets keywords from this object's file's title"""
@@ -467,7 +474,7 @@ class Post(Message):
         Returns
         -------
         int
-            The expiration as an int
+            The expiration as an int.
 
         """
 
@@ -521,6 +528,27 @@ class Post(Message):
         self.poll = poll
         return poll
 
+    def get_post(self):
+        """
+        Gets the message as a serialized JSON object.
+
+
+        Returns
+        -------
+        Object
+            The message as an object.
+
+        """
+
+        return dict({
+            "text": self.format_text(),
+            "files": self.get_files(),
+            "price": self.get_price(),
+            "expires": self.get_expiration(),
+            "schedule": self.get_schedule(),
+            "poll": self.get_poll()
+        })
+
     def get_schedule(self, again=True):
         """
         Gets the schedule value if not none else sets it from args or prompts.
@@ -534,7 +562,7 @@ class Post(Message):
         Returns
         -------
         Schedule
-            Schedule object with proper values
+            Schedule object with proper values.
 
         """
 
@@ -569,7 +597,7 @@ class Post(Message):
             try:
                 successes = 0
                 failures = 0
-                successful = Driver.get_driver().post(message=self)
+                successful = Driver.post(self.get_post())
                 if successful: successes+=1
                 else: failures+=1
             except Exception as e:

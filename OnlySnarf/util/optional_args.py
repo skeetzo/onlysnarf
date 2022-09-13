@@ -56,6 +56,11 @@ def apply_args(parser):
   parser.add_argument('-destination', dest='destination', default=None, choices=["remote","local"],
     help='file backup location. uses same as -source if none specified')
   ##
+  # -download-max
+  # maximum number of images to download
+  parser.add_argument('-download-max', type=int, default=DEFAULT.IMAGE_LIMIT, dest="download_limit",
+  help='the max number of images to download')
+  ##
   # -duration
   # poll duration
   parser.add_argument('-duration', type=valid_duration, dest='duration',
@@ -82,6 +87,21 @@ def apply_args(parser):
   parser.add_argument('-months', type=valid_month, default=None, dest='months',
     help='the number of months to discount or apply promotion')
   ##
+  # -password
+  # the password for OnlyFans
+  parser.add_argument('-password', type=str, dest='password',
+    help='the OnlyFans user password for login (used with username)')
+  ##
+  # -password
+  # the password for Google
+  parser.add_argument('-password-google', type=str, dest='google_password',
+    help='the Google password for login')
+  ##
+  # -password
+  # the password for Twitter
+  parser.add_argument('-password-twitter', type=str, dest='twitter_password',
+    help='the Twitter password for login')
+  ##
   # -performers
   # list of performers to upload matching content of
   parser.add_argument('-performers', dest='performers', action='append',  default=[],
@@ -90,7 +110,11 @@ def apply_args(parser):
   # -price
   # the price to be set in a message
   parser.add_argument('-price', type=valid_price, help='the price to charge', default=0, dest='price')
-  
+  ##
+  # -profile-path
+  # the path to the profile.json file
+  parser.add_argument('-profile-path', type=str, dest='path_profile',
+    help='the path to cache profile locally', default=DEFAULT.PROFILE_PATH)
   ##
   # -promotion-expiration
   # expiration for a promotion
@@ -117,6 +141,19 @@ def apply_args(parser):
   # the schedule to upload a post for
   parser.add_argument('-schedule', type=valid_schedule, default=None, dest='schedule',
     help='the schedule (MM-DD-YYYY:HH:MM)')
+  ##
+  # -skip-download
+  parser.add_argument('-skip-download', action='store_true', dest='skip_download',
+    help='skip file downloads')
+  ##
+  # -skip-upload
+  # skips file upload
+  parser.add_argument('-skip-upload', action='store_true', dest='skip_upload',
+    help='skip file uploads')
+  ##
+  # list of users to skip
+  parser.add_argument('-skip-users', dest='skipped_users', 
+    action='append', help='the users to skip or ignore ')
   ##
   # -sort
   # the sort method to use when selecting content unprompted
@@ -149,6 +186,11 @@ def apply_args(parser):
     help='enable tweeting when posting')
   ##
   # -upload-max
+  # maximum number of images that can be uploaded
+  parser.add_argument('-upload-max', type=int, default=DEFAULT.IMAGE_LIMIT, dest='upload_max',
+  help='the max number of images to upload')
+  ##
+  # -upload-max-duration
   # the max number of 10 minute intervals to upload for
   parser.add_argument('-upload-max-duration', dest='upload_max_duration', default=DEFAULT.UPLOAD_MAX_DURATION,
     type=int, help='the number of 10 minute intervals to wait while uploading a file')
@@ -157,6 +199,11 @@ def apply_args(parser):
   # the user to target
   parser.add_argument('-user', type=str,  default=None, dest='user',
     help='the user to target with an action')
+  ##
+  # -user-path
+  # the path to the users.json file
+  parser.add_argument('-users-path', type=str, dest='path_users',
+    help='the path to cache users locally', default=DEFAULT.USERS_PATH)
   ##
   # -users
   # the users to target
@@ -168,6 +215,11 @@ def apply_args(parser):
   parser.add_argument('-username', type=str, default="", dest='username',
     help='the OnlyFans username')
   ##
+  # -username-google
+  # the Google username to use
+  parser.add_argument('-username-google', type=str, default="", dest='google_username',
+    help='the Google username for login')
+  ##
   # -username-twitter
   # the Twitter username to use
   parser.add_argument('-username-twitter', type=str, default="", dest='twitter_username',
@@ -177,10 +229,40 @@ def apply_args(parser):
   ## DEBUGGING ##
   ###############
 
+  ##
+  # -cookies
+  # load & save from/to local cookies path
+  parser.add_argument('-cookies', action='store_true', dest='cookies',
+    help='enable loading & saving from/to the local cookies path')
   # -debug
   # debugging - skips uploading and deleting unless otherwise forced
   parser.add_argument('-debug', action='store_true', dest='debug',
     help='enable debugging')
+  ##
+  # -debug-delay
+  # user message delay
+  parser.add_argument('-debug-delay', action='store_true', dest='debug_delay',
+    help='enable a wait between crucial steps for debugging')
+  ##
+  # -debug-firefox
+  # enables trace logging for firefox
+  parser.add_argument('-debug-firefox', action='store_true', dest='debug_firefox',
+    help='enable debugging of firefox')
+  ##
+  # -debug-google
+  # enables trace logging for google chrome
+  parser.add_argument('-debug-chrome', action='store_true', dest='debug_chrome',
+    help='enable debugging of google chrome')
+  ##
+  # -debug-selenium
+  # enables selenium logging
+  parser.add_argument('-debug-selenium', action='store_true', dest='debug_selenium',
+    help='enable debugging of selenium')
+  ##
+  # -download-path
+  # the path to the downloaded files
+  parser.add_argument('-download-path', type=str, dest='path_download',
+    help='the path to download files to', default=DEFAULT.DOWNLOAD_PATH)
   # -force-backup 
   # force backup during debugging
   parser.add_argument('-force-backup', action='store_true', dest='force_backup',
@@ -200,3 +282,5 @@ def apply_args(parser):
   # v, vv, vvv
   parser.add_argument('-v', '-verbose', dest="verbose", action='count', default=0, 
     help="verbosity level (max 3)")
+
+

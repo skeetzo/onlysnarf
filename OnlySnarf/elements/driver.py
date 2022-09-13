@@ -328,7 +328,7 @@ ELEMENTS = [
     # tab probably closes error windows...
     {
         "name": "errorUpload",
-        "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded.m-border", "button.g-btn.m-rounded.m-border"],
+        "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded.m-border", "button.g-btn.m-rounded.m-border", "g-btn.m-flat.m-btn-gaps.m-reset-width"],
         "text": ["Close"],
         "id": []
     },

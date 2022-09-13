@@ -31,12 +31,6 @@ parser.add_argument('-cron-user', type=str, dest='cron_user',
   help='the user to run OnlySnarf as', default='root')
 
 ##
-# -debug-delay
-# user message delay
-parser.add_argument('-debug-delay', action='store_true', dest='debug_delay',
-  help='enable a wait between crucial steps for debugging')
-
-##
 # -delete-empty
 # delete empty content folders
 parser.add_argument('-delete-empty', action='store_true', dest='delete_empty',
@@ -54,55 +48,13 @@ parser.add_argument('-download-path', type=str, dest='download_path',
 # delete uploaded content instaed of backing it up
 parser.add_argument('-delete-google', action='store_true', dest='delete_google',
   help='delete file instead of backing up')
-##
-# -delete
-# delete content instaed of backing it up
-parser.add_argument('-delete', action='store_true', dest='delete',
-  help='delete file instead of backing up')
-##
-# -download-max
-# maximum number of images to download
-parser.add_argument('-download-max', type=int, default=IMAGE_DOWNLOAD_LIMIT, dest="download_limit",
-  help='the max number of images to download')
-##
-# -upload-max
-# maximum number of images that can be uploaded
-parser.add_argument('-upload-max', type=int, default=IMAGE_UPLOAD_LIMIT, dest='upload_max',
-  help='the max number of images to upload')
+
 
 ##
 # removed 9/9/2022
 ##
 
-##
-# -cookies
-# load & save from/to local cookies path
-parser.add_argument('-cookies', action='store_true', dest='cookies',
-  help='enable loading & saving from/to the local cookies path')
 
-##
-# -debug-firefox
-# enables trace logging for firefox
-parser.add_argument('-debug-firefox', action='store_true', dest='debug_firefox',
-  help='enable debugging of firefox')
-
-##
-# -debug-google
-# enables trace logging for google chrome
-parser.add_argument('-debug-chrome', action='store_true', dest='debug_chrome',
-  help='enable debugging of google chrome')
-
-##
-# -debug-selenium
-# enables selenium logging
-parser.add_argument('-debug-selenium', action='store_true', dest='debug_selenium',
-  help='enable debugging of selenium')
-
-##
-# -download-path
-# the path to the downloaded files
-parser.add_argument('-download-path', type=str, dest='path_download',
-  help='the path to download files to', default=DEFAULT.DOWNLOAD_PATH)
 
 ##
 # -duration-promo
@@ -115,17 +67,6 @@ parser.add_argument('-duration-promo', type=valid_promo_duration, dest='duration
 # the OnlyFans email to use for login
 parser.add_argument('-email', type=str, default="", dest='email',
   help='the email for an OnlyFans profile')
-
-##
-# -image-download-max
-# maximum number of images that can be downloaded / uploaded
-parser.add_argument('-image-download-max', type=int, default=DEFAULT.IMAGE_LIMIT, dest='image_download_limit',
-  help='the max number of images to download')
-##
-# -image-upload-max
-# maximum number of images that can be downloaded / uploaded
-parser.add_argument('-image-upload-max', type=int, default=DEFAULT.IMAGE_LIMIT, dest='image_upload_limit',
-  help='the max number of images to upload')
 
 ##
 # -keywords
@@ -144,29 +85,6 @@ parser.add_argument('-bykeyword', dest='bykeyword', default=None,
 parser.add_argument('-notkeyword', dest='notkeyword', default=None,
   help="search for folder not by keyword")
 
-##
-# -password
-# the password for OnlyFans
-parser.add_argument('-password', type=str, dest='password',
-  help='the OnlyFans user password for login (used with username)')
-
-##
-# -password
-# the password for Google
-parser.add_argument('-password-google', type=str, dest='google_password',
-  help='the Google password for login')
-
-##
-# -password
-# the password for Twitter
-parser.add_argument('-password-twitter', type=str, dest='twitter_password',
-  help='the Twitter password for login')
-
-##
-# -username-google
-# the Google username to use
-parser.add_argument('-username-google', type=str, default="", dest='google_username',
-  help='the Google username for login')
 
 ##
 # -prefer-local
@@ -192,15 +110,7 @@ parser.add_argument('-recent-users-count', default=3, dest='recent_users_count',
 parser.add_argument('-reduce', action='store_true', dest='reduce',
   help='enable reducing files over 50 MB')
 
-##
-# -skip-download
-parser.add_argument('-skip-download', action='store_true', dest='skip_download',
-  help='skip file downloads')
-##
-# -skip-upload
-# skips file upload
-parser.add_argument('-skip-upload', action='store_true', dest='skip_upload',
-  help='skip file uploads')
+
 
 ##
 # -title
@@ -260,11 +170,6 @@ parser.add_argument('-session-url', default=None, dest='session_url',
   help='the session url to use')
 
 ##
-# list of users to skip
-parser.add_argument('-skip-users', dest='skipped_users', 
-  action='append', help='the users to skip or ignore ')
-
-##
 # -thumbnail
 # attempt to fix thumbnail
 parser.add_argument('-thumbnail', action='store_true', dest='thumbnail',
@@ -291,18 +196,6 @@ parser.add_argument('-promotion-method', dest='promotion_method', default="campa
 # -promotion-user
 parser.add_argument('-promotion-user', dest="promotion_user", action='store_true', 
   help="uses user method when combined with action=promotion")
-
-##
-# -user-path
-# the path to the users.json file
-parser.add_argument('-users-path', type=str, dest='path_users',
-  help='the path to cache users locally', default=DEFAULT.USERS_PATH)
-
-##
-# -profile-path
-# the path to the profile.json file
-parser.add_argument('-profile-path', type=str, dest='profile_path',
-  help='the path to cache profile locally', default=DEFAULT.PROFILE_PATH)
 
 ##
 # -root-path
