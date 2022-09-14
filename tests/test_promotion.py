@@ -9,7 +9,7 @@ from OnlySnarf.util.settings import Settings
 from OnlySnarf.snarf import Snarf
 # from OnlySnarf.classes.user import User
 
-class TestSnarfPromotion(unittest.TestCase):
+class TestPromotion(unittest.TestCase):
 
     def setUp(self):
         Settings.set_debug("tests")

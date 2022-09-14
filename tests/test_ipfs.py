@@ -9,30 +9,34 @@ from OnlySnarf.util.settings import Settings
 from OnlySnarf.snarf import Snarf
 # from OnlySnarf.classes.user import User
 
-class TestSnarfIPFS(unittest.TestCase):
+class TestIPFS(unittest.TestCase):
 
     def setUp(self):
+        config["text"] = "shnarf!"
+        config["destination"] = "IPFS"
+        config["source"] = "IPFS"
         Settings.set_debug("tests")
         self.test_snarf = Snarf()
 
     def tearDown(self):
+        config["input"] = []
         Driver.exit()
 
     @unittest.skip("todo")
     def test_backup_to_ipfs(self):
-        config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
-        config["text"] = "shnarf!"
+        config["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"]
         config["backup"] = True
         # config["force_backup"] = True
-        config["destination"] = "IPFS"
         assert self.test_snarf.post(), "unable to backup content to ipfs"
+        config["backup"] = False
+        # config["force_backup"] = False
 
     @unittest.skip("todo")
     def test_post_from_ipfs(self):
-        config["input"] = "CID" # recognize CID format and automatically attempt to use IPFS
+        config["input"] = ["CID"] # recognize CID format and automatically attempt to use IPFS
         config["price"] = DEFAULT.PRICE_MINIMUM
-        config["text"] = "test balls"
         assert self.test_snarf.post(), "unable to post content from ipfs"
+        config["price"] = 0
 
 ############################################################################################
 

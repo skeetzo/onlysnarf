@@ -46,9 +46,6 @@ class Element:
             return None
         global ONLYFANS_ELEMENTS
         for element in ONLYFANS_ELEMENTS:
-            # element = Element(name=element["name"], classes=element["classes"], text=element["text"], id=element["id"])
-            if str(element["name"]) == str(name):
-                Settings.dev_print("prepped ele: {}".format(element["name"]))
-                return Element(name=element["name"], classes=element["classes"], text=element["text"], id=element["id"])
+            if str(element["name"]) == str(name): return Element(name=element["name"], classes=element["classes"], text=element["text"], id=element["id"])
         Settings.warn_print("missing element fetch - {}".format(name))
         return None

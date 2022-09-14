@@ -6,7 +6,7 @@ from .user import User
 from PyInquirer import prompt
 from PyInquirer import Validator, ValidationError
 ##
-from ..util.validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ExpirationValidator, ListValidator
+from ..util.validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ListValidator
 from ..lib import remote as Remote
 from .file import File, Folder
 

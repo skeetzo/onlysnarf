@@ -5,7 +5,7 @@ from ..util.settings import Settings
 from .user import User
 from PyInquirer import prompt
 ##
-from ..util.validators import PriceValidator, ExpirationValidator, ListValidator
+from ..util.validators import PriceValidator, ListValidator
 from ..lib import remote as Remote
 from .file import File, Folder
 from .poll import Poll
@@ -489,8 +489,8 @@ class Post(Message):
         question = {
             'type': 'input',
             'name': 'expiration',
-            'message': 'Expiration [1, 3, 7, 99 (\'No Limit\')]',
-            'validate': ExpirationValidator
+            'message': 'Expiration [any number, 999 for \'No Limit\']',
+            # 'validate': 
         }
         expiration = prompt(question)["expiration"]
         # confirm expiration

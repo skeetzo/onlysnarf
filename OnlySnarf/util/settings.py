@@ -154,10 +154,7 @@ class Settings:
         return DEFAULT.PROMOTION_DURATION_ALLOWED or []
 
     def get_expiration():
-        return config["expiration"] or config["promotion_expiration"] or None
-        
-    def get_expiration_allowed():
-        return DEFAULT.EXPIRATION_ALLOWED or []
+        return config["expiration"] or config["promotion_expiration"] or 0
 
     def get_input():
         return config["input"] or []
@@ -306,13 +303,13 @@ class Settings:
         return tags
 
     def get_text():
-        return config["text"] or None
+        return config["text"] or ""
 
     def get_time():
         return config["time"] or None
 
     def get_title():
-        return config["title"] or None
+        return config["title"] or ""
         
     def get_skipped_users():
         return config["skipped_users"] or []
@@ -410,8 +407,6 @@ class Settings:
     def select_profile():
         pass
 
-
-
     # def get_users_favorite():
     #     return config["users_favorite"] or []
         
@@ -461,7 +456,7 @@ class Settings:
         return config["prefer_local"] or False
 
     def is_prompt():
-        return Settings.PROMPT or config["prompt"] or False
+        return Settings.PROMPT or False
 
     def is_save_users():
         return config["save_users"] or False
