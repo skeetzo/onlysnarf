@@ -516,12 +516,18 @@
     - more finishing touches to uploading post & message (and rebroken fixed things)
     - major updates / fixes to browser creation flow / attempts to fix reconnect bug
     - fixed issue in lib/driver with media upload popup from multiple of the same file --> updated error window close
+**4.2.2 : 9/14/2022**
+    - finished testing test_message and test_post (again)
+    - added tests for selenium browser configurations
+
 
 ------------------------------------------------------------------------------------
 
-- finish updating expires, poll, schedule new .get() return dict({})
+finish debugging schedule, probably from update mentioned below
 
-- finish testing: poll, schedule, discount (again), all profile tests (eventually)
+- finish updating expiration, poll, schedule new .get() return dict({})
+
+- finish testing: test_discount (again), test_poll, test_schedule
 
 ## Fix / Debug
 
@@ -581,6 +587,8 @@ https://pypi.org/project/config/
 - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
 - need to add 'create' to Profile for asking for profile settings when syncing to
 - add config for profile templates when testing profile features again
+- add tests for profile integration / behavior
+
 
 (once app works again)
 -> Twitter

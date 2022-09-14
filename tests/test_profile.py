@@ -9,7 +9,7 @@ from OnlySnarf.util.settings import Settings
 from OnlySnarf.snarf import Snarf
 # from OnlySnarf.classes.user import User
 
-class TestSnarfProfile(unittest.TestCase):
+class TestProfile(unittest.TestCase):
 
     def setUp(self):
         self.test_snarf = Snarf()

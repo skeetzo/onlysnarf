@@ -108,11 +108,9 @@ class Driver:
 
         """
 
-        Driver.init()
         if not Driver.login(): os._exit(1)
         ## Cookies
-        if Settings.is_cookies() == "True":
-            Driver.cookies_save()
+        if Settings.is_cookies() == "True": Driver.cookies_save()
         return True
 
     ###################
@@ -154,7 +152,7 @@ class Driver:
     ##### Discount #####
     ####################
 
-    def discount_user(discount=None):
+    def discount_user(discount):
         """
         Enter and apply discount to user
 
@@ -178,13 +176,13 @@ class Driver:
         if not discount:
             Settings.err_print("missing discount")
             return False
+        Settings.dev_print("discounting user...")
         try:
             discount.get()
             months = int(discount.get_months())
             amount = int(discount.get_amount())
             username = str(discount.get_username())
             # ensure username is actually a username
-            # from OnlySnarf.classes.user import User
             from ..classes.user import User
             if isinstance(discount.username, User):
                 username = discount.username.username
@@ -201,7 +199,7 @@ class Driver:
             elif int(amount) < int(Settings.get_discount_min_amount()):
                 Settings.warn_print("amount too low, min -> {}%".format(Settings.get_discount_min_months()))
                 amount = int(Settings.get_discount_min_amount())
-            Settings.print("Discounting: {}".format(username))
+            Settings.print("discounting: {}".format(username))
             Driver.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
             end_ = True
             count = 0
@@ -250,26 +248,14 @@ class Driver:
                 Settings.warn_print("unable to find discount btn for: {}".format(username))
                 return False
             time.sleep(1)
-            Settings.dev_print("finding months and discount amount btns")
-            from OnlySnarf.util.defaults import DISCOUNT_MAX_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_AMOUNT, DISCOUNT_MIN_MONTHS
-            discountAmount = DISCOUNT_MIN_AMOUNT
-            monthsAmount = DISCOUNT_MIN_MONTHS
-            print(Driver.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserAmount").getClass()))
-            discountEle = Driver.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserAmount").getClass())[0]
-            monthsEle = Driver.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserMonths").getClass())[1]
-            Settings.dev_print("found months and discount amount")
 
             def apply_discount():
-                Settings.dev_print("attempting discount")
-                # eles = Driver.browser.find_elements_by_class_name("v-select__selection.v-select__selection--comma")
-                # for ele in eles:
-                    # if str("% discount") in ele.get_attribute("innerHTML"):
+                Settings.maybe_print("attempting discount entry...")
+                Settings.dev_print("finding months and discount amount btns")
+                ## amount
+                discountEle = Driver.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserAmount").getClass())[0]
                 discountAmount = int(discountEle.get_attribute("innerHTML").replace("% discount", ""))
                 Settings.dev_print("amount: {}".format(discountAmount))
-                    # elif str(" month") in ele.get_attribute("innerHTML"):
-                monthsAmount = int(monthsEle.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
-                Settings.dev_print("months: {}".format(monthsAmount))
-                ## amount
                 Settings.dev_print("entering discount amount")
                 if int(discountAmount) != int(amount):
                     up_ = int((discountAmount / 5) - 1)
@@ -289,6 +275,9 @@ class Driver:
                     action.perform()
                 Settings.dev_print("successfully entered discount amount")
                 ## months
+                monthsEle = Driver.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserMonths").getClass())[1]
+                monthsAmount = int(monthsEle.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
+                Settings.dev_print("months: {}".format(monthsAmount))
                 Settings.dev_print("entering discount months")
                 if int(monthsAmount) != int(months):
                     up_ = int(monthsAmount - 1)
@@ -307,6 +296,10 @@ class Driver:
                     action.send_keys(Keys.TAB)
                     action.perform()
                 Settings.dev_print("successfully entered discount months")
+                discountEle = Driver.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserAmount").getClass())[0]
+                discountAmount = int(discountEle.get_attribute("innerHTML").replace("% discount", ""))
+                monthsEle = Driver.browser.find_elements_by_class_name(Element.get_element_by_name("discountUserMonths").getClass())[1]
+                monthsAmount = int(monthsEle.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
                 return discountAmount, monthsAmount
 
             # discount method is repeated until values are correct because somehow it occasionally messes up...
@@ -314,28 +307,28 @@ class Driver:
             while int(discountAmount) != int(amount) and int(monthsAmount) != int(months):
                 # Settings.print("{} = {}    {} = {}".format(discountAmount, amount, monthsAmount, months))
                 discountAmount, monthsAmount = apply_discount()
-              
+
             Settings.debug_delay_check()
             ## apply
             Settings.dev_print("applying discount")
             buttons_ = Driver.find_elements_by_name("discountUserButton")
             for button in buttons_:
                 if not button.is_enabled() and not button.is_displayed(): continue
-                if "Cancel" in button.get_attribute("innerHTML") and int(discountAmount) == int(amount) and int(monthsAmount) == int(months):
-                    Settings.print("skipping: Existing Discount")
-                    button.click()
-                    Settings.dev_print("successfully skipped existing discount")
-                    Settings.dev_print("### Discount Successful ###")
-                    return True
                 if "Cancel" in button.get_attribute("innerHTML") and Settings.is_debug() == "True":
-                    Settings.print("skipping: Save Discount (Debug)")
+                    Settings.print("skipping save discount (debug)")
                     button.click()
                     Settings.dev_print("successfully canceled discount")
                     Settings.dev_print("### Discount Successful ###")
                     return True
+                elif "Cancel" in button.get_attribute("innerHTML") and int(discountAmount) == int(amount) and int(monthsAmount) == int(months):
+                    Settings.print("skipping existing discount")
+                    button.click()
+                    Settings.dev_print("successfully skipped existing discount")
+                    Settings.dev_print("### Discount Successful ###")
+                    return True
                 elif "Apply" in button.get_attribute("innerHTML"):
                     button.click()
-                    Settings.print("Discounted: {}".format(username))
+                    Settings.print("discounted: {}".format(username))
                     Settings.dev_print("successfully applied discount")
                     Settings.dev_print("### Discount Successful ###")
                     return True
@@ -634,51 +627,58 @@ class Driver:
 
         """
 
-        Settings.dev_print("expiring")
+        if not expiration: return True
         try:
             Settings.print("Expiration:")
             Settings.print("- Period: {}".format(expiration))
+            # if expiration is 'no limit', then there's no expiration and hence no point here
+            if expiration == 999: return True
             Driver.open_more_options()
             # open expires window
-            Settings.dev_print("adding expires")
+            Settings.dev_print("adding expiration")
             Driver.find_element_to_click("expiresAdd").click()
             # select duration
-            Settings.dev_print("selecting expires")
-            nums = Driver.find_elements_by_name("expiresPeriods")
-            for num in nums:
-                inner = num.get_attribute("innerHTML")
-                if ">1<" in str(inner) and int(expiration) == 1: num.click()
-                if ">3<" in str(inner) and int(expiration) == 3: num.click()
-                if ">7<" in str(inner) and int(expiration) == 7: num.click()
-                if ">30<" in str(inner) and int(expiration) == 30: num.click()
-                if ">o limit<" in str(inner) and int(expiration) == 99: num.click()
+            Settings.dev_print("entering expiration")
+
+            # leave in case needed again
+            # nums = Driver.find_elements_by_name("expiresPeriods")
+            # for num in nums:
+            #     inner = num.get_attribute("innerHTML")
+            #     if int(expiration) == 1  and ">1<" in str(inner): num.click()
+            #     if int(expiration) == 3  and ">3<" in str(inner): num.click()
+            #     if int(expiration) == 7  and ">7<" in str(inner): num.click()
+            #     if int(expiration) == 30 and ">30<" in str(inner): num.click()
+            #     if int(expiration) == 99 and ">o limit<" in str(inner): num.click()
+
+            # expiration can now have any int, so update for entering any int less than 30
+            Driver.browser.find_element_by_name("periodValue").send_keys(expiration)
+
             Settings.dev_print("successfully selected expiration")
             Settings.debug_delay_check()
             # save
             if Settings.is_debug() == "True":
-                Settings.print("skipping: Expiration (debug)")
-                Settings.dev_print("skipping expires")
+                Settings.maybe_print("skipping expiration (debug)")
+                Settings.dev_print("skipping expiration")
                 Driver.find_element_to_click("expiresCancel").click()
                 Settings.dev_print("successfully canceled expires")
                 Settings.dev_print("### Expiration Successfully Canceled ###")
             else:
-                Settings.dev_print("saving expires")
+                Settings.dev_print("saving expiration")
                 Driver.find_element_to_click("expiresSave").click()
                 Settings.dev_print("successfully saved expires")
-                Settings.print("Expiration Entered")
                 Settings.dev_print("### Expiration Successful ###")
             return True
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failed to enter expiration")
             try:
-                Settings.dev_print("canceling expires")
+                Settings.dev_print("canceling expiration")
                 Driver.find_element_to_click("expiresCancel").click()
-                Settings.dev_print("successfully canceled expires")
+                Settings.dev_print("successfully canceled expiration")
                 Settings.dev_print("### Expiration Successful Failure ###")
             except: 
                 Settings.dev_print("### Expiration Failure Failure")
-            return False
+        return False
 
     ######################################################################
 
@@ -831,7 +831,7 @@ class Driver:
 
         """
         try:
-            if not Driver.browser: Driver.browser = Driver.spawn_browser()
+            if not Driver.browser: Driver.spawn_browser(Settings.get_browser_type())
             return Driver.browser
         except Exception as e:
             print(e)
@@ -870,6 +870,7 @@ class Driver:
 
         """
 
+        Driver.init()
         def goto():
             Settings.maybe_print("goto -> onlyfans.com")
             Driver.browser.get(ONLYFANS_HOME_URL)
@@ -1253,24 +1254,14 @@ class Driver:
                 Driver.error_checker(e)
             return False
 
-        successful = loggedin_check()
-        if successful:
-            Driver.logged_in = True
-            return True
+        # TODO: remember to add auto here if it works again for auto reconnecting
+        if Settings.get_browser_type() == "reconnect" or Settings.get_browser_type() == "remote":
+            if loggedin_check():
+                Driver.logged_in = True
+                return True
 
+        successful = False
         try:
-            # TODO: use after upgrading python version to 3.10?
-            # match Settings.get_login_method():
-            #     case "auto":
-            #         successful = via_form()
-            #         if not successful: successful = via_twitter()
-            #         if not successful: successful = via_google()
-            #     case "onlyfans":
-            #         successful = via_form()
-            #     case "twitter":
-            #         successful = via_twitter()
-            #     case "google":
-            #         successful = via_google()
             if Settings.get_login_method() == "auto":
                 successful = via_form()
                 if not successful: successful = via_twitter()
@@ -1369,7 +1360,7 @@ class Driver:
             Settings.dev_print("getting confirm to click")
             confirm = Driver.find_element_to_click("new_post")
             if Settings.is_debug() == "True":
-                Settings.print('OnlyFans Message: Skipped (debug)')
+                Settings.print('skipped message (debug)')
                 Settings.dev_print("### Message Successful (debug) ###")
                 Settings.debug_delay_check()
                 Driver.go_to_home()
@@ -1742,7 +1733,7 @@ class Driver:
 
         """
 
-        Settings.dev_print("poll")
+        if str(poll) == "None": return True
         poll.get()
         duration = poll["duration"]
         questions = poll["questions"]
@@ -1792,7 +1783,7 @@ class Driver:
             Settings.dev_print("question paths: {}".format(len(questions_)))
             # enter the questions
             i = 0
-            # Settings.print("questions: {}".format(questions))
+            Settings.dev_print("questions: {}".format(questions))
             for question in list(questions):
                 Settings.dev_print("entering question: {}".format(question))
                 questions_[i].send_keys(str(question))
@@ -1802,12 +1793,10 @@ class Driver:
             Settings.dev_print("successfully entered questions")
             Settings.debug_delay_check()
             if Settings.is_debug() == "True":
-                Settings.print("skipping: Poll (debug)")
+                Settings.maybe_print("skipping poll (debug)")
                 cancel = Driver.find_element_to_click("pollCancel")
                 cancel.click()
                 Settings.dev_print("### Poll Successfully Canceled ###")
-            else:
-                Settings.print("Poll Entered")
             Settings.dev_print("### Poll Successful ###")
             time.sleep(3)
             return True
@@ -1844,15 +1833,14 @@ class Driver:
 
         """
 
-        if not message:
-            Settings.err_print("missing message")
-            return False
-        Settings.dev_print("posting")
+        Settings.dev_print("posting...")
         try:
             Driver.go_to_home()
+            Driver.auth()
             files = message["files"]
             text = message["text"]
             if str(text) == "None": text = ""
+            #################### Formatted Text ####################
             Settings.print("====================")
             Settings.print("Posting:")
             Settings.print("- Files: {}".format(len(files)))
@@ -1860,24 +1848,12 @@ class Driver:
             # Settings.print("- Performers: {}".format(message.get_performers()))
             Settings.print("- Text: {}".format(text))
             Settings.print("- Tweeting: {}".format(Settings.is_tweeting()))
-            # Settings.print("====================")
             ## Expires, Schedule, Poll
-            if str(message["expiration"]) != "None":
-                if not Driver.expires(message["expiration"]):
-                    Settings.print("- Expires: False".format(text))
-                    return False
-                Settings.print("- Expires: True".format(text))
-            if str(message["schedule"]) != "None":
-                if not Driver.schedule(message["schedule"]):
-                    Settings.print("- Scheduled: False".format(text))
-                    return False
-                Settings.print("- Scheduled: True".format(text))
-            if str(message["poll"]) != "None":
-                if not Driver.poll(message["poll"]):
-                    Settings.print("- Poll: False".format(text))
-                    return False
-                Settings.print("- Poll: True".format(text))
+            if not Driver.expires(message["expiration"]): return False
+            if not Driver.schedule(message["schedule"]): return False
+            if not Driver.poll(message["poll"]): return False
             Settings.print("====================")
+            ############################################################
             WAIT = WebDriverWait(Driver.browser, 600, poll_frequency=10)
             ## Tweeting
             if Settings.is_tweeting() == "True":
@@ -1926,7 +1902,7 @@ class Driver:
                 if send:
                     Settings.debug_delay_check()
                     if Settings.is_debug() == "True":
-                        Settings.print('Skipped: OnlyFans Post (debug)')
+                        Settings.print('skipped post (debug)')
                         Settings.debug_delay_check()
                         Driver.go_to_home(force=True)
                         return True
@@ -2040,7 +2016,7 @@ class Driver:
             if Settings.is_debug() == "True":
                 Settings.dev_print("finding campaign cancel")
                 Driver.find_element_to_click("promotionalTrialCancel").click()
-                Settings.print("skipping: Promotion (debug)")
+                Settings.maybe_print("skipping promotion (debug)")
                 Settings.dev_print("successfully cancelled promotion campaign")
                 return True
             Settings.dev_print("finding campaign save")
@@ -2274,12 +2250,12 @@ class Driver:
             save = Driver.find_element_by_name("promotionalTrialApply")
             if Settings.is_debug() == "True":
                 Driver.find_element_by_name("promotionalTrialCancel").click()
-                Settings.print("skipping: Save Discount (Debug)")
+                Settings.maybe_print("skipping save discount (debug)")
                 Settings.dev_print("successfully canceled discount")
                 cancel.click()
                 return True
             save.click()
-            Settings.print("Discounted: {}".format(user.username))
+            Settings.print("discounted: {}".format(user.username))
             Settings.dev_print("### User Discount Successful ###")
             return True
         except Exception as e:
@@ -2421,11 +2397,11 @@ class Driver:
         """
 
         if not Driver.browser:
-            Settings.print('OnlyFans Not Open, skipping Reset')
+            Settings.print('OnlyFans not open, skipping reset')
             return True
         try:
             Driver.go_to_home()
-            Settings.print('OnlyFans Reset')
+            Settings.print('OnlyFans reset')
             return True
         except Exception as e:
             Driver.error_checker(e)
@@ -2452,6 +2428,7 @@ class Driver:
 
         """
 
+        if str(schedule) == "None": return True
         try:
             schedule.get()
             month_ = schedule.month
@@ -2569,13 +2546,13 @@ class Driver:
             Settings.dev_print("saving schedule")
             Settings.debug_delay_check()
             if Settings.is_debug() == "True":
-                Settings.print("skipping: Schedule (debug)")
+                Settings.maybe_print("skipping schedule (debug)")
                 Driver.find_element_to_click("scheduleCancel").click()
                 Settings.dev_print("successfully canceled schedule")
             else:
                 Driver.find_element_to_click("scheduleSave").click()
                 Settings.dev_print("successfully saved schedule")
-                Settings.print("Schedule Entered")
+                Settings.print("schedule entered")
             Settings.dev_print("### Schedule Successful ###")
             return True
         except Exception as e:
@@ -2789,7 +2766,7 @@ class Driver:
             element = Driver.find_element_to_click("profileSave")
             Settings.dev_print("found page save")
             if Settings.is_debug() == "True":
-                Settings.print("skipping: Save (debug)")
+                Settings.print("skipping settings save (debug)")
             else:
                 Settings.dev_print("saving page")
                 element.click()
@@ -2820,16 +2797,20 @@ class Driver:
 
         """
 
-        # if Driver.browser:
-        #     Settings.dev_print("closing existing browser...")
-        #     Driver.browser.quit()
-
         if Settings.is_debug("selenium") == "False":
             import logging
-            from selenium.webdriver.remote.remote_connection import LOGGER
-            LOGGER.setLevel(logging.WARNING)
-            # logging.getLogger("requests").setLevel(logging.WARNING)
+            from selenium.webdriver.remote.remote_connection import LOGGER as SeleniumLogger
+            SeleniumLogger.setLevel(logging.ERROR)
             logging.getLogger("urllib3").setLevel(logging.ERROR)
+            logging.getLogger("requests").setLevel(logging.ERROR)
+            if Settings.get_verbosity() == 3:
+                SeleniumLogger.setLevel(logging.WARNING)
+                logging.getLogger("urllib3").setLevel(logging.WARNING)
+                logging.getLogger("requests").setLevel(logging.WARNING)
+
+        browser = None
+        browserTypeFinal = None
+        Settings.print("spawning web browser...")
 
         def attempt_chrome():
             """
@@ -2873,6 +2854,7 @@ class Driver:
                 # options.binary_location = chromedriver_binary.chromedriver_filename
                 browser = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
                 Settings.print("browser created - chrome")
+                browserTypeFinal = "chrome"
                 return browser
             except Exception as e:
                 Settings.warn_print("unable to launch chrome!")
@@ -2912,13 +2894,14 @@ class Driver:
                 # browser = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, capabilities=d)
                 browser = webdriver.Firefox(options=options, desired_capabilities=d, service_log_path=Settings.get_logs_path("firefox"))
                 Settings.print("browser created - firefox")
+                browserTypeFinal = "firefox"
                 return browser
             except Exception as e:
                 Settings.warn_print("unable to launch firefox!")
                 Settings.dev_print(e)
             return None
 
-        def attempt_reconnect(driver):
+        def attempt_reconnect():
             """
             Reconnect to the corresponding session id and url.
 
@@ -2942,10 +2925,13 @@ class Driver:
 
             """
 
-            reconnect_id, url = Driver.read_session_data()
+            reconnect_id, url, browserTypeFinal_ = Driver.read_session_data()
             if not reconnect_id and not url:
                 Settings.maybe_print("unable to read session data")
-                return driver
+                return None
+            if not browserTypeFinal_:
+                Settings.maybe_print("unable to read previous browser type")
+                return None
             Settings.maybe_print("reconnecting to web browser...")
             Settings.dev_print("reconnect id: {}".format(reconnect_id))
             Settings.dev_print("reconnect url: {}".format(url))
@@ -2968,12 +2954,12 @@ class Driver:
                 # Replace the patched function with original function
                 # WebDriver.execute = original_execute
                 # necessary?
-                driver.title # fails check with: 'NoneType' object has no attribute 'title'
+                browser.title # fails check with: 'NoneType' object has no attribute 'title'
                 Settings.print("browser reconnected!")
             except Exception as e:
                 Settings.warn_print("unable to reconnect!")
                 Settings.dev_print(e)
-            return driver
+            return browser
 
         def attempt_remote():
             """
@@ -3006,6 +2992,7 @@ class Driver:
                     options = webdriver.ChromeOptions()
                     if Settings.is_show_window() == "False":
                         options.add_argument('--headless')
+                    browserTypeFinal = "chrome"
                     return dC, options
                 except Exception as e:
                     Settings.dev_print(e)
@@ -3018,6 +3005,7 @@ class Driver:
                     options = webdriver.FirefoxOptions()
                     if Settings.is_show_window() == "False":
                         options.add_argument('--headless')
+                    browserTypeFinal = "firefox"
                     return dC, options
                 except Exception as e:
                     Settings.dev_print(e)
@@ -3043,11 +3031,8 @@ class Driver:
         ################################################################################################################################################
         ################################################################################################################################################
 
-        Settings.print("spawning web browser...")
-        browser = None
         if "auto" in browserType:
-            # alphabetical
-            browser = attempt_chrome() or attempt_firefox()
+            browser = attempt_reconnect() or attempt_chrome() or attempt_firefox()
         elif "remote" in browserType:
             browser = attempt_remote()
         elif "chrome" in browserType:
@@ -3057,9 +3042,9 @@ class Driver:
         if "reconnect" in browserType:
             if not browser: browser = attempt_chrome() or attempt_firefox()
             browser = attempt_reconnect(browser)
-        if browser and Settings.is_keep() == "True":
-            Driver.write_session_data(browser.session_id, browser.command_executor._url)
 
+        if browser and Settings.is_keep() == "True":
+            Driver.write_session_data(browser.session_id, browser.command_executor._url, browserTypeFinal)
         if not browser:
             Settings.err_print("unable to spawn a web browser!")
             os._exit(1)
@@ -3076,17 +3061,19 @@ class Driver:
         Settings.dev_print("local session path: "+str(path_))
         id_ = None
         url = None
+        browserTypeFinal = None
         try:
             with open(str(path_)) as json_file:  
                 data = json.load(json_file)
                 id_ = data['id']
                 url = data['url']
+                browserTypeFinal = data['browserTypeFinal']
             Settings.maybe_print("loaded local users")
         except Exception as e:
             Settings.dev_print(e)
-        return (id_, url)
+        return (id_, url, browserTypeFinal)
 
-    def write_session_data(id_, url):
+    def write_session_data(id_, url, browserTypeFinal):
         Settings.maybe_print("writing local session")
         Settings.dev_print("saving session id: {}".format(id_))        
         Settings.dev_print("saving session url: {}".format(url))
@@ -3095,6 +3082,7 @@ class Driver:
         data = {}
         data['id'] = id_
         data['url'] = url
+        data['browserTypeFinal'] = browserTypeFinal
         try:
             with open(str(path_), 'w') as outfile:  
                 json.dump(data, outfile, indent=4, sort_keys=True)
@@ -3152,11 +3140,11 @@ class Driver:
             Settings.print("skipping upload (upload)")
             return True
         if len(files) == 0:
-            Settings.maybe_print("skipping upload, empty file list")
-            return False
+            Settings.maybe_print("skipping upload (empty file list)")
+            return True
         if Settings.is_skip_upload() == "True":
-            Settings.print("skipping upload: Disabled")
-            return False
+            Settings.print("skipping upload (disabled)")
+            return True
         files = files[:int(Settings.get_upload_max())]
         Settings.print("uploading file(s): {}".format(len(files)))
 
@@ -3177,7 +3165,7 @@ class Driver:
 
         Settings.dev_print("files prepared: {}".format(len(files_)))
         if len(files_) == 0:
-            Settings.err_print("skipping upload, unable to prepare files")
+            Settings.err_print("skipping upload (unable to prepare files)")
             return False
 
         ####
@@ -3231,6 +3219,7 @@ class Driver:
         username = None
         try:
             Driver.go_to_home()
+            Driver.auth()
             eles = Driver.browser.find_elements_by_tag_name("a")
             eles = [ele for ele in eles 
                     if "@" in str(ele.get_attribute("innerHTML"))
@@ -3730,13 +3719,13 @@ class Driver:
                     Driver.browser.switch_to.window(original_handle)
             Settings.print("")
             if not clicked:
-                Settings.print("skipping: List Add (none)")
+                Settings.print("skipping list add (none)")
                 Settings.dev_print("skipping list save")
                 Driver.browser.refresh()
                 Settings.dev_print("### List Add Successfully Skipped ###")
                 return True
             if Settings.is_debug() == "True":
-                Settings.print("skipping: List Add (debug)")
+                Settings.print("skipping list add (debug)")
                 Settings.dev_print("skipping list save")
                 Driver.browser.refresh()
                 Settings.dev_print("### List Add Successfully Canceled ###")
@@ -3779,6 +3768,7 @@ class Driver:
             Settings.print("Exiting OnlyFans")
         Driver.browser.quit()
         Settings.print("Browser Closed")
+        Driver._initialized_ = False
 
 ##################################################################################
 

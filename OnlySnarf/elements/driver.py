@@ -100,7 +100,7 @@ ELEMENTS = [
     # show more options # unnecessary w/ tabbing
     {
         "name": "moreOptions",
-        "classes": ["g-btn.m-flat.b-make-post__more-btn.has-tooltip", "g-btn.m-flat.b-make-post__more-btn", "button.g-btn.m-flat.b-make-post__more-btn"],
+        "classes": ["button.g-btn.m-flat.b-make-post__more-btn"],
         "text": [],
         "id": []
     },
@@ -121,7 +121,7 @@ ELEMENTS = [
     },
     {
         "name": "expiresPeriods",
-        "classes": ["b-make-post__expire__label"],
+        "classes": ["b-tabs__nav__text", "b-make-post__expire__label"],
         "text": [],
         "id": []
     },
@@ -139,7 +139,7 @@ ELEMENTS = [
     },
     {
         "name": "expiresCancel",
-        "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded.m-border"],
+        "classes": ["g-btn.m-flat.m-btn-gaps.m-reset-width", "g-btn.m-transparent-bg", "g-btn.m-rounded.m-border"],
         "text": ["Cancel"],
         "id": []
     },

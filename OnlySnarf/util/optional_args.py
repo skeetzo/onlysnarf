@@ -20,7 +20,7 @@ def apply_args(parser):
   # action: discount
   # the amount to discount a user by
   parser.add_argument('-amount', type=valid_amount, dest='amount',
-    help='the amount (%%) to discount by', default=None)
+    help='the amount (%%) to discount by', default=DEFAULT.AMOUNT_NONE)
   ##
   # -backup
   # backup uploaded content to designated folder at "destination"
@@ -33,7 +33,7 @@ def apply_args(parser):
   ##
   # -category
   # the category of folder to upload from
-  parser.add_argument('-category', default=None, dest='category',
+  parser.add_argument('-category', default=DEFAULT.CATEGORY_NONE, dest='category',
     help='the category of content to post or message')
   ##
   # -config-path
@@ -43,7 +43,7 @@ def apply_args(parser):
   ##
   # -date
   # date in MM-DD-YYYY
-  parser.add_argument('-date', type=valid_date, default=None, dest='date',
+  parser.add_argument('-date', type=valid_date, default=DEFAULT.DATE_NONE, dest='date',
     help='schedule date (MM-DD-YYYY)')
   ##
   # -delete
@@ -64,12 +64,11 @@ def apply_args(parser):
   # -duration
   # poll duration
   parser.add_argument('-duration', type=valid_duration, dest='duration',
-    help='the duration in days (99 for \'No Limit\') for a poll', choices=DEFAULT.DURATION_ALLOWED, default=None)
+    help='the duration in days (99 for \'No Limit\') for a poll', choices=DEFAULT.DURATION_ALLOWED, default=DEFAULT.DURATION_NONE)
   ##
   # -expiration
   # date of post or poll expiration
-  parser.add_argument('-expiration', type=valid_expiration, dest='expiration',
-    help='the expiration in days (99 for \'No Limit\')', choices=DEFAULT.EXPIRATION_ALLOWED, default=None)
+  parser.add_argument('-expiration', type=valid_expiration, dest='expiration', help='the expiration in days (999 for \'No Limit\')', default=DEFAULT.EXPIRATION_NONE)
   ##
   # -keep
   # keep the browser window open

@@ -46,18 +46,18 @@ def valid_promo_duration(s):
 		raise argparse.ArgumentTypeError(msg)
 	return int(s)
 
-def valid_expiration(s):
-	try:
-		if int(s) in DEFAULT.EXPIRATION_ALLOWED: return int(s)
-	except ValueError:
-		msg = "Not a valid expiration: '{0}'.".format(s)
-		raise argparse.ArgumentTypeError(msg)
-
 def valid_promo_expiration(s):
 	try:
 		if int(s) in DEFAULT.PROMOTION_EXPIRATION_ALLOWED: return int(s)
 	except ValueError:
 		msg = "Not a valid promo expiration: '{0}'.".format(s)
+		raise argparse.ArgumentTypeError(msg)
+
+def valid_expiration(s):
+	try:
+		if int(s) <= DEFAULT.EXPIRATION_MAX: return int(s)
+	except ValueError:
+		msg = "Not a valid expiration: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
 
 def valid_limit(s):
@@ -161,14 +161,23 @@ class DurationValidator(Validator):
 	def validate(self, document):
 		if str(document.text).lower() not in str(Settings.get_duration_allowed()).lower():
 			raise ValidationError(
-				message='Please enter a duration ({})'.format(", ".join(Settings.get_duration_allowed())),
+				message='Please enter a duration ({})'.format(Settings.get_duration_allowed()),
 				cursor_position=len(document.text))  # Move cursor to end
 
 class PromoDurationValidator(Validator):
 	def validate(self, document):
 		if str(document.text).lower() not in str(Settings.get_duration_promo_allowed()).lower():
 			raise ValidationError(
-				message='Please enter a promo duration ({})'.format(", ".join(Settings.get_duration_promo_allowed())),
+				message='Please enter a promo duration ({})'.format(Settings.get_duration_promo_allowed()),
+				cursor_position=len(document.text))  # Move cursor to end
+
+class PromoExpirationValidator(Validator):
+	def validate(self, document):
+		try:
+			int(document.text)
+		except ValueError:
+			raise ValidationError(
+				message='Please enter a promo expiration ({})'.format(Settings.get_expiration_allowed()),
 				cursor_position=len(document.text))  # Move cursor to end
 
 class ExpirationValidator(Validator):
@@ -177,7 +186,7 @@ class ExpirationValidator(Validator):
 			int(document.text)
 		except ValueError:
 			raise ValidationError(
-				message='Please enter an expiration ({})'.format(", ".join(Settings.get_expiration_allowed())),
+				message='Please enter an expiration ({})'.format(Settings.get_expiration_allowed()),
 				cursor_position=len(document.text))  # Move cursor to end
 
 class ListValidator(Validator):
