@@ -149,14 +149,14 @@ class Promotion:
     def get(self):
         """Update the promotion object's default values"""
 
-        if self.gotten: return
-        gotten = self.get_user()
-        gotten = self.get_amount()
-        gotten = self.get_expiration()
-        gotten = self.get_limit()
-        gotten = self.get_duration()
-        gotten = self.get_message()
-        self.gotten = True
+        return dict({
+            "user": self.get_user(),
+            "amount": self.get_amount(),
+            "expiration": self.get_expiration(),
+            "limit": self.get_limit(),
+            "duraction": self.get_duration(),
+            "message": self.get_message()
+        })
 
     def get_amount(self):
         """

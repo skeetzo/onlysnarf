@@ -507,35 +507,48 @@
   - add / ensure all default values to config.conf
   - cleand up config files and example
   - cleaned up dir structure references across project
-**4.2.0 : 9/12/2022**
-  - finished debugging test_message & test_post; uploading files works again
-  - tested changes made from removing / cleaning up args and commands
-  - cleaned up tests (broke again)
+  **4.2.0 : 9/12/2022**
+    - finished debugging test_message & test_post; uploading files works again
+    - tested changes made from removing / cleaning up args and commands
+    - cleaned up tests (broke again)
+**4.2.1 : 9/13/2022**
+    - mostly finished debugging (again): test_message
+    - more finishing touches to uploading post & message (and rebroken fixed things)
+    - major updates / fixes to browser creation flow / attempts to fix reconnect bug
+    - fixed issue in lib/driver with media upload popup from multiple of the same file --> updated error window close
 
 ------------------------------------------------------------------------------------
 
-- finish debugging (again): test_message
+- finish updating expires, poll, schedule new .get() return dict({})
+
 - finish testing: poll, schedule, discount (again), all profile tests (eventually)
 
 ## Fix / Debug
 
-- keep open might be working now
-
 - browser reconnect; doesn't reconnect to browser or retain session
+-- keep open might be working now to reconnect to; nope
 - cookies: currently prevents saving login session
 
-(unlikely to be fixed soon)
+(unlikely to be fixed soon, if ever)
 - google login: unsafe browser warning --> possibly end of usability --> should I just remove this? form login works, twitter login works (i think)
 -- maybe just cut out / leave as is until can debug "unsafe browser" issue?
 
 - debug: discover the cause of the super slow web scraping
 -- not: debug_delay
 
-- debug: issue in lib/driver with media upload popup from multiple of the same file, maybe Escape out?
-
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- add github build testing
+- update / check pypi config 
+https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+https://github.com/atinfo/awesome-test-automation/blob/master/python-test-automation.md
+https://www.the-analytics.club/python-auto-run-tests
+https://medium.com/swlh/automate-python-testing-with-github-actions-7926b5d8a865
+https://pypi.org/project/configuration/
+https://pypi.org/project/pkgconfig/
+https://pypi.org/project/config/
 
 - finish cleaning up class/user
 - finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleanuping up code
