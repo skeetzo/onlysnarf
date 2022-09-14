@@ -516,8 +516,10 @@ class Post(Message):
         """
 
         # check if poll is ready
-        if self.poll and self.poll.check(): return self.poll
-        else: return None
+        if self.poll and self.poll.check():
+            return self.poll
+        else:
+            return None
         # prompt skip
         if not Settings.prompt("poll"): return None
         poll = Poll()
@@ -544,7 +546,7 @@ class Post(Message):
             "text": self.format_text(),
             "files": self.get_files(),
             "price": self.get_price(),
-            "expires": self.get_expiration(),
+            "expiration": self.get_expiration(),
             "schedule": self.get_schedule(),
             "poll": self.get_poll()
         })

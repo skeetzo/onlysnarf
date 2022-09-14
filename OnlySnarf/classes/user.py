@@ -97,7 +97,7 @@ class User:
         if not successful: return False
         successful = self.enter_message(message)
         if not successful: return False
-        Settings.print("messaged: {}".format(self.username))
+        Settings.print("messaged: user (id): {} ({})".format(self.username, self.id))
         return True
 
     @staticmethod
@@ -113,7 +113,7 @@ class User:
         """
 
         user = User({"username":username,"id":user_id})
-        user.message(message)    
+        return user.message(message)    
 
     def enter_message(self, message):
 

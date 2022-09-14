@@ -59,6 +59,12 @@ class Schedule:
             maybe_print("hour: {}".format(self.hour))
             maybe_print("minutes: {}".format(self.minute))
         self.gotten = True
+        
+        return dict({
+            "date": self.get_date(),
+            "time": self.get_time()
+        })
+
 
     def get_date(self):
         """

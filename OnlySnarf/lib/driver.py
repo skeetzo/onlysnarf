@@ -603,7 +603,7 @@ class Driver:
             if len(error_buttons) == 0: return True
             for butt in error_buttons:
                 if butt.get_attribute("innerHTML").strip() == "Close" and butt.is_enabled():
-                    Settings.maybe_Settings.warn_print("upload error message, closing")
+                    Settings.maybe_print("upload error message, closing")
                     butt.click()
                     Settings.maybe_print("success: upload error message closed")
                     return True
@@ -616,7 +616,7 @@ class Driver:
     ##### Expiration #####
     ######################
 
-    def expires(expiration=None):
+    def expires(expiration):
         """
         Enters the provided expiration duration for a post
 
@@ -634,10 +634,7 @@ class Driver:
 
         """
 
-        if not expiration:
-            Settings.err_print("missing expiration")
-            return False
-        Settings.dev_print("expires")
+        Settings.dev_print("expiring")
         try:
             Settings.print("Expiration:")
             Settings.print("- Period: {}".format(expiration))
@@ -1729,7 +1726,7 @@ class Driver:
     ##### Poll #####
     ################
 
-    def poll(poll=None):
+    def poll(poll):
         """
         Enter the Poll object into the current post
 
@@ -1745,13 +1742,10 @@ class Driver:
 
         """
 
-        if not poll:
-            Settings.err_print("missing poll")
-            return False
         Settings.dev_print("poll")
         poll.get()
-        duration = poll.get_duration()
-        questions = poll.get_questions()
+        duration = poll["duration"]
+        questions = poll["questions"]
         try:
             Settings.print("Poll:")
             Settings.print("- Duration: {}".format(duration))
@@ -1856,11 +1850,8 @@ class Driver:
         Settings.dev_print("posting")
         try:
             Driver.go_to_home()
-            files = message.get_files()
-            text = message.format_text()
-            expires = message.get_expiration()
-            schedule = message.get_schedule()
-            poll = message.get_poll()
+            files = message["files"]
+            text = message["text"]
             if str(text) == "None": text = ""
             Settings.print("====================")
             Settings.print("Posting:")
@@ -1871,18 +1862,18 @@ class Driver:
             Settings.print("- Tweeting: {}".format(Settings.is_tweeting()))
             # Settings.print("====================")
             ## Expires, Schedule, Poll
-            if expires:
-                if not Driver.expires(expiration=expires):
+            if str(message["expiration"]) != "None":
+                if not Driver.expires(message["expiration"]):
                     Settings.print("- Expires: False".format(text))
                     return False
                 Settings.print("- Expires: True".format(text))
-            if schedule:
-                if not Driver.schedule(schedule=schedule):
+            if str(message["schedule"]) != "None":
+                if not Driver.schedule(message["schedule"]):
                     Settings.print("- Scheduled: False".format(text))
                     return False
                 Settings.print("- Scheduled: True".format(text))
-            if poll:
-                if not Driver.poll(poll=poll):
+            if str(message["poll"]) != "None":
+                if not Driver.poll(message["poll"]):
                     Settings.print("- Poll: False".format(text))
                     return False
                 Settings.print("- Poll: True".format(text))
@@ -1983,12 +1974,12 @@ class Driver:
         # go to onlyfans.com/my/subscribers/active
         try:
             promotion.get()
-            limit = promotion.get_limit()
-            expiration = promotion.get_expiration()
-            duration = promotion.get_duration()
-            # user = promotion.get_user()
-            amount = promotion.get_amount()
-            text = promotion.get_message()
+            limit = promotion["limit"]
+            expiration = promotion["expiration"]
+            duration = promotion["duration"]
+            # user = promotion["user"]
+            amount = promotion["amount"]
+            text = promotion["message"]
             Settings.maybe_print("goto -> /my/promotions")
             Driver.go_to_page("my/promotions")
             Settings.dev_print("checking existing promotion")
@@ -2108,10 +2099,10 @@ class Driver:
         # go to onlyfans.com/my/subscribers/active
         try:
             promotion.get()
-            limit = promotion.get_limit()
-            expiration = promotion.get_expiration()
-            duration = promotion.get_duration()
-            user = promotion.get_user()
+            limit = promotion["limit"]
+            expiration = promotion["expiration"]
+            duration = promotion["duration"]
+            user = promotion["user"]
             Settings.maybe_print("goto -> /my/promotions")
             Driver.go_to_page("/my/promotions")
             Settings.dev_print("showing promotional trial link")
@@ -2234,10 +2225,10 @@ class Driver:
             return False
         # go to onlyfans.com/my/subscribers/active
         promotion.get()
-        expiration = promotion.get_expiration()
-        months = promotion.get_duration()
-        user = promotion.get_user()
-        message = promotion.get_message()
+        expiration = promotion["expiration"]
+        months = promotion["duration"]
+        user = promotion["user"]
+        message = promotion["message"]
         if int(expiration) > int(Settings.get_discount_max_amount()):
             Settings.warn_print("discount too high, max -> {}%".format(Settings.get_discount_max_amount()))
             discount = Settings.get_discount_max_amount()
@@ -2445,7 +2436,7 @@ class Driver:
     ##### Schedule #####
     ####################
 
-    def schedule(schedule=None):
+    def schedule(schedule):
         """
         Enter the provided schedule
 
@@ -2461,9 +2452,6 @@ class Driver:
 
         """
 
-        if not schedule:
-            Settings.err_print("missing schedule")
-            return False
         try:
             schedule.get()
             month_ = schedule.month

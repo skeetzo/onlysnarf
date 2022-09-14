@@ -25,17 +25,18 @@ class TestSnarf(unittest.TestCase):
         config["months"] = DEFAULT.DISCOUNT_MIN_MONTHS
         config["user"] = "randomficus"
         assert self.test_snarf.discount(), "unable to apply discount"
-
+        
+    @unittest.skip("todo")
     def test_message(self):
-        config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
+        config["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["text"] = "test balls"
         config["user"] = "randomficus"
         assert self.test_snarf.message(), "unable to send message"
 
-    @unittest.skip("works")
+    # @unittest.skip("works")
     def test_post(self):
-        config["input"] = "/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"
+        config["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["text"] = "test balls"
         assert self.test_snarf.post(), "unable to post message"

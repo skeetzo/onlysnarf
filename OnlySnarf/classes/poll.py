@@ -38,14 +38,10 @@ class Poll:
         return False
 
     def get(self):
-        if self.gotten: return
-        gotten = self.get_duration()
-        # return early if skipped
-        if not gotten: return
-        gotten = self.get_questions()
-        # return early if skipped
-        if not gotten: return
-        self.gotten = True
+        return dict({
+            "duration": self.get_duration(),
+            "questions": self.get_questions()
+        })
 
     def get_duration(self):
         """

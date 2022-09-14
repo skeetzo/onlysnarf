@@ -84,6 +84,12 @@ class Discount:
         gotten = self.get_amount()
         gotten = self.get_months()
         self.gotten = True
+        
+        return dict({
+            "username": self.get_username(),
+            "amount": self.get_amount(),
+            "months": self.get_months()
+        })
 
     def get_amount(self):
 
