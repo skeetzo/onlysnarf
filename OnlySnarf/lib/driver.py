@@ -2428,36 +2428,16 @@ class Driver:
 
         """
 
-        if str(schedule) == "None": return True
+        if str(schedule) == "None" or schedule: return True
         try:
-            schedule.get()
-            month_ = schedule.month
-            day_ = schedule.day
-            year_ = schedule.year
-            hour_ = schedule.hour
-            minute_ = schedule.minute
-            today = datetime.now()
-            Settings.dev_print("today: {} {}".format(today.strftime("%B"), today.strftime("%Y")))
-            date__ = None
-            try:
-                date__ = datetime.strptime(str(schedule.date), "%Y-%m-%d")
-            except Exception as e:
-                if "unconverted data remains:  00:00:00" in str(e):
-                    date__ = datetime.strptime(str(schedule.date), "%Y-%m-%d %H:%M:%S")
-                else:
-                    Settings.maybe_print(e)
-                    Settings.err_print("unable to parse date")
-                    return False
-            if not date__:
-                Settings.err_print("unable to parse date")
-                return False
-
-            if date__ < today:
-                Settings.err_print("unable to schedule earlier date")
-                return False
+            month_ = schedule["month"]
+            day_ = schedule["day"]
+            year_ = schedule["year"]
+            hour_ = schedule["hour"]
+            minute_ = schedule["minute"]
             Settings.print("Schedule:")
-            Settings.print("- Date: {}".format(schedule.date))
-            Settings.print("- Time: {}".format(schedule.time))
+            Settings.print("- Date: {}".format(schedule["date"]))
+            Settings.print("- Time: {}".format(schedule["time"]))
             Driver.open_more_options()
             # click schedule
             Settings.dev_print("opening schedule")
@@ -2538,7 +2518,7 @@ class Driver:
             suffixes = Driver.find_elements_by_name("scheduleMinutes")
             for suffix in suffixes:
                 inner = suffix.get_attribute("innerHTML")
-                if str(schedule.suffix).lower() in str(inner).lower() and suffix.is_enabled():
+                if str(schedule["suffix"]).lower() in str(inner).lower() and suffix.is_enabled():
                     suffix.click()
                     Settings.dev_print("successfully set suffix")
                     break

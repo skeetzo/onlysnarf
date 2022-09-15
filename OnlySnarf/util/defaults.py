@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from pathlib import Path
 
 ##
@@ -7,9 +8,19 @@ from pathlib import Path
 
 AMOUNT_NONE = 0
 
-
 CATEGORIES = [ "images", "galleries", "videos", "performers" ]
 CATEGORY_NONE = CATEGORIES[0]
+
+# SCHEDULE = None
+DATE_FORMAT = "%m/%d/%Y"
+TIME_FORMAT = "%H:%M:%S"
+SCHEDULE_FORMAT = "{} {}".format(DATE_FORMAT, TIME_FORMAT)
+
+date_ = datetime.strptime(str(datetime.now().strftime(SCHEDULE_FORMAT)), SCHEDULE_FORMAT)
+
+DATE = date_.date()
+TIME = date_.time()
+SCHEDULE = date_
 
 DEFAULT_MESSAGE = ":)"
 DEFAULT_REFRESHER = "hi!"
@@ -19,8 +30,6 @@ DISCOUNT_MAX_AMOUNT = 55
 DISCOUNT_MIN_AMOUNT = 10
 DISCOUNT_MAX_MONTHS = 7
 DISCOUNT_MIN_MONTHS = 1
-
-DATE_NONE = None
 
 DURATION_ALLOWED = [1,3,7,30,99] # in days
 DURATION_NONE = 0
@@ -42,7 +51,6 @@ PROMOTION_OFFER_LIMIT = [0,1,2,3,4,5,6,7,8,9,10]
 # various datetime
 PROMOTION_DURATION_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
 
-
 PRICE_MINIMUM = 3
 
 # sftp
@@ -53,7 +61,9 @@ BROWSER_PORT = 4444
 REMOTE_HOST = "127.0.0.1"
 REMOTE_PORT = 22
 
+
 SOURCES = [ "local","remote" ]
+
 
 UPLOAD_MAX_DURATION = 6*6 # increments of 10 minutes; 6 = 1 hr
 

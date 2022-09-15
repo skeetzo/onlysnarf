@@ -25,7 +25,7 @@ def valid_amount(s):
 		raise argparse.ArgumentTypeError(msg)
 
 def valid_date(s):
-	try: return datetime.strptime(s, "%m-%d-%Y")
+	try: return datetime.strptime(s, DEFAULT.DATE_FORMAT)
 	except ValueError:
 		msg = "Not a valid date: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
@@ -93,13 +93,13 @@ def valid_price(s):
 		raise argparse.ArgumentTypeError(msg)
 
 def valid_schedule(s):
-	try: return datetime.strptime(s, "%m-%d-%Y:%H:%M")
+	try: return datetime.strptime(s, DEFAULT.SCHEDULE_FORMAT)
 	except ValueError:
 		msg = "Not a valid schedule: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
 
 def valid_time(s):
-	try: return datetime.strptime(s, "%H:%M")
+	try: return datetime.strptime(s, DEFAULT.TIME_FORMAT)
 	except ValueError:
 		msg = "Not a valid time: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)

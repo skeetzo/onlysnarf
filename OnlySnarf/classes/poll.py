@@ -23,21 +23,8 @@ class Poll:
         # prevents double prompts
         self.gotten = False
 
-    def check(self):
-        """Check if poll is ready with valid values
-
-        Returns
-        -------
-        bool
-            Whether the poll is ready to be posted or not
-
-        """
-
-        if len(self.get_questions()) > 0: return True
-        if self.get_duration(): return True
-        return False
-
     def get(self):
+        if not self.validate(): return None
         return dict({
             "duration": self.get_duration(),
             "questions": self.get_questions()
@@ -55,24 +42,22 @@ class Poll:
         """
 
         if self.duration: return self.duration
-        # retrieve from args and return if exists
-        duration = Settings.get_duration()
-        if duration: 
-            self.duration = duration
-            return duration
-        # prompt skip
-        if not Settings.prompt("duration"): return None
-        question = {
-            'type': 'input',
-            'name': 'duration',
-            'message': 'Duration [1, 3, 7, 99 (\'No Limit\')]',
-            'validate': DurationValidator
-        }
-        duration = prompt(question)["duration"]
-        # confirm duration
-        if not Settings.confirm(duration): return self.get_duration()
-        self.duration = duration
+        self.duration = Settings.get_duration()
         return self.duration
+
+        # # prompt skip
+        # if not Settings.prompt("duration"): return None
+        # question = {
+        #     'type': 'input',
+        #     'name': 'duration',
+        #     'message': 'Duration [1, 3, 7, 99 (\'No Limit\')]',
+        #     'validate': DurationValidator
+        # }
+        # duration = prompt(question)["duration"]
+        # # confirm duration
+        # if not Settings.confirm(duration): return self.get_duration()
+        # self.duration = duration
+        # return self.duration
 
     def get_questions(self):
         """
@@ -86,24 +71,40 @@ class Poll:
         """
 
         if len(self.questions) > 0: return self.questions
-        # retrieve from args and return if exists
-        questions = Settings.get_questions()
-        if len(questions) > 0: 
-            self.questions = questions
-            return questions
-        # prompt skip
-        if not Settings.prompt("questions"): return []
-        print("Enter Questions")
-        while True:
-            question = {
-                'type': 'input',
-                'name': 'question',
-                'message': 'Question:',
-            }
-            answers = prompt(question)["question"]
-            if str(question) == "": break
-            questions.append(question)
-        # confirm questions
-        if not Settings.confirm(questions): return self.get_questions()
-        self.questions = questions
+        self.questions = Settings.get_questions()
         return self.questions
+
+        # # prompt skip
+        # if not Settings.prompt("questions"): return []
+        # print("Enter Questions")
+        # while True:
+        #     question = {
+        #         'type': 'input',
+        #         'name': 'question',
+        #         'message': 'Question:',
+        #     }
+        #     answers = prompt(question)["question"]
+        #     if str(question) == "": break
+        #     questions.append(question)
+        # # confirm questions
+        # if not Settings.confirm(questions): return self.get_questions()
+        # self.questions = questions
+        # return self.questions
+
+    def validate(self):
+        Settings.dev_print("validating poll...")
+
+        """Check if poll is ready with valid values.
+
+        Returns
+        -------
+        bool
+            Whether the poll is ready to be posted or not
+
+        """
+
+        if len(self.get_questions()) > 0 and self.get_duration():
+            Settings.dev_print("valid!")
+            return True
+        Settings.dev_print("invalid!")
+        return False

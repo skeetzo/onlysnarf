@@ -1,14 +1,16 @@
 import re
 from datetime import datetime
-from ..lib.driver import Driver
-from ..util.settings import Settings
-from .user import User
 from PyInquirer import prompt
 from PyInquirer import Validator, ValidationError
 ##
-from ..util.validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ListValidator
+
 from ..lib import remote as Remote
+from ..lib.driver import Driver
+from ..util import defaults as DEFAULT
+from ..util.settings import Settings
+from ..util.validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ListValidator
 from .file import File, Folder
+from .user import User
 
 class Promotion:
     """Promotion class"""

@@ -1,7 +1,8 @@
 from datetime import datetime
-from ..util.settings import Settings
 from PyInquirer import prompt
-##
+
+from ..util import defaults as DEFAULT
+from ..util.settings import Settings
 from ..util.validators import TimeValidator, DateValidator
 
 class Schedule:
@@ -17,54 +18,42 @@ class Schedule:
         self.day = "0"
         self.suffix = "am"
         ##
-        self.gotten = False
+        self.init()
 
-    def apply(self):
-        self.get()
-        if not self.gotten: return
-        if not Settings.prompt("Schedule"): return
+    def init(self):
+        Settings.dev_print("initiliazing schedule...")
 
-    def check(self):
-        if self.get_date() and self.get_time(): return True
-        return False
+        date = self.get_date()
+        time = self.get_time()
+        
+        if "am" in str(time).lower(): self.suffix = "am"
+        elif "pm" in str(time).lower(): self.suffix = "pm"
+
+        self.year = date.year
+        self.month = date.strftime("%B")
+        self.day = date.day
+        self.hour = date.hour
+        self.minute = date.minute
+        Settings.dev_print("initiliazed schedule")
 
     def get(self):
-        if self.gotten: return
-        if self.get_date():
-            date = self.get_date()
-            maybe_print(0)
-            maybe_print(date)
-            if self.get_time():
-                maybe_print(11)
-                maybe_print(self.get_time())
-                if "00:00:00" in str(date):
-                    date = str(date).replace("00:00:00", self.get_time())
-                else:
-                    date = "{} {}".format(date, self.get_time())
-            if "am" in self.get_time().lower(): self.suffix = "am"
-            elif "pm" in self.get_time().lower(): self.suffix = "pm"
-            maybe_print(1)
-            maybe_print(date)
-            date = datetime.strptime(str(date), "%Y-%m-%d %H:%M %p")
-            maybe_print(2)
-            maybe_print(date)
-            self.year = date.year
-            self.month = date.strftime("%B")
-            self.day = date.day
-            self.hour = date.hour
-            self.minute = date.minute
-            maybe_print("year: {}".format(self.year))
-            maybe_print("month: {}".format(self.month))
-            maybe_print("day: {}".format(self.day))
-            maybe_print("hour: {}".format(self.hour))
-            maybe_print("minutes: {}".format(self.minute))
-        self.gotten = True
-        
+        Settings.maybe_print("Schedule:")
+        Settings.maybe_print("year: {}".format(self.year))
+        Settings.maybe_print("month: {}".format(self.month))
+        Settings.maybe_print("day: {}".format(self.day))
+        Settings.maybe_print("hour: {}".format(self.hour))
+        Settings.maybe_print("minutes: {}".format(self.minute))
+        if not self.validate(): return None
         return dict({
             "date": self.get_date(),
-            "time": self.get_time()
+            "time": self.get_time(),
+            "hour" : self.hour,
+            "minute" : self.minute,
+            "year" : self.year,
+            "month" : self.month,
+            "day" : self.day,
+            "suffix" : self.suffix
         })
-
 
     def get_date(self):
         """
@@ -78,16 +67,9 @@ class Schedule:
         """
 
         if self.date: return self.date
-        date = Settings.get_date() or None
-        if date: 
-            self.date = date
-            return date
-        # retrieve from args and return if exists
-        schedule = Settings.get_schedule() or None
-        if schedule:
-            date = datetime.strptime(str(schedule), "%Y-%m-%d %H:%M:%S")
-            self.date = date.date()
-            return self.date
+        self.date = Settings.get_date()
+        return self.date
+
         # prompt skip
         if not Settings.prompt("date"): return None
         question = {
@@ -115,18 +97,23 @@ class Schedule:
 
         if self.time: return self.time
         # retrieve from args and return if exists
-        time = Settings.get_time() or None
-        if time: 
-            time = datetime.strptime(str(time), "%Y-%m-%d %H:%M:%S")
-            # Settings.dev_print(time)
-            time = time.strftime("%I:%M %p")
-            # Settings.dev_print(time)
-            self.time = time
-            return self.time
+        self.time = Settings.get_time()
+        return self.time
+
+
+
+        # # if time: 
+        # time = datetime.strptime(str(time), DEFAULT.SCHEDULE_FORMAT)
+        # # Settings.dev_print(time)
+        # time = time.strftime("%I:%M %p")
+        # # Settings.dev_print(time)
+        # self.time = time
+        # return self.time
+
         # retrieve time from schedule args and return if exists
         schedule = Settings.get_schedule() or None
         if schedule:
-            time = datetime.strptime(str(schedule), "%Y-%m-%d %H:%M:%S")
+            time = datetime.strptime(str(schedule), DEFAULT.SCHEDULE_FORMAT)
             # Settings.dev_print(time)
             time = time.strftime("%I:%M %p")
             # Settings.dev_print(time)
@@ -137,7 +124,7 @@ class Schedule:
         question = {
             'type': 'input',
             'name': 'time',
-            'message': 'Enter a time (HH:MM):',
+            'message': 'Enter a time (HH:MM:SS):',
             'validate': TimeValidator
         }
         time = prompt(question)["time"]
@@ -145,6 +132,42 @@ class Schedule:
         if not Settings.confirm(time): return self.get_time()
         self.time = time
         return self.time
+
+    def validate(self):
+        Settings.dev_print("validating schedule...")
+
+        today = datetime.now()
+        todayF = today.strftime("%B")
+        year = today.year
+        yearF = today.strftime("%Y")
+        time = today.time()
+        timeF = time.strftime(DEFAULT.TIME_FORMAT)
+
+        Settings.dev_print("today: {}".format(todayF))
+        Settings.dev_print("year: {}".format(year))
+        Settings.dev_print("yearF: {}".format(yearF))
+        Settings.dev_print("time: {}".format(time))
+        Settings.dev_print("timeF: {}".format(timeF))
+        Settings.dev_print("vs")
+        Settings.dev_print("date: {}".format(self.get_date()))
+        Settings.dev_print("time: {}".format(self.get_time()))
+
+        return True
+
+        if str(self.get_date()) == str(today):
+            Settings.dev_print("valid!")
+        if str(self.get_time()) == str(time):
+            Settings.dev_print("valid!")
+        else:
+            Settings.dev_print("invalid!")
+
+        # if not date__:
+        #     Settings.err_print("unable to parse date")
+        #     return False
+        # if date__ < today:
+        #     Settings.err_print("unable to schedule earlier date")
+        #     return False
+
 
 # round to 5
 def myround(x, base=5):
