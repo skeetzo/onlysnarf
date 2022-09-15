@@ -511,7 +511,7 @@
     - finished debugging test_message & test_post; uploading files works again
     - tested changes made from removing / cleaning up args and commands
     - cleaned up tests (broke again)
-**4.2.1 : 9/13/2022**
+  **4.2.1 : 9/13/2022**
     - mostly finished debugging (again): test_message
     - more finishing touches to uploading post & message (and rebroken fixed things)
     - major updates / fixes to browser creation flow / attempts to fix reconnect bug
@@ -519,15 +519,14 @@
 **4.2.2 : 9/14/2022**
     - finished testing test_message and test_post (again)
     - added tests for selenium browser configurations
-
+    - mostly finished updating expiration, poll, schedule new .get() return dict({})
+    - mostly finished testing: test_discount (again), test_poll, test_schedule
+    - major updates to classes/schedule & util/settings for proper datetime manipulation
+    - added new tests for schedule variables
 
 ------------------------------------------------------------------------------------
 
-finish debugging schedule, probably from update mentioned below
-
-- finish updating expiration, poll, schedule new .get() return dict({})
-
-- finish testing: test_discount (again), test_poll, test_schedule
+- completely finish debugging basic snarf functionality
 
 ## Fix / Debug
 
@@ -589,7 +588,6 @@ https://pypi.org/project/config/
 - add config for profile templates when testing profile features again
 - add tests for profile integration / behavior
 
-
 (once app works again)
 -> Twitter
 - needs a dummy account to test actual tweeting w/
@@ -621,3 +619,9 @@ Add stuff for:
 
 **4.1.4**
   - boolean checks from "Settings.is_" functions are failing: replaced with redundant "== True"
+
+**4.2.2**
+- unclosed socket error during testing that eventually builds up into lack of room; occurs after checking for chrome binary and failing to find it before switching to try firefox, which launches and then doesn't seem to work
+
+  "/venv/lib/python3.8/site-packages/OnlySnarf-4.2.1-py3.8.egg/OnlySnarf/lib/driver.py:2841: ResourceWarning: unclosed <socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('127.0.0.1', 35896), raddr=('127.0.0.1', 35181)>"
+  ResourceWarning: Enable tracemalloc to get the object allocation traceback
