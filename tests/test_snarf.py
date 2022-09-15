@@ -58,7 +58,8 @@ class TestSnarf(unittest.TestCase):
     def test_schedule(self):
         config["text"] = "test balls"
         today = datetime.date.today()
-        tomorrow = today + datetime.timedelta(1) # +1 day
+        # tomorrow = today + datetime.timedelta(1) # +1 day
+        print(today)
         config["schedule"] = today.strftime(DEFAULT.SCHEDULE_FORMAT)
         assert self.test_snarf.post(), "unable to post schedule"
         config["schedule"] = None

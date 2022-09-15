@@ -115,16 +115,9 @@ class Settings:
         return DEFAULT.PRICE_MINIMUM or 0
 
     def get_date():
-        date = DEFAULT.DATE
-        # check if date can be found in schedule; overrides 'date'
-        if str(Settings.get_schedule()) != "None":
+        if config["date"] == DEFAULT.DATE and config["schedule"] != DEFAULT.SCHEDULE:
             date = datetime.strptime(str(Settings.get_schedule()), DEFAULT.SCHEDULE_FORMAT)
             config["date"] = datetime.strptime(datetime.strftime(date.date(), DEFAULT.DATE_FORMAT), DEFAULT.DATE_FORMAT)
-        else:
-            try:
-                config["date"] = datetime.strptime(config["date"], DEFAULT.DATE_FORMAT)
-            except Exception as e:
-                Settings.err_print(e)
         Settings.maybe_print("date (settings): {}".format(config["date"]))
         return config["date"]
 
@@ -303,16 +296,11 @@ class Settings:
         return config["profile_method"] or None
 
     def get_schedule():
-
-        if valid_schedule(config["schedule"]): return str(config["schedule"])
-
-        else:
-            config["schedule"] = "{} {}".format(config["date"], config["time"])
-
-        if not valid_schedule(config["schedule"]):
-            config["schedule"] = ""
-
+        if datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT) == DEFAULT.SCHEDULE:
+            config["schedule"] = datetime.strptime("{} {}".format(config["date"], config["time"]), SCHEDULE_FORMAT)
         Settings.maybe_print("schedule (settings): {}".format(config["schedule"]))
+        if isinstance(config["schedule"], str):
+            config["schedule"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT)
         return config["schedule"]
 
     def get_tags():
@@ -324,11 +312,9 @@ class Settings:
         return config["text"] or ""
 
     def get_time():
-        if str(Settings.get_schedule()) != "None" and str(Settings.get_schedule()) != "":
-            date = datetime.strptime(str(Settings.get_schedule()), DEFAULT.SCHEDULE_FORMAT)
+        if config["time"] == DEFAULT.TIME_NONE and config["schedule"] != DEFAULT.SCHEDULE:
+            date = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT)
             config["time"] = date.time().strftime(DEFAULT.TIME_FORMAT)
-        if not valid_time(config["time"]):
-            config["time"] = datetime.strptime(str(DEFAULT.TIME), DEFAULT.TIME_FORMAT)
         Settings.maybe_print("time (settings): {}".format(config["time"]))
         return config["time"]
 

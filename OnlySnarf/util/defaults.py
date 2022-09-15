@@ -18,9 +18,11 @@ SCHEDULE_FORMAT = "{} {}".format(DATE_FORMAT, TIME_FORMAT)
 
 date_ = datetime.strptime(str(datetime.now().strftime(SCHEDULE_FORMAT)), SCHEDULE_FORMAT)
 
-DATE = date_.date()
-TIME = date_.time()
-SCHEDULE = date_
+DATE = date_.date().strftime(DATE_FORMAT)
+TIME = date_.time().strftime(TIME_FORMAT)
+SCHEDULE = date_.strftime(SCHEDULE_FORMAT)
+
+TIME_NONE = "00:00:00"
 
 DEFAULT_MESSAGE = ":)"
 DEFAULT_REFRESHER = "hi!"
