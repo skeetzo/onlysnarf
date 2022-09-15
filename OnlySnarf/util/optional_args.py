@@ -43,7 +43,7 @@ def apply_args(parser):
   ##
   # -date
   # date in MM-DD-YYYY
-  parser.add_argument('-date', type=valid_date, default=DEFAULT.DATE_NONE, dest='date',
+  parser.add_argument('-date', type=valid_date, default=DEFAULT.DATE, dest='date',
     help='schedule date (MM-DD-YYYY)')
   ##
   # -delete
@@ -138,8 +138,8 @@ def apply_args(parser):
   ##
   # -schedule
   # the schedule to upload a post for
-  parser.add_argument('-schedule', type=valid_schedule, default=None, dest='schedule',
-    help='the schedule (MM-DD-YYYY:HH:MM)')
+  parser.add_argument('-schedule', type=valid_schedule, default=DEFAULT.SCHEDULE, dest='schedule',
+    help='the schedule (MM-DD-YYYY:HH:MM:SS)')
   ##
   # -skip-download
   parser.add_argument('-skip-download', action='store_true', dest='skip_download',
@@ -176,7 +176,7 @@ def apply_args(parser):
   ##
   # -time
   # time in HH:MM
-  parser.add_argument('-time', type=valid_time, default=None, dest='time',
+  parser.add_argument('-time', type=valid_time, default=DEFAULT.TIME, dest='time',
     help='the time (HH:MM)')
   ##
   # -tweet

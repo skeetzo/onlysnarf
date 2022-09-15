@@ -2,6 +2,7 @@ import pkg_resources
 import time
 import PyInquirer
 import os, json, sys
+from datetime import datetime
 from pathlib import Path
 ##
 from .colorize import colorize
@@ -9,6 +10,8 @@ from .config import config
 from . import defaults as DEFAULT
 from .logger import logging
 log = logging.getLogger('onlysnarf')
+
+from .validators import valid_schedule, valid_time
 
 class Settings:
     
@@ -112,7 +115,18 @@ class Settings:
         return DEFAULT.PRICE_MINIMUM or 0
 
     def get_date():
-        return config["date"] or None
+        date = DEFAULT.DATE
+        # check if date can be found in schedule; overrides 'date'
+        if str(Settings.get_schedule()) != "None":
+            date = datetime.strptime(str(Settings.get_schedule()), DEFAULT.SCHEDULE_FORMAT)
+            config["date"] = datetime.strptime(datetime.strftime(date.date(), DEFAULT.DATE_FORMAT), DEFAULT.DATE_FORMAT)
+        else:
+            try:
+                config["date"] = datetime.strptime(config["date"], DEFAULT.DATE_FORMAT)
+            except Exception as e:
+                Settings.err_print(e)
+        Settings.maybe_print("date (settings): {}".format(config["date"]))
+        return config["date"]
 
     def get_default_greeting():
         return DEFAULT.GREETING or ""
@@ -289,12 +303,16 @@ class Settings:
         return config["profile_method"] or None
 
     def get_schedule():
-        if str(config["schedule"]) != "None": return config["schedule"]
-        if Settings.get_date():
-            if Settings.get_time():
-                config["schedule"] = "{} {}".format(Settings.get_date(), Settings.get_time())
-            else:
-                config["schedule"] = "{}".format(Settings.get_date())
+
+        if valid_schedule(config["schedule"]): return str(config["schedule"])
+
+        else:
+            config["schedule"] = "{} {}".format(config["date"], config["time"])
+
+        if not valid_schedule(config["schedule"]):
+            config["schedule"] = ""
+
+        Settings.maybe_print("schedule (settings): {}".format(config["schedule"]))
         return config["schedule"]
 
     def get_tags():
@@ -306,7 +324,13 @@ class Settings:
         return config["text"] or ""
 
     def get_time():
-        return config["time"] or None
+        if str(Settings.get_schedule()) != "None" and str(Settings.get_schedule()) != "":
+            date = datetime.strptime(str(Settings.get_schedule()), DEFAULT.SCHEDULE_FORMAT)
+            config["time"] = date.time().strftime(DEFAULT.TIME_FORMAT)
+        if not valid_time(config["time"]):
+            config["time"] = datetime.strptime(str(DEFAULT.TIME), DEFAULT.TIME_FORMAT)
+        Settings.maybe_print("time (settings): {}".format(config["time"]))
+        return config["time"]
 
     def get_title():
         return config["title"] or ""

@@ -516,19 +516,10 @@ class Post(Message):
         """
 
         # check if poll is ready
-        if self.poll and self.poll.check():
-            return self.poll
-        else:
-            return None
-        # prompt skip
-        if not Settings.prompt("poll"): return None
-        poll = Poll()
-        # ensure the poll has non default values
-        poll.get()
-        # checks if poll is valid, uses Settings.confirm
-        # if not poll.check(): return self.get_poll(again=again)
-        self.poll = poll
-        return poll
+        if self.poll: return self.poll
+        self.poll = Poll()
+        self.poll = self.poll.get()
+        return self.poll
 
     def get_post(self):
         """
@@ -569,14 +560,9 @@ class Post(Message):
         """
 
         if self.schedule: return self.schedule
-        # prompt skip
-        if not Settings.prompt("schedule"): return None
-        schedule = Schedule()
-        schedule.get()
-        # checks if schedule is valid, uses Settings.confirm
-        # if not schedule.check(): return self.get_schedule(again=again)
-        self.schedule = schedule
-        return schedule
+        self.schedule = Schedule()
+        self.schedule = self.schedule.get()
+        return self.schedule
 
     def send(self):
         """
