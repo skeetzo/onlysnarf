@@ -80,7 +80,7 @@ if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "Non
     USER = os.getenv('SUDO_USER')
 USER_HOME = "/home/{}".format(USER)
 
-ROOT_PATH = "{}/OnlySnarf".format(USER_HOME)
+ROOT_PATH = "{}/onlysnarf".format(USER_HOME)
 DOWNLOAD_PATH = os.path.join(ROOT_PATH, "downloads")
 UPLOAD_PATH = os.path.join(ROOT_PATH, "uploads")
 LOG_PATH = os.path.join(ROOT_PATH, "snarf.log")
