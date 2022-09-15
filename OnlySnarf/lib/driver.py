@@ -584,7 +584,6 @@ class Driver:
             Settings.warn_print("onlysnarf may require an update")
         if "Message: " in str(e): return
         Settings.dev_print(e)
-        Settings.dev_print(e)
 
     def error_window_upload():
         """Closes error window that appears during uploads for 'duplicate' files"""
@@ -2804,6 +2803,7 @@ class Driver:
             """
 
             Settings.maybe_print("attempting chrome web browser...")
+            browserAttempt = None
             try:
                 options = webdriver.ChromeOptions()
                 options.add_argument("--no-sandbox") # Bypass OS security model
@@ -2832,14 +2832,14 @@ class Driver:
                     service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
-                browser = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
+                browserAttempt = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
                 Settings.print("browser created - chrome")
                 browserTypeFinal = "chrome"
-                return browser
+                return browserAttempt
             except Exception as e:
                 Settings.warn_print("unable to launch chrome!")
                 Settings.dev_print(e)
-            return None
+            return browserAttempt
 
         def attempt_firefox():
             """
@@ -2857,6 +2857,7 @@ class Driver:
             if os.geteuid() == 0:
                 Settings.print("You must run `onlysnarf` as non-root for Firefox to work correctly!")
                 return False
+            browserAttempt = None
             try:
                 d = DesiredCapabilities.FIREFOX
                 options = FirefoxOptions()
@@ -2870,16 +2871,16 @@ class Driver:
                 # added for cookies, doesn't seem to help
                 # opts.add_argument("--user-data-dir=/tmp")
 
-                # browser = webdriver.Firefox(options=options, log_path='/var/log/onlysnarf/geckodriver.log')
-                # browser = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, capabilities=d)
-                browser = webdriver.Firefox(options=options, desired_capabilities=d, service_log_path=Settings.get_logs_path("firefox"))
+                # browserAttempt = webdriver.Firefox(options=options, log_path='/var/log/onlysnarf/geckodriver.log')
+                # browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, capabilities=d)
+                browserAttempt = webdriver.Firefox(options=options, desired_capabilities=d, service_log_path=Settings.get_logs_path("firefox"))
                 Settings.print("browser created - firefox")
                 browserTypeFinal = "firefox"
-                return browser
+                return browserAttempt
             except Exception as e:
                 Settings.warn_print("unable to launch firefox!")
                 Settings.dev_print(e)
-            return None
+            return browserAttempt
 
         def attempt_reconnect():
             """
