@@ -104,7 +104,7 @@ class Poll:
         """
 
         if len(self.get_questions()) > 0 and self.get_duration():
-            Settings.dev_print("valid!")
+            Settings.dev_print("valid poll!")
             return True
-        Settings.dev_print("invalid!")
+        Settings.dev_print("invalid poll!")
         return False

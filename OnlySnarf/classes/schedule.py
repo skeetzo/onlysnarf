@@ -135,43 +135,18 @@ class Schedule:
 
     def validate(self):
         Settings.dev_print("validating schedule...")
-
-        today = datetime.now()
-        todayF = today.strftime("%d")
-        year = today.year
-        yearF = today.strftime("%Y")
-        time = today.time()
-        timeF = time.strftime(DEFAULT.TIME_FORMAT)
-
-        # use yearF
-        # use timeF
-
-
-        Settings.dev_print("today: {}".format(todayF))
-        Settings.dev_print("year: {}".format(year))
-        Settings.dev_print("yearF: {}".format(yearF))
-        Settings.dev_print("time: {}".format(time))
-        Settings.dev_print("timeF: {}".format(timeF))
-        Settings.dev_print("vs")
-        Settings.dev_print("date: {}".format(self.get_date()))
-        Settings.dev_print("time: {}".format(self.get_time()))
-
+        today = datetime.strptime(str(datetime.now().strftime(DEFAULT.SCHEDULE_FORMAT)), DEFAULT.SCHEDULE_FORMAT)
+        schedule = datetime.strptime(str(Settings.get_schedule().now().strftime(DEFAULT.SCHEDULE_FORMAT)), DEFAULT.SCHEDULE_FORMAT)
+        # should invalidate if all default settings
+        if self.get_date() == DEFAULT.DATE and (self.get_time() == DEFAULT.TIME or self.get_time() == DEFAULT.TIME_NONE):
+            Settings.dev_print("invalid schedule! (default date and time)")
+            return False
+        # cannot post in the past
+        # TODO: possibly add margin of error if necessary
+        elif schedule <= today:
+            Settings.dev_print("invalid schedule! (must be in future)")
+        Settings.dev_print("valid schedule!")
         return True
-
-        if str(self.get_date()) == str(today):
-            Settings.dev_print("valid!")
-        if str(self.get_time()) == str(time):
-            Settings.dev_print("valid!")
-        else:
-            Settings.dev_print("invalid!")
-
-        # if not date__:
-        #     Settings.err_print("unable to parse date")
-        #     return False
-        # if date__ < today:
-        #     Settings.err_print("unable to schedule earlier date")
-        #     return False
-
 
 # round to 5
 def myround(x, base=5):

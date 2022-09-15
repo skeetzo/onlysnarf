@@ -597,6 +597,5 @@ class Post(Message):
             if successes > failures: return True
         except Exception as e:
             Settings.dev_print(e)
-            print(e)
         Settings.print("something went wrong! shnarrnf!")
         return False
