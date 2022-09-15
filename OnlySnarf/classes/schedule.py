@@ -137,11 +137,15 @@ class Schedule:
         Settings.dev_print("validating schedule...")
 
         today = datetime.now()
-        todayF = today.strftime("%B")
+        todayF = today.strftime("%d")
         year = today.year
         yearF = today.strftime("%Y")
         time = today.time()
         timeF = time.strftime(DEFAULT.TIME_FORMAT)
+
+        # use yearF
+        # use timeF
+
 
         Settings.dev_print("today: {}".format(todayF))
         Settings.dev_print("year: {}".format(year))
