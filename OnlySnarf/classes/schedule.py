@@ -8,6 +8,7 @@ from ..util.validators import TimeValidator, DateValidator
 class Schedule:
 
     def __init__(self):
+        self._initialized_ = False
         self.date = None
         self.time = None
         ##
@@ -21,6 +22,7 @@ class Schedule:
         self.init()
 
     def init(self):
+        if self._initialized_: return
         Settings.dev_print("initiliazing schedule...")
 
         date = self.get_date()
@@ -35,14 +37,15 @@ class Schedule:
         self.hour = date.hour
         self.minute = date.minute
         Settings.dev_print("initiliazed schedule")
+        self._initialized_ = True
 
     def get(self):
-        Settings.maybe_print("Schedule:")
-        Settings.maybe_print("year: {}".format(self.year))
-        Settings.maybe_print("month: {}".format(self.month))
-        Settings.maybe_print("day: {}".format(self.day))
-        Settings.maybe_print("hour: {}".format(self.hour))
-        Settings.maybe_print("minutes: {}".format(self.minute))
+        # Settings.maybe_print("Schedule:")
+        # Settings.maybe_print("year: {}".format(self.year))
+        # Settings.maybe_print("month: {}".format(self.month))
+        # Settings.maybe_print("day: {}".format(self.day))
+        # Settings.maybe_print("hour: {}".format(self.hour))
+        # Settings.maybe_print("minutes: {}".format(self.minute))
         if not self.validate(): return None
         return dict({
             "date": self.get_date(),
@@ -136,7 +139,8 @@ class Schedule:
     def validate(self):
         Settings.dev_print("validating schedule...")
         today = datetime.strptime(str(datetime.now().strftime(DEFAULT.SCHEDULE_FORMAT)), DEFAULT.SCHEDULE_FORMAT)
-        schedule = datetime.strptime(str(Settings.get_schedule().now().strftime(DEFAULT.SCHEDULE_FORMAT)), DEFAULT.SCHEDULE_FORMAT)
+        # schedule = datetime.strptime(str(Settings.get_schedule().now().strftime(DEFAULT.SCHEDULE_FORMAT)), DEFAULT.SCHEDULE_FORMAT)
+        schedule = Settings.get_schedule()
         # should invalidate if all default settings
         if self.get_date() == DEFAULT.DATE and (self.get_time() == DEFAULT.TIME or self.get_time() == DEFAULT.TIME_NONE):
             Settings.dev_print("invalid schedule! (default date and time)")
@@ -145,6 +149,7 @@ class Schedule:
         # TODO: possibly add margin of error if necessary
         elif schedule <= today:
             Settings.dev_print("invalid schedule! (must be in future)")
+            return False
         Settings.dev_print("valid schedule!")
         return True
 

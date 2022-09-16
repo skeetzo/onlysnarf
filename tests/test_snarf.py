@@ -59,7 +59,8 @@ class TestSnarf(unittest.TestCase):
 
     # @unittest.skip("works")
     def test_schedule(self):
-        config["schedule"] = today.strftime(DEFAULT.SCHEDULE_FORMAT)
+        config["schedule"] = today + datetime.timedelta(days=1)
+        config["schedule"] = config["schedule"].strftime(DEFAULT.SCHEDULE_FORMAT)
         assert self.test_snarf.post(), "unable to post schedule"
         config["schedule"] = DEFAULT.SCHEDULE
 

@@ -115,9 +115,10 @@ class Settings:
         return DEFAULT.PRICE_MINIMUM or 0
 
     def get_date():
-        if config["date"] == DEFAULT.DATE and config["schedule"] != DEFAULT.SCHEDULE:
-            date = datetime.strptime(str(Settings.get_schedule()), DEFAULT.SCHEDULE_FORMAT)
-            config["date"] = datetime.strptime(datetime.strftime(date.date(), DEFAULT.DATE_FORMAT), DEFAULT.DATE_FORMAT)
+        formattedDate = datetime.strptime(str(config["date"].strftime(DEFAULT.SCHEDULE_FORMAT)), DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.DATE_FORMAT)
+        if formattedDate == DEFAULT.DATE and config["schedule"] != DEFAULT.SCHEDULE:
+            config["date"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT).date().strftime(DEFAULT.DATE_FORMAT)
+            config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
         Settings.maybe_print("date (settings): {}".format(config["date"]))
         return config["date"]
 
@@ -296,11 +297,12 @@ class Settings:
         return config["profile_method"] or None
 
     def get_schedule():
-        if datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT) == DEFAULT.SCHEDULE:
+        # if datetime.strptime(str(config["schedule"]), DEFAULT.SCHEDULE_FORMAT) == DEFAULT.SCHEDULE:
+        if config["schedule"] == DEFAULT.SCHEDULE:
             config["schedule"] = datetime.strptime("{} {}".format(config["date"], config["time"]), SCHEDULE_FORMAT)
-        Settings.maybe_print("schedule (settings): {}".format(config["schedule"]))
         if isinstance(config["schedule"], str):
-            config["schedule"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT)
+            config["schedule"] = datetime.strptime(str(config["schedule"]), DEFAULT.SCHEDULE_FORMAT)
+        Settings.maybe_print("schedule (settings): {}".format(config["schedule"]))
         return config["schedule"]
 
     def get_tags():
