@@ -2427,7 +2427,7 @@ class Driver:
 
         """
 
-        if str(schedule) == "None" or schedule: return True
+        if str(schedule) == "None" or not schedule: return True
         try:
             month_ = schedule["month"]
             day_ = schedule["day"]
@@ -2435,8 +2435,11 @@ class Driver:
             hour_ = schedule["hour"]
             minute_ = schedule["minute"]
             Settings.print("Schedule:")
+
+            ## TODO: format these better
             Settings.print("- Date: {}".format(schedule["date"]))
             Settings.print("- Time: {}".format(schedule["time"]))
+            
             Driver.open_more_options()
             # click schedule
             Settings.dev_print("opening schedule")
@@ -2834,12 +2837,11 @@ class Driver:
                 # options.binary_location = chromedriver_binary.chromedriver_filename
                 browserAttempt = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
                 Settings.print("browser created - chrome")
-                browserTypeFinal = "chrome"
-                return browserAttempt
+                return browserAttempt, "chrome"
             except Exception as e:
                 Settings.warn_print("unable to launch chrome!")
                 Settings.dev_print(e)
-            return browserAttempt
+            return browserAttempt, "chrome"
 
         def attempt_firefox():
             """
@@ -2875,12 +2877,11 @@ class Driver:
                 # browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, capabilities=d)
                 browserAttempt = webdriver.Firefox(options=options, desired_capabilities=d, service_log_path=Settings.get_logs_path("firefox"))
                 Settings.print("browser created - firefox")
-                browserTypeFinal = "firefox"
-                return browserAttempt
+                return browserAttempt, "firefox"
             except Exception as e:
                 Settings.warn_print("unable to launch firefox!")
                 Settings.dev_print(e)
-            return browserAttempt
+            return browserAttempt, "firefox"
 
         def attempt_reconnect():
             """
@@ -2909,10 +2910,10 @@ class Driver:
             reconnect_id, url, browserTypeFinal_ = Driver.read_session_data()
             if not reconnect_id and not url:
                 Settings.maybe_print("unable to read session data")
-                return None
+                return None, None
             if not browserTypeFinal_:
                 Settings.maybe_print("unable to read previous browser type")
-                return None
+                return None, None
             Settings.maybe_print("reconnecting to web browser...")
             Settings.dev_print("reconnect id: {}".format(reconnect_id))
             Settings.dev_print("reconnect url: {}".format(url))
@@ -2940,7 +2941,7 @@ class Driver:
             except Exception as e:
                 Settings.warn_print("unable to reconnect!")
                 Settings.dev_print(e)
-            return browser
+            return browser, browserTypeFinal_
 
         def attempt_remote():
             """
@@ -2955,7 +2956,7 @@ class Driver:
 
             link = 'http://{}:{}/wd/hub'.format(config["remote_browser_host"], config["remote_browser_port"])
             Settings.dev_print("remote url: {}".format(link))
-
+            browserTypeFinal_ = None
             def attempt(dc, opts):
                 try:
                     browserAttempt = webdriver.Remote(command_executor=link, desired_capabilities=dc, options=opts)
@@ -2973,7 +2974,7 @@ class Driver:
                     options = webdriver.ChromeOptions()
                     if Settings.is_show_window() == "False":
                         options.add_argument('--headless')
-                    browserTypeFinal = "chrome"
+                    browserTypeFinal_ = "chrome"
                     return dC, options
                 except Exception as e:
                     Settings.dev_print(e)
@@ -2986,43 +2987,45 @@ class Driver:
                     options = webdriver.FirefoxOptions()
                     if Settings.is_show_window() == "False":
                         options.add_argument('--headless')
-                    browserTypeFinal = "firefox"
+                    browserTypeFinal_ = "firefox"
                     return dC, options
                 except Exception as e:
                     Settings.dev_print(e)
                 return None, None
 
-            if "chrome" in browserType: return attempt(*chrome_options())
-            elif "firefox" in browserType: return attempt(*firefox_options())
+            if "chrome" in browserType: return attempt(*chrome_options()), "chrome"
+            elif "firefox" in browserType: return attempt(*firefox_options()), "firefox"
             else: # auto
                 # alphabetical
                 try:
-                    return attempt(*chrome_options())
+                    return attempt(*chrome_options()), browserTypeFinal_
                 except Exception as e:
                     Settings.warn_print("unable to connect remotely via chrome!")
                     Settings.dev_print(e)
                 try:
-                    return attempt(*firefox_options())
+                    return attempt(*firefox_options()), browserTypeFinal_
                 except Exception as e:
                     Settings.warn_print("unable to connect remotely via firefox!")
                     Settings.dev_print(e)
-            return None
+            return None, None
 
         ################################################################################################################################################
         ################################################################################################################################################
         ################################################################################################################################################
 
         if "auto" in browserType:
-            browser = attempt_reconnect() or attempt_chrome() or attempt_firefox()
+            browser, browserTypeFinal = attempt_reconnect()
+            if not browser: browser, browserTypeFinal = attempt_chrome()
+            if not browser: browser, browserTypeFinal = attempt_firefox()
         elif "remote" in browserType:
-            browser = attempt_remote()
+            browser, browserTypeFinal = attempt_remote()
         elif "chrome" in browserType:
-            browser = attempt_chrome()
+            browser, browserTypeFinal = attempt_chrome()
         elif "firefox" in browserType:
-            browser = attempt_firefox()
+            browser, browserTypeFinal = attempt_firefox()
         if "reconnect" in browserType:
             if not browser: browser = attempt_chrome() or attempt_firefox()
-            browser = attempt_reconnect(browser)
+            browser, browserTypeFinal = attempt_reconnect(browser)
 
         if browser and Settings.is_keep() == "True":
             Driver.write_session_data(browser.session_id, browser.command_executor._url, browserTypeFinal)
@@ -3058,6 +3061,7 @@ class Driver:
         Settings.maybe_print("writing local session")
         Settings.dev_print("saving session id: {}".format(id_))        
         Settings.dev_print("saving session url: {}".format(url))
+        Settings.dev_print("saving browser type: {}".format(browserTypeFinal))
         path_ = os.path.join(Settings.get_base_directory(), "session.json")
         Settings.dev_print("local session path: "+str(path_))
         data = {}

@@ -523,10 +523,19 @@
     - mostly finished testing: test_discount (again), test_poll, test_schedule
     - major updates to classes/schedule & util/settings for proper datetime manipulation
     - added new tests for schedule variables
+**4.2.3 : 9/15/2022**
+    - more updates to debugging schedule
 
 ------------------------------------------------------------------------------------
 
+- finish debugging schedule & poll
+
 - completely finish debugging basic snarf functionality
+
+- finish debugging browser reconnect
+
+- finish adding tests (before breaking things again)
+- run full tests suite (or enough of) before uploading working version to pypi
 
 ## Fix / Debug
 
@@ -567,10 +576,13 @@ https://pypi.org/project/config/
 - add to upload scheme (probably also as a config value): least to greatest (folder sizes)
 - add tests for additional config variables such as browser and image options
 
+- upload working changes to pypi
+
 ------------------------------------------------------------------------------------
 
 - finish xmas tests
 - finish / update tests
+- fix any new cli menu errors made while updating major processes
 
 (once successfully done testing uploading a file, otherwise pointless endeavor)
 -> IPFS
