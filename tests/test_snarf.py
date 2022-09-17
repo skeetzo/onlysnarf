@@ -57,22 +57,24 @@ class TestSnarf(unittest.TestCase):
         config["expiration"] = 0
         config["questions"] = []
 
-    # @unittest.skip("works")
+    @unittest.skip("works")
     def test_schedule(self):
         config["schedule"] = today + datetime.timedelta(days=1)
         config["schedule"] = config["schedule"].strftime(DEFAULT.SCHEDULE_FORMAT)
         assert self.test_snarf.post(), "unable to post schedule"
         config["schedule"] = DEFAULT.SCHEDULE
 
-    @unittest.skip("todo")
+    # @unittest.skip("todo")
     def test_schedule_date(self):
-        config["date"] = today.strftime(DEFAULT.DATE_FORMAT)
+        config["date"] = today + datetime.timedelta(days=1)
+        config["date"] = config["date"].strftime(DEFAULT.DATE_FORMAT)
         assert self.test_snarf.post(), "unable to post schedule via date"
         config["date"] = DEFAULT.DATE
 
-    @unittest.skip("todo")
+    # @unittest.skip("todo")
     def test_schedule_time(self):
-        config["time"] = today.strftime(DEFAULT.TIME_FORMAT)
+        config["time"] = today + datetime.timedelta(hours=1)
+        config["time"] = config["time"].strftime(DEFAULT.TIME_FORMAT)
         assert self.test_snarf.post(), "unable to post schedule via time"
         config["time"] = DEFAULT.TIME
 

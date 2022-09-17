@@ -31,6 +31,8 @@ class Schedule:
         if "am" in str(time).lower(): self.suffix = "am"
         elif "pm" in str(time).lower(): self.suffix = "pm"
 
+        date = datetime.strptime(str(date), DEFAULT.DATE_FORMAT)
+        
         self.year = date.year
         self.month = date.strftime("%B")
         self.day = date.day

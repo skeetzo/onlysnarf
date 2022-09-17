@@ -2437,8 +2437,8 @@ class Driver:
             Settings.print("Schedule:")
 
             ## TODO: format these better
-            Settings.print("- Date: {}".format(schedule["date"]))
-            Settings.print("- Time: {}".format(schedule["time"]))
+            Settings.print("- Date: {}".format(Settings.format_date(schedule["date"])))
+            Settings.print("- Time: {}".format(Settings.format_ime(schedule["time"])))
             
             Driver.open_more_options()
             # click schedule
@@ -2839,8 +2839,11 @@ class Driver:
                 Settings.print("browser created - chrome")
                 return browserAttempt, "chrome"
             except Exception as e:
-                Settings.warn_print("unable to launch chrome!")
-                Settings.dev_print(e)
+                if "cannot find Chrome binary" in str(e):
+                    Settings.warn_print("unable to launch chrome! (missing binary)")
+                else:
+                    Settings.warn_print("unable to launch chrome!")
+                    Settings.dev_print(e)
             return browserAttempt, "chrome"
 
         def attempt_firefox():
