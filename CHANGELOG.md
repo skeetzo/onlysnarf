@@ -528,7 +528,7 @@
 
 ------------------------------------------------------------------------------------
 
-- finish debugging schedule & poll
+- finish debugging schedule (date & time) & poll
 
 - completely finish debugging basic snarf functionality
 
@@ -608,6 +608,8 @@ https://pypi.org/project/config/
 - can include media attachments
 -- add checks for previously existing tweets
 -- keep track of tweets (somehow)
+
+- add quiz & target (onlyfans buttons)
 
 (after python version upgraded to 3.10+)
 - possibly use switch statement in lib/driver
