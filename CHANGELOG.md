@@ -516,33 +516,36 @@
     - more finishing touches to uploading post & message (and rebroken fixed things)
     - major updates / fixes to browser creation flow / attempts to fix reconnect bug
     - fixed issue in lib/driver with media upload popup from multiple of the same file --> updated error window close
-**4.2.2 : 9/14/2022**
+  **4.2.2 : 9/14/2022**
     - finished testing test_message and test_post (again)
     - added tests for selenium browser configurations
     - mostly finished updating expiration, poll, schedule new .get() return dict({})
     - mostly finished testing: test_discount (again), test_poll, test_schedule
     - major updates to classes/schedule & util/settings for proper datetime manipulation
     - added new tests for schedule variables
-**4.2.3 : 9/15/2022, 9/18/2022**
+  **4.2.3 : 9/15/2022, 9/18/2022**
     - more updates to debugging schedule & poll
     - continued finalizing sufficient OK testing responses
+**4.2.4 : 9/19/2022**
+  - more debugging schedule & poll, reconnect
+  - added tests for trying different browsers, reconnecting, keeping open, remote sessions
+  - schedule tests pass they just don't set the right hour
+  - major snarf tests all OK (minus poll)
 
 ------------------------------------------------------------------------------------
 
 - finish debugging schedule (date & time) & poll
-
-- completely finish debugging basic snarf functionality
-
 - finish debugging browser reconnect
-
-- finish adding tests (before breaking things again)
-- run full tests suite (or enough of) before uploading working version to pypi
 
 ## Fix / Debug
 
-- browser reconnect; doesn't reconnect to browser or retain session
--- keep open might be working now to reconnect to; nope
-- cookies: currently prevents saving login session
+- schedule takes an obscenely long time
+
+- driver: schedule hours not being set
+- driver: poll button not being clicked
+
+- browser reconnect; doesn't reconnect to browser / retain session
+- cookies: not saving login session
 
 (unlikely to be fixed soon, if ever)
 - google login: unsafe browser warning --> possibly end of usability --> should I just remove this? form login works, twitter login works (i think)
@@ -551,11 +554,21 @@
 - debug: discover the cause of the super slow web scraping
 -- not: debug_delay
 
+tests: auth, browsers, ipfs, post, profile, promotion, reconnect, remote, selenium, snarf, xmas
+
+## Working as Intended
+
+tests: discount, message, users
+
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- add github build testing
+- completely finish debugging basic snarf functionality
+- finish adding tests
+- run full tests suite (or enough of) before uploading working version to pypi
+
+- add github build testing?
 - update / check pypi config 
 https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 https://github.com/atinfo/awesome-test-automation/blob/master/python-test-automation.md
@@ -565,13 +578,9 @@ https://pypi.org/project/configuration/
 https://pypi.org/project/pkgconfig/
 https://pypi.org/project/config/
 
-- finish cleaning up class/user
-- finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleanuping up code
-
-- add tests that include variations of variables such as image limits, download limits, upload limits, 
-- add tests for trying different browsers, reconnecting, keeping open, remote sessions
 
 (once downloads and uploads function again)
+- clean up classes/files to keep up with gutting google, etc in exchange for ipfs
 - change deletion behavior to preserve better
 - update: backup function to include original folder name -> posted/galleries/$file
 - add to upload scheme (probably also as a config value): least to greatest (folder sizes)
@@ -581,9 +590,12 @@ https://pypi.org/project/config/
 
 ------------------------------------------------------------------------------------
 
+- finish cleaning up class/user
+- finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleanuping up code
 - finish xmas tests
 - finish / update tests
 - fix any new cli menu errors made while updating major processes
+- add tests that include variations of variables such as image limits, download limits, upload limits, 
 
 (once successfully done testing uploading a file, otherwise pointless endeavor)
 -> IPFS
@@ -614,15 +626,6 @@ https://pypi.org/project/config/
 
 (after python version upgraded to 3.10+)
 - possibly use switch statement in lib/driver
-
-## Tests
-
-Add stuff for:
-- ffmpeg input/outputs results
-- file server upload/downloads & functionality
-- google functionality (if keeping it at all)
-- any weird specific things in profile settings or snarf settings
-- unittests for user class (and others) functionality
 
 ------------------------------------------------------------------------------------  
 

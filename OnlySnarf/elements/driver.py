@@ -108,8 +108,8 @@ ELEMENTS = [
     # poll
     {
         "name": "poll",
-        "classes": ["g-btn.m-flat.b-make-post__voting-btn", "g-btn.m-flat.b-make-post__voting-btn.has-tooltip", "button.g-btn.m-flat.b-make-post__voting-btn", "button.g-btn.m-flat.b-make-post__voting-btn.has-tooltip"],
-        "text": ["<svg class=\"g-icon\" aria-hidden=\"true\"><use xlink:href=\"#icon-more\" href=\"#icon-more\"></use></svg>"],
+        "classes": ["g-btn.m-flat.m-gray.m-with-round-hover.m-size-md-hover.m-default-icon-size.m-reset-width.has-tooltip", "g-btn.m-flat.b-make-post__voting-btn", "g-btn.m-flat.b-make-post__voting-btn.has-tooltip", "button.g-btn.m-flat.b-make-post__voting-btn", "button.g-btn.m-flat.b-make-post__voting-btn.has-tooltip"],
+        "text": [],
         "id": ["icon-quiz"]
     },
     # expire add
