@@ -523,8 +523,9 @@
     - mostly finished testing: test_discount (again), test_poll, test_schedule
     - major updates to classes/schedule & util/settings for proper datetime manipulation
     - added new tests for schedule variables
-**4.2.3 : 9/15/2022**
-    - more updates to debugging schedule
+**4.2.3 : 9/15/2022, 9/18/2022**
+    - more updates to debugging schedule & poll
+    - continued finalizing sufficient OK testing responses
 
 ------------------------------------------------------------------------------------
 

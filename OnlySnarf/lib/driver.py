@@ -761,7 +761,7 @@ class Driver:
             raise Exception("unable to locate elements")
         return eles_
 
-    def find_element_to_click(name):
+    def find_element_to_click(name, useId=False):
         """
         Find element on page by name to click
 
@@ -785,7 +785,9 @@ class Driver:
         if not element:
             Settings.err_print("unable to find element reference")
             return False
-        for className in element.getClasses():
+        elements = element.getClasses()
+        if useId: elements = element.getIds()
+        for className in elements:
             eles = []
             elesCSS = []
             try: eles = Driver.browser.find_elements_by_class_name(className)
@@ -1359,10 +1361,10 @@ class Driver:
             Settings.dev_print("getting confirm to click")
             confirm = Driver.find_element_to_click("new_post")
             if Settings.is_debug() == "True":
-                Settings.print('skipped message (debug)')
-                Settings.dev_print("### Message Successful (debug) ###")
                 Settings.debug_delay_check()
                 Driver.go_to_home()
+                Settings.print('skipped message (debug)')
+                Settings.dev_print("### Message Successful (debug) ###")
                 return True
             Settings.dev_print("clicking confirm")
             confirm.click()
@@ -1732,8 +1734,7 @@ class Driver:
 
         """
 
-        if str(poll) == "None": return True
-        poll.get()
+        if str(poll) == "None" or not poll: return True
         duration = poll["duration"]
         questions = poll["questions"]
         try:
@@ -1744,7 +1745,7 @@ class Driver:
             Driver.open_more_options()
             # add a poll
             Settings.dev_print("adding poll")
-            Driver.find_element_to_click("poll").click()
+            Driver.find_element_to_click("poll", useId=True).click()
             # open the poll duration
             Settings.dev_print("adding duration")
             Driver.find_element_to_click("pollDuration").click()
@@ -1849,8 +1850,8 @@ class Driver:
             Settings.print("- Tweeting: {}".format(Settings.is_tweeting()))
             ## Expires, Schedule, Poll
             if not Driver.expires(message["expiration"]): return False
-            if not Driver.schedule(message["schedule"]): return False
-            if not Driver.poll(message["poll"]): return False
+            if message["schedule"].validate() and not Driver.schedule(message["schedule"].get()): return False
+            if message["poll"].validate() and not Driver.poll(message["poll"].get()): return False
             Settings.print("====================")
             ############################################################
             WAIT = WebDriverWait(Driver.browser, 600, poll_frequency=10)
@@ -2438,7 +2439,7 @@ class Driver:
 
             ## TODO: format these better
             Settings.print("- Date: {}".format(Settings.format_date(schedule["date"])))
-            Settings.print("- Time: {}".format(Settings.format_ime(schedule["time"])))
+            Settings.print("- Time: {}".format(Settings.format_time(schedule["time"])))
             
             Driver.open_more_options()
             # click schedule

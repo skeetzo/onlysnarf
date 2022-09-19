@@ -38,17 +38,15 @@ class Schedule:
         self.day = date.day
         self.hour = date.hour
         self.minute = date.minute
-        Settings.dev_print("initiliazed schedule")
-        self._initialized_ = True
-
-    def get(self):
-        # Settings.maybe_print("Schedule:")
         # Settings.maybe_print("year: {}".format(self.year))
         # Settings.maybe_print("month: {}".format(self.month))
         # Settings.maybe_print("day: {}".format(self.day))
         # Settings.maybe_print("hour: {}".format(self.hour))
         # Settings.maybe_print("minutes: {}".format(self.minute))
-        if not self.validate(): return None
+        Settings.dev_print("initiliazed schedule")
+        self._initialized_ = True
+
+    def get(self):
         return dict({
             "date": self.get_date(),
             "time": self.get_time(),
@@ -143,8 +141,10 @@ class Schedule:
         today = datetime.strptime(str(datetime.now().strftime(DEFAULT.SCHEDULE_FORMAT)), DEFAULT.SCHEDULE_FORMAT)
         # schedule = datetime.strptime(str(Settings.get_schedule().now().strftime(DEFAULT.SCHEDULE_FORMAT)), DEFAULT.SCHEDULE_FORMAT)
         schedule = Settings.get_schedule()
+        if isinstance(schedule, str):
+            schedule = datetime.strptime(schedule, DEFAULT.SCHEDULE_FORMAT)
         # should invalidate if all default settings
-        if self.get_date() == DEFAULT.DATE and (self.get_time() == DEFAULT.TIME or self.get_time() == DEFAULT.TIME_NONE):
+        if str(self.get_date()) == DEFAULT.DATE and (str(self.get_time()) == DEFAULT.TIME or str(self.get_time()) == DEFAULT.TIME_NONE):
             Settings.dev_print("invalid schedule! (default date and time)")
             return False
         # cannot post in the past

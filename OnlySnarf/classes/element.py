@@ -38,6 +38,9 @@ class Element:
         if self.id and len(self.id) > 0:
             return self.id[0]
 
+    def getIds(self):
+        return self.id
+
     @staticmethod
     def get_element_by_name(name):
         Settings.dev_print("getting element: {}".format(name))

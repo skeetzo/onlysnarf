@@ -518,7 +518,6 @@ class Post(Message):
         # check if poll is ready
         if self.poll: return self.poll
         self.poll = Poll()
-        self.poll = self.poll.get()
         return self.poll
 
     def get_post(self):
@@ -559,9 +558,9 @@ class Post(Message):
 
         """
 
-        if self.schedule: return self.schedule.get()
+        if self.schedule: return self.schedule
         self.schedule = Schedule()
-        return self.schedule.get()
+        return self.schedule
 
     def send(self):
         """

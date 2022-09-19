@@ -24,7 +24,6 @@ class Poll:
         self.gotten = False
 
     def get(self):
-        if not self.validate(): return None
         return dict({
             "duration": self.get_duration(),
             "questions": self.get_questions()
