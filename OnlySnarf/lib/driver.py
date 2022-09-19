@@ -761,7 +761,7 @@ class Driver:
             raise Exception("unable to locate elements")
         return eles_
 
-    def find_element_to_click(name, useId=False):
+    def find_element_to_click(name, useId=False, offset=0):
         """
         Find element on page by name to click
 
@@ -797,6 +797,8 @@ class Driver:
             Settings.dev_print("class: {} - {}:css".format(len(eles), len(elesCSS)))
             eles.extend(elesCSS)
             for i in range(len(eles)):
+                i += offset
+                if i > len(eles): i = len(eles)
                 Settings.dev_print("ele: {} -> {}".format(eles[i].get_attribute("innerHTML").strip(), element.getText()))
                 if (eles[i].is_displayed() and element.getText() and str(element.getText().lower()) == eles[i].get_attribute("innerHTML").strip().lower()) and eles[i].is_enabled():
                     Settings.dev_print("found matching ele")
@@ -814,7 +816,7 @@ class Driver:
                     Settings.dev_print("found enabled ele")
                     # Settings.dev_print("found enabled ele: {}".format(eles[i].get_attribute("innerHTML").strip()))
                     return eles[i]
-            if len(eles) > 0: return eles[0]
+            if len(eles) > 0: return eles[offset]
             Settings.dev_print("unable to find element - {}".format(className))
         raise Exception("unable to locate element")
 
@@ -1740,12 +1742,24 @@ class Driver:
         try:
             Settings.print("Poll:")
             Settings.print("- Duration: {}".format(duration))
-            Settings.print("- Questions:\n> {}".format("\n> ".join(questions)))
+            Settings.print("- Questions:")
+            for question in questions:
+                Settings.print("> {}".format(question))
             # make sure the extra options are shown
             Driver.open_more_options()
             # add a poll
             Settings.dev_print("adding poll")
-            Driver.find_element_to_click("poll", useId=True).click()
+
+            Driver.move_to_then_click_element(Driver.find_element_to_click("poll", offset=4))
+
+            # elements = Driver.browser.find_elements_by_class_name(Element.get_element_by_name("poll").getClass())
+
+            # for ele in elements:
+            #     print(elem.get_attribute('innerHTML'))
+                
+
+            return False
+
             # open the poll duration
             Settings.dev_print("adding duration")
             Driver.find_element_to_click("pollDuration").click()
@@ -2796,16 +2810,6 @@ class Driver:
         Settings.print("spawning web browser...")
 
         def attempt_chrome():
-            """
-            Spawn a Google browser
-            
-            Returns
-            -------
-            bool
-                Whether or not the browser was created successfully
-
-            """
-
             Settings.maybe_print("attempting chrome web browser...")
             browserAttempt = None
             try:
@@ -2848,16 +2852,6 @@ class Driver:
             return browserAttempt, "chrome"
 
         def attempt_firefox():
-            """
-            Spawn a Firefox browser
-            
-            Returns
-            -------
-            bool
-                Whether or not the browser was created successfully
-
-            """
-
             Settings.maybe_print("attempting firefox web browser...")
             # firefox needs non root
             if os.geteuid() == 0:
@@ -2888,29 +2882,6 @@ class Driver:
             return browserAttempt, "firefox"
 
         def attempt_reconnect():
-            """
-            Reconnect to the corresponding session id and url.
-
-            Notes:
-            https://stackoverflow.com/questions/8344776/can-selenium-interact-with-an-existing-browser-session
-            https://stackoverflow.com/questions/47861813/how-can-i-reconnect-to-the-browser-opened-by-webdriver-with-selenium
-
-            Parameters
-            ----------
-            browser : WebDriver
-                An existing (for the running script) WebDriver browser to reconnect the session to, if it exists.
-            reconnect_id : int
-                The saved reconnect id to use
-            url : str
-                The saved url to reconnect with
-
-            Returns
-            -------
-            bool
-                Whether or not the reconnect was successful
-
-            """
-
             reconnect_id, url, browserTypeFinal_ = Driver.read_session_data()
             if not reconnect_id and not url:
                 Settings.maybe_print("unable to read session data")
@@ -2921,43 +2892,33 @@ class Driver:
             Settings.maybe_print("reconnecting to web browser...")
             Settings.dev_print("reconnect id: {}".format(reconnect_id))
             Settings.dev_print("reconnect url: {}".format(url))
+            browserAttempt = None
+            original_execute = WebDriver.execute
             try:
-                # original_execute = WebDriver.execute
-                # def new_command_execute(command, params=None):
-                #     if command == "newSession":
-                #         # Mock the response
-                #         return {'success': 0, 'value': None, 'sessionId': reconnect_id}
-                #     else:
-                #         return original_execute(command, params)
+                def new_command_execute(self, command, params=None):
+                    if command == "newSession":
+                        # Mock the response
+                        return {'success': 0, 'value': None, 'session_id': reconnect_id}
+                    else:
+                        return original_execute(command, params)
                 # Patch the function before creating the browser object
-                # WebDriver.execute = new_command_execute
+                WebDriver.execute = new_command_execute
                 browserAttempt = webdriver.Remote(command_executor=url, desired_capabilities={})
-                if browserAttempt.session_id != reconnect_id:   # this is pretty much guaranteed to be the case
-                    browserAttempt.close()   # this closes the session's window - it is currently the only one, thus the session itself will be auto-killed, yet:
-                    browserAttempt.quit()    # for remote connections (like ours), this deletes the session, but does not stop the SE server
+                # if browserAttempt.session_id != reconnect_id:   # this is pretty much guaranteed to be the case
+                browserAttempt.close()   # this closes the session's window - it is currently the only one, thus the session itself will be auto-killed, yet:
+                # browserAttempt.quit()    # for remote connections (like ours), this deletes the session, but does not stop the SE server
                 # take the session that's already running
                 browserAttempt.session_id = reconnect_id
-                # Replace the patched function with original function
-                # WebDriver.execute = original_execute
-                # necessary?
-                browser.title # fails check with: 'NoneType' object has no attribute 'title'
+                browserAttempt.title # fails check with: 'NoneType' object has no attribute 'title'
                 Settings.print("browser reconnected!")
             except Exception as e:
                 Settings.warn_print("unable to reconnect!")
                 Settings.dev_print(e)
-            return browser, browserTypeFinal_
+            # Replace the patched function with original function
+            WebDriver.execute = original_execute
+            return browserAttempt, browserTypeFinal_
 
         def attempt_remote():
-            """
-            Connect to remote Selenium webdriver
-
-            Returns
-            -------
-            bool
-                Whether or not the remote connection was successful
-
-            """
-
             link = 'http://{}:{}/wd/hub'.format(config["remote_browser_host"], config["remote_browser_port"])
             Settings.dev_print("remote url: {}".format(link))
             browserTypeFinal_ = None

@@ -16,7 +16,6 @@ class TestSelenium(unittest.TestCase):
         Settings.set_debug("tests")
 
     def tearDown(self):
-        config["price"] = 0
         Driver.exit()
 
     ## Auto ##
