@@ -128,11 +128,14 @@ class Settings:
 
     def get_date():
         config["date"] = Settings.format_date(config["date"])
-        if config["date"] == DEFAULT.DATE and config["schedule"] != DEFAULT.SCHEDULE:
-            config["date"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT).date().strftime(DEFAULT.DATE_FORMAT)
-            config["date"] = datetime.strptime(config["date"], DEFAULT.DATE_FORMAT)
+        if str(config["date"]) == DEFAULT.DATE and str(config["schedule"]) != DEFAULT.SCHEDULE:
+            if isinstance(config["schedule"], str):
+                config["date"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT).date().strftime(DEFAULT.DATE_FORMAT)
+            else:
+                config["date"] = config["schedule"].date().strftime(DEFAULT.DATE_FORMAT)
+            config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
         else:
-            config["date"] = datetime.strptime(config["date"], DEFAULT.DATE_FORMAT)
+            config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
         config["date"] = config["date"].strftime(DEFAULT.DATE_FORMAT)    
         Settings.maybe_print("date (settings): {}".format(config["date"]))
         return config["date"]
@@ -312,16 +315,8 @@ class Settings:
         return config["profile_method"] or None
 
     def get_schedule():
-
-        # print(config["schedule"])
-        # print(DEFAULT.SCHEDULE)
-
-
-        if isinstance(config["schedule"], str):
-            config["schedule"] = datetime.strptime(str(config["schedule"]), DEFAULT.SCHEDULE_FORMAT)
-        elif datetime.strptime(config["schedule"].strftime(DEFAULT.SCHEDULE_FORMAT), DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT) == DEFAULT.SCHEDULE:
-            config["schedule"] = datetime.strptime("{} {}".format(Settings.format_date(config["date"]), Settings.format_time(config["time"])), DEFAULT.SCHEDULE_FORMAT)
-        config["schedule"] = config["schedule"].strftime(DEFAULT.SCHEDULE_FORMAT)
+        if str(config["schedule"]) == DEFAULT.SCHEDULE:
+            config["schedule"] = datetime.strptime("{} {}".format(Settings.get_date(), Settings.get_time()), DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
         Settings.maybe_print("schedule (settings): {}".format(config["schedule"]))
         return config["schedule"]
 
@@ -334,10 +329,10 @@ class Settings:
         return config["text"] or ""
 
     def get_time():
-        config["time"] = Settings.format_time(config["time"])
-        if config["time"] == DEFAULT.TIME_NONE and config["schedule"] != DEFAULT.SCHEDULE:
+        config["time"] = Settings.format_time(config["time"])        
+        if str(config["time"]) == DEFAULT.TIME_NONE and str(config["schedule"]) != DEFAULT.SCHEDULE:
             date = datetime.strptime(str(config["schedule"]), DEFAULT.SCHEDULE_FORMAT)
-            config["time"] = datetime.strptime(date.time().strftime(DEFAULT.TIME_FORMAT), DEFAULT.TIME_FORMAT)
+            config["time"] = datetime.strptime(str(date.time().strftime(DEFAULT.TIME_FORMAT)), DEFAULT.TIME_FORMAT)
         else:
             config["time"] = datetime.strptime(str(config["time"]), DEFAULT.TIME_FORMAT)
         config["time"] = config["time"].strftime(DEFAULT.TIME_FORMAT)
