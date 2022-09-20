@@ -12,25 +12,26 @@ from OnlySnarf.snarf import Snarf
 class TestSeleniumBrowsers(unittest.TestCase):
 
     def setUp(self):
+        config["debug_selenium"] = True
         config["keep"] = False
+        config["show"] = True
         Settings.set_debug("tests")
 
     def tearDown(self):
+        config["debug_selenium"] = False
+        config["show"] = False
         Driver.exit()
 
-    # @unittest.skip("todo")
     def test_auto(self):
         config["browser"] = "auto"
         Driver.init()
         assert Driver.browser, "unable to launch via auto"
 
-    @unittest.skip("todo")
     def test_chrome(self):
         config["browser"] = "chrome"
         Driver.init()
         assert Driver.browser, "unable to launch chrome"
 
-    # @unittest.skip("todo")
     def test_firefox(self):
         config["browser"] = "firefox"
         Driver.init()

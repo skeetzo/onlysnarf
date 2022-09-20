@@ -526,16 +526,22 @@
   **4.2.3 : 9/15/2022, 9/18/2022**
     - more updates to debugging schedule & poll
     - continued finalizing sufficient OK testing responses
-**4.2.4 : 9/19/2022**
-  - more debugging schedule & poll, reconnect
-  - added tests for trying different browsers, reconnecting, keeping open, remote sessions
-  - schedule tests pass they just don't set the right hour
-  - major snarf tests all OK (minus poll)
+  **4.2.4 : 9/19/2022**
+    - more debugging schedule & poll, reconnect
+    - added tests for trying different browsers, reconnecting, keeping open, remote sessions
+    - schedule tests pass they just don't set the right hour
+    - major snarf tests all OK (minus poll)
+**4.3.0 : 9/20/2022**
+  - updated selenium, google chrome, & firefox geckodriver versions
+  - driver updates to accomodate selenium version changes
 
 ------------------------------------------------------------------------------------
 
 - finish debugging schedule (date & time) & poll
 - finish debugging browser reconnect
+
+
+firefox / geckodriver: 0.31.0
 
 ## Fix / Debug
 

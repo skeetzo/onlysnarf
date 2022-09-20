@@ -12,26 +12,41 @@ from OnlySnarf.snarf import Snarf
 class TestSeleniumReconnect(unittest.TestCase):
 
     def setUp(self):
-        config["keep"] = False
+        config["cookies"] = True
+        config["debug_selenium"] = True
+        config["keep"] = True
+        config["show"] = True
         Settings.set_debug("tests")
 
     def tearDown(self):
+        config["cookies"] = False
+        config["debug_selenium"] = False
+        config["keep"] = False
+        config["show"] = False
         Driver.exit()
     
-    # @unittest.skip("todo")
+    @unittest.skip("works")
     def test_reconnect(self):
+        config["browser"] = "auto"
+        Driver.init()
+        Driver.exit()
         config["browser"] = "reconnect"
         Driver.init()
         assert Driver.browser, "unable to launch via reconnect"
 
-    @unittest.skip("todo")
     def test_reconnect_chrome(self):
+        config["browser"] = "chrome"
+        Driver.init()
+        Driver.exit()
         config["browser"] = "reconnect-chrome"
         Driver.init()
         assert Driver.browser, "unable to launch via reconnect chrome"
 
     @unittest.skip("todo")
     def test_reconnect_firefox(self):
+        config["browser"] = "firefox"
+        Driver.init()
+        Driver.exit()
         config["browser"] = "reconnect-firefox"
         Driver.init()
         assert Driver.browser, "unable to launch via reconnect firefox"
