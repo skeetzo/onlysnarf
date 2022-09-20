@@ -17,7 +17,8 @@ setuptools.setup(
     packages=["OnlySnarf", "OnlySnarf/classes","OnlySnarf/conf","OnlySnarf/elements","OnlySnarf/lib","OnlySnarf/util"],
     include_package_data=True,
     install_requires=[
-        'selenium==3.141.0',
+        # 'selenium==3.141.0',
+        'selenium',
         'pydrive',
         'pathlib', 
         'chromedriver-binary',

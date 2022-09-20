@@ -120,18 +120,21 @@ class Driver:
     def cookies_load():
         """Loads existing web browser cookies from local source"""
 
-        if os.path.exists(Settings.get_cookies_path()):
-            # must be at onlyfans.com to load cookies of onlyfans.com
-            Driver.go_to_home()
-            file = open(Settings.get_cookies_path(), "rb")
-            cookies = pickle.load(file)
-            file.close()
-            for cookie in cookies:
-                Driver.browser.add_cookie(cookie)
-            Settings.dev_print("successfully loaded cookies")
-            Driver.refresh()
-        else: 
-            Settings.dev_print("failed to load cookies")
+        try:
+            if os.path.exists(Settings.get_cookies_path()):
+                # must be at onlyfans.com to load cookies of onlyfans.com
+                Driver.go_to_home()
+                file = open(Settings.get_cookies_path(), "rb")
+                cookies = pickle.load(file)
+                file.close()
+                for cookie in cookies:
+                    Driver.browser.add_cookie(cookie)
+                Settings.dev_print("successfully loaded cookies")
+                Driver.refresh()
+            else: 
+                Settings.dev_print("failed to load cookies")
+        except Exception as e:
+            Settings.dev_print("error loading cookies")
             Settings.dev_print(e)
 
     def cookies_save():
@@ -650,7 +653,7 @@ class Driver:
             #     if int(expiration) == 99 and ">o limit<" in str(inner): num.click()
 
             # expiration can now have any int, so update for entering any int less than 30
-            Driver.browser.find_element_by_name("periodValue").send_keys(expiration)
+            Driver.find_element_by_name("periodValue").send_keys(expiration)
 
             Settings.dev_print("successfully selected expiration")
             Settings.debug_delay_check()
@@ -1132,19 +1135,21 @@ class Driver:
                     Settings.err_print("missing onlyfans login info")
                     return False
                 Driver.go_to_home()
-                Settings.dev_print("finding username")
-                Driver.browser.find_element_by_name("email").send_keys(username)
+                WAIT = WebDriverWait(Driver.browser, 10, poll_frequency=2)
+                Settings.dev_print("finding username & password")
+                usernameField = WAIT.until(EC.presence_of_element_located((By.NAME, "email")))
+                passwordField = WAIT.until(EC.presence_of_element_located((By.NAME, "password")))
+                usernameField.click()
+                usernameField.send_keys(username)
                 Settings.dev_print("username entered")
-                # fill in password and hit the login button 
-                Settings.dev_print("finding password")
-                password_ = Driver.browser.find_element_by_name("password")
-                password_.send_keys(password)
+                passwordField.click()
+                passwordField.send_keys(password)
                 Settings.dev_print("password entered")
-                password_.send_keys(Keys.ENTER)
+                passwordField.send_keys(Keys.ENTER)
                 def check_captcha():
                     try:
                         time.sleep(10) # wait extra long to make sure it doesn't verify obnoxiously
-                        el = Driver.browser.find_element_by_name("password")
+                        el = Driver.browser.find_element("name", "password")
                         if not el: return # likely logged in without captcha
                         Settings.print("waiting for captcha completion by user...")
                         # action = webdriver.common.action_chains.ActionChains(Driver.browser)
@@ -1244,10 +1249,10 @@ class Driver:
                     # Settings.print("Please Login")
                 elements = Driver.browser.find_elements_by_tag_name("a")
                 [elem for elem in elements if '/twitter/auth' in str(elem.get_attribute('href'))][0].click()
-                Driver.browser.find_element_by_name("session[username_or_email]").send_keys(username)
+                Driver.browser.find_element("name", "session[username_or_email]").send_keys(username)
                 Settings.dev_print("username entered")
                 # fill in password and hit the login button 
-                password_ = Driver.browser.find_element_by_name("session[password]")
+                password_ = Driver.browser.find_element("name", "session[password]")
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
@@ -1258,7 +1263,7 @@ class Driver:
             return False
 
         # TODO: remember to add auto here if it works again for auto reconnecting
-        if Settings.get_browser_type() == "reconnect" or Settings.get_browser_type() == "remote":
+        if Settings.get_browser_type() == "reconnect" or Settings.get_browser_type() == "remote" or str(Settings.is_cookies()) == "True":
             if loggedin_check():
                 Driver.logged_in = True
                 return True
@@ -1455,7 +1460,7 @@ class Driver:
             Settings.dev_print("finding text area")
             # message = Driver.find_element_by_name("messageText")     
             message = Driver.browser.find_element_by_id("new_post_text_input")     
-            # message = Driver.browser.find_element_by_name("message")     
+            # message = Driver.browser.find_element("name", "message")     
             Settings.dev_print("entering text")
             message.send_keys(str(text))
             Settings.dev_print("successfully entered text")
@@ -2811,20 +2816,19 @@ class Driver:
 
         def attempt_chrome():
             Settings.maybe_print("attempting chrome web browser...")
-            browserAttempt = None
             try:
                 options = webdriver.ChromeOptions()
-                options.add_argument("--no-sandbox") # Bypass OS security model
-                options.add_argument('--disable-software-rasterizer')
-                if not Settings.is_show_window() == "True":
+                # options.add_argument("--no-sandbox") # Bypass OS security model
+                # options.add_argument('--disable-software-rasterizer')
+                if Settings.is_show_window() == "False":
                     options.add_argument('--headless')
+                # options.add_argument("user-data-dir=selenium") 
+                # options.add_argument('--ignore-certificate-errors')
+                # options.add_argument("--remote-debugging-address=localhost")    
+                # options.add_argument("--remote-debugging-port=9223")
                 options.add_argument("--disable-extensions") # disabling extensions
                 options.add_argument("--disable-infobars") # disabling infobars
-                options.add_argument("user-data-dir=selenium") 
-                options.add_argument('--ignore-certificate-errors')
-                options.add_argument("--remote-debugging-address=localhost")    
-                options.add_argument("--remote-debugging-port=9223")
-                options.add_argument("--allow-insecure-localhost")                
+                options.add_argument("--allow-insecure-localhost")            
                 capabilities = {
                   'browserName': 'chrome',
                   'platform': 'LINUX',
@@ -2840,7 +2844,7 @@ class Driver:
                     service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
-                browserAttempt = webdriver.Chrome(desired_capabilities=capabilities, executable_path=chromedriver_binary.chromedriver_filename, chrome_options=options, service_args=service_args)
+                browserAttempt = webdriver.Chrome(options=options, service_args=service_args)
                 Settings.print("browser created - chrome")
                 return browserAttempt, "chrome"
             except Exception as e:
@@ -2849,7 +2853,7 @@ class Driver:
                 else:
                     Settings.warn_print("unable to launch chrome!")
                     Settings.dev_print(e)
-            return browserAttempt, "chrome"
+            return None, "chrome"
 
         def attempt_firefox():
             Settings.maybe_print("attempting firefox web browser...")
@@ -2857,7 +2861,6 @@ class Driver:
             if os.geteuid() == 0:
                 Settings.print("You must run `onlysnarf` as non-root for Firefox to work correctly!")
                 return False
-            browserAttempt = None
             try:
                 d = DesiredCapabilities.FIREFOX
                 options = FirefoxOptions()
@@ -2879,7 +2882,7 @@ class Driver:
             except Exception as e:
                 Settings.warn_print("unable to launch firefox!")
                 Settings.dev_print(e)
-            return browserAttempt, "firefox"
+            return None, "firefox"
 
         def attempt_reconnect():
             reconnect_id, url, browserTypeFinal_ = Driver.read_session_data()
@@ -2892,8 +2895,7 @@ class Driver:
             Settings.maybe_print("reconnecting to web browser...")
             Settings.dev_print("reconnect id: {}".format(reconnect_id))
             Settings.dev_print("reconnect url: {}".format(url))
-            browserAttempt = None
-            original_execute = WebDriver.execute
+            # original_execute = WebDriver.execute
             try:
                 def new_command_execute(self, command, params=None):
                     if command == "newSession":
@@ -2902,7 +2904,7 @@ class Driver:
                     else:
                         return original_execute(command, params)
                 # Patch the function before creating the browser object
-                WebDriver.execute = new_command_execute
+                # WebDriver.execute = new_command_execute
                 browserAttempt = webdriver.Remote(command_executor=url, desired_capabilities={})
                 # if browserAttempt.session_id != reconnect_id:   # this is pretty much guaranteed to be the case
                 browserAttempt.close()   # this closes the session's window - it is currently the only one, thus the session itself will be auto-killed, yet:
@@ -2915,8 +2917,8 @@ class Driver:
                 Settings.warn_print("unable to reconnect!")
                 Settings.dev_print(e)
             # Replace the patched function with original function
-            WebDriver.execute = original_execute
-            return browserAttempt, browserTypeFinal_
+            # WebDriver.execute = original_execute
+            return None, browserTypeFinal_
 
         def attempt_remote():
             link = 'http://{}:{}/wd/hub'.format(config["remote_browser_host"], config["remote_browser_port"])
@@ -2989,13 +2991,14 @@ class Driver:
         elif "firefox" in browserType:
             browser, browserTypeFinal = attempt_firefox()
         if "reconnect" in browserType:
-            if not browser: browser = attempt_chrome() or attempt_firefox()
-            browser, browserTypeFinal = attempt_reconnect(browser)
+            # if not browser: browser = attempt_chrome() or attempt_firefox()
+            browser, browserTypeFinal = attempt_reconnect()
 
         if browser and Settings.is_keep() == "True":
             Driver.write_session_data(browser.session_id, browser.command_executor._url, browserTypeFinal)
         if not browser:
             Settings.err_print("unable to spawn a web browser!")
+            if Settings.is_debug() == "True": return False
             os._exit(1)
         browser.implicitly_wait(30) # seconds
         browser.set_page_load_timeout(1200)
@@ -3704,7 +3707,7 @@ class Driver:
             # from OnlySnarf.classes.user import User
             from ..classes.user import User
             User.write_users_local()
-        if Settings.is_keep() == "True":
+        if str(Settings.is_keep()) == "True":
             Settings.maybe_print("keeping browser open")
             # Driver.go_to_home(force=True)
             Driver.go_to_home()

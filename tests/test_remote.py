@@ -12,6 +12,7 @@ from OnlySnarf.snarf import Snarf
 class TestSeleniumRemote(unittest.TestCase):
 
     def setUp(self):
+        config["debug_selenium"] = True
         config["keep"] = False
         Settings.set_debug("tests")
 
