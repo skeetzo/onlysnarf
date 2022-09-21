@@ -50,6 +50,8 @@ class Driver:
 
     BROWSER = None
     BROWSERS = []
+    DRIVERS = []
+
     #
     DOWNLOADING = True
     DOWNLOADING_MAX = False
@@ -91,11 +93,13 @@ class Driver:
         """
 
         if self._initialized_: return
-        self.spawn_browser(Settings.get_browser_type())
+        self.browser = self.spawn_browser(Settings.get_browser_type())
+        self.browsers.append(self.browser)
         ## Cookies
         if str(Settings.is_cookies()) == "True": self.cookies_load()
         self.tabs.append([self.browser.current_url, self.browser.current_window_handle, 0])
         self._initialized_ = True
+        Driver.DRIVERS.append(self)
 
     def auth(self):
         """
@@ -110,12 +114,13 @@ class Driver:
 
         """
 
+        self.init()
         if not self.login():
             if Settings.is_debug() == "True":
                 return False
             os._exit(1)
         ## Cookies
-        if Settings.is_cookies() == "True":
+        if str(Settings.is_cookies()) == "True":
             self.cookies_save()
         return True
 
@@ -833,6 +838,12 @@ class Driver:
 
     ######################################################################
 
+    @staticmethod
+    def get_driver():
+        if len(Driver.DRIVERS) > 0:
+            return Driver.DRIVERS[0]
+        return Driver()
+
     # waits for page load
     def get_page_load(self):
         """Attempt to generic page load"""
@@ -1306,6 +1317,7 @@ class Driver:
             Settings.err_print("missing user to message")
             return False
         try:
+            self.auth()
             Settings.dev_print("attempting to start message for {}...".format(username))
             type__ = None # default
             # if the username is a key string it will behave differently
@@ -1326,7 +1338,7 @@ class Driver:
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failure to message - {}".format(username))
-            return False
+        return False
      
     def message_confirm(self):
         """
@@ -1402,7 +1414,7 @@ class Driver:
             priceElements = self.find_elements_by_name("priceClick")
             priceElement = None
             for ele in priceElements:
-                Settings.dev_print("{}  {}".format(ele.get_attribute("value")))
+                Settings.dev_print(ele.get_attribute("value"))
                 if "#icon-price" in str(ele.get_attribute("innerHTML")):
                     priceElement = ele
             if not priceElement:
@@ -2991,8 +3003,7 @@ class Driver:
         browser.implicitly_wait(30) # seconds
         browser.set_page_load_timeout(1200)
         browser.file_detector = LocalFileDetector() # for uploading via remote sessions
-        self.browser = browser
-        self.browsers.append(browser)
+        return browser
 
     ## possibly move these functions elsewhere (again)
     def read_session_data(self):
@@ -3026,31 +3037,11 @@ class Driver:
         except OSError:
             Settings.err_print("Missing Session Path")
 
-    #####
-
-    #####
-
-
-    def tryDriverFunction(function, objecto):
-        try:
-            successes = 0
-            failures = 0
-            successful = Driver[function](objecto)
-            if successful: successes+=1
-            else: failures+=1
-        except Exception as e:
-            Settings.dev_print(e)
-            failures+=1
-        Settings.maybe_print("successful: {}".format(successes))
-        Settings.maybe_print("failed: {}".format(failures))
-        if successes > failures: return True
-
-
     ##################
     ##### Upload #####
     ##################
 
-    def upload_files(files):
+    def upload_files(self, files):
         """
         Upload the files to a post or message.
 
@@ -3697,12 +3688,17 @@ class Driver:
                 Settings.print("Kept Browser Open")
             Driver.NOT_INFORMED_KEPT = True
             # todo: add delay for setting this back to false
-            return
         else:
             Settings.print("Exiting OnlyFans")
-        Driver.browser.quit()
-        Settings.print("Browser Closed")
-        self._initialized_ = False
+            self.browser.quit()
+            Settings.print("Browser Closed")
+            self._initialized_ = False
+            Driver.DRIVERS.remove(self)
+
+    @staticmethod
+    def exit_all():
+        for driver in Driver.DRIVERS:
+            driver.exit()
 
 ##################################################################################
 

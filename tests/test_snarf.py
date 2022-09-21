@@ -5,7 +5,6 @@ import datetime
 
 from OnlySnarf.util.config import config
 from OnlySnarf.util import defaults as DEFAULT
-from OnlySnarf.lib.driver import Driver
 from OnlySnarf.util.settings import Settings
 from OnlySnarf.snarf import Snarf
 # from OnlySnarf.classes.user import User
@@ -33,7 +32,7 @@ class TestSnarf(unittest.TestCase):
         config["questions"] = []
         config["schedule"] = DEFAULT.SCHEDULE
         config["time"] = DEFAULT.TIME
-        Driver.exit()
+        self.test_snarf.close()
 
     def test_discount(self):
         config["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT

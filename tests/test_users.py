@@ -18,7 +18,7 @@ class TestUsers(unittest.TestCase):
         
     def tearDown(self):
         config["cookies"] = False
-        Driver.exit()
+        Driver.exit_all()
 
     def test_users(self):
         assert User.get_all_users(), "unable to read users"

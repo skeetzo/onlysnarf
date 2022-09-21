@@ -16,7 +16,7 @@ class TestSelenium(unittest.TestCase):
         Settings.set_debug("tests")
 
     def tearDown(self):
-        Driver.exit()
+        Driver.exit_all()
 
     ## Auto ##
 

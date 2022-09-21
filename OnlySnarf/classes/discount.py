@@ -57,7 +57,7 @@ class Discount:
         for user in users:
             try:
                 self.username = user.username
-                successful = Driver.discount_user(discount=self)
+                successful = Driver.get_driver().discount_user(discount=self)
                 if successful: successes+=1
                 else: failures+=1
             except Exception as e:
@@ -203,6 +203,6 @@ class Discount:
             self.username = user.username
             print("Grandfathering: {}".format(self.username))
             try:
-                Driver.discount_user(discount=self)
+                Driver.get_driver().discount_user(discount=self)
             except Exception as e:
                 print(e)

@@ -3,7 +3,6 @@ os.environ['ENV'] = "test"
 
 from OnlySnarf.util.config import config
 from OnlySnarf.util import defaults as DEFAULT
-from OnlySnarf.lib.driver import Driver
 from OnlySnarf.util.settings import Settings
 from OnlySnarf.snarf import Snarf
 # from OnlySnarf.classes.user import User
@@ -18,30 +17,29 @@ class TestXMAS(unittest.TestCase):
         self.test_snarf = Snarf()
         
     def tearDown(self):
+        config["bykeyword"] = []
         config["input"] = []
-        Driver.exit()
+        config["price"] = 0
+        config["upload_max"] = int(DEFAULT.IMAGE_LIMIT)
+        config["user"] = ""
+        self.test_snarf.close()
 
     def test_teaser(self):
         config["input"] = ["./public/images/xmas-shnarf-tease.jpg"]
         config["bykeyword"] = "xmas tease"
         config["upload_max"] = int(DEFAULT.IMAGE_LIMIT / 5)
         assert self.test_snarf.post(), "unable to send xmas tease"
-        config["bykeyword"] = []
-        config["upload_max"] = int(DEFAULT.IMAGE_LIMIT)
 
     def test_xmas_message(self):
         config["input"] = ["./public/images/xmas-shnarf.jpg"]
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["user"] = "recent"
         assert self.test_snarf.message(), "unable to send xmas nude message"
-        config["price"] = 0
-        config["user"] = ""
 
     def test_xmas_post(self):
         config["input"] = ["./public/images/xmas-shnarf-video.mp4"]
         config["price"] = DEFAULT.PRICE_MINIMUM * 10
         assert self.test_snarf.post(), "unable to post xmas gift"
-        config["price"] = 0
 
 ############################################################################################
 
