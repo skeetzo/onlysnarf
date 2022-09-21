@@ -17,6 +17,7 @@ class TestSnarf(unittest.TestCase):
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["text"] = "test balls"
         config["user"] = "random"
+        config["keep"] = True
         Settings.set_debug("tests")
         self.test_snarf = Snarf()
 
@@ -25,7 +26,7 @@ class TestSnarf(unittest.TestCase):
         config["input"] = []
         config["price"] = 0
         config["user"] = None
-        Driver.exit()
+        Driver.exit_all()
 
     def test_message(self):
         assert self.test_snarf.message(), "unable to send message"

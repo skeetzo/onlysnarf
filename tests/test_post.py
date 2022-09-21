@@ -31,9 +31,9 @@ class TestSnarf(unittest.TestCase):
         config["date"] = DEFAULT.DATE
         config["time"] = DEFAULT.TIME
         config["input"] = []
-        Driver.exit()
+        self.test_snarf.close()
 
-    @unittest.skip("works")
+    # @unittest.skip("works")
     def test_post(self):
         config["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]
         config["price"] = DEFAULT.PRICE_MINIMUM
@@ -46,19 +46,19 @@ class TestSnarf(unittest.TestCase):
         config["questions"] = ["suck","my","dick","please?"]
         assert self.test_snarf.post(), "unable to post poll"
 
-    # @unittest.skip("todo")
+    @unittest.skip("todo")
     def test_schedule(self):
         config["schedule"] = tomorrow
         config["schedule"] = config["schedule"].strftime(DEFAULT.SCHEDULE_FORMAT)
         assert self.test_snarf.post(), "unable to post schedule"
         
-    # @unittest.skip("todo")
+    @unittest.skip("todo")
     def test_schedule_date(self):
         config["date"] = tomorrow
         config["date"] = config["date"].strftime(DEFAULT.DATE_FORMAT)
         assert self.test_snarf.post(), "unable to post schedule via date"
 
-    # @unittest.skip("todo")
+    @unittest.skip("todo")
     def test_schedule_time(self):
         config["time"] = today + datetime.timedelta(hours=1)
         config["time"] = config["time"].strftime(DEFAULT.TIME_FORMAT)

@@ -39,3 +39,5 @@ python setup.py install && python tests/test_xmas.py
 # reconnect
 # auth
 # discount
+# message
+# post (basic)

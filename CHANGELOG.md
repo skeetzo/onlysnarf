@@ -531,22 +531,18 @@
     - added tests for trying different browsers, reconnecting, keeping open, remote sessions
     - schedule tests pass they just don't set the right hour
     - major snarf tests all OK (minus poll)
-**4.3.0 : 9/20/2022**
+**4.3.0 : 9/20/2022, 9/21/2022**
   - updated selenium, google chrome, & firefox geckodriver versions
   - driver updates to accomodate selenium version changes
   - changed Driver back to a basic class instead of all static, needs more debugging (again)
   - more individual tests for messages
   - mostly OK on basic tests
+  - reconnect works again for chrome
 
 ------------------------------------------------------------------------------------
 
-- chrome reconnect might be working
-
 - finish debugging schedule (date & time) & poll
-- finish debugging browser reconnect
-
-
-firefox / geckodriver: 0.31.0
+- finish debugging browser reconnect completely
 
 ## Fix / Debug
 
@@ -567,13 +563,11 @@ firefox / geckodriver: 0.31.0
 
 tests: auth, browsers, ipfs, post, profile, promotion, reconnect, remote, selenium, snarf, xmas
 
-## Working as Intended
-
-tests: discount, message, users
-
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- add tests for messaging: all, recent, favorite, renew on
 
 - completely finish debugging basic snarf functionality
 - finish adding tests
@@ -654,3 +648,13 @@ https://pypi.org/project/config/
 
   "/venv/lib/python3.8/site-packages/OnlySnarf-4.2.1-py3.8.egg/OnlySnarf/lib/driver.py:2841: ResourceWarning: unclosed <socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('127.0.0.1', 35896), raddr=('127.0.0.1', 35181)>"
   ResourceWarning: Enable tracemalloc to get the object allocation traceback
+
+
+# Web Browser Versions
+
+geckodriver: 0.31.0
+
+Version Check:
+stable => Google Chrome 106.0.5249.40 beta
+beta => Google Chrome 106.0.5249.40 beta
+binary => Version: 106.0.5249.21.0

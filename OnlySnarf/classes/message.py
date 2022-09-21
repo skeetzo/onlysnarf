@@ -583,7 +583,7 @@ class Post(Message):
             try:
                 successes = 0
                 failures = 0
-                successful = Driver.post(self.get_post())
+                successful = Driver.get_driver().post(self.get_post())
                 if successful: successes+=1
                 else: failures+=1
             except Exception as e:

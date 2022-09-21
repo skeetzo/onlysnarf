@@ -14,32 +14,33 @@ class TestSeleniumBrowsers(unittest.TestCase):
     def setUp(self):
         config["debug_selenium"] = True
         config["keep"] = False
-        config["show"] = True
+        # config["show"] = True
         Settings.set_debug("tests")
+        self.driver = Driver()
 
     def tearDown(self):
         config["debug_google"] = False
         config["debug_firefox"] = False
         config["debug_selenium"] = False
         config["show"] = False
-        Driver.exit()
+        self.driver.exit()
 
     def test_auto(self):
         config["browser"] = "auto"
-        Driver.init()
-        assert Driver.browser, "unable to launch via auto"
+        self.driver.init()
+        assert self.driver.browser, "unable to launch via auto"
 
     def test_chrome(self):
         config["browser"] = "chrome"
         config["debug_google"] = True
-        Driver.init()
-        assert Driver.browser, "unable to launch chrome"
+        self.driver.init()
+        assert self.driver.browser, "unable to launch chrome"
 
     def test_firefox(self):
         config["browser"] = "firefox"
         config["debug_firefox"] = True
-        Driver.init()
-        assert Driver.browser, "unable to launch firefox"
+        self.driver.init()
+        assert self.driver.browser, "unable to launch firefox"
 
 ############################################################################################
 

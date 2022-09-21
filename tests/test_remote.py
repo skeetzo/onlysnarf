@@ -17,7 +17,7 @@ class TestSeleniumRemote(unittest.TestCase):
         Settings.set_debug("tests")
 
     def tearDown(self):
-        Driver.exit()
+        Driver.exit_all()
 
     @unittest.skip("todo")
     def test_remote(self):

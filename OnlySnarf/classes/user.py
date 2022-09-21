@@ -63,7 +63,7 @@ class User:
         """
 
         if self.id: return self.id
-        id_ = Driver.user_get_id(self.get_username())
+        id_ = Driver.get_driver().user_get_id(self.get_username())
         self.id = id_
         return self.id
 
@@ -75,7 +75,7 @@ class User:
         """
 
         if self.username: return self.username
-        username = Driver.user_get_username(self.get_id())
+        username = Driver.get_driver().user_get_username(self.get_id())
         self.username = username
         return self.username
 
@@ -93,7 +93,7 @@ class User:
 
         if not self.get_username() and not self.get_id(): return Settings.error("Missing user identifiers")
         Settings.print("messaging user (id): {} ({}) <-- {}".format(self.username, self.id, message["text"]))
-        successful = Driver.message(self.username, user_id=self.id)
+        successful = Driver.get_driver().message(self.username, user_id=self.id)
         if not successful: return False
         successful = self.enter_message(message)
         if not successful: return False
@@ -131,14 +131,14 @@ class User:
         try:
             # enter the text of the message
             def enter_text(text):
-                return Driver.message_text(text)
+                return Driver.get_driver().message_text(text)
             # enter the price to send the message to the user
             def enter_price(price):
                 if not price: return True
                 if price != None and Decimal(sub(r'[^\d.]', '', str(price))) < Decimal(Settings.get_price_minimum()):
                     Settings.warn_print("price too low; {} < {}".format(price, Settings.get_price_minimum()))
                     return False
-                return Driver.message_price(price)
+                return Driver.get_driver().message_price(price)
             # enter files by filepath while checking for already sent files
             def enter_files(files):
                 # if isinstance(files, str) and str(files) == "unset": return True
@@ -149,9 +149,9 @@ class User:
                         # return False
                         continue
                     self.sent_files.append(file_name)
-                return Driver.upload_files(files)
+                return Driver.get_driver().upload_files(files)
             def confirm_message():
-                return Driver.message_confirm()
+                return Driver.get_driver().message_confirm()
             successful = []
             successful.append(enter_text(message["text"]))
             successful.append(enter_price(message["price"]))
@@ -203,7 +203,7 @@ class User:
         """
 
         Settings.print("reading user chat: {} - {}".format(self.username, self.id))
-        messages, messages_received, messages_sent = Driver.read_user_messages(self.username, user_id=self.id)
+        messages, messages_received, messages_sent = Driver.get_driver().read_user_messages(self.username, user_id=self.id)
         self.messages = messages
         self.messages_received = messages_received
         self.messages_sent = messages_sent
@@ -248,7 +248,7 @@ class User:
             users = User.read_users_local()
             if len(users) > 0: return users
         active_users = []
-        users = Driver.users_get()
+        users = Driver.get_driver().users_get()
         for user in users:
             try:
                 user = User(user)
@@ -270,7 +270,7 @@ class User:
             users = User.read_following_local()
             if len(users) > 0: return users
         active_users = []
-        users = Driver.following_get()
+        users = Driver.get_driver().following_get()
         for user in users:
             try:
                 user = User(user)
@@ -387,7 +387,7 @@ class User:
     @staticmethod
     def get_users_by_list(number=None, name=None, ):
         Settings.maybe_print("getting users by list: {} - {}".format(number, name))
-        users = Driver.get_list(number=number, name=name)
+        users = Driver.get_driver().get_list(number=number, name=name)
         listUsers = []
         for user in users:
             Settings.maybe_print("user: {}".format(user.username))
@@ -473,8 +473,8 @@ class User:
         Settings.maybe_print("getting recent users from messages")
         users = []
         try:
-            users_ = Driver.messages_scan()
-            # users_ = Driver.messages_scan(num=notusers)
+            users_ = Driver.get_driver().messages_scan()
+            # users_ = Driver.get_driver().messages_scan(num=notusers)
             for user in users_:
                 users.append(User({"id":user}))
         except Exception as e:
@@ -521,7 +521,7 @@ class User:
                 except Exception as e:
                     Settings.err_print("unable to find list number")
         elif str(answer) == "Select":
-            lists_ = Driver.get_lists()
+            lists_ = Driver.get_driver().get_lists()
             lists__ = [{"name":"Back", "value":"back"}]
             for list___ in lists_:
                 lists__.append({
@@ -538,7 +538,7 @@ class User:
             if str(answer) == "back":
                 return User.select_user()
             else:
-                return Driver.get_list_members(answer)
+                return Driver.get_driver().get_list_members(answer)
         return []
 
 

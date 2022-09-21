@@ -20,7 +20,7 @@ class TestIPFS(unittest.TestCase):
 
     def tearDown(self):
         config["input"] = []
-        Driver.exit()
+        Driver.exit_all()
 
     @unittest.skip("todo")
     def test_backup_to_ipfs(self):

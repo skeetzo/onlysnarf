@@ -31,6 +31,11 @@ class Snarf:
         pass
 
     @staticmethod
+    def close():
+        Driver.exit_all()
+        Settings.print("Shnarf!?")
+
+    @staticmethod
     def discount():
 
         """
@@ -149,7 +154,7 @@ class Snarf:
 def exit_handler():
     """Exit cleanly"""
 
-    Driver.exit()
+    Driver.exit_all()
     Settings.print("Shnarrf!")
     sys.exit(0)
 
