@@ -541,6 +541,8 @@
 
 ------------------------------------------------------------------------------------
 
+- finish test for cookies
+
 - finish debugging schedule (date & time) & poll
 - finish debugging browser reconnect completely
 
