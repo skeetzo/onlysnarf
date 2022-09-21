@@ -16,12 +16,14 @@ tomorrow = today + datetime.timedelta(days=1)
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
+        config["cookies"] = True
         config["text"] = "test balls"
         Settings.set_debug("tests")
         self.test_snarf = Snarf()
 
     def tearDown(self):
         config["amount"] = 0
+        config["cookies"] = False
         config["date"] = DEFAULT.DATE
         config["duration"] = None
         config["expiration"] = 0

@@ -276,7 +276,6 @@ class User:
                 user = User(user)
                 user = User.skipUserCheck(user)
                 if user is None: continue
-                setattr(user, "driver", driver)
                 active_users.append(user)
             except Exception as e:
                 Settings.dev_print(e)
@@ -285,7 +284,10 @@ class User:
         Settings.set_prefer_local(True)
         return active_users
 
-
+    @staticmethod
+    def get_random_user():
+        import random
+        return random.choice(User.get_all_users())
 
 
 
@@ -319,7 +321,7 @@ class User:
 
 
     @staticmethod
-    def get_user_by_username(username=None):
+    def get_user_by_username(username):
         if not username or username == None:
             Settings.err_print("missing username")
             return None
@@ -330,6 +332,9 @@ class User:
             return User.get_recent_users()
         elif str(username) == "favorite":
             return User.get_favorite_users()
+        elif str(username) == "random":
+            return User.get_random_user()
+        
 
         users = User.read_users_local()
         for user in users:
@@ -342,6 +347,25 @@ class User:
                 Settings.maybe_print("found user: members")
                 return user
         Settings.err_print("missing user by username - {}".format(username))
+        return None
+
+    @staticmethod
+    def get_user_by_id(userid):
+        if not userid or userid == None:
+            Settings.err_print("missing user id")
+            return None
+
+        users = User.read_users_local()
+        for user in users:
+            if str(user.id) == "@u"+str(userid) or str(user.id) == "@"+str(userid) or str(user.id) == str(userid):
+                Settings.maybe_print("found user: local")
+                return user
+        users = User.get_all_users()
+        for user in users:
+            if str(user.id) == "@u"+str(userid) or str(user.id) == "@"+str(userid) or str(user.id) == str(userid):
+                Settings.maybe_print("found user: members")
+                return user
+        Settings.err_print("missing user by user id - {}".format(userid))
         return None
 
     ## TODO
@@ -452,9 +476,7 @@ class User:
             users_ = Driver.messages_scan()
             # users_ = Driver.messages_scan(num=notusers)
             for user in users_:
-                user_ = User({"id":user})
-                setattr(user_, "driver", driver)
-                users.append(user_)
+                users.append(User({"id":user}))
         except Exception as e:
             Settings.dev_print(e)
         return users
@@ -491,11 +513,11 @@ class User:
             theList = None
             try:
                 theList = int(list_)
-                users = User.get_users_by_list(number=theList, driver=Driver)
+                users = User.get_users_by_list(number=theList)
             except Exception as e:
                 try:
                     theList = str(list_)
-                    return User.get_users_by_list(name=theList, driver=Driver)
+                    return User.get_users_by_list(name=theList)
                 except Exception as e:
                     Settings.err_print("unable to find list number")
         elif str(answer) == "Select":
@@ -691,9 +713,7 @@ class User:
             Settings.maybe_print("loaded local users")
             for user in users:
                 try:
-                    user_ = User(json.loads(user))
-                    setattr(user_, "driver", driver)
-                    users_.append(user_)
+                    users_.append(User(json.loads(user)))
                 except Exception as e:
                     Settings.dev_print(e)
             return users_

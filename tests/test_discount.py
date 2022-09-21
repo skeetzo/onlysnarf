@@ -13,6 +13,7 @@ class TestSnarf(unittest.TestCase):
 
     def setUp(self):
         config["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT
+        config["cookies"] = True
         config["months"] = DEFAULT.DISCOUNT_MAX_MONTHS
         config["user"] = "random"
         Settings.set_debug("tests")
@@ -20,6 +21,7 @@ class TestSnarf(unittest.TestCase):
 
     def tearDown(self):
         config["amount"] = 0
+        config["cookies"] = False
         config["months"] = 0
         config["user"] = None
         Driver.exit()

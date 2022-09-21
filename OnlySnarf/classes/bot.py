@@ -70,7 +70,9 @@ class Bot():
 
     def parse_messages(self):
         # if self.running: self.running.stop()
-        if not self.driver: self.driver = Driver(browser=None)
+        if not self.driver:
+            self.driver = Driver()
+            self.driver.init()
 
         # read all messages
         # users = Bot.USERS
@@ -106,7 +108,7 @@ class Bot():
                         elif len(self.drivers) >= MAX_BROWSERS:
                             user.driver = self.drivers[i]
                         else:
-                            user.driver = Driver(browser=None)
+                            user.driver = Driver()
                             self.drivers.append(user.driver)
                     self.lock.release()
                     Bot.parse(user=user)

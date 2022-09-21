@@ -534,8 +534,13 @@
 **4.3.0 : 9/20/2022**
   - updated selenium, google chrome, & firefox geckodriver versions
   - driver updates to accomodate selenium version changes
+  - changed Driver back to a basic class instead of all static, needs more debugging (again)
+  - more individual tests for messages
+  - mostly OK on basic tests
 
 ------------------------------------------------------------------------------------
+
+- chrome reconnect might be working
 
 - finish debugging schedule (date & time) & poll
 - finish debugging browser reconnect

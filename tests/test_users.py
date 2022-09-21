@@ -12,10 +12,12 @@ from OnlySnarf.classes.user import User
 class TestUsers(unittest.TestCase):
 
     def setUp(self):
+        config["cookies"] = True
         Settings.set_debug("tests")
         Settings.set_prefer_local(False)
         
     def tearDown(self):
+        config["cookies"] = False
         Driver.exit()
 
     def test_users(self):

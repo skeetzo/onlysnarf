@@ -31,3 +31,11 @@ python setup.py install && python tests/test_ipfs.py
 
 ## XMAS ##
 python setup.py install && python tests/test_xmas.py
+
+
+
+# Pass:
+# browsers
+# reconnect
+# auth
+# discount

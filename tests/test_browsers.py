@@ -18,6 +18,8 @@ class TestSeleniumBrowsers(unittest.TestCase):
         Settings.set_debug("tests")
 
     def tearDown(self):
+        config["debug_google"] = False
+        config["debug_firefox"] = False
         config["debug_selenium"] = False
         config["show"] = False
         Driver.exit()
@@ -29,11 +31,13 @@ class TestSeleniumBrowsers(unittest.TestCase):
 
     def test_chrome(self):
         config["browser"] = "chrome"
+        config["debug_google"] = True
         Driver.init()
         assert Driver.browser, "unable to launch chrome"
 
     def test_firefox(self):
         config["browser"] = "firefox"
+        config["debug_firefox"] = True
         Driver.init()
         assert Driver.browser, "unable to launch firefox"
 
