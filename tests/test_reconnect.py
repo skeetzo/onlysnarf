@@ -25,7 +25,6 @@ class TestSeleniumReconnect(unittest.TestCase):
         config["show"] = False
         Driver.exit()
     
-    @unittest.skip("works")
     def test_reconnect(self):
         config["browser"] = "auto"
         Driver.init()
@@ -42,7 +41,6 @@ class TestSeleniumReconnect(unittest.TestCase):
         Driver.init()
         assert Driver.browser, "unable to launch via reconnect chrome"
 
-    @unittest.skip("todo")
     def test_reconnect_firefox(self):
         config["browser"] = "firefox"
         Driver.init()

@@ -12,6 +12,7 @@ from OnlySnarf.snarf import Snarf
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
+        config["cookies"] = True
         config["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["text"] = "test balls"
@@ -20,6 +21,7 @@ class TestSnarf(unittest.TestCase):
         self.test_snarf = Snarf()
 
     def tearDown(self):
+        config["cookies"] = False
         config["input"] = []
         config["price"] = 0
         config["user"] = None
@@ -27,6 +29,18 @@ class TestSnarf(unittest.TestCase):
 
     def test_message(self):
         assert self.test_snarf.message(), "unable to send message"
+
+    @unittest.skip("todo")
+    def test_message_files(self):
+        assert self.test_snarf.message(), "unable to upload message files"
+
+    @unittest.skip("todo")
+    def test_message_price(self):
+        assert self.test_snarf.message(), "unable to set message price"
+
+    @unittest.skip("todo")
+    def test_message_text(self):
+        assert self.test_snarf.message(), "unable to set message text"
 
 ############################################################################################
 

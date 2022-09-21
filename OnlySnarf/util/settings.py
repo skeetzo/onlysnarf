@@ -371,17 +371,19 @@ class Settings:
             if isinstance(user, User):
                 pass
             elif isinstance(user, str):
-                user = User({"username":user})
+                # user = User({"username":user})
+                user = User.get_user_by_username(user)
             # BUG (potential): might bug out if the username is for whatever reason all numbers
             elif isinstance(user, int):
-                user = User({"id":config["user"]})
+                # user = User({"id":config["user"]})
+                user = User.get_user_by_id(user)
             users_.append(user)
         return users_
 
     def get_user():
         if not config["user"]: return None
         from ..classes.user import User
-        return User({"username":config["user"]})
+        return User.get_user_by_username(config["user"])
 
     def get_email():
         return config["email"] or ""
@@ -456,7 +458,7 @@ class Settings:
         return Settings.CONFIRM or config["confirm"] or False
 
     def is_cookies():
-        return config["cookies"] or False
+        return config["cookies"]
 
     def is_delete():
         return config["delete"] or False

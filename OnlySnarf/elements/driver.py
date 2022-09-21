@@ -219,7 +219,7 @@ ELEMENTS = [
     # price add
     {
         "name": "priceClick",
-        "classes": ["g-btn.m-flat.has-tooltip"],
+        "classes": ["g-btn.m-flat.has-tooltip", "g-btn.m-flat.m-gray.m-with-round-hover.m-size-md-hover.m-default-icon-size.m-reset-width"],
         "text": [],
         "id": []
     },
