@@ -119,9 +119,6 @@ class Driver:
             if Settings.is_debug() == "True":
                 return False
             os._exit(1)
-        ## Cookies
-        if str(Settings.is_cookies()) == "True":
-            self.cookies_save()
         return True
 
     ###################
@@ -880,7 +877,15 @@ class Driver:
 
         def goto():
             Settings.maybe_print("goto -> onlyfans.com")
-            self.browser.get(ONLYFANS_HOME_URL)
+            try:
+                self.browser.get(ONLYFANS_HOME_URL)
+                element_present = EC.presence_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass()))
+                WebDriverWait(self.browser, 10).until(element_present)
+            except TimeoutException:
+                Settings.err_print("timed out waiting for page to load!")
+            except WebDriverException as e:
+                Settings.dev_print("error fetching home page")
+                Settings.err_print(e)
             # self.open_tab(ONLYFANS_HOME_URL)
             self.handle_alert()
             self.get_page_load()
@@ -892,7 +897,7 @@ class Driver:
         if str(self.browser.current_url) == str(ONLYFANS_HOME_URL):
             Settings.maybe_print("at -> onlyfans.com")
             self.browser.execute_script("window.scrollTo(0, 0);")
-        else: goto()
+        else: goto()        
         
     def go_to_page(self, page):
         """
@@ -1100,7 +1105,7 @@ class Driver:
 
             try:
                 Settings.dev_print("waiting for logincheck...")
-                WebDriverWait(self.browser, 120, poll_frequency=6).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
+                WebDriverWait(self.browser, 16, poll_frequency=2).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
                 Settings.print("OnlyFans login successful!")
                 Settings.dev_print("login successful - {}".format(which))
                 return True
@@ -1200,7 +1205,7 @@ class Driver:
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing google login info")
                     return False
-                self.go_to_home()
+                # self.go_to_home()
                 elements = self.browser.find_elements(By.TAG_NAME, "a")
                 [elem for elem in elements if '/auth/google' in str(elem.get_attribute('href'))][0].click()
                 time.sleep(5)
@@ -1241,7 +1246,7 @@ class Driver:
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing twitter login info")
                     return False
-                self.go_to_home()
+                # self.go_to_home()
                 # rememberMe checkbox doesn't actually cause login to be remembered
                 # rememberMe = self.browser.find_element_by_xpath(Element.get_element_by_name("rememberMe").getXPath())
                 # if not rememberMe.is_selected():
@@ -1263,11 +1268,15 @@ class Driver:
                 Driver.error_checker(e)
             return False
 
-        # TODO: remember to add auto here if it works again for auto reconnecting
         if Settings.get_browser_type() == "reconnect" or Settings.get_browser_type() == "remote" or str(Settings.is_cookies()) == "True":
             if loggedin_check():
+                if str(Settings.is_cookies()) == "True":
+                    Settings.maybe_print("successfully logged in from cookies!")
                 self.logged_in = True
                 return True
+            elif str(Settings.is_cookies()) == "True" and Settings.is_debug("tests"):
+                Settings.err_print("failed to login from cookies!")
+                return False
 
         successful = False
         try:
@@ -2821,7 +2830,7 @@ class Driver:
                 options = webdriver.ChromeOptions()
                 # options.add_argument("--no-sandbox") # Bypass OS security model
                 # options.add_argument('--disable-software-rasterizer')
-                if Settings.is_show_window() == "False":
+                if str(Settings.is_show_window()) == "False":
                     options.add_argument('--headless')
                 # options.add_argument("user-data-dir=selenium") 
                 # options.add_argument('--ignore-certificate-errors')
@@ -2846,7 +2855,10 @@ class Driver:
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
                 browserAttempt = webdriver.Chrome(options=options, service_args=service_args)
-                Settings.print("browser created - chrome")
+                if str(Settings.is_show_window()) == "False":
+                    Settings.print("browser created - chrome (headless)")
+                else:
+                    Settings.print("browser created - chrome")
                 return browserAttempt
             except Exception as e:
                 if "cannot find Chrome binary" in str(e):
@@ -2867,7 +2879,7 @@ class Driver:
                 options = FirefoxOptions()
                 if Settings.is_debug("firefox") == "True":
                     options.log.level = "trace"
-                if Settings.is_show_window() == "False":
+                if str(Settings.is_show_window()) == "False":
                     options.add_argument("--headless")
                 options.add_argument("--enable-file-cookies")
 
@@ -2878,7 +2890,10 @@ class Driver:
                 # browserAttempt = webdriver.Firefox(options=options, log_path='/var/log/onlysnarf/geckodriver.log')
                 # browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, capabilities=d)
                 browserAttempt = webdriver.Firefox(options=options, desired_capabilities=d, service_log_path=Settings.get_logs_path("firefox"))
-                Settings.print("browser created - firefox")
+                if str(Settings.is_show_window()) == "False":
+                    Settings.print("browser created - firefox (headless)")                    
+                else:
+                    Settings.print("browser created - firefox")
                 return browserAttempt
             except Exception as e:
                 Settings.warn_print("unable to launch firefox!")
@@ -3206,7 +3221,7 @@ class Driver:
         Settings.dev_print("successfully found following users")
         return users
 
-    def users_get(page=ONLYFANS_USERS_ACTIVE_URL):
+    def users_get(self, page=ONLYFANS_USERS_ACTIVE_URL):
         """
         Return lists of accounts subscribed to the logged in user.
 
@@ -3299,7 +3314,7 @@ class Driver:
             Settings.err_print("failed to find users")
         return users
 
-    def user_get_id(username):
+    def user_get_id(self, username):
         """
         Get the user id of the user by username.
 
@@ -3335,7 +3350,7 @@ class Driver:
             Settings.err_print("failed to find user id")
         return user_id
 
-    def search_for_list(name=None, number=None):
+    def search_for_list(self, name=None, number=None):
         """
         Search for list in Driver.lists cache by name or number.
 
@@ -3366,7 +3381,7 @@ class Driver:
                 Settings.dev_print(e)
         return name, number
 
-    def get_list(name=None, number=None):
+    def get_list(self, name=None, number=None):
         """
         Search for list by name or number on OnlyFans.
 
@@ -3469,7 +3484,7 @@ class Driver:
             Settings.err_print("failed to find lists")
         return lists
 
-    def get_list_members(list):
+    def get_list_members(self, list):
         """
         Get the members of a list.
 
@@ -3493,7 +3508,7 @@ class Driver:
             Settings.err_print("failed to find list members")
         return users
 
-    def add_user_to_list(username=None, listNumber=None):
+    def add_user_to_list(self, username=None, listNumber=None):
         """
         Add user by username to list by number.
 
@@ -3576,7 +3591,7 @@ class Driver:
             Settings.err_print("failed to add user to list")
         return False
 
-    def add_users_to_list(users=[], number=None, name=None):
+    def add_users_to_list(self, users=[], number=None, name=None):
         """
         Add the users to the list by name or number.
 
@@ -3674,6 +3689,9 @@ class Driver:
         """Save and exit"""
 
         if self.browser == None: return
+        ## Cookies
+        if str(Settings.is_cookies()) == "True":
+            self.cookies_save()
         if Settings.is_save_users() == "True":
             Settings.print("Saving and Exiting OnlyFans")
             # from OnlySnarf.classes.user import User
@@ -3694,6 +3712,7 @@ class Driver:
             Settings.print("Browser Closed")
             self._initialized_ = False
             Driver.DRIVERS.remove(self)
+
 
     @staticmethod
     def exit_all():

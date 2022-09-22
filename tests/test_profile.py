@@ -17,7 +17,7 @@ class TestProfile(unittest.TestCase):
         Settings.set_prefer_local(False)
 
     def tearDown(self):
-        Driver.exit_all()
+        self.test_snarf.close()
 
     @unittest.skip("todo")
     def test_profile_backup(self):

@@ -531,17 +531,21 @@
     - added tests for trying different browsers, reconnecting, keeping open, remote sessions
     - schedule tests pass they just don't set the right hour
     - major snarf tests all OK (minus poll)
-**4.3.0 : 9/20/2022, 9/21/2022**
+  **4.3.0 : 9/20/2022, 9/21/2022**
   - updated selenium, google chrome, & firefox geckodriver versions
   - driver updates to accomodate selenium version changes
   - changed Driver back to a basic class instead of all static, needs more debugging (again)
   - more individual tests for messages
   - mostly OK on basic tests
   - reconnect works again for chrome
+**4.3.1 : 9/22/2022**
+  - more test debugging and finalizing basic OKs
+  - browser reconnect reconnects to browser / retains session
+  - debugging cookies somewhat saving login session
 
 ------------------------------------------------------------------------------------
 
-- finish test for cookies
+- finish test for cookies; finish debugging cookies
 
 - finish debugging schedule (date & time) & poll
 - finish debugging browser reconnect completely
@@ -553,8 +557,6 @@
 - driver: schedule hours not being set
 - driver: poll button not being clicked
 
-- browser reconnect; doesn't reconnect to browser / retain session
-- cookies: not saving login session
 
 (unlikely to be fixed soon, if ever)
 - google login: unsafe browser warning --> possibly end of usability --> should I just remove this? form login works, twitter login works (i think)
@@ -570,6 +572,7 @@ tests: auth, browsers, ipfs, post, profile, promotion, reconnect, remote, seleni
 ## TODO
 
 - add tests for messaging: all, recent, favorite, renew on
+- finish tests for individual message entry parts, individual post entry parts
 
 - completely finish debugging basic snarf functionality
 - finish adding tests
