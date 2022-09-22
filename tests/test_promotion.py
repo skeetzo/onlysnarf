@@ -17,7 +17,7 @@ class TestPromotion(unittest.TestCase):
         self.test_snarf = Snarf()
 
     def tearDown(self):
-        Driver.exit_all()
+        self.test_snarf.close()
 
     @unittest.skip("todo")
     def test_promotion_campaign(self):

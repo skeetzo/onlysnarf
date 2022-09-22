@@ -16,69 +16,69 @@ class TestSelenium(unittest.TestCase):
         Settings.set_debug("tests")
 
     def tearDown(self):
-        Driver.exit_all()
+        self.driver.exit_all()
 
     ## Auto ##
 
     @unittest.skip("todo")
     def test_auto(self):
         config["browser"] = "auto"
-        Driver.init()
-        assert Driver.browser, "unable to launch via auto"
+        self.driver.init()
+        assert self.driver.browser, "unable to launch via auto"
 
     ## Standard ##
 
     @unittest.skip("todo")
     def test_chrome(self):
         config["browser"] = "chrome"
-        Driver.init()
-        assert Driver.browser, "unable to launch chrome"
+        self.driver.init()
+        assert self.driver.browser, "unable to launch chrome"
 
     @unittest.skip("todo")
     def test_firefox(self):
         config["browser"] = "firefox"
-        Driver.init()
-        assert Driver.browser, "unable to launch firefox"
+        self.driver.init()
+        assert self.driver.browser, "unable to launch firefox"
 
     ## Reconnect ##
     
     @unittest.skip("todo")
     def test_reconnect(self):
         config["browser"] = "reconnect"
-        Driver.init()
-        assert Driver.browser, "unable to launch via reconnect"
+        self.driver.init()
+        assert self.driver.browser, "unable to launch via reconnect"
 
     @unittest.skip("todo")
     def test_reconnect_chrome(self):
         config["browser"] = "reconnect-chrome"
-        Driver.init()
-        assert Driver.browser, "unable to launch via reconnect chrome"
+        self.driver.init()
+        assert self.driver.browser, "unable to launch via reconnect chrome"
 
     @unittest.skip("todo")
     def test_reconnect_firefox(self):
         config["browser"] = "reconnect-firefox"
-        Driver.init()
-        assert Driver.browser, "unable to launch via reconnect firefox"
+        self.driver.init()
+        assert self.driver.browser, "unable to launch via reconnect firefox"
 
     ## Remote ##
 
     @unittest.skip("todo")
     def test_remote(self):
         config["browser"] = "remote"
-        Driver.init()
-        assert Driver.browser, "unable to launch via remote"
+        self.driver.init()
+        assert self.driver.browser, "unable to launch via remote"
     
     @unittest.skip("todo")
     def test_remote_chrome(self):
         config["browser"] = "remote-chrome"
-        Driver.init()
-        assert Driver.browser, "unable to launch via remote chrome"
+        self.driver.init()
+        assert self.driver.browser, "unable to launch via remote chrome"
 
     @unittest.skip("todo")
     def test_remote_firefox(self):
         config["browser"] = "remote-firefox"
-        Driver.init()
-        assert Driver.browser, "unable to launch via remote firefox"
+        self.driver.init()
+        assert self.driver.browser, "unable to launch via remote firefox"
 
 ############################################################################################
 

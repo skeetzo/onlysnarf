@@ -12,22 +12,22 @@ from OnlySnarf.util.settings import Settings
 class TestAuth(unittest.TestCase):
 
     def setUp(self):
-        config["cookies"] = True
-        # config["show"] = True
+        config["keep"] = False
         Settings.set_debug("tests")
         self.driver = Driver()
 
     def tearDown(self):
-        config["cookies"] = False
-        config["show"] = False
         self.driver.exit()
 
     def test_login(self):
+        config["cookies"] = False
         assert self.driver.auth(), "unable to login"
+        config["cookies"] = True
 
-    @unittest.skip("todo")
     def test_login_via_cookies(self):
+        config["cookies"] = True
         assert self.driver.auth(), "unable to save login from cookies"
+        config["cookies"] = False
 
 ############################################################################################
 
