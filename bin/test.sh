@@ -35,8 +35,12 @@ python setup.py install && python tests/test_xmas.py
 
 
 # Pass:
+
+## Selenium:
 # browsers
 # reconnect
+
+## Snarf:
 # auth
 # discount
 # message

@@ -128,7 +128,7 @@ class Driver:
     def cookies_load(self):
         """Loads existing web browser cookies from local source"""
 
-        Settings.dev_print("loading cookies...")
+        Settings.maybe_print("loading cookies...")
         try:
             if os.path.exists(Settings.get_cookies_path()):
                 # must be at onlyfans.com to load cookies of onlyfans.com
@@ -136,29 +136,31 @@ class Driver:
                 file = open(Settings.get_cookies_path(), "rb")
                 cookies = pickle.load(file)
                 file.close()
+                Settings.dev_print("cookies: ")
                 for cookie in cookies:
                     self.browser.add_cookie(cookie)
-                Settings.dev_print("successfully loaded cookies")
+                    Settings.dev_print(cookie)
+                Settings.maybe_print("successfully loaded cookies")
                 self.refresh()
             else: 
-                Settings.dev_print("failed to load cookies, do not exist")
+                Settings.maybe_print("failed to load cookies, do not exist")
         except Exception as e:
-            Settings.dev_print("error loading cookies")
+            Settings.print("error loading cookies!")
             Settings.dev_print(e)
 
     def cookies_save(self):
         """Saves existing web browser cookies to local source"""
 
-        Settings.dev_print("saving cookies...")
+        Settings.maybe_print("saving cookies...")
         try:
             # must be at onlyfans.com to save cookies of onlyfans.com
             self.go_to_home()
             file = open(Settings.get_cookies_path(), "wb")
             pickle.dump(self.browser.get_cookies(), file) # "cookies.pkl"
             file.close()
-            Settings.dev_print("successfully saved cookies")
+            Settings.maybe_print("successfully saved cookies")
         except Exception as e:
-            Settings.dev_print("failed to save cookies")
+            Settings.print("failed to save cookies!")
             Settings.dev_print(e)
 
     ####################
@@ -879,10 +881,10 @@ class Driver:
             Settings.maybe_print("goto -> onlyfans.com")
             try:
                 self.browser.get(ONLYFANS_HOME_URL)
-                element_present = EC.presence_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass()))
-                WebDriverWait(self.browser, 10).until(element_present)
+                # element_present = EC.presence_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass()))
+                # WebDriverWait(self.browser, 10).until(element_present)
             except TimeoutException:
-                Settings.err_print("timed out waiting for page to load!")
+                Settings.dev_print("timed out waiting for page to check login element")
             except WebDriverException as e:
                 Settings.dev_print("error fetching home page")
                 Settings.err_print(e)
@@ -1104,7 +1106,7 @@ class Driver:
             """
 
             try:
-                Settings.dev_print("waiting for logincheck...")
+                Settings.dev_print("waiting for login check...")
                 WebDriverWait(self.browser, 16, poll_frequency=2).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
                 Settings.print("OnlyFans login successful!")
                 Settings.dev_print("login successful - {}".format(which))
@@ -1268,16 +1270,23 @@ class Driver:
                 Driver.error_checker(e)
             return False
 
-        if Settings.get_browser_type() == "reconnect" or Settings.get_browser_type() == "remote" or str(Settings.is_cookies()) == "True":
+
+        # this needs to go after them because they reconnect then need to login check
+        # if Settings.get_browser_type() == "reconnect" or Settings.get_browser_type() == "remote" or 
+
+        if str(Settings.is_cookies()) == "True":
             if loggedin_check():
-                if str(Settings.is_cookies()) == "True":
-                    Settings.maybe_print("successfully logged in from cookies!")
                 self.logged_in = True
                 return True
-            elif str(Settings.is_cookies()) == "True" and Settings.is_debug("tests"):
+            elif str(Settings.is_cookies()) == "True" and str(Settings.is_debug("cookies")) == "True":
                 Settings.err_print("failed to login from cookies!")
+                Settings.set_cookies(False)
                 return False
+            elif str(Settings.is_cookies()) == "True":
+                Settings.set_cookies(False)
+                Settings.maybe_print("failed to login from cookies!")
 
+        Settings.dev_print("attempting login...")
         successful = False
         try:
             if Settings.get_login_method() == "auto":
@@ -1290,14 +1299,12 @@ class Driver:
                 successful = via_twitter()
             elif Settings.get_login_method() == "google":
                 successful = via_google()
-            if not successful:
-                Settings.print("OnlyFans login failed!")
-            self.logged_in = True
-            return True
+            if successful:
+                self.logged_in = True
+                return True
         except Exception as e:
-            Settings.dev_print("login failure")
             Driver.error_checker(e)
-            Settings.print("OnlyFans login failed!")
+        Settings.err_print("OnlyFans login failed!")
         return False
 
     ####################
@@ -2816,10 +2823,13 @@ class Driver:
             SeleniumLogger.setLevel(logging.ERROR)
             logging.getLogger("urllib3").setLevel(logging.ERROR)
             logging.getLogger("requests").setLevel(logging.ERROR)
+            logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.ERROR)
+
             if Settings.get_verbosity() == 3:
                 SeleniumLogger.setLevel(logging.WARNING)
                 logging.getLogger("urllib3").setLevel(logging.WARNING)
                 logging.getLogger("requests").setLevel(logging.WARNING)
+                logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.WARNING)
 
         browser = None
         Settings.print("spawning web browser...")
@@ -2828,17 +2838,29 @@ class Driver:
             Settings.maybe_print("attempting chrome web browser...")
             try:
                 options = webdriver.ChromeOptions()
-                # options.add_argument("--no-sandbox") # Bypass OS security model
-                # options.add_argument('--disable-software-rasterizer')
                 if str(Settings.is_show_window()) == "False":
                     options.add_argument('--headless')
-                # options.add_argument("user-data-dir=selenium") 
-                # options.add_argument('--ignore-certificate-errors')
-                # options.add_argument("--remote-debugging-address=localhost")    
-                # options.add_argument("--remote-debugging-port=9223")
+                options.add_argument("user-data-dir=selenium") # do not disable, required for cookies to work 
                 options.add_argument("--disable-extensions") # disabling extensions
                 options.add_argument("--disable-infobars") # disabling infobars
                 options.add_argument("--allow-insecure-localhost")            
+                options.add_argument("--no-sandbox") # Bypass OS security model
+                # possibly linux only
+                options.add_argument("--disable-dev-shm-usage") # overcome limited resource problems
+                # TODO: to be added to list of removed (if not truly needed by then):
+                # options.add_argument('--disable-software-rasterizer')
+                # options.add_argument('--ignore-certificate-errors')
+                # options.add_argument("--remote-debugging-address=localhost")    
+                # options.add_argument("--remote-debugging-port=9223")
+
+                # https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
+                # options.addArguments("start-maximized"); // open Browser in maximized mode
+                # options.addArguments("disable-infobars"); // disabling infobars
+                # options.addArguments("--disable-extensions"); // disabling extensions
+                # options.addArguments("--disable-gpu"); // applicable to windows os only
+                # options.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
+                # options.addArguments("--no-sandbox"); // Bypass OS security model
+                
                 capabilities = {
                   'browserName': 'chrome',
                   'platform': 'LINUX',
@@ -2852,6 +2874,8 @@ class Driver:
                 service_args = []
                 if Settings.is_debug("google"):
                     service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
+                else:
+                    options.add_experimental_option('excludeSwitches', ['enable-logging'])
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
                 browserAttempt = webdriver.Chrome(options=options, service_args=service_args)

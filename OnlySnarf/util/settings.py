@@ -470,6 +470,7 @@ class Settings:
         if process == "firefox": return config["debug_firefox"]
         elif process == "google": return config["debug_google"]
         elif process == "selenium": return config["debug_selenium"]
+        elif process == "cookies": return config["debug_cookies"]
         # elif process == "tests": return 
         return config["debug"] or False
 
@@ -679,6 +680,9 @@ class Settings:
 
     def set_category(cat):
         config["category"] = cat
+
+    def set_cookies(value):
+        config["cookies"] = value
 
     def set_confirm(value):
         config["confirm"] = value

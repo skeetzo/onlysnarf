@@ -542,13 +542,12 @@
   - more test debugging and finalizing basic OKs
   - browser reconnect reconnects to browser / retains session
   - debugging cookies somewhat saving login session
+  - finished test for cookies; finished debugging cookies
+  - finished debugging browser reconnect completely (maybe)
 
 ------------------------------------------------------------------------------------
 
-- finish test for cookies; finish debugging cookies
-
 - finish debugging schedule (date & time) & poll
-- finish debugging browser reconnect completely
 
 ## Fix / Debug
 
@@ -556,7 +555,6 @@
 
 - driver: schedule hours not being set
 - driver: poll button not being clicked
-
 
 (unlikely to be fixed soon, if ever)
 - google login: unsafe browser warning --> possibly end of usability --> should I just remove this? form login works, twitter login works (i think)
@@ -567,18 +565,19 @@
 
 tests: auth, browsers, ipfs, post, profile, promotion, reconnect, remote, selenium, snarf, xmas
 
+- figure out how to suppress the chrome stacktrace debugging messages
+
 ------------------------------------------------------------------------------------
 
 ## TODO
 
+- finish adding tests
+
 - add tests for messaging: all, recent, favorite, renew on
 - finish tests for individual message entry parts, individual post entry parts
-
 - completely finish debugging basic snarf functionality
-- finish adding tests
 - run full tests suite (or enough of) before uploading working version to pypi
 
-- add github build testing?
 - update / check pypi config 
 https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 https://github.com/atinfo/awesome-test-automation/blob/master/python-test-automation.md
