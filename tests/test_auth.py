@@ -12,6 +12,8 @@ from OnlySnarf.util.settings import Settings
 class TestAuth(unittest.TestCase):
 
     def setUp(self):
+        config["cookies"] = False
+        config["debug_cookies"] = False
         config["keep"] = False
         Settings.set_debug("tests")
         self.driver = Driver()
@@ -20,14 +22,15 @@ class TestAuth(unittest.TestCase):
         self.driver.exit()
 
     def test_login(self):
-        config["cookies"] = False
         assert self.driver.auth(), "unable to login"
-        config["cookies"] = True
+        config["cookies"] = True # saves cookies for next test
 
     def test_login_via_cookies(self):
         config["cookies"] = True
+        config["debug_cookies"] = True
         assert self.driver.auth(), "unable to save login from cookies"
         config["cookies"] = False
+        config["debug_cookies"] = False
 
 ############################################################################################
 

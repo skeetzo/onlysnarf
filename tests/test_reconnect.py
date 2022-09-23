@@ -12,7 +12,6 @@ from OnlySnarf.util.settings import Settings
 class TestSeleniumReconnect(unittest.TestCase):
 
     def setUp(self):
-        # config["cookies"] = True
         config["debug_selenium"] = True
         config["keep"] = True
         # config["show"] = True
@@ -20,10 +19,9 @@ class TestSeleniumReconnect(unittest.TestCase):
         self.driver = Driver()
 
     def tearDown(self):
-        # config["cookies"] = False
         config["debug_selenium"] = False
         config["keep"] = False
-        # config["show"] = False
+        config["show"] = False
         self.driver.exit()
     
     def test_reconnect(self):
