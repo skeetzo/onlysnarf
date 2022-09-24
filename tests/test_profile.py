@@ -14,7 +14,7 @@ class TestProfile(unittest.TestCase):
     def setUp(self):
         self.test_snarf = Snarf()
         Settings.set_debug("tests")
-        Settings.set_prefer_local(False)
+        config["prefer_local"] = False
 
     def tearDown(self):
         self.test_snarf.close()

@@ -2473,6 +2473,7 @@ class Driver:
             year_ = schedule["year"]
             hour_ = schedule["hour"]
             minute_ = schedule["minute"]
+
             Settings.print("Schedule:")
 
             ## TODO: format these better
@@ -2503,63 +2504,45 @@ class Driver:
                     Settings.dev_print("clicked day")
             Settings.dev_print("successfully set day")
             Settings.debug_delay_check()
-            
             # save schedule date
             saves = self.find_element_to_click("scheduleNext")
             Settings.dev_print("found next button, clicking")
             saves.click()
             Settings.dev_print("successfully saved date")
-            # set hours
-            # try:
-            #     hours = self.browser.find_elements(By.CLASS_NAME, "vdatetime-time-picker.vdatetime-time-picker__with-suffix")
-            #     Settings.print(hours)
-            #     for hour in hours:
-            #         Settings.print(hour.get_attribute(By.CLASS_NAME))
-            #         Settings.print(hour.get_attribute("innerHTML"))
-            # except Exception as e:
-            #     Settings.print(e)
-
-                # try:
-                #     Settings.print(2)
-                #     hours = self.browser.find_elements(By.CLASS_NAME, "vdatetime-time-picker__list--hours")
-                #     Settings.print(hours)
-                #     for hour in hours:
-                #         Settings.print(hour.get_attribute(By.CLASS_NAME))
-                #         Settings.print(hour.get_attribute("innerHTML"))
-                # except Exception as e:
-                #     Settings.print(e)
-
-
-                # return False
-
+            
             Settings.dev_print("setting hours")
             hours = self.find_elements_by_name("scheduleHours")
             # this finds both hours and minutes so just cut off first 12
             hours = hours[:12]
-            for hour in hours:
-                inner = hour.get_attribute("innerHTML")
-                if str(hour_) in str(inner) and hour.is_enabled():
-                    hour.click()
-                    Settings.dev_print("successfully set hours")
-                    break
+            self.browser.execute_script("arguments[0].scrollIntoView();", hours[0])
+            action = ActionChains(self.browser)
+            action.click(on_element=hours[1]) # start from offset
+            if int(hour_) > 12: hour_ = int(hour_) - 12
+            for n in range(int(hour_)):
+                action.send_keys(Keys.DOWN)
+            action.click()
+            action.perform()
+
             # set minutes
             Settings.dev_print("setting minutes")
             minutes = self.find_elements_by_name("scheduleMinutes")
-            # and get ones after first 12 hours
+            # get elements after first 12 which are hours
             minutes = minutes[12:]
-            for minute in minutes:
-                inner = minute.get_attribute("innerHTML")
-                if str(minute_) in str(inner) and minute.is_enabled():
-                    minute.click()
-                    Settings.dev_print("successfully set minutes")
-                    break
+            self.browser.execute_script("arguments[0].scrollIntoView();", minutes[0])
+            action = ActionChains(self.browser)
+            action.click(on_element=minutes[1]) # start from offset
+            for n in range(int(minute_)):
+                action.send_keys(Keys.DOWN)
+            action.click()
+            action.perform()
+
             # set am/pm
             Settings.dev_print("setting suffix")
             # suffixes = self.find_elements_by_name("scheduleAMPM")
             suffixes = self.find_elements_by_name("scheduleMinutes")
             for suffix in suffixes:
                 inner = suffix.get_attribute("innerHTML")
-                if str(schedule["suffix"]).lower() in str(inner).lower() and suffix.is_enabled():
+                if str(schedule["suffix"]).lower() in str(inner).lower() and not suffix.is_enabled():
                     suffix.click()
                     Settings.dev_print("successfully set suffix")
                     break
