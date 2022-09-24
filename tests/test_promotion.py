@@ -13,7 +13,7 @@ class TestPromotion(unittest.TestCase):
 
     def setUp(self):
         Settings.set_debug("tests")
-        Settings.set_prefer_local(True)
+        config["prefer_local"] = False
         self.test_snarf = Snarf()
 
     def tearDown(self):

@@ -24,25 +24,20 @@ class Schedule:
     def init(self):
         if self._initialized_: return
         Settings.dev_print("initiliazing schedule...")
-
-        date = self.get_date()
-        time = self.get_time()
-        
-        if "am" in str(time).lower(): self.suffix = "am"
-        elif "pm" in str(time).lower(): self.suffix = "pm"
-
-        date = datetime.strptime(str(date), DEFAULT.DATE_FORMAT)
-        
+        schedule = Settings.get_schedule()
+        if "am" in str(schedule).lower(): self.suffix = "am"
+        elif "pm" in str(schedule).lower(): self.suffix = "pm"
+        date = datetime.strptime(str(schedule), DEFAULT.SCHEDULE_FORMAT)
         self.year = date.year
         self.month = date.strftime("%B")
         self.day = date.day
         self.hour = date.hour
         self.minute = date.minute
-        # Settings.maybe_print("year: {}".format(self.year))
-        # Settings.maybe_print("month: {}".format(self.month))
-        # Settings.maybe_print("day: {}".format(self.day))
-        # Settings.maybe_print("hour: {}".format(self.hour))
-        # Settings.maybe_print("minutes: {}".format(self.minute))
+        Settings.dev_print("year: {}".format(self.year))
+        Settings.dev_print("month: {}".format(self.month))
+        Settings.dev_print("day: {}".format(self.day))
+        Settings.dev_print("hour: {}".format(self.hour))
+        Settings.dev_print("minutes: {}".format(self.minute))
         Settings.dev_print("initiliazed schedule")
         self._initialized_ = True
 

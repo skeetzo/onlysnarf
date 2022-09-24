@@ -544,14 +544,17 @@
   - debugging cookies somewhat saving login session
   - finished test for cookies; finished debugging cookies
   - finished debugging browser reconnect completely (maybe)
+**4.3.2 : 9/22/2022**
+  - mostly finished debugging schedule
+  - preparing for pypi upload version bump
+  - almost done completely debugging basic snarf functionality
 
 ------------------------------------------------------------------------------------
 
-- finish debugging schedule (date & time) & poll
+- finish debugging schedule (date & time)
+- finish debugging poll
 
 ## Fix / Debug
-
-- schedule takes an obscenely long time
 
 - driver: schedule hours not being set
 - driver: poll button not being clicked
@@ -569,24 +572,23 @@ tests: auth, browsers, ipfs, post, profile, promotion, reconnect, remote, seleni
 
 ------------------------------------------------------------------------------------
 
+- run full tests suite (or enough of) before uploading working version to pypi
+--> all work except for schedule (& poll?)
+
+- completely finish debugging basic snarf functionality
+--> sync with main/master branch, upload new version to pypi
+
 ## TODO
 
-- finish adding tests
-
-- add tests for messaging: all, recent, favorite, renew on
-- finish tests for individual message entry parts, individual post entry parts
-- completely finish debugging basic snarf functionality
-- run full tests suite (or enough of) before uploading working version to pypi
+- finish adding tests for individual circumstances:
+messaging: all, recent, favorite, renew on
+individual message entry parts, individual post entry parts
 
 - update / check pypi config 
 https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 https://github.com/atinfo/awesome-test-automation/blob/master/python-test-automation.md
 https://www.the-analytics.club/python-auto-run-tests
 https://medium.com/swlh/automate-python-testing-with-github-actions-7926b5d8a865
-https://pypi.org/project/configuration/
-https://pypi.org/project/pkgconfig/
-https://pypi.org/project/config/
-
 
 (once downloads and uploads function again)
 - clean up classes/files to keep up with gutting google, etc in exchange for ipfs
