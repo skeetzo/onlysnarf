@@ -1,6 +1,7 @@
 # apt-get install python3-venv
-python3.8 -m pip install --user virtualenv
-python3.8 -m venv venv
+python3 -m pip install --upgrade pip setuptools wheel build
+python3 -m pip install --user virtualenv
+python3 -m venv venv
 wait
 source venv/bin/activate
 pip install --upgrade pip
