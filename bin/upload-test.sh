@@ -5,4 +5,4 @@ fi
 bin/save.sh
 wait
 python -m build
-twine upload -r testpypi dist/*
+twine upload --verbose -r testpypi dist/*
