@@ -1,113 +1,37 @@
 # OnlySnarf
 
-`pip3 install OnlySnarf`  
+`python3 -m pip install OnlySnarf`  
 or  
-`git clone git@github.com:skeetzo/onlysnarf && sudo python3 setup.py install`
+`git clone git@github.com:skeetzo/onlysnarf && python3 setup.py install`
 
 ## Description
 
-OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans. OnlySnarf is capable of downloading a file (image or video) or gallery of files (images) locally or from a remote location such as a [local or remote file system, Google Drive, ...] to upload to an OnlyFans account.
+OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans by interacting with the site via web scraping. OnlySnarf carries no weapons, but he has been known to use his tail, teeth and claws.
 
-## Menu
-[Menu](https://github.com/skeetzo/onlysnarf/blob/master/menu.md)
+Previous versions included the ability to download/upload from Google Drive. I have decided to drop Drive in favor of IPFS (which will be available in whichever next major version). A majority of previously funtional operations remain untested after a code "cleanup" including the original menu feature (the first part initially built). Currently, the only reliable / working way to upload is with locally available files. The runtime command has changed as well dropping the "py" previously meant to distinguish it from the menu. For example:
 
-## Previews
-![preview](https://github.com/skeetzo/onlysnarf/blob/master/images/preview.jpeg)
-[Gallery](https://github.com/skeetzo/onlysnarf/blob/master/images/gallery.gif)
-[Video](https://github.com/skeetzo/onlysnarf/blob/master/images/video.gif)
-[Discount](https://github.com/skeetzo/onlysnarf/blob/master/images/discount-recent.gif)
-[Message](https://github.com/skeetzo/onlysnarf/blob/master/images/message-recent-debug.gif)
-
-## Scripts
-First run:  
-  * `(sudo) onlysnarf-config`
-Then from within project's OnlySnarf directory either:  
-  * `(sudo) onlysnarf [args]`
-  * `(sudo) onlysnarfpy (-debug) -category image|gallery|video`
-  * or directly via `python3 onlysnarf.py (-debug) -category image|gallery|video`
-
-## args
-
--debug  
-  `python3 onlysnarf.py -debug`  
-Tests configuration. Does not upload or remove from file source.
-
--category image  
-  `python3 onlysnarf.py -category image`  
-Uploads an image labeled: 'imageName - %d%m%y'  
-
--category gallery  
-  `python3 onlysnarf.py -category gallery`  
-Uploads a gallery labeled: 'folderName - %d%m%y'  
-
--category video  
-  `python3 onlysnarf.py -category video`  
-Uploads a video labeled: 'folderName - %d%m%y'  
-
--text  
-  `python3 onlysnarf.py -category video -text "your mom"`  
-Uploads a video labeled: 'your mom'  
-
--show
-  `python3 onlysnarf.py -show`
-Shows the browser
-
-**more available in menu**
-
-Or include a 'config.conf' file located at '/opt/onlysnarf/config.conf' to set variables at runtime without using arguments. An example file has been provided. Please be sure to follow the key:value pattern. A starting # denotes a comment.
-
-## Google Authentication  
---------------
-When downloading/uploading from a Google Drive account this package requires configuring a Google App with *PyDrive* for access to your Google Drive. The Drive API requires OAuth2.0 for authentication.
-###### from [Auth Quickstart](https://raw.githubusercontent.com/gsuitedevs/PyDrive/master/docs/quickstart.rst)
-1. Go to `APIs Console`_ and make your own project.
-2. Search for 'Google Drive API', select the entry, and click 'Enable'.
-3. Select 'Credentials' from the left menu, click 'Create Credentials', select 'OAuth client ID'.
-4. Now, the product name and consent screen need to be set -> click 'Configure consent screen' and follow the instructions. Once finished:
-
- a. Select 'Application type' to be *Web application*.
- b. Enter an appropriate name.
- c. Input *http://localhost:8080* for 'Authorized JavaScript origins'.
- d. Input *http://localhost:8080/* for 'Authorized redirect URIs'.
- e. Click 'Create'.
-
-5. Click 'Download JSON' on the right side of Client ID to download **client_secret_<really long ID>.json**.
-
-**Rename the file to "client_secrets.json" and place it into your installed OnlySnarf directory.**
-To update your installation with the new file, run `onlysnarf-config`, select 'Update Google Creds', and enter the location of your "client_secret.json" file.
+`onlysnarf -text "balls" /path/to/image.jpeg`
 
 ## Config
-##### config.conf  
-Path: /opt/onlysnarf/config.conf (previously /etc/onlysnarf/config.conf)
-Create or update the "config.conf" file with the following values:
-  * username -> the Twitter connected to your OnlyFans's username  
-  * password -> the Twitter conencted to your OnlyFans's password  
+The config process has been updated as well from the previous format. There are now 2 main config files that should be created:
+1) the config for the general app behavior
+2) one for each user w/ their credentials
 
-###### Why Twitter credentials?
-OnlyFans uses a captcha to prevent malicious bots from accessing user accounts. However, this captcha is only necessary when logging in with your OnlyFans username and password. Logging in with the provided Twitter authentication does not provide a captcha and thus allows a more accessible automated entrance.
+The config files are located in the private OnlySnarf home directory: `$HOME/.onlysnarf/`  
+The general config file should be located at: `$HOME/.onlysnarf/config.conf`  
+All user configs should be located at: `$HOME/.onlysnarf/users/`  
+For example: `$HOME/.onlysnarf/users/alexdicksdown.conf`  
 
-##### google_creds.txt   
-Generated by Google Drive's authentication process. Saves Google authentication for repeat access.
-
-##### settings.yaml  
-Used to facilitate Google Drive's python authentication. Requires generating an app w/ credentials via Google Console. Credentials are authenticated once and then saved to "google_creds.txt".
-
-## Example Crons  
-
-Upload a random image once a day at noon:  
-  `* 12 * * * onlysnarfpy -category image`
-
-Upload a random gallery of images every Wednesday at 2:30pm:  
-  `30 14 * * 3 onlysnarfpy -category gallery`
-
-Upload a random video every Friday in the month of June at 6:00pm:  
-  `00 18 * 6 5 onlysnarfpy -category video`
-
-Text will be generated if not provided with `-text`
-  `* 12 * * * onlysnarfpy -category image -text "Your mother is a dirty whore"`
+**Why Twitter credentials?**
+OnlyFans uses a captcha to prevent malicious bots from accessing user accounts. However, this captcha is only necessary when logging in with your OnlyFans username and password. Logging in with the provided Twitter authentication does not provide a captcha and thus allows a more accessible automated entrance. Once logged in, saving cookies will enable sessions to be remembered thus skipping any future login checks.
 
 ## Dependencies
-  ### Google Chrome -> `sudo apt install -y google-chrome-beta`
+Selenium requires either Google Chrome or Firefox which can be installed with their respective install-* scripts in /bin. The chromedriver binary is installed with the package, however, due to being a bunch of finnicky bitches the install scripts are available to ensure proper installation and operation (I mostly have no idea what I'm doing anyways so it's safer this way).
+
+Running `bin/install-google.sh` should result in matching version numbers. If they do not, the browser may fail to spawn properly.
+
+## Menu
+Please refer to here for help with the available arguments and config settings: [Menu](https://github.com/skeetzo/onlysnarf/blob/master/menu.md)
 
 ## Referral
 Feel free to make use of my referral code ;)  

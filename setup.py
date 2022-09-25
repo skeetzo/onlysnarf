@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="4.3.2",
+    version="4.3.3",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
@@ -34,14 +34,14 @@ setuptools.setup(
         ],
     entry_points={
         'console_scripts' : [
-            'onlysnarf = OnlySnarf.menu:main',
-            'snarf = OnlySnarf.snarf:main'
+            'snarf = OnlySnarf.menu:main',
+            'onlysnarf = OnlySnarf.snarf:main'
         ]
     },
     classifiers=[
         'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'Topic :: System :: Shells',
+        'Intended Audience :: End Users/Desktop',
+        'Topic :: System :: Emulators',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.8',
         "Operating System :: OS Independent"
