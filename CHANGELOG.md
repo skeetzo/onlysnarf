@@ -544,10 +544,13 @@
   - debugging cookies somewhat saving login session
   - finished test for cookies; finished debugging cookies
   - finished debugging browser reconnect completely (maybe)
-**4.3.2 : 9/22/2022**
+  **4.3.2 : 9/22/2022**
   - mostly finished debugging schedule
   - preparing for pypi upload version bump
   - almost done completely debugging basic snarf functionality
+**4.3.3 : 9/24/2022**
+  - updated readme
+  - update & test pypi upload process
 
 ------------------------------------------------------------------------------------
 
@@ -571,6 +574,9 @@ tests: auth, browsers, ipfs, post, profile, promotion, reconnect, remote, seleni
 - figure out how to suppress the chrome stacktrace debugging messages
 
 ------------------------------------------------------------------------------------
+
+- update previews; readd to readme
+- add snarf pic to readme
 
 - run full tests suite (or enough of) before uploading working version to pypi
 --> all work except for schedule (& poll?)
@@ -658,9 +664,8 @@ https://medium.com/swlh/automate-python-testing-with-github-actions-7926b5d8a865
 
 # Web Browser Versions
 
-geckodriver: 0.31.0
-
 Version Check:
 stable => Google Chrome 106.0.5249.40 beta
 beta => Google Chrome 106.0.5249.40 beta
 binary => Version: 106.0.5249.21.0
+geckodriver => geckodriver 0.31.0 (b617178ef491 2022-04-06 11:57 +0000)
