@@ -2,6 +2,7 @@
 if [ -z "$1" ]; then
 	set "upload"
 fi
+python -m pip freeze
 bin/save.sh
 wait
 python -m build

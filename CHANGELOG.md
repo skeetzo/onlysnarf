@@ -551,77 +551,49 @@
 **4.3.3 : 9/24/2022**
   - updated readme
   - update & test pypi upload process
+  - updated / checked pypi config
+  - mostly finished / updated tests: all OKs
 
 ------------------------------------------------------------------------------------
-
-- finish debugging schedule (date & time)
-- finish debugging poll
-
-## Fix / Debug
 
 - driver: schedule hours not being set
 - driver: poll button not being clicked
-
-(unlikely to be fixed soon, if ever)
-- google login: unsafe browser warning --> possibly end of usability --> should I just remove this? form login works, twitter login works (i think)
--- maybe just cut out / leave as is until can debug "unsafe browser" issue?
-
-- debug: discover the cause of the super slow web scraping
--- not: debug_delay
-
-tests: auth, browsers, ipfs, post, profile, promotion, reconnect, remote, selenium, snarf, xmas
-
 - figure out how to suppress the chrome stacktrace debugging messages
-
-------------------------------------------------------------------------------------
-
-- update previews; readd to readme
-- add snarf pic to readme
-
-- run full tests suite (or enough of) before uploading working version to pypi
---> all work except for schedule (& poll?)
-
-- completely finish debugging basic snarf functionality
---> sync with main/master branch, upload new version to pypi
 
 ## TODO
 
-- finish adding tests for individual circumstances:
-messaging: all, recent, favorite, renew on
-individual message entry parts, individual post entry parts
+(getting ready for new pypi release)
+- finish debugging schedule (date & time)
+- finish debugging poll
+- completely finish debugging basic snarf functionality
+- add snarf pic to readme
+- update previews of behavior for readme
+- run full tests suite before final upload to pypi
+(ready for new pypi release)
+- sync with main/master branch
+- upload working changes to pypi
 
-- update / check pypi config 
-https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-https://github.com/atinfo/awesome-test-automation/blob/master/python-test-automation.md
-https://www.the-analytics.club/python-auto-run-tests
-https://medium.com/swlh/automate-python-testing-with-github-actions-7926b5d8a865
-
-(once downloads and uploads function again)
+(more cleanup before IPFS)
+- finish cleaning up class/user
+- finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleanuping up code
 - clean up classes/files to keep up with gutting google, etc in exchange for ipfs
 - change deletion behavior to preserve better
 - update: backup function to include original folder name -> posted/galleries/$file
 - add to upload scheme (probably also as a config value): least to greatest (folder sizes)
 - add tests for additional config variables such as browser and image options
 
-- upload working changes to pypi
-
 ------------------------------------------------------------------------------------
 
-- finish cleaning up class/user
-- finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleanuping up code
-- finish xmas tests
-- finish / update tests
-- fix any new cli menu errors made while updating major processes
-- add tests that include variations of variables such as image limits, download limits, upload limits, 
-
-(once successfully done testing uploading a file, otherwise pointless endeavor)
 -> IPFS
 - add IPFS integration; dev scripts
 - add to "source" variable "ipfs" for sourcing from IPFS 
 - add to "backup" variable "ipfs" for uploading content to IPFS to host / backup / disseminate
 - integrate IPFS process in such a way as to not "offend" via links ergo pull from IPFS -> upload to OnlyFans (etc) 
 
-(review usability and code)
+-> CLI
+- fix any new cli menu errors made while updating major processes
+
+(review usability and code first)
 -> Profile
 - new - setup - Twitter -> profile, banner; Price and Settings
 - new - advertise
@@ -630,7 +602,7 @@ https://medium.com/swlh/automate-python-testing-with-github-actions-7926b5d8a865
 - add config for profile templates when testing profile features again
 - add tests for profile integration / behavior
 
-(once app works again)
+(once everything else in app works again)
 -> Twitter
 - needs a dummy account to test actual tweeting w/
 - tweet reminders from inlaid config behavior
@@ -639,12 +611,22 @@ https://medium.com/swlh/automate-python-testing-with-github-actions-7926b5d8a865
 -- add checks for previously existing tweets
 -- keep track of tweets (somehow)
 
-- add quiz & target (onlyfans buttons)
+-> OnlyFans
+- add quiz & target interactions (onlyfans buttons)
 
-(after python version upgraded to 3.10+)
-- possibly use switch statement in lib/driver
+-> Tests
+- finish adding tests for individual circumstances:
+messaging: all, recent, favorite, renew on
+individual message entry parts, individual post entry parts
 
-------------------------------------------------------------------------------------  
+## Fix / Debug
+
+(unlikely to be fixed soon, if ever)
+- google login: unsafe browser warning --> possibly end of usability --> should I just remove this? form login works, twitter login works (i think)
+-- maybe just cut out / leave as is until can debug "unsafe browser" issue?
+
+- debug: discover the cause of the super slow web scraping
+-- probably not: debug_delay
 
 # Bugs
 
