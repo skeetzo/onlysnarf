@@ -9,11 +9,12 @@ from OnlySnarf.util.settings import Settings
 from OnlySnarf.snarf import Snarf
 
 today = datetime.datetime.now()
-tomorrow = today + datetime.timedelta(days=1, hours=13, minutes=1)
+tomorrow = today + datetime.timedelta(days=1, hours=13, minutes=10)
 
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
+        config["keep"] = True
         config["text"] = "test balls"
         Settings.set_debug("tests")
         self.test_snarf = Snarf()
@@ -23,6 +24,7 @@ class TestSnarf(unittest.TestCase):
         config["date"] = DEFAULT.DATE
         config["time"] = DEFAULT.TIME
         self.test_snarf.close()
+        config["keep"] = False
 
     # @unittest.skip("works")
     def test_schedule(self):
@@ -36,8 +38,7 @@ class TestSnarf(unittest.TestCase):
 
     @unittest.skip("todo")
     def test_schedule_time(self):
-        time = today + datetime.timedelta(hours=1)
-        config["time"] = time.strftime(DEFAULT.TIME_FORMAT)
+        config["time"] = tomorrow.strftime(DEFAULT.TIME_FORMAT)
         assert self.test_snarf.post(), "unable to post schedule via time"
 
     @unittest.skip("todo")

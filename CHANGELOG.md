@@ -531,14 +531,14 @@
     - added tests for trying different browsers, reconnecting, keeping open, remote sessions
     - schedule tests pass they just don't set the right hour
     - major snarf tests all OK (minus poll)
-  **4.3.0 : 9/20/2022, 9/21/2022**
+**4.3.0 : 9/20/2022, 9/21/2022**
   - updated selenium, google chrome, & firefox geckodriver versions
   - driver updates to accomodate selenium version changes
   - changed Driver back to a basic class instead of all static, needs more debugging (again)
   - more individual tests for messages
   - mostly OK on basic tests
   - reconnect works again for chrome
-**4.3.1 : 9/22/2022**
+  **4.3.1 : 9/22/2022**
   - more test debugging and finalizing basic OKs
   - browser reconnect reconnects to browser / retains session
   - debugging cookies somewhat saving login session
@@ -553,6 +553,7 @@
   - update & test pypi upload process
   - updated / checked pypi config
   - mostly finished / updated tests: all OKs
+  - reorganized tests for grouping
 
 ------------------------------------------------------------------------------------
 
