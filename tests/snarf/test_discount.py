@@ -10,22 +10,21 @@ from OnlySnarf.snarf import Snarf
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
-        config["text"] = "test balls"
+        config["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT
+        config["months"] = DEFAULT.DISCOUNT_MAX_MONTHS
+        config["user"] = "random"
         Settings.set_debug("tests")
         self.test_snarf = Snarf()
 
     def tearDown(self):
-        config["duration"] = None
-        config["expiration"] = 0
-        config["questions"] = []
+        config["amount"] = 0
+        config["months"] = 0
+        config["user"] = None
         self.test_snarf.close()
 
-    def test_poll(self):
-        config["duration"] = DEFAULT.DURATION_ALLOWED[-1]
-        config["expiration"] = 999
-        config["questions"] = ["suck","my","dick","please?"]
-        assert self.test_snarf.post(), "unable to post poll"
-
+    def test_discount(self):
+        assert self.test_snarf.discount(), "unable to apply discount"
+        
 ############################################################################################
 
 if __name__ == '__main__':

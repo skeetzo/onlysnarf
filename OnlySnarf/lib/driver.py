@@ -139,7 +139,6 @@ class Driver:
                 Settings.dev_print("cookies: ")
                 for cookie in cookies:
                     self.browser.add_cookie(cookie)
-                    Settings.dev_print(cookie)
                 Settings.maybe_print("successfully loaded cookies")
                 self.refresh()
             else: 
@@ -192,6 +191,7 @@ class Driver:
             Settings.err_print("missing discount")
             return False
         Settings.dev_print("discounting user...")
+        self.auth()
         try:
             discount.get()
             months = int(discount.get_months())
@@ -2516,10 +2516,11 @@ class Driver:
             hours = hours[:12]
             self.browser.execute_script("arguments[0].scrollIntoView();", hours[0])
             action = ActionChains(self.browser)
-            action.click(on_element=hours[1]) # start from offset
+            action.click(on_element=hours[0]) # start from offset
             if int(hour_) > 12: hour_ = int(hour_) - 12
             for n in range(int(hour_)):
                 action.send_keys(Keys.DOWN)
+                time.sleep(0.5)
             action.click()
             action.perform()
 
@@ -2530,9 +2531,10 @@ class Driver:
             minutes = minutes[12:]
             self.browser.execute_script("arguments[0].scrollIntoView();", minutes[0])
             action = ActionChains(self.browser)
-            action.click(on_element=minutes[1]) # start from offset
+            action.click(on_element=minutes[0]) # start from offset
             for n in range(int(minute_)):
                 action.send_keys(Keys.DOWN)
+                time.sleep(0.5)
             action.click()
             action.perform()
 
@@ -2823,7 +2825,7 @@ class Driver:
                 options = webdriver.ChromeOptions()
                 if str(Settings.is_show_window()) == "False":
                     options.add_argument('--headless')
-                options.add_argument("user-data-dir=selenium") # do not disable, required for cookies to work 
+                options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
                 options.add_argument("--disable-extensions") # disabling extensions
                 options.add_argument("--disable-infobars") # disabling infobars
                 options.add_argument("--allow-insecure-localhost")            
@@ -2882,7 +2884,7 @@ class Driver:
                 Settings.print("You must run `onlysnarf` as non-root for Firefox to work correctly!")
                 return False
             try:
-                d = DesiredCapabilities.FIREFOX
+                # d = DesiredCapabilities.FIREFOX
                 options = FirefoxOptions()
                 if Settings.is_debug("firefox") == "True":
                     options.log.level = "trace"
@@ -2896,7 +2898,9 @@ class Driver:
 
                 # browserAttempt = webdriver.Firefox(options=options, log_path='/var/log/onlysnarf/geckodriver.log')
                 # browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, capabilities=d)
-                browserAttempt = webdriver.Firefox(options=options, desired_capabilities=d, service_log_path=Settings.get_logs_path("firefox"))
+                browserAttempt = webdriver.Firefox(options=options, service_log_path=Settings.get_logs_path("firefox"))
+                # browserAttempt = webdriver.Firefox(options=options, desired_capabilities=d) 
+                # browserAttempt = webdriver.Firefox(options=options) 
                 if str(Settings.is_show_window()) == "False":
                     Settings.print("browser created - firefox (headless)")                    
                 else:
@@ -3751,7 +3755,7 @@ def parse_users(user_ids, starteds, users, usernames):
                 user_ids_.append(user_ids[i].get_attribute("href"))
         for i in range(len(starteds)):
             text = starteds[i].get_attribute("innerHTML")
-            match = re.findall("Started.*([A-Za-z]{3}\s[0-9]{1,2},\s[0-9]{4})", text)
+            match = re.findall("Started.*([A-Za-z]{3}\\s[0-9]{1,2},\\s[0-9]{4})", text)
             if len(match) > 0:
                 starteds_.append(match[0])
         if len(user_ids_) == 0:
