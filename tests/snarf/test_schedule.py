@@ -16,37 +16,41 @@ class TestSnarf(unittest.TestCase):
     def setUp(self):
         config["keep"] = True
         config["text"] = "test balls"
+        config["schedule"] = DEFAULT.SCHEDULE
+        config["date"] = DEFAULT.DATE
+        config["time"] = DEFAULT.TIME
         Settings.set_debug("tests")
         self.test_snarf = Snarf()
 
     def tearDown(self):
-        config["schedule"] = DEFAULT.SCHEDULE
-        config["date"] = DEFAULT.DATE
-        config["time"] = DEFAULT.TIME
         self.test_snarf.close()
-        config["keep"] = False
 
-    # @unittest.skip("works")
     def test_schedule(self):
         config["schedule"] = tomorrow.strftime(DEFAULT.SCHEDULE_FORMAT)
         assert self.test_snarf.post(), "unable to post schedule"
         
-    @unittest.skip("todo")
     def test_schedule_date(self):
         config["date"] = tomorrow.strftime(DEFAULT.DATE_FORMAT)
         assert self.test_snarf.post(), "unable to post schedule via date"
 
-    @unittest.skip("todo")
     def test_schedule_time(self):
-        config["time"] = tomorrow.strftime(DEFAULT.TIME_FORMAT)
+        config["time"] = (today + datetime.timedelta(hours=3, minutes=30)).strftime(DEFAULT.TIME_FORMAT)
         assert self.test_snarf.post(), "unable to post schedule via time"
+
+    ## TODO:
+    # verify correct values by getting values of selected components:
+        # vdatetime-calendar__current--month
+    #     day, month, year: class="vdatetime-calendar__month__day vdatetime-calendar__month__day--selected"
+    #     vdatetime-time-picker__item vdatetime-time-picker__item--selected
 
     @unittest.skip("todo")
     def test_schedule_calendar_day(self):
         pass
+
     @unittest.skip("todo")
     def test_schedule_calendar_hour(self):
         pass
+
     @unittest.skip("todo")
     def test_schedule_calendar_minute(self):
         pass

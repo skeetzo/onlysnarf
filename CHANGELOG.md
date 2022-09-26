@@ -548,24 +548,29 @@
   - mostly finished debugging schedule
   - preparing for pypi upload version bump
   - almost done completely debugging basic snarf functionality
-**4.3.3 : 9/24/2022**
+  **4.3.3 : 9/24/2022**
   - updated readme
   - update & test pypi upload process
   - updated / checked pypi config
   - mostly finished / updated tests: all OKs
   - reorganized tests for grouping
+**4.3.4 : 9/26/2022**
+  - fixed driver: schedule hours not being set now work again
+  - reorganized schedule in prep for individual component testing
+  - finished debugging schedule (date & time)
 
 ------------------------------------------------------------------------------------
 
-- driver: schedule hours not being set
 - driver: poll button not being clicked
+- finish debugging poll
+
 - figure out how to suppress the chrome stacktrace debugging messages
 
 ## TODO
 
+- update cookie process to specifically retain a login session above anything else; prevent overwrites
+
 (getting ready for new pypi release)
-- finish debugging schedule (date & time)
-- finish debugging poll
 - completely finish debugging basic snarf functionality
 - add snarf pic to readme
 - update previews of behavior for readme
@@ -590,6 +595,9 @@
 - add to "source" variable "ipfs" for sourcing from IPFS 
 - add to "backup" variable "ipfs" for uploading content to IPFS to host / backup / disseminate
 - integrate IPFS process in such a way as to not "offend" via links ergo pull from IPFS -> upload to OnlyFans (etc) 
+
+(preferably after additional developments like IPFS)
+- separate driver functions into individual components ala schedule --> individual steps; for easier testing (and to clean up the giant ass driver file)
 
 -> CLI
 - fix any new cli menu errors made while updating major processes

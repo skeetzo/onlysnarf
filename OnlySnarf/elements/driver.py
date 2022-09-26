@@ -268,7 +268,7 @@ ELEMENTS = [
     # schedule hours
     {
         "name": "scheduleHours",  
-        "classes": ["vdatetime-time-picker__item.vdatetime-time-picker__item", "button.vdatetime-time-picker__item.vdatetime-time-picker__item"],
+        "classes": ["vdatetime-time-picker__list--hours", "vdatetime-time-picker__item.vdatetime-time-picker__item", "button.vdatetime-time-picker__item.vdatetime-time-picker__item"],
         "text": [],
         "id": []
     },
@@ -290,7 +290,7 @@ ELEMENTS = [
     {
         "name": "scheduleSave",
         "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded", "button.g-btn.m-rounded"],
-        "text": ["Save"],
+        "text": ["OK"],
         "id": []
     },
     # schedule cancel
@@ -498,6 +498,16 @@ ELEMENTS = [
         "text": ["Copy trial link"],
         "id": [],
     },
+
+
+    {
+        "name": "postCancel",
+        "classes": ["m-btn-clear-draft.g-btn.m-border.m-rounded.m-sm-width.m-reset-width"],
+        "text": ["Clear"],
+        "id": [],
+    },
+
+
     {
         "name": "userOptions",
         "classes": ["btn.dropdown-toggle.btn-link"],

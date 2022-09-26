@@ -25,19 +25,22 @@ class Schedule:
         if self._initialized_: return
         Settings.dev_print("initiliazing schedule...")
         schedule = Settings.get_schedule()
-        if "am" in str(schedule).lower(): self.suffix = "am"
-        elif "pm" in str(schedule).lower(): self.suffix = "pm"
         date = datetime.strptime(str(schedule), DEFAULT.SCHEDULE_FORMAT)
         self.year = date.year
         self.month = date.strftime("%B")
         self.day = date.day
         self.hour = date.hour
         self.minute = date.minute
+        self.suffix = "am"
+        if int(self.hour) > 12:
+            self.suffix = "pm"
+            self.hour = int(self.hour) - 12
         Settings.dev_print("year: {}".format(self.year))
         Settings.dev_print("month: {}".format(self.month))
         Settings.dev_print("day: {}".format(self.day))
         Settings.dev_print("hour: {}".format(self.hour))
         Settings.dev_print("minutes: {}".format(self.minute))
+        Settings.dev_print("suffix: {}".format(self.suffix))
         Settings.dev_print("initiliazed schedule")
         self._initialized_ = True
 
