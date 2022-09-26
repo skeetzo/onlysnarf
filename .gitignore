@@ -25,6 +25,7 @@ yarn-error.log*
 
 /venv
 __pycache__
+.pytest_cache
 
 OnlySnarf/conf/users/alexdicksdown.conf
 log/

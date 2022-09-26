@@ -558,23 +558,28 @@
   - fixed driver: schedule hours not being set now work again
   - reorganized schedule in prep for individual component testing
   - finished debugging schedule (date & time)
+  - fixed driver: poll button not being clicked and rest of poll functionality
+  - finished debugging poll
+  - updated cookie process to check if logged in from session data before overwriting existing cookies and re logging in
+
 
 ------------------------------------------------------------------------------------
 
-- driver: poll button not being clicked
-- finish debugging poll
+- add text clear from post to message
+- fix message price not entering 
+
+- completely finished debugging basic snarf functionality
+- run full tests suite before final upload to pypi
 
 - figure out how to suppress the chrome stacktrace debugging messages
 
 ## TODO
 
-- update cookie process to specifically retain a login session above anything else; prevent overwrites
+- fix firefox: DeprecationWarning: service_log_path has been deprecated, please pass in a Service object
 
 (getting ready for new pypi release)
-- completely finish debugging basic snarf functionality
 - add snarf pic to readme
 - update previews of behavior for readme
-- run full tests suite before final upload to pypi
 (ready for new pypi release)
 - sync with main/master branch
 - upload working changes to pypi

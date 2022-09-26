@@ -30,22 +30,22 @@ python setup.py install && python tests/test_ipfs.py
 # Pass:
 
 ## Selenium:
+# auth
 # browsers
 # reconnect
 
 ## Snarf:
-# auth
 # discount
 # message
 # post (basic)
+# post - schedule, date, time
+# post - poll
 # users
 
 #############################################################################
 
 # Fail
 
-# post - schedule, date, time
-# post - poll (?)
 
 #############################################################################
 

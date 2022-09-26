@@ -167,7 +167,7 @@ ELEMENTS = [
     # poll save duration
     {
         "name": "pollSave",
-        "classes": ["g-btn.m-transparent-bg", "g-btn.m-rounded", "button.g-btn.m-rounded"],
+        "classes": ["g-btn.m-flat.m-btn-gaps.m-reset-width"],
         "text": ["Save"],
         "id": []
     },

@@ -13,7 +13,6 @@ class TestSnarf(unittest.TestCase):
         config["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["text"] = "test balls"
-        # config["keep"] = True
         Settings.set_debug("tests")
         self.test_snarf = Snarf()
 
@@ -21,7 +20,6 @@ class TestSnarf(unittest.TestCase):
         config["input"] = []
         config["price"] = 0
         self.test_snarf.close()
-        # config["keep"] = False
 
     def test_post(self):
         assert self.test_snarf.post(), "unable to post"

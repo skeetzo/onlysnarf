@@ -1758,70 +1758,49 @@ class Driver:
         """
 
         if str(poll) == "None" or not poll: return True
-        duration = poll["duration"]
-        questions = poll["questions"]
         try:
             Settings.print("Poll:")
-            Settings.print("- Duration: {}".format(duration))
+            Settings.print("- Duration: {}".format(poll["duration"]))
             Settings.print("- Questions:")
-            for question in questions:
-                Settings.print("> {}".format(question))
             # make sure the extra options are shown
             # self.open_more_options()
             # add a poll
             Settings.dev_print("adding poll")
-
-            # TODO: this is definitely extra
-            self.move_to_then_click_element(self.find_element_to_click("poll", offset=4))
-
-            # elements = self.browser.find_element(By.CLASS_NAME, Element.get_element_by_name("poll").getClass())
-
-            # for ele in elements:
-            #     print(elem.get_attribute('innerHTML'))
-                
-            return False
-
+            self.browser.find_element(By.CLASS_NAME, "b-make-post__actions").find_elements(By.XPATH, "./child::*")[4].click()
             # open the poll duration
             Settings.dev_print("adding duration")
-            self.find_element_to_click("pollDuration").click()
+            # self.find_element_to_click("pollDuration").click()
+            self.browser.find_element(By.CLASS_NAME, "b-post-piece__value").click()
             # click on the correct duration number
             Settings.dev_print("setting duration")
             # nums = self.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("pollDurations").getClass())
-            nums = self.find_elements_by_name("pollDurations")
-            for num in nums:
-                ##
-                # <span class="g-first-letter">1</span> day
-                # <span class="g-first-letter">3</span> days
-                # <span class="g-first-letter">7</span> days
-                # <span class="g-first-letter">30</span> days
-                # <span><span class="g-first-letter">N</span>o limit</span>
-                ##
-                inner = num.get_attribute("innerHTML")
-                if ">1<" in str(inner) and int(duration) == 1: num.click()
-                if ">3<" in str(inner) and int(duration) == 3: num.click()
-                if ">7<" in str(inner) and int(duration) == 7: num.click()
-                if ">30<" in str(inner) and int(duration) == 30: num.click()
-                if ">o limit<" in str(inner) and int(duration) == 99: num.click()
+            duration = poll["duration"]
+            if int(duration) > 30: duration = "No limit"
+            self.browser.find_element(By.NAME, "periodValue").send_keys(str(duration))
             # save the duration
             Settings.dev_print("saving duration")
             self.find_element_to_click("pollSave").click()
             Settings.dev_print("successfully saved duration")
+            questions = self.browser.find_elements(By.CLASS_NAME, "v-text-field__slot")
+            Settings.dev_print("configuring question paths...")
             # add extra question space
-            if len(questions) > 2:
-                for question in questions[2:]:
+            OFFSET = 2 # number of preexisting questions
+            if OFFSET + len(poll["questions"]) > len(questions):
+                for i in range(OFFSET + len(poll["questions"])-len(questions)):
                     Settings.dev_print("adding question")
                     question_ = self.find_element_to_click("pollQuestionAdd").click()
                     Settings.dev_print("added question")
             # find the question inputs
-            Settings.dev_print("locating question paths")
-            questions_ = self.browser.find_elements(By.XPATH, Element.get_element_by_name("pollInput").getXPath())
-            Settings.dev_print("question paths: {}".format(len(questions_)))
+            # questions_ = self.browser.find_elements(By.XPATH, Element.get_element_by_name("pollInput").getXPath())
+            questions = self.browser.find_elements(By.CLASS_NAME, "v-text-field__slot")
+            Settings.dev_print("question paths: {}".format(len(questions)))
             # enter the questions
             i = 0
-            Settings.dev_print("questions: {}".format(questions))
-            for question in list(questions):
+            Settings.dev_print("questions: {}".format(poll["questions"]))
+            for question in list(poll["questions"]):
+                Settings.print("> {}".format(question))
                 Settings.dev_print("entering question: {}".format(question))
-                questions_[i].send_keys(str(question))
+                questions[i].find_elements(By.XPATH, "./child::*")[0].send_keys(str(question))
                 Settings.dev_print("entered question")
                 time.sleep(1)
                 i+=1
@@ -1831,14 +1810,12 @@ class Driver:
                 Settings.maybe_print("skipping poll (debug)")
                 cancel = self.find_element_to_click("pollCancel")
                 cancel.click()
-                Settings.dev_print("### Poll Successfully Canceled ###")
             Settings.dev_print("### Poll Successful ###")
-            time.sleep(3)
             return True
         except Exception as e:
             Driver.error_checker(e)
-            Settings.err_print("failed to enter poll")
-            return False
+            Settings.err_print("failed to enter poll!")
+        return False
 
     ################
     ##### Post #####
