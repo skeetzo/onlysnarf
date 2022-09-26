@@ -95,8 +95,8 @@ class Driver:
         if self._initialized_: return
         self.browser = self.spawn_browser(Settings.get_browser_type())
         self.browsers.append(self.browser)
-        ## Cookies
-        if str(Settings.is_cookies()) == "True": self.cookies_load()
+        # ## Cookies
+        # if str(Settings.is_cookies()) == "True": self.cookies_load()
         self.tabs.append([self.browser.current_url, self.browser.current_window_handle, 0])
         self._initialized_ = True
         Driver.DRIVERS.append(self)
@@ -562,26 +562,15 @@ class Driver:
         """
 
         try:
-            # click on open text area
-            Settings.dev_print("finding text")
-            enterText = Element.get_element_by_name("enterText").getId()
-            sendText = self.browser.find_element(By.ID, enterText)
-            # action = webdriver.common.action_chains.ActionChains(self.browser)
-            action = ActionChains(self.browser)
-            action.move_to_element(sendText)
-            action.click()
-            action.perform()
-            # action seperated for debugging
-            sendText = self.browser.find_element(By.ID, enterText)
-            Settings.dev_print("found text")
-            sendText.clear()
-            Settings.dev_print("sending text")
-            sendText.send_keys(str(text))
-            Settings.dev_print("successfully entered text")
+            Settings.dev_print("entering text")
+            # for clearing text field with action chain:
+            # https://stackoverflow.com/questions/45690688/clear-selenium-action-chains
+            ActionChains(self.browser).move_to_element(self.browser.find_element(By.ID, Element.get_element_by_name("enterText").getId())).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(text)).perform()
+            Settings.dev_print("entered text")
             return True
         except Exception as e:
             Settings.dev_print(e)
-            return False
+        return False
 
     @staticmethod
     def error_checker(e):
@@ -1086,10 +1075,13 @@ class Driver:
 
             self.go_to_home(force=True)
             try:
-                ele = self.browser.find_element(By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())
-                if ele: 
-                    Settings.print("already logged into OnlyFans!")
-                    return True
+                # ele = self.browser.find_element(By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())
+                WebDriverWait(self.browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
+                # if ele: 
+                Settings.print("already logged into OnlyFans!")
+                return True
+            except TimeoutException as te:
+                Settings.dev_print(str(te))
             except Exception as e:
                 Settings.dev_print(e)
             return False
@@ -1274,7 +1266,12 @@ class Driver:
         # this needs to go after them because they reconnect then need to login check
         # if Settings.get_browser_type() == "reconnect" or Settings.get_browser_type() == "remote" or 
 
+        if loggedin_check():
+            self.logged_in = True
+            return True
+
         if str(Settings.is_cookies()) == "True":
+            self.cookies_load()
             if loggedin_check():
                 self.logged_in = True
                 return True
@@ -1770,7 +1767,7 @@ class Driver:
             for question in questions:
                 Settings.print("> {}".format(question))
             # make sure the extra options are shown
-            self.open_more_options()
+            # self.open_more_options()
             # add a poll
             Settings.dev_print("adding poll")
 
@@ -1782,7 +1779,6 @@ class Driver:
             # for ele in elements:
             #     print(elem.get_attribute('innerHTML'))
                 
-
             return False
 
             # open the poll duration
@@ -1901,10 +1897,9 @@ class Driver:
             
             ## Upload Files
             try:
-                successful_upload = self.upload_files(files) or False # neither of these are supposed to fail
-                ## Text
-                successful_text = self.enter_text(text) or False # neither of these are supposed to fail
-                if not successful_text or not successful_upload:
+                # successful_text = self.enter_text(text)
+                # successful_upload = self.upload_files(files)
+                if not self.enter_text(text) or not self.upload_files(files):
                     Settings.err_print("unable to post")
                     return False
                 ## Upload
@@ -1940,11 +1935,16 @@ class Driver:
                 if send:
                     Settings.debug_delay_check()
                     if Settings.is_debug() == "True":
+                        try:
+                            self.find_element_to_click("postCancel").click()
+                        except Exception as e:
+                            Settings.dev_print(e)
+                            self.go_to_home(force=True)
+
                         Settings.print('skipped post (debug)')
                         Settings.debug_delay_check()
-                        self.go_to_home(force=True)
                         return True
-                    Settings.dev_print("confirming upload")
+                    Settings.dev_print("uploading post")
                     send.click()
                     # send[1].click() # the 0th one is disabled
                 else:
@@ -2450,6 +2450,85 @@ class Driver:
     ##### Schedule #####
     ####################
 
+    def schedule_open(self):
+        # click schedule
+        Settings.dev_print("opening schedule")
+        self.find_element_to_click("scheduleAdd").click()
+        Settings.dev_print("successfully opened schedule")
+
+    def schedule_date(self, month, year):
+        # find and click month w/ correct date
+        Settings.dev_print("setting date")
+        while True:
+
+            date = self.browser.find_element(By.CLASS_NAME, "vdatetime-calendar__current--month").get_attribute("innerHTML")
+
+            # date = self.find_element_by_name("scheduleDate").get_attribute("innerHTML")
+            Settings.dev_print("date: {} - {} {}".format(date, month, year))
+            if str(month) in str(date) and str(year) in str(date):
+                Settings.dev_print("set month and year")
+                return True
+            else:
+                self.find_element_to_click("scheduleNextMonth").click()
+        return False
+
+    def schedule_day(self, day):
+        # set day in month
+        Settings.dev_print("setting day")
+        for ele in self.find_elements_by_name("scheduleDays"):
+            if str(day) in ele.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>",""):
+                ele.click()
+                Settings.dev_print("set day")
+                return True
+        return False
+
+    def schedule_save_date(self):
+        # save schedule date and move to next view in frame by hitting next
+        self.find_element_to_click("scheduleNext").click()
+        Settings.dev_print("successfully saved date")
+
+    def schedule_hour(self, hour):
+        Settings.dev_print("setting hours")
+        eles = self.browser.find_element(By.CLASS_NAME, "vdatetime-time-picker__list--hours").find_elements(By.XPATH, "./child::*")
+        for ele in eles:
+            if str(hour) == ele.get_attribute("innerHTML").strip():
+                ele.click()
+                Settings.dev_print("set hour")
+                return True
+        return False
+
+    def schedule_minutes(self, minutes):
+        Settings.dev_print("setting minutes")
+        eles = self.browser.find_element(By.CLASS_NAME, "vdatetime-time-picker__list--minutes").find_elements(By.XPATH, "./child::*")
+        for ele in eles:
+            if str(minutes) == ele.get_attribute("innerHTML").strip():
+                ele.click()
+                Settings.dev_print("set minutes")
+                return True
+        return False
+
+    def schedule_suffix(self, suffix):
+        # set am/pm
+        Settings.dev_print("setting suffix")
+        eles = self.browser.find_element(By.CLASS_NAME, "vdatetime-time-picker__list--suffix").find_elements(By.XPATH, "./child::*")
+        for ele in eles:
+            if str(suffix).lower() == ele.get_attribute("innerHTML").strip().lower():
+                ele.click()
+                Settings.dev_print("set suffix")
+                return True
+        return False
+
+    def schedule_cancel(self):
+        self.browser.find_element(By.CLASS_NAME, "vdatetime-popup__actions__button--cancel").find_elements(By.XPATH, "./child::*")[0].click()
+        Settings.print("canceled schedule")
+        return True
+
+    def schedule_save(self):
+        # self.find_element_to_click("scheduleSave").click()
+        self.browser.find_element(By.CLASS_NAME, "vdatetime-popup__actions__button--confirm").find_elements(By.XPATH, "./child::*")[0].click()
+        Settings.print("saved schedule")
+        return True
+
     def schedule(self, schedule):
         """
         Enter the provided schedule
@@ -2468,103 +2547,46 @@ class Driver:
 
         if str(schedule) == "None" or not schedule: return True
         try:
-            month_ = schedule["month"]
-            day_ = schedule["day"]
-            year_ = schedule["year"]
-            hour_ = schedule["hour"]
-            minute_ = schedule["minute"]
-
             Settings.print("Schedule:")
-
-            ## TODO: format these better
             Settings.print("- Date: {}".format(Settings.format_date(schedule["date"])))
             Settings.print("- Time: {}".format(Settings.format_time(schedule["time"])))
-            
-            self.open_more_options()
-            # click schedule
-            Settings.dev_print("opening schedule")
-            self.find_element_to_click("scheduleAdd").click()
-            Settings.dev_print("successfully opened schedule")
+            # ensure schedule button can be accessed
+            # self.open_more_options()
 
-            # find and click month w/ correct date
-            while True:
-                Settings.dev_print("getting date")
-                existingDate = self.find_element_by_name("scheduleDate").get_attribute("innerHTML")
-                Settings.dev_print("date: {} - {} {}".format(existingDate, month_, year_))
-                if str(month_) in str(existingDate) and str(year_) in str(existingDate): break
-                else: self.find_element_to_click("scheduleNextMonth").click()
-            Settings.dev_print("successfully set month")
-            # set day in month
-            Settings.dev_print("setting days")
-            days = self.find_elements_by_name("scheduleDays")
-            for day in days:
-                inner = day.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>","")
-                if str(day_) == str(inner):
-                    day.click()
-                    Settings.dev_print("clicked day")
-            Settings.dev_print("successfully set day")
+            # tries twice to solve various bugs
+            try:
+                self.schedule_open()
+            except Exception as e:
+                Settings.dev_print(e)
+                self.go_to_home()
+                self.schedule_open()
+
+            # set month, year, and day
+            if not self.schedule_date(schedule["month"], schedule["year"]):
+                raise Exception("failed to enter date!")
+            if not self.schedule_day(schedule["day"]):
+                raise Exception("failed to enter day!")
             Settings.debug_delay_check()
-            # save schedule date
-            saves = self.find_element_to_click("scheduleNext")
-            Settings.dev_print("found next button, clicking")
-            saves.click()
-            Settings.dev_print("successfully saved date")
-            
-            Settings.dev_print("setting hours")
-            hours = self.find_elements_by_name("scheduleHours")
-            # this finds both hours and minutes so just cut off first 12
-            hours = hours[:12]
-            self.browser.execute_script("arguments[0].scrollIntoView();", hours[0])
-            action = ActionChains(self.browser)
-            action.click(on_element=hours[0]) # start from offset
-            if int(hour_) > 12: hour_ = int(hour_) - 12
-            for n in range(int(hour_)):
-                action.send_keys(Keys.DOWN)
-                time.sleep(0.5)
-            action.click()
-            action.perform()
-
-            # set minutes
-            Settings.dev_print("setting minutes")
-            minutes = self.find_elements_by_name("scheduleMinutes")
-            # get elements after first 12 which are hours
-            minutes = minutes[12:]
-            self.browser.execute_script("arguments[0].scrollIntoView();", minutes[0])
-            action = ActionChains(self.browser)
-            action.click(on_element=minutes[0]) # start from offset
-            for n in range(int(minute_)):
-                action.send_keys(Keys.DOWN)
-                time.sleep(0.5)
-            action.click()
-            action.perform()
-
-            # set am/pm
-            Settings.dev_print("setting suffix")
-            # suffixes = self.find_elements_by_name("scheduleAMPM")
-            suffixes = self.find_elements_by_name("scheduleMinutes")
-            for suffix in suffixes:
-                inner = suffix.get_attribute("innerHTML")
-                if str(schedule["suffix"]).lower() in str(inner).lower() and not suffix.is_enabled():
-                    suffix.click()
-                    Settings.dev_print("successfully set suffix")
-                    break
+            self.schedule_save_date()
+            # set time
+            if not self.schedule_hour(schedule["hour"]):
+                raise Exception("failed to enter hour!")
+            if not self.schedule_minutes(schedule["minute"]):
+                raise Exception("failed to enter minutes!")
+            if not self.schedule_suffix(schedule["suffix"]):
+                raise Exception("failed to enter suffix!")
             # save time
-            Settings.dev_print("saving schedule")
             Settings.debug_delay_check()
+            Settings.dev_print("saving schedule")
             if Settings.is_debug() == "True":
-                Settings.maybe_print("skipping schedule (debug)")
-                self.find_element_to_click("scheduleCancel").click()
-                Settings.dev_print("successfully canceled schedule")
+                Settings.print("skipping schedule save (debug)")
+                return self.schedule_cancel()
             else:
-                self.find_element_to_click("scheduleSave").click()
-                Settings.dev_print("successfully saved schedule")
-                Settings.print("schedule entered")
-            Settings.dev_print("### Schedule Successful ###")
-            return True
+                return self.schedule_save()
         except Exception as e:
             Driver.error_checker(e)
-            Settings.err_print("failed to enter schedule")
-            return False
+        # attempt to cancel window
+        return self.schedule_cancel()
 
     ####################
     ##### Settings #####

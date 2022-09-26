@@ -20,7 +20,6 @@ class TestSnarf(unittest.TestCase):
         config["questions"] = []
         self.test_snarf.close()
 
-    @unittest.skip("todo")
     def test_poll(self):
         config["duration"] = DEFAULT.DURATION_ALLOWED[-1]
         config["expiration"] = 999
