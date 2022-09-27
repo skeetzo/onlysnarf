@@ -1,5 +1,5 @@
 <p style="text-align: center;">
-	<h1>OnlySnarf</h1>
+	OnlySnarf
 </p>
 <p align="center">
 	<img src="public/images/snarf-missionary.jpg" alt="Shnarf" width="400"/>
