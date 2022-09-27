@@ -561,12 +561,11 @@
   - fixed driver: poll button not being clicked and rest of poll functionality
   - finished debugging poll
   - updated cookie process to check if logged in from session data before overwriting existing cookies and re logging in
-
+  - fixed message price not entering 
 
 ------------------------------------------------------------------------------------
 
 - add text clear from post to message
-- fix message price not entering 
 
 - completely finished debugging basic snarf functionality
 - run full tests suite before final upload to pypi
