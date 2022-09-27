@@ -573,6 +573,7 @@
 ## TODO
 
 - update / check '-help' output; add to readme 
+- ensure docs/menu.md is properly updated
 
 (getting ready for new pypi release)
 - update previews of behavior for readme w/ OBS: discount, message, post
