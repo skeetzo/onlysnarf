@@ -1,16 +1,13 @@
 <h1 align="center">OnlySnarf</h1>
 <p align="center"><img src="public/images/snarf-missionary.jpg" alt="Shnarf" width="400"/></p>
-
-Please refer to the [Menu](https://github.com/skeetzo/onlysnarf/blob/master/menu.md) for help with the available arguments and config settings. 
+<p align="center">Please refer to the [Menu](https://github.com/skeetzo/onlysnarf/blob/master/menu.md) for help with the available arguments and config settings.</p> 
 
 ## Description
-OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans by interacting with the site via web scraping. OnlySnarf carries no weapons, but it has been known to use its tail, teeth and claws when improperly updated.
+OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans by interacting with the site via web scraping. OnlySnarf carries no weapons, but it has been known to use its tail, teeth and claws when improperly configured.
 
 ## Installation
 pip: `python3 -m pip install OnlySnarf`  
 clone repo & install: `git clone git@github.com:skeetzo/onlysnarf && python3 setup.py install`  
-
-# Usage
 
 [add -help]
 
@@ -36,7 +33,7 @@ Running `bin/install-google.sh` should result in matching version numbers. If th
 From my current understanding, Selenium 4 may have a better method for handling binaries. If so then in a future version the above steps may be removed and instead properly handled  internally.
 
 ## Removed
-Previous versions (before v5) included the ability to download/upload from Google Drive (and was supposed to add Dropbox). I have decided to drop everything in favor of IPFS (which will probably be available in a minor version of 5). A majority of previously funtional operations remain untested after a code "cleanup" including the original menu feature (the first part I initially built of this hot mess). Currently, the only reliable / working way to upload is with locally available files referenced at runtime. The runtime command has changed as well dropping the "py" previously meant to distinguish it from the menu from "onlysnarfpy" to now just "onlysnarf".
+Previous versions (before v4.1) included the ability to download/upload from Google Drive (and was supposed to add Dropbox). I have decided to drop everything in favor of IPFS (which will probably be available in a minor version of the upcoming v5). A majority of previously funtional operations remain untested after a code "cleanup" including the original menu feature (the first part I initially built of this hot mess). Currently, the only reliable / working way to upload is with locally available files referenced at runtime. The runtime command has changed as well dropping the "py" previously meant to distinguish it from the menu from "onlysnarfpy" to now just "onlysnarf".
 
 ## Referral
 Feel free to make use of my referral code ;)  
