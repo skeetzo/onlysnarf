@@ -1,5 +1,5 @@
 <p align="center">
-<img src="public/images/snarf-missionary.jpg" alt="Shnarf" width="200"/>
+<img src="public/images/snarf-missionary.jpg" alt="Shnarf"/>
 </p>
 <!-- ![shnarf](public/images/snarf-missionary.jpg "Shnarf") -->
 
