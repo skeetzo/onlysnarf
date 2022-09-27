@@ -554,7 +554,7 @@
   - updated / checked pypi config
   - mostly finished / updated tests: all OKs
   - reorganized tests for grouping
-**4.3.4 : 9/26/2022**
+  **4.3.4 : 9/26/2022**
   - fixed driver: schedule hours not being set now work again
   - reorganized schedule in prep for individual component testing
   - finished debugging schedule (date & time)
@@ -564,17 +564,18 @@
   - fixed message price not entering 
 **4.3.5 : 9/27/2022**
   - added text clear from post to message
+  - added snarf pic to readme
+  - completely finished debugging basic snarf functionality
+  - ran full tests suite before final upload to pypi
 
 ------------------------------------------------------------------------------------
-
-- completely finished debugging basic snarf functionality
-- run full tests suite before final upload to pypi
 
 ## TODO
 
 (getting ready for new pypi release)
-- add snarf pic to readme
 - update previews of behavior for readme
+message, post
+
 (ready for new pypi release)
 - sync with main/master branch
 - upload working changes to pypi
