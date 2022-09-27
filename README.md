@@ -1,14 +1,12 @@
+# OnlySnarf
+
 <p align="center">
 	<img src="public/images/snarf-missionary.jpg" alt="Shnarf" width="400"/>
 </p>
-<!-- ![shnarf](public/images/snarf-missionary.jpg "Shnarf") -->
-
-# OnlySnarf
 
 `python3 -m pip install OnlySnarf`  
 or  
 `git clone git@github.com:skeetzo/onlysnarf && python3 setup.py install`
-
 
 ## Description
 
