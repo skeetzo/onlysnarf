@@ -1,4 +1,6 @@
-<h1 style="text-align: center;">OnlySnarf</h1>
+
+<h1 align="center">OnlySnarf</h1>
+
 <p align="center">
 	<img src="public/images/snarf-missionary.jpg" alt="Shnarf" width="400"/>
 </p>
