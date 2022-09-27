@@ -1,7 +1,7 @@
 <p align="center">
-![shnarf](public/images/snarf-missionary.jpg "Shnarf")
+<img src="public/images/snarf-missionary.jpg" alt="Shnarf" width="200"/>
 </p>
-<!-- <img src="public/images/snarf-missionary.jpg" alt="Shnarf" style="width: 100%; margin: 0 auto;"/> -->
+<!-- ![shnarf](public/images/snarf-missionary.jpg "Shnarf") -->
 
 # OnlySnarf
 
