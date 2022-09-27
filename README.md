@@ -1,4 +1,4 @@
-![shnarf](./public/snarf-missionary.jpg "Shnarf")
+![shnarf](public/snarf-missionary.jpg "Shnarf")
 
 # OnlySnarf
 
