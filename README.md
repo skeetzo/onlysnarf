@@ -1,6 +1,6 @@
 <h1 align="center">OnlySnarf</h1>
 <p align="center"><img src="public/images/snarf-missionary.jpg" alt="Shnarf" width="400"/></p>
-<p align="center">Please refer to the [Menu](https://github.com/skeetzo/onlysnarf/blob/master/menu.md) for help with the available arguments and config settings.</p> 
+<p align="center">Please refer to the <a href="https://github.com/skeetzo/onlysnarf/blob/master/menu.md">Menu</a> for help with the available arguments and config settings.</p> 
 
 ## Description
 OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans by interacting with the site via web scraping. OnlySnarf carries no weapons, but it has been known to use its tail, teeth and claws when improperly configured.
