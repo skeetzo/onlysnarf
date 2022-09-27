@@ -6,6 +6,10 @@
 pytest tests/selenium
 pytest tests/snarf
 
+pytest tests/snarf/test_message.py
+pytest tests/snarf/test_users.py
+
+
 ## Authentication ##
 python setup.py install && python tests/selenium/test_auth.py
 
