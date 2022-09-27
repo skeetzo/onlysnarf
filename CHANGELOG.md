@@ -572,6 +572,8 @@
 
 ## TODO
 
+- update / check '-help' output; add to readme 
+
 (getting ready for new pypi release)
 - update previews of behavior for readme w/ OBS: discount, message, post
 

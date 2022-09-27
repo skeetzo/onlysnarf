@@ -3,15 +3,18 @@
 
 Please refer to the [Menu](https://github.com/skeetzo/onlysnarf/blob/master/menu.md) for help with the available arguments and config settings. 
 
+## Description
+OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans by interacting with the site via web scraping. OnlySnarf carries no weapons, but it has been known to use its tail, teeth and claws when improperly updated.
+
 ## Installation
 pip: `python3 -m pip install OnlySnarf`  
 clone repo & install: `git clone git@github.com:skeetzo/onlysnarf && python3 setup.py install`  
 
+# Usage
+
+[add -help]
+
 Example: `onlysnarf -text "suck my giant balls" /path/to/balls.jpeg`
-
-## Description
-
-OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans by interacting with the site via web scraping. OnlySnarf carries no weapons, but it has been known to use its tail, teeth and claws when improperly updated.
 
 ## Config
 The config process has been updated as well from the previous format. Example config files are provided. There are now 2 main config files that should be provided to affect behavior:
