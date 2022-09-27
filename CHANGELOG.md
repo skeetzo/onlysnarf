@@ -573,8 +573,7 @@
 ## TODO
 
 (getting ready for new pypi release)
-- update previews of behavior for readme
-message, post
+- update previews of behavior for readme w/ OBS: discount, message, post
 
 (ready for new pypi release)
 - sync with main/master branch
