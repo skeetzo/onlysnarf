@@ -1,3 +1,7 @@
+<!-- ![shnarf](public/images/snarf-missionary.jpg "Shnarf") -->
+
+<img src="public/images/snarf-missionary.jpg" alt="Shnarf" width="200"/>
+
 # OnlySnarf
 
 `python3 -m pip install OnlySnarf`  
@@ -12,8 +16,6 @@ OnlySnarf is a python based automation tool to assist with uploading content to 
 Previous versions included the ability to download/upload from Google Drive. I have decided to drop Drive in favor of IPFS (which will be available in whichever next major version). A majority of previously funtional operations remain untested after a code "cleanup" including the original menu feature (the first part initially built). Currently, the only reliable / working way to upload is with locally available files. The runtime command has changed as well dropping the "py" previously meant to distinguish it from the menu. For example:
 
 `onlysnarf -text "suck my giant balls" /path/to/balls.jpeg`
-
-![shnarf](public/images/snarf-missionary.jpg "Shnarf")
 
 ## Config
 The config process has been updated as well from the previous format. There are now 2 main config files that should be created:
