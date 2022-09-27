@@ -562,19 +562,15 @@
   - finished debugging poll
   - updated cookie process to check if logged in from session data before overwriting existing cookies and re logging in
   - fixed message price not entering 
+**4.3.5 : 9/27/2022**
+  - added text clear from post to message
 
 ------------------------------------------------------------------------------------
-
-- add text clear from post to message
 
 - completely finished debugging basic snarf functionality
 - run full tests suite before final upload to pypi
 
-- figure out how to suppress the chrome stacktrace debugging messages
-
 ## TODO
-
-- fix firefox: DeprecationWarning: service_log_path has been deprecated, please pass in a Service object
 
 (getting ready for new pypi release)
 - add snarf pic to readme
@@ -591,6 +587,7 @@
 - update: backup function to include original folder name -> posted/galleries/$file
 - add to upload scheme (probably also as a config value): least to greatest (folder sizes)
 - add tests for additional config variables such as browser and image options
+- figure out how to suppress the chrome stacktrace debugging messages
 
 ------------------------------------------------------------------------------------
 
@@ -631,6 +628,10 @@
 - finish adding tests for individual circumstances:
 messaging: all, recent, favorite, renew on
 individual message entry parts, individual post entry parts
+
+-> Upgrade Selenium to 4.0
+https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-has-been-deprecated-selenium-python
+- fix firefox: DeprecationWarning: service_log_path has been deprecated, please pass in a Service object
 
 ## Fix / Debug
 

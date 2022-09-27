@@ -1421,32 +1421,31 @@ class Driver:
                 return False
             time.sleep(1) # prevents delay from inputted text preventing buttom from being available to click
             # Settings.print("price: {}".format(price))
-            Settings.dev_print("waiting for price area to enter price")
+            # Settings.dev_print("waiting for price area to enter price")
             # finds the button on the page with the #icon-price text
             # priceElements = self.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("priceClick").getClass())
-            priceElements = self.find_elements_by_name("priceClick")
-            priceElement = None
-            for ele in priceElements:
-                Settings.dev_print(ele.get_attribute("value"))
-                if "#icon-price" in str(ele.get_attribute("innerHTML")):
-                    priceElement = ele
-            if not priceElement:
-                Settings.dev_print("failed to find price button")
-                Settings.err_print("failure to enter price")
-                return False
-            WebDriverWait(self.browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(priceElement))
+
             Settings.dev_print("entering price")
-            priceElement.click()
-            priceText = self.browser.find_element(By.ID, "priceInput_1")
-            WebDriverWait(self.browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(priceText))
+            self.browser.find_element(By.CLASS_NAME, "b-make-post__actions").find_elements(By.XPATH, "./child::*")[6].click()
+
+
+            # priceElements = self.find_elements_by_name("priceClick")
+            # priceElement = None
+            # for ele in priceElements:
+            #     Settings.dev_print(ele.get_attribute("value"))
+            #     if "#icon-price" in str(ele.get_attribute("innerHTML")):
+            #         priceElement = ele
+            # if not priceElement:
+            #     Settings.dev_print("failed to find price button")
+            #     Settings.err_print("failure to enter price")
+            #     return False
+            # WebDriverWait(self.browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(priceElement))
+            # priceElement.click()
+            priceText = WebDriverWait(self.browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(self.browser.find_element(By.ID, "priceInput_1")))
             priceText.click()
             priceText.send_keys(str(price))
-            # actions = ActionChains(self.browser)
-            # actions.move_to_element(priceElement)
-            # actions.send_keys(str(price)) 
-            # actions.perform()
             Settings.dev_print("entered price")
-            # Settings.debug_delay_check()
+            Settings.debug_delay_check()
             Settings.dev_print("saving price")
             self.find_element_to_click("priceSave").click()    
             Settings.dev_print("successfully saved price")
@@ -1473,23 +1472,17 @@ class Driver:
         """
 
         try:
-            # self.go_to_page(ONLYFANS_HOME_URL)
-            if not text or text == None or str(text) == "None" or text == "":
-                Settings.warn_print("missing text for message")
+            if not text or text == None or str(text) == "None" or str(text) == "":
+                Settings.err_print("missing text for message!")
                 return False
-            # Settings.print("text: {}".format(text))
-            Settings.dev_print("finding text area")
-            # message = self.find_element_by_name("messageText")     
-            message = self.browser.find_element(By.ID, "new_post_text_input")     
-            # message = self.browser.find_element("name", "message")     
             Settings.dev_print("entering text")
-            message.send_keys(str(text))
+            ActionChains(self.browser).move_to_element(self.browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(text)).perform()
             Settings.dev_print("successfully entered text")
             return True
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failure to enter message")
-            return False
+        return False
 
     def message_user_by_id(self, user_id=None):
         """
@@ -1509,7 +1502,7 @@ class Driver:
 
         user_id = str(user_id).replace("@u","").replace("@","")
         if not user_id or user_id == None or str(user_id) == "None":
-            Settings.warn_print("missing user id")
+            Settings.err_print("missing user id!")
             return False
         try:
             self.go_to_page("{}{}".format(ONLYFANS_CHAT_URL, user_id))
@@ -1517,8 +1510,8 @@ class Driver:
             return True
         except Exception as e:
             Driver.error_checker(e)
-            Settings.err_print("failed to message user by id")
-            return False
+            Settings.err_print("failed to message user by id!")
+        return False
 
     def message_user(self, username, user_id=None):
         """
@@ -2830,26 +2823,27 @@ class Driver:
                 if str(Settings.is_show_window()) == "False":
                     options.add_argument('--headless')
                 options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
-                options.add_argument("--disable-extensions") # disabling extensions
-                options.add_argument("--disable-infobars") # disabling infobars
                 options.add_argument("--allow-insecure-localhost")            
                 options.add_argument("--no-sandbox") # Bypass OS security model
                 # possibly linux only
-                options.add_argument("--disable-dev-shm-usage") # overcome limited resource problems
+                options.add_argument('disable-notifications')
+                # https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
+                # options.add_arguments("start-maximized"); // open Browser in maximized mode
+                options.add_argument("--window-size=1920,1080");
+                options.add_argument("--disable-gpu");
+                options.add_argument("--disable-crash-reporter");
+                options.add_argument("--disable-extensions");
+                options.add_argument("--disable-infobars")
+                options.add_argument("--disable-in-process-stack-traces");
+                options.add_argument("--disable-logging");
+                options.add_argument("--disable-dev-shm-usage");
+                options.add_argument("--log-level=3");
+                options.add_argument("--output=/dev/null");
                 # TODO: to be added to list of removed (if not truly needed by then):
                 # options.add_argument('--disable-software-rasterizer')
                 # options.add_argument('--ignore-certificate-errors')
                 # options.add_argument("--remote-debugging-address=localhost")    
                 # options.add_argument("--remote-debugging-port=9223")
-
-                # https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
-                # options.addArguments("start-maximized"); // open Browser in maximized mode
-                # options.addArguments("disable-infobars"); // disabling infobars
-                # options.addArguments("--disable-extensions"); // disabling extensions
-                # options.addArguments("--disable-gpu"); // applicable to windows os only
-                # options.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
-                # options.addArguments("--no-sandbox"); // Bypass OS security model
-                
                 capabilities = {
                   'browserName': 'chrome',
                   'platform': 'LINUX',
@@ -2863,8 +2857,8 @@ class Driver:
                 service_args = []
                 if Settings.is_debug("google"):
                     service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
-                else:
-                    options.add_experimental_option('excludeSwitches', ['enable-logging'])
+                # else:
+                # options.add_experimental_option('excludeSwitches', ['enable-logging'])
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
                 browserAttempt = webdriver.Chrome(options=options, service_args=service_args)

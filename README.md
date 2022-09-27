@@ -1,8 +1,11 @@
+![shnarf](./public/snarf-missionary.jpg "Shnarf")
+
 # OnlySnarf
 
 `python3 -m pip install OnlySnarf`  
 or  
 `git clone git@github.com:skeetzo/onlysnarf && python3 setup.py install`
+
 
 ## Description
 
