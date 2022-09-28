@@ -576,6 +576,7 @@
 - ensure docs/menu.md is properly updated
 
 (getting ready for new pypi release)
+- prepare commands for generating previews to record functionality with ala: "onlysnarf -discount -user random"
 - update previews of behavior for readme w/ OBS: discount, message, post
 
 (ready for new pypi release)
