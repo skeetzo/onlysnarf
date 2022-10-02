@@ -2,17 +2,19 @@
 
 `onlysnarf *args`
 
+Please refer to the example config file provided for a complete listing of available options.
+
 ## Action
 
-An action is performed by including the required forms of input.
+An action is performed by including the required combinations of arguments & input.
 
 ### Discount
-user: "all" | "recent" | "new" | "select" | "username"   
+user: "all" | "recent" | "new" | "select" | "username" | "random"
 amount (%): 0-55  
 months: 1-12  
 
 ### Message
-user: "all" | "recent" | "new" | "select" | "username"
+user: "all" | "recent" | "new" | "select" | "username" | "random"
 text: ""  
 
 (optional)
@@ -46,9 +48,6 @@ expires: 1, 3, 7, 99 or "No limit"
 tags: key, words -> #key #words  
 performers: performerName1, performerName2 -> w/ @performerName1 @performerName2  
 
-(optional, in development)
-performerIds: performerId1 -> performerName1 -> w/ @performerName1
-
 Upload $category of content from $source as a post with $text, $tags, and detected (or provided) $performers.
   If provided: enters questions as provided in order, enter's poll duration, expiration, and/or scheduling.
 
@@ -58,8 +57,9 @@ Upload $category of content from $source as a post with $text, $tags, and detect
 **New**: users subscribed within last month who haven't been messaged  
 **Select**: selects User from list  
 **Username**: enter User by username  
+**Random**: select user at random
 
-### Profile
+### Profile (probably not working)
 
 Backup:
 **Content**: Downloads all posted content
@@ -68,7 +68,7 @@ Backup:
 
 ## args
 OnlySnarf actions can be fulfilled as a promptless script via:
-`onlysnarfpy /path/to/fileOrDirectory` aka `onlysnarfpy -help`
+`onlysnarf /path/to/fileOrDirectory` aka `onlysnarf -help`
 
 /path/to/fileOrDirectory
 The file or folder of content to use.
@@ -158,7 +158,7 @@ The user by username to specify for operations.
 The users by username to specify for operations.
 
 Example:
-  `onlysnarfpy -category video -date "12/25/2019" -expires 7`  
+  `onlysnarf -category video -date "12/25/2019" -expires 7`  
 Uploads a random video, schedules it to release at midnight on Christmas, and sets the post to expire after 7 days.  
 
 ## more args
@@ -198,7 +198,7 @@ Shows additional log output (up to 3)
 Prints the version
 
 Complete Debugging:
-  `onlysnarfpy -debug -verbose -verbose -verbose -show -debug-delay`
+  `onlysnarf -debug -verbose -verbose -verbose -show -debug-delay`
 
 ## Config File Only
 

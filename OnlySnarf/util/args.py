@@ -10,7 +10,7 @@ args: Dict[str, Any] = {}
 # Argument Parser
 ##
 
-parser = argparse.ArgumentParser(prog='OnlySnarf', allow_abbrev=False, epilog="Shnarrf!", 
+parser = argparse.ArgumentParser(prog='onlysnarf', allow_abbrev=False, epilog="Shnarrf!", 
   description=__doc__, conflict_handler='resolve')
 
 ############
@@ -37,9 +37,9 @@ parser.add_argument('-version', action='version')
 try:
   args.update(vars(parser.parse_args()))
 except Exception as e:
+  print(e)
   print("Error: Incorrect arg format")
-  import sys
-  sys.exit(1)
+  parser.exit(1)
 
 if args["source"] and not args["destination"]:
   args["destination"] = args["source"]
