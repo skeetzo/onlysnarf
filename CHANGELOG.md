@@ -567,13 +567,13 @@
   - added snarf pic to readme
   - completely finished debugging basic snarf functionality
   - ran full tests suite before final upload to pypi
+**4.3.6 : 10/2/2022**
+  - update / check '-help' output; add to readme
+  - ensure docs/menu.md is properly updated
 
 ------------------------------------------------------------------------------------
 
 ## TODO
-
-- update / check '-help' output; add to readme 
-- ensure docs/menu.md is properly updated
 
 (getting ready for new pypi release)
 - prepare commands for generating previews to record functionality with ala: "onlysnarf -discount -user random"

@@ -9,8 +9,18 @@ OnlySnarf is a python based automation tool to assist with uploading content to 
 pip: `python3 -m pip install OnlySnarf`  
 clone repo & install: `git clone git@github.com:skeetzo/onlysnarf && python3 setup.py install`  
 
-[add -help]
-
+> usage: onlysnarf [-h] [-version] ...
+> 
+> positional arguments:
+> input       file or folder path for input to post or message
+> 
+> optional arguments:
+>  -h, --help  show this help message and exit
+>  -version    show program's version number and exit
+>  -[refer to [menu](OnlySnarf/dogs/menu.md) for more options] ...
+>
+> Shnarrf!
+  
 Example: `onlysnarf -text "suck my giant balls" /path/to/balls.jpeg`
 
 ## Config

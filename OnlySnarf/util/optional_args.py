@@ -63,12 +63,12 @@ def apply_args(parser):
   ##
   # -duration
   # poll duration
-  parser.add_argument('-duration', type=valid_duration, dest='duration',
+  durationAndExpiration.add_argument('-duration', type=valid_duration, dest='duration',
     help='the duration in days (99 for \'No Limit\') for a poll', choices=DEFAULT.DURATION_ALLOWED, default=DEFAULT.DURATION_NONE)
   ##
   # -expiration
   # date of post or poll expiration
-  parser.add_argument('-expiration', type=valid_expiration, dest='expiration', help='the expiration in days (999 for \'No Limit\')', default=DEFAULT.EXPIRATION_NONE)
+  durationAndExpiration.add_argument('-expiration', type=valid_expiration, dest='expiration', help='the expiration in days (999 for \'No Limit\')', default=DEFAULT.EXPIRATION_NONE)
   ##
   # -keep
   # keep the browser window open
