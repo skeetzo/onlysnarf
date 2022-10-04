@@ -579,7 +579,6 @@
 
 - test newly added subcommand structure
 - reorganize tests as necessary
-- fix redundant message from argparse help for 'browser' and 'B'
 
 (getting ready for new pypi release)
 - prepare commands for generating previews to record functionality with ala: "onlysnarf -discount -user random"
