@@ -562,18 +562,24 @@
   - finished debugging poll
   - updated cookie process to check if logged in from session data before overwriting existing cookies and re logging in
   - fixed message price not entering 
-**4.3.5 : 9/27/2022**
+  **4.3.5 : 9/27/2022**
   - added text clear from post to message
   - added snarf pic to readme
   - completely finished debugging basic snarf functionality
   - ran full tests suite before final upload to pypi
-**4.3.6 : 10/2/2022**
+  **4.3.6 : 10/2/2022**
   - update / check '-help' output; add to readme
   - ensure docs/menu.md is properly updated
+**4.3.7 : 10/4/2022**
+  - added subcommands to -help
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- test newly added subcommand structure
+- reorganize tests as necessary
+- fix redundant message from argparse help for 'browser' and 'B'
 
 (getting ready for new pypi release)
 - prepare commands for generating previews to record functionality with ala: "onlysnarf -discount -user random"
