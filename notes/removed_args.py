@@ -5,6 +5,120 @@
 ###################################################################
 
 ##
+# removed 10/4/2021
+# mostly temporary
+##
+
+##
+# -password
+# the password for OnlyFans
+parser.add_argument('-password', type=str, dest='password',
+  help='the OnlyFans user password for login (used with username)')
+##
+# -password
+# the password for Google
+parser.add_argument('-password-google', type=str, dest='google_password',
+  help='the Google password for login')
+##
+# -password
+# the password for Twitter
+parser.add_argument('-password-twitter', type=str, dest='twitter_password',
+  help='the Twitter password for login')
+
+##
+# -profile-path
+# the path to the profile.json file
+parser.add_argument('-profile-path', type=str, dest='path_profile',
+  help='the path to cache profile locally', default=DEFAULT.PROFILE_PATH)
+
+##
+# -promotion-expiration
+# expiration for a promotion
+parser.add_argument('-promotion-expiration', type=valid_promo_expiration, dest='promotion_expiration',
+  help='the promotions expiration in days)', choices=DEFAULT.PROMOTION_EXPIRATION_ALLOWED, default=None)
+##
+# -promotion-limit
+# maximum number of subscribers for a promotion
+parser.add_argument('-promotion-limit', type=valid_limit, default=None, dest='promotion_limit', choices=DEFAULT.LIMIT_ALLOWED,
+  help='the max number of subscribers allowed for a promotion')
+
+##
+# -username-google
+# the Google username to use
+parser.add_argument('-username-google', type=str, default="", dest='google_username',
+  help='the Google username for login')
+##
+# -username-twitter
+# the Twitter username to use
+parser.add_argument('-username-twitter', type=str, default="", dest='twitter_username',
+  help='the Twitter username for login')
+
+############
+## Remote ##
+############
+
+##
+# -remote-path
+# root remote folder. can be set in profile.conf
+parser.add_argument('-remote-path', type=str, default=DEFAULT.REMOTE_PATH, dest='remote_path',
+  help='the root remote file sharing folder name')
+
+##
+# -remote-host
+# the remote host to connect to
+parser.add_argument('-remote-host', type=str, dest='remote_host',
+  help='the remote host to connect to for file sharing', default="127.0.0.1")
+
+##
+# -remote-host
+# the remote host to connect to
+parser.add_argument('-remote-browser-host', type=str, dest='remote_browser_host',
+  help='the remote host to connect to for remote browser', default="127.0.0.1")
+
+##
+# -remote-port
+# the remote port to connect to
+parser.add_argument('-remote-port', type=int, dest='remote_port',
+  help='the remote port to connect to for file sharing', default=22)
+
+##
+# -remote-browser-port
+# the remote port to connect to
+parser.add_argument('-remote-browser-port', type=int, dest='remote_browser_port',
+  help='the remote port to connect to for remote browser', default=4444)
+
+##
+# -remote-username
+# the remote username to use
+parser.add_argument('-remote-username', type=str, dest='remote_username',
+  help='the remote username to use', default=None)
+
+##
+# -remote-password
+# the remote password to use
+parser.add_argument('-remote-password', type=int, dest='remote_password',
+  help='the remote password to use', default=None)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##
 # removed ?/?/2021
 ##
 
