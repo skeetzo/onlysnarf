@@ -13,29 +13,29 @@ def apply_args(parser):
   ## Discount ##
   ##############
 
-  parser_discount = subparsers.add_parser('dicount', help='> discount one or more users')
+  parser_discount = subparsers.add_parser('discount', help='> discount one or more users')
   ##
   # -amount
   # action: discount
   # the amount to discount a user by
-  parser_discount.add_argument('-amount', '-A', type=valid_amount, dest='amount',
-    help='the amount (%%) to discount by', default=DEFAULT.AMOUNT_NONE)
+  parser_discount.add_argument('-amount', type=valid_amount, dest='amount',
+    help='amount (%%) to discount by', default=DEFAULT.AMOUNT_NONE)
   ##
   # -months
   # action: discount
   # the number of months to discount for
-  parser_discount.add_argument('-months', '-M', type=valid_month, default=None, dest='months',
-    help='the number of months to discount')
+  parser_discount.add_argument('-months', type=valid_month, default=None, dest='months',
+    help='number of months to discount')
   ##
   # -user
   # the user to discount
-  parser_discount.add_argument('-user', '-U', type=str,  default=None, dest='user',
-    help='the user to discount')
+  parser_discount.add_argument('-user', type=str,  default=None, dest='user',
+    help='user to discount')
   ##
   # -users
   # the users to discount
-  parser_discount.add_argument('-users', '-Us', dest='users', action='append', default=[],
-    help='the users to discount')
+  parser_discount.add_argument('-users', dest='users', action='append', default=[],
+    help='users to discount')
 
   #############
   ## Message ##
@@ -52,17 +52,17 @@ def apply_args(parser):
   ##
   # -price
   # the price to be set in a message
-  parser_message.add_argument('-price', '-P', type=valid_price, help='the price to charge', default=0, dest='price')
+  parser_message.add_argument('-price', type=valid_price, help='price to charge ($)', default=0, dest='price')
   ##
   # -schedule
   # the schedule to upload a post for
   dateAndSchedule.add_argument('-schedule', type=valid_schedule, default=DEFAULT.SCHEDULE, dest='schedule',
-    help='the schedule (MM-DD-YYYY:HH:MM:SS)')
+    help='schedule (MM-DD-YYYY:HH:MM:SS)')
   ##
   # -time
   # time in HH:MM
   parser_message.add_argument('-time', type=valid_time, default=DEFAULT.TIME, dest='time',
-    help='the time (HH:MM)')
+    help='time (HH:MM)')
   ##
   # -tags
   # @[tag]
@@ -70,17 +70,17 @@ def apply_args(parser):
   ##
   # -text
   # text for message or upload
-  parser_message.add_argument('-text', '-T', default=None, dest='text', help='the text to send')
+  parser_message.add_argument('-text', default=None, dest='text', help='text to send')
   ##
   # -user
   # the user to message
-  parser_message.add_argument('-user', '-U', type=str,  default=None, dest='user',
-    help='the user to message')
+  parser_message.add_argument('-user', type=str,  default=None, dest='user',
+    help='user to message')
   ##
   # -users
   # the users to message
-  parser_message.add_argument('-users', '-Us', dest='users', action='append', default=[],
-    help='the users to message')
+  parser_message.add_argument('-users', dest='users', action='append', default=[],
+    help='users to message')
 
   ##########
   ## Post ##
@@ -98,35 +98,35 @@ def apply_args(parser):
   # -duration
   # poll duration
   durationAndExpiration.add_argument('-duration', type=valid_duration, dest='duration',
-    help='the duration in days (99 for \'No Limit\') for a poll', choices=DEFAULT.DURATION_ALLOWED, default=DEFAULT.DURATION_NONE)
+    help='duration in days (99 for \'No Limit\') for a poll', choices=DEFAULT.DURATION_ALLOWED, default=DEFAULT.DURATION_NONE)
   ##
   # -expiration
   # date of post or poll expiration
-  durationAndExpiration.add_argument('-expiration', type=valid_expiration, dest='expiration', help='the expiration in days (999 for \'No Limit\')', default=DEFAULT.EXPIRATION_NONE)
+  durationAndExpiration.add_argument('-expiration', type=valid_expiration, dest='expiration', help='expiration in days (999 for \'No Limit\')', default=DEFAULT.EXPIRATION_NONE)
   ##
   # -price
-  # the price to be set in a message
-  parser_post.add_argument('-price', '-P', type=valid_price, help='the price to charge', default=0, dest='price')
+  # price to be set in a message
+  parser_post.add_argument('-price', type=valid_price, help='price to charge ($)', default=0, dest='price')
   ##
   # -schedule
-  # the schedule to upload a post for
-  dateAndSchedule.add_argument('-schedule', type=valid_schedule, default=DEFAULT.SCHEDULE, dest='schedule', help='the schedule (MM-DD-YYYY:HH:MM:SS)')
+  # schedule to upload a post for
+  dateAndSchedule.add_argument('-schedule', type=valid_schedule, default=DEFAULT.SCHEDULE, dest='schedule', help='schedule (MM-DD-YYYY:HH:MM:SS)')
   ##
   # -time
   # time in HH:MM
-  parser_post.add_argument('-time', type=valid_time, default=DEFAULT.TIME, dest='time', help='the time (HH:MM)')
+  parser_post.add_argument('-time', type=valid_time, default=DEFAULT.TIME, dest='time', help='time (HH:MM)')
   ##
   # -tags
   # @[tag]
-  parser_post.add_argument('-tags', dest='tags', action='append', default=[], help='the tags (@[tag])')
+  # parser_post.add_argument('-tags', dest='tags', action='append', default=[], help='tags (@[tag])')
   ##
   # -text
   # text for message or upload
-  parser_post.add_argument('-text', '-T', default=None, dest='text', help='the text to send')
+  parser_post.add_argument('-text', default=None, dest='text', help='text to send')
   ##
   # -question
   # poll questions
-  parser_post.add_argument('-poll', dest='questions', action='append', default=[], help='the questions to ask for a poll')
+  parser_post.add_argument('-poll', dest='questions', action='append', default=[], help='questions to ask')
 
   #############
   ## General ##
@@ -139,41 +139,41 @@ def apply_args(parser):
   ##
   # -browser
   parser.add_argument('-browser', '-B', type=str, default="auto", choices=["auto","chrome","firefox","remote", "remote-chrome","remote-firefox","reconnect","reconnect-chrome","reconnect-firefox"], dest='browser',
-    help='the web browser to use')
+    help='web browser to use')
   ##
   # -category
-  # the category of folder to upload from
+  # category of folder to upload from
   # parser.add_argument('-category', default=DEFAULT.CATEGORY_NONE, dest='category',
-    # help='the category of content to post or message')
+    # help='category of content to post or message')
   ##
   # -delete
   # delete content after upload
   parser.add_argument('-delete', action='store_true', dest='delete', help='delete file instead of backing up')
   ##
   # -destination
-  # the destination to use when backing up content
+  # destination to use when backing up content
   # parser.add_argument('-destination', dest='destination', default=None, choices=["remote","local"], help='file backup location. uses same as -source if none specified')
   ##
   # -login
-  # the method to prefer when logging in
-  parser.add_argument('-login', '-L', dest='login', default="auto", choices=["auto","onlyfans","twitter"], help='the method of user login to prefer')
+  # method to prefer when logging in
+  parser.add_argument('-login', '-L', dest='login', default="auto", choices=["auto","onlyfans","twitter"], help='method of user login to prefer')
   ##
   # -performers
   # list of performers to upload matching content of
   # parser.add_argument('-performers', dest='performers', action='append',  default=[],
-  #   help='the performers to upload. adds \"w/ @[...performers]\"')
+  #   help='performers to upload. adds \"w/ @[...performers]\"')
   ##
   # -save-users
   # saves OnlyFans users upon exit
   parser.add_argument('-save-users', '-Su', action='store_true', dest='save_users', help='enable saving users locally on exit')
   ##
   # -sort
-  # the sort method to use when selecting content unprompted
+  # sort method to use when selecting content unprompted
   # parser.add_argument('-sort', dest='sort', default="random", choices=["ordered","random","least","greatest"],
-    # help='the sort method to use when selecting content unprompted')
+    # help='sort method to use when selecting content unprompted')
   ##
   # -source
-  # the source to use when searching for content
+  # source to use when searching for content
   # parser.add_argument('-source', dest='source', default="local", choices=["remote","local"], help='file host location')
   ##
   # -tweet
@@ -181,8 +181,8 @@ def apply_args(parser):
   parser.add_argument('-tweet', action='store_true', dest='tweeting', help='enable tweeting when posting')
   ##
   # -username
-  # the OnlyFans username to use
-  parser.add_argument('-username', '-OF', type=str, default="", dest='username', help='the OnlyFans username to use')
+  # OnlyFans username to use
+  parser.add_argument('-username', '-OF', type=str, default="", dest='username', help='OnlyFans username to use')
 
   ###############
   ## DEBUGGING ##
@@ -190,8 +190,8 @@ def apply_args(parser):
 
   ##
   # -config
-  # the path to the config.conf file
-  parser.add_argument('-config', '-C', dest="path_config", type=str, help='the path to the config.conf', default=DEFAULT.CONFIG_PATH)
+  # path to config.conf file
+  parser.add_argument('-config', '-C', dest="path_config", type=str, help='path to config.conf', default=DEFAULT.CONFIG_PATH)
   ##
   # -cookies
   # load & save from/to local cookies path
@@ -233,11 +233,11 @@ def apply_args(parser):
   ##
   # -keep
   # keep the browser window open
-  parser.add_argument('-keep', '-K', action='store_true', dest='keep', help='keep the browser window open after scripting ends')
+  parser.add_argument('-keep', '-K', action='store_true', dest='keep', help='keep browser window open after scripting ends')
   ##
   # -show
   # shows window
-  parser.add_argument('-show', '-show-window', '-SW', dest='show', action='store_true',  help='enable displaying the browser window')
+  parser.add_argument('-show', '-show-window', '-SW', dest='show', action='store_true',  help='enable displaying browser window')
   ##
   # -skip-download
   parser.add_argument('-skip-download', action='store_true', dest='skip_download', help=argparse.SUPPRESS)
