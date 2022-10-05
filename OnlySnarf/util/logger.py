@@ -9,9 +9,9 @@ if config["debug"]: loglevel = logging.DEBUG
 
 logPath = DEFAULT.LOG_PATH
 if os.environ.get('ENV') == "test":
-    logPath = os.path.join(os.getcwd(), "log", "onlysnarf.log")
+    logPath = os.path.join(os.getcwd(), "log", "snarf.log")
 
-Path(os.path.basename(os.path.dirname(logPath))).mkdir(parents=True, exist_ok=True)
+Path(os.path.dirname(logPath)).mkdir(parents=True, exist_ok=True)
 
 # set up logging to file - see previous section for more details
 logging.basicConfig(level=loglevel,
@@ -48,7 +48,7 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 # create file handler which logs everything
-# fh = logging.FileHandler('onlysnarf.log')
+# fh = logging.FileHandler('snarf.log')
 # fh.setLevel(logging.DEBUG)
 
 # define a Handler which writes INFO messages or higher to the sys.stderr

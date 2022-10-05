@@ -573,12 +573,14 @@
 **4.3.7 : 10/4/2022**
   - added subcommands to -help
   - changed 'questions' to 'poll'
-  - test newly added subcommand structure
   - reorganize tests as necessary (none)
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- debug & test newly added subcommand structure: discount, message, post --> snarf.py
+- reupdate menu.md w/ pruned config & args
 
 (getting ready for new pypi release)
 - prepare commands for generating previews to record functionality with ala: "onlysnarf discount -user random"

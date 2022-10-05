@@ -265,13 +265,13 @@ class Settings:
         return ""
 
     def get_download_path():
-        return config["download_path"] or ""
+        return config["path_download"]
 
     def get_users_path():
-        return config["path_users"] or DEFAULT.USERS_PATH
+        return config["path_users"]
 
     def get_config_path():
-        return config["config_path"] or ""    
+        return config["path_config"]   
 
     def get_local_path():
         localPath = os.path.join(Settings.get_root_path(), Settings.get_username())
