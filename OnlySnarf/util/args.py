@@ -24,8 +24,7 @@ apply_args(parser)
 
 ##
 # input
-parser.add_argument('input', default=[], nargs=argparse.REMAINDER, 
-  type=valid_path, help='the path to a file (or folder) to include in a post or message')
+parser.add_argument('input', default=[], nargs=argparse.REMAINDER, type=valid_path, help='the path to a file (or folder) to include in a post or message')
 
 ##
 import pkg_resources
@@ -41,11 +40,11 @@ except Exception as e:
   print("Error: Incorrect arg format")
   parser.exit(1)
 
-if args["source"] and not args["destination"]:
-  args["destination"] = args["source"]
-if not args["source"]: args["source"] = "local"
-if not args["destination"]: args["destination"] = "local"
-if not args["category"]: args["source"] = None
+# if args["source"] and not args["destination"]:
+#   args["destination"] = args["source"]
+# if not args["source"]: args["source"] = "local"
+# if not args["destination"]: args["destination"] = "local"
+# if not args["category"]: args["source"] = None
 
 #############
 # Debugging #
