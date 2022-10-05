@@ -586,6 +586,8 @@ class User:
             return User.get_favorite_users()
         elif str(user) == "list":
             return User.list_menu()
+        elif str(user) == "all":
+            return User.get_all_users()
         if not Settings.confirm(user): return User.select_user()
         return user
 
