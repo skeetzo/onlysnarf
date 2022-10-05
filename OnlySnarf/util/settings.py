@@ -459,16 +459,16 @@ class Settings:
     # Bools
 
     def is_confirm():
-        return Settings.CONFIRM or config["confirm"] or False
+        return Settings.CONFIRM or config["confirm"]
 
     def is_cookies():
         return config["cookies"]
 
     def is_delete():
-        return config["delete"] or False
+        return config["delete"]
 
     def is_delete_empty():
-        return config["delete_empty"] or False
+        return config["delete_empty"]
 
     def is_debug(process=None):
         if process == "firefox": return config["debug_firefox"]
@@ -476,52 +476,52 @@ class Settings:
         elif process == "selenium": return config["debug_selenium"]
         elif process == "cookies": return config["debug_cookies"]
         # elif process == "tests": return 
-        return config["debug"] or False
+        return config["debug"]
 
     def is_debug_delay():
-        return config["debug_delay"] or False
+        return config["debug_delay"]
 
     def is_force_backup():
-        return config["force_backup"] or False
+        return config["force_backup"]
 
     def is_force_upload():
-        return config["force_upload"] or False
+        return config["force_upload"]
 
     def is_keep():
-        return config["keep"] or False
+        return config["keep"]
 
     def is_prefer_local():
-        return config["prefer_local"] or False
+        return config["prefer_local"]
 
     def is_prompt():
-        return Settings.PROMPT or False
+        return Settings.PROMPT
 
     def is_save_users():
-        return config["save_users"] or False
+        return config["save_users"]
         
     def is_reduce():
-        return config["enable_reduce"] or False
+        return config["enable_reduce"]
     
     def is_show_window():
-        return config["show"] or False
+        return config["show"]
 
     def is_split():
-        return config["enable_split"] or False
+        return config["enable_split"]
         
     def is_trim():
-        return config["enable_trim"] or False
+        return config["enable_trim"]
         
     def is_tweeting():
-        return config["tweeting"] or False
+        return config["tweeting"]
         
     def is_backup():
-        return config["backup"] or False
+        return config["backup"]
         
     def is_skip_download():
-        return config["skip_download"] or False
+        return config["skip_download"]
         
     def is_skip_upload():
-        return config["skip_upload"] or False
+        return config["skip_upload"]
 
     ##
     # Menu

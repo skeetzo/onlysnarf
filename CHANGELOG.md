@@ -579,6 +579,9 @@
 
 ## TODO
 
+- clean up user class & methods for selecting user(s)
+- finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleanuping up code
+
 - debug & test newly added subcommand structure: discount, message, post --> snarf.py
 - reupdate menu.md w/ pruned config & args
 
@@ -592,7 +595,6 @@
 
 (more cleanup before IPFS)
 - finish cleaning up class/user
-- finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleanuping up code
 - clean up classes/files to keep up with gutting google, etc in exchange for ipfs
 - change deletion behavior to preserve better
 - update: backup function to include original folder name -> posted/galleries/$file

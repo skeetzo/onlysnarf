@@ -13,14 +13,22 @@ class Discount:
 
         """OnlyFans discount action."""
 
+        self._initialized_ = False
         # amount in percent
         self.amount = None
         # number of months (1-12)
         self.months = None
         # the recipient username
         self.username = None
-        # prevents double prompts
-        self.gotten = False
+
+    def init(self):
+        """Update the discount object's default values"""
+
+        if self._initialized_: return
+        self.get_username()
+        self.get_amount()
+        self.get_months()
+        self._initialized_ = True
 
     def apply(self):
 
@@ -34,10 +42,7 @@ class Discount:
         """
 
         # ensure the discount has non default values
-        self.get()
-        if not self.gotten:
-            Settings.err_print("Unable to apply discount")
-            return
+        self.init()
         # skip prompt if disabled
         if Settings.is_prompt():
             if not Settings.prompt("Discount"): return
@@ -68,23 +73,7 @@ class Discount:
             return False
         return True
 
-    @staticmethod
-    def create():
-
-        """Create and apply a discount from args or prompts"""
-
-        discount = Discount()
-        discount.apply()
-
-    def get(self):
-        """Update the discount object's default values"""
-
-        if self.gotten: return
-        gotten = self.get_username()
-        gotten = self.get_amount()
-        gotten = self.get_months()
-        self.gotten = True
-        
+    def get(self):        
         return dict({
             "username": self.get_username(),
             "amount": self.get_amount(),
@@ -195,7 +184,7 @@ class Discount:
         if len(users) == 0:
             users = User.get_users_by_list(name="grandfathered")
         print("Discount - Grandfathering: {} users".format(len(users)))
-        from .validators import DISCOUNT_MAX_MONTHS, DISCOUNT_MAX_AMOUNT
+        from ..util.defaults import DISCOUNT_MAX_MONTHS, DISCOUNT_MAX_AMOUNT
         self.months = DISCOUNT_MAX_MONTHS
         self.amount = DISCOUNT_MAX_AMOUNT
         # apply discount to all users
