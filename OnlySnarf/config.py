@@ -267,5 +267,5 @@ if __name__ == "__main__":
         Settings.initialize()
         main()
     except Exception as e:
-        Settings.maybePrint(e)
+        Settings.maybe_print(e)
         Settings.print(e)

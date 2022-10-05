@@ -289,14 +289,14 @@ class File():
         """
 
         try:
-            Settings.maybePrint('deleting local files...')
+            Settings.maybe_print('deleting local files...')
             # delete /tmp
             tmp = File.get_tmp()
             if os.path.exists(tmp):
                 shutil.rmtree(tmp)
-                Settings.print('local files removed')
+                Settings.maybe_print('local files removed!')
             else:
-                Settings.print('no local files found to remove')
+                Settings.maybe_print('no local files found!')
         except Exception as e:
             Settings.dev_print(e)
 

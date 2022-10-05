@@ -9,7 +9,6 @@ from OnlySnarf.classes.discount import Discount
 from OnlySnarf.classes.message import Message, Post
 from OnlySnarf.classes.profile import Profile
 from OnlySnarf.classes.promotion import Promotion
-# from OnlySnarf.classes.user import User
 
 #################
 ##### Snarf #####
@@ -164,7 +163,7 @@ atexit.register(exit_handler)
 def main():
     try:
         # purge local tmp files
-        from .file import File
+        from .classes.file import File
         File.remove_local()
         # disable menu prompts
         Settings.set_prompt(False)
