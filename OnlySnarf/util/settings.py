@@ -84,6 +84,27 @@ class Settings:
         return DEFAULT.ACTIONS
 
     def get_amount():
+
+
+        # # prompt skip
+        # if not Settings.prompt("amount"): return None
+        # question = {
+        #     'type': 'input',
+        #     'name': 'amount',
+        #     'message': 'Amount:',
+        #     'validate': AmountValidator,
+        #     'filter': lambda val: int(myround(int(val)))
+        # }
+        # amount = prompt(question)["amount"]
+        # if not Settings.confirm(amount): return self.get_amount()
+        # self.amount = amount
+        # return self.amount
+
+
+
+
+
+
         return config["amount"]
 
     def get_base_directory():
@@ -100,6 +121,24 @@ class Settings:
         return config["browser"]
 
     def get_months():
+
+
+        # # prompt skip
+        # if not Settings.prompt("months"): return None
+        # question = {
+        #     'type': 'input',
+        #     'name': 'months',
+        #     'message': 'Months:',
+        #     'validate': MonthValidator,
+        #     'filter': lambda val: int(val)
+        # }
+        # months = prompt(question)["months"]
+        # if not Settings.confirm(months): return self.get_months()
+        # self.months = months
+        # return self.months
+
+
+
         return config["months"]
 
     def get_category():
@@ -359,38 +398,38 @@ class Settings:
         # return config["upload_max_messages"] or UPLOAD_MAX_MESSAGES
 
     def get_login_method():
-        return config["login"] or "onlyfans"
+        return config["login"]
         
     def get_upload_max_duration():
         return config["upload_max_duration"] or DEFAULT.UPLOAD_MAX_DURATION # 6 hours
 
     # comma separated string of usernames
     def get_users():
-        users = config["users"] or []
-        if str(config["user"]) != "None": users.append(str(config["user"]))
-        users = [n.strip() for n in users]
         from ..classes.user import User
-        users_ = []
-        for user in users:
-            if isinstance(user, User):
-                pass
-            elif isinstance(user, str):
-                # user = User({"username":user})
-                user = User.get_user_by_username(user)
+        if str(config["user"]) != "None":
+            if str(config["user"]) == "all":
+                config["users"].extend([user.username for user in User.get_all_users()])
+            elif str(config["user"]) == "recent":
+                config["users"].extend([user.username for user in User.get_recent_users()])
+            elif str(config["user"]) == "favorite":
+                config["users"].extend([user.username for user in User.get_favorite_users()])
+            elif str(config["user"]) == "random":
+                config["users"].append(User.get_random_user().username)
+            else: config["users"].append(config["user"])
+        users = []
+        for user in [n.strip() for n in config["users"]]:
+            if isinstance(user, User): pass
+            elif isinstance(user, str): user = User({"username":user})
             # BUG (potential): might bug out if the username is for whatever reason all numbers
-            elif isinstance(user, int):
-                # user = User({"id":config["user"]})
-                user = User.get_user_by_id(user)
-            users_.append(user)
-        return users_
+            elif isinstance(user, int): user = User({"id":user})
+            users.append(user)
+        return users
 
     def get_user():
-        if not config["user"]: return None
-        from ..classes.user import User
-        return User.get_user_by_username(config["user"])
+        return Settings.get_users()[0]
 
     def get_email():
-        return config["email"] or ""
+        return config["email"]
 
     def get_user_configs():
         # load configs from .onlysnarf or baseDir
@@ -401,6 +440,7 @@ class Settings:
         config_file = configparser.ConfigParser()
         # strip email
         if "@" in username: username = username[0 : username.index("@")]
+        Settings.dev_print("retreiving user config: {}".format(username))
         config_file.read(os.path.join(Settings.get_base_directory(), "users", username+".conf"))
         userConfig = {}
         for section in config_file.sections():

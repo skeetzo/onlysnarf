@@ -38,17 +38,18 @@ class Snarf:
     def discount():
 
         """
-        Applies the provided discount or creates one from args / prompts.
+        Applies a discount to users as provided from args / prompts.
 
-        Parameters
-        ----------
-        discount : classes.Discount
-            A discount consisting of amount, months, and / or username. Prompts for missing.
 
         """
 
-        discount = Discount()
-        try: return discount.apply()
+        try:
+            successful = []
+            for user in Settings.get_users():
+                Settings.print("> Discounting user: {}".format(user.username))
+                discount = Discount(user.username)
+                successful.append(discount.apply())
+            return all(successful)
         except Exception as e: Settings.dev_print(e)
         return False
 
@@ -56,13 +57,8 @@ class Snarf:
     def message():
 
         """
-        Sends the provided message or creates one from args / prompts.
+        Sends the configured message from args / prompts.
 
-        Parameters
-        ----------
-        message : classes.Message
-            A message consisting of text, recipient(s), and possibly also files, keywords, tags, 
-                performers, and/or price.
         
         """
 
@@ -75,12 +71,8 @@ class Snarf:
     def post():
 
         """
-        Posts the provided text or from args / prompts.
+        Posts the configured text from args / prompts.
 
-        Parameters
-        ----------
-        post : classes.Message.Post
-            A message is a post plus also possibly also, expiration, poll, and/or schedule.
         
         """
 
@@ -172,14 +164,13 @@ def main():
         action = Settings.get_action()
         Settings.print("Running - {}".format(action))
         action = getattr(Snarf, action)
-        successful = action()
-        if successful: Settings.print("Shnarrf shnarfff shnarf!!")
-        else: Settings.print("Shnarrf shnaaaaaaaarrrff!!")
+        if action(): Settings.print("Shnarrf shnarfff shnarf!!")
+        else: Settings.print("Shnarrf? Shnaaaaaaaarrrff??")
     except Exception as e:
         Settings.dev_print(e)
         Settings.print("Shnarf??")
-    finally:
-        exit_handler()
+    # finally:
+        # exit_handler()
 
 ################################################################################################################################################
 

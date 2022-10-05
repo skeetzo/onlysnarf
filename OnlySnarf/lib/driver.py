@@ -166,7 +166,8 @@ class Driver:
     ##### Discount #####
     ####################
 
-    def discount_user(self, discount):
+    @staticmethod
+    def discount_user(discount):
         """
         Enter and apply discount to user
 
@@ -191,16 +192,14 @@ class Driver:
             Settings.err_print("missing discount")
             return False
         Settings.dev_print("discounting user...")
-        self.auth()
         try:
-            discount.get()
-            months = int(discount.get_months())
-            amount = int(discount.get_amount())
-            username = str(discount.get_username())
-            # ensure username is actually a username
-            from ..classes.user import User
-            if isinstance(discount.username, User):
-                username = discount.username.username
+            driver = Driver.get_driver()
+            driver.auth()
+
+            months = int(discount["months"])
+            amount = int(discount["amount"])
+            username = str(discount["username"])
+
             # check variable constraints
             if int(months) > int(Settings.get_discount_max_months()):
                 Settings.warn_print("months too high, max -> {} months".format(Settings.get_discount_max_months()))
@@ -214,26 +213,27 @@ class Driver:
             elif int(amount) < int(Settings.get_discount_min_amount()):
                 Settings.warn_print("amount too low, min -> {}%".format(Settings.get_discount_min_months()))
                 amount = int(Settings.get_discount_min_amount())
+
             Settings.print("discounting: {}".format(username))
-            self.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
+            driver.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
             end_ = True
             count = 0
             user_ = None
             Settings.print("searching for user...")
             # scroll through users on page until user is found
             while end_:
-                elements = self.browser.find_elements(By.CLASS_NAME, "m-fans")
+                elements = driver.browser.find_elements(By.CLASS_NAME, "m-fans")
                 for ele in elements:
                     username_ = ele.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()
                     if str(username) == str(username_).replace("@",""):
-                        self.browser.execute_script("arguments[0].scrollIntoView();", ele)
+                        driver.browser.execute_script("arguments[0].scrollIntoView();", ele)
                         user_ = ele
                         end_ = False
                 if not end_: continue
                 if len(elements) == int(count): break
                 Settings.print_same_line("({}/{}) scrolling...".format(count, len(elements)))
                 count = len(elements)
-                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
             Settings.print("")
             Settings.dev_print("successfully found fans")
@@ -241,7 +241,7 @@ class Driver:
                 Settings.err_print("unable to find user - {}".format(username))
                 return False
             Settings.maybe_print("found: {}".format(username))
-            ActionChains(self.browser).move_to_element(user_).perform()
+            ActionChains(driver.browser).move_to_element(user_).perform()
             Settings.dev_print("successfully moved to user")
             Settings.dev_print("finding discount btn")
             buttons = user_.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUser").getClass())
@@ -268,7 +268,7 @@ class Driver:
                 Settings.maybe_print("attempting discount entry...")
                 Settings.dev_print("finding months and discount amount btns")
                 ## amount
-                discountEle = self.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserAmount").getClass())[0]
+                discountEle = driver.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserAmount").getClass())[0]
                 discountAmount = int(discountEle.get_attribute("innerHTML").replace("% discount", ""))
                 Settings.dev_print("amount: {}".format(discountAmount))
                 Settings.dev_print("entering discount amount")
@@ -277,7 +277,7 @@ class Driver:
                     down_ = int((int(amount) / 5) - 1)
                     Settings.dev_print("up: {}".format(up_))
                     Settings.dev_print("down: {}".format(down_))
-                    action = ActionChains(self.browser)
+                    action = ActionChains(driver.browser)
                     action.click(on_element=discountEle)
                     action.pause(1)
                     for n in range(up_):
@@ -290,7 +290,7 @@ class Driver:
                     action.perform()
                 Settings.dev_print("successfully entered discount amount")
                 ## months
-                monthsEle = self.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserMonths").getClass())[1]
+                monthsEle = driver.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserMonths").getClass())[1]
                 monthsAmount = int(monthsEle.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
                 Settings.dev_print("months: {}".format(monthsAmount))
                 Settings.dev_print("entering discount months")
@@ -299,7 +299,7 @@ class Driver:
                     down_ = int(int(months) - 1)
                     Settings.dev_print("up: {}".format(up_))
                     Settings.dev_print("down: {}".format(down_))
-                    action = ActionChains(self.browser)
+                    action = ActionChains(driver.browser)
                     action.click(on_element=monthsEle)
                     action.pause(1)
                     for n in range(up_):
@@ -311,9 +311,9 @@ class Driver:
                     action.send_keys(Keys.TAB)
                     action.perform()
                 Settings.dev_print("successfully entered discount months")
-                discountEle = self.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserAmount").getClass())[0]
+                discountEle = driver.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserAmount").getClass())[0]
                 discountAmount = int(discountEle.get_attribute("innerHTML").replace("% discount", ""))
-                monthsEle = self.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserMonths").getClass())[1]
+                monthsEle = driver.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserMonths").getClass())[1]
                 monthsAmount = int(monthsEle.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
                 return discountAmount, monthsAmount
 
@@ -326,7 +326,7 @@ class Driver:
             Settings.debug_delay_check()
             ## apply
             Settings.dev_print("applying discount")
-            buttons_ = self.find_elements_by_name("discountUserButton")
+            buttons_ = driver.find_elements_by_name("discountUserButton")
             for button in buttons_:
                 if not button.is_enabled() and not button.is_displayed(): continue
                 if "Cancel" in button.get_attribute("innerHTML") and Settings.is_debug() == "True":
@@ -352,7 +352,7 @@ class Driver:
         except Exception as e:
             Settings.print(e)
             Driver.error_checker(e)
-            buttons_ = self.find_elements_by_name("discountUserButton")
+            buttons_ = driver.find_elements_by_name("discountUserButton")
             for button in buttons_:
                 if "Cancel" in button.get_attribute("innerHTML"):
                     button.click()
@@ -1308,7 +1308,8 @@ class Driver:
     ##### Messages #####
     ####################
 
-    def message(self, username, user_id=None):
+    @staticmethod
+    def message(username, user_id=None):
         """
         Start a message to the username (or group of users) or user_id.
 
@@ -1330,7 +1331,8 @@ class Driver:
             Settings.err_print("missing user to message")
             return False
         try:
-            self.auth()
+            driver = Driver.get_driver()
+            driver.auth()
             Settings.dev_print("attempting to start message for {}...".format(username))
             type__ = None # default
             # if the username is a key string it will behave differently
@@ -1340,12 +1342,12 @@ class Driver:
             elif str(username).lower() == "renew on": type__ = "messageRenewers"
             successful = False
             if type__ != None:
-                self.go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+                driver.go_to_page(ONLYFANS_NEW_MESSAGE_URL)
                 Settings.dev_print("clicking message type: {}".format(username))
-                self.find_element_to_click(type__).click()
+                driver.find_element_to_click(type__).click()
                 successful = True
             else:
-                successful = self.message_user(username, user_id=user_id)
+                successful = driver.message_user(username, user_id=user_id)
             Settings.dev_print("successfully started message for {}".format(username))
             return successful
         except Exception as e:
@@ -1561,7 +1563,8 @@ class Driver:
             return False
         return True
 
-    def messages_scan(self, num=0):
+    @staticmethod
+    def messages_scan(num=0):
         """
         Scan messages page for recent users
 
@@ -1580,77 +1583,24 @@ class Driver:
         # go to /messages page
         # get top n users
         Settings.dev_print("scanning messages")
-        # 
-
-        # g-avatar online_status_class m-w50 -> username
-        # b-chats__item__link -> id
-
-        # if users found < n, scroll
-        # g-section-title -> scroll this
-        # if int(num) == 0: num = Settings.get_user_num()
         users = []
         try:
-            self.go_to_page("/my/chats")
-
-            # num += len(notusers)
-
-            ## so none of the scrolling is working, might as well only return the top 10 every time
-            # count = 0
-            # while True:
-                # elements = self.browser.find_elements(By.CLASS_NAME, "b-chats__item__link")
-                # if len(elements) <= int(num): break
-                # if len(elements) <= int(count): break
-                # Settings.print_same_line("({}/{}) scrolling...".format(count, len(elements)))
-                # count = len(elements)
-                # elementToFocus = self.browser.find_element(By.CLASS_NAME, "g-section-title")
-                # elementToFocus = elements[0]
-                # Settings.print(elementToFocus.get_attribute("innerHTML"))
-                # self.browser.execute_script("arguments[0].focus();", elementToFocus)
-                # actions = ActionChains(self.browser)
-                # actions.send_keys(Keys.PAGE_DOWN) 
-                # actions.perform()
-                # self.browser.execute_script("window.scrollBy(0,250)", "");
-                # self.browser.execute_script("scroll(0, 250);");
-                # elementToFocus.send_keys(Keys.END)
-                # elementToFocus.sendKeys(Keys.PAGE_DOWN);
-                # elementToFocus.sendKeys(Keys.PAGE_DOWN);
-                # elementToFocus.sendKeys(Keys.PAGE_DOWN);
-                # elementToFocus = elements[0]
-                # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                # self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                # time.sleep(2)
-
-            users_ = self.browser.find_elements(By.CLASS_NAME, "g-user-username")
+            driver = Driver.get_driver()
+            driver.auth()
+            driver.go_to_page("/my/chats")
+            users_ = driver.browser.find_elements(By.CLASS_NAME, "g-user-username")
             Settings.dev_print("users: {}".format(len(users_)))
-
-            user_ids = self.browser.find_elements(By.CLASS_NAME, "b-chats__item__link")
+            user_ids = driver.browser.find_elements(By.CLASS_NAME, "b-chats__item__link")
             Settings.dev_print("ids: {}".format(len(user_ids)))
-
-
-            # for user in users_:
-            #     if not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
-            #     Settings.print(str(user.get_attribute("href")).replace(ONLYFANS_HOME_URL2, ""))
-
-            #     users.append(str(user.get_attribute("href")).replace(ONLYFANS_HOME_URL2, ""))
-
             for user in user_ids:
                 if not user or not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
-                # Settings.print(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
-                # Settings.print(str(user.get_attribute("innerHTML")))
-                # for notuser in notusers:
-                    # if str(notuser.id) == str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""): 
-                        # Settings.print("skipping not user")
-                        # continue
                 users.append(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
-
-
             return users[:10]
         except Exception as e:
             Settings.print(e)
             Driver.error_checker(e)
             Settings.err_print("failed to scan messages")
         return users
-
 
     def move_to_then_click_element(self, element):
         """
@@ -2284,7 +2234,8 @@ class Driver:
 
     ######################################################################
 
-    def read_user_messages(self, username, user_id=None):
+    @staticmethod
+    def read_user_messages(username, user_id=None):
         """
         Read the messages of the target user by username or user id.
 
@@ -2303,11 +2254,12 @@ class Driver:
         """
 
         try:
+            driver = Driver.get_driver()
             # go to onlyfans.com/my/subscribers/active
-            self.message_user(username, user_id=user_id)
+            driver.message_user(username, user_id=user_id)
             messages_sent_ = []
             try:
-                messages_sent_ = self.find_elements_by_name("messagesFrom")
+                messages_sent_ = driver.find_elements_by_name("messagesFrom")
             except Exception as e:
                 if "Unable to locate elements" in str(e):
                     pass
@@ -2316,7 +2268,7 @@ class Driver:
             # messages_received_.pop(0) # drop self user at top of page
             messages_all_ = []
             try:
-                messages_all_ = self.find_elements_by_name("messagesAll")
+                messages_all_ = driver.find_elements_by_name("messagesAll")
             except Exception as e:
                 if "Unable to locate elements" in str(e):
                     pass
@@ -2324,7 +2276,7 @@ class Driver:
             messages_all = []
             messages_received = []
             messages_sent = []
-            # timestamps_ = self.browser.find_elements(By.CLASS_NAME, "b-chat__message__time")
+            # timestamps_ = driver.browser.find_elements(By.CLASS_NAME, "b-chat__message__time")
             # timestamps = []
             # for timestamp in timestamps_:
                 # Settings.maybe_print("timestamp1: {}".format(timestamp))
@@ -3151,7 +3103,8 @@ class Driver:
     ##### Users #####
     #################
 
-    def get_username(self):
+    @staticmethod
+    def get_username():
         """
         Gets the username of the logged in user.
 
@@ -3162,28 +3115,27 @@ class Driver:
 
         """
 
-        username = None
         try:
-            self.auth()
-            eles = self.browser.find_elements(By.TAG_NAME, "a")
-            eles = [ele for ele in eles 
-                    if "@" in str(ele.get_attribute("innerHTML"))
-                    and "onlyfans" not in str(ele.get_attribute("innerHTML"))
-                    ]
-            Settings.dev_print("successfully found users")
-            # for ele in eles:
-                # Settings.print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+            driver = Driver.get_driver()
+            driver.auth()
+            eles = [ele for ele in driver.browser.find_elements(By.TAG_NAME, "a") if "@" in str(ele.get_attribute("innerHTML")) and "onlyfans" not in str(ele.get_attribute("innerHTML"))]
+            Settings.dev_print("successfully found users...")
+            if Settings.is_debug():
+                for ele in eles:
+                    Settings.dev_print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
             if len(eles) == 0:
-                Settings.err_print("unable to find username")
-                return None
-            username = str(eles[0].get_attribute("href")).replace(ONLYFANS_HOME_URL2,"")
-            Settings.dev_print("successfully got username: {}".format(username))
+                Settings.err_print("unable to find username!")
+            else:
+                username = str(eles[0].get_attribute("href")).replace(ONLYFANS_HOME_URL2, "")
+                Settings.dev_print("successfully found active username: {}".format(username))
+                return username
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failed to find username")
-        return username
+        return None
 
-    def following_get(self):
+    @staticmethod
+    def following_get():
         """
         Return lists of accounts followed by the logged in user.
 
@@ -3196,17 +3148,18 @@ class Driver:
 
         users = []
         try:
-            self.go_to_page(ONLYFANS_USERS_FOLLOWING_URL)
+            driver = Driver.get_driver()
+            driver.go_to_page(ONLYFANS_USERS_FOLLOWING_URL)
             count = 0
             while True:
-                elements = self.browser.find_elements(By.CLASS_NAME, "m-subscriptions")
+                elements = driver.browser.find_elements(By.CLASS_NAME, "m-subscriptions")
                 if len(elements) == count: break
                 Settings.print_same_line("({}/{}) scrolling...".format(count, len(elements)))
                 count = len(elements)
-                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
             Settings.print("")
-            elements = self.browser.find_elements(By.CLASS_NAME, "m-subscriptions")
+            elements = driver.browser.find_elements(By.CLASS_NAME, "m-subscriptions")
             Settings.dev_print("successfully found subscriptions")
             for ele in elements:
                 username = ele.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()
@@ -3226,7 +3179,8 @@ class Driver:
         Settings.dev_print("successfully found following users")
         return users
 
-    def users_get(self, page=ONLYFANS_USERS_ACTIVE_URL):
+    @staticmethod
+    def users_get(page=ONLYFANS_USERS_ACTIVE_URL):
         """
         Return lists of accounts subscribed to the logged in user.
 
@@ -3239,9 +3193,10 @@ class Driver:
 
         users = []
         try:
-            self.go_to_page(page)
+            driver = Driver.get_driver()
+            driver.go_to_page(page)
             # user_count = int(self.browser.find_element(By.CLASS_NAME, "l-sidebar__user-data__item__count").get_attribute("innerHTML").strip())
-            user_count = self.browser.find_elements(By.TAG_NAME, "a")
+            user_count = driver.browser.find_elements(By.TAG_NAME, "a")
             # for debugging new regexes:
             # for ele in user_count:
             #     Settings.print("{}  -  {}".format(ele.get_attribute("href"), ele.get_attribute("innerHTML")))
@@ -3256,17 +3211,17 @@ class Driver:
             thirdTime = 0
             count = 0
             while True:
-                elements = self.browser.find_elements(By.CLASS_NAME, "m-fans")
+                elements = driver.browser.find_elements(By.CLASS_NAME, "m-fans")
                 if len(elements) == int(user_count): break
                 if len(elements) == int(count) and thirdTime >= 3: break
                 Settings.print_same_line("({}/{}) scrolling...".format(count, user_count))
                 count = len(elements)
-                self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
                 if thirdTime >= 3 and len(elements) == 0: break
                 thirdTime += 1
             Settings.print("")
-            elements = self.browser.find_elements(By.CLASS_NAME, "m-fans")
+            elements = driver.browser.find_elements(By.CLASS_NAME, "m-fans")
             Settings.dev_print("successfully found fans")
             Settings.dev_print("finding users")
             for ele in elements:
@@ -3319,7 +3274,8 @@ class Driver:
             Settings.err_print("failed to find users")
         return users
 
-    def user_get_id(self, username):
+    @staticmethod
+    def user_get_id(username):
         """
         Get the user id of the user by username.
 
@@ -3337,9 +3293,10 @@ class Driver:
 
         user_id = None
         try:
-            self.go_to_page(username)
+            driver = Driver.get_driver()
+            driver.go_to_page(username)
             time.sleep(3) # this should realistically only fail if they're no longer subscribed but it fails often from loading
-            elements = self.browser.find_elements(By.TAG_NAME, "a")
+            elements = driver.browser.find_elements(By.TAG_NAME, "a")
             ele = [ele.get_attribute("href") for ele in elements
                     if "/my/chats/chat/" in str(ele.get_attribute("href"))]
             if len(ele) == 0: 
@@ -3386,7 +3343,8 @@ class Driver:
                 Settings.dev_print(e)
         return name, number
 
-    def get_list(self, name=None, number=None):
+    @staticmethod
+    def get_list(name=None, number=None):
         """
         Search for list by name or number on OnlyFans.
 
@@ -3408,18 +3366,20 @@ class Driver:
 
         """
 
+        driver = Driver.get_driver()
+        driver.auth()
         # gets members from list
         users = []
         Settings.maybe_print("getting list: {} - {}".format(name, number))
-        name, number = self.search_for_list(name=name, number=number)
+        name, number = driver.search_for_list(name=name, number=number)
         try:
             if not name or not number:
-                for list_ in self.get_lists():
+                for list_ in driver.get_lists():
                     if name and str(list_[1]).lower() == str(name).lower():
                         number = list_[0]
                     if number and str(list_[0]).lower() == str(number).lower():
                         name = list_[1]
-            users = self.users_get(page="/my/lists/{}".format(number))
+            users = Driver.users_get(page="/my/lists/{}".format(number))
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failed to find list members")
@@ -3507,7 +3467,7 @@ class Driver:
 
         users = []
         try:
-            users = self.users_get(page="/my/lists/{}".format(int(list_)))
+            users = Driver.users_get(page="/my/lists/{}".format(int(list_)))
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failed to find list members")

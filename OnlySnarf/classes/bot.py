@@ -54,6 +54,16 @@ class Bot():
 
         user.update_chat_log()
 
+        ## TODO: update to be used here instead of in user class
+        def get_unparsed_messages(self):
+            unparsed_messages = [m for m in self.messages if m not in self.messages_parsed]  
+            Settings.dev_print("unparsed messages: {}\n{}".format(len(unparsed_messages),"\n".join(unparsed_messages)))
+            return unparsed_messages
+
+        def parse_message(self, message=None):
+            self.messages.remove(str(message))
+            self.messages_parsed.append(str(message))
+
         unparsed = user.get_unparsed_messages()
         for message in unparsed:
             successful = False
