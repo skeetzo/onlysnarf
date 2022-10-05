@@ -574,13 +574,16 @@
   - added subcommands to -help
   - changed 'questions' to 'poll'
   - reorganize tests as necessary (none)
+**4.3.8 : 10/5/2022**
+  - cleaned up user class & simplified current methods for selecting user(s) aka removed prompts for now
+  - restructured class/discount and how users are passed via args
 
 ------------------------------------------------------------------------------------
 
-## TODO
+- update message&post for new way of handling users passed via args
+- finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleaning up code
 
-- clean up user class & methods for selecting user(s)
-- finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleanuping up code
+## TODO
 
 - debug & test newly added subcommand structure: discount, message, post --> snarf.py
 - reupdate menu.md w/ pruned config & args
@@ -601,6 +604,8 @@
 - add to upload scheme (probably also as a config value): least to greatest (folder sizes)
 - add tests for additional config variables such as browser and image options
 - figure out how to suppress the chrome stacktrace debugging messages
+- re-enable prompting for discount amount&months in Settings (at some point)
+- re-add removed user select code in notes/selectstuff.py (for menu prompts)
 
 ------------------------------------------------------------------------------------
 

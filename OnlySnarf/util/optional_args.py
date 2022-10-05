@@ -14,6 +14,8 @@ def apply_args(parser):
   ##############
 
   parser_discount = subparsers.add_parser('discount', help='> discount one or more users')
+  userAndUsers = parser_discount.add_mutually_exclusive_group()
+
   ##
   # -amount
   # action: discount
@@ -27,11 +29,11 @@ def apply_args(parser):
   ##
   # -user
   # the user to discount
-  parser_discount.add_argument('-user', type=str,  default=None, dest='user', help='user to discount')
+  userAndUsers.add_argument('-user', type=str,  default=None, dest='user', help='user to discount')
   ##
   # -users
   # the users to discount
-  parser_discount.add_argument('-users', dest='users', action='append', default=[], help='users to discount')
+  userAndUsers.add_argument('-users', dest='users', action='append', default=[], help='users to discount')
 
   #############
   ## Message ##
@@ -39,6 +41,7 @@ def apply_args(parser):
 
   parser_message = subparsers.add_parser('message', help='> send a message to one or more users')
   dateAndSchedule = parser_message.add_mutually_exclusive_group()
+  userAndUsers = parser_message.add_mutually_exclusive_group()
 
   ##
   # -date
@@ -67,11 +70,11 @@ def apply_args(parser):
   ##
   # -user
   # the user to message
-  parser_message.add_argument('-user', type=str,  default=None, dest='user', help='user to message')
+  userAndUsers.add_argument('-user', type=str,  default=None, dest='user', help='user to message')
   ##
   # -users
   # the users to message
-  parser_message.add_argument('-users', dest='users', action='append', default=[], help='users to message')
+  userAndUsers.add_argument('-users', dest='users', action='append', default=[], help='users to message')
 
   ##########
   ## Post ##
@@ -129,7 +132,8 @@ def apply_args(parser):
   parser.add_argument('-backup', '-Bu', action='store_true', dest='backup', help='enables backup processes')
   ##
   # -browser
-  parser.add_argument('-browser', '-B', type=str, default="auto", choices=["auto","chrome","firefox","remote", "remote-chrome","remote-firefox","reconnect","reconnect-chrome","reconnect-firefox"], dest='browser',
+  parser.add_argument('-browser', '-B', type=str, default="auto", choices=["auto","chrome","firefox","remote"], dest='browser',
+  # parser.add_argument('-browser', '-B', type=str, default="auto", choices=["auto","chrome","firefox","remote", "remote-chrome","remote-firefox","reconnect","reconnect-chrome","reconnect-firefox"], dest='browser',
     help='web browser to use')
   ##
   # -category
@@ -154,9 +158,9 @@ def apply_args(parser):
   # parser.add_argument('-performers', dest='performers', action='append',  default=[],
   #   help='performers to upload. adds \"w/ @[...performers]\"')
   ##
-  # -save-users
+  # --save
   # saves OnlyFans users upon exit
-  parser.add_argument('-save-users', '-Su', action='store_true', dest='save_users', help='enable saving users locally on exit')
+  parser.add_argument('-save', action='store_true', dest='save_users', help='enable saving users locally on exit')
   ##
   # -sort
   # sort method to use when selecting content unprompted
@@ -173,7 +177,7 @@ def apply_args(parser):
   ##
   # -username
   # OnlyFans username to use
-  parser.add_argument('-username', '-OF', type=str, default="", dest='username', help='OnlyFans username to use')
+  parser.add_argument('--username', '--u', type=str, default="", dest='username', help='OnlyFans username to use')
 
   ###############
   ## DEBUGGING ##

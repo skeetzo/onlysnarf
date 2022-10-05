@@ -4,31 +4,19 @@ from .user import User
 from PyInquirer import prompt
 ##
 from ..util.validators import AmountValidator, MonthValidator
+from ..util.defaults import DISCOUNT_MAX_AMOUNT, DISCOUNT_MIN_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_MONTHS
 
 class Discount:
 
     """OnlyFans discount class"""
 
-    def __init__(self):
+    def __init__(self, username, amount=None, months=None):
 
         """OnlyFans discount action."""
 
-        self._initialized_ = False
-        # amount in percent
-        self.amount = None
-        # number of months (1-12)
-        self.months = None
-        # the recipient username
-        self.username = None
-
-    def init(self):
-        """Update the discount object's default values"""
-
-        if self._initialized_: return
-        self.get_username()
-        self.get_amount()
-        self.get_months()
-        self._initialized_ = True
+        self.amount = amount or DISCOUNT_MIN_AMOUNT # amount in percent
+        self.months = months or DISCOUNT_MIN_MONTHS # number of months (1-12)
+        self.username = username # the recipient username
 
     def apply(self):
 
@@ -41,37 +29,11 @@ class Discount:
 
         """
 
-        # ensure the discount has non default values
-        self.init()
         # skip prompt if disabled
         if Settings.is_prompt():
             if not Settings.prompt("Discount"): return
         Settings.maybe_print("discounting: {}".format(self.username))
-        # create new or find default browser
-        if self.username.lower() == "all":
-            users = User.get_all_users()
-        elif self.username.lower() == "recent":
-            users = User.get_recent_users()
-        elif self.username.lower() == "favorite":
-            users = User.get_favorite_users()
-        elif self.username.lower() == "new":
-            users = User.get_new_users()
-        else: users = [self]
-        successes = 0
-        failures = 0
-        for user in users:
-            try:
-                self.username = user.username
-                successful = Driver.get_driver().discount_user(discount=self)
-                if successful: successes+=1
-                else: failures+=1
-            except Exception as e:
-                Settings.dev_print(e)
-                failures+=1
-        if failures >= successes:
-            Settings.print("Successful: {} | Failed: {}".format(successes, failures))
-            return False
-        return True
+        return Driver.discount_user(self.get())
 
     def get(self):        
         return dict({
@@ -94,25 +56,7 @@ class Discount:
 
         """
 
-        if self.amount: return self.amount
-        # retrieve from args and return if exists
-        amount = Settings.get_amount() or None
-        if amount: 
-            self.amount = amount
-            return amount
-        # prompt skip
-        if not Settings.prompt("amount"): return None
-        question = {
-            'type': 'input',
-            'name': 'amount',
-            'message': 'Amount:',
-            'validate': AmountValidator,
-            'filter': lambda val: int(myround(int(val)))
-        }
-        amount = prompt(question)["amount"]
-        if not Settings.confirm(amount): return self.get_amount()
-        self.amount = amount
-        return self.amount
+        return self.amount or Settings.get_amount()
 
     def get_months(self):
 
@@ -128,25 +72,8 @@ class Discount:
 
         """
 
-        if self.months: return self.months
-        # retrieve from args and return if exists
-        months = Settings.get_months() or None
-        if months: 
-            self.months = months
-            return months
-        # prompt skip
-        if not Settings.prompt("months"): return None
-        question = {
-            'type': 'input',
-            'name': 'months',
-            'message': 'Months:',
-            'validate': MonthValidator,
-            'filter': lambda val: int(val)
-        }
-        months = prompt(question)["months"]
-        if not Settings.confirm(months): return self.get_months()
-        self.months = months
-        return self.months
+        return self.months or Settings.get_months()
+        
 
     def get_username(self):
 
@@ -162,8 +89,8 @@ class Discount:
 
         """
 
-        if self.username: return self.username
-        self.username = User.select_user().username
+        # if self.username: return self.username
+        # self.username = Settings.get_user().username
         return self.username
 
     def grandfatherer(self, users=[]):
@@ -184,7 +111,6 @@ class Discount:
         if len(users) == 0:
             users = User.get_users_by_list(name="grandfathered")
         print("Discount - Grandfathering: {} users".format(len(users)))
-        from ..util.defaults import DISCOUNT_MAX_MONTHS, DISCOUNT_MAX_AMOUNT
         self.months = DISCOUNT_MAX_MONTHS
         self.amount = DISCOUNT_MAX_AMOUNT
         # apply discount to all users
