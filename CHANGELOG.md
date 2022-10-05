@@ -572,16 +572,16 @@
   - ensure docs/menu.md is properly updated
 **4.3.7 : 10/4/2022**
   - added subcommands to -help
+  - changed 'questions' to 'poll'
+  - test newly added subcommand structure
+  - reorganize tests as necessary (none)
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- test newly added subcommand structure
-- reorganize tests as necessary
-
 (getting ready for new pypi release)
-- prepare commands for generating previews to record functionality with ala: "onlysnarf -discount -user random"
+- prepare commands for generating previews to record functionality with ala: "onlysnarf discount -user random"
 - update previews of behavior for readme w/ OBS: discount, message, post
 
 (ready for new pypi release)

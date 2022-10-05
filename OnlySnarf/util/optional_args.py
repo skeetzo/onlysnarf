@@ -7,7 +7,7 @@ from . import defaults as DEFAULT
 
 def apply_args(parser):
 
-  subparsers = parser.add_subparsers(help='Include a sub-command to run a corresponding action:')
+  subparsers = parser.add_subparsers(help='Include a sub-command to run a corresponding action:', dest="action", required=True)
 
   ##############
   ## Discount ##
@@ -18,24 +18,20 @@ def apply_args(parser):
   # -amount
   # action: discount
   # the amount to discount a user by
-  parser_discount.add_argument('-amount', type=valid_amount, dest='amount',
-    help='amount (%%) to discount by', default=DEFAULT.AMOUNT_NONE)
+  parser_discount.add_argument('-amount', type=valid_amount, dest='amount', help='amount (%%) to discount by', default=DEFAULT.AMOUNT_NONE)
   ##
   # -months
   # action: discount
   # the number of months to discount for
-  parser_discount.add_argument('-months', type=valid_month, default=None, dest='months',
-    help='number of months to discount')
+  parser_discount.add_argument('-months', type=valid_month, default=None, dest='months', help='number of months to discount')
   ##
   # -user
   # the user to discount
-  parser_discount.add_argument('-user', type=str,  default=None, dest='user',
-    help='user to discount')
+  parser_discount.add_argument('-user', type=str,  default=None, dest='user', help='user to discount')
   ##
   # -users
   # the users to discount
-  parser_discount.add_argument('-users', dest='users', action='append', default=[],
-    help='users to discount')
+  parser_discount.add_argument('-users', dest='users', action='append', default=[], help='users to discount')
 
   #############
   ## Message ##
@@ -47,8 +43,7 @@ def apply_args(parser):
   ##
   # -date
   # date in MM-DD-YYYY
-  dateAndSchedule.add_argument('-date', type=valid_date, default=DEFAULT.DATE, dest='date',
-    help='schedule date (MM-DD-YYYY)')
+  dateAndSchedule.add_argument('-date', type=valid_date, default=DEFAULT.DATE, dest='date', help='schedule date (MM-DD-YYYY)')
   ##
   # -price
   # the price to be set in a message
@@ -56,13 +51,11 @@ def apply_args(parser):
   ##
   # -schedule
   # the schedule to upload a post for
-  dateAndSchedule.add_argument('-schedule', type=valid_schedule, default=DEFAULT.SCHEDULE, dest='schedule',
-    help='schedule (MM-DD-YYYY:HH:MM:SS)')
+  dateAndSchedule.add_argument('-schedule', type=valid_schedule, default=DEFAULT.SCHEDULE, dest='schedule', help='schedule (MM-DD-YYYY:HH:MM:SS)')
   ##
   # -time
   # time in HH:MM
-  parser_message.add_argument('-time', type=valid_time, default=DEFAULT.TIME, dest='time',
-    help='time (HH:MM)')
+  parser_message.add_argument('-time', type=valid_time, default=DEFAULT.TIME, dest='time', help='time (HH:MM)')
   ##
   # -tags
   # @[tag]
@@ -74,13 +67,11 @@ def apply_args(parser):
   ##
   # -user
   # the user to message
-  parser_message.add_argument('-user', type=str,  default=None, dest='user',
-    help='user to message')
+  parser_message.add_argument('-user', type=str,  default=None, dest='user', help='user to message')
   ##
   # -users
   # the users to message
-  parser_message.add_argument('-users', dest='users', action='append', default=[],
-    help='users to message')
+  parser_message.add_argument('-users', dest='users', action='append', default=[], help='users to message')
 
   ##########
   ## Post ##
