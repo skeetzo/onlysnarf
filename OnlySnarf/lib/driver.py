@@ -1769,7 +1769,8 @@ class Driver:
     ##### Post #####
     ################
 
-    def post(self, message):
+    @staticmethod
+    def post(message):
         """
         Post the message to OnlyFans.
 
@@ -1795,7 +1796,8 @@ class Driver:
 
         Settings.dev_print("posting...")
         try:
-            self.auth()
+            driver = Driver.get_driver()
+            driver.auth()
             files = message["files"]
             text = message["text"]
             if str(text) == "None": text = ""
@@ -1808,12 +1810,12 @@ class Driver:
             Settings.print("- Text: {}".format(text))
             Settings.print("- Tweeting: {}".format(Settings.is_tweeting()))
             ## Expires, Schedule, Poll
-            if not self.expires(message["expiration"]): return False
-            if message["schedule"].validate() and not self.schedule(message["schedule"].get()): return False
-            if message["poll"].validate() and not self.poll(message["poll"].get()): return False
+            if not driver.expires(message["expiration"]): return False
+            if message["schedule"].validate() and not driver.schedule(message["schedule"].get()): return False
+            if message["poll"].validate() and not driver.poll(message["poll"].get()): return False
             Settings.print("====================")
             ############################################################
-            WAIT = WebDriverWait(self.browser, 600, poll_frequency=10)
+            WAIT = WebDriverWait(driver.browser, 600, poll_frequency=10)
             ## Tweeting
             if Settings.is_tweeting() == "True":
                 Settings.dev_print("tweeting")
@@ -1822,24 +1824,24 @@ class Driver:
             
             ## Upload Files
             try:
-                # successful_text = self.enter_text(text)
-                # successful_upload = self.upload_files(files)
-                if not self.enter_text(text) or not self.upload_files(files):
+                # successful_text = driver.enter_text(text)
+                # successful_upload = driver.upload_files(files)
+                if not driver.enter_text(text) or not driver.upload_files(files):
                     Settings.err_print("unable to post")
                     return False
                 ## Upload
                 i = 0
                 while True:
                     try:
-                        WebDriverWait(self.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("sendButton").getClass())))
+                        WebDriverWait(driver.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("sendButton").getClass())))
                         Settings.dev_print("upload complete")
                         break
                     except Exception as e:
                         # try: 
                         #     # check for existence of "thumbnail is fucked up" modal and hit ok button
                         #     # haven't seen in long enough time to properly add
-                        #     self.browser.switchTo().frame("iframe");
-                        #     self.browser.find_element(By.CLASS_NAME, "g-btn m-rounded m-border").send_keys(Keys.ENTER)
+                        #     driver.browser.switchTo().frame("iframe");
+                        #     driver.browser.find_element(By.CLASS_NAME, "g-btn m-rounded m-border").send_keys(Keys.ENTER)
                         #     Settings.err_print("thumbnail missing")
                         #     break
                         # except Exception as ef:
@@ -1856,15 +1858,15 @@ class Driver:
 
             ## Confirm
             try:
-                send = self.find_element_to_click("new_post")
+                send = driver.find_element_to_click("new_post")
                 if send:
                     Settings.debug_delay_check()
                     if Settings.is_debug() == "True":
                         try:
-                            self.find_element_to_click("postCancel").click()
+                            driver.find_element_to_click("postCancel").click()
                         except Exception as e:
                             Settings.dev_print(e)
-                            self.go_to_home(force=True)
+                            driver.go_to_home(force=True)
 
                         Settings.print('skipped post (debug)')
                         Settings.debug_delay_check()

@@ -62,8 +62,13 @@ class Snarf:
         
         """
 
-        message = Message()
-        try: return message.send()
+        try:
+            successful = []
+            for user in Settings.get_users():
+                Settings.print("> Messaging user: {}".format(user.username))
+                message = Message(user.username)
+                successful.append(message.send(user.username, user_id=user.id))
+            return all[successful]
         except Exception as e: Settings.dev_print(e)
         return False
                 
