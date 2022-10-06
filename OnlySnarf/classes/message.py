@@ -1,20 +1,22 @@
 import re
 from datetime import datetime
-from ..lib.driver import Driver
-from ..util.settings import Settings
-from .user import User
+from decimal import Decimal
+from re import sub
 from PyInquirer import prompt
 ##
-from ..util.validators import PriceValidator, ListValidator
-from ..lib import remote as Remote
+from ..lib.driver import Driver
 from .file import File, Folder
 from .poll import Poll
+from .user import User
+from ..util.settings import Settings
 from .schedule import Schedule
+from ..util.validators import PriceValidator, ListValidator
+from ..lib import remote as Remote
 
 class Message():
     """OnlyFans message (and post) class"""
 
-    def __init__(self, users):
+    def __init__(self, users=[]):
         """
         OnlyFans message and post object
 
@@ -34,7 +36,7 @@ class Message():
         self.hasPerformers = False # used to flag files from performer folders
 
         # typically related to messages only
-        self.users = users or [] # users to send to as username or user id
+        self.users = users # users to send to as username or user id
         self.user_id = 0 # user to send's to known user id
 
         self.__initialized__ = False
@@ -267,43 +269,36 @@ class Message():
         })
 
 
-    def get_price(self, again=True):
+    def get_price(self):
         """
         Gets the price value if not none else sets it from args or prompts.
 
 
-        Parameters
-        ----------
-        again : bool
-            Whether or not it is the script user's first time around.
-
         Returns
         -------
         int
-            The price as an int.
+            The price
 
         """
 
-        if self.price: return int(self.price)
-        # retrieve from args and return if exists
-        price = Settings.get_price() or 0
-        if price: 
-            self.price = price
-            return int(price)
-        if not Settings.prompt("price"): return 0
-        question = {
-            'type': 'input',
-            'name': 'price',
-            'message': 'Price',
-            'validate': PriceValidator,
-            'filter': lambda val: int(val)
-        }
-        price = prompt(question)["price"]
-        # if not Settings.confirm(price): return self.get_price(again=again)
-        self.price = int(price)
-        return int(price)
+        if self.price: return self.price
+        price = Settings.get_price()
+        priceMin = Settings.get_price_minimum()
+        priceMax = Settings.get_price_maximum()
+        if str(price) == "max": price = priceMax
+        elif str(price) == "min": price = priceMin
+        elif Decimal(sub(r'[^\d.]', '', str(price))) < Decimal(priceMin):
+            Settings.warn_print("price too low: {} < {}".format(price, priceMin))
+            Settings.maybe_print("adjusting price to minimum...")
+            price = priceMin
+        elif Decimal(sub(r'[^\d.]', '', str(price))) > Decimal(priceMax):
+            Settings.warn_print("price too high: {} < {}".format(price, priceMax))
+            Settings.maybe_print("adjusting price to maximum...")
+            price = priceMax    
+        self.price = price
+        return self.price
 
-    def get_recipients(self, again=True):
+    def get_recipients(self):
         """
         Gets the recipients value if not none else sets it from args or prompts. Users 'user' from config if provided as base for list otherwise 'users'.
 
@@ -518,15 +513,18 @@ class Post(Message):
             "poll": self.get_poll()
         })
 
-    def get_schedule(self, again=True):
+    def get_recipients(self):
+        """
+        Override does nothing.
+
+
+        """
+
+        pass
+
+    def get_schedule(self):
         """
         Gets the schedule value if not none else sets it from args or prompts.
-        
-        Parameters
-        ----------
-        again : bool
-            Whether or not it is the script user's first time around.
-
 
         Returns
         -------

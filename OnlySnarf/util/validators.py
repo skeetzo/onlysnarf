@@ -8,17 +8,19 @@ from . import defaults as DEFAULT
 #
 # Args
 
-def valid_action(s):
-	try:
-		if str(s) in DEFAULT.ACTIONS:
-			return str(s)
-	except ValueError:
-		msg = "Not a valid action: '{0}'.".format(s)
-		raise argparse.ArgumentTypeError(msg)
+# def valid_action(s):
+# 	try:
+# 		if str(s) in DEFAULT.ACTIONS:
+# 			return str(s)
+# 	except ValueError:
+# 		msg = "Not a valid action: '{0}'.".format(s)
+# 		raise argparse.ArgumentTypeError(msg)
 
 def valid_amount(s):
 	try:
-		if int(s) >= DEFAULT.DISCOUNT_MIN_AMOUNT and int(s) <= DEFAULT.DISCOUNT_MAX_AMOUNT:
+		if str(s) == "max": return DEFAULT.DISCOUNT_MAX_AMOUNT
+		elif str(s) == "min": return DEFAULT.DISCOUNT_MIN_AMOUNT
+		elif int(s) >= DEFAULT.DISCOUNT_MIN_AMOUNT and int(s) <= DEFAULT.DISCOUNT_MAX_AMOUNT:
 			return int(s)
 	except ValueError:
 		msg = "Not a valid discount amount: '{0}'.".format(s)
@@ -32,7 +34,9 @@ def valid_date(s):
 
 def valid_duration(s):
 	try:
-		if str(s) in DEFAULT.DURATION_ALLOWED: return str(s)
+		if str(s) == "max": return DEFAULT.DURATION_ALLOWED[:-1]
+		elif str(s) == "min": return DEFAULT.DURATION_ALLOWED[0]
+		elif str(s) in DEFAULT.DURATION_ALLOWED: return str(s)
 	except ValueError:
 		msg = "Not a valid duration: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
@@ -55,14 +59,18 @@ def valid_promo_expiration(s):
 
 def valid_expiration(s):
 	try:
-		if int(s) <= DEFAULT.EXPIRATION_MAX: return int(s)
+		if str(s) == "max": return DEFAULT.EXPIRATION_MAX
+		elif str(s) == "min": return DEFAULT.EXPIRATION_MIN
+		elif int(s) <= DEFAULT.EXPIRATION_MAX: return int(s)
 	except ValueError:
 		msg = "Not a valid expiration: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
 
 def valid_limit(s):
 	try:
-		if int(s) in DEFAULT.LIMIT_ALLOWED: return int(s)
+		if str(s) == "max": return DEFAULT.LIMIT_ALLOWED[:-1]
+		elif str(s) == "min": return DEFAULT.LIMIT_ALLOWED[0]
+		elif int(s) in DEFAULT.LIMIT_ALLOWED: return int(s)
 	except ValueError:
 		msg = "Not a valid limit: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
@@ -70,7 +78,9 @@ def valid_limit(s):
 
 def valid_month(s):
 	try:
-		if int(s) >= DEFAULT.DISCOUNT_MIN_MONTHS and int(s) <= DEFAULT.DISCOUNT_MAX_MONTHS:
+		if str(s) == "max": return DEFAULT.DISCOUNT_MAX_MONTHS
+		elif str(s) == "min": return DEFAULT.DISCOUNT_MIN_MONTHS
+		elif int(s) >= DEFAULT.DISCOUNT_MIN_MONTHS and int(s) <= DEFAULT.DISCOUNT_MAX_MONTHS:
 			return int(s)
 	except ValueError:
 		msg = "Not a valid month number: '{0}'.".format(s)
@@ -87,6 +97,8 @@ def valid_path(s):
 	return s
 
 def valid_price(s):
+	if str(s) == "max": return DEFAULT.PRICE_MAXIMUM
+	elif str(s) == "min": return DEFAULT.PRICE_MINIMUM
 	try: return "{:.2f}".format(float(s))
 	except ValueError:
 		msg = "Not a valid price: '{0}'.".format(s)
@@ -114,7 +126,7 @@ def valid_time(s):
 #     raise argparse.ArgumentTypeError(msg)
 
 ##
-# Questions
+# Questions / Prompts
 
 class MonthValidator(Validator):
 	def validate(self, document):

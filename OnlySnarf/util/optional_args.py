@@ -1,5 +1,5 @@
 import argparse
-from .validators import valid_amount, valid_price
+from .validators import valid_amount, valid_price, valid_path
 from .validators import valid_date, valid_month, valid_schedule, valid_time
 from .validators import valid_duration, valid_expiration, valid_limit
 from .validators import valid_promo_duration, valid_promo_expiration
@@ -15,7 +15,6 @@ def apply_args(parser):
 
   parser_discount = subparsers.add_parser('discount', help='> discount one or more users')
   userAndUsers = parser_discount.add_mutually_exclusive_group()
-
   ##
   # -amount
   # action: discount
@@ -42,7 +41,6 @@ def apply_args(parser):
   parser_message = subparsers.add_parser('message', help='> send a message to one or more users')
   dateAndSchedule = parser_message.add_mutually_exclusive_group()
   userAndUsers = parser_message.add_mutually_exclusive_group()
-
   ##
   # -date
   # date in MM-DD-YYYY
@@ -75,6 +73,10 @@ def apply_args(parser):
   # -users
   # the users to message
   userAndUsers.add_argument('-users', dest='users', action='append', default=[], help='users to message')
+
+  ##
+  # input
+  parser_message.add_argument('input', default=[], nargs=argparse.REMAINDER, type=valid_path, help='one or more paths to files (or folder) to include in the message')
 
   ##########
   ## Post ##
@@ -120,7 +122,11 @@ def apply_args(parser):
   ##
   # -question
   # poll questions
-  parser_post.add_argument('-poll', dest='questions', action='append', default=[], help='questions to ask')
+  parser_post.add_argument('-question', '-Q', dest='questions', action='append', default=[], help='questions to ask')
+
+  ##
+  # input
+  parser_post.add_argument('input', default=[], nargs=argparse.REMAINDER, type=valid_path, help='one or more paths to files (or folders) to include in the post')
 
   #############
   ## General ##

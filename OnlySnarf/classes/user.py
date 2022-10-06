@@ -3,8 +3,6 @@ import time
 import os
 import threading
 from datetime import datetime, timedelta
-from re import sub
-from decimal import Decimal
 import PyInquirer
 ##
 from ..util.colorize import colorize
@@ -142,10 +140,6 @@ class User:
             # enter the price to send the message to the user
             def enter_price(price):
                 if not price: return True
-                if price != None and Decimal(sub(r'[^\d.]', '', str(price))) < Decimal(Settings.get_price_minimum()):
-                    Settings.warn_print("price too low: {} < {}".format(price, Settings.get_price_minimum()))
-                    Settings.maybe_print("adjusting price to minimum...")
-                    price = Settings.get_price_minimum()
                 return driver.message_price(price)
             def enter_files(files):
                 for file in files:

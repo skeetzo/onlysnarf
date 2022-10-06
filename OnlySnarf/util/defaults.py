@@ -54,6 +54,7 @@ PROMOTION_OFFER_LIMIT = [0,1,2,3,4,5,6,7,8,9,10]
 PROMOTION_DURATION_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
 
 PRICE_MINIMUM = 3
+PRICE_MAXIMUM = 200
 
 # sftp
 # selenium browser

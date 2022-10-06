@@ -574,23 +574,26 @@
   - added subcommands to -help
   - changed 'questions' to 'poll'
   - reorganize tests as necessary (none)
-**4.3.8 : 10/5/2022**
+  **4.3.8 : 10/5/2022**
   - finished cleaning up class/user
   - cleaned up user class & simplified current methods for selecting user(s) aka removed prompts for now
   - restructured class/discount and how users are passed via args
   - updated message for new way of handling users passed via args
+**4.3.9: 10/6/2022**
+  - added 'min' and 'max' to arg inputs: price, expiration, duration, amount, months, limit
+  - changed 'poll' args back to 'question'
+  - prepared commands for generating previews to record functionality with ala: "onlysnarf discount -user random"
 
 ------------------------------------------------------------------------------------
 
-- finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleaning up code
-
 ## TODO
 
-- debug & test newly added subcommand structure: discount, message, post --> snarf.py
-- reupdate menu.md w/ pruned config & args
+- add subcommand for fetching users
 
 (getting ready for new pypi release)
-- prepare commands for generating previews to record functionality with ala: "onlysnarf discount -user random"
+- debug & test newly added subcommand structure: discount, message, post --> snarf.py
+- finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleaning up code
+- reupdate menu.md w/ pruned config & args
 - update previews of behavior for readme w/ OBS: discount, message, post
 
 (ready for new pypi release)
@@ -606,6 +609,8 @@
 - figure out how to suppress the chrome stacktrace debugging messages
 - re-enable prompting for discount amount&months in Settings (at some point)
 - re-add removed user select code in notes/selectstuff.py (for menu prompts)
+- update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
+- update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
 
 ------------------------------------------------------------------------------------
 
@@ -622,6 +627,10 @@
 - fix any new cli menu errors made while updating major processes
 
 (review usability and code first)
+-> Promos
+- clean up / fix & test
+- add min/max to args & validators
+
 -> Profile
 - new - setup - Twitter -> profile, banner; Price and Settings
 - new - advertise
