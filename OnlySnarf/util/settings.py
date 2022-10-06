@@ -160,10 +160,27 @@ class Settings:
         return os.path.join(Settings.get_base_directory(), "cookies.pkl")
 
     def get_price():
-        return config["price"] or ""
+        return config["price"]
+
+
+        # if not Settings.prompt("price"): return 0
+        # question = {
+        #     'type': 'input',
+        #     'name': 'price',
+        #     'message': 'Price',
+        #     'validate': PriceValidator,
+        #     'filter': lambda val: int(val)
+        # }
+        # price = prompt(question)["price"]
+        # # if not Settings.confirm(price): return self.get_price(again=again)
+        # self.price = price
+        # return price
 
     def get_price_minimum():
-        return DEFAULT.PRICE_MINIMUM or 0
+        return DEFAULT.PRICE_MINIMUM
+
+    def get_price_maximum():
+        return DEFAULT.PRICE_MAXIMUM
 
     def get_date():
         config["date"] = Settings.format_date(config["date"])
@@ -219,7 +236,10 @@ class Settings:
         return DEFAULT.PROMOTION_DURATION_ALLOWED or []
 
     def get_expiration():
-        return config["expiration"] or config["promotion_expiration"] or 0
+        return config["expiration"]
+
+    def get_promo_expiration():
+        return config["promotion_expiration"]
 
     def get_input():
         return config["input"] or []

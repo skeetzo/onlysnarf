@@ -32,21 +32,22 @@ Message $user users $text possibly with $image for $price.
 text: ""  
 
 (optional, "date" & "time" or only "schedule")
+schedule: "mm/dd/YYYY:HH:MM"  
 date: "mm/dd/YYYY"  
 time: "HH:MM"
-schedule: "mm/dd/YYYY:HH:MM"  
 
 (optional)
 category: "image" | "gallery" | "video"
 input: "/path/to/folderOrFile"
 source: "[local, remote, ipfs]"
 destination: "[local, remote, ipfs]"
+tags: key, words -> #key #words  
+performers: performerName1, performerName2 -> w/ @performerName1 @performerName2  
 
+poll:
 questions: "your mom", "is very hot", "today"  
 duration (poll): 1, 3, 7, 99 or "No limit"  
 expires: 1, 3, 7, 99 or "No limit"  
-tags: key, words -> #key #words  
-performers: performerName1, performerName2 -> w/ @performerName1 @performerName2  
 
 Upload $category of content from $source as a post with $text, $tags, and detected (or provided) $performers.
   If provided: enters questions as provided in order, enter's poll duration, expiration, and/or scheduling.

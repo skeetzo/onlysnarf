@@ -61,3 +61,24 @@ python setup.py install && python tests/test_ipfs.py
 # remote
 
 # (individual driver / message tests)
+
+
+#############################################################################
+
+##################
+## Demo Scripts ##
+##################
+
+# Discount
+ENV=test onlysnarf -debug discount -user random
+
+# Message
+ENV=test onlysnarf -debug message -user random -text shnarf! -price min public/images/snarf-missionary.jpg
+
+# Post
+ENV=test onlysnarf -debug post -text random public/images/snarf-missionary.jpg
+
+# Schedule, Date, Time
+ENV=test onlysnarf -debug post -text shnarff! -schedule 10/8/2022:16:20
+ENV=test onlysnarf -debug post -text shnarff! -date 10/10/2022 -time 16:20 
+ENV=test onlysnarf -debug post -text shnarff! -question "sharnf shnarf?" -question "shnarf shhhnarff snarf?" -duration min -expiration min

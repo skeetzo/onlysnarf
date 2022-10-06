@@ -1,6 +1,5 @@
 import argparse
 from typing import Dict, Any
-from .validators import valid_path
 
 args: Dict[str, Any] = {}
 
@@ -17,14 +16,6 @@ parser = argparse.ArgumentParser(prog='onlysnarf', allow_abbrev=False, epilog="S
 
 from .optional_args import apply_args
 apply_args(parser)
-
-##
-# Positional
-##
-
-##
-# input
-parser.add_argument('input', default=[], nargs=argparse.REMAINDER, type=valid_path, help='the path to a file (or folder) to include in a post or message')
 
 ##
 import pkg_resources
