@@ -14,7 +14,7 @@ from .schedule import Schedule
 class Message():
     """OnlyFans message (and post) class"""
 
-    def __init__(self):
+    def __init__(self, users):
         """
         OnlyFans message and post object
 
@@ -34,7 +34,7 @@ class Message():
         self.hasPerformers = False # used to flag files from performer folders
 
         # typically related to messages only
-        self.users = [] # users to send to as username or user id
+        self.users = users or [] # users to send to as username or user id
         self.user_id = 0 # user to send's to known user id
 
         self.__initialized__ = False
@@ -382,7 +382,7 @@ class Message():
         text = self.update_tags(text)
         return text
 
-    def send(self):
+    def send(self, username, user_id=None):
         """
         Sends a message.
 
@@ -393,33 +393,10 @@ class Message():
             Whether or not sending the message was successful.
 
         """
-        try:
-            self.init()
-            # if not Settings.confirm("Send message?"): return False
-            # if not self.get_files() and self.get_text() == "":
-            #     Settings.err_print("Missing files and text!")
-            #     return False
-            try: 
-                successes = 0
-                failures = 0
-                recipients = self.get_recipients()
-                Settings.maybe_print("messaging users: {}".format(len(recipients)))
-                for user in recipients:
-                    successful = User.message_user(self.get_message(), user.username, user_id=user.id)
-                    if successful: successes+=1
-                    else: failures+=1
-            except Exception as e:
-                Settings.dev_print(e)
-                failures+=1
-            Settings.maybe_print("successful: {}".format(successes))
-            Settings.maybe_print("failed: {}".format(failures))
-            self.cleanup()
-            if successes > failures: return True
-        except Exception as e:
-            Settings.dev_print(e)
-        Settings.print("something went wrong! shnarrnf!")
-        return False
 
+        self.init()
+        return User.message_user(self.get_message(), username, user_id=user_id)
+        
     def update_keywords(self, text):
         """Sets keywords from this object's file's title"""
 
@@ -573,27 +550,12 @@ class Post(Message):
             Whether or not sending the post was successful.
 
         """
-        try:
-            self.init()
-            Settings.print("post > {}".format(self.get_text()))
-            # if not Settings.confirm("Send post?"): return False
-            if not self.get_files() and self.get_text() == "":
-                Settings.err_print("Missing files and text!")
-                return False
-            try:
-                successes = 0
-                failures = 0
-                successful = Driver.get_driver().post(self.get_post())
-                if successful: successes+=1
-                else: failures+=1
-            except Exception as e:
-                Settings.dev_print(e)
-                failures+=1
-            Settings.maybe_print("successful: {}".format(successes))
-            Settings.maybe_print("failed: {}".format(failures))
-            self.cleanup()
-            if successes > failures: return True
-        except Exception as e:
-            Settings.dev_print(e)
-        Settings.print("something went wrong! shnarrnf!")
-        return False
+        
+        self.init()
+        Settings.print("post > {}".format(self.get_text()))
+        # if not Settings.confirm("Send post?"): return False
+        if not self.get_files() and self.get_text() == "":
+            Settings.err_print("Missing files and text!")
+            return False
+        return Driver.post(self.get_post())
+            

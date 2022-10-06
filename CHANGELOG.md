@@ -570,17 +570,18 @@
   **4.3.6 : 10/2/2022**
   - update / check '-help' output; add to readme
   - ensure docs/menu.md is properly updated
-**4.3.7 : 10/4/2022**
+  **4.3.7 : 10/4/2022**
   - added subcommands to -help
   - changed 'questions' to 'poll'
   - reorganize tests as necessary (none)
 **4.3.8 : 10/5/2022**
+  - finished cleaning up class/user
   - cleaned up user class & simplified current methods for selecting user(s) aka removed prompts for now
   - restructured class/discount and how users are passed via args
+  - updated message for new way of handling users passed via args
 
 ------------------------------------------------------------------------------------
 
-- update message&post for new way of handling users passed via args
 - finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleaning up code
 
 ## TODO
@@ -597,7 +598,6 @@
 - upload working changes to pypi
 
 (more cleanup before IPFS)
-- finish cleaning up class/user
 - clean up classes/files to keep up with gutting google, etc in exchange for ipfs
 - change deletion behavior to preserve better
 - update: backup function to include original folder name -> posted/galleries/$file
