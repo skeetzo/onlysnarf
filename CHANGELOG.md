@@ -591,6 +591,8 @@
 
 ------------------------------------------------------------------------------------
 
+- update method of importing config/args to allow for subcommand testing via pytest
+
 - debug & test newly added subcommand structure: discount, message, post --> snarf.py
 
 ## TODO

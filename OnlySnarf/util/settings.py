@@ -8,9 +8,6 @@ from pathlib import Path
 from .colorize import colorize
 from .config import config
 from . import defaults as DEFAULT
-from .logger import logging
-log = logging.getLogger('onlysnarf')
-
 from .validators import valid_schedule, valid_time
 
 class Settings:
@@ -21,9 +18,17 @@ class Settings:
     FILES = None
     PERFORMER_CATEGORY = None
     PROMPT = True
+    LOG = None
 
-    def __init__():
-        pass
+    # TODO: figure out what to do here better
+    def init():
+        import logging
+        from .logger import get_logger
+        loglevel = logging.INFO
+        if config["debug"] loglevel = logging.DEBUG
+        Settings.LOG = get_logger(loglevel)
+        config()
+
 
     #####################
     ##### Functions #####
@@ -39,7 +44,7 @@ class Settings:
 
     def print(text):
         if int(config["verbose"]) >= 1:
-            log.info(text)
+            Settings.LOG.info(text)
 
     def print_same_line(text):
         sys.stdout.write('\r')
@@ -49,17 +54,17 @@ class Settings:
 
     def maybe_print(text):
         if int(config["verbose"]) >= 2:
-            log.debug(text)
+            Settings.LOG.debug(text)
 
     def dev_print(text):
         if int(config["verbose"]) >= 3:
-            log.debug(text)
+            Settings.LOG.debug(text)
 
     def err_print(error):
-        log.error(error)
+        Settings.LOG.error(error)
 
     def warn_print(error):
-        log.warning(error)
+        Settings.LOG.warning(error)
 
     def format_date(date):
         if isinstance(date, str):
