@@ -73,7 +73,6 @@ def apply_args(parser):
   # -users
   # the users to message
   userAndUsers.add_argument('-users', dest='users', action='append', default=[], help='users to message')
-
   ##
   # input
   parser_message.add_argument('input', default=[], nargs=argparse.REMAINDER, type=valid_path, help='one or more paths to files (or folder) to include in the message')
@@ -123,37 +122,25 @@ def apply_args(parser):
   # -question
   # poll questions
   parser_post.add_argument('-question', '-Q', dest='questions', action='append', default=[], help='questions to ask')
-
   ##
   # input
   parser_post.add_argument('input', default=[], nargs=argparse.REMAINDER, type=valid_path, help='one or more paths to files (or folders) to include in the post')
+
+  ##########
+  ## User ##
+  ##########
+
+  parser_user = subparsers.add_parser('users', help='> scan & save users')
 
   #############
   ## General ##
   #############
 
   ##
-  # -backup
-  # backup uploaded content to designated folder at "destination"
-  parser.add_argument('-backup', '-Bu', action='store_true', dest='backup', help='enables backup processes')
-  ##
   # -browser
   parser.add_argument('-browser', '-B', type=str, default="auto", choices=["auto","chrome","firefox","remote"], dest='browser',
   # parser.add_argument('-browser', '-B', type=str, default="auto", choices=["auto","chrome","firefox","remote", "remote-chrome","remote-firefox","reconnect","reconnect-chrome","reconnect-firefox"], dest='browser',
     help='web browser to use')
-  ##
-  # -category
-  # category of folder to upload from
-  # parser.add_argument('-category', default=DEFAULT.CATEGORY_NONE, dest='category',
-    # help='category of content to post or message')
-  ##
-  # -delete
-  # delete content after upload
-  parser.add_argument('-delete', action='store_true', dest='delete', help='delete file instead of backing up')
-  ##
-  # -destination
-  # destination to use when backing up content
-  # parser.add_argument('-destination', dest='destination', default=None, choices=["remote","local"], help='file backup location. uses same as -source if none specified')
   ##
   # -login
   # method to prefer when logging in
@@ -161,12 +148,11 @@ def apply_args(parser):
   ##
   # -performers
   # list of performers to upload matching content of
-  # parser.add_argument('-performers', dest='performers', action='append',  default=[],
-  #   help='performers to upload. adds \"w/ @[...performers]\"')
+  parser.add_argument('-performers', dest='performers', action='append',  default=[], help='performers to upload. adds \"w/ @[...performers]\"')
   ##
   # --save
   # saves OnlyFans users upon exit
-  parser.add_argument('-save', action='store_true', dest='save_users', help='enable saving users locally on exit')
+  parser.add_argument('-save', '-S', action='store_true', dest='save_users', help='enable saving users locally on exit')
   ##
   # -sort
   # sort method to use when selecting content unprompted
@@ -203,7 +189,7 @@ def apply_args(parser):
   ##
   # -debug-delay
   # user message delay
-  parser.add_argument('-debug-delay', '-DD', action='store_true', dest='debug_delay', help=argparse.SUPPRESS)
+  parser.add_argument('-debug-delay', action='store_true', dest='debug_delay', help=argparse.SUPPRESS)
   ##
   # -debug-firefox
   # enables trace logging for firefox
@@ -238,7 +224,7 @@ def apply_args(parser):
   ##
   # -show
   # shows window
-  parser.add_argument('-show', '-show-window', '-SW', dest='show', action='store_true',  help='enable displaying browser window')
+  parser.add_argument('-show', '-SW', dest='show', action='store_true',  help='enable displaying browser window')
   ##
   # -skip-download
   parser.add_argument('-skip-download', action='store_true', dest='skip_download', help=argparse.SUPPRESS)

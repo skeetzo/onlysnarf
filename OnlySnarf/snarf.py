@@ -9,6 +9,7 @@ from OnlySnarf.classes.discount import Discount
 from OnlySnarf.classes.message import Message, Post
 from OnlySnarf.classes.profile import Profile
 from OnlySnarf.classes.promotion import Promotion
+from OnlySnarf.classes.user import User
 
 #################
 ##### Snarf #####
@@ -142,6 +143,22 @@ class Snarf:
             elif method == "user": return Promotion.apply_to_user()
             elif method == "grandfather": return Promotion.grandfathered()
             else: Settings.err_print("Missing Promotion Method")
+        except Exception as e: Settings.dev_print(e)
+        return False
+
+    @staticmethod
+    def users():
+
+        """
+        Scan users.
+
+        
+        """
+
+        try:
+            Settings.set_prefer_local(False)
+            User.get_all_users()
+            return True
         except Exception as e: Settings.dev_print(e)
         return False
 

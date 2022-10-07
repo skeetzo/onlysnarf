@@ -31,12 +31,6 @@ except Exception as e:
   print("Error: Incorrect arg format")
   parser.exit(1)
 
-# if args["source"] and not args["destination"]:
-#   args["destination"] = args["source"]
-# if not args["source"]: args["source"] = "local"
-# if not args["destination"]: args["destination"] = "local"
-# if not args["category"]: args["source"] = None
-
 #############
 # Debugging #
 # import sys

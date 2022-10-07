@@ -303,24 +303,18 @@ class Settings:
         return config["promotion_method"] or None
 
     def get_password():
-        try:
-            return config["password"] or Settings.get_user_config(Settings.get_username())["onlyfans_password"]
-        except Exception as e:
-            Settings.err_print(e)
+        try: return Settings.get_user_config(Settings.get_username())["onlyfans_password"]
+        except Exception as e: Settings.err_print(e)
         return ""
 
     def get_password_google():
-        try:
-            return config["google_password"] or Settings.get_user_config(Settings.get_username())["google_password"]
-        except Exception as e:
-            Settings.err_print(e)
+        try: return Settings.get_user_config(Settings.get_username())["google_password"]
+        except Exception as e: Settings.err_print(e)
         return ""
 
     def get_password_twitter():
-        try:
-            return config["twitter_password"] or Settings.get_user_config(Settings.get_username())["twitter_password"]
-        except Exception as e:
-            Settings.err_print(e)
+        try: return Settings.get_user_config(Settings.get_username())["twitter_password"]
+        except Exception as e: Settings.err_print(e)
         return ""
 
     def get_download_path():

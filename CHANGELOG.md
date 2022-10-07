@@ -579,52 +579,48 @@
   - cleaned up user class & simplified current methods for selecting user(s) aka removed prompts for now
   - restructured class/discount and how users are passed via args
   - updated message for new way of handling users passed via args
-**4.3.9: 10/6/2022**
+  **4.3.9: 10/6/2022**
   - added 'min' and 'max' to arg inputs: price, expiration, duration, amount, months, limit
   - changed 'poll' args back to 'question'
   - prepared commands for generating previews to record functionality with ala: "onlysnarf discount -user random"
+**4.3.10: 10/7/2022**
+  - finished adding docstrings to classes/user.py
+  - added subcommand for fetching users
+  - reupdated menu.md w/ pruned config & args
+  - updated help.md
 
 ------------------------------------------------------------------------------------
 
+- debug & test newly added subcommand structure: discount, message, post --> snarf.py
+
 ## TODO
 
-- add subcommand for fetching users
-
 (getting ready for new pypi release)
-- debug & test newly added subcommand structure: discount, message, post --> snarf.py
-- finish adding docstrings to classes/user.py (doublecheck all others)... aka finish cleaning up code
-- reupdate menu.md w/ pruned config & args
-- update previews of behavior for readme w/ OBS: discount, message, post
+- update previews of behavior for readme w/ OBS: discount, message, post, users
 
 (ready for new pypi release)
 - sync with main/master branch
 - upload working changes to pypi
 
-(more cleanup before IPFS)
-- clean up classes/files to keep up with gutting google, etc in exchange for ipfs
-- change deletion behavior to preserve better
+(more cleanup)
+- doublecheck code for missing docstrings... aka finish cleaning up code
+- clean up classes/files to keep up with gutting google, etc
 - update: backup function to include original folder name -> posted/galleries/$file
-- add to upload scheme (probably also as a config value): least to greatest (folder sizes)
-- add tests for additional config variables such as browser and image options
-- figure out how to suppress the chrome stacktrace debugging messages
-- re-enable prompting for discount amount&months in Settings (at some point)
-- re-add removed user select code in notes/selectstuff.py (for menu prompts)
-- update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
-- update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
+- change deletion behavior to preserve better
 
 ------------------------------------------------------------------------------------
 
--> IPFS
-- add IPFS integration; dev scripts
-- add to "source" variable "ipfs" for sourcing from IPFS 
-- add to "backup" variable "ipfs" for uploading content to IPFS to host / backup / disseminate
-- integrate IPFS process in such a way as to not "offend" via links ergo pull from IPFS -> upload to OnlyFans (etc) 
-
-(preferably after additional developments like IPFS)
 - separate driver functions into individual components ala schedule --> individual steps; for easier testing (and to clean up the giant ass driver file)
 
 -> CLI
 - fix any new cli menu errors made while updating major processes
+- update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
+- update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
+- figure out how to suppress the chrome stacktrace debugging messages
+
+-> Menu
+- re-enable prompting for discount amount&months in Settings (at some point)
+- re-add removed user select code in notes/selectstuff.py (for menu prompts)
 
 (review usability and code first)
 -> Promos
@@ -652,6 +648,7 @@
 - add quiz & target interactions (onlyfans buttons)
 
 -> Tests
+- add tests for additional config variables such as browser and image options
 - finish adding tests for individual circumstances:
 messaging: all, recent, favorite, renew on
 individual message entry parts, individual post entry parts
@@ -668,22 +665,12 @@ https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-
 
 - debug: discover the cause of the super slow web scraping
 -- probably not: debug_delay
+---- possibly improved via recent updated coding? (4.3.10)
 
 # Bugs
 
-**?.?.?**
--> Remote
-- debug / add error catch for uploads: ('Connection aborted.', BrokenPipeError(32, 'Broken pipe'))
-
 **4.1.4**
   - boolean checks from "Settings.is_" functions are failing: replaced with redundant "== True"
-
-**4.2.2**
-- unclosed socket error during testing that eventually builds up into lack of room; occurs after checking for chrome binary and failing to find it before switching to try firefox, which launches and then doesn't seem to work
-
-  "/venv/lib/python3.8/site-packages/OnlySnarf-4.2.1-py3.8.egg/OnlySnarf/lib/driver.py:2841: ResourceWarning: unclosed <socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=6, laddr=('127.0.0.1', 35896), raddr=('127.0.0.1', 35181)>"
-  ResourceWarning: Enable tracemalloc to get the object allocation traceback
-
 
 # Web Browser Versions
 

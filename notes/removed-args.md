@@ -69,6 +69,12 @@ The path to the users file.
 -profile-path
 The path to the profile file.
 
+-promotion-expiration
+The expiration to use for a promotion.
+
+-promotion-limit
+The max number of subscribers for a promotion.
+
 -promotion-trial
 
 -promotion-user
@@ -103,8 +109,6 @@ The favorite users by username to specify for favorite operations.
 
 -title
 Specific title of file to search for remotely.
-
-
 
 
 
