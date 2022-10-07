@@ -10,8 +10,10 @@ from ..lib.driver import Driver
 from ..util.settings import Settings
 
 class User:
+    """OnlyFans users."""
 
     def __init__(self, data):
+        """User object"""
 
         data = json.loads(json.dumps(data))
         self.name               =   data.get('name')                            or None
@@ -55,18 +57,21 @@ class User:
 
         Parameters
         ----------
-        user : classes.User
-            The classes.User to compare this classes.User object against.
+        classes.User
+            The user to compare another user object against
         """
 
         if str(user.username) == str(self.username) or str(user.id) == str(self.id): return True
         return False
 
     def get_id(self):
-
         """
-        Get the provided ID of the User.
+        Get the provided ID of the User. Searches via username if necessary.
 
+        Returns
+        -------
+        str
+            The user id
         """
 
         if self.id: return self.id
@@ -74,10 +79,13 @@ class User:
         return self.id
 
     def get_username(self):
-
         """
-        Get the @username of the User.
+        Get the username of the User.
 
+        Returns
+        -------
+        str
+            The username
         """
 
         if self.username: return self.username
@@ -85,7 +93,6 @@ class User:
         return self.username
 
     def message(self, message):
-
         """
         Message the user by their available username or id with the provided message.
 
@@ -94,6 +101,10 @@ class User:
         message : Object
             The message to send as a serialized Message object from get_message.
 
+        Returns
+        -------
+        bool
+            Whether or not the message was successful
         """
 
         if not self.get_username() and not self.get_id(): return Settings.err_print("missing user identifiers!")
@@ -102,8 +113,7 @@ class User:
         else:
             Settings.print("messaging user: {} <-- {}".format(self.username, message["text"]))
         if not Driver.message(self.username, user_id=self.id): return False
-        if not self.message_send(message): return False
-        return True
+        return self.message_send(message)
 
     def messages_read(self):
         """
@@ -120,7 +130,6 @@ class User:
         Settings.maybe_print("chat read!")
 
     def message_send(self, message):
-
         """
         Complete the various components of sending a message to a user.
         
@@ -129,6 +138,10 @@ class User:
         message : Object
             The message to send as a serialized Message object from get_message.
 
+        Returns
+        -------
+        bool
+            Whether or not the message was successful
         """
 
         Settings.print("entering message: (${}) {}".format(message["price"], message["text"]))
@@ -170,6 +183,16 @@ class User:
     # gets users from local or refreshes from onlyfans.com
     @staticmethod
     def get_active_users():
+        """
+        Get active users.
+
+        Returns
+        -------
+        list
+            The active users
+
+        """
+
         Settings.dev_print("getting active users...")
         active_users = []
         for user in User.get_all_users():
@@ -180,6 +203,16 @@ class User:
     
     @staticmethod
     def get_all_users():
+        """
+        Get all users.
+
+        Returns
+        -------
+        list
+            The users
+
+        """
+
         Settings.dev_print("getting all users...")
         if Settings.is_prefer_local():
             users = User.read_users_local()
@@ -197,6 +230,16 @@ class User:
     # make this actually do something
     @staticmethod
     def get_favorite_users():
+        """
+        Get all favorite users.
+
+        Returns
+        -------
+        list
+            The favorite users
+
+        """
+
         Settings.dev_print("getting favorite users...")
         users = []
         for user in User.get_all_users():
@@ -206,8 +249,17 @@ class User:
         return users
 
     @staticmethod
-    # return following Users
     def get_following():
+        """
+        Get all following.
+
+        Returns
+        -------
+        list
+            The users being followed
+
+        """
+
         Settings.dev_print("getting following...")
         if Settings.is_prefer_local():
             users = User.read_following_local()
@@ -223,6 +275,16 @@ class User:
 
     @staticmethod
     def get_never_messaged_users():
+        """
+        Get all users that have never been messaged before.
+
+        Returns
+        -------
+        list
+            The users that have not been messaged
+
+        """
+
         Settings.dev_print("getting users that have never been messaged...")
         users = []
         for user in User.get_all_users():
@@ -231,9 +293,18 @@ class User:
                 users.append(user)
         return users
 
-    # returns users that have no messages sent to them
     @staticmethod
     def get_new_users():
+        """
+        Get all new users.
+
+        Returns
+        -------
+        list
+            The users that are new
+
+        """
+
         Settings.dev_print("getting new users...")
         newUsers = []
         date_ = datetime.today() - timedelta(days=10)
@@ -248,12 +319,31 @@ class User:
 
     @staticmethod
     def get_random_user():
+        """
+        Get a random user.
+
+        Returns
+        -------
+        classes.User
+            A random user
+
+        """
+
         Settings.dev_print("getting random user...")
         import random
         return random.choice(User.get_all_users())
 
     @staticmethod
     def get_recent_messagers():
+        """
+        Get users that have recently sent messages.
+
+        Returns
+        -------
+        list
+            The users that have recently sent messages
+
+        """
         Settings.dev_print("getting recent users from messages...")
         users = []
         for user in Driver.messages_scan():
@@ -263,6 +353,15 @@ class User:
     ## TODO: maybe update this so it actually works?
     @staticmethod
     def get_recent_users():
+        """
+        Get recent users.
+
+        Returns
+        -------
+        list
+            The recent users
+
+        """
         Settings.dev_print("getting recent users...")
         i = 0
         users = []
@@ -275,6 +374,15 @@ class User:
 
     @staticmethod
     def get_user_by_id(userid):
+        """
+        Get user by id.
+
+        Returns
+        -------
+        int
+            The user id
+
+        """
         if not userid or userid == None:
             Settings.err_print("missing user id")
             return None
@@ -287,6 +395,15 @@ class User:
 
     @staticmethod
     def get_user_by_username(username):
+        """
+        Get user by username.
+
+        Returns
+        -------
+        classes.User
+            The user with the provided username
+
+        """
         if not username or str(username) == "None":
             Settings.err_print("missing username!")
             return None
@@ -299,6 +416,15 @@ class User:
 
     @staticmethod
     def get_users_by_list(number=None, name=None, ):
+        """
+        Get users by custom list.
+
+        Returns
+        -------
+        list
+            The users on the list
+
+        """
         Settings.maybe_print("getting users by list: {} - {}".format(number, name))
         listUsers = []
         for user in Driver.get_list(number=number, name=name):
@@ -323,6 +449,15 @@ class User:
 
     @staticmethod
     def read_following_local():
+        """
+        Read the locally saved following file.
+
+        Returns
+        -------
+        list
+            The locally saved followers
+
+        """
         Settings.dev_print("getting local following...")
         users = []
         try:
@@ -334,9 +469,17 @@ class User:
             Settings.dev_print(e)
         return users
 
-    # gets a list of all subscribed user_ids from local txt
     @staticmethod
     def read_users_local():
+        """
+        Read the locally saved users file.
+
+        Returns
+        -------
+        list
+            The locally saved users
+
+        """
         Settings.dev_print("getting local users...")
         users = []
         try:
@@ -355,7 +498,7 @@ class User:
 
         Parameters
         ----------
-        users : classes.User
+        classes.User
             A list of users to read the messages of.
 
         """
@@ -368,14 +511,26 @@ class User:
  
     @staticmethod
     def skipUserCheck(user):
+        """
+        Skip user if meets flags.
+
+        Returns
+        -------
+        classes.User
+            The same user provided (if not skipped)
+
+        """
         if str(user.id).lower() in Settings.get_skipped_users() or str(user.username).lower() in Settings.get_skipped_users():
             Settings.maybe_print("skipping: {}".format(user.username))
             return None
         return user
 
-    # writes user list to local txt
     @staticmethod
     def write_users_local(users=None):
+        """
+        Write to local users file.
+
+        """
         if users is None:
             users = User.get_all_users()
         if len(users) == 0:
@@ -403,6 +558,10 @@ class User:
 
     @staticmethod
     def write_following_local(users=None):
+        """
+        Write to local followers file.
+
+        """
         if users is None:
             users = User.get_following()
         if len(users) == 0:

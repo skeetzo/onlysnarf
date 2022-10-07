@@ -3680,9 +3680,10 @@ class Driver:
             self._initialized_ = False
             Driver.DRIVERS.remove(self)
 
-
     @staticmethod
     def exit_all():
+        """Exit all known browsers."""
+
         for driver in Driver.DRIVERS:
             driver.exit()
 
