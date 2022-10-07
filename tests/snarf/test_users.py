@@ -13,10 +13,9 @@ class TestUsers(unittest.TestCase):
     def setUp(self):
         config["prefer_local"] = False
         Settings.set_debug("tests")
-        self.test_snarf = Snarf()
         
     def tearDown(self):
-        self.test_snarf.close()
+        Snarf.close()
 
     def test_get_users(self):
         assert User.get_all_users(), "unable to read users"

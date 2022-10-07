@@ -14,6 +14,13 @@ parser = argparse.ArgumentParser(prog='onlysnarf', allow_abbrev=False, epilog="S
 
 ############
 
+import os
+if os.environ.get("ENV") != "test":
+  from .optional_args import apply_subcommand_args
+  apply_subcommand_args(parser)
+
+## TODO: possibly add more to ensure default config settings are prepared?
+
 from .optional_args import apply_args
 apply_args(parser)
 
@@ -25,7 +32,11 @@ parser.add_argument('-version', action='version')
 ############################################################################################
 
 try:
-  args.update(vars(parser.parse_args()))
+  # args.update(vars(parser.parse_args()))
+
+  parsedargs, unknownargs = parser.parse_known_args()
+  print("unknown args: {}".format(unknownargs))
+  args.update(vars(parsedargs))
 except Exception as e:
   print(e)
   print("Error: Incorrect arg format")

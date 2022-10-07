@@ -199,7 +199,6 @@ parser.add_argument('-bykeyword', dest='bykeyword', default=None,
 parser.add_argument('-notkeyword', dest='notkeyword', default=None,
   help="search for folder not by keyword")
 
-
 ##
 # -prefer-local
 # prefers local user cache over refreshing first call
@@ -219,20 +218,10 @@ parser.add_argument('-recent-users-count', default=3, dest='recent_users_count',
   type=int, help='the number of users to consider recent')
 
 ##
-# -reduce
-# enables file reduction
-parser.add_argument('-reduce', action='store_true', dest='reduce',
-  help='enable reducing files over 50 MB')
-
-
-
-##
 # -title
 # the title of a file to search for
 parser.add_argument('-title', default=None, dest='title',
   help='the title of the file to search for')
-
-
 
 ##
 # -session-id

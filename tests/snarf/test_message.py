@@ -16,29 +16,28 @@ class TestSnarf(unittest.TestCase):
         config["user"] = "random"
         # config["keep"] = True
         Settings.set_debug("tests")
-        self.test_snarf = Snarf()
 
     def tearDown(self):
         config["input"] = []
         config["price"] = 0
         config["user"] = None
-        self.test_snarf.close()
+        Snarf.close()
         # config["keep"] = False
 
     def test_message(self):
-        assert self.test_snarf.message(), "unable to send message"
+        assert Snarf.message(), "unable to send message"
 
     @unittest.skip("todo")
     def test_message_files(self):
-        assert self.test_snarf.message(), "unable to upload message files"
+        assert Snarf.message(), "unable to upload message files"
 
     @unittest.skip("todo")
     def test_message_price(self):
-        assert self.test_snarf.message(), "unable to set message price"
+        assert Snarf.message(), "unable to set message price"
 
     @unittest.skip("todo")
     def test_message_text(self):
-        assert self.test_snarf.message(), "unable to set message text"
+        assert Snarf.message(), "unable to set message text"
 
 ############################################################################################
 

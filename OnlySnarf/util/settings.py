@@ -9,6 +9,8 @@ from .colorize import colorize
 from .config import config
 from . import defaults as DEFAULT
 from .validators import valid_schedule, valid_time
+from .logger import logging
+log = logging.getLogger('onlysnarf')
 
 class Settings:
     
@@ -18,17 +20,6 @@ class Settings:
     FILES = None
     PERFORMER_CATEGORY = None
     PROMPT = True
-    LOG = None
-
-    # TODO: figure out what to do here better
-    def init():
-        import logging
-        from .logger import get_logger
-        loglevel = logging.INFO
-        if config["debug"] loglevel = logging.DEBUG
-        Settings.LOG = get_logger(loglevel)
-        config()
-
 
     #####################
     ##### Functions #####
@@ -44,7 +35,7 @@ class Settings:
 
     def print(text):
         if int(config["verbose"]) >= 1:
-            Settings.LOG.info(text)
+            log.info(text)
 
     def print_same_line(text):
         sys.stdout.write('\r')
@@ -54,17 +45,17 @@ class Settings:
 
     def maybe_print(text):
         if int(config["verbose"]) >= 2:
-            Settings.LOG.debug(text)
+            log.debug(text)
 
     def dev_print(text):
         if int(config["verbose"]) >= 3:
-            Settings.LOG.debug(text)
+            log.debug(text)
 
     def err_print(error):
-        Settings.LOG.error(error)
+        log.error(error)
 
     def warn_print(error):
-        Settings.LOG.warning(error)
+        log.warning(error)
 
     def format_date(date):
         if isinstance(date, str):
@@ -493,6 +484,12 @@ class Settings:
             Settings.err_print(e)
         return ""
 
+    def get_remote_browser_host():
+        return config["remote_browser_host"]
+
+    def get_remote_browser_port():
+        return config["remote_browser_port"]
+
     ## TODO
     # add arg -profile
     # add method for reading config profiles from conf/users
@@ -540,9 +537,6 @@ class Settings:
     def is_debug_delay():
         return config["debug_delay"]
 
-    def is_force_backup():
-        return config["force_backup"]
-
     def is_force_upload():
         return config["force_upload"]
 
@@ -559,16 +553,10 @@ class Settings:
         return config["save_users"]
         
     def is_reduce():
-        return config["enable_reduce"]
+        return config["reduce"]
     
     def is_show_window():
         return config["show"]
-
-    def is_split():
-        return config["enable_split"]
-        
-    def is_trim():
-        return config["enable_trim"]
         
     def is_tweeting():
         return config["tweeting"]

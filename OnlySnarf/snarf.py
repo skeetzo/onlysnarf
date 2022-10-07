@@ -179,8 +179,6 @@ def main():
         # purge local tmp files
         from .classes.file import File
         File.remove_local()
-        ## TODO: finish init or redesign?
-        Settings.init()
         # disable menu prompts
         Settings.set_prompt(False)
         Settings.set_confirm(False)

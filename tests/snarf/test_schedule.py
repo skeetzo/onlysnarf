@@ -20,22 +20,21 @@ class TestSnarf(unittest.TestCase):
         config["date"] = DEFAULT.DATE
         config["time"] = DEFAULT.TIME
         Settings.set_debug("tests")
-        self.test_snarf = Snarf()
 
     def tearDown(self):
-        self.test_snarf.close()
+        Snarf.close()
 
     def test_schedule(self):
         config["schedule"] = tomorrow.strftime(DEFAULT.SCHEDULE_FORMAT)
-        assert self.test_snarf.post(), "unable to post schedule"
+        assert Snarf.post(), "unable to post schedule"
         
     def test_schedule_date(self):
         config["date"] = tomorrow.strftime(DEFAULT.DATE_FORMAT)
-        assert self.test_snarf.post(), "unable to post schedule via date"
+        assert Snarf.post(), "unable to post schedule via date"
 
     def test_schedule_time(self):
         config["time"] = (today + datetime.timedelta(hours=3, minutes=30)).strftime(DEFAULT.TIME_FORMAT)
-        assert self.test_snarf.post(), "unable to post schedule via time"
+        assert Snarf.post(), "unable to post schedule via time"
 
     ## TODO:
     # verify correct values by getting values of selected components:
