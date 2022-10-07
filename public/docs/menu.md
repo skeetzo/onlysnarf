@@ -223,9 +223,6 @@ The maximum number of files to download.
 -image-upload-max #
 The maximum number of files to upload.
 
--prefer-local True (default)
-Whether or not to use local file for referencing users.
-
 -recent-users-count #
 The number of users to count as "recent".
 

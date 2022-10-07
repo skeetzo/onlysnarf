@@ -588,10 +588,11 @@
   - added subcommand for fetching users
   - reupdated menu.md w/ pruned config & args
   - updated help.md
-
+  - more debugging for new subcommand structure
+  
 ------------------------------------------------------------------------------------
 
-- update method of importing config/args to allow for subcommand testing via pytest
+- update method of importing config/args to allow for full subcommand testing via pytest
 
 - debug & test newly added subcommand structure: discount, message, post --> snarf.py
 
@@ -609,6 +610,8 @@
 - clean up classes/files to keep up with gutting google, etc
 - update: backup function to include original folder name -> posted/galleries/$file
 - change deletion behavior to preserve better
+
+- update driver.firefox: service_log_path=Settings.get_logs_path
 
 ------------------------------------------------------------------------------------
 

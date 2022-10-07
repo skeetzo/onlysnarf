@@ -25,7 +25,6 @@ from selenium.common.exceptions import WebDriverException
 from pathlib import Path
 ##
 from ..classes.element import Element
-from ..util.config import config
 from ..util.settings import Settings
 
 ###################
@@ -2894,7 +2893,7 @@ class Driver:
             return None
 
         def attempt_remote():
-            link = 'http://{}:{}/wd/hub'.format(config["remote_browser_host"], config["remote_browser_port"])
+            link = 'http://{}:{}/wd/hub'.format(Settings.get_remote_browser_host(), Settings.get_remote_browser_port())
             Settings.dev_print("remote url: {}".format(link))
             def attempt(dc, opts):
                 try:

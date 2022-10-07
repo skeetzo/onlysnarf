@@ -14,16 +14,15 @@ class TestSnarf(unittest.TestCase):
         config["months"] = DEFAULT.DISCOUNT_MAX_MONTHS
         config["user"] = "random"
         Settings.set_debug("tests")
-        self.test_snarf = Snarf()
 
     def tearDown(self):
         config["amount"] = 0
         config["months"] = 0
         config["user"] = None
-        self.test_snarf.close()
+        Snarf.close()
 
     def test_discount(self):
-        assert self.test_snarf.discount(), "unable to apply discount"
+        assert Snarf.discount(), "unable to apply discount"
         
 ############################################################################################
 

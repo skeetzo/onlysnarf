@@ -14,27 +14,26 @@ class TestSnarf(unittest.TestCase):
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["text"] = "test balls"
         Settings.set_debug("tests")
-        self.test_snarf = Snarf()
 
     def tearDown(self):
         config["input"] = []
         config["price"] = 0
-        self.test_snarf.close()
+        Snarf.close()
 
     def test_post(self):
-        assert self.test_snarf.post(), "unable to post"
+        assert Snarf.post(), "unable to post"
 
     @unittest.skip("todo")
     def test_post_files(self):
-        assert self.test_snarf.post(), "unable to upload post files"
+        assert Snarf.post(), "unable to upload post files"
 
     @unittest.skip("todo")
     def test_post_price(self):
-        assert self.test_snarf.post(), "unable to set post price"
+        assert Snarf.post(), "unable to set post price"
 
     @unittest.skip("todo")
     def test_post_text(self):
-        assert self.test_snarf.post(), "unable to set post text"
+        assert Snarf.post(), "unable to set post text"
 
 ############################################################################################
 

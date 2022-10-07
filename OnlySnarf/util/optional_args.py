@@ -5,7 +5,7 @@ from .validators import valid_duration, valid_expiration, valid_limit
 from .validators import valid_promo_duration, valid_promo_expiration
 from . import defaults as DEFAULT
 
-def apply_args(parser):
+def apply_subcommand_args(parser):
 
   subparsers = parser.add_subparsers(help='Include a sub-command to run a corresponding action:', dest="action", required=True)
 
@@ -132,6 +132,8 @@ def apply_args(parser):
 
   parser_user = subparsers.add_parser('users', help='> scan & save users')
 
+def apply_args(parser):
+
   #############
   ## General ##
   #############
@@ -150,14 +152,13 @@ def apply_args(parser):
   # list of performers to upload matching content of
   parser.add_argument('-performers', dest='performers', action='append',  default=[], help='performers to upload. adds \"w/ @[...performers]\"')
   ##
+  # -reduce
+  # enables file reduction
+  parser.add_argument('-reduce', action='store_true', dest='reduce', help='enable reducing files over 50 MB')
+  ##
   # --save
   # saves OnlyFans users upon exit
   parser.add_argument('-save', '-S', action='store_true', dest='save_users', help='enable saving users locally on exit')
-  ##
-  # -sort
-  # sort method to use when selecting content unprompted
-  # parser.add_argument('-sort', dest='sort', default="random", choices=["ordered","random","least","greatest"],
-    # help='sort method to use when selecting content unprompted')
   ##
   # -source
   # source to use when searching for content
