@@ -4,22 +4,6 @@ from pathlib import Path
 from . import defaults as DEFAULT
 from .config import config
 
-loglevel = logging.INFO
-if config["debug"]: loglevel = logging.DEBUG
-
-logPath = DEFAULT.LOG_PATH
-if os.environ.get('ENV') == "test":
-    logPath = os.path.join(os.getcwd(), "log", "snarf.log")
-
-Path(os.path.dirname(logPath)).mkdir(parents=True, exist_ok=True)
-
-# set up logging to file - see previous section for more details
-logging.basicConfig(level=loglevel,
-                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                    datefmt='%m-%d %H:%M',
-                    filename=logPath,
-                    filemode='w')
-
 # https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
 class CustomFormatter(logging.Formatter):
     """Logging Formatter to add colors and count warning / errors"""
@@ -47,19 +31,31 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
 
-# create file handler which logs everything
-# fh = logging.FileHandler('snarf.log')
-# fh.setLevel(logging.DEBUG)
+def get_logger(loglevel=logging.INFO):
+    
+    if config["debug"]: loglevel = logging.DEBUG
 
-# define a Handler which writes INFO messages or higher to the sys.stderr
-console = logging.StreamHandler()
-# console.setLevel(logging.INFO)
-# set a format which is simpler for console use
-# formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
-# tell the handler to use this format
-console.setFormatter(CustomFormatter())
-# add the handler to the root logger
-logging.getLogger('').addHandler(console)
+    logPath = DEFAULT.LOG_PATH
+    if os.environ.get('ENV') == "test":
+        logPath = os.path.join(os.getcwd(), "log", "snarf.log")
 
-# hide output during tests
-# if os.environ.get("ENV") == "test": logging.getLogger('').removeHandler(console)
+    Path(os.path.dirname(logPath)).mkdir(parents=True, exist_ok=True)
+
+    # set up logging to file - see previous section for more details
+    logging.basicConfig(level=loglevel,
+                        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                        datefmt='%m-%d %H:%M',
+                        filename=logPath,
+                        filemode='w')
+    
+    # define a Handler which writes INFO messages or higher to the sys.stderr
+    console = logging.StreamHandler()
+    # tell the handler to use this format
+    console.setFormatter(CustomFormatter())
+    # add the handler to the root logger
+    logging.getLogger('').addHandler(console)
+
+    # hide output during tests
+    # if os.environ.get("ENV") == "test": logging.getLogger('').removeHandler(console)
+
+    return logging.getLogger('onlysnarf')
