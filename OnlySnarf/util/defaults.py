@@ -61,11 +61,9 @@ BROWSER_PORT = 4444
 REMOTE_HOST = "127.0.0.1"
 REMOTE_PORT = 22
 
+#3600 # 1hr in seconds
+UPLOAD_MAX_DURATION = 60 # 1 minute
 
-SOURCES = [ "local","remote" ]
-
-
-UPLOAD_MAX_DURATION = 6*6 # increments of 10 minutes; 6 = 1 hr
 
 USER_LIMIT = 10
 

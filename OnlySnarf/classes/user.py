@@ -109,9 +109,9 @@ class User:
 
         if not self.get_username() and not self.get_id(): return Settings.err_print("missing user identifiers!")
         if self.id:
-            Settings.print("messaging user (id): {} ({}) <-- {}".format(self.username, self.id, message["text"]))
+            Settings.print("messaging user (id): {} ({}) - \"{}\"".format(self.username, self.id, message["text"]))
         else:
-            Settings.print("messaging user: {} <-- {}".format(self.username, message["text"]))
+            Settings.print("messaging user: {} - \"{}\"".format(self.username, message["text"]))
         if not Driver.message(self.username, user_id=self.id): return False
         return self.message_send(message)
 
