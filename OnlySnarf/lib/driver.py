@@ -2736,7 +2736,7 @@ class Driver:
             logging.getLogger("requests").setLevel(logging.ERROR)
             logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.ERROR)
 
-            if Settings.get_verbosity() >= 2:
+            if int(Settings.get_verbosity()) >= 2:
                 SeleniumLogger.setLevel(logging.WARNING)
                 logging.getLogger("urllib3").setLevel(logging.WARNING)
                 logging.getLogger("requests").setLevel(logging.WARNING)

@@ -16,13 +16,13 @@ class TestSnarf(unittest.TestCase):
     def tearDown(self):
         config["duration"] = None
         config["expiration"] = 0
-        config["poll"] = []
+        config["questions"] = []
         Snarf.close()
 
     def test_poll(self):
         config["duration"] = DEFAULT.DURATION_ALLOWED[-1]
         config["expiration"] = 999
-        config["poll"] = ["suck","my","dick","please?"]
+        config["questions"] = ["suck","my","dick","please?"]
         assert Snarf.post(), "unable to post poll"
 
 ############################################################################################
