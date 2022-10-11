@@ -14,15 +14,21 @@ else:
   configFile = os.path.join("/home/{}/.onlysnarf".format(USER), "config.conf")
 config_file = configparser.ConfigParser()
 config_file.read(configFile)
-# continue to overwrite values from arguments with config values
-# relabels args -> config for cleaner usage
-from .args import args as config
+
+config = {}
+
+# relabels config for cleaner usage
 for section in config_file.sections():
   for key in config_file[section]:
     if section == "ARGS":
       config[key] = config_file[section][key]
     else:
       config[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
+
+# continue to overwrite values from config file with args
+from .args import args
+for key, value in args.items():
+  config[key] = value
 
 ###############
 ## Debugging ##

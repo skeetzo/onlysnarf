@@ -42,6 +42,7 @@ class Poll:
 
         if self.duration: return self.duration
         self.duration = Settings.get_duration()
+        if int(self.duration) > 30: self.duration = "No limit"
         return self.duration
 
         # # prompt skip

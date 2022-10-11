@@ -29,8 +29,8 @@ class Settings:
     #####################
 
     def debug_delay_check():
-        if Settings.is_debug() == "True" and Settings.is_debug_delay() == "True":
-            time.sleep(int(10))
+        if str(Settings.is_debug()) == "True" and str(Settings.is_debug_delay()) == "True":
+            time.sleep(10)
 
     ##
     # Print
@@ -464,7 +464,7 @@ class Settings:
         return userConfig
 
     def get_username():
-        return config["username"] or "(default)"
+        return config["username"] or "default"
 
     def get_username_onlyfans():
         try:
