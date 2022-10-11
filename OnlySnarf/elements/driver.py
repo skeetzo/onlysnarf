@@ -46,6 +46,13 @@ ELEMENTS = [
         "id": []
     },
 
+    {
+        "name": "new_message",
+        "classes": ["g-btn.m-rounded.b-chat__btn-submit"],
+        "text": ["Send"],
+        "id": []
+    },
+
     ### upload
     # send
     {

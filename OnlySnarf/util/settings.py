@@ -21,6 +21,9 @@ class Settings:
     PERFORMER_CATEGORY = None
     PROMPT = True
 
+    PREFER_LOCAL = True
+    PREFER_LOCAL_FOLLOWING = True
+
     #####################
     ##### Functions #####
     #####################
@@ -34,7 +37,7 @@ class Settings:
     ##
 
     def print(text):
-        if int(config["verbose"]) >= 1:
+        if int(config["verbose"]) >= 0:
             log.info(text)
 
     def print_same_line(text):
@@ -44,11 +47,11 @@ class Settings:
         sys.stdout.flush()
 
     def maybe_print(text):
-        if int(config["verbose"]) >= 2:
+        if int(config["verbose"]) >= 1:
             log.debug(text)
 
     def dev_print(text):
-        if int(config["verbose"]) >= 3:
+        if int(config["verbose"]) >= 2:
             log.debug(text)
 
     def err_print(error):
@@ -411,7 +414,7 @@ class Settings:
         return config["login"]
         
     def get_upload_max_duration():
-        return config["upload_max_duration"] or DEFAULT.UPLOAD_MAX_DURATION # 6 hours
+        return config["upload_max_duration"] or DEFAULT.UPLOAD_MAX_DURATION # 1 hour
 
     # comma separated string of usernames
     def get_users():
@@ -450,7 +453,7 @@ class Settings:
         config_file = configparser.ConfigParser()
         # strip email
         if "@" in username: username = username[0 : username.index("@")]
-        Settings.dev_print("retreiving user config: {}".format(username))
+        Settings.dev_print("retrieving user config: {}".format(username))
         config_file.read(os.path.join(Settings.get_base_directory(), "users", username+".conf"))
         userConfig = {}
         for section in config_file.sections():
@@ -461,7 +464,7 @@ class Settings:
         return userConfig
 
     def get_username():
-        return config["username"] or ""
+        return config["username"] or "(default)"
 
     def get_username_onlyfans():
         try:
@@ -528,7 +531,7 @@ class Settings:
 
     def is_debug(process=None):
         if process == "firefox": return config["debug_firefox"]
-        elif process == "google": return config["debug_google"]
+        elif process == "chrome": return config["debug_chrome"]
         elif process == "selenium": return config["debug_selenium"]
         elif process == "cookies": return config["debug_cookies"]
         # elif process == "tests": return 
@@ -544,7 +547,10 @@ class Settings:
         return config["keep"]
 
     def is_prefer_local():
-        return config["prefer_local"]
+        return Settings.PREFER_LOCAL
+        
+    def is_prefer_local_following():
+        return Settings.PREFER_LOCAL_FOLLOWING
 
     def is_prompt():
         return Settings.PROMPT
@@ -769,10 +775,10 @@ class Settings:
         config["password_twitter"] = str(password)
 
     def set_prefer_local(buul):
-        config["prefer_local"] = buul
+        Settings.PREFER_LOCAL = buul
     
     def set_prefer_local_following(buul):
-        config["prefer_local_following"] = buul
+        Settings.PREFER_LOCAL_FOLLOWING = buul
 
     def set_prompt(value):
         Settings.PROMPT = value

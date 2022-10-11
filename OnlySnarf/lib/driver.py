@@ -115,7 +115,7 @@ class Driver:
 
         self.init()
         if not self.login():
-            if Settings.is_debug() == "True":
+            if str(Settings.is_debug()) == "True":
                 return False
             os._exit(1)
         return True
@@ -328,7 +328,7 @@ class Driver:
             buttons_ = driver.find_elements_by_name("discountUserButton")
             for button in buttons_:
                 if not button.is_enabled() and not button.is_displayed(): continue
-                if "Cancel" in button.get_attribute("innerHTML") and Settings.is_debug() == "True":
+                if "Cancel" in button.get_attribute("innerHTML") and str(Settings.is_debug()) == "True":
                     Settings.print("skipping save discount (debug)")
                     button.click()
                     Settings.dev_print("successfully canceled discount")
@@ -498,6 +498,10 @@ class Driver:
         path : str
             The file path to drag onto the web element
 
+        Returns
+        -------
+        bool
+            Whether or not dragging the file was successful
 
         """
 
@@ -538,8 +542,10 @@ class Driver:
             file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 50, 50)
             file_input.send_keys(path)
             Settings.debug_delay_check()
+            return True
         except Exception as e:
             Settings.err_print(e) 
+        return False
 
     def enter_text(self, text):
         """
@@ -658,7 +664,7 @@ class Driver:
             Settings.dev_print("successfully selected expiration")
             Settings.debug_delay_check()
             # save
-            if Settings.is_debug() == "True":
+            if str(Settings.is_debug()) == "True":
                 Settings.maybe_print("skipping expiration (debug)")
                 Settings.dev_print("skipping expiration")
                 self.find_element_to_click("expiresCancel").click()
@@ -981,29 +987,29 @@ class Driver:
 
         original_handle = self.browser.current_window_handle
         Settings.dev_print("tabs: {}".format(self.tabs))
+        Settings.dev_print("handles: {}".format(self.browser.window_handles))
         try:
+            Settings.dev_print("checking tabs...")
             for page_, handle, value in self.tabs:
-                # Settings.dev_print("{} = {}".format(page_, page))
-                if str(page_) == str(page):
+                Settings.dev_print("{} = {}".format(page_, page))
+                if str(page_) in str(page):
                     self.browser.switch_to.window(handle)
                     value += 1
                     Settings.dev_print("successfully located tab in cache: {}".format(page))
                     return True
-            for handle in self.browser.window_handles[0]:
-                self.browser.switch_to.window(handle)
-                if str(page) in str(self.browser.current_url):
-                    Settings.dev_print("successfully located tab: {}".format(page))
-                    return True
+            Settings.dev_print("checking handles...")
             for handle in self.browser.window_handles:
+                Settings.dev_print(handle)
                 self.browser.switch_to.window(handle)
                 if str(page) in str(self.browser.current_url):
-                    Settings.dev_print("successfully located tab in windows: {}".format(page))
+                    Settings.dev_print("successfully located tab in handles: {}".format(page))
                     return True
             Settings.dev_print("failed to locate tab: {}".format(page))
             self.browser.switch_to.window(original_handle)
         except Exception as e:
-            if "Unable to locate window" not in str(e):
-                Settings.dev_print(e)
+            # print(e)
+            # if "Unable to locate window" not in str(e):
+            Settings.dev_print(e)
         return False
 
     def open_tab(self, url):
@@ -1347,7 +1353,8 @@ class Driver:
                 successful = True
             else:
                 successful = driver.message_user(username, user_id=user_id)
-            Settings.dev_print("successfully started message for {}".format(username))
+            if successful: Settings.dev_print("started message for {}".format(username))
+            else: Settings.warn_print("failed to start message for {}!".format(username))
             return successful
         except Exception as e:
             Driver.error_checker(e)
@@ -1366,38 +1373,23 @@ class Driver:
         """
 
         try:
-            WAIT = WebDriverWait(self.browser, 600, poll_frequency=10)
-            i = 0
-            Settings.dev_print("waiting for message confirm to be clickable")
-            while True:
-                try:                
-                    WAIT.until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("uploadMessageConfirm").getClass())))
-                    Settings.dev_print("message confirm is clickable")
-                    break
-                except Exception as e:
-                    Settings.print('uploading...')
-                    Driver.error_checker(e)
-                    i += 1
-                    if i == int(Settings.get_upload_max_duration()):
-                        Settings.err_print("max upload time reached")
-                        return False
-            Settings.dev_print("getting confirm to click")
-            confirm = self.find_element_to_click("new_post")
-            if Settings.is_debug() == "True":
+            Settings.dev_print("waiting for message confirm to be clickable...")
+            confirm = WebDriverWait(self.browser, int(Settings.get_upload_max_duration()), poll_frequency=3).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("new_message").getClass())))
+            Settings.dev_print("message confirm is clickable")
+            if str(Settings.is_debug()) == "True":
                 Settings.debug_delay_check()
                 self.go_to_home()
                 Settings.print('skipped message (debug)')
-                Settings.dev_print("### Message Successful (debug) ###")
                 return True
             Settings.dev_print("clicking confirm")
             confirm.click()
-            Settings.print('OnlyFans Message: Sent')
-            Settings.dev_print("### Message Successful ###")
+            Settings.print('OnlyFans message sent!')
             return True
+        except TimeoutException:
+            Settings.warn_print("timed out waiting for message confirm!")
         except Exception as e:
             Driver.error_checker(e)
-            Settings.err_print("failure to confirm message")
-            Settings.dev_print("### Message Failure ###")
+            Settings.err_print("failure to confirm message!")
         return False
 
     def message_price(self, price):
@@ -1421,40 +1413,26 @@ class Driver:
                 Settings.err_print("missing price")
                 return False
             time.sleep(1) # prevents delay from inputted text preventing buttom from being available to click
-            # Settings.print("price: {}".format(price))
-            # Settings.dev_print("waiting for price area to enter price")
-            # finds the button on the page with the #icon-price text
-            # priceElements = self.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("priceClick").getClass())
-
-            Settings.dev_print("entering price")
+            try:
+                Settings.dev_print("clearing any preexisting price...")
+                self.browser.find_element(By.CLASS_NAME, "m-btn-remove").click()
+            except Exception as e:
+                Settings.dev_print(e)
+            Settings.dev_print("entering price...")
             self.browser.find_element(By.CLASS_NAME, "b-make-post__actions").find_elements(By.XPATH, "./child::*")[6].click()
-
-
-            # priceElements = self.find_elements_by_name("priceClick")
-            # priceElement = None
-            # for ele in priceElements:
-            #     Settings.dev_print(ele.get_attribute("value"))
-            #     if "#icon-price" in str(ele.get_attribute("innerHTML")):
-            #         priceElement = ele
-            # if not priceElement:
-            #     Settings.dev_print("failed to find price button")
-            #     Settings.err_print("failure to enter price")
-            #     return False
-            # WebDriverWait(self.browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(priceElement))
-            # priceElement.click()
             priceText = WebDriverWait(self.browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(self.browser.find_element(By.ID, "priceInput_1")))
             priceText.click()
             priceText.send_keys(str(price))
             Settings.dev_print("entered price")
             Settings.debug_delay_check()
-            Settings.dev_print("saving price")
+            Settings.dev_print("saving price...")
             self.find_element_to_click("priceSave").click()    
-            Settings.dev_print("successfully saved price")
+            Settings.dev_print("saved price")
             return True
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failure to enter price")
-            return False
+        return False
 
     def message_text(self, text):
         """
@@ -1535,14 +1513,13 @@ class Driver:
         Settings.dev_print("username: {} : {}: user_id".format(username, user_id))
         if user_id and str(user_id) != "None": return self.message_user_by_id(user_id=user_id)
         if not username:
-            Settings.err_print("missing username to message")
+            Settings.err_print("missing username to message!")
             return False
         try:
             self.go_to_page(username)
             time.sleep(5) # for whatever reason this constantly errors out from load times
             elements = self.browser.find_elements(By.TAG_NAME, "a")
-            ele = [ele for ele in elements
-                    if ONLYFANS_CHAT_URL in str(ele.get_attribute("href"))]
+            ele = [ele for ele in elements if ONLYFANS_CHAT_URL in str(ele.get_attribute("href"))]
             if len(ele) == 0:
                 Settings.warn_print("user cannot be messaged - unable to locate id")
                 return False
@@ -1555,12 +1532,11 @@ class Driver:
             Settings.maybe_print("user id found: {}".format(ele.replace(ONLYFANS_HOME_URL2, "")))
             self.go_to_page(ele)
             Settings.dev_print("successfully messaging username: {}".format(username))
-            # return True
+            return True
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failed to message user")
-            return False
-        return True
+        return False
 
     @staticmethod
     def messages_scan(num=0):
@@ -1753,7 +1729,7 @@ class Driver:
                 i+=1
             Settings.dev_print("successfully entered questions")
             Settings.debug_delay_check()
-            if Settings.is_debug() == "True":
+            if str(Settings.is_debug()) == "True":
                 Settings.maybe_print("skipping poll (debug)")
                 cancel = self.find_element_to_click("pollCancel")
                 cancel.click()
@@ -1816,7 +1792,7 @@ class Driver:
             ############################################################
             WAIT = WebDriverWait(driver.browser, 600, poll_frequency=10)
             ## Tweeting
-            if Settings.is_tweeting() == "True":
+            if str(Settings.is_tweeting()) == "True":
                 Settings.dev_print("tweeting")
                 WAIT.until(EC.element_to_be_clickable((By.XPATH, Element.get_element_by_name("tweet").getXPath()))).click()
             else: Settings.dev_print("not tweeting")
@@ -1848,7 +1824,7 @@ class Driver:
                         Settings.print('uploading...')
                         Driver.error_checker(e)
                         i+=1
-                        if i == int(Settings.get_upload_max_duration()) and Settings.is_force_upload() == "False":
+                        if i == int(Settings.get_upload_max_duration()) and str(Settings.is_force_upload()) == "False":
                             Settings.err_print("max upload time reached")
                             return False
 
@@ -1860,7 +1836,7 @@ class Driver:
                 send = driver.find_element_to_click("new_post")
                 if send:
                     Settings.debug_delay_check()
-                    if Settings.is_debug() == "True":
+                    if str(Settings.is_debug()) == "True":
                         try:
                             driver.find_element_to_click("postCancel").click()
                         except Exception as e:
@@ -1977,7 +1953,7 @@ class Driver:
             # todo: [] apply to expired subscribers checkbox
             Settings.debug_delay_check()
             # find and click promotionalTrialConfirm
-            if Settings.is_debug() == "True":
+            if str(Settings.is_debug()) == "True":
                 Settings.dev_print("finding campaign cancel")
                 self.find_element_to_click("promotionalTrialCancel").click()
                 Settings.maybe_print("skipping promotion (debug)")
@@ -2212,7 +2188,7 @@ class Driver:
             Settings.dev_print("successfully entered message")
             Settings.dev_print("applying discount")
             save = self.find_element_by_name("promotionalTrialApply")
-            if Settings.is_debug() == "True":
+            if str(Settings.is_debug()) == "True":
                 self.find_element_by_name("promotionalTrialCancel").click()
                 Settings.maybe_print("skipping save discount (debug)")
                 Settings.dev_print("successfully canceled discount")
@@ -2506,7 +2482,7 @@ class Driver:
             # save time
             Settings.debug_delay_check()
             Settings.dev_print("saving schedule")
-            if Settings.is_debug() == "True":
+            if str(Settings.is_debug()) == "True":
                 Settings.print("skipping schedule save (debug)")
                 return self.schedule_cancel()
             else:
@@ -2670,7 +2646,7 @@ class Driver:
                     element.send_keys(getattr(profile, str(name)))
                 elif str(type_) == "checkbox":
                     element.click()
-            if Settings.is_debug() == "True":
+            if str(Settings.is_debug()) == "True":
                 Settings.dev_print("successfully cancelled settings page: {}".format(page))
             else:
                 self.settings_save(page=page)
@@ -2721,7 +2697,7 @@ class Driver:
             Settings.dev_print("derp")
             element = self.find_element_to_click("profileSave")
             Settings.dev_print("found page save")
-            if Settings.is_debug() == "True":
+            if str(Settings.is_debug()) == "True":
                 Settings.print("skipping settings save (debug)")
             else:
                 Settings.dev_print("saving page")
@@ -2752,7 +2728,7 @@ class Driver:
 
         """
 
-        if Settings.is_debug("selenium") == "False":
+        if str(Settings.is_debug("selenium")) == "False":
             import logging
             from selenium.webdriver.remote.remote_connection import LOGGER as SeleniumLogger
             SeleniumLogger.setLevel(logging.ERROR)
@@ -2760,7 +2736,7 @@ class Driver:
             logging.getLogger("requests").setLevel(logging.ERROR)
             logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.ERROR)
 
-            if Settings.get_verbosity() == 3:
+            if Settings.get_verbosity() >= 2:
                 SeleniumLogger.setLevel(logging.WARNING)
                 logging.getLogger("urllib3").setLevel(logging.WARNING)
                 logging.getLogger("requests").setLevel(logging.WARNING)
@@ -2808,13 +2784,14 @@ class Driver:
                   }
                 }  
                 service_args = []
-                if Settings.is_debug("google"):
+                if str(Settings.is_debug("chrome")) == "True":
                     service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
                 # else:
                 # options.add_experimental_option('excludeSwitches', ['enable-logging'])
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
                 browserAttempt = webdriver.Chrome(options=options, service_args=service_args)
+                # browserAttempt = webdriver.Chrome(options=options)
                 if str(Settings.is_show_window()) == "False":
                     Settings.print("browser created - chrome (headless)")
                 else:
@@ -2837,7 +2814,7 @@ class Driver:
             try:
                 # d = DesiredCapabilities.FIREFOX
                 options = FirefoxOptions()
-                if Settings.is_debug("firefox") == "True":
+                if str(Settings.is_debug("firefox")) == "True":
                     options.log.level = "trace"
                 if str(Settings.is_show_window()) == "False":
                     options.add_argument("--headless")
@@ -2910,7 +2887,7 @@ class Driver:
                     Settings.dev_print("attempting remote: chrome")
                     dC = DesiredCapabilities.CHROME
                     options = webdriver.ChromeOptions()
-                    if Settings.is_show_window() == "False":
+                    if str(Settings.is_show_window()) == "False":
                         options.add_argument('--headless')
                     return dC, options
                 except Exception as e:
@@ -2922,7 +2899,7 @@ class Driver:
                     Settings.dev_print("attempting remote: firefox")
                     dC = DesiredCapabilities.FIREFOX
                     options = webdriver.FirefoxOptions()
-                    if Settings.is_show_window() == "False":
+                    if str(Settings.is_show_window()) == "False":
                         options.add_argument('--headless')
                     return dC, options
                 except Exception as e:
@@ -2963,14 +2940,14 @@ class Driver:
             if not browser: browser = attempt_chrome() or attempt_firefox()
             browser = attempt_reconnect()
 
-        if browser and Settings.is_keep() == "True":
+        if browser and str(Settings.is_keep()) == "True":
             self.session_id = browser.session_id
             self.session_url = browser.command_executor._url
             self.write_session_data()
 
         if not browser:
             Settings.err_print("unable to spawn a web browser!")
-            if Settings.is_debug("test") == "True": return False
+            if str(Settings.is_debug("test")) == "True": return False
             os._exit(1)
 
         browser.implicitly_wait(30) # seconds
@@ -3032,16 +3009,16 @@ class Driver:
 
         """
 
-        if Settings.is_skip_download() == "True": 
+        if str(Settings.is_skip_download()) == "True": 
             Settings.print("skipping upload (download)")
             return True
-        elif Settings.is_skip_upload() == "True": 
+        elif str(Settings.is_skip_upload()) == "True": 
             Settings.print("skipping upload (upload)")
             return True
         if len(files) == 0:
             Settings.maybe_print("skipping upload (empty file list)")
             return True
-        if Settings.is_skip_upload() == "True":
+        if str(Settings.is_skip_upload()) == "True":
             Settings.print("skipping upload (disabled)")
             return True
         files = files[:int(Settings.get_upload_max())]
@@ -3070,12 +3047,13 @@ class Driver:
         ####
 
         enter_file = self.browser.find_element(By.ID, "attach_file_photo")
+        successful = []
 
         i = 1
         for file in files_:
             Settings.print('> {} - {}/{}'.format(file.get_title(), i, len(files)))
             i += 1
-            self.drag_and_drop_file(enter_file , file.get_path())
+            successful.append(self.drag_and_drop_file(enter_file , file.get_path()))
             time.sleep(1)
             ###
             def fix_filename(file):
@@ -3096,9 +3074,12 @@ class Driver:
             ###
         # one last final check
         Settings.debug_delay_check()
-        if self.error_window_upload(): Settings.dev_print("### Files Upload Successful ###")
-        else: Settings.dev_print("### Files Upload Successful (probably) ###")
-        return True
+        if all(successful):
+            if self.error_window_upload(): Settings.dev_print("files uploaded successfully")
+            else: Settings.dev_print("files probably uploaded succesfully")
+            return True
+        Settings.warn_print("a file failed to upload!")
+        return False
 
     #################
     ##### Users #####
@@ -3630,7 +3611,7 @@ class Driver:
                 self.browser.refresh()
                 Settings.dev_print("### List Add Successfully Skipped ###")
                 return True
-            if Settings.is_debug() == "True":
+            if str(Settings.is_debug()) == "True":
                 Settings.print("skipping list add (debug)")
                 Settings.dev_print("skipping list save")
                 self.browser.refresh()
@@ -3658,7 +3639,7 @@ class Driver:
         ## Cookies
         if str(Settings.is_cookies()) == "True":
             self.cookies_save()
-        if Settings.is_save_users() == "True":
+        if str(Settings.is_save_users()) == "True":
             Settings.print("Saving and Exiting OnlyFans")
             # from OnlySnarf.classes.user import User
             from ..classes.user import User

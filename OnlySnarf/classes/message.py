@@ -283,6 +283,7 @@ class Message():
 
         if self.price: return self.price
         price = Settings.get_price()
+        if str(price) == "0": return 0
         priceMin = Settings.get_price_minimum()
         priceMax = Settings.get_price_maximum()
         if str(price) == "max": price = priceMax

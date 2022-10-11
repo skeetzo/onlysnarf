@@ -70,18 +70,19 @@ python setup.py install && python tests/test_ipfs.py
 ##################
 
 # Discount
-ENV=test onlysnarf -debug discount -user random
+onlysnarf -debug -show discount -user random -amount max -months max
 
 # Message
-ENV=test onlysnarf -debug message -user random -text shnarf! -price min public/images/snarf-missionary.jpg
+onlysnarf -debug -show message -user random -text shnarf! -price min ~/Projects/onlysnarf/public/images/snarf-missionary.jpg
 
 # Post
-ENV=test onlysnarf -debug post -text random public/images/snarf-missionary.jpg
+onlysnarf -debug -show post -text "shnarf" ~/Projects/onlysnarf/public/images/snarf-missionary.jpg
 
-# Schedule, Date, Time
-ENV=test onlysnarf -debug post -text shnarff! -schedule 10/8/2022:16:20
-ENV=test onlysnarf -debug post -text shnarff! -date 10/10/2022 -time 16:20 
-ENV=test onlysnarf -debug post -text shnarff! -question "sharnf shnarf?" -question "shnarf shhhnarff snarf?" -duration min -expiration min
+# Poll
+onlysnarf -debug -show post -text shnarff! -question "sharnf shnarf?" -question "shnarf shhhnarff snarf?" -duration min -expiration min
+
+# Schedule
+onlysnarf -debug -show post -text shnarff! -schedule "10/31/2022 16:20:00"
 
 # User
-ENV=test onlysnarf -debug users
+onlysnarf -debug -show users

@@ -583,18 +583,22 @@
   - added 'min' and 'max' to arg inputs: price, expiration, duration, amount, months, limit
   - changed 'poll' args back to 'question'
   - prepared commands for generating previews to record functionality with ala: "onlysnarf discount -user random"
-**4.3.10: 10/7/2022**
+  **4.3.10: 10/7/2022**
   - finished adding docstrings to classes/user.py
   - added subcommand for fetching users
   - reupdated menu.md w/ pruned config & args
   - updated help.md
   - more debugging for new subcommand structure
-  
+  **4.3.11: 10/8/2022**
+  - updated method of importing config/args to allow for full subcommand testing via pytest by adding shim for args
+**4.3.12: 10/10/2022**
+  - fixed tab handling in driver
+  - debugged & tested newly added subcommand structure: discount, message, post --> snarf.py
+  - beginning recordings for behavior previews
+
 ------------------------------------------------------------------------------------
 
-- update method of importing config/args to allow for full subcommand testing via pytest
-
-- debug & test newly added subcommand structure: discount, message, post --> snarf.py
+- message: drag&drop has decided to stop working; maybe a selenium version issue?
 
 ## TODO
 

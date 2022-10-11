@@ -69,7 +69,7 @@ class Snarf:
                 Settings.print("> Messaging user: {}".format(user.username))
                 message = Message(user.username)
                 successful.append(message.send(user.username, user_id=user.id))
-            return all[successful]
+            return all(successful)
         except Exception as e: Settings.dev_print(e)
         return False
                 
