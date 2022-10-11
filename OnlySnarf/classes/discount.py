@@ -35,7 +35,17 @@ class Discount:
         Settings.maybe_print("discounting: {}".format(self.username))
         return Driver.discount_user(self.get())
 
-    def get(self):        
+    def get(self):
+        """
+        Get the discount's values in a dict.
+
+        Returns
+        -------
+        dict
+            A dict containing the values of the discount
+
+        """
+
         return dict({
             "username": self.get_username(),
             "amount": self.get_amount(),

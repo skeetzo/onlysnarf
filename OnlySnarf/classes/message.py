@@ -11,7 +11,6 @@ from .user import User
 from ..util.settings import Settings
 from .schedule import Schedule
 from ..util.validators import PriceValidator, ListValidator
-from ..lib import remote as Remote
 
 class Message():
     """OnlyFans message (and post) class"""
@@ -28,50 +27,21 @@ class Message():
         # universal message variables
         self.text = ""
         self.files = []
-        self.keywords = []
         self.performers = []
         self.price = 0 # $3 - $100
-        
-        # TODO: check if this is necessary
-        self.hasPerformers = False # used to flag files from performer folders
-
-        # typically related to messages only
-        self.users = users # users to send to as username or user id
-        self.user_id = 0 # user to send's to known user id
-
+        self.tags = []
         self.__initialized__ = False
-
-    # def __str__(self):
-    #     return "foo"
-
 
     def init(self):
         """Initialize."""
 
         if self.__initialized__: return
         self.get_text()
-        # self.get_tags()
+        self.get_tags()
         self.get_price()
         self.get_files()
-        self.get_recipients()
-        # self.get_performers()
+        self.get_performers()
         self.__initialized__ = True
-
-    def backup_files(self):
-        """Backs up files"""
-
-        for file in self.get_files(): file.backup()
-
-    def delete_files(self):
-        """Deletes files"""
-
-        for file in self.get_files(): file.delete()
-
-    def cleanup(self):
-        """Processes files after a successful message or post by backing them up then deleting them"""
-
-        self.backup_files()
-        self.delete_files()
 
     @staticmethod
     def format_keywords(keywords):
@@ -90,7 +60,7 @@ class Message():
         """
 
         # ternary: a if condition else b
-        return " #{}".format(" #".join(keywords)) if len(keywords) > 0 else ""
+        return "#{}".format(" #".join(keywords)) if len(keywords) > 0 else ""
 
     @staticmethod
     def format_performers(performers):
@@ -110,7 +80,7 @@ class Message():
         """
 
         # ternary: a if condition else b
-        return " w/ @{} ".format(" @".join(performers)) if len(performers) > 0 else ""
+        return " @{} ".format(" @".join(performers)) if len(performers) > 0 else ""
 
 
     def format_text(self):
@@ -121,61 +91,11 @@ class Message():
         -------
         str
             The generated text into a string. Example:
-            "This is the text. w/ @name, @name, and @name #keyword0 #keyword1"
+            "This is the text. @name, @name, and @name #keyword0 #keyword1"
 
         """
 
-        return self.get_text().strip()
-        # return "{}{}{}".format(self.get_text(),Message.format_performers(self.get_performers()),Message.format_keywords(self.get_tags())).strip()
-
-    def get_tags(self, performers=True, again=True):
-        """
-        Gets the keywords (or performers) value if not none else sets it from args or prompts from script runner.
-            If "performers" is equal to true then the prompt knows to fetch performers instead of keywords.
-            If "again" is equal to true then the prompt knows that the user might be unsure. 
-        
-        Parameters
-        ----------
-        performers : bool
-            Signal to get performers instead of keywords.
-
-        again : bool
-            Whether or not it is the script user's first time around.
-
-
-        Returns
-        -------
-        list
-            The keyword strings in a list
-
-        """
-
-        variable = "keywords"
-        if performers: variable = "performers"
-        # retrieve if set already
-        if len(dict(self)[variable]) > 0: return dict(self)[variable]
-        # else retrieve from args and return if exists
-        variables = []
-        if variable == "keywords": variables = Settings.get_tags()
-        elif variable == "performers": variables = Settings.get_performers()
-        if len(variables) > 0: 
-            dict(self)[variable] = variables
-            return variables
-        # skip prompt
-        if not Settings.prompt(variable): return []
-        question = {
-            'type': 'input',
-            'name': 'keywords',
-            'message': '{}:'.format(variable.camelCase()),
-            'validate': ListValidator
-        }
-        if again: Settings.print("are you sure you've done this before, {}? ;)".format(Settings.get_username()))
-        variables = prompt(question)[variable]
-        variables = [n.strip() for n in variables.split(",")]
-        # confirm variables or go in a circle
-        # if not Settings.confirm(variables): return self.get_tags(performers=performers, again=True)
-        dict(self)[variable] = variables
-        return variables
+        return "{}{}{}".format(self.get_text(), Message.format_performers(self.get_performers()), Message.format_keywords(self.get_tags())).strip()
 
     @staticmethod
     def is_tip(text):
@@ -268,6 +188,20 @@ class Message():
             "price": self.get_price()
         })
 
+    def get_performers(self):
+        """
+        Gets the performers for the text.
+
+        Returns
+        -------
+        list
+            The performers
+
+        """
+
+        if len(self.performers) > 0: return self.performers
+        self.performers = Settings.get_performers()
+        return self.performers
 
     def get_price(self):
         """
@@ -299,20 +233,20 @@ class Message():
         self.price = price
         return self.price
 
-    def get_recipients(self):
+    def get_tags(self):
         """
-        Gets the recipients value if not none else sets it from args or prompts. Users 'user' from config if provided as base for list otherwise 'users'.
+        Gets the tags for the text.
 
         Returns
         -------
         list
-            Usernames in a list
+            The tags
 
         """
 
-        if len(self.users) > 0: return self.users
-        self.users = Settings.get_users()
-        return self.users
+        if len(self.tags) > 0: return self.tags
+        self.tags = Settings.get_tags()
+        return self.tags
 
     def get_text(self, again=True):
         """
@@ -354,7 +288,6 @@ class Message():
         self.text = text
         return self.text
 
-
     def get_text_from_filename(self):
         """Gets text from this object's file's title"""
 
@@ -391,18 +324,7 @@ class Message():
         """
 
         self.init()
-        return User.message_user(self.get_message(), username, user_id=user_id)
-        
-    def update_keywords(self, text):
-        """Sets keywords from this object's file's title"""
-
-        return
-        if len(self.get_tags()) == 0 and len(self.get_files()) > 0:
-            self.keywords = self.files[0].get_parent()["title"].split(" ")
-            for keyword in self.keywords:
-                if str(keyword) in str(self.text):
-                    self.keywords = []
-            
+        return User.message_user(self.get_message(), username, user_id=user_id)            
 
 class Post(Message):
     """OnlyFans message (and post) class"""
@@ -513,15 +435,6 @@ class Post(Message):
             "schedule": self.get_schedule(),
             "poll": self.get_poll()
         })
-
-    def get_recipients(self):
-        """
-        Override does nothing.
-
-
-        """
-
-        pass
 
     def get_schedule(self):
         """

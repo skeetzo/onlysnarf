@@ -11,6 +11,9 @@ ONLYFANS_ELEMENTS.extend(loginElements)
 ONLYFANS_ELEMENTS.extend(profileElements)
 
 # represents elements the webdriver sortof looks for
+# this class and the objects in th elements folder act as a half assed method for organizing the onlyfans interaction points
+# it's an attempt to make things easier to parse but should be cleaned up at some point
+
 class Element:
     def __init__(self, name=None, classes=[], text=[], id=[]):
         self.name = name

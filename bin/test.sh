@@ -74,7 +74,7 @@ onlysnarf -debug -show discount -user random -amount max -months max
 onlysnarf -debug -show message -user random -text shnarf! -price min ~/Projects/onlysnarf/public/images/snarf-missionary.jpg
 
 # Post
-onlysnarf -debug -show post -text "shnarf" ~/Projects/onlysnarf/public/images/snarf-missionary.jpg
+onlysnarf -debug -show post -text "shnarf" -tags "suck" -tags "my" -tags "balls" -performers "yourmom" -performers  "yourdad" ~/Projects/onlysnarf/public/images/snarf-missionary.jpg
 
 # Poll
 onlysnarf -debug -show post -text shnarff! -question "sharnf shnarf?" -question "shnarf shhhnarff snarf?" -duration min

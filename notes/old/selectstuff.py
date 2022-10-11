@@ -132,3 +132,28 @@ def list_menu():
         else:
             return Driver.get_driver().get_list_members(answer)
     return []
+
+
+
+
+
+
+
+
+
+# from selecting / confirming the tags/performers in messages.py
+        # skip prompt
+        if not Settings.prompt(variable): return []
+        question = {
+            'type': 'input',
+            'name': 'keywords',
+            'message': '{}:'.format(variable.camelCase()),
+            'validate': ListValidator
+        }
+        if again: Settings.print("are you sure you've done this before, {}? ;)".format(Settings.get_username()))
+        variables = prompt(question)[variable]
+        variables = [n.strip() for n in variables.split(",")]
+        # confirm variables or go in a circle
+        # if not Settings.confirm(variables): return self.get_tags(performers=performers, again=True)
+        dict(self)[variable] = variables
+        return variables

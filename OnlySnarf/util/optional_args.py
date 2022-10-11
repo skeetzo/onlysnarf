@@ -21,10 +21,6 @@ def apply_args(parser):
   # method to prefer when logging in
   parser.add_argument('-login', '-L', dest='login', default="auto", choices=["auto","onlyfans","twitter"], help='method of user login to prefer')
   ##
-  # -performers
-  # list of performers to upload matching content of
-  parser.add_argument('-performers', dest='performers', action='append',  default=[], help='performers to upload. adds \"w/ @[...performers]\"')
-  ##
   # -reduce
   # enables file reduction
   parser.add_argument('-reduce', action='store_true', dest='reduce', help='enable reducing files over 50 MB')
@@ -32,10 +28,6 @@ def apply_args(parser):
   # --save
   # saves OnlyFans users upon exit
   parser.add_argument('-save', '-S', action='store_true', dest='save_users', help='enable saving users locally on exit')
-  ##
-  # -source
-  # source to use when searching for content
-  # parser.add_argument('-source', dest='source', default="local", choices=["remote","local"], help='file host location')
   ##
   # -tweet
   # enabled tweeting
@@ -84,9 +76,6 @@ def apply_args(parser):
   # -download-path
   # the path to the downloaded files
   parser.add_argument('-download-path', type=str, dest='path_download', default=DEFAULT.DOWNLOAD_PATH, help=argparse.SUPPRESS)
-  # -force-backup 
-  # force backup during debugging
-  parser.add_argument('-force-backup', action='store_true', dest='force_backup', help=argparse.SUPPRESS)
   ##
   # -force-upload
   # ignore upload max wait
@@ -169,6 +158,10 @@ def apply_subcommand_args(parser):
   # date in MM-DD-YYYY
   dateAndSchedule.add_argument('-date', type=valid_date, default=DEFAULT.DATE, dest='date', help='schedule date (MM-DD-YYYY)')
   ##
+  # -performers
+  # list of performers to tag
+  parser_message.add_argument('-performers', dest='performers', action='append',  default=[], help='performers to reference. adds \"@[...performers]\"')
+  ##
   # -price
   # the price to be set in a message
   parser_message.add_argument('-price', type=valid_price, help='price to charge ($)', default=0, dest='price')
@@ -183,7 +176,7 @@ def apply_subcommand_args(parser):
   ##
   # -tags
   # @[tag]
-  # parser_message.add_argument('-tags', dest='tags', action='append', default=[], help='the tags (@[tag])')
+  parser_message.add_argument('-tags', dest='tags', action='append', default=[], help='the tags (@[tag])')
   ##
   # -text
   # text for message or upload
@@ -222,6 +215,10 @@ def apply_subcommand_args(parser):
   # date of post or poll expiration
   durationAndExpiration.add_argument('-expiration', type=valid_expiration, dest='expiration', help='expiration in days (999 for \'No Limit\')', default=DEFAULT.EXPIRATION_NONE)
   ##
+  # -performers
+  # list of performers to tag
+  parser_post.add_argument('-performers', dest='performers', action='append',  default=[], help='performers to reference. adds \"@[...performers]\"')
+  ##
   # -price
   # price to be set in a message
   parser_post.add_argument('-price', type=valid_price, help='price to charge ($)', default=0, dest='price')
@@ -236,7 +233,7 @@ def apply_subcommand_args(parser):
   ##
   # -tags
   # @[tag]
-  # parser_post.add_argument('-tags', dest='tags', action='append', default=[], help='tags (@[tag])')
+  parser_post.add_argument('-tags', dest='tags', action='append', default=[], help='tags (@[tag])')
   ##
   # -text
   # text for message or upload
@@ -254,7 +251,6 @@ def apply_subcommand_args(parser):
   ##########
 
   parser_user = subparsers.add_parser('users', help='> scan & save users')
-
 
 def apply_shim_args(parser):
   parser.add_argument('-amount', type=valid_amount, dest='amount', help='amount (%%) to discount by', default=DEFAULT.AMOUNT_NONE)

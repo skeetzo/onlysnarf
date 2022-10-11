@@ -7,7 +7,6 @@ from PyInquirer import prompt
 from PyInquirer import Validator, ValidationError
 ##
 from ..util.validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ListValidator
-from ..lib import remote as Remote
 from .file import File, Folder
 
 class Poll:
@@ -24,6 +23,16 @@ class Poll:
         self.gotten = False
 
     def get(self):
+        """
+        Get the poll's values in a dict.
+
+        Returns
+        -------
+        dict
+            A dict containing the values of the poll
+
+        """
+
         return dict({
             "duration": self.get_duration(),
             "questions": self.get_questions()
@@ -92,17 +101,17 @@ class Poll:
         # return self.questions
 
     def validate(self):
-        Settings.dev_print("validating poll...")
-
-        """Check if poll is ready with valid values.
+        """
+        Determines whether or not the poll settings are valid.
 
         Returns
         -------
         bool
-            Whether the poll is ready to be posted or not
+            Whether or not the poll is valid
 
         """
 
+        Settings.dev_print("validating poll...")
         if len(self.get_questions()) > 0 and self.get_duration():
             Settings.dev_print("valid poll!")
             return True

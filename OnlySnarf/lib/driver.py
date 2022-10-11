@@ -34,15 +34,12 @@ from ..util.settings import Settings
 # Urls
 ONLYFANS_HOME_URL = "https://onlyfans.com"
 ONLYFANS_HOME_URL2 = "https://onlyfans.com/"
-# ONLYFANS_MESSAGES_URL = "/my/chats/"
 ONLYFANS_NEW_MESSAGE_URL = "/my/chats/send"
 ONLYFANS_CHAT_URL = "/my/chats/chat/"
 ONLYFANS_SETTINGS_URL = "/my/settings/"
 ONLYFANS_USERS_ACTIVE_URL = "/my/subscribers/active"
 ONLYFANS_USERS_FOLLOWING_URL = "/my/subscriptions/active"
 ONLYFANS_LISTS_URL = "/my/lists/"
-# ONLYFANS_CHATS_URL_FULL = "{}{}".format(ONLYFANS_HOME_URL, ONLYFANS_CHAT_URL)
-# ONLYFANS_LISTS_URL_FULL = "{}{}".format(ONLYFANS_HOME_URL, ONLYFANS_LISTS_URL)
 
 class Driver:
     """Driver class for Selenium management"""
@@ -84,10 +81,6 @@ class Driver:
         """
         Initiliaze the web driver aspect.
 
-        Parameters
-        ----------
-        browser : Selenium.webdriver
-            An existing selenium webdriver object / web browser
 
         """
 
@@ -833,6 +826,17 @@ class Driver:
 
     @staticmethod
     def get_driver():
+        """
+        Return an existing driver, if not create one
+
+        Returns
+        -------
+        classes.driver
+            The default driver object.
+
+
+        """
+
         if len(Driver.DRIVERS) > 0:
             return Driver.DRIVERS[0]
         return Driver()
@@ -1670,8 +1674,8 @@ class Driver:
 
         Parameters
         ----------
-        poll : classes.Poll
-            The poll object containing required values
+        poll : dict
+            The values of the poll in a dict
 
         Returns
         -------
@@ -1757,8 +1761,8 @@ class Driver:
 
         Parameters
         ----------
-        message : classes.Message
-            The message to be entered into the post
+        message : dict
+            The message values to be entered into the post 
 
         Returns
         -------
@@ -2353,13 +2357,15 @@ class Driver:
     ####################
 
     def schedule_open(self):
-        # click schedule
+        """Click schedule"""
+
         Settings.dev_print("opening schedule")
         self.find_element_to_click("scheduleAdd").click()
         Settings.dev_print("successfully opened schedule")
 
     def schedule_date(self, month, year):
-        # find and click month w/ correct date
+        """Find and click month w/ correct date"""
+
         Settings.dev_print("setting date")
         while True:
 
@@ -2375,7 +2381,8 @@ class Driver:
         return False
 
     def schedule_day(self, day):
-        # set day in month
+        """Set day in month"""
+
         Settings.dev_print("setting day")
         for ele in self.find_elements_by_name("scheduleDays"):
             if str(day) in ele.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>",""):
@@ -2385,11 +2392,14 @@ class Driver:
         return False
 
     def schedule_save_date(self):
-        # save schedule date and move to next view in frame by hitting next
+        """Save schedule date and move to next view in frame by hitting next"""
+        
         self.find_element_to_click("scheduleNext").click()
         Settings.dev_print("successfully saved date")
 
     def schedule_hour(self, hour):
+        """Set schedule hour"""
+
         Settings.dev_print("setting hours")
         eles = self.browser.find_element(By.CLASS_NAME, "vdatetime-time-picker__list--hours").find_elements(By.XPATH, "./child::*")
         for ele in eles:
@@ -2400,6 +2410,8 @@ class Driver:
         return False
 
     def schedule_minutes(self, minutes):
+        """Set schedule minutes"""
+
         Settings.dev_print("setting minutes")
         eles = self.browser.find_element(By.CLASS_NAME, "vdatetime-time-picker__list--minutes").find_elements(By.XPATH, "./child::*")
         for ele in eles:
@@ -2410,7 +2422,8 @@ class Driver:
         return False
 
     def schedule_suffix(self, suffix):
-        # set am/pm
+        """Set am/pm suffix"""
+
         Settings.dev_print("setting suffix")
         eles = self.browser.find_element(By.CLASS_NAME, "vdatetime-time-picker__list--suffix").find_elements(By.XPATH, "./child::*")
         for ele in eles:
@@ -2421,11 +2434,15 @@ class Driver:
         return False
 
     def schedule_cancel(self):
+        """Cancel schedule by clicking cancel"""
+
         self.browser.find_element(By.CLASS_NAME, "vdatetime-popup__actions__button--cancel").find_elements(By.XPATH, "./child::*")[0].click()
         Settings.print("canceled schedule")
         return True
 
     def schedule_save(self):
+        """Save schedule by clicking save"""
+
         # self.find_element_to_click("scheduleSave").click()
         self.browser.find_element(By.CLASS_NAME, "vdatetime-popup__actions__button--confirm").find_elements(By.XPATH, "./child::*")[0].click()
         Settings.print("saved schedule")
@@ -2437,7 +2454,7 @@ class Driver:
 
         Parameters
         ----------
-        schedule : classes.Schedule
+        schedule : dict
             The schedule object containing the values to enter
 
         Returns
@@ -2712,12 +2729,12 @@ class Driver:
         """
         Spawns a browser according to args.
 
-        Browser options can be: firefox, chrome
+        Browser options can be: auto, chrome, firefox, remote
 
         Parameters
         ----------
-        driver : Selenium.WebDriver
-            Selenium Webdriver to attach a browser to
+        browserType : str
+            The configured browser type to use
 
         Returns
         -------
@@ -2934,9 +2951,9 @@ class Driver:
             browser = attempt_chrome()
         elif "firefox" in browserType:
             browser = attempt_firefox()
-        if "reconnect" in browserType:
-            if not browser: browser = attempt_chrome() or attempt_firefox()
-            browser = attempt_reconnect()
+        # if "reconnect" in browserType:
+        #     if not browser: browser = attempt_chrome() or attempt_firefox()
+        #     browser = attempt_reconnect()
 
         if browser and str(Settings.is_keep()) == "True":
             self.session_id = browser.session_id

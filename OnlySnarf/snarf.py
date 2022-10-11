@@ -33,7 +33,7 @@ class Snarf:
     @staticmethod
     def close():
         Driver.exit_all()
-        Settings.print("Shnarf!?")
+        Settings.print("*snarf waves goodbye*")
 
     @staticmethod
     def discount():
@@ -100,11 +100,6 @@ class Snarf:
         syncTo - updates profile settings with provided profile
 
         Extended description of function.
-
-        Parameters
-        ----------
-        profile : profile.Profile
-            Class representation of Onlyfans profile settings
 
         """
 

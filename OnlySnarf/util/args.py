@@ -10,7 +10,7 @@ args: Dict[str, Any] = {}
 ##
 
 parser = argparse.ArgumentParser(prog='onlysnarf', allow_abbrev=False, epilog="Shnarrf!", 
-  description=__doc__, conflict_handler='resolve')
+  description="No mention of old Shnarf, I notice. Go ahead, just take all the glory, and leave it to Snarf to clean up after you. I don't mind!", conflict_handler='resolve')
 
 ############
 
@@ -33,8 +33,6 @@ parser.add_argument('-version', action='version')
 ############################################################################################
 
 try:
-  # args.update(vars(parser.parse_args()))
-
   parsedargs, unknownargs = parser.parse_known_args()
   # print("unknown args: {}".format(unknownargs))
   args.update(vars(parsedargs))

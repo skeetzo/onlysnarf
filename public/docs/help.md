@@ -1,7 +1,7 @@
 # -h
 
-usage: onlysnarf [-h] [-browser {auto,chrome,firefox,remote}] [-login {auto,onlyfans,twitter}] [-performers PERFORMERS] [-save] [-tweet] [--username USERNAME]
-                 [-config PATH_CONFIG] [-debug] [-keep] [-show] [-v] [-version]
+usage: onlysnarf [-h] [-browser {auto,chrome,firefox,remote}] [-login {auto,onlyfans,twitter}] [-reduce] [-save] [-tweet]
+                 [--username USERNAME] [-config PATH_CONFIG] [-debug] [-keep] [-show] [-v] [-version]
                  {discount,message,post,users} ...
 
 positional arguments:
@@ -18,8 +18,7 @@ optional arguments:
                         web browser to use
   -login {auto,onlyfans,twitter}, -L {auto,onlyfans,twitter}
                         method of user login to prefer
-  -performers PERFORMERS
-                        performers to upload. adds "w/ @[...performers]"
+  -reduce               enable reducing files over 50 MB
   -save, -S             enable saving users locally on exit
   -tweet                enable tweeting when posting
   --username USERNAME, --u USERNAME
@@ -47,25 +46,30 @@ optional arguments:
 
 # Message
 
-usage: onlysnarf message [-h] [-date DATE] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-text TEXT] [-user USER | -users USERS] ...
+usage: onlysnarf message [-h] [-date DATE] [-performers PERFORMERS] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-tags TAGS]
+                         [-text TEXT] [-user USER | -users USERS]
+                         ...
 
 positional arguments:
-  input               one or more paths to files (or folder) to include in the message
+  input                 one or more paths to files (or folder) to include in the message
 
 optional arguments:
-  -h, --help          show this help message and exit
-  -date DATE          schedule date (MM-DD-YYYY)
-  -price PRICE        price to charge ($)
-  -schedule SCHEDULE  schedule (MM-DD-YYYY:HH:MM:SS)
-  -time TIME          time (HH:MM)
-  -text TEXT          text to send
-  -user USER          user to message
-  -users USERS        users to message
+  -h, --help            show this help message and exit
+  -date DATE            schedule date (MM-DD-YYYY)
+  -performers PERFORMERS
+                        performers to reference. adds "@[...performers]"
+  -price PRICE          price to charge ($)
+  -schedule SCHEDULE    schedule (MM-DD-YYYY:HH:MM:SS)
+  -time TIME            time (HH:MM)
+  -tags TAGS            the tags (@[tag])
+  -text TEXT            text to send
+  -user USER            user to message
+  -users USERS          users to message
 
 # Post
 
-usage: onlysnarf post [-h] [-date DATE] [-duration {1,3,7,30,99} | -expiration EXPIRATION] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-text TEXT]
-                      [-question QUESTIONS]
+usage: onlysnarf post [-h] [-date DATE] [-duration {1,3,7,30,99} | -expiration EXPIRATION] [-performers PERFORMERS] [-price PRICE]
+                      [-schedule SCHEDULE] [-time TIME] [-tags TAGS] [-text TEXT] [-question QUESTIONS]
                       ...
 
 positional arguments:
@@ -78,9 +82,12 @@ optional arguments:
                         duration in days (99 for 'No Limit') for a poll
   -expiration EXPIRATION
                         expiration in days (999 for 'No Limit')
+  -performers PERFORMERS
+                        performers to reference. adds "@[...performers]"
   -price PRICE          price to charge ($)
   -schedule SCHEDULE    schedule (MM-DD-YYYY:HH:MM:SS)
   -time TIME            time (HH:MM)
+  -tags TAGS            tags (@[tag])
   -text TEXT            text to send
   -question QUESTIONS, -Q QUESTIONS
                         questions to ask
