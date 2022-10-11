@@ -599,14 +599,18 @@
   - fixed args & config overwrite direction
   - recorded new videos for demos
   - updated preview gifs of behavior for readme w/ OBS: discount, message, poll, post, schedule, users
+  - cleaned up config files w/ final changes
+  - added previews to readme
+  - updated user config explainer to readme
+  - cleaned up packages
 
+  
 ------------------------------------------------------------------------------------
 
 
 ## TODO
 
 (getting ready for new pypi release)
-- clean up config files w/ final changes
 - clean up classes/files to keep up with gutting google, etc
 
 (ready for new pypi release)
