@@ -531,7 +531,7 @@
     - added tests for trying different browsers, reconnecting, keeping open, remote sessions
     - schedule tests pass they just don't set the right hour
     - major snarf tests all OK (minus poll)
-**4.3.0 : 9/20/2022, 9/21/2022**
+  **4.3.0 : 9/20/2022, 9/21/2022**
   - updated selenium, google chrome, & firefox geckodriver versions
   - driver updates to accomodate selenium version changes
   - changed Driver back to a basic class instead of all static, needs more debugging (again)
@@ -604,9 +604,7 @@
   - updated user config explainer to readme
   - cleaned up packages
 
-
 ------------------------------------------------------------------------------------
-
 
 ## TODO
 
@@ -616,6 +614,7 @@
 (ready for new pypi release)
 - sync with main/master branch
 - upload working changes to pypi
+- possibly add github workspaces / workflow for testing releases
 
 (more cleanup)
 - doublecheck code for missing docstrings... aka finish cleaning up code

@@ -29,9 +29,6 @@ python setup.py install && python tests/snarf/test_profile.py
 python setup.py install && python tests/snarf/test_promotion.py
 python setup.py install && python tests/snarf/test_users.py
 
-## IPFS ##
-python setup.py install && python tests/test_ipfs.py
-
 #############################################################################
 
 # Pass:
@@ -58,13 +55,11 @@ python setup.py install && python tests/test_ipfs.py
 
 # Untested
 
-# ipfs
 # profile
 # promotion
 # remote
 
 # (individual driver / message tests)
-
 
 #############################################################################
 
