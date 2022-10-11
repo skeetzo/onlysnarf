@@ -16,8 +16,11 @@ Here are some debugging previews of how it looks when everything works:
 **Note: this package has been updated from its previous "do a lot" design to a slim "do few things right" build. Meaning all previous methods for internally handling files and media should now be done by an alternative project / package.**
 
 ## Installation
-pip: `python3 -m pip install OnlySnarf`  
-clone repo & install: `git clone git@github.com:skeetzo/onlysnarf && python3 setup.py install`  
+
+Python 3.8.3
+
+pip: `python -m pip install onlysnarf`  
+clone repo & install: `git clone git@github.com:skeetzo/onlysnarf && python setup.py install`  
 
 > usage: onlysnarf [-h] [-version] ...
 > 
