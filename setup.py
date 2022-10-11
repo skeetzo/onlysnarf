@@ -9,7 +9,7 @@ setuptools.setup(
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
-    keywords = ['OnlyFans', 'OnlySnarf'],
+    keywords = ['OnlyFans', 'OnlySnarf', 'selenium', 'snarf'],
     description="OnlyFans Content Distribution Tool",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -19,18 +19,18 @@ setuptools.setup(
     install_requires=[
         # 'geckodriver-autoinstaller',    
         'chromedriver-binary',
-        'httplib2',
+        # 'httplib2',
         'ffmpeg',
-        'pathlib', 
+        # 'pathlib', 
         'pillow',
-        'pysftp',
+        # 'pysftp',
         'pyinquirer',
         'wget',
         'selenium'
         ],
     entry_points={
         'console_scripts' : [
-            'snarf = OnlySnarf.menu:main',
+            # 'snarf = OnlySnarf.menu:main',
             'onlysnarf = OnlySnarf.snarf:main'
         ]
     },
