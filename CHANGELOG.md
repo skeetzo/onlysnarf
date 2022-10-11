@@ -595,7 +595,7 @@
   - fixed tab handling in driver
   - debugged & tested newly added subcommand structure: discount, message, post --> snarf.py
   - beginning recordings for behavior previews
-**4.3.13: 10/11/2022**
+**4.4.0: 10/11/2022**
   - fixed args & config overwrite direction
   - recorded new videos for demos
   - updated preview gifs of behavior for readme w/ OBS: discount, message, poll, post, schedule, users
@@ -604,7 +604,7 @@
   - updated user config explainer to readme
   - cleaned up packages
 
-  
+
 ------------------------------------------------------------------------------------
 
 
