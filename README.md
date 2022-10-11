@@ -5,8 +5,6 @@
 ## Description
 OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans by interacting with the site via web scraping. OnlySnarf carries no weapons, but it has been known to use its tail, teeth and claws when improperly configured.
 
-Note: this package has been updated from its previous "do a lot" design to a slim "do few things right" build. Meaning all previous methods for internally handling files and media should now be done by an alternative project / package.
-
 Here are some debugging previews of how it looks when everything works:
 - [Discount](public/previews/discount.gif)
 - [Message](public/previews/message.gif)
@@ -14,6 +12,8 @@ Here are some debugging previews of how it looks when everything works:
 - [Post](public/previews/post.gif)
 - [Schedule](public/previews/schedule.gif)
 - [Users](public/previews/users.gif)
+
+**Note: this package has been updated from its previous "do a lot" design to a slim "do few things right" build. Meaning all previous methods for internally handling files and media should now be done by an alternative project / package.**
 
 ## Installation
 pip: `python3 -m pip install OnlySnarf`  
