@@ -598,16 +598,16 @@
 **4.3.13: 10/11/2022**
   - fixed args & config overwrite direction
   - recorded new videos for demos
+  - updated preview gifs of behavior for readme w/ OBS: discount, message, poll, post, schedule, users
 
 ------------------------------------------------------------------------------------
 
-- clean up config files w/ final changes
-- clean up classes/files to keep up with gutting google, etc
 
 ## TODO
 
 (getting ready for new pypi release)
-- update previews of behavior for readme w/ OBS: discount, message, post, users
+- clean up config files w/ final changes
+- clean up classes/files to keep up with gutting google, etc
 
 (ready for new pypi release)
 - sync with main/master branch
