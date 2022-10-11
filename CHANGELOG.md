@@ -591,14 +591,18 @@
   - more debugging for new subcommand structure
   **4.3.11: 10/8/2022**
   - updated method of importing config/args to allow for full subcommand testing via pytest by adding shim for args
-**4.3.12: 10/10/2022**
+  **4.3.12: 10/10/2022**
   - fixed tab handling in driver
   - debugged & tested newly added subcommand structure: discount, message, post --> snarf.py
   - beginning recordings for behavior previews
+**4.3.13: 10/11/2022**
+  - fixed args & config overwrite direction
+  - recorded new videos for demos
 
 ------------------------------------------------------------------------------------
 
-- message: drag&drop has decided to stop working; maybe a selenium version issue?
+- clean up config files w/ final changes
+- clean up classes/files to keep up with gutting google, etc
 
 ## TODO
 
@@ -611,10 +615,6 @@
 
 (more cleanup)
 - doublecheck code for missing docstrings... aka finish cleaning up code
-- clean up classes/files to keep up with gutting google, etc
-- update: backup function to include original folder name -> posted/galleries/$file
-- change deletion behavior to preserve better
-
 - update driver.firefox: service_log_path=Settings.get_logs_path
 
 ------------------------------------------------------------------------------------
@@ -680,6 +680,10 @@ https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-
 
 **4.1.4**
   - boolean checks from "Settings.is_" functions are failing: replaced with redundant "== True"
+
+**4.3.12**
+  - message: drag&drop has decided to occasionally stop working; maybe a selenium version issue?
+
 
 # Web Browser Versions
 

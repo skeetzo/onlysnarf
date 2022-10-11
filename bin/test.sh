@@ -6,7 +6,10 @@
 pytest tests/selenium
 pytest tests/snarf
 
+pytest tests/snarf/test_discount.py
 pytest tests/snarf/test_message.py
+pytest tests/snarf/test_post.py
+pytest tests/snarf/test_profile.py
 pytest tests/snarf/test_users.py
 
 
@@ -79,7 +82,7 @@ onlysnarf -debug -show message -user random -text shnarf! -price min ~/Projects/
 onlysnarf -debug -show post -text "shnarf" ~/Projects/onlysnarf/public/images/snarf-missionary.jpg
 
 # Poll
-onlysnarf -debug -show post -text shnarff! -question "sharnf shnarf?" -question "shnarf shhhnarff snarf?" -duration min -expiration min
+onlysnarf -debug -show post -text shnarff! -question "sharnf shnarf?" -question "shnarf shhhnarff snarf?" -duration min
 
 # Schedule
 onlysnarf -debug -show post -text shnarff! -schedule "10/31/2022 16:20:00"

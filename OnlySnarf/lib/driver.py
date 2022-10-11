@@ -1696,10 +1696,8 @@ class Driver:
             self.browser.find_element(By.CLASS_NAME, "b-post-piece__value").click()
             # click on the correct duration number
             Settings.dev_print("setting duration")
-            # nums = self.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("pollDurations").getClass())
-            duration = poll["duration"]
-            if int(duration) > 30: duration = "No limit"
-            self.browser.find_element(By.NAME, "periodValue").send_keys(str(duration))
+            time.sleep(0.5)
+            ActionChains(self.browser).move_to_element(self.browser.find_element(By.NAME, "periodValue")).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(poll["duration"])).perform()
             # save the duration
             Settings.dev_print("saving duration")
             self.find_element_to_click("pollSave").click()
