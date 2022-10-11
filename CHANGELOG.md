@@ -603,49 +603,47 @@
   - added previews to readme
   - updated user config explainer to readme
   - cleaned up packages
+  - cleaned up classes/files to keep up with gutting google, etc; removed Remote & Bot and saved in notes/old
+  - doublechecked code for missing docstrings... aka finished cleaning up code (wow go me)
+  - double checked / re-enabled performers & tags functionality
+  - updated help.md and menu.md with new text changes
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-(getting ready for new pypi release)
-- clean up classes/files to keep up with gutting google, etc
-
 (ready for new pypi release)
 - sync with main/master branch
 - upload working changes to pypi
-- possibly add github workspaces / workflow for testing releases
-
-(more cleanup)
-- doublecheck code for missing docstrings... aka finish cleaning up code
-- update driver.firefox: service_log_path=Settings.get_logs_path
 
 ------------------------------------------------------------------------------------
 
-- separate driver functions into individual components ala schedule --> individual steps; for easier testing (and to clean up the giant ass driver file)
-
--> CLI
-- fix any new cli menu errors made while updating major processes
 - update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
 - update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
-- figure out how to suppress the chrome stacktrace debugging messages
 
--> Menu
-- re-enable prompting for discount amount&months in Settings (at some point)
+-> CLI Menu
+- fix any new cli menu errors made while updating major processes
+- re-enable prompting for discount amount&months in Settings or somewhere else (at some point)
 - re-add removed user select code in notes/selectstuff.py (for menu prompts)
+- re-enable menu command
 
 (review usability and code first)
--> Promos
+-> OnlyFans: Promos
 - clean up / fix & test
 - add min/max to args & validators
+- re-enable / add promo subcommands and config variables
 
--> Profile
+-> OnlyFans: Profile
 - new - setup - Twitter -> profile, banner; Price and Settings
 - new - advertise
 - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
 - need to add 'create' to Profile for asking for profile settings when syncing to
 - add config for profile templates when testing profile features again
 - add tests for profile integration / behavior
+- re-enable / add profile subcommands and config variables
+
+-> OnlyFans
+- add quiz & target interactions (onlyfans buttons)
 
 (once everything else in app works again)
 -> Twitter
@@ -656,18 +654,16 @@
 -- add checks for previously existing tweets
 -- keep track of tweets (somehow)
 
--> OnlyFans
-- add quiz & target interactions (onlyfans buttons)
-
 -> Tests
-- add tests for additional config variables such as browser and image options
-- finish adding tests for individual circumstances:
-messaging: all, recent, favorite, renew on
-individual message entry parts, individual post entry parts
+- separate driver functions into individual components ala schedule --> individual steps; for easier testing (and to clean up the giant ass driver file)
+- add tests for newly separated driver files / functions
+- add tests for additional config variables such as browser and image/video options, limits
+- finish adding tests for individual messaging circumstances: all, recent, favorite, renew on
+- finish adding tests for individual message entry parts, individual post entry parts
 
+(break things)
 -> Upgrade Selenium to 4.0
 https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-has-been-deprecated-selenium-python
-- fix firefox: DeprecationWarning: service_log_path has been deprecated, please pass in a Service object
 
 ## Fix / Debug
 
@@ -679,10 +675,13 @@ https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-
 -- probably not: debug_delay
 ---- possibly improved via recent updated coding? (4.3.10)
 
+- figure out how to suppress the chrome stacktrace debugging messages
+- fix driver.firefox: DeprecationWarning: service_log_path has been deprecated, please pass in a Service object
+
 # Bugs
 
 **4.1.4**
-  - boolean checks from "Settings.is_" functions are failing: replaced with redundant "== True"
+  - boolean checks from "Settings.is_" functions are failing: replaced with redundant string checks for if == "True"
 
 **4.3.12**
   - message: drag&drop has decided to occasionally stop working; maybe a selenium version issue?

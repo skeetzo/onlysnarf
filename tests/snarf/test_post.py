@@ -13,6 +13,8 @@ class TestSnarf(unittest.TestCase):
         config["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["text"] = "test balls"
+        config["tags"] = ["test","ticles"]
+        config["performers"] = ["yourmom","yourdad"]
         Settings.set_debug("tests")
 
     def tearDown(self):

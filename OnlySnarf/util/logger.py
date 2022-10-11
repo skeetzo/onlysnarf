@@ -47,19 +47,9 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
 
-# create file handler which logs everything
-# fh = logging.FileHandler('snarf.log')
-# fh.setLevel(logging.DEBUG)
-
 # define a Handler which writes INFO messages or higher to the sys.stderr
 console = logging.StreamHandler()
-# console.setLevel(logging.INFO)
-# set a format which is simpler for console use
-# formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
 # tell the handler to use this format
 console.setFormatter(CustomFormatter())
 # add the handler to the root logger
 logging.getLogger('').addHandler(console)
-
-# hide output during tests
-# if os.environ.get("ENV") == "test": logging.getLogger('').removeHandler(console)

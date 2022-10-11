@@ -49,7 +49,7 @@ text: ""
 (optional)
 input: "/path/to/fileoOrFolder"
 tags: key, words -> #key #words  
-performers: performerName1, performerName2 -> w/ @performerName1 @performerName2  
+performers: performerName1, performerName2 -> @performerName1 @performerName2  
 
 Schedule: ("date" & "time" or only "schedule")
 schedule: "mm/dd/YYYY:HH:MM"  
@@ -110,13 +110,16 @@ The users by username to specify for discounting.
 -date "01/01/2000"
 The date required for a scheduled message.
 
+-performers "name1" -performers "name2" ...
+Performer usernames to reference. Adds to text with "@" symbols.
+
 -price 0
 The price to specify for file uploads.
 
 -schedule "mm/dd/YYYY:HH:MM"  
 Schedule message for upload via $date and $time.
 
--tags "tag1,tag2"
+-tags "tag1" -tags "tag2" ...
 Tags to become #tags when creating text.
 
 -text ""
@@ -141,10 +144,13 @@ The duration for a post.
 -expiration [0,3,7,99,min,max]
 The expiration to use for a post.
 
+-performers "name1" -performers "name2" ...
+Performer usernames to reference. Adds to text with "@" symbols.
+
 -schedule "mm/dd/YYYY:HH:MM"
 Schedule post for upload via $date and $time.
 
--tags "tag1,tag2"
+-tags "tag1" -tags "tag2" ...
 Tags to become #tags when creating text.
 
 -text ""

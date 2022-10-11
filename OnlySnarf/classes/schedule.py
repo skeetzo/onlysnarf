@@ -22,6 +22,8 @@ class Schedule:
         self.init()
 
     def init(self):
+        """Initialize the schedule's settings"""
+
         if self._initialized_: return
         Settings.dev_print("initiliazing schedule...")
         schedule = Settings.get_schedule()
@@ -45,6 +47,16 @@ class Schedule:
         self._initialized_ = True
 
     def get(self):
+        """
+        Get the schedule's values in a dict.
+
+        Returns
+        -------
+        dict
+            A dict containing the values of the schedule
+
+        """
+
         return dict({
             "date": self.get_date(),
             "time": self.get_time(),
@@ -135,6 +147,16 @@ class Schedule:
         return self.time
 
     def validate(self):
+        """
+        Determines whether or not the schedule settings are valid.
+
+        Returns
+        -------
+        bool
+            Whether or not the schedule is valid
+
+        """
+
         Settings.dev_print("validating schedule...")
         today = datetime.strptime(str(datetime.now().strftime(DEFAULT.SCHEDULE_FORMAT)), DEFAULT.SCHEDULE_FORMAT)
         # schedule = datetime.strptime(str(Settings.get_schedule().now().strftime(DEFAULT.SCHEDULE_FORMAT)), DEFAULT.SCHEDULE_FORMAT)

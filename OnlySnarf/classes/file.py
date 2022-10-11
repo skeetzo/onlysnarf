@@ -1,12 +1,9 @@
 import os, shutil, random, sys
 import PyInquirer
-from PIL import Image
 from os import walk
 ##
-from ..lib import remote as Remote
 from ..lib.ffmpeg import ffmpeg
 from ..util.settings import Settings
-
 
 ###############################################################
 
@@ -39,78 +36,10 @@ class File():
         ##
         # file title reference
         self.title = ""
-        # [image, gallery, video, performer], default image
-        self.category = "image"
         # file size
         self.size = 0
 
     ######################################################################################
-
-    def backup(self):
-        """Backup file to appropriate destination source"""
-
-        if not self.backup_check(): return
-        if Settings.get_destination() == "remote":
-            Remote.upload_file(self)
-        else:
-            # move file to local backup location
-            backupPath = os.path.join(Settings.get_local_path(), "posted")
-            backupPath = os.path.join(backupPath, self.category, self.get_title())
-            shutil.move(self.get_path(), backupPath)
-
-    def backup_check(self):
-        """
-        Print applicable backup text
-
-        Returns
-        -------
-        bool
-            Whether or not the file should be backed up
-
-        """
-
-        if Settings.is_skip_download():
-            Settings.warn_print("skipping backup, skipped download")
-            return False
-        if Settings.is_force_backup():
-            Settings.maybe_print("backing up (forced): {}".format(self.get_title()))
-        elif not Settings.is_backup():
-            Settings.maybe_print("skipping backup (disabled): {}".format(self.get_title()))
-            return False
-        elif Settings.is_debug():
-            Settings.maybe_print("skipping backup (debug): {}".format(self.get_title()))
-            return False
-        else:
-            Settings.maybe_print("backing up: {}".format(self.get_title()))
-        return True
-
-
-    def backup_files(self):
-        """
-        Backup files provided to appropriate destinations
-
-        Returns
-        -------
-        bool
-            Whether or not the files were backed up successfully
-
-        """
-
-        if not self.backup_check(): return
-        if Settings.get_destination() == Source.REMOTE:
-            Remote.upload_files(self.files)
-        elif Settings.get_destination() == Source.IPFS:
-            IPFS.upload_files(self.files)
-        else:
-            successfuls = 0
-            failures = 0
-            for file in self.files:
-                if file.backup(): successfuls+=1
-                else: failures+=1
-            if successfuls > failures:
-                Settings.shnarf()
-                return True
-        return False
 
     def check_size(self):
         """
@@ -139,55 +68,6 @@ class File():
             Settings.err_print("empty file size")
             return False
         self.size = size
-        return True
-
-    def delete(self):
-        """Delete file"""
-
-        if not self.delete_text(): return
-        try: 
-            os.remove(self.get_path())
-            Settings.print('File deleted: {}'.format(self.get_title()))
-        except Exception as e: Settings.dev_print(e)
-
-    def delete_text(self):
-        """
-        Print applicable deletion text
-        
-        Returns
-        -------
-        bool
-            Whether or not the file should be deleted
-
-        """
-
-        if Settings.is_skip_download():
-            Settings.warn_print("skipping delete, skipped download")
-            return False
-        if not Settings.is_delete():
-            Settings.maybe_print("skipping delete (disabled): {}".format(self.title))
-            return False
-        elif Settings.is_debug():
-            Settings.maybe_print("skipping delete (debug): {}".format(self.title))
-            return False
-        else:
-            Settings.maybe_print("deleting: {}".format(self.title))
-        return True
-
-    def download_text():
-        """
-        Print applicable download text.
-        
-        Returns
-        -------
-        bool
-            Whether or not the file should be downloaded
-
-        """
-
-        if Settings.is_skip_download():
-            Settings.print("Skipping Download (debug)")
-            return False
         return True
 
     ##############################
@@ -282,48 +162,6 @@ class File():
         return self.check_size()
 
     @staticmethod
-    def remove_local():
-        """
-        Delete all local files.
-
-        """
-
-        try:
-            Settings.maybe_print('deleting local files...')
-            # delete /tmp
-            tmp = File.get_tmp()
-            if os.path.exists(tmp):
-                shutil.rmtree(tmp)
-                Settings.maybe_print('local files removed!')
-            else:
-                Settings.maybe_print('no local files found!')
-        except Exception as e:
-            Settings.dev_print(e)
-
-    @staticmethod
-    def get_files():
-        """
-        Get files from the runtime source.
-
-        Returns
-        -------
-        list
-            The files retrieved
-
-        """
-
-        
-        files = []
-        # get files from appropriate source's menu selection
-        if Settings.get_source() == Source.REMOTE:
-            files = Remote.get_files()
-        elif Settings.get_source() == Source.LOCAL:
-            files = File.get_files()
-        elif Settings.get_source() == Source.IPFS:
-            files = IPFS.get_files()    
-        return files
-
-    @staticmethod
     def get_files_by_folder(path):
         """
         Get local files from the local folder path.
@@ -346,82 +184,6 @@ class File():
             break
         return f
 
-    def get_folder_by_name(category, parent=None):
-        """
-        Get local folder by category and parent.
-
-        Parameters
-        ----------
-        category : str
-            The category or folder name to get
-        parent : file.Folder
-            The local folder's parent to search within
-
-        Returns
-        -------
-        str
-            The folder path of the found folder
-
-        """
-
-        if not parent:
-            parent = Settings.get_local_path()
-        Settings.maybe_print("parent: {}".format(parent))
-        f = []
-        for (dirpath, dirnames, filenames) in walk(parent):
-            Settings.dev_print("dirpath: {}".format(dirpath))
-            for dir_ in dirnames:
-                Settings.dev_print("dir: {} = {} :category".format(dir_, category))
-                if str(dir_) == str(category):
-                    return os.path.join(parent, dir_)
-            break
-        return None
-
-    @staticmethod
-    def get_folders_of_folder_by_keywords(categoryFolder):
-        """
-        Summary line.
-
-        Extended description of function.
-
-        Parameters
-        ----------
-        arg1 : int
-            Description of arg1
-        arg2 : str
-            Description of arg2
-
-        Returns
-        -------
-        int
-            Description of return value
-
-        """
-
-        Settings.dev_print("getting keywords of folder: {}".format(categoryFolder))
-        if categoryFolder == None: return []
-        folders = File.get_folders_of_folder(categoryFolder)
-        folders_ = []
-        for folder in folders:
-            if Settings.get_drive_keyword() and str(folder.get_title()) != str(Settings.get_drive_keyword()):
-                Settings.dev_print("{} -> not keyword".format(folder.get_title()))
-                continue
-            elif Settings.get_drive_ignore() and str(folder.get_title()) == str(Settings.get_drive_ignore()):
-                Settings.dev_print("{} -> by not keyword".format(folder.get_title()))
-                continue
-            elif str(folder.get_title()) == str(Settings.get_drive_keyword):
-                Settings.dev_print("{} -> by keyword".format(folder.get_title()))
-            else:
-                Settings.dev_print("{}".format(folder.get_title()))
-            folders_.append(folder)
-        return folders_
-
-    # @staticmethod
-    # def get_random_file():
-    #     """Get random file from all files"""
-
-    #     return random.choice(File.get_files())
-
     def get_random_file(self):
         """Get random file from all files"""
 
@@ -430,21 +192,17 @@ class File():
     @staticmethod
     def get_images_of_folder(folder):
         """
-        Summary line.
-
-        Extended description of function.
+        Get images of folder.
 
         Parameters
         ----------
-        arg1 : int
-            Description of arg1
-        arg2 : str
-            Description of arg2
+        folder : str
+            The folder path to get images from
 
         Returns
         -------
-        int
-            Description of return value
+        list
+            The discovered image files
 
         """
 
@@ -466,21 +224,17 @@ class File():
     @staticmethod
     def get_videos_of_folder(folder):
         """
-        Summary line.
-
-        Extended description of function.
+        Get videos of folder.
 
         Parameters
         ----------
-        arg1 : int
-            Description of arg1
-        arg2 : str
-            Description of arg2
+        folder : str
+            The folder path to get videos from
 
         Returns
         -------
-        int
-            Description of return value
+        list
+            The discovered video files
 
         """
 
@@ -505,21 +259,17 @@ class File():
     @staticmethod
     def get_folders_of_folder(folderPath):
         """
-        Summary line.
-
-        Extended description of function.
+        Get folders of folder.
 
         Parameters
         ----------
-        arg1 : int
-            Description of arg1
-        arg2 : str
-            Description of arg2
+        folderPath : str
+            The folder path to get folders from
 
         Returns
         -------
-        int
-            Description of return value
+        list
+            The discovered folders
 
         """
 
@@ -540,254 +290,101 @@ class File():
         return folders
 
     @staticmethod
-    def get_files_by_category(cat, performer=None):
+    def remove_local():
         """
-        Summary line.
-
-        Extended description of function.
-
-        Parameters
-        ----------
-        arg1 : int
-            Description of arg1
-        arg2 : str
-            Description of arg2
-
-        Returns
-        -------
-        int
-            Description of return value
+        Delete all local files.
 
         """
 
-        Settings.maybe_print("loading local files...")
-        files = []
-        ##
-        def parse_categories(category, categoryFolder=None):
-            """
-            Summary line.
-
-            Extended description of function.
-
-            Parameters
-            ----------
-            arg1 : int
-                Description of arg1
-            arg2 : str
-                Description of arg2
-
-            Returns
-            -------
-            int
-                Description of return value
-
-            """
-
-            files = []
-            # return File.get_files_by_category(cat)
-            if Types.IMAGE in str(category):
-                categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
-                for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
-                    if not folder: continue
-                    for image in File.get_images_of_folder(folder):
-                        file = File()
-                        setattr(file, "path", imageget_path())
-                        setattr(file, "category", folder.get_title())
-                        files.append(file)
-            elif Types.VIDEO in str(category):
-                categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
-                for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
-                    if not folder: continue
-                    videos = File.get_videos_of_folder(folder)
-                    # if len(videos) > 0:
-                        # files.append(folder)
-                    for video in videos:
-                        file = File()
-                        setattr(file, "path", video.get_path())
-                        setattr(file, "category", folder.get_title())
-                        files.append(file)
-            elif Types.PERFORMER in str(category):
-                categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
-                for performer_ in File.get_folders_of_folder_by_keywords(categoryFolder):
-                    # for performer in File.get_folders_of_folder(folder):
-                    if not performer_: continue
-                    p = Folder()
-                    setattr(p, "path", performer_.get_path())
-                    setattr(p, "category", categoryFolder.get_title())
-                    files.append(p)
-            # elif "galler" in str(category):
+        try:
+            Settings.maybe_print('deleting local files...')
+            # delete /tmp
+            tmp = File.get_tmp()
+            if os.path.exists(tmp):
+                shutil.rmtree(tmp)
+                Settings.maybe_print('local files removed!')
             else:
-                categoryFolder = File.get_folder_by_name(category, parent=categoryFolder)
-                for folder in File.get_folders_of_folder_by_keywords(categoryFolder):
-                    if not folder: continue
-                    galleries = File.get_folders_of_folder(folder)
-                    if len(galleries) > 0:
-                        files.append(folder)
-                    for gallery in galleries:
-                        file = Folder()
-                        setattr(file, "path", galleryget_path())
-                        setattr(file, "category", folder.get_title())
-                        files.append(file)
-            return files
-        ##
-        if performer:
-            categoryFolder = File.get_folder_by_name("performers")
-            for performerFolder in File.get_folders_of_folder_by_keywords(categoryFolder):
-                if str(performer) == str(performerFolder.get_title()):
-                    return parse_categories(cat, categoryFolder=performerFolder)
-        return parse_categories(cat)
+                Settings.maybe_print('no local files found!')
+        except Exception as e:
+            Settings.dev_print(e)
 
+    # @staticmethod
+    # def select_file(category, performer=None):
+    #     files = File.get_files_by_category(category, performer=performer)
+    #     files_ = []
+    #     for file in files:
+    #         if isinstance(file, str):
+    #             files_.append(PyInquirer.Separator())
+    #             continue
+    #         file.category = category
+    #         file_ = {
+    #             "name": file.get_title(),
+    #             "value": file,
+    #         }
+    #         files_.append(file_)
+    #     if len(files_) == 0:
+    #         Settings.print("Missing Files")
+    #         return
+    #     files_.append({
+    #         "name": 'Back',
+    #         "value": None,
+    #     })
+    #     question = {
+    #         'type': 'list',
+    #         'name': 'file',
+    #         'message': 'File Path:',
+    #         'choices': files_,
+    #         # 'filter': lambda file: file.lower()
+    #     }
+    #     answer = PyInquirer.prompt(question)
+    #     if not answer: return File.select_files()
+    #     file = answer["file"]
+    #     if not Settings.confirm(file.get_path()): return None
+    #     return file
 
-        ## TODO
-        ## double check that i didn't erase this function being used at all
-    @staticmethod
-    def select_file(category, performer=None):
-        """
-        Summary line.
+    # @staticmethod
+    # def select_files():
+    #     # if not Settings.is_prompt(): return [File.get_random_file()]
+    #     category = Settings.select_category()
+    #     if not category: return File.select_file_upload_method()
+    #     # if not Settings.confirm(category): return File.select_files()
+    #     Settings.print("Select Files or a Folder")
+    #     files = []
+    #     while True:
+    #         file = File.select_file(category)
+    #         if not file: break
+    #         ##
+    #         if "performer" in str(category):
+    #             cat = Settings.select_category([cat for cat in Settings.get_categories() if "performer" not in cat])
+    #             performerName = file.get_title()
+    #             file = File.select_file(cat, performer=performerName)
+    #             if not file: break
+    #             setattr(file, "performer", performerName)
+    #             files.append(file)
+    #             if "galler" in str(cat) or "video" in str(cat): break
+    #         ##
+    #         files.append(file)
+    #         if "galler" in str(category) or "video" in str(category): break
+    #     if str(files[0]) == "unset": return files
+    #     if not Settings.confirm([file.get_title() for file in files]): return File.select_files()
+    #     return files
 
-        Extended description of function.
+    # def upload(self):
+    #     """
+    #     Process ran by a file after it has been uploaded.
 
-        Parameters
-        ----------
-        arg1 : int
-            Description of arg1
-        arg2 : str
-            Description of arg2
-
-        Returns
-        -------
-        int
-            Description of return value
-
-        """
-
-        files = File.get_files_by_category(category, performer=performer)
-        files_ = []
-        for file in files:
-            if isinstance(file, str):
-                files_.append(PyInquirer.Separator())
-                continue
-            file.category = category
-            file_ = {
-                "name": file.get_title(),
-                "value": file,
-            }
-            files_.append(file_)
-        if len(files_) == 0:
-            Settings.print("Missing Files")
-            return
-        files_.append({
-            "name": 'Back',
-            "value": None,
-        })
-        question = {
-            'type': 'list',
-            'name': 'file',
-            'message': 'File Path:',
-            'choices': files_,
-            # 'filter': lambda file: file.lower()
-        }
-        answer = PyInquirer.prompt(question)
-        if not answer: return File.select_files()
-        file = answer["file"]
-        if not Settings.confirm(file.get_path()): return None
-        return file
-
-    @staticmethod
-    def select_files():
-        """
-        Summary line.
-
-        Extended description of function.
-
-        Parameters
-        ----------
-        arg1 : int
-            Description of arg1
-        arg2 : str
-            Description of arg2
-
-        Returns
-        -------
-        int
-            Description of return value
-
-        """
-
-        # if not Settings.is_prompt(): return [File.get_random_file()]
-        category = Settings.select_category()
-        if not category: return File.select_file_upload_method()
-        # if not Settings.confirm(category): return File.select_files()
-        Settings.print("Select Files or a Folder")
-        files = []
-        while True:
-            file = File.select_file(category)
-            if not file: break
-            ##
-            if "performer" in str(category):
-                cat = Settings.select_category([cat for cat in Settings.get_categories() if "performer" not in cat])
-                performerName = file.get_title()
-                file = File.select_file(cat, performer=performerName)
-                if not file: break
-                setattr(file, "performer", performerName)
-                files.append(file)
-                if "galler" in str(cat) or "video" in str(cat): break
-            ##
-            files.append(file)
-            if "galler" in str(category) or "video" in str(category): break
-        if str(files[0]) == "unset": return files
-        if not Settings.confirm([file.get_title() for file in files]): return File.select_files()
-        return files
-
-    @staticmethod
-    def select_source():
-        """
-        Menu to select the source to access a file.
-
-        Returns
-        -------
-        list
-            The appropriately selected files (via prompts).
-
-        """
-
-        question = {
-            'type': 'list',
-            'name': 'upload',
-            'message': 'Source:',
-            'choices': [src.title() for src in Sources.get_source_options()] # fix this later so it works better
-        }
-        upload = PyInquirer.prompt(question)["upload"]
-
-
-        # everything after this part should be in another function
-        # this should just return the string of the upload source
-
-
-        if str(upload) == "Local":
-            return File.select_files()
-        elif str(upload) == "Remote":
-            return Remote.select_files()
-        return File.select_files()
-
-    def upload(self):
-        """
-        Process ran by a file after it has been uploaded.
-
-        Ensures the file has been backed up and then deleted locally.
+    #     Ensures the file has been backed up and then deleted locally.
         
-        Returns
-        -------
-        bool
-            Whether or not the file was properly handled after its upload
+    #     Returns
+    #     -------
+    #     bool
+    #         Whether or not the file was properly handled after its upload
 
-        """
-        if not self.prepare():
-            Settings.err_print("unable to upload file - {}".format(self.get_title()))
-            return False
-        self.backup()
-        self.delete()
-        return True
+    #     """
+    #     if not self.prepare():
+    #         Settings.err_print("unable to upload file - {}".format(self.get_title()))
+    #         return False
+    #     return True
 
 ######################################################################################################################
 ######################################################################################################################
@@ -798,10 +395,17 @@ class Folder(File):
         File.__init__(self)
         self.files = None
 
-    def backup(self):
-        if File.backup_check(self.get_title()): return
-
     def check_size(self):
+        """
+        Check the size of the files in the folder to check if the folder exists.
+
+        Returns
+        -------
+        bool
+            Whether or not the folder exists
+
+        """
+
         for file in self.get_files():
             exists = file.check_size()
             if not exists: return False
@@ -819,42 +423,18 @@ class Folder(File):
 
     ##############################
 
-
-    def download(self):
-        Settings.print("Downloading Folder: {}".format(self.get_title()))
-        if len(self.files) == 0:
-            file_list = Google.get_files_by_folder_id(self.get_id())
-            self.files = []
-            for file in file_list:
-                file_ = Google_File()
-                setattr(file_, "id", file["id"])
-                setattr(file_, "file", file)
-                self.files.append(file_)
-        folder_size = len(self.files)
-        Settings.maybe_print("folder size: {}".format(folder_size))
-        Settings.maybe_print("upload limit: {}".format(Settings.get_upload_max()))
-        if int(folder_size) == 0:
-            Settings.err_print("empty folder")
-            return False
-        file_list = self.files
-        random.shuffle(file_list)
-        file_list = file_list[:int(Settings.get_upload_max())]
-        ## video preference
-        videos = []
-        for file in file_list:
-            if str(file.get_mimetype()) in File.MIMETYPES_VIDEOS_LIST:
-                videos.append(file)
-        if len(videos) > 0: file_list = [random.choice(videos)]
-        ##
-        i = 1
-        for file in sorted(file_list, key = lambda x: x.get_title()):
-            Settings.print("Downloading: {} ({}/{})".format(file.get_title(), i, folder_size))
-            file.download()
-            i+=1
-        Settings.print()
-        Settings.print("Downloaded Folder: {}".format(self.get_title()))
-
     def get_files(self):
+        """
+        Get files from the folder.
+
+
+        Returns
+        -------
+        list
+            The discovered files
+
+        """
+
         if not self.files and self.path:
             self.files = []
             files = File.get_files_by_folder(self.get_path())
@@ -871,6 +451,16 @@ class Folder(File):
         return self.files
 
     def get_title(self):
+        """
+        Get the title of the folder.
+
+        Returns
+        -------
+        str
+            The folder's title
+
+        """
+
         if self.title: return self.title
         path = self.get_path()
         if str(path) == "": 
@@ -881,6 +471,16 @@ class Folder(File):
         return self.title
 
     def prepare():
+        """
+        Prepare the files in the folder for handling.
+
+        Returns
+        -------
+        bool
+            Whether or not the folder has been prepared successfully
+
+        """
+
         Settings.maybe_print("preparing folder: {}".format(self.get_title()))
         prepared = False
         for file in self.get_files():
@@ -897,6 +497,16 @@ class Image(File):
         pass
 
     def prepare(self):
+        """
+        Prepare the image.
+
+        Returns
+        -------
+        bool
+            Whether or not the image has been prepared
+
+        """
+
         Settings.maybe_print("preparing image: {}".format(self.get_title()))
         return super().prepare()
 
@@ -912,11 +522,15 @@ class Video(File):
 
     #seconds off front or back
     def trim(self):
+        """Trim the video file."""
+
         path = self.get_path()
         self.trimmed = ffmpeg.trim(path) 
 
     # into segments (60 sec, 5 min, 10 min)
     def split(self):
+        """Split the video file."""
+
         path = self.get_path()
         self.split = ffmpeg.split(path)
 
@@ -926,15 +540,27 @@ class Video(File):
         pass
 
     # cleanup & label appropriately (digital watermarking?)
-    def get_metadata(self):
-        pass
+    # def get_metadata(self):
+        # pass
 
     # frames for preview gallery
     def get_frames(self):
+        """Get frames from the video as screenshots."""
+
         path = self.get_path()
         self.screenshots = ffmpeg.frames(path)
 
     def prepare(self):
+        """
+        Prepare the video.
+
+        Returns
+        -------
+        bool
+            Whether or not the video has been prepared
+
+        """
+
         Settings.maybe_print("preparing video: {}".format(self.get_title()))
         self.reduce()
         self.repair()
@@ -942,6 +568,8 @@ class Video(File):
         return super().prepare()
 
     def reduce(self):
+        """Reduce the video file."""
+
         if not Settings.is_reduce(): 
             Settings.maybe_print("skipping: video reduction")
             return
@@ -952,47 +580,15 @@ class Video(File):
         self.path = ffmpeg.reduce(path)
     
     # unnecessary
-    def repair(self):
-        if not Settings.is_repair():
-            Settings.dev_print("skipping: video repair")
-            return
-        path = self.get_path()
-        if Settings.is_repair():
-            return
-        Settings.dev_print("repair: {}".format(self.get_title()))
-        self.path = ffmpeg.repair(path)
+    # def repair(self):
+    #     """Repair the video file."""
+        
+    #     if not Settings.is_repair():
+    #         Settings.dev_print("skipping: video repair")
+    #         return
+    #     path = self.get_path()
+    #     if Settings.is_repair():
+    #         return
+    #     Settings.dev_print("repair: {}".format(self.get_title()))
+    #     self.path = ffmpeg.repair(path)
 
-######################################################################################################################
-######################################################################################################################
-######################################################################################################################
-
-class Remote_File(File):
-    def __init__(self):
-        File.__init__(self)
-
-    def backup(self):
-        if not File.backup_check(self.get_title()): return
-        if Settings.get_destination() == "remote":
-            Remote.backup_file(self)
-        else:
-            file = self.download()
-            file.backup()
-            self.delete()
-
-    def delete(self):
-        if not File.delete_text(self.get_title()): return
-        try: 
-            Remote.delete_file(self)
-            Settings.print('File Deleted: {}'.format(self.get_title()))
-        except Exception as e: Settings.dev_print(e)
-
-    def download(self):
-        if not File.download_text(self.get_title()): return False
-        file = Remote.download_file(self)
-        if not file: return False
-        ### Finish ###
-        if not file.check_size():
-            Settings.err_print("missing downloaded file")
-            return False
-        Settings.print("Downloaded: {}".format(file.get_title()))
-        return file

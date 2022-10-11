@@ -4,7 +4,6 @@ from PyInquirer import prompt
 from PyInquirer import Validator, ValidationError
 ##
 
-from ..lib import remote as Remote
 from ..lib.driver import Driver
 from ..util import defaults as DEFAULT
 from ..util.settings import Settings
