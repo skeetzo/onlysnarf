@@ -612,6 +612,7 @@
   - uploaded working changes to pypi
 **4.4.1: 10/12/2022**
   - minor text changes
+  - fixed file upload when posting (of course this would still be semi broken after publishing changes)
 
 ------------------------------------------------------------------------------------
 

@@ -1786,7 +1786,8 @@ class Driver:
             if not driver.enter_text(message["text"]) or not driver.upload_files(message["files"]):
                 Settings.err_print("unable to post!")
                 return False
-            WebDriverWait(driver.browser, Settings.get_upload_max_duration(), poll_frequency=3).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("sendButton").getClass())))
+            # twitter tweet button is 1st, post is 2nd
+            postButton = WebDriverWait(driver.browser, Settings.get_upload_max_duration(), poll_frequency=3).until(EC.element_to_be_clickable(driver.browser.find_element(By.CLASS_NAME, "b-btns-group").find_elements(By.XPATH, "./child::*")[1]))
             Settings.dev_print("upload complete")
             if str(Settings.is_debug()) == "True":
                 try:
@@ -1806,7 +1807,7 @@ class Driver:
                 return True
             Settings.dev_print("uploading post")
             # twitter tweet button is 1st, post is 2nd
-            ActionChains(driver.browser).move_to_element(driver.browser.find_element(By.CLASS_NAME, "b-btns-group").find_elements(By.XPATH, "./child::*")[1]).click().perform()
+            ActionChains(driver.browser).move_to_element(postButton).click().perform()
             Settings.print('posted to OnlyFans!')
             return True
         except TimeoutException:
