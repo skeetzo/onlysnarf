@@ -163,7 +163,7 @@ def exit_handler():
     """Exit cleanly"""
 
     Driver.exit_all()
-    Settings.print("Shnarrf!")
+    Settings.print("shnarrf!")
     sys.exit(0)
 
 import atexit
@@ -181,11 +181,10 @@ def main():
         action = Settings.get_action()
         Settings.print("Running - {}".format(action))
         action = getattr(Snarf, action)
-        if action(): Settings.print("Shnarrf shnarfff shnarf!!")
-        else: Settings.print("Shnarrf? Shnaaaaaaaarrrff??")
+        action()
     except Exception as e:
         Settings.dev_print(e)
-        Settings.print("Shnarf??")
+        Settings.print("shnarf??")
     # finally:
         # exit_handler()
 

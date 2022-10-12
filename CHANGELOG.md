@@ -610,6 +610,8 @@
   - fixed driver & message actually sending... haha and discount applying.... woops
   - synced with main/master branch
   - uploaded working changes to pypi
+**4.4.1: 10/12/2022**
+  - minor text changes
 
 ------------------------------------------------------------------------------------
 

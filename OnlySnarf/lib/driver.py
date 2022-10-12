@@ -3605,23 +3605,21 @@ class Driver:
         if str(Settings.is_cookies()) == "True":
             self.cookies_save()
         if str(Settings.is_save_users()) == "True":
-            Settings.print("Saving and Exiting OnlyFans")
+            Settings.print("saving and exiting OnlyFans...")
             # from OnlySnarf.classes.user import User
             from ..classes.user import User
             User.write_users_local()
         if str(Settings.is_keep()) == "True":
-            Settings.maybe_print("keeping browser open")
-            # self.go_to_home(force=True)
             self.go_to_home()
             Settings.dev_print("reset to home page")
             if not Driver.NOT_INFORMED_KEPT:
-                Settings.print("Kept Browser Open")
+                Settings.print("kept browser open")
             Driver.NOT_INFORMED_KEPT = True
-            # todo: add delay for setting this back to false
+            # todo: add delay for setting this back to false?
         else:
-            Settings.print("Exiting OnlyFans")
+            Settings.print("exiting OnlyFans...")
             self.browser.quit()
-            Settings.print("Browser Closed")
+            Settings.maybe_print("browser closed")
             self._initialized_ = False
             Driver.DRIVERS.remove(self)
 
