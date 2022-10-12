@@ -608,16 +608,12 @@
   - double checked / re-enabled performers & tags functionality
   - updated help.md and menu.md with new text changes
   - fixed driver & message actually sending... haha and discount applying.... woops
+  - synced with main/master branch
+  - uploaded working changes to pypi
 
 ------------------------------------------------------------------------------------
 
 ## TODO
-
-(ready for new pypi release)
-- sync with main/master branch
-- upload working changes to pypi
-
-------------------------------------------------------------------------------------
 
 - update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
 - update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
