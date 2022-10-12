@@ -607,6 +607,7 @@
   - doublechecked code for missing docstrings... aka finished cleaning up code (wow go me)
   - double checked / re-enabled performers & tags functionality
   - updated help.md and menu.md with new text changes
+  - fixed driver & message actually sending... haha and discount applying.... woops
 
 ------------------------------------------------------------------------------------
 
@@ -647,6 +648,7 @@
 
 (once everything else in app works again)
 -> Twitter
+- actually test if tweeting behavior works in driver
 - needs a dummy account to test actual tweeting w/
 - tweet reminders from inlaid config behavior
 - can enter and edit the final text that is tweeted
@@ -682,10 +684,10 @@ https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-
 
 **4.1.4**
   - boolean checks from "Settings.is_" functions are failing: replaced with redundant string checks for if == "True"
-
 **4.3.12**
   - message: drag&drop has decided to occasionally stop working; maybe a selenium version issue?
-
+**4.4.0**
+  - discount: amount&months still require 2 passes on average to update values correctly
 
 # Web Browser Versions
 

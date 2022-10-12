@@ -14,8 +14,8 @@ class Discount:
 
         """OnlyFans discount action."""
 
-        self.amount = amount or DISCOUNT_MIN_AMOUNT # amount in percent
-        self.months = months or DISCOUNT_MIN_MONTHS # number of months (1-12)
+        self.amount = amount
+        self.months = months
         self.username = username # the recipient username
 
     def apply(self):
@@ -47,9 +47,9 @@ class Discount:
         """
 
         return dict({
-            "username": self.get_username(),
             "amount": self.get_amount(),
-            "months": self.get_months()
+            "months": self.get_months(),
+            "username": self.get_username()
         })
 
     def get_amount(self):
@@ -66,7 +66,15 @@ class Discount:
 
         """
 
-        return self.amount or Settings.get_amount()
+        amount = self.amount or Settings.get_amount()
+        if int(amount) > int(Settings.get_discount_max_amount()):
+            Settings.warn_print("discount amount too high, max -> {}%".format(Settings.get_discount_max_months()))
+            amount = int(Settings.get_discount_max_amount())
+        elif int(amount) < int(Settings.get_discount_min_amount()):
+            Settings.warn_print("discount amount too low, min -> {}%".format(Settings.get_discount_min_months()))
+            amount = int(Settings.get_discount_min_amount())
+        self.amount = amount
+        return self.amount
 
     def get_months(self):
 
@@ -82,8 +90,16 @@ class Discount:
 
         """
 
-        return self.months or Settings.get_months()
-        
+        months = self.months or Settings.get_months()
+        # check variable constraints
+        if int(months) > int(Settings.get_discount_max_months()):
+            Settings.warn_print("discount months too high, max -> {} months".format(Settings.get_discount_max_months()))
+            months = int(Settings.get_discount_max_months())
+        elif int(months) < int(Settings.get_discount_min_months()):
+            Settings.warn_print("discount months too low, min -> {} months".format(Settings.get_discount_min_months()))
+            months = int(Settings.get_discount_min_months())
+        self.months = months
+        return self.months
 
     def get_username(self):
 
