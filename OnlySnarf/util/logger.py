@@ -6,6 +6,7 @@ from .config import config
 
 loglevel = logging.INFO
 if config["debug"]: loglevel = logging.DEBUG
+if int(config["verbose"]) >= 2: loglevel = logging.DEBUG
 
 logPath = DEFAULT.LOG_PATH
 if os.environ.get('ENV') == "test":

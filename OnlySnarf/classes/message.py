@@ -185,7 +185,9 @@ class Message():
         return dict({
             "text": self.format_text(),
             "files": self.get_files(),
-            "price": self.get_price()
+            "performers": self.get_performers(),
+            "price": self.get_price(),
+            "tags": self.get_tags()
         })
 
     def get_performers(self):
@@ -430,10 +432,12 @@ class Post(Message):
         return dict({
             "text": self.format_text(),
             "files": self.get_files(),
+            "performers": self.get_performers(),
             "price": self.get_price(),
             "expiration": self.get_expiration(),
             "schedule": self.get_schedule(),
-            "poll": self.get_poll()
+            "poll": self.get_poll(),
+            "tags": self.get_tags()
         })
 
     def get_schedule(self):

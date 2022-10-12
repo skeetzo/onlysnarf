@@ -191,22 +191,7 @@ class Driver:
             months = int(discount["months"])
             amount = int(discount["amount"])
             username = str(discount["username"])
-
-            # check variable constraints
-            if int(months) > int(Settings.get_discount_max_months()):
-                Settings.warn_print("months too high, max -> {} months".format(Settings.get_discount_max_months()))
-                months = int(Settings.get_discount_max_months())
-            elif int(months) < int(Settings.get_discount_min_months()):
-                Settings.warn_print("months too low, min -> {} months".format(Settings.get_discount_min_months()))
-                months = int(Settings.get_discount_min_months())
-            if int(amount) > int(Settings.get_discount_max_amount()):
-                Settings.warn_print("amount too high, max -> {}%".format(Settings.get_discount_max_months()))
-                amount = int(Settings.get_discount_max_amount())
-            elif int(amount) < int(Settings.get_discount_min_amount()):
-                Settings.warn_print("amount too low, min -> {}%".format(Settings.get_discount_min_months()))
-                amount = int(Settings.get_discount_min_amount())
-
-            Settings.print("discounting: {}".format(username))
+            Settings.print("discounting: {} {} for {} month(s)".format(username, amount, months))
             driver.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
             end_ = True
             count = 0
@@ -327,12 +312,12 @@ class Driver:
                     Settings.dev_print("successfully canceled discount")
                     Settings.dev_print("### Discount Successful ###")
                     return True
-                elif "Cancel" in button.get_attribute("innerHTML") and int(discountAmount) == int(amount) and int(monthsAmount) == int(months):
-                    Settings.print("skipping existing discount")
-                    button.click()
-                    Settings.dev_print("successfully skipped existing discount")
-                    Settings.dev_print("### Discount Successful ###")
-                    return True
+                # elif "Cancel" in button.get_attribute("innerHTML") and int(discountAmount) == int(amount) and int(monthsAmount) == int(months):
+                    # Settings.print("skipping existing discount")
+                    # button.click()
+                    # Settings.dev_print("successfully skipped existing discount")
+                    # Settings.dev_print("### Discount Successful ###")
+                    # return True
                 elif "Apply" in button.get_attribute("innerHTML"):
                     button.click()
                     Settings.print("discounted: {}".format(username))
@@ -600,6 +585,7 @@ class Driver:
                     Settings.maybe_print("upload error message, closing")
                     butt.click()
                     Settings.maybe_print("success: upload error message closed")
+                    time.sleep(0.5)
                     return True
             return False
         except Exception as e:
@@ -1772,99 +1758,63 @@ class Driver:
         """
 
         Settings.dev_print("posting...")
+        driver = Driver.get_driver()
+        driver.auth()
+        #################### Formatted Text ####################
+        Settings.print("====================")
+        Settings.print("Posting:")
+        Settings.print("- Files: {}".format(len(message["files"])))
+        Settings.print("- Performers: {}".format(message["performers"]))
+        Settings.print("- Tags: {}".format(message["tags"]))
+        Settings.print("- Text: {}".format(message["text"]))
+        Settings.print("- Tweeting: {}".format(Settings.is_tweeting()))
+        ## Expires, Schedule, Poll ##
+        if not driver.expires(message["expiration"]): return False
+        if message["schedule"].validate() and not driver.schedule(message["schedule"].get()): return False
+        if message["poll"].validate() and not driver.poll(message["poll"].get()): return False
+        Settings.print("====================")
+        ############################################################
+        ## Tweeting ##
+        if str(Settings.is_tweeting()) == "True":
+            Settings.dev_print("tweeting...")
+            # twitter tweet button is 1st, post is 2nd
+            ActionChains(driver.browser).move_to_element(driver.browser.find_element(By.CLASS_NAME, "b-btns-group").find_elements(By.XPATH, "./child::*")[0]).click().perform()
+            # WebDriverWait(driver.browser, 30, poll_frequency=3).until(EC.element_to_be_clickable((By.XPATH, Element.get_element_by_name("tweet").getXPath()))).click()
+        else: Settings.dev_print("not tweeting")
+        ## Upload Files ##
         try:
-            driver = Driver.get_driver()
-            driver.auth()
-            files = message["files"]
-            text = message["text"]
-            if str(text) == "None": text = ""
-            #################### Formatted Text ####################
-            Settings.print("====================")
-            Settings.print("Posting:")
-            Settings.print("- Files: {}".format(len(files)))
-            # Settings.print("- Keywords: {}".format(message.get_keywords()))
-            # Settings.print("- Performers: {}".format(message.get_performers()))
-            Settings.print("- Text: {}".format(text))
-            Settings.print("- Tweeting: {}".format(Settings.is_tweeting()))
-            ## Expires, Schedule, Poll
-            if not driver.expires(message["expiration"]): return False
-            if message["schedule"].validate() and not driver.schedule(message["schedule"].get()): return False
-            if message["poll"].validate() and not driver.poll(message["poll"].get()): return False
-            Settings.print("====================")
-            ############################################################
-            WAIT = WebDriverWait(driver.browser, 600, poll_frequency=10)
-            ## Tweeting
-            if str(Settings.is_tweeting()) == "True":
-                Settings.dev_print("tweeting")
-                WAIT.until(EC.element_to_be_clickable((By.XPATH, Element.get_element_by_name("tweet").getXPath()))).click()
-            else: Settings.dev_print("not tweeting")
-            
-            ## Upload Files
-            try:
-                # successful_text = driver.enter_text(text)
-                # successful_upload = driver.upload_files(files)
-                if not driver.enter_text(text) or not driver.upload_files(files):
-                    Settings.err_print("unable to post")
-                    return False
-                ## Upload
-                i = 0
-                while True:
-                    try:
-                        WebDriverWait(driver.browser, 600, poll_frequency=10).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("sendButton").getClass())))
-                        Settings.dev_print("upload complete")
-                        break
-                    except Exception as e:
-                        # try: 
-                        #     # check for existence of "thumbnail is fucked up" modal and hit ok button
-                        #     # haven't seen in long enough time to properly add
-                        #     driver.browser.switchTo().frame("iframe");
-                        #     driver.browser.find_element(By.CLASS_NAME, "g-btn m-rounded m-border").send_keys(Keys.ENTER)
-                        #     Settings.err_print("thumbnail missing")
-                        #     break
-                        # except Exception as ef:
-                        #     Settings.maybe_print(ef)
-                        Settings.print('uploading...')
-                        Driver.error_checker(e)
-                        i+=1
-                        if i == int(Settings.get_upload_max_duration()) and str(Settings.is_force_upload()) == "False":
-                            Settings.err_print("max upload time reached")
-                            return False
-
-            except Exception as e:
-                Settings.print(e)
-
-            ## Confirm
-            try:
-                send = driver.find_element_to_click("new_post")
-                if send:
-                    Settings.debug_delay_check()
-                    if str(Settings.is_debug()) == "True":
-                        try:
-                            driver.find_element_to_click("postCancel").click()
-                        except Exception as e:
-                            Settings.dev_print(e)
-                            driver.go_to_home(force=True)
-
-                        Settings.print('skipped post (debug)')
-                        Settings.debug_delay_check()
-                        return True
-                    Settings.dev_print("uploading post")
-                    send.click()
-                    # send[1].click() # the 0th one is disabled
-                else:
-                    Settings.err_print("unable to locate 'Send Post' button")
-                    return False
-            except Exception as e:
-                Settings.err_print("unable to send post")
-                Settings.dev_print(e)
+            if not driver.enter_text(message["text"]) or not driver.upload_files(message["files"]):
+                Settings.err_print("unable to post!")
                 return False
-
+            WebDriverWait(driver.browser, Settings.get_upload_max_duration(), poll_frequency=3).until(EC.element_to_be_clickable((By.CLASS_NAME, Element.get_element_by_name("sendButton").getClass())))
+            Settings.dev_print("upload complete")
+            if str(Settings.is_debug()) == "True":
+                try:
+                    driver.find_element_to_click("postCancel").click()
+                except Exception as e:
+                    Settings.dev_print(e)
+                    # refresh and reclick on text area to spawn cancel button
+                    driver.go_to_home(force=True)
+                    try:
+                        driver.enter_text(message["text"])
+                        driver.find_element_to_click("postCancel").click()
+                    except Exception as e:
+                        Settings.dev_print(e)
+                        driver.go_to_home(force=True)
+                Settings.print('skipped post (debug)')
+                Settings.debug_delay_check()
+                return True
+            Settings.dev_print("uploading post")
+            # twitter tweet button is 1st, post is 2nd
+            ActionChains(driver.browser).move_to_element(driver.browser.find_element(By.CLASS_NAME, "b-btns-group").find_elements(By.XPATH, "./child::*")[1]).click().perform()
             Settings.print('posted to OnlyFans!')
             return True
+        except TimeoutException:
+            Settings.dev_print("timed out waiting for post upload!")
         except Exception as e:
-            Driver.error_checker(e)
-            Settings.err_print("onlyfans post failure")
-            return False
+            Settings.dev_print(e)
+            Settings.err_print("unable to send post")
+        return False
 
     ######################
     ##### Promotions #####
