@@ -613,10 +613,16 @@
 **4.4.1: 10/12/2022**
   - minor text changes
   - fixed file upload when posting (of course this would still be semi broken after publishing changes)
+  **10/13/2022**
+  - more minor text changes
+  - changed text: bin/google* --> bin/chrome*
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- add current instructions for installing from github
+- add a way for installation to work for webdrivers for pypi
 
 - update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
 - update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
@@ -687,6 +693,26 @@ https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-
   - message: drag&drop has decided to occasionally stop working; maybe a selenium version issue?
 **4.4.0**
   - discount: amount&months still require 2 passes on average to update values correctly
+
+
+
+from fresh python3.8 install without a browser:
+ubuntu@Hephaestus:~$ onlysnarf -debug users
+2022-10-13 23:17:39,815 - onlysnarf - INFO - Running - users
+2022-10-13 23:17:39,816 - onlysnarf - INFO - spawning web browser...
+2022-10-13 23:17:39,841 - onlysnarf - WARNING - unable to launch chrome!
+2022-10-13 23:17:39,863 - onlysnarf - WARNING - unable to launch firefox!
+2022-10-13 23:17:39,865 - onlysnarf - ERROR - unable to spawn a web browser!
+'bool' object has no attribute 'current_url'
+2022-10-13 23:17:39,866 - onlysnarf - ERROR - failed to find users
+2022-10-13 23:17:39,866 - onlysnarf - INFO - shnarrf!
+
+
+
+when installing webdriver source from outside onlysnarf root directory:
+snarf/bin/install-google.sh: line 31: bin/check-google.sh: No such file or directory
+
+
 
 # Web Browser Versions
 
