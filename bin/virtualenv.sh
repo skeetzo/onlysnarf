@@ -9,6 +9,3 @@ python3 -m venv venv
 # deactivate
 
 # virtualenv --python=/usr/bin/python3.8 venv
-
-
-
