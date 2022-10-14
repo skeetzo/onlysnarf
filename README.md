@@ -19,8 +19,8 @@ Here are some debugging previews of how it looks when everything works:
 
 Python 3.8.3
 
-pip: `python -m pip install onlysnarf`  
-clone repo & install: `git clone git@github.com:skeetzo/onlysnarf && python setup.py install`  
+pip: `python3.8 -m pip install onlysnarf`  
+clone repo & install: `git clone git@github.com:skeetzo/onlysnarf && python3.8 setup.py install`  
 
 > usage: onlysnarf [-h] [-version] ...
 > 
