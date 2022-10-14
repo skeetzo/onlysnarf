@@ -2788,7 +2788,7 @@ class Driver:
                 options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
                 # browserAttempt = webdriver.Firefox(options=options, log_path='/var/log/onlysnarf/geckodriver.log')
                 # browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, capabilities=d)
-                browserAttempt = webdriver.Firefox(options=options, service_log_path=Settings.get_logs_path("firefox"))
+                browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, service_log_path=Settings.get_logs_path("firefox"))
                 # browserAttempt = webdriver.Firefox(options=options, desired_capabilities=d) 
                 # browserAttempt = webdriver.Firefox(options=options)
                 if str(Settings.is_show_window()) == "False":
