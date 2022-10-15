@@ -2756,7 +2756,8 @@ class Driver:
                 # options.add_experimental_option('excludeSwitches', ['enable-logging'])
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 options.binary_location = chromedriver_binary.chromedriver_filename
-                browserAttempt = webdriver.Chrome(options=options, service_args=service_args)
+                browserAttempt = webdriver.Chrome(chrome_binary=chromedriver_binary.chromedriver_filename, options=options, service_args=service_args)
+                # browserAttempt = webdriver.Chrome(options=options, service_args=service_args)
                 # browserAttempt = webdriver.Chrome(options=options)
                 if str(Settings.is_show_window()) == "False":
                     Settings.print("browser created - chrome (headless)")
