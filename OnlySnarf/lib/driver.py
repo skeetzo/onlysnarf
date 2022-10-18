@@ -22,6 +22,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
+from webdriver_manager.firefox import GeckoDriverManager
 from pathlib import Path
 ##
 from ..classes.element import Element
@@ -2737,8 +2738,8 @@ class Driver:
                 # TODO: to be added to list of removed (if not truly needed by then):
                 # options.add_argument('--disable-software-rasterizer')
                 # options.add_argument('--ignore-certificate-errors')
-                # options.add_argument("--remote-debugging-address=localhost")    
-                # options.add_argument("--remote-debugging-port=9223")
+                options.add_argument("--remote-debugging-address=localhost")    
+                options.add_argument("--remote-debugging-port=9223")
                 capabilities = {
                   'browserName': 'chrome',
                   'platform': 'LINUX',
@@ -2756,8 +2757,8 @@ class Driver:
                 # options.add_experimental_option('excludeSwitches', ['enable-logging'])
                 Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 options.binary_location = chromedriver_binary.chromedriver_filename
-                browserAttempt = webdriver.Chrome(chrome_binary=chromedriver_binary.chromedriver_filename, options=options, service_args=service_args)
-                # browserAttempt = webdriver.Chrome(options=options, service_args=service_args)
+                # browserAttempt = webdriver.Chrome(chrome_binary=chromedriver_binary.chromedriver_filename, options=options, service_args=service_args)
+                browserAttempt = webdriver.Chrome(options=options, service_args=service_args)
                 # browserAttempt = webdriver.Chrome(options=options)
                 if str(Settings.is_show_window()) == "False":
                     Settings.print("browser created - chrome (headless)")
@@ -2789,7 +2790,8 @@ class Driver:
                 options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
                 # browserAttempt = webdriver.Firefox(options=options, log_path='/var/log/onlysnarf/geckodriver.log')
                 # browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, capabilities=d)
-                browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, service_log_path=Settings.get_logs_path("firefox"))
+                # browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, service_log_path=Settings.get_logs_path("firefox"))
+                browserAttempt = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options, service_log_path=Settings.get_logs_path("firefox"))
                 # browserAttempt = webdriver.Firefox(options=options, desired_capabilities=d) 
                 # browserAttempt = webdriver.Firefox(options=options)
                 if str(Settings.is_show_window()) == "False":

@@ -6,11 +6,11 @@ sudo apt-get remove google-chrome-beta --purge -y
 pip uninstall chromedriver-binary -y
 
 #
-wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+# wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 # echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
-sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-sudo sh -c "echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' >>   /etc/apt/sources.list"
-sudo apt-get update
+# sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+# sudo sh -c "echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' >>   /etc/apt/sources.list"
+# sudo apt-get update
 #
 
 # sudo apt-get install -y google-chrome-stable
@@ -30,4 +30,5 @@ pip install chromedriver-binary
 
 echo "
 "
-bin/check-chrome.sh
+MYDIR="$(dirname "$(realpath "$0")")"
+$MYDIR/check-chrome.sh

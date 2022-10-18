@@ -34,7 +34,7 @@ def valid_date(s):
 
 def valid_duration(s):
 	try:
-		if str(s) == "max": return DEFAULT.DURATION_ALLOWED[:-2]
+		if str(s) == "max": return DEFAULT.DURATION_ALLOWED[-1]
 		elif str(s) == "min": return DEFAULT.DURATION_ALLOWED[0]
 		elif str(s) in DEFAULT.DURATION_ALLOWED: return str(s)
 	except ValueError:
@@ -68,7 +68,7 @@ def valid_expiration(s):
 
 def valid_limit(s):
 	try:
-		if str(s) == "max": return DEFAULT.LIMIT_ALLOWED[:-1]
+		if str(s) == "max": return DEFAULT.LIMIT_ALLOWED[-1]
 		elif str(s) == "min": return DEFAULT.LIMIT_ALLOWED[0]
 		elif int(s) in DEFAULT.LIMIT_ALLOWED: return int(s)
 	except ValueError:

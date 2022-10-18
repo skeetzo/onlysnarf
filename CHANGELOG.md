@@ -610,12 +610,15 @@
   - fixed driver & message actually sending... haha and discount applying.... woops
   - synced with main/master branch
   - uploaded working changes to pypi
-**4.4.1: 10/12/2022**
+  **4.4.1: 10/12/2022**
   - minor text changes
   - fixed file upload when posting (of course this would still be semi broken after publishing changes)
   **10/13/2022**
   - more minor text changes
   - changed text: bin/google* --> bin/chrome*
+**4.4.2: 10/14/2022**
+  - fixed args validator for duration's "min" "max"
+  - debugging project deployment & installer scripts for web browsers
 
 ------------------------------------------------------------------------------------
 
@@ -650,6 +653,7 @@
 
 -> OnlyFans
 - add quiz & target interactions (onlyfans buttons)
+- add functionality that follows profiles that are free for a month
 
 (once everything else in app works again)
 -> Twitter
