@@ -2791,6 +2791,7 @@ class Driver:
                 # browserAttempt = webdriver.Firefox(options=options, log_path='/var/log/onlysnarf/geckodriver.log')
                 # browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, capabilities=d)
                 # browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, service_log_path=Settings.get_logs_path("firefox"))
+                print("helooooooooooooooooo")
                 browserAttempt = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options, service_log_path=Settings.get_logs_path("firefox"))
                 # browserAttempt = webdriver.Firefox(options=options, desired_capabilities=d) 
                 # browserAttempt = webdriver.Firefox(options=options)
