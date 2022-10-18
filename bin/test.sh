@@ -84,3 +84,7 @@ onlysnarf -debug -show post -text shnarff! -schedule "10/31/2022 16:20:00"
 
 # User
 onlysnarf -debug -show users
+
+
+
+onlysnarf post -text "are you ready for nft nudes?" -question "yes" -question "maybe?" -question "no" -question "double no" -duration "max"
