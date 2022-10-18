@@ -90,7 +90,8 @@ class Driver:
         self.browsers.append(self.browser)
         # ## Cookies
         # if str(Settings.is_cookies()) == "True": self.cookies_load()
-        self.tabs.append([self.browser.current_url, self.browser.current_window_handle, 0])
+        if self.browser:
+            self.tabs.append([self.browser.current_url, self.browser.current_window_handle, 0])
         self._initialized_ = True
         Driver.DRIVERS.append(self)
 
