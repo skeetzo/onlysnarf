@@ -4,11 +4,11 @@ import os
 import shutil
 import json
 import pathlib
-import chromedriver_binary
 import time
 import wget
 import pickle
 from datetime import datetime, timedelta
+from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -22,8 +22,20 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
+##
+# chrome
+from webdriver_manager.chrome import ChromeDriverManager
+# chromium
+# brave
+from webdriver_manager.core.utils import ChromeType
+# firefox
 from webdriver_manager.firefox import GeckoDriverManager
-from pathlib import Path
+# ie
+from webdriver_manager.microsoft import IEDriverManager
+# edge
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+# opera
+from webdriver_manager.opera import OperaDriverManager
 ##
 from ..classes.element import Element
 from ..util.settings import Settings
@@ -2713,65 +2725,81 @@ class Driver:
         browser = None
         Settings.print("spawning web browser...")
 
-        def attempt_chrome():
-            Settings.maybe_print("attempting chrome web browser...")
+        def get_chrome_options():
+            webdriver.ChromeOptions()
+            if str(Settings.is_show_window()) == "False":
+                options.add_argument('--headless')
+            options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
+            options.add_argument("--allow-insecure-localhost")            
+            options.add_argument("--no-sandbox") # Bypass OS security model
+            # possibly linux only
+            options.add_argument('disable-notifications')
+            # https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
+            # options.add_arguments("start-maximized"); // open Browser in maximized mode
+            options.add_argument("--window-size=1920,1080");
+            options.add_argument("--disable-gpu");
+            options.add_argument("--disable-crash-reporter");
+            options.add_argument("--disable-extensions");
+            options.add_argument("--disable-infobars")
+            options.add_argument("--disable-in-process-stack-traces");
+            options.add_argument("--disable-logging");
+            options.add_argument("--disable-dev-shm-usage");
+            options.add_argument("--log-level=3");
+            options.add_argument("--output=/dev/null");
+            # TODO: to be added to list of removed (if not truly needed by then):
+            # options.add_argument('--disable-software-rasterizer')
+            # options.add_argument('--ignore-certificate-errors')
+            options.add_argument("--remote-debugging-address=localhost")    
+            options.add_argument("--remote-debugging-port=9223")
+            return options
+
+
+        def browser_error(err):
+            # if "cannot find Chrome binary" in str(e):
+                # Settings.warn_print("unable to launch {}! (missing binary)".format(browserType))
+            # else:
+            Settings.warn_print("unable to launch {}!".format(browserType))
+            Settings.dev_print(e)
+
+        def attempt_chrome(brave=False, chromium=False, edge=False):
+            if brave:
+                Settings.maybe_print("attempting brave web browser...")
+            elif chromium:
+                Settings.maybe_print("attempting chromium web browser...")
+            elif edge:
+                Settings.maybe_print("attempting edge web browser...")
+            else:
+                Settings.maybe_print("attempting chrome web browser...")
+
             try:
-                options = webdriver.ChromeOptions()
-                if str(Settings.is_show_window()) == "False":
-                    options.add_argument('--headless')
-                options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
-                options.add_argument("--allow-insecure-localhost")            
-                options.add_argument("--no-sandbox") # Bypass OS security model
-                # possibly linux only
-                options.add_argument('disable-notifications')
-                # https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
-                # options.add_arguments("start-maximized"); // open Browser in maximized mode
-                options.add_argument("--window-size=1920,1080");
-                options.add_argument("--disable-gpu");
-                options.add_argument("--disable-crash-reporter");
-                options.add_argument("--disable-extensions");
-                options.add_argument("--disable-infobars")
-                options.add_argument("--disable-in-process-stack-traces");
-                options.add_argument("--disable-logging");
-                options.add_argument("--disable-dev-shm-usage");
-                options.add_argument("--log-level=3");
-                options.add_argument("--output=/dev/null");
-                # TODO: to be added to list of removed (if not truly needed by then):
-                # options.add_argument('--disable-software-rasterizer')
-                # options.add_argument('--ignore-certificate-errors')
-                options.add_argument("--remote-debugging-address=localhost")    
-                options.add_argument("--remote-debugging-port=9223")
-                capabilities = {
-                  'browserName': 'chrome',
-                  'platform': 'LINUX',
-                  'chromeOptions':  {
-                    'acceptInsecureCerts': True,
-                    'useAutomationExtension': False,
-                    'forceDevToolsScreenshot': True,
-                    'args': ['--start-maximized', '--disable-infobars']
-                  }
-                }  
+                options = get_chrome_options()
+                # capabilities = {
+                #   'browserName': 'chrome',
+                #   'platform': 'LINUX',
+                #   'chromeOptions':  {
+                #     'acceptInsecureCerts': True,
+                #     'useAutomationExtension': False,
+                #     'forceDevToolsScreenshot': True,
+                #     'args': ['--start-maximized', '--disable-infobars']
+                #   }
+                # }  
                 service_args = []
                 if str(Settings.is_debug("chrome")) == "True":
                     service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
-                # else:
-                # options.add_experimental_option('excludeSwitches', ['enable-logging'])
-                Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
-                options.binary_location = chromedriver_binary.chromedriver_filename
-                # browserAttempt = webdriver.Chrome(chrome_binary=chromedriver_binary.chromedriver_filename, options=options, service_args=service_args)
-                browserAttempt = webdriver.Chrome(options=options, service_args=service_args)
-                # browserAttempt = webdriver.Chrome(options=options)
-                if str(Settings.is_show_window()) == "False":
-                    Settings.print("browser created - chrome (headless)")
+
+                # browserAttempt = webdriver.Chrome(ChromeDriverManager().install(), options=options, service_args=service_args)
+
+                if brave:
+                    browserAttempt = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install())
+                elif chromium:
+                    browserAttempt = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+                elif edge:
+                    browserAttempt = webdriver.Edge(EdgeChromiumDriverManager().install())
                 else:
-                    Settings.print("browser created - chrome")
+                    browserAttempt = webdriver.Chrome(ChromeDriverManager().install())
                 return browserAttempt
             except Exception as e:
-                if "cannot find Chrome binary" in str(e):
-                    Settings.warn_print("unable to launch chrome! (missing binary)")
-                else:
-                    Settings.warn_print("unable to launch chrome!")
-                    Settings.dev_print(e)
+                browser_error(e)
             return None
 
         def attempt_firefox():
@@ -2789,45 +2817,44 @@ class Driver:
                     options.add_argument("--headless")
                 options.add_argument("--enable-file-cookies")
                 options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
-                # browserAttempt = webdriver.Firefox(options=options, log_path='/var/log/onlysnarf/geckodriver.log')
-                # browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, capabilities=d)
-                # browserAttempt = webdriver.Firefox(firefox_binary="/usr/local/bin/geckodriver", options=options, service_log_path=Settings.get_logs_path("firefox"))
-                print("helooooooooooooooooo")
-                browserAttempt = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options, service_log_path=Settings.get_logs_path("firefox"))
-                # browserAttempt = webdriver.Firefox(options=options, desired_capabilities=d) 
-                # browserAttempt = webdriver.Firefox(options=options)
-                if str(Settings.is_show_window()) == "False":
-                    Settings.print("browser created - firefox (headless)")                    
-                else:
-                    Settings.print("browser created - firefox")
+
+                browserAttempt = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+                # browserAttempt = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options, service_log_path=Settings.get_logs_path("firefox"))
+
                 return browserAttempt
             except Exception as e:
-                Settings.warn_print("unable to launch firefox!")
-                Settings.dev_print(e)
+                browser_error(e)
+            return None
+
+        def attempt_ie():
+            Settings.maybe_print("attempting ie web browser...")
+            try:
+                browserAttempt = webdriver.Ie(service=IEService(IEDriverManager().install()))
+                return browserAttempt
+            except Exception as e:
+                browser_error(e)
+            return None
+
+        def attempt_opera():
+            Settings.maybe_print("attempting opera web browser...")
+            try:
+                browserAttempt = webdriver.Opera(executable_path=OperaDriverManager().install())
+                return browserAttempt
+            except Exception as e:
+                browser_error(e)
             return None
 
         def attempt_reconnect():
             self.read_session_data()
             if not self.session_id and not self.session_url:
-                Settings.maybe_print("unable to read session data")
+                Settings.warn_print("unable to read session data!")
                 return None
             Settings.maybe_print("reconnecting to web browser...")
             Settings.dev_print("reconnect id: {}".format(self.session_id))
             Settings.dev_print("reconnect url: {}".format(self.session_url))
-            # original_execute = WebDriver.execute
             try:
-                # def new_command_execute(self, command, params=None):
-                #     if command == "newSession":
-                #         # Mock the response
-                #         return {'success': 0, 'value': None, 'session_id': self.session_id}
-                #     else:
-                #         return original_execute(command, params)
-                # Patch the function before creating the browser object
-                # WebDriver.execute = new_command_execute
                 browserAttempt = webdriver.Remote(command_executor=self.session_url, desired_capabilities={})
-                # if browserAttempt.session_id != reconnect_id:   # this is pretty much guaranteed to be the case
                 browserAttempt.close()   # this closes the session's window - it is currently the only one, thus the session itself will be auto-killed, yet:
-                # browserAttempt.quit()    # for remote connections (like ours), this deletes the session, but does not stop the SE server
                 # take the session that's already running
                 browserAttempt.session_id = self.session_id
                 browserAttempt.title # fails check with: 'NoneType' object has no attribute 'title'
@@ -2836,8 +2863,6 @@ class Driver:
             except Exception as e:
                 Settings.warn_print("unable to reconnect!")
                 Settings.dev_print(e)
-            # Replace the patched function with original function
-            # WebDriver.execute = original_execute
             return None
 
         def attempt_remote():
@@ -2845,6 +2870,9 @@ class Driver:
             Settings.dev_print("remote url: {}".format(link))
             def attempt(dc, opts):
                 try:
+                    if str(Settings.is_show_window()) == "False":
+                        opts.add_argument('--headless')
+                    Settings.dev_print("attempting remote: {}".format(browserType))
                     browserAttempt = webdriver.Remote(command_executor=link, desired_capabilities=dc, options=opts)
                     Settings.print("remote browser created - {}".format(browserType))
                     return browserAttempt
@@ -2853,63 +2881,80 @@ class Driver:
                     Settings.dev_print(e)
                 return None
 
+            def brave_options():
+                dC = DesiredCapabilities.BRAVE
+                options = webdriver.BraveOptions()
+                return dC, options
+
             def chrome_options():
-                try:
-                    Settings.dev_print("attempting remote: chrome")
-                    dC = DesiredCapabilities.CHROME
-                    options = webdriver.ChromeOptions()
-                    if str(Settings.is_show_window()) == "False":
-                        options.add_argument('--headless')
-                    return dC, options
-                except Exception as e:
-                    Settings.dev_print(e)
-                return None
+                dC = DesiredCapabilities.CHROME
+                options = webdriver.ChromeOptions()
+                return dC, options
+
+            def chromium_options():
+                dC = DesiredCapabilities.CHROMIUM
+                options = webdriver.ChromiumOptions()
+                return dC, options
+
+            def edge_options():
+                dC = DesiredCapabilities.EDGE
+                options = webdriver.EdgeOptions()
+                return dC, options
 
             def firefox_options():
-                try:
-                    Settings.dev_print("attempting remote: firefox")
-                    dC = DesiredCapabilities.FIREFOX
-                    options = webdriver.FirefoxOptions()
-                    if str(Settings.is_show_window()) == "False":
-                        options.add_argument('--headless')
-                    return dC, options
-                except Exception as e:
-                    Settings.dev_print(e)
-                return None
+                dC = DesiredCapabilities.FIREFOX
+                options = webdriver.FirefoxOptions()
+                return dC, options
 
-            if "chrome" in browserType: return attempt(*chrome_options())
+            def ie_options():
+                dC = DesiredCapabilities.IE
+                options = webdriver.IEOptions()
+                return dC, options
+
+            def opera_options():
+                dC = DesiredCapabilities.OPERA
+                options = webdriver.OperaOptions()
+                return dC, options
+
+            if "brave" in browserType: return attempt(*brave_options())
+            elif "chrome" in browserType: return attempt(*chrome_options())
+            elif "chromium" in browserType: return attempt(*chromium_options())
+            elif "edge" in browserType: return attempt(*edge_options())
             elif "firefox" in browserType: return attempt(*firefox_options())
-            else: # auto
-                # alphabetical
-                try:
-                    return attempt(*chrome_options())
-                except Exception as e:
-                    Settings.warn_print("unable to connect remotely via chrome!")
-                    Settings.dev_print(e)
-                try:
-                    return attempt(*firefox_options())
-                except Exception as e:
-                    Settings.warn_print("unable to connect remotely via firefox!")
-                    Settings.dev_print(e)
+            elif "ie" in browserType: return attempt(*ie_options())
+            elif "opera" in browserType: return attempt(*opera_options())
+            Settings.warn_print("unable to connect remotely via {}!".format(browserType))
             return None
 
         ################################################################################################################################################
         ################################################################################################################################################
         ################################################################################################################################################
 
+        attempt_brave = False
+        attempt_chromium = False
+        attempt_edge = False
+        if "brave" in browserType:
+            attempt_brave = True
+        elif "chromium" in browserType:
+            attempt_chromium = True
+        elif "edge" in browserType:
+            attempt_edge = True
+            
+
         if "auto" in browserType:
             browser = attempt_reconnect()
-            if not browser: browser = attempt_chrome()
+            if not browser: browser = attempt_chrome(brave=attempt_brave, chromium=attempt_chromium, edge=attempt_edge)
             if not browser: browser = attempt_firefox()
         elif "remote" in browserType:
             browser = attempt_remote()
         elif "chrome" in browserType:
-            browser = attempt_chrome()
+            browser = attempt_chrome(brave=attempt_brave, chromium=attempt_chromium)
         elif "firefox" in browserType:
             browser = attempt_firefox()
-        # if "reconnect" in browserType:
-        #     if not browser: browser = attempt_chrome() or attempt_firefox()
-        #     browser = attempt_reconnect()
+        elif "ie" in browserType:
+            browser = attempt_ie()
+        elif "opera" in browserType:
+            browser = attempt_opera()
 
         if browser and str(Settings.is_keep()) == "True":
             self.session_id = browser.session_id
@@ -2918,12 +2963,18 @@ class Driver:
 
         if not browser:
             Settings.err_print("unable to spawn a web browser!")
-            if str(Settings.is_debug("test")) == "True": return False
+            if str(Settings.is_debug("test")) == "True": 
+                print(str(Settings.is_debug("test")))
+                return False
             os._exit(1)
 
         browser.implicitly_wait(30) # seconds
         browser.set_page_load_timeout(1200)
         browser.file_detector = LocalFileDetector() # for uploading via remote sessions
+        if str(Settings.is_show_window()) == "False":
+            Settings.print("browser created - {} (headless)".format(browserType))
+        else:
+            Settings.print("browser created - {}".format(browserType))
         return browser
 
     ## possibly move these functions elsewhere (again)

@@ -616,13 +616,21 @@
   **10/13/2022**
   - more minor text changes
   - changed text: bin/google* --> bin/chrome*
-**4.4.2: 10/14/2022**
+  **4.4.2: 10/14/2022**
   - fixed args validator for duration's "min" "max"
   - debugging project deployment & installer scripts for web browsers
+**4.4.3: 10/15/2022**
+  - added: webdriver_manager; cleaned up driver spawn code and packages
+  - debugging webdriver install processes on rpi4
+  - added browser options to help with debugging on rpi: brave, chromium, ie, edge, and opera
+  - added tests for new browser options
 
 ------------------------------------------------------------------------------------
 
+
 ## TODO
+
+- add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi
 
 - add current instructions for installing from github
 - add a way for installation to work for webdrivers for pypi

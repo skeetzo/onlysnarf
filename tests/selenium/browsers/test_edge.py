@@ -6,7 +6,7 @@ from OnlySnarf.util.config import config
 from OnlySnarf.lib.driver import Driver
 from OnlySnarf.util.settings import Settings
 
-class TestSeleniumBrowsers(unittest.TestCase):
+class TestSeleniumEdge(unittest.TestCase):
 
     def setUp(self):
         config["debug_selenium"] = True
@@ -16,14 +16,15 @@ class TestSeleniumBrowsers(unittest.TestCase):
         self.driver = Driver()
 
     def tearDown(self):
-        config["debug_selenium"] = False
+        # config["debug_edge"] = False
         config["show"] = False
         self.driver.exit()
 
-    def test_auto(self):
-        config["browser"] = "auto"
+    def test_edge(self):
+        config["browser"] = "edge"
+        # config["debug_edge"] = True
         self.driver.init()
-        assert self.driver.browser, "unable to launch via auto"
+        assert self.driver.browser, "unable to launch edge"
 
 ############################################################################################
 

@@ -3,11 +3,8 @@ os.environ['ENV'] = "test"
 import unittest
 
 from OnlySnarf.util.config import config
-from OnlySnarf.util import defaults as DEFAULT
 from OnlySnarf.lib.driver import Driver
 from OnlySnarf.util.settings import Settings
-# from OnlySnarf.snarf import Snarf
-# from OnlySnarf.classes.user import User
 
 class TestSeleniumReconnect(unittest.TestCase):
 
@@ -28,25 +25,9 @@ class TestSeleniumReconnect(unittest.TestCase):
         config["browser"] = "auto"
         self.driver.init()
         self.driver.exit()
-        config["browser"] = "reconnect"
+        config["browser"] = "auto"
         self.driver.init()
-        assert self.driver.browser, "unable to launch via reconnect"
-
-    def test_reconnect_chrome(self):
-        config["browser"] = "chrome"
-        self.driver.init()
-        self.driver.exit()
-        config["browser"] = "reconnect-chrome"
-        self.driver.init()
-        assert self.driver.browser, "unable to launch via reconnect chrome"
-
-    def test_reconnect_firefox(self):
-        config["browser"] = "firefox"
-        self.driver.init()
-        self.driver.exit()
-        config["browser"] = "reconnect-firefox"
-        self.driver.init()
-        assert self.driver.browser, "unable to launch via reconnect firefox"
+        assert self.driver.browser, "unable to launch via reconnect auto"
 
 ############################################################################################
 
