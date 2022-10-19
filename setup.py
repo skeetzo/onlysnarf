@@ -17,6 +17,7 @@ setuptools.setup(
     packages=["OnlySnarf", "OnlySnarf/classes","OnlySnarf/conf","OnlySnarf/elements","OnlySnarf/lib","OnlySnarf/util"],
     include_package_data=True,
     install_requires=[
+        'chromedriver_autoinstaller',
         'ffmpeg',
         'pillow',
         'pyinquirer',
