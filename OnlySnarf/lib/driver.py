@@ -2778,10 +2778,8 @@ class Driver:
                                                   # and if it doesn't exist, download it automatically,
                                                   # then add chromedriver to path
             except Exception as e:
-                Settings.dev_print(e)
-
-
-
+                Settings.warn_print(e)
+                
             browserName = "chrome"
             if brave:
                 Settings.maybe_print("attempting brave web browser...")
