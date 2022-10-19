@@ -20,6 +20,7 @@ class TestSeleniumOpera(unittest.TestCase):
         config["show"] = False
         self.driver.exit()
 
+    @unittest.skip("todo")
     def test_opera(self):
         config["browser"] = "opera"
         config["debug_opera"] = True
