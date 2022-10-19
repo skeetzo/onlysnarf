@@ -2754,34 +2754,29 @@ class Driver:
             return options
 
 
-        def browser_error(err):
-            # if "cannot find Chrome binary" in str(e):
-                # Settings.warn_print("unable to launch {}! (missing binary)".format(browserType))
-            # else:
-            Settings.warn_print("unable to launch {}!".format(browserType))
+        def browser_error(err, browserName):
+            Settings.warn_print("unable to launch {}!".format(browserName))
             Settings.dev_print(err)
 
-
-
+            # TODO
             # https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
             # check if permissions are off, possibly adjust:
             # import os
             # os.chmod('/path/to/chromedriver', 0755) # e.g. os.chmod('/Users/user/Documents/my_project/chromedriver', 0755)
 
-
-
-
-
         def attempt_chrome(brave=False, chromium=False, edge=False):
+            browserName = "chrome"
             if brave:
                 Settings.maybe_print("attempting brave web browser...")
+                browserName = "brave"
             elif chromium:
                 Settings.maybe_print("attempting chromium web browser...")
+                browserName = "chromium"
             elif edge:
                 Settings.maybe_print("attempting edge web browser...")
+                browserName = "edge"
             else:
                 Settings.maybe_print("attempting chrome web browser...")
-
             try:
                 options = get_chrome_options()
                 # capabilities = {
@@ -2799,7 +2794,6 @@ class Driver:
                     service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
 
                 # browserAttempt = webdriver.Chrome(ChromeDriverManager().install(), options=options, service_args=service_args)
-
                 if brave:
                     browserAttempt = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install())
                 elif chromium:
@@ -2810,7 +2804,7 @@ class Driver:
                     browserAttempt = webdriver.Chrome(ChromeDriverManager().install())
                 return browserAttempt
             except Exception as e:
-                browser_error(e)
+                browser_error(e, browserName)
             return None
 
         def attempt_firefox():
@@ -2834,7 +2828,7 @@ class Driver:
 
                 return browserAttempt
             except Exception as e:
-                browser_error(e)
+                browser_error(e, "firefox")
             return None
 
         def attempt_ie():
@@ -2843,7 +2837,7 @@ class Driver:
                 browserAttempt = webdriver.Ie(IEDriverManager().install())
                 return browserAttempt
             except Exception as e:
-                browser_error(e)
+                browser_error(e, "ie")
             return None
 
         def attempt_opera():
@@ -2852,7 +2846,7 @@ class Driver:
                 browserAttempt = webdriver.Opera(executable_path=OperaDriverManager().install())
                 return browserAttempt
             except Exception as e:
-                browser_error(e)
+                browser_error(e, "opera")
             return None
 
         def attempt_reconnect():
