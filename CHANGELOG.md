@@ -640,6 +640,7 @@ https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedrive
 - opera: might have a version limit requirement
 
 
+chown -R ubuntu /home/ubuntu/.wdm/drivers
 
 - finish debugging new browser tests
 
