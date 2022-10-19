@@ -2771,6 +2771,11 @@ class Driver:
             Settings.dev_print(err)
 
         def attempt_chrome(brave=False, chromium=False, edge=False):
+            # https://stackoverflow.com/questions/50692358/how-to-work-with-a-specific-version-of-chromedriver-while-chrome-browser-gets-up
+            import chromedriver_autoinstaller
+            chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
+                                                  # and if it doesn't exist, download it automatically,
+                                                  # then add chromedriver to path
             browserName = "chrome"
             if brave:
                 Settings.maybe_print("attempting brave web browser...")
@@ -2829,7 +2834,8 @@ class Driver:
                 options.add_argument("--enable-file-cookies")
                 options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
 
-                browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+                # browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+                browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options, service_log_path=Settings.get_logs_path("firefox"))
                 # browserAttempt = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options, service_log_path=Settings.get_logs_path("firefox"))
 
                 return browserAttempt
