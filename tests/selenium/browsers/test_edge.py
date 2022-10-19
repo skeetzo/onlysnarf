@@ -20,7 +20,7 @@ class TestSeleniumEdge(unittest.TestCase):
         config["show"] = False
         self.driver.exit()
 
-    @unittest.skip("todo")
+    # @unittest.skip("todo")
     def test_edge(self):
         config["browser"] = "edge"
         # config["debug_edge"] = True

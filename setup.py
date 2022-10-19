@@ -21,7 +21,7 @@ setuptools.setup(
         'pillow',
         'pyinquirer',
         'wget',
-        'selenium>=3.11',
+        'selenium>=4',
         'webdriver_manager'
         ],
     entry_points={
