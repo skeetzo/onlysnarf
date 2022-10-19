@@ -2943,8 +2943,13 @@ class Driver:
 
         if "auto" in browserType:
             browser = attempt_reconnect()
-            if not browser: browser = attempt_chrome(brave=attempt_brave, chromium=attempt_chromium, edge=attempt_edge)
+            if not browser: browser = attempt_chrome(brave=True, chromium=False, edge=False)
+            if not browser: browser = attempt_chrome(brave=False, chromium=False, edge=False)
+            if not browser: browser = attempt_chrome(brave=False, chromium=True, edge=False)
+            if not browser: browser = attempt_chrome(brave=False, chromium=False, edge=True)
             if not browser: browser = attempt_firefox()
+            if not browser: browser = attempt_ie()
+            if not browser: browser = attempt_opera()
         elif "remote" in browserType:
             browser = attempt_remote()
         elif "brave" in browserType:
