@@ -24,15 +24,20 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 ##
 # chrome
+from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 # chromium
-# brave
 from webdriver_manager.core.utils import ChromeType
+# brave
+# use ChromeService
 # firefox
+from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.firefox import GeckoDriverManager
 # ie
+from selenium.webdriver.ie.service import Service as IEService
 from webdriver_manager.microsoft import IEDriverManager
 # edge
+from selenium.webdriver.edge.service import Service as EdgeService
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 # opera
 from webdriver_manager.opera import OperaDriverManager
@@ -2722,6 +2727,14 @@ class Driver:
                 logging.getLogger("requests").setLevel(logging.WARNING)
                 logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.WARNING)
 
+
+        # TODO
+        Settings.dev_print("updating permissions...")
+        # https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
+        # check if permissions are off, possibly adjust:
+        os.chmod("/home/{}/.wdm/drivers/".format(os.getenv('USER')), 755) # e.g. os.chmod('/Users/user/Documents/my_project/chromedriver', 0755)
+        shutil.chown("/home/{}/.wdm/drivers/".format(os.getenv('USER')), user=os.getenv('USER'), group=None)
+
         browser = None
         Settings.print("spawning web browser...")
 
@@ -2753,16 +2766,9 @@ class Driver:
             options.add_argument("--remote-debugging-port=9223")
             return options
 
-
         def browser_error(err, browserName):
             Settings.warn_print("unable to launch {}!".format(browserName))
             Settings.dev_print(err)
-
-            # TODO
-            # https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
-            # check if permissions are off, possibly adjust:
-            # import os
-            # os.chmod('/path/to/chromedriver', 0755) # e.g. os.chmod('/Users/user/Documents/my_project/chromedriver', 0755)
 
         def attempt_chrome(brave=False, chromium=False, edge=False):
             browserName = "chrome"
@@ -2795,13 +2801,13 @@ class Driver:
 
                 # browserAttempt = webdriver.Chrome(ChromeDriverManager().install(), options=options, service_args=service_args)
                 if brave:
-                    browserAttempt = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install())
+                    browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()))
                 elif chromium:
-                    browserAttempt = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+                    browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
                 elif edge:
-                    browserAttempt = webdriver.Edge(EdgeChromiumDriverManager().install())
+                    browserAttempt = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
                 else:
-                    browserAttempt = webdriver.Chrome(ChromeDriverManager().install())
+                    browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
                 return browserAttempt
             except Exception as e:
                 browser_error(e, browserName)
@@ -2823,7 +2829,7 @@ class Driver:
                 options.add_argument("--enable-file-cookies")
                 options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
 
-                browserAttempt = webdriver.Firefox(executable_path=GeckoDriverManager().install())
+                browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
                 # browserAttempt = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options, service_log_path=Settings.get_logs_path("firefox"))
 
                 return browserAttempt
@@ -2834,7 +2840,7 @@ class Driver:
         def attempt_ie():
             Settings.maybe_print("attempting ie web browser...")
             try:
-                browserAttempt = webdriver.Ie(IEDriverManager().install())
+                browserAttempt = webdriver.Ie(service=IEService(IEDriverManager().install()))
                 return browserAttempt
             except Exception as e:
                 browser_error(e, "ie")

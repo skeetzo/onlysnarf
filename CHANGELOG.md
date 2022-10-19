@@ -629,6 +629,9 @@
 
 ## TODO
 
+https://pypi.org/project/webdriver-manager/
+https://stackoverflow.com/questions/58686471/how-to-use-edge-chromium-webdriver-unknown-error-cannot-find-msedge-binary
+
 notes:
 - edge might only work for selenium v102
 "There are various issues for chromium drivers for browser v103 used by Edge and Google Chrome. These are being addressed in v104, but they are still in beta.
