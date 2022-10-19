@@ -2726,7 +2726,7 @@ class Driver:
         Settings.print("spawning web browser...")
 
         def get_chrome_options():
-            webdriver.ChromeOptions()
+            options = webdriver.ChromeOptions()
             if str(Settings.is_show_window()) == "False":
                 options.add_argument('--headless')
             options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
@@ -2759,7 +2759,18 @@ class Driver:
                 # Settings.warn_print("unable to launch {}! (missing binary)".format(browserType))
             # else:
             Settings.warn_print("unable to launch {}!".format(browserType))
-            Settings.dev_print(e)
+            Settings.dev_print(err)
+
+
+
+            # https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
+            # check if permissions are off, possibly adjust:
+            # import os
+            # os.chmod('/path/to/chromedriver', 0755) # e.g. os.chmod('/Users/user/Documents/my_project/chromedriver', 0755)
+
+
+
+
 
         def attempt_chrome(brave=False, chromium=False, edge=False):
             if brave:
@@ -2829,7 +2840,7 @@ class Driver:
         def attempt_ie():
             Settings.maybe_print("attempting ie web browser...")
             try:
-                browserAttempt = webdriver.Ie(service=IEService(IEDriverManager().install()))
+                browserAttempt = webdriver.Ie(IEDriverManager().install())
                 return browserAttempt
             except Exception as e:
                 browser_error(e)
@@ -2930,25 +2941,20 @@ class Driver:
         ################################################################################################################################################
         ################################################################################################################################################
 
-        attempt_brave = False
-        attempt_chromium = False
-        attempt_edge = False
-        if "brave" in browserType:
-            attempt_brave = True
-        elif "chromium" in browserType:
-            attempt_chromium = True
-        elif "edge" in browserType:
-            attempt_edge = True
-            
-
         if "auto" in browserType:
             browser = attempt_reconnect()
             if not browser: browser = attempt_chrome(brave=attempt_brave, chromium=attempt_chromium, edge=attempt_edge)
             if not browser: browser = attempt_firefox()
         elif "remote" in browserType:
             browser = attempt_remote()
+        elif "brave" in browserType:
+            browser = attempt_chrome(brave=True, chromium=False, edge=False)
         elif "chrome" in browserType:
-            browser = attempt_chrome(brave=attempt_brave, chromium=attempt_chromium)
+            browser = attempt_chrome(brave=False, chromium=False, edge=False)
+        elif "chromium" in browserType:
+            browser = attempt_chrome(brave=False, chromium=True, edge=False)
+        elif "edge" in browserType:
+            browser = attempt_chrome(brave=False, chromium=False, edge=True)
         elif "firefox" in browserType:
             browser = attempt_firefox()
         elif "ie" in browserType:
@@ -2963,9 +2969,6 @@ class Driver:
 
         if not browser:
             Settings.err_print("unable to spawn a web browser!")
-            if str(Settings.is_debug("test")) == "True": 
-                print(str(Settings.is_debug("test")))
-                return False
             os._exit(1)
 
         browser.implicitly_wait(30) # seconds

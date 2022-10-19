@@ -620,15 +620,28 @@
   - fixed args validator for duration's "min" "max"
   - debugging project deployment & installer scripts for web browsers
 **4.4.3: 10/15/2022**
-  - added: webdriver_manager; cleaned up driver spawn code and packages
+  - added: webdriver_manager; cleaned up driver spawn code and packages : https://pypi.org/project/webdriver-manager/
   - debugging webdriver install processes on rpi4
   - added browser options to help with debugging on rpi: brave, chromium, ie, edge, and opera
   - added tests for new browser options
 
 ------------------------------------------------------------------------------------
 
-
 ## TODO
+
+notes:
+- edge might only work for selenium v102
+"There are various issues for chromium drivers for browser v103 used by Edge and Google Chrome. These are being addressed in v104, but they are still in beta.
+
+Advise that you downgrade for now to v102."
+https://stackoverflow.com/questions/72773330/when-running-selenium-edge-in-pyton-getting-sedgedriver-exe-unexpectedly-exite
+- ie:
+https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
+- opera: might have a version limit requirement
+
+
+
+- finish debugging new browser tests
 
 - add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi
 

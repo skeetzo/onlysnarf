@@ -4,6 +4,9 @@
 # python tests/test_snarf.py -p "users"
 
 pytest tests/selenium
+pytest tests/selenium/browsers
+pytest tests/selenium/reconnect
+
 pytest tests/snarf
 
 pytest tests/snarf/test_discount.py
@@ -12,14 +15,34 @@ pytest tests/snarf/test_post.py
 pytest tests/snarf/test_profile.py
 pytest tests/snarf/test_users.py
 
-
 ## Authentication ##
 python setup.py install && python tests/selenium/test_auth.py
 
 ## Selenium Processes ##
 python setup.py install && python tests/selenium/test_browsers.py
+
+python setup.py install && python tests/selenium/browsers/test_brave.py
+python setup.py install && python tests/selenium/browsers/test_chrome.py
+python setup.py install && python tests/selenium/browsers/test_chromium.py
+python setup.py install && python tests/selenium/browsers/test_edge.py
+python setup.py install && python tests/selenium/browsers/test_firefox.py
+python setup.py install && python tests/selenium/browsers/test_ie.py
+python setup.py install && python tests/selenium/browsers/test_opera.py
+
+## Reconnect Browsers ##
 python setup.py install && python tests/selenium/test_reconnect.py
+
+python setup.py install && python tests/selenium/reconnect/test_brave.py
+python setup.py install && python tests/selenium/reconnect/test_chrome.py
+python setup.py install && python tests/selenium/reconnect/test_chromium.py
+python setup.py install && python tests/selenium/reconnect/test_edge.py
+python setup.py install && python tests/selenium/reconnect/test_firefox.py
+python setup.py install && python tests/selenium/reconnect/test_ie.py
+python setup.py install && python tests/selenium/reconnect/test_opera.py
+
+## Remote Browsers ##
 python setup.py install && python tests/selenium/test_remote.py
+# python setup.py install && python tests/selenium/remote/test_remote_chrome.py
 
 ## Snarf Processes ##
 python setup.py install && python tests/snarf/test_discount.py
@@ -85,6 +108,6 @@ onlysnarf -debug -show post -text shnarff! -schedule "10/31/2022 16:20:00"
 # User
 onlysnarf -debug -show users
 
-
+onlysnarf -debug -show -browser brave users
 
 onlysnarf post -text "are you ready for nft nudes?" -question "yes" -question "maybe?" -question "no" -question "double no" -duration "max"
