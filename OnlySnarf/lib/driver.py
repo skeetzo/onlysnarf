@@ -2771,11 +2771,17 @@ class Driver:
             Settings.dev_print(err)
 
         def attempt_chrome(brave=False, chromium=False, edge=False):
-            # https://stackoverflow.com/questions/50692358/how-to-work-with-a-specific-version-of-chromedriver-while-chrome-browser-gets-up
-            import chromedriver_autoinstaller
-            chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
+            try:
+                # https://stackoverflow.com/questions/50692358/how-to-work-with-a-specific-version-of-chromedriver-while-chrome-browser-gets-up
+                import chromedriver_autoinstaller
+                chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
                                                   # and if it doesn't exist, download it automatically,
                                                   # then add chromedriver to path
+            except Exception as e:
+                Settings.dev_print(e)
+
+
+
             browserName = "chrome"
             if brave:
                 Settings.maybe_print("attempting brave web browser...")
