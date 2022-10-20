@@ -2807,8 +2807,6 @@ class Driver:
                 service_args = []
                 if str(Settings.is_debug("chrome")) == "True":
                     service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
-
-                # browserAttempt = webdriver.Chrome(ChromeDriverManager().install(), options=options, service_args=service_args)
                 if brave:
                     browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()))
                 elif chromium:
@@ -2842,11 +2840,7 @@ class Driver:
                     options.add_argument("--headless")
                 options.add_argument("--enable-file-cookies")
                 options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
-
-                # browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
-                browserAttempt = webdriver.Firefox(executable_path="/usr/local/bin/geckodriver", service=FirefoxService(GeckoDriverManager().install()), options=options, service_log_path=Settings.get_logs_path("firefox"))
-                # browserAttempt = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options, service_log_path=Settings.get_logs_path("firefox"))
-
+                browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options, service_log_path=Settings.get_logs_path("firefox"))
                 return browserAttempt
             except Exception as e:
                 browser_error(e, "firefox")

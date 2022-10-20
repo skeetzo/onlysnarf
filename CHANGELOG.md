@@ -619,41 +619,29 @@
   **4.4.2: 10/14/2022**
   - fixed args validator for duration's "min" "max"
   - debugging project deployment & installer scripts for web browsers
-**4.4.3: 10/15/2022**
+  **4.4.3: 10/15/2022**
+  - add a way for installation to work for webdrivers for pypi
   - added: webdriver_manager; cleaned up driver spawn code and packages : https://pypi.org/project/webdriver-manager/
   - debugging webdriver install processes on rpi4
   - added browser options to help with debugging on rpi: brave, chromium, ie, edge, and opera
   - added tests for new browser options
+**4.4.4: 10/20/2022**
+  - continued debugging attempts for browsers on rpi4
+  - added notes for debugging browsers
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-https://pypi.org/project/webdriver-manager/
-https://stackoverflow.com/questions/58686471/how-to-use-edge-chromium-webdriver-unknown-error-cannot-find-msedge-binary
+- finish debugging new webdriver manager system w/ updated install scripts for browsers
+- finish debugging new browser tests on rpi4
 
-notes:
-- edge might only work for selenium v102
-"There are various issues for chromium drivers for browser v103 used by Edge and Google Chrome. These are being addressed in v104, but they are still in beta.
-
-Advise that you downgrade for now to v102."
-https://stackoverflow.com/questions/72773330/when-running-selenium-edge-in-pyton-getting-sedgedriver-exe-unexpectedly-exite
-- ie:
-https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
-- opera: might have a version limit requirement
-
-
-chown -R ubuntu /home/ubuntu/.wdm/drivers
-
-- finish debugging new browser tests
+- figure out how to request specific verstion installs to test v102
+- update install scripts and organize by usability by platform; distinguish arm scripts for rpis
 
 - add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi
 
-- add current instructions for installing from github
-- add a way for installation to work for webdrivers for pypi
-
-- update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
-- update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
+- add / update current instructions for installing from github
 
 -> CLI Menu
 - fix any new cli menu errors made while updating major processes
@@ -666,6 +654,9 @@ chown -R ubuntu /home/ubuntu/.wdm/drivers
 - clean up / fix & test
 - add min/max to args & validators
 - re-enable / add promo subcommands and config variables
+
+- update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
+- update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
 
 -> OnlyFans: Profile
 - new - setup - Twitter -> profile, banner; Price and Settings
@@ -713,6 +704,28 @@ https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-
 
 - figure out how to suppress the chrome stacktrace debugging messages
 - fix driver.firefox: DeprecationWarning: service_log_path has been deprecated, please pass in a Service object
+
+
+### Browser Changes
+
+https://pypi.org/project/webdriver-manager/
+https://stackoverflow.com/questions/58686471/how-to-use-edge-chromium-webdriver-unknown-error-cannot-find-msedge-binary
+
+notes:
+- edge might only work for selenium v102
+"There are various issues for chromium drivers for browser v103 used by Edge and Google Chrome. These are being addressed in v104, but they are still in beta.
+
+Advise that you downgrade for now to v102."
+https://stackoverflow.com/questions/72773330/when-running-selenium-edge-in-pyton-getting-sedgedriver-exe-unexpectedly-exite
+- ie:
+https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
+- opera: might have a version limit requirement
+
+
+updating permissions didn't work:
+chown -R ubuntu /home/ubuntu/.wdm/drivers
+
+
 
 # Bugs
 
