@@ -2779,7 +2779,7 @@ class Driver:
                                                   # then add chromedriver to path
             except Exception as e:
                 Settings.warn_print(e)
-                
+
             browserName = "chrome"
             if brave:
                 Settings.maybe_print("attempting brave web browser...")
@@ -2829,6 +2829,11 @@ class Driver:
                 Settings.print("You must run `onlysnarf` as non-root for Firefox to work correctly!")
                 return False
             try:
+
+                from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+                binary = FirefoxBinary('path/to/binary')
+                driver = webdriver.Firefox(firefox_binary=binary)
+
                 # d = DesiredCapabilities.FIREFOX
                 options = FirefoxOptions()
                 if str(Settings.is_debug("firefox")) == "True":
@@ -2839,7 +2844,7 @@ class Driver:
                 options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
 
                 # browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
-                browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options, service_log_path=Settings.get_logs_path("firefox"))
+                browserAttempt = webdriver.Firefox(executable_path="/usr/local/bin/geckodriver", service=FirefoxService(GeckoDriverManager().install()), options=options, service_log_path=Settings.get_logs_path("firefox"))
                 # browserAttempt = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options, service_log_path=Settings.get_logs_path("firefox"))
 
                 return browserAttempt
