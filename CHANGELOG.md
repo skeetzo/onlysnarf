@@ -636,7 +636,7 @@
 - finish debugging new webdriver manager system w/ updated install scripts for browsers
 - finish debugging new browser tests on rpi4
 
-- figure out how to request specific verstion installs to test v102
+- figure out how to request specific version installs to test v102
 - update install scripts and organize by usability by platform; distinguish arm scripts for rpis
 
 - add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi
