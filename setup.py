@@ -25,6 +25,11 @@ setuptools.setup(
         'selenium>=4',
         'webdriver_manager'
         ],
+    extras_require={
+        'dev': [
+            'pytest'
+        ]
+    },
     entry_points={
         'console_scripts' : [
             # 'snarf = OnlySnarf.menu:main',
