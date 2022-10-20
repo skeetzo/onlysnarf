@@ -22,11 +22,15 @@ pip install chromedriver-binary
 # sudo apt-get install google-chrome-beta=$VERSION-1 -y
 # pip install chromedriver-binary==$VERSION.0 --force --upgrade
 
+
+
+## didn't work for rpi4
 # or
 # Chrome 			Chromedriver
 # 81.0.4044.129  |  106.0.5249.61
 version=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
 wget -qP "/tmp/" "https://chromedriver.storage.googleapis.com/${version}/chromedriver_linux64.zip"
+sudo apt-get install unzip
 sudo unzip -o /tmp/chromedriver_linux64.zip -d /usr/bin
 
 echo "
