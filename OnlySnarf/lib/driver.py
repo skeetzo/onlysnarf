@@ -2810,13 +2810,13 @@ class Driver:
 
                 # browserAttempt = webdriver.Chrome(ChromeDriverManager().install(), options=options, service_args=service_args)
                 if brave:
-                    browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()))
+                    browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()))
                 elif chromium:
-                    browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
+                    browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
                 elif edge:
-                    browserAttempt = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
+                    browserAttempt = webdriver.Edge(options=options, service=EdgeService(EdgeChromiumDriverManager().install()))
                 else:
-                    browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+                    browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
                 return browserAttempt
             except Exception as e:
                 browser_error(e, browserName)
