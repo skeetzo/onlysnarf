@@ -625,13 +625,17 @@
   - debugging webdriver install processes on rpi4
   - added browser options to help with debugging on rpi: brave, chromium, ie, edge, and opera
   - added tests for new browser options
-**4.4.4: 10/20/2022**
+  **4.4.4: 10/20/2022**
   - continued debugging attempts for browsers on rpi4
   - added notes for debugging browsers
+**4.4.5: 10/20/2022**
+
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- add traviscli for testing python versions & os installs
 
 - finish debugging new webdriver manager system w/ updated install scripts for browsers
 - finish debugging new browser tests on rpi4
