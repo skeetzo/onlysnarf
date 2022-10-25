@@ -22,7 +22,7 @@ setuptools.setup(
         'pillow',
         'pyinquirer',
         'wget',
-        'selenium>=4',
+        'selenium==4.5.0',
         'webdriver_manager'
         ],
     extras_require={
