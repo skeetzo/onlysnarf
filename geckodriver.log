@@ -1,0 +1,79 @@
+1666738583515	geckodriver	INFO	Listening on 127.0.0.1:34695
+1666738636988	geckodriver	INFO	Listening on 127.0.0.1:44785
+1666738698749	geckodriver	INFO	Listening on 127.0.0.1:36147
+1666738932788	geckodriver	INFO	Listening on 127.0.0.1:42133
+1666738988569	geckodriver	INFO	Listening on 127.0.0.1:34847
+1666739051883	geckodriver	INFO	Listening on 127.0.0.1:39855
+1666739828833	geckodriver	INFO	Listening on 127.0.0.1:36795
+1666820759252	geckodriver	INFO	Listening on 127.0.0.1:44329
+1666820936557	geckodriver	INFO	Listening on 127.0.0.1:37111
+1666820954202	geckodriver	INFO	Listening on 127.0.0.1:43843
+1666821150830	geckodriver	INFO	Listening on 127.0.0.1:33697
+1666821196652	geckodriver	INFO	Listening on 127.0.0.1:37149
+1666828761667	geckodriver	INFO	Listening on 127.0.0.1:37177
+1666829900802	geckodriver	INFO	Listening on 127.0.0.1:35631
+1666829900805	geckodriver::capabilities	DEBUG	Trying to read firefox version from ini files
+1666829900806	geckodriver::capabilities	DEBUG	Found version 88.0
+1666829900807	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "--enable-file-cookies" "user-data-dir=/tmp/selenium" "--remote-debugging-port" "40233" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilebkdIqr"
+1666829900807	geckodriver::marionette	DEBUG	Waiting 60s to connect to browser on 127.0.0.1
+1666829900808	geckodriver::marionette	TRACE	Retrying in 100ms
+*** You are running in headless mode.
+1666829900908	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829901008	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829901109	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829901209	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829901217	Marionette	INFO	Marionette enabled
+1666829901309	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829901409	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829901509	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829901610	geckodriver::marionette	TRACE	Retrying in 100ms
+
+(/usr/lib/firefox/firefox:6484): GLib-GObject-CRITICAL **: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+1666829901710	geckodriver::marionette	TRACE	Retrying in 100ms
+
+(/usr/lib/firefox/firefox:6501): GLib-GObject-CRITICAL **: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+1666829901810	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829901911	geckodriver::marionette	TRACE	Retrying in 100ms
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1666829902011	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829902111	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829902212	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829902312	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829902412	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829902512	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829902613	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829902677	RemoteAgent	DEBUG	Setting recommended pref browser.contentblocking.features.standard to -tp,tpPrivate,cookieBehavior0,-cm,-fp
+1666829902679	RemoteAgent	DEBUG	Setting recommended pref network.cookie.cookieBehavior to 0
+1666829902680	RemoteAgent	DEBUG	Setting recommended pref prompts.contentPromptSubDialog to false
+DevTools listening on ws://localhost:40233/devtools/browser/72813a3c-fc8c-4a67-a5bf-1c0db77b9906
+1666829902713	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829902813	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829902914	geckodriver::marionette	TRACE	Retrying in 100ms
+1666829902917	Marionette	INFO	Listening on port 33369
+
+(/usr/lib/firefox/firefox:6573): GLib-GObject-CRITICAL **: g_object_set: assertion 'G_IS_OBJECT (object)' failed
+1666829903029	geckodriver::marionette	DEBUG	Connection to Marionette established on 127.0.0.1:33369.
+1666829903037	Marionette	WARN	TLS certificate errors will be ignored for this session
+1666829903058	webdriver::server	DEBUG	<- 200 OK {"value":{"sessionId":"85da7c65-3e6c-49de-b5cc-160044894b95","capabilities":{"acceptInsecureCerts":true,"browserName":"firefox","browserVersion":"88.0","moz:accessibilityChecks":false,"moz:buildID":"20210415204500","moz:debuggerAddress":"localhost:40233","moz:geckodriverVersion":"0.32.0","moz:headless":true,"moz:processID":6435,"moz:profile":"/tmp/rust_mozprofilebkdIqr","moz:shutdownTimeout":60000,"moz:useNonSpecCompliantPointerOrigin":false,"moz:webdriverClick":true,"pageLoadStrategy":"normal","platformName":"linux","platformVersion":"4.14.228-37743-g49d2c603c1a5","rotatable":false,"setWindowRect":true,"strictFileInteractability":false,"timeouts":{"implicit":0,"pageLoad":300000,"script":30000},"unhandledPromptBehavior":"dismiss and notify"}}}
+1666829903060	webdriver::server	DEBUG	-> POST /session/85da7c65-3e6c-49de-b5cc-160044894b95/timeouts {"implicit": 30000}
+1666829903064	webdriver::server	DEBUG	<- 200 OK {"value":null}
+1666829903065	webdriver::server	DEBUG	-> POST /session/85da7c65-3e6c-49de-b5cc-160044894b95/timeouts {"pageLoad": 1200000}
+1666829903067	webdriver::server	DEBUG	<- 200 OK {"value":null}
+1666829903068	webdriver::server	DEBUG	-> GET /session/85da7c65-3e6c-49de-b5cc-160044894b95/url 
+1666829903069	webdriver::server	DEBUG	<- 200 OK {"value":"about:blank"}
+1666829903070	webdriver::server	DEBUG	-> GET /session/85da7c65-3e6c-49de-b5cc-160044894b95/window 
+1666829903071	webdriver::server	DEBUG	<- 200 OK {"value":"17"}
+1666829903072	webdriver::server	DEBUG	-> DELETE /session/85da7c65-3e6c-49de-b5cc-160044894b95 
+1666829903073	Marionette	INFO	Stopped listening on port 33369
+1666829903131	webdriver::server	DEBUG	Teardown session
+!!! error running onStopped callback: TypeError: callback is not a function
+1666829903480	RemoteAgent	DEBUG	Resetting recommended pref browser.contentblocking.features.standard
+1666829903480	RemoteAgent	DEBUG	Resetting recommended pref network.cookie.cookieBehavior
+1666829903480	RemoteAgent	DEBUG	Resetting recommended pref prompts.contentPromptSubDialog
+1666829903481	RemoteAgent	ERROR	unable to stop listener: [Exception... "Component returned failure code: 0x8000ffff (NS_ERROR_UNEXPECTED) [nsIWindowMediator.getEnumerator]"  nsresult: "0x8000ffff (NS_ERROR_UNEXPECTED)"  location: "JS frame :: chrome://remote/content/cdp/observers/TargetObserver.jsm :: stop :: line 64"  data: no] Stack trace: stop()@TargetObserver.jsm:64
+unwatchForTabs()@TargetList.jsm:70
+unwatchForTargets()@TargetList.jsm:37
+destructor()@TargetList.jsm:109
+close()@RemoteAgent.jsm:136
+1666829903531	geckodriver::browser	DEBUG	Browser process stopped: exit status: 0
+1666829903538	webdriver::server	DEBUG	<- 200 OK {"value":null}

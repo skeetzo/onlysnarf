@@ -3,6 +3,10 @@
 # python -m unittest test_snarf.TestSnarf.test_users
 # python tests/test_snarf.py -p "users"
 
+python -m pip install -e .[dev]
+
+onlysnarf -debug -vvv post -text "balls"
+
 pytest tests/selenium
 pytest tests/selenium/browsers
 pytest tests/selenium/reconnect
@@ -16,41 +20,42 @@ pytest tests/snarf/test_profile.py
 pytest tests/snarf/test_users.py
 
 ## Authentication ##
-python setup.py install && python tests/selenium/test_auth.py
+python -m pip install -e .[dev] && python tests/selenium/test_auth.py
 
 ## Selenium Processes ##
-python setup.py install && python tests/selenium/test_browsers.py
+python -m pip install -e .[dev] && pytest tests/selenium/browsers
+python -m pip install -e .[dev] && python tests/selenium/test_browsers.py
 
-python setup.py install && python tests/selenium/browsers/test_brave.py
-python setup.py install && python tests/selenium/browsers/test_chrome.py
-python setup.py install && python tests/selenium/browsers/test_chromium.py
-python setup.py install && python tests/selenium/browsers/test_edge.py
-python setup.py install && python tests/selenium/browsers/test_firefox.py
-python setup.py install && python tests/selenium/browsers/test_ie.py
-python setup.py install && python tests/selenium/browsers/test_opera.py
+python -m pip install -e .[dev] && python tests/selenium/browsers/test_brave.py
+python -m pip install -e .[dev] && python tests/selenium/browsers/test_chrome.py
+python -m pip install -e .[dev] && python tests/selenium/browsers/test_chromium.py
+python -m pip install -e .[dev] && python tests/selenium/browsers/test_edge.py
+python -m pip install -e .[dev] && python tests/selenium/browsers/test_firefox.py
+python -m pip install -e .[dev] && python tests/selenium/browsers/test_ie.py
+python -m pip install -e .[dev] && python tests/selenium/browsers/test_opera.py
 
 ## Reconnect Browsers ##
-python setup.py install && python tests/selenium/test_reconnect.py
+python -m pip install -e .[dev] && python tests/selenium/test_reconnect.py
 
-python setup.py install && python tests/selenium/reconnect/test_brave.py
-python setup.py install && python tests/selenium/reconnect/test_chrome.py
-python setup.py install && python tests/selenium/reconnect/test_chromium.py
-python setup.py install && python tests/selenium/reconnect/test_edge.py
-python setup.py install && python tests/selenium/reconnect/test_firefox.py
-python setup.py install && python tests/selenium/reconnect/test_ie.py
-python setup.py install && python tests/selenium/reconnect/test_opera.py
+python -m pip install -e .[dev] && python tests/selenium/reconnect/test_brave.py
+python -m pip install -e .[dev] && python tests/selenium/reconnect/test_chrome.py
+python -m pip install -e .[dev] && python tests/selenium/reconnect/test_chromium.py
+python -m pip install -e .[dev] && python tests/selenium/reconnect/test_edge.py
+python -m pip install -e .[dev] && python tests/selenium/reconnect/test_firefox.py
+python -m pip install -e .[dev] && python tests/selenium/reconnect/test_ie.py
+python -m pip install -e .[dev] && python tests/selenium/reconnect/test_opera.py
 
 ## Remote Browsers ##
-python setup.py install && python tests/selenium/test_remote.py
-# python setup.py install && python tests/selenium/remote/test_remote_chrome.py
+python -m pip install -e .[dev] && python tests/selenium/test_remote.py
+# python -m pip install -e .[dev] && python tests/selenium/remote/test_remote_chrome.py
 
 ## Snarf Processes ##
-python setup.py install && python tests/snarf/test_discount.py
-python setup.py install && python tests/snarf/test_message.py
-python setup.py install && python tests/snarf/test_post.py
-python setup.py install && python tests/snarf/test_profile.py
-python setup.py install && python tests/snarf/test_promotion.py
-python setup.py install && python tests/snarf/test_users.py
+python -m pip install -e .[dev] && python tests/snarf/test_discount.py
+python -m pip install -e .[dev] && python tests/snarf/test_message.py
+python -m pip install -e .[dev] && python tests/snarf/test_post.py
+python -m pip install -e .[dev] && python tests/snarf/test_profile.py
+python -m pip install -e .[dev] && python tests/snarf/test_promotion.py
+python -m pip install -e .[dev] && python tests/snarf/test_users.py
 
 #############################################################################
 
