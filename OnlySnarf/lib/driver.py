@@ -2821,10 +2821,10 @@ class Driver:
                     # browserAttempt = webdriver.Edge(options=options, service=EdgeService(EdgeChromiumDriverManager().install()))
                 else:
 
-                    from pyvirtualdisplay import Display
-
-                    display = Display(visible=0, size=(1600, 1200))
-                    display.start()
+                    # TODO: maybe needed for RPi:
+                    # from pyvirtualdisplay import Display
+                    # display = Display(visible=0, size=(1600, 1200))
+                    # display.start()
 
 
                     browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))

@@ -633,30 +633,29 @@
   - connected travis to github
   - more driver debugging for added webmanager autoinstalls
 **4.4.6: 10/27/2022**
-
+  - added travisci for testing python versions & os installs
+  - more rpi debugging attempts; added attempt scripts
 
 ------------------------------------------------------------------------------------
-
-- figure out how to request specific webdriver versions installs to test v102
 
 - finish adding travisci for continuous integration
 - finish testing new browser changes
 
-- add travisci for testing python versions & os installs
+- finish debugging web browser on rpi4
 
 ## TODO
 
 - update install scripts and organize by usability by platform; distinguish arm scripts for rpis
-- finish debugging new browser tests on rpi4
 
 (travis ci)
 - finish debugging travis tests w/ multiple versions & os
 
-- add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi
-
 (publish new changes)
 - finish debugging new webdriver manager system w/ updated install scripts for browsers
 - add / update current instructions for installing from github
+
+(webdriver)
+- figure out how to request specific webdriver versions installs to test v102 for edge
 
 -> CLI Menu
 - fix any new cli menu errors made while updating major processes
@@ -702,6 +701,7 @@
 - add tests for additional config variables such as browser and image/video options, limits
 - finish adding tests for individual messaging circumstances: all, recent, favorite, renew on
 - finish adding tests for individual message entry parts, individual post entry parts
+- add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi
 
 (break things)
 -> Upgrade Selenium to 4.0
