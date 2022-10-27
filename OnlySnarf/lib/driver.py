@@ -2808,33 +2808,26 @@ class Driver:
                 elif chromium:
                     browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
                 elif edge:
-
-
-                    # def add_edge_options(options):
-                    #  from msedge.selenium_tools import Edge,EdgeOptions
-                    #  edge_options = EdgeOptions()
-                    #  edge_options.use_chromium = True
-                    #  edge_options.add_argument("start-maximized")
-                    #  edge_options.add_argument("inprivate") 
-
-
                     from msedge.selenium_tools import Edge,EdgeOptions
                     options = EdgeOptions()
-                    options.use_chromium = True
-                    # options.add_argument("start-maximized")
-                    # options.add_argument("inprivate")
-                    add_options(options)
-
                     # options = webdriver.EdgeOptions()
-                    # add_edge_options(options)
-                    options.binary_location="/home/skeetzo/.wdm/drivers/edgedriver/linux64/106.0.1370/msedgedriver"
+                    options.use_chromium = True
+                    add_options(options)
+                    options.binary_location="/home/{user}/.wdm/drivers/edgedriver/linux64/106.0.1370/msedgedriver".format(user=os.getenv('USER'))
+                    # fix any permissions issues
+                    os.chmod(options.binary_location, 0o755)
+                    shutil.chown(options.binary_location, user=os.getenv('USER'), group=None)
+                    browserAttempt = Edge(executable_path=options.binary_location, options=options)
                     # browserAttempt = webdriver.Edge(options=options, service=EdgeService(EdgeChromiumDriverManager().install()))
-
-                    browserAttempt = Edge(executable_path="/home/skeetzo/.wdm/drivers/edgedriver/linux64/106.0.1370/msedgedriver", options=options)
-
                 else:
-                    browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
 
+                    from pyvirtualdisplay import Display
+
+                    display = Display(visible=0, size=(1600, 1200))
+                    display.start()
+
+
+                    browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
 
                 # TODO
                 # Settings.dev_print("updating permissions...")
@@ -2842,8 +2835,6 @@ class Driver:
                 # check if permissions are off, possibly adjust:
                 # os.chmod("/home/{}/.wdm/drivers/*".format(os.getenv('USER')), 0o755) # e.g. os.chmod('/Users/user/Documents/my_project/chromedriver', 0755)
                 # shutil.chown("/home/{}/.wdm/drivers/*".format(os.getenv('USER')), user=os.getenv('USER'), group=None)
-
-
 
                 return browserAttempt
             except Exception as e:
@@ -2858,11 +2849,11 @@ class Driver:
                 return False
             try:
 
-                from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+                # from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
                 # binary = FirefoxBinary('path/to/binary')
                 # driver = webdriver.Firefox(firefox_binary=binary)
-
                 # d = DesiredCapabilities.FIREFOX
+
                 options = FirefoxOptions()
                 if str(Settings.is_debug("firefox")) == "True":
                     options.log.level = "trace"
@@ -2879,20 +2870,9 @@ class Driver:
         def attempt_ie():
             Settings.maybe_print("attempting ie web browser...")
             try:
-                # options = webdriver.IEOptions()
-                # options.binary_location="/home/skeetzo/.wdm/drivers/IEDriverServer/linux64/IEDriverServer.exe"
-
                 driver_path = IEDriverManager().install()
-
-                # TODO
-                # Settings.dev_print("updating permissions...")
-                # https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
-                # check if permissions are off, possibly adjust:
-                os.chmod(driver_path, 0o755) # e.g. os.chmod('/Users/user/Documents/my_project/chromedriver', 0755)
-                # shutil.chown("/home/{}/.wdm/drivers/*".format(os.getenv('USER')), user=os.getenv('USER'), group=None)
-
-
-                browserAttempt = webdriver.Ie(executable_path=driver_path, service=IEService(IEDriverManager().install()))
+                os.chmod(driver_path, 0o755)
+                browserAttempt = webdriver.Ie(executable_path=driver_path, service=IEService(driver_path))
                 return browserAttempt
             except Exception as e:
                 browser_error(e, "ie")
@@ -2901,11 +2881,8 @@ class Driver:
         def attempt_opera():
             Settings.maybe_print("attempting opera web browser...")
             try:
-
                 # options.add_argument('allow-elevated-browser')
                 # options.binary_location = "C:\\Users\\USERNAME\\FOLDERLOCATION\\Opera\\VERSION\\opera.exe"
-
-
                 browserAttempt = webdriver.Opera(executable_path=OperaDriverManager().install())
                 return browserAttempt
             except Exception as e:
@@ -2961,7 +2938,7 @@ class Driver:
 
             def chromium_options():
                 dC = DesiredCapabilities.CHROMIUM
-                options = webdriver.ChromiumOptions()
+                options = webdriver.ChromeOptions()
                 return dC, options
 
             def edge_options():
@@ -2976,7 +2953,7 @@ class Driver:
 
             def ie_options():
                 dC = DesiredCapabilities.IE
-                options = webdriver.IEOptions()
+                options = webdriver.ChromeOptions()
                 return dC, options
 
             def opera_options():

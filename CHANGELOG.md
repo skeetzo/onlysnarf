@@ -628,32 +628,35 @@
   **4.4.4: 10/20/2022**
   - continued debugging attempts for browsers on rpi4
   - added notes for debugging browsers
-**4.4.5: 10/20/2022**
+  **4.4.5: 10/20/2022**
   - added travis.cli config
   - connected travis to github
   - more driver debugging for added webmanager autoinstalls
+**4.4.6: 10/27/2022**
+
 
 ------------------------------------------------------------------------------------
 
-- finish adding traviscli for continuous integration
+- figure out how to request specific webdriver versions installs to test v102
+
+- finish adding travisci for continuous integration
 - finish testing new browser changes
+
+- add travisci for testing python versions & os installs
 
 ## TODO
 
-- add / update current instructions for installing from github
-
-- add traviscli for testing python versions & os installs
-
-- finish debugging new webdriver manager system w/ updated install scripts for browsers
+- update install scripts and organize by usability by platform; distinguish arm scripts for rpis
 - finish debugging new browser tests on rpi4
 
+(travis ci)
 - finish debugging travis tests w/ multiple versions & os
-- update install scripts and organize by usability by platform; distinguish arm scripts for rpis
-
-- figure out how to request specific webdriver versions installs to test v102
 
 - add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi
 
+(publish new changes)
+- finish debugging new webdriver manager system w/ updated install scripts for browsers
+- add / update current instructions for installing from github
 
 -> CLI Menu
 - fix any new cli menu errors made while updating major processes
@@ -725,9 +728,7 @@ not working: edge, ie, opera
 
 existing browsers: chrome, firefox
 added new browsers: brave, chromium, ie, edge, and opera
-other potential browsers: phantomjs, safari
-
-should I add phantomjs and safari? might as well
+other potential browsers: phantomjs (requires node), safari (requires python2.7)
 
 https://pypi.org/project/webdriver-manager/
 https://stackoverflow.com/questions/58686471/how-to-use-edge-chromium-webdriver-unknown-error-cannot-find-msedge-binary
