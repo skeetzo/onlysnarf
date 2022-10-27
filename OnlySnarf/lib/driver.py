@@ -2727,58 +2727,50 @@ class Driver:
                 logging.getLogger("requests").setLevel(logging.WARNING)
                 logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.WARNING)
 
-
-        # TODO
-        Settings.dev_print("updating permissions...")
-        # https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
-        # check if permissions are off, possibly adjust:
-        os.chmod("/home/{}/.wdm/drivers/".format(os.getenv('USER')), 755) # e.g. os.chmod('/Users/user/Documents/my_project/chromedriver', 0755)
-        shutil.chown("/home/{}/.wdm/drivers/".format(os.getenv('USER')), user=os.getenv('USER'), group=None)
-
         browser = None
         Settings.print("spawning web browser...")
 
-        def get_chrome_options():
-            options = webdriver.ChromeOptions()
+        def add_options(options):
             if str(Settings.is_show_window()) == "False":
                 options.add_argument('--headless')
-            options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
-            options.add_argument("--allow-insecure-localhost")            
+            # options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
+            # options.add_argument("--allow-insecure-localhost")            
             options.add_argument("--no-sandbox") # Bypass OS security model
             # possibly linux only
-            options.add_argument('disable-notifications')
+            # options.add_argument('disable-notifications')
             # https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
             # options.add_arguments("start-maximized"); // open Browser in maximized mode
-            options.add_argument("--window-size=1920,1080");
-            options.add_argument("--disable-gpu");
-            options.add_argument("--disable-crash-reporter");
-            options.add_argument("--disable-extensions");
-            options.add_argument("--disable-infobars")
-            options.add_argument("--disable-in-process-stack-traces");
-            options.add_argument("--disable-logging");
-            options.add_argument("--disable-dev-shm-usage");
-            options.add_argument("--log-level=3");
-            options.add_argument("--output=/dev/null");
-            # TODO: to be added to list of removed (if not truly needed by then):
+            # options.add_argument("--window-size=1920,1080")
+            options.add_argument("--disable-gpu")
+            # options.add_argument("--disable-crash-reporter")
+            options.add_argument("--disable-extensions")
+            # options.add_argument("--disable-infobars")
+            # options.add_argument("--disable-in-process-stack-traces")
+            # options.add_argument("--disable-logging")
+            options.add_argument("--disable-dev-shm-usage")
+            # options.add_argument("--log-level=3")
+            # options.add_argument("--output=/dev/null")
+
+            # TODO: to be added to list of removed (if not truly needed by then)
             # options.add_argument('--disable-software-rasterizer')
             # options.add_argument('--ignore-certificate-errors')
-            options.add_argument("--remote-debugging-address=localhost")    
-            options.add_argument("--remote-debugging-port=9223")
-            return options
+            # options.add_argument("--remote-debugging-address=localhost")    
+            # options.add_argument("--remote-debugging-port=9223")
+            # return options
 
         def browser_error(err, browserName):
             Settings.warn_print("unable to launch {}!".format(browserName))
             Settings.dev_print(err)
 
         def attempt_chrome(brave=False, chromium=False, edge=False):
-            try:
+            # try:
                 # https://stackoverflow.com/questions/50692358/how-to-work-with-a-specific-version-of-chromedriver-while-chrome-browser-gets-up
-                import chromedriver_autoinstaller
-                chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
+                # import chromedriver_autoinstaller
+                # chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
                                                   # and if it doesn't exist, download it automatically,
                                                   # then add chromedriver to path
-            except Exception as e:
-                Settings.warn_print(e)
+            # except Exception as e:
+                # Settings.warn_print(e)
 
             browserName = "chrome"
             if brave:
@@ -2793,7 +2785,7 @@ class Driver:
             else:
                 Settings.maybe_print("attempting chrome web browser...")
             try:
-                options = get_chrome_options()
+                # options = get_options()
                 # capabilities = {
                 #   'browserName': 'chrome',
                 #   'platform': 'LINUX',
@@ -2804,6 +2796,10 @@ class Driver:
                 #     'args': ['--start-maximized', '--disable-infobars']
                 #   }
                 # }  
+
+                options = webdriver.ChromeOptions()
+                add_options(options)
+
                 service_args = []
                 if str(Settings.is_debug("chrome")) == "True":
                     service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
@@ -2812,9 +2808,43 @@ class Driver:
                 elif chromium:
                     browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
                 elif edge:
-                    browserAttempt = webdriver.Edge(options=options, service=EdgeService(EdgeChromiumDriverManager().install()))
+
+
+                    # def add_edge_options(options):
+                    #  from msedge.selenium_tools import Edge,EdgeOptions
+                    #  edge_options = EdgeOptions()
+                    #  edge_options.use_chromium = True
+                    #  edge_options.add_argument("start-maximized")
+                    #  edge_options.add_argument("inprivate") 
+
+
+                    from msedge.selenium_tools import Edge,EdgeOptions
+                    options = EdgeOptions()
+                    options.use_chromium = True
+                    # options.add_argument("start-maximized")
+                    # options.add_argument("inprivate")
+                    add_options(options)
+
+                    # options = webdriver.EdgeOptions()
+                    # add_edge_options(options)
+                    options.binary_location="/home/skeetzo/.wdm/drivers/edgedriver/linux64/106.0.1370/msedgedriver"
+                    # browserAttempt = webdriver.Edge(options=options, service=EdgeService(EdgeChromiumDriverManager().install()))
+
+                    browserAttempt = Edge(executable_path="/home/skeetzo/.wdm/drivers/edgedriver/linux64/106.0.1370/msedgedriver", options=options)
+
                 else:
                     browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
+
+
+                # TODO
+                # Settings.dev_print("updating permissions...")
+                # https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
+                # check if permissions are off, possibly adjust:
+                # os.chmod("/home/{}/.wdm/drivers/*".format(os.getenv('USER')), 0o755) # e.g. os.chmod('/Users/user/Documents/my_project/chromedriver', 0755)
+                # shutil.chown("/home/{}/.wdm/drivers/*".format(os.getenv('USER')), user=os.getenv('USER'), group=None)
+
+
+
                 return browserAttempt
             except Exception as e:
                 browser_error(e, browserName)
@@ -2829,8 +2859,8 @@ class Driver:
             try:
 
                 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-                binary = FirefoxBinary('path/to/binary')
-                driver = webdriver.Firefox(firefox_binary=binary)
+                # binary = FirefoxBinary('path/to/binary')
+                # driver = webdriver.Firefox(firefox_binary=binary)
 
                 # d = DesiredCapabilities.FIREFOX
                 options = FirefoxOptions()
@@ -2849,7 +2879,20 @@ class Driver:
         def attempt_ie():
             Settings.maybe_print("attempting ie web browser...")
             try:
-                browserAttempt = webdriver.Ie(service=IEService(IEDriverManager().install()))
+                # options = webdriver.IEOptions()
+                # options.binary_location="/home/skeetzo/.wdm/drivers/IEDriverServer/linux64/IEDriverServer.exe"
+
+                driver_path = IEDriverManager().install()
+
+                # TODO
+                # Settings.dev_print("updating permissions...")
+                # https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
+                # check if permissions are off, possibly adjust:
+                os.chmod(driver_path, 0o755) # e.g. os.chmod('/Users/user/Documents/my_project/chromedriver', 0755)
+                # shutil.chown("/home/{}/.wdm/drivers/*".format(os.getenv('USER')), user=os.getenv('USER'), group=None)
+
+
+                browserAttempt = webdriver.Ie(executable_path=driver_path, service=IEService(IEDriverManager().install()))
                 return browserAttempt
             except Exception as e:
                 browser_error(e, "ie")
@@ -2858,6 +2901,11 @@ class Driver:
         def attempt_opera():
             Settings.maybe_print("attempting opera web browser...")
             try:
+
+                # options.add_argument('allow-elevated-browser')
+                # options.binary_location = "C:\\Users\\USERNAME\\FOLDERLOCATION\\Opera\\VERSION\\opera.exe"
+
+
                 browserAttempt = webdriver.Opera(executable_path=OperaDriverManager().install())
                 return browserAttempt
             except Exception as e:
@@ -2983,6 +3031,7 @@ class Driver:
 
         if not browser:
             Settings.err_print("unable to spawn a web browser!")
+            if os.environ.get("ENV") and str(os.environ.get("ENV")) == "test": return False
             os._exit(1)
 
         browser.implicitly_wait(30) # seconds
@@ -3674,7 +3723,7 @@ class Driver:
     def exit(self):
         """Save and exit"""
 
-        if self.browser == None: return
+        if not self.browser: return
         ## Cookies
         if str(Settings.is_cookies()) == "True":
             self.cookies_save()

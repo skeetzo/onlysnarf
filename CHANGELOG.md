@@ -629,23 +629,31 @@
   - continued debugging attempts for browsers on rpi4
   - added notes for debugging browsers
 **4.4.5: 10/20/2022**
-
+  - added travis.cli config
+  - connected travis to github
+  - more driver debugging for added webmanager autoinstalls
 
 ------------------------------------------------------------------------------------
 
+- finish adding traviscli for continuous integration
+- finish testing new browser changes
+
 ## TODO
+
+- add / update current instructions for installing from github
 
 - add traviscli for testing python versions & os installs
 
 - finish debugging new webdriver manager system w/ updated install scripts for browsers
 - finish debugging new browser tests on rpi4
 
-- figure out how to request specific version installs to test v102
+- finish debugging travis tests w/ multiple versions & os
 - update install scripts and organize by usability by platform; distinguish arm scripts for rpis
+
+- figure out how to request specific webdriver versions installs to test v102
 
 - add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi
 
-- add / update current instructions for installing from github
 
 -> CLI Menu
 - fix any new cli menu errors made while updating major processes
@@ -712,23 +720,39 @@ https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-
 
 ### Browser Changes
 
+working: brave, chrome, chromium, firefox 
+not working: edge, ie, opera
+
+existing browsers: chrome, firefox
+added new browsers: brave, chromium, ie, edge, and opera
+other potential browsers: phantomjs, safari
+
+should I add phantomjs and safari? might as well
+
 https://pypi.org/project/webdriver-manager/
 https://stackoverflow.com/questions/58686471/how-to-use-edge-chromium-webdriver-unknown-error-cannot-find-msedge-binary
 
 notes:
-- edge might only work for selenium v102
-"There are various issues for chromium drivers for browser v103 used by Edge and Google Chrome. These are being addressed in v104, but they are still in beta.
 
-Advise that you downgrade for now to v102."
+- edge:
+-- might only work for selenium v102
+-- might only work on Windows
+"There are various issues for chromium drivers for browser v103 used by Edge and Google Chrome. These are being addressed in v104, but they are still in beta. Advise that you downgrade for now to v102."
 https://stackoverflow.com/questions/72773330/when-running-selenium-edge-in-pyton-getting-sedgedriver-exe-unexpectedly-exite
+
 - ie:
+-- might only work on Windows
+
 https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
 - opera: might have a version limit requirement
-
 
 updating permissions didn't work:
 chown -R ubuntu /home/ubuntu/.wdm/drivers
 
+what helps in general:
+>> using correct webdriver options generator
+>> specifying binary paths
+>> correct permissions on binary paths
 
 
 # Bugs
@@ -739,26 +763,6 @@ chown -R ubuntu /home/ubuntu/.wdm/drivers
   - message: drag&drop has decided to occasionally stop working; maybe a selenium version issue?
 **4.4.0**
   - discount: amount&months still require 2 passes on average to update values correctly
-
-
-
-from fresh python3.8 install without a browser:
-ubuntu@Hephaestus:~$ onlysnarf -debug users
-2022-10-13 23:17:39,815 - onlysnarf - INFO - Running - users
-2022-10-13 23:17:39,816 - onlysnarf - INFO - spawning web browser...
-2022-10-13 23:17:39,841 - onlysnarf - WARNING - unable to launch chrome!
-2022-10-13 23:17:39,863 - onlysnarf - WARNING - unable to launch firefox!
-2022-10-13 23:17:39,865 - onlysnarf - ERROR - unable to spawn a web browser!
-'bool' object has no attribute 'current_url'
-2022-10-13 23:17:39,866 - onlysnarf - ERROR - failed to find users
-2022-10-13 23:17:39,866 - onlysnarf - INFO - shnarrf!
-
-
-
-when installing webdriver source from outside onlysnarf root directory:
-snarf/bin/install-google.sh: line 31: bin/check-google.sh: No such file or directory
-
-
 
 # Web Browser Versions
 
