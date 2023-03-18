@@ -89,8 +89,12 @@ class Settings:
             USER = os.getenv('SUDO_USER')
         baseDir = "/home/{}/.onlysnarf".format(USER)
         # if os.environ.get('ENV') == "test":
-          # baseDir = os.getcwd()
+        baseDir = os.path.join(os.getcwd(),"OnlySnarf")
           # baseDir = os.path.dirname(__file__)
+        print(baseDir)
+        print(baseDir)
+        print(baseDir)
+        print(baseDir)
         return baseDir
 
     def get_browser_type():
@@ -399,7 +403,7 @@ class Settings:
         # strip email
         if "@" in username: username = username[0 : username.index("@")]
         Settings.dev_print("retrieving user config: {}".format(username))
-        config_file.read(os.path.join(Settings.get_base_directory(), "users", username+".conf"))
+        config_file.read(os.path.join(Settings.get_base_directory(), "conf", "users", username+".conf"))
         userConfig = {}
         for section in config_file.sections():
             # print(section)
