@@ -1275,9 +1275,13 @@ class Driver:
         # this needs to go after them because they reconnect then need to login check
         # if Settings.get_browser_type() == "reconnect" or Settings.get_browser_type() == "remote" or 
 
-        if loggedin_check():
-            self.logged_in = True
-            return True
+        try:
+            if loggedin_check():
+                self.logged_in = True
+                return True
+        except Exception as e:
+            Settings.err_print(e)
+            return False
 
         if str(Settings.is_cookies()) == "True":
             self.cookies_load()
@@ -2728,64 +2732,53 @@ class Driver:
         def add_options(options):
             if str(Settings.is_show_window()) == "False":
                 options.add_argument('--headless')
-            # options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
-            # options.add_argument("--allow-insecure-localhost")            
             options.add_argument("--no-sandbox") # Bypass OS security model
+            options.add_argument("--disable-gpu")
+            options.add_argument("--disable-extensions")
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
+            # options.add_argument("--allow-insecure-localhost")            
             # possibly linux only
             # options.add_argument('disable-notifications')
             # https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
             # options.add_arguments("start-maximized"); // open Browser in maximized mode
             # options.add_argument("--window-size=1920,1080")
-            options.add_argument("--disable-gpu")
             # options.add_argument("--disable-crash-reporter")
-            options.add_argument("--disable-extensions")
             # options.add_argument("--disable-infobars")
             # options.add_argument("--disable-in-process-stack-traces")
             # options.add_argument("--disable-logging")
-            options.add_argument("--disable-dev-shm-usage")
             # options.add_argument("--log-level=3")
             # options.add_argument("--output=/dev/null")
-
             # TODO: to be added to list of removed (if not truly needed by then)
             # options.add_argument('--disable-software-rasterizer')
             # options.add_argument('--ignore-certificate-errors')
             # options.add_argument("--remote-debugging-address=localhost")    
             # options.add_argument("--remote-debugging-port=9223")
-            # return options
 
         def browser_error(err, browserName):
             Settings.warn_print("unable to launch {}!".format(browserName))
             Settings.dev_print(err)
 
         def attempt_chrome(brave=False, chromium=False, edge=False):
-            # try:
-                # https://stackoverflow.com/questions/50692358/how-to-work-with-a-specific-version-of-chromedriver-while-chrome-browser-gets-up
-                # import chromedriver_autoinstaller
-                # chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
-                                                  # and if it doesn't exist, download it automatically,
-                                                  # then add chromedriver to path
-            # except Exception as e:
-                # Settings.warn_print(e)
-
             browserName = None
             browserAttempt = None
             try:
+                options = webdriver.ChromeOptions()
+                add_options(options)
                 if brave:
                     browserName = "brave"
                     Settings.maybe_print("attempting {} web browser...".format(browserName))
-                    browserAttempt = webdriver.Chrome(service=BraveService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()))
+                    browserAttempt = webdriver.Chrome(service=BraveService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()), options=options)
                     Settings.print("browser created - {}".format(browserName))
                 elif chromium:
                     browserName = "chromium"
                     Settings.maybe_print("attempting {} web browser...".format(browserName))
-                    options = webdriver.ChromeOptions()
-                    # browserAttempt = webdriver.Chrome(options=options, executable_path=ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
-                    browserAttempt = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+                    browserAttempt = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install(), options=options)
                     Settings.print("browser created - {}".format(browserName))
                 elif edge:
+                    # doesn't work
                     browserName = "edge"
                     Settings.maybe_print("attempting {} web browser...".format(browserName))
-
                     options = EdgeOptions()
                     options.use_chromium = True
                     add_options(options)
@@ -2799,7 +2792,7 @@ class Driver:
                     Settings.print("browser created - {}".format(browserName))
                 else:
                     browserName = "chrome"
-                    browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+                    browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
                 # TODO
                 # Settings.dev_print("updating permissions...")
                 # https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
@@ -2822,20 +2815,15 @@ class Driver:
                 options = FirefoxOptions()
                 if str(Settings.is_debug("firefox")) == "True":
                     options.log.level = "trace"
-                if str(Settings.is_show_window()) == "False":
-                    options.add_argument("--headless")
-                options.add_argument("--enable-file-cookies")
-                options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
-                # FirefoxService(GeckoDriverManager().install())
-                # GeckoDriverManager().install()
-                # browserAttempt = webdriver.Firefox(executable_path="/home/skeetzo/.wdm/drivers/geckodriver/linux64/0.32/geckodriver", options=options, service_log_path=Settings.get_logs_path("firefox"))
-                # browserAttempt = webdriver.Firefox(executable_path="/home/skeetzo/.wdm/drivers/geckodriver/linux64/0.32/geckodriver")
+                add_options(options)
+                # options.add_argument("--enable-file-cookies")
                 browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
                 return browserAttempt
             except Exception as e:
                 browser_error(e, "firefox")
             return None
 
+        # doesn't work
         def attempt_ie():
             Settings.maybe_print("attempting ie web browser...")
             try:
@@ -2848,6 +2836,7 @@ class Driver:
                 browser_error(e, "ie")
             return None
 
+        # doesn't work
         def attempt_opera():
             Settings.maybe_print("attempting opera web browser...")
             try:
@@ -3224,7 +3213,11 @@ class Driver:
             user_count = re.search(r'>[0-9]*<', str(user_count))
             user_count = user_count.group()
             user_count = user_count.replace("<","").replace(">","")
+            print(user_count)
+            if not user_count:
+                raise Exception("unable to find user count")
 
+                
             thirdTime = 0
             count = 0
             while True:

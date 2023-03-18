@@ -80,10 +80,14 @@ DOWNLOAD_PATH = os.path.join(ROOT_PATH, "downloads")
 UPLOAD_PATH = os.path.join(ROOT_PATH, "uploads")
 LOG_PATH = os.path.join(ROOT_PATH, "snarf.log")
 REMOTE_PATH = ROOT_PATH
-CONFIGS_PATH = "{}/.onlysnarf".format(USER_HOME)
+# CONFIGS_PATH = "{}/.onlysnarf".format(USER_HOME)
+CONFIGS_PATH = os.path.join(os.getcwd(), "OnlySnarf/conf")
 USERS_PATH = os.path.join(CONFIGS_PATH, "users.json")
 PROFILE_PATH = os.path.join(CONFIGS_PATH, "profile.json")
 CONFIG_PATH = os.path.join(CONFIGS_PATH, "config.conf")
+if os.environ.get('ENV') == "test":
+    CONFIG_PATH = os.path.join(CONFIGS_PATH, "test-config.conf")
+
 PROFILES_PATH = os.path.join(CONFIGS_PATH, "users")
 
 if os.environ.get('ENV') == "test":

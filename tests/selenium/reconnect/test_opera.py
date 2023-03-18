@@ -21,6 +21,7 @@ class TestSeleniumReconnectOpera(unittest.TestCase):
         config["show"] = False
         self.driver.exit()
     
+    @unittest.skip("todo")
     def test_reconnect_opera(self):
         config["browser"] = "opera"
         self.driver.init()

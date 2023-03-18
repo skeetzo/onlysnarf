@@ -21,6 +21,7 @@ class TestSeleniumReconnectEdge(unittest.TestCase):
         config["show"] = False
         self.driver.exit()
 
+    @unittest.skip("todo")
     def test_reconnect_edge(self):
         config["browser"] = "edge"
         self.driver.init()

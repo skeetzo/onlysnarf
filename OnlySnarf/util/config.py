@@ -18,20 +18,26 @@ else:
 config_file = configparser.ConfigParser()
 config_file.read(configFile)
 
-config = {}
+configs = {}
 
 # relabels config for cleaner usage
 for section in config_file.sections():
   for key in config_file[section]:
     if section == "ARGS":
-      config[key] = config_file[section][key]
+      configs[key] = config_file[section][key]
+      # print(key, config[key])
     else:
-      config[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
+      configs[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
+      # print(key, config[section.lower()+"_"+key.lower()])
 
+config = {}
 # continue to overwrite values from config file with args
 from .args import args
+# print(args.items())
 for key, value in args.items():
   config[key] = value
+for key, value in configs.items():
+  config[key] = value  
 
 ###############
 ## Debugging ##
