@@ -18,8 +18,6 @@ setuptools.setup(
     include_package_data=True,
     install_requires=[
         'ffmpeg',
-        'pillow',
-        'pyinquirer',
         'wget',
         'selenium==4.5.0',
         'webdriver_manager'
@@ -31,8 +29,7 @@ setuptools.setup(
     },
     entry_points={
         'console_scripts' : [
-            # 'snarf = OnlySnarf.menu:main',
-            'onlysnarf = OnlySnarf.snarf:main'
+            'snarf = OnlySnarf.snarf:main'
         ]
     },
     classifiers=[

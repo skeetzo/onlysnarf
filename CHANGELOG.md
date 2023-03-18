@@ -595,7 +595,7 @@
   - fixed tab handling in driver
   - debugged & tested newly added subcommand structure: discount, message, post --> snarf.py
   - beginning recordings for behavior previews
-**4.4.0: 10/11/2022**
+  **4.4.0: 10/11/2022**
   - fixed args & config overwrite direction
   - recorded new videos for demos
   - updated preview gifs of behavior for readme w/ OBS: discount, message, poll, post, schedule, users
@@ -632,9 +632,12 @@
   - added travis.cli config
   - connected travis to github
   - more driver debugging for added webmanager autoinstalls
-**4.4.6: 10/27/2022**
+  **4.4.6: 10/27/2022**
   - added travisci for testing python versions & os installs
   - more rpi debugging attempts; added attempt scripts
+**4.4.7: 3/17/2023**
+  - prep for project cleanup and python update
+  - pruned prompts
 
 ------------------------------------------------------------------------------------
 
@@ -645,7 +648,11 @@
 
 ## TODO
 
+- update scripts for python10
 - update install scripts and organize by usability by platform; distinguish arm scripts for rpis
+
+- add current instructions for installing from github
+- add a way for installation to work for webdrivers for pypi
 
 (travis ci)
 - finish debugging travis tests w/ multiple versions & os
