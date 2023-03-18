@@ -1,6 +1,5 @@
 import pkg_resources
 import time
-import PyInquirer
 import os, json, sys
 from datetime import datetime
 from pathlib import Path
@@ -19,7 +18,6 @@ class Settings:
     CONFIRM = True
     FILES = None
     PERFORMER_CATEGORY = None
-    PROMPT = True
 
     PREFER_LOCAL = True
     PREFER_LOCAL_FOLLOWING = True
@@ -83,27 +81,6 @@ class Settings:
         return DEFAULT.ACTIONS
 
     def get_amount():
-
-
-        # # prompt skip
-        # if not Settings.prompt("amount"): return None
-        # question = {
-        #     'type': 'input',
-        #     'name': 'amount',
-        #     'message': 'Amount:',
-        #     'validate': AmountValidator,
-        #     'filter': lambda val: int(myround(int(val)))
-        # }
-        # amount = prompt(question)["amount"]
-        # if not Settings.confirm(amount): return self.get_amount()
-        # self.amount = amount
-        # return self.amount
-
-
-
-
-
-
         return config["amount"]
 
     def get_base_directory():
@@ -120,24 +97,6 @@ class Settings:
         return config["browser"]
 
     def get_months():
-
-
-        # # prompt skip
-        # if not Settings.prompt("months"): return None
-        # question = {
-        #     'type': 'input',
-        #     'name': 'months',
-        #     'message': 'Months:',
-        #     'validate': MonthValidator,
-        #     'filter': lambda val: int(val)
-        # }
-        # months = prompt(question)["months"]
-        # if not Settings.confirm(months): return self.get_months()
-        # self.months = months
-        # return self.months
-
-
-
         return config["months"]
 
     def get_category():
@@ -160,20 +119,6 @@ class Settings:
 
     def get_price():
         return config["price"]
-
-
-        # if not Settings.prompt("price"): return 0
-        # question = {
-        #     'type': 'input',
-        #     'name': 'price',
-        #     'message': 'Price',
-        #     'validate': PriceValidator,
-        #     'filter': lambda val: int(val)
-        # }
-        # price = prompt(question)["price"]
-        # # if not Settings.confirm(price): return self.get_price(again=again)
-        # self.price = price
-        # return price
 
     def get_price_minimum():
         return DEFAULT.PRICE_MINIMUM
@@ -552,9 +497,6 @@ class Settings:
     def is_prefer_local_following():
         return Settings.PREFER_LOCAL_FOLLOWING
 
-    def is_prompt():
-        return Settings.PROMPT
-
     def is_save_users():
         return config["save_users"]
         
@@ -575,158 +517,6 @@ class Settings:
         
     def is_skip_upload():
         return config["skip_upload"]
-
-    ##
-    # Menu
-    ##
-
-    def confirm(text):
-        try:
-            if text == None: return False
-            if list(text) == []: return False
-            if str(text) == "": return False
-            # if config["confirm"] == "True": return True
-            # if 
-        except: pass
-        questions = [
-            {
-                'type': 'confirm',
-                'message': 'Is this correct? -> {}'.format(text),
-                'name': 'confirm',
-                'default': True,
-            }
-        ]
-        return PyInquirer.prompt(questions)["confirm"]
-
-    def header():
-        if Settings.LAST_UPDATED_KEY is not None:
-            print("Updated: {} = {}".format(Settings.LAST_UPDATED_KEY, config[str(Settings.LAST_UPDATED_KEY).replace(" ","_").lower()]))
-            print('\r')
-        Settings.LAST_UPDATED_KEY = None
-
-    def menu():
-        skipList = ["action", "amount", "category", "categories", "cron", "input", "messages", "posts", "date", "duration", "expiration", "keywords", "limit", "months", "bykeyword", "notkeyword", "price", "config_path", "questions", "schedule", "skipped_users", "tags", "text", "time", "title", "user", "users", "username", "password", "users_favorite"]
-        print('Settings')
-        keys = [key.replace("_"," ").title() for key in config.keys() if key.lower() not in skipList and "categories" not in str(key).lower() and "messages" not in str(key).lower()]
-        keys.insert(0, "Back")
-        question = {
-            'type': 'list',
-            'name': 'choice',
-            'message': 'Set:',
-            'choices': keys,
-            'filter': lambda val: val.lower()
-        }
-        answer = PyInquirer.prompt(question)["choice"]
-        if str(answer).lower() == "back": return
-        Settings.set_setting(answer.replace(" ", "_"))
-
-    def prompt(text):
-        if list(text) == []: return False
-        if str(text) == "": return False
-        if not Settings.PROMPT: return False
-        question = {
-            'type': 'confirm',
-            'message': '{}?'.format(str(text).capitalize()),
-            'name': 'confirm',
-            'default': True,
-        }
-        return PyInquirer.prompt(question)["confirm"]
-
-    def prompt_email():
-        if not Settings.PROMPT: return False
-        question = {
-            'type': 'input',
-            'message': 'Email:',
-            'name': 'email'
-        }
-        email = PyInquirer.prompt(question)["email"]
-        Settings.set_email(email)
-        return email
-
-    def prompt_username():
-        if not Settings.PROMPT: return False
-        question = {
-            'type': 'input',
-            'message': 'Username:',
-            'name': 'username'
-        }
-        username = PyInquirer.prompt(question)["username"]
-        Settings.set_username(username)
-        return username
-
-    def prompt_password():
-        if not Settings.PROMPT: return False
-        question = {
-            'type': 'password',
-            'message': 'Password:',
-            'name': 'password'
-        }
-        pw = PyInquirer.prompt(question)["password"]
-        Settings.set_password(pw)
-        return pw
-
-    def prompt_username_google():
-        if not Settings.PROMPT: return False
-        question = {
-            'type': 'input',
-            'message': 'Google username:',
-            'name': 'username'
-        }
-        username = PyInquirer.prompt(question)["username"]
-        Settings.set_username_google(username)
-        return username
-
-    def prompt_password_google():
-        if not Settings.PROMPT: return False
-        question = {
-            'type': 'password',
-            'message': 'Google password:',
-            'name': 'password'
-        }
-        pw = PyInquirer.prompt(question)["password"]
-        Settings.set_password_google(pw)
-        return pw
-
-    def prompt_username_twitter():
-        if not Settings.PROMPT: return False
-        question = {
-            'type': 'input',
-            'message': 'Twitter username:',
-            'name': 'username'
-        }
-        username = PyInquirer.prompt(question)["username"]
-        Settings.set_username_twitter(username)
-        return username
-
-    def prompt_password_twitter():
-        if not Settings.PROMPT: return False
-        question = {
-            'type': 'password',
-            'message': 'Twitter password:',
-            'name': 'password'
-        }
-        pw = PyInquirer.prompt(question)["password"]
-        Settings.set_password_twitter(pw)
-        return pw
-
-    def select_category(categories=None):
-        # if Settings.CATEGORY: return Settings.CATEGORY
-        if not categories: categories = Settings.get_categories()
-        print("Select a Category")
-        categories.insert(0, "Back")
-        question = {
-            'type': 'list',
-            'message': 'Category:',
-            'name': 'category',
-            'choices': categories,
-            'filter': lambda cat: cat.lower()
-        }
-        cat = PyInquirer.prompt(question)["category"]
-        if str(cat) == "back": return None
-        if not Settings.confirm(cat): return Settings.select_category()
-        # Settings.CATEGORY = cat
-        config["category"] = cat
-        return cat
 
     ##
     # Setters
@@ -750,9 +540,7 @@ class Settings:
     def set_debug(newValue):
         if str(newValue) == "tests":
             # config["confirm"] = False
-            # config["prompt"] = False
             Settings.CONFIRM = False
-            Settings.PROMPT = False
         else:
             config["debug"] = newValue
 
@@ -779,38 +567,6 @@ class Settings:
     
     def set_prefer_local_following(buul):
         Settings.PREFER_LOCAL_FOLLOWING = buul
-
-    def set_prompt(value):
-        Settings.PROMPT = value
-
-    def set_setting(key):
-        try:
-            value = config[key]
-            key = key.replace("_"," ").title()
-            print("Current: {}".format(value))
-            if str(value) == "True" or str(value) == "False":
-                question = {
-                    'type': 'confirm',
-                    'name': 'setting',
-                    'message': "Toggle value?"
-                }
-                answer = PyInquirer.prompt(question)["setting"]
-                if not answer: return Settings.menu()
-                if bool(value): config[key.lower()] = False
-                else: config[key.lower()] = True
-            else:
-                question = {
-                    'type': 'input',
-                    'name': 'setting',
-                    'message': "New value:",
-                    # 'default': int(value)
-                }
-                answer = PyInquirer.prompt(question)["setting"]
-                if not Settings.confirm(answer): return Settings.menu()
-                config[key.lower().replace(" ","_")] = answer
-            Settings.LAST_UPDATED_KEY = key.lower()
-        except Exception as e:
-            Settings.dev_print(e)
 
 ###########################################################################
 

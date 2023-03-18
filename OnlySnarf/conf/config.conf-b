@@ -23,7 +23,7 @@
 #tweeting = False
 #user =  
 #users =  
-username = alexdicksdown
+#username = default
 
 ## Selenium ##
 # auto, firefox, chrome; reconnect[-firefox, chrome], remote[-firefox, chrome]

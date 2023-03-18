@@ -1,5 +1,4 @@
 import os, shutil, random, sys
-import PyInquirer
 from os import walk
 ##
 from ..lib.ffmpeg import ffmpeg
@@ -307,67 +306,6 @@ class File():
                 Settings.maybe_print('no local files found!')
         except Exception as e:
             Settings.dev_print(e)
-
-    # @staticmethod
-    # def select_file(category, performer=None):
-    #     files = File.get_files_by_category(category, performer=performer)
-    #     files_ = []
-    #     for file in files:
-    #         if isinstance(file, str):
-    #             files_.append(PyInquirer.Separator())
-    #             continue
-    #         file.category = category
-    #         file_ = {
-    #             "name": file.get_title(),
-    #             "value": file,
-    #         }
-    #         files_.append(file_)
-    #     if len(files_) == 0:
-    #         Settings.print("Missing Files")
-    #         return
-    #     files_.append({
-    #         "name": 'Back',
-    #         "value": None,
-    #     })
-    #     question = {
-    #         'type': 'list',
-    #         'name': 'file',
-    #         'message': 'File Path:',
-    #         'choices': files_,
-    #         # 'filter': lambda file: file.lower()
-    #     }
-    #     answer = PyInquirer.prompt(question)
-    #     if not answer: return File.select_files()
-    #     file = answer["file"]
-    #     if not Settings.confirm(file.get_path()): return None
-    #     return file
-
-    # @staticmethod
-    # def select_files():
-    #     # if not Settings.is_prompt(): return [File.get_random_file()]
-    #     category = Settings.select_category()
-    #     if not category: return File.select_file_upload_method()
-    #     # if not Settings.confirm(category): return File.select_files()
-    #     Settings.print("Select Files or a Folder")
-    #     files = []
-    #     while True:
-    #         file = File.select_file(category)
-    #         if not file: break
-    #         ##
-    #         if "performer" in str(category):
-    #             cat = Settings.select_category([cat for cat in Settings.get_categories() if "performer" not in cat])
-    #             performerName = file.get_title()
-    #             file = File.select_file(cat, performer=performerName)
-    #             if not file: break
-    #             setattr(file, "performer", performerName)
-    #             files.append(file)
-    #             if "galler" in str(cat) or "video" in str(cat): break
-    #         ##
-    #         files.append(file)
-    #         if "galler" in str(category) or "video" in str(category): break
-    #     if str(files[0]) == "unset": return files
-    #     if not Settings.confirm([file.get_title() for file in files]): return File.select_files()
-    #     return files
 
     # def upload(self):
     #     """

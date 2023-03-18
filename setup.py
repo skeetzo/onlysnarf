@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="4.4.1",
+    version="4.4.2",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
@@ -18,20 +18,17 @@ setuptools.setup(
     include_package_data=True,
     install_requires=[
         # 'geckodriver-autoinstaller',    
-        'chromedriver-binary',
-        # 'httplib2',
+        # 'chromedriver-binary',
         'ffmpeg',
-        # 'pathlib', 
-        'pillow',
         # 'pysftp',
-        'pyinquirer',
+        # 'pyinquirer',
         'wget',
-        'selenium'
+        'selenium',
+        'webdriver-manager'
         ],
     entry_points={
         'console_scripts' : [
-            # 'snarf = OnlySnarf.menu:main',
-            'onlysnarf = OnlySnarf.snarf:main'
+            'snarf = OnlySnarf.snarf:main'
         ]
     },
     classifiers=[

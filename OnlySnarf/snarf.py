@@ -174,9 +174,6 @@ def main():
         # purge local tmp files
         from .classes.file import File
         File.remove_local()
-        # disable menu prompts
-        Settings.set_prompt(False)
-        Settings.set_confirm(False)
         # get the thing, do the thing
         action = Settings.get_action()
         Settings.print("Running - {}".format(action))

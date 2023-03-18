@@ -595,7 +595,7 @@
   - fixed tab handling in driver
   - debugged & tested newly added subcommand structure: discount, message, post --> snarf.py
   - beginning recordings for behavior previews
-**4.4.0: 10/11/2022**
+  **4.4.0: 10/11/2022**
   - fixed args & config overwrite direction
   - recorded new videos for demos
   - updated preview gifs of behavior for readme w/ OBS: discount, message, poll, post, schedule, users
@@ -610,16 +610,21 @@
   - fixed driver & message actually sending... haha and discount applying.... woops
   - synced with main/master branch
   - uploaded working changes to pypi
-**4.4.1: 10/12/2022**
+  **4.4.1: 10/12/2022**
   - minor text changes
   - fixed file upload when posting (of course this would still be semi broken after publishing changes)
   **10/13/2022**
   - more minor text changes
   - changed text: bin/google* --> bin/chrome*
+**4.4.2: 3/17/2023**
+  - prep for project cleanup and python update
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- update scripts for python10
+
 
 - add current instructions for installing from github
 - add a way for installation to work for webdrivers for pypi
