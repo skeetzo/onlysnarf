@@ -639,8 +639,12 @@
   - prep for project cleanup and python update
   - pruned prompts
   - fixed webdriver manager configurations for most browsers: brave, chrome, chromium, and firefox
-
+  **3/18/2023**
+  - fixed cookies for chrome but not firefox
+  
 ------------------------------------------------------------------------------------
+
+- update any webscraping as necessary
 
 - finish adding travisci for continuous integration
 - finish testing new browser changes

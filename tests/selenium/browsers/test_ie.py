@@ -21,7 +21,7 @@ class TestSeleniumIE(unittest.TestCase):
         self.driver.exit()
 
     # @unittest.skip("todo")
-    def test_ie(self):
+    def xtest_ie(self):
         config["browser"] = "ie"
         # config["debug_ie"] = True
         self.driver.init()

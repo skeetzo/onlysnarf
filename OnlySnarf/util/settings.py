@@ -91,10 +91,6 @@ class Settings:
         # if os.environ.get('ENV') == "test":
         baseDir = os.path.join(os.getcwd(),"OnlySnarf")
           # baseDir = os.path.dirname(__file__)
-        print(baseDir)
-        print(baseDir)
-        print(baseDir)
-        print(baseDir)
         return baseDir
 
     def get_browser_type():
