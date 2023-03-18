@@ -23,6 +23,8 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 ##
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service as BraveService
 # chrome
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
@@ -39,6 +41,7 @@ from webdriver_manager.microsoft import IEDriverManager
 # edge
 from selenium.webdriver.edge.service import Service as EdgeService
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from msedge.selenium_tools import Edge,EdgeOptions
 # opera
 from webdriver_manager.opera import OperaDriverManager
 ##
@@ -2764,60 +2767,39 @@ class Driver:
             # except Exception as e:
                 # Settings.warn_print(e)
 
-            browserName = "chrome"
-            if brave:
-                Settings.maybe_print("attempting brave web browser...")
-                browserName = "brave"
-            elif chromium:
-                Settings.maybe_print("attempting chromium web browser...")
-                browserName = "chromium"
-            elif edge:
-                Settings.maybe_print("attempting edge web browser...")
-                browserName = "edge"
-            else:
-                Settings.maybe_print("attempting chrome web browser...")
+            browserName = None
+            browserAttempt = None
             try:
-                from webdriver_manager.chrome import ChromeDriverManager
-
-                driver = webdriver.Chrome(ChromeDriverManager().install())
-                options = webdriver.ChromeOptions()
-                
                 if brave:
-                    browserAttempt = webdriver.Chrome(options=options, executable_path=ChromeDriverManager(chrome_type=ChromeType.BRAVE).install())
+                    browserName = "brave"
+                    Settings.maybe_print("attempting {} web browser...".format(browserName))
+                    browserAttempt = webdriver.Chrome(service=BraveService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()))
+                    Settings.print("browser created - {}".format(browserName))
                 elif chromium:
-                    browserAttempt = webdriver.Chrome(options=options, executable_path=ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+                    browserName = "chromium"
+                    Settings.maybe_print("attempting {} web browser...".format(browserName))
+                    options = webdriver.ChromeOptions()
+                    # browserAttempt = webdriver.Chrome(options=options, executable_path=ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+                    browserAttempt = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+                    Settings.print("browser created - {}".format(browserName))
                 elif edge:
+                    browserName = "edge"
+                    Settings.maybe_print("attempting {} web browser...".format(browserName))
 
-                    from msedge.selenium_tools import Edge,EdgeOptions
                     options = EdgeOptions()
-                    # options = webdriver.EdgeOptions()
                     options.use_chromium = True
                     add_options(options)
-                    options.binary_location="/home/{user}/.wdm/drivers/edgedriver/linux64/106.0.1370/msedgedriver".format(user=os.getenv('USER'))
+                    options.binary_location="/home/{user}/.wdm/drivers/edgedriver/linux64/111.0.1661/msedgedriver".format(user=os.getenv('USER'))
                     # fix any permissions issues
-                    os.chmod(options.binary_location, 0o755)
+                    # os.chmod(options.binary_location, 0o755)
                     shutil.chown(options.binary_location, user=os.getenv('USER'), group=None)
-                    browserAttempt = Edge(executable_path=options.binary_location, options=options)
+                    # browserAttempt = Edge(executable_path=options.binary_location, options=options)
                     # browserAttempt = webdriver.Edge(options=options, executable_path=EdgeService(EdgeChromiumDriverManager().install()))
-                # else:
-                # options.add_experimental_option('excludeSwitches', ['enable-logging'])
-                # Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
-                # options.binary_location = chromedriver_binary.chromedriver_filename
-                # browserAttempt = webdriver.Chrome(options=options, service_args=service_args)
-                browserAttempt = webdriver.Chrome(options=options)
-                # browserAttempt = webdriver.Chrome(options=options)
-                if str(Settings.is_show_window()) == "False":
-                    Settings.print("browser created - chrome (headless)")
+                    browserAttempt = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
+                    Settings.print("browser created - {}".format(browserName))
                 else:
-
-                    # TODO: maybe needed for RPi:
-                    # from pyvirtualdisplay import Display
-                    # display = Display(visible=0, size=(1600, 1200))
-                    # display.start()
-
-
-                    browserAttempt = webdriver.Chrome(options=options, executable_path=ChromeDriverManager().install())
-
+                    browserName = "chrome"
+                    browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
                 # TODO
                 # Settings.dev_print("updating permissions...")
                 # https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
@@ -2837,12 +2819,6 @@ class Driver:
                 Settings.print("You must run `onlysnarf` as non-root for Firefox to work correctly!")
                 return False
             try:
-
-                # from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-                # binary = FirefoxBinary('path/to/binary')
-                # driver = webdriver.Firefox(firefox_binary=binary)
-                # d = DesiredCapabilities.FIREFOX
-
                 options = FirefoxOptions()
                 if str(Settings.is_debug("firefox")) == "True":
                     options.log.level = "trace"
@@ -2851,9 +2827,10 @@ class Driver:
                 options.add_argument("--enable-file-cookies")
                 options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
                 # FirefoxService(GeckoDriverManager().install())
-                GeckoDriverManager().install()
+                # GeckoDriverManager().install()
                 # browserAttempt = webdriver.Firefox(executable_path="/home/skeetzo/.wdm/drivers/geckodriver/linux64/0.32/geckodriver", options=options, service_log_path=Settings.get_logs_path("firefox"))
-                browserAttempt = webdriver.Firefox(executable_path="/home/skeetzo/.wdm/drivers/geckodriver/linux64/0.32/geckodriver")
+                # browserAttempt = webdriver.Firefox(executable_path="/home/skeetzo/.wdm/drivers/geckodriver/linux64/0.32/geckodriver")
+                browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
                 return browserAttempt
             except Exception as e:
                 browser_error(e, "firefox")
@@ -2864,7 +2841,8 @@ class Driver:
             try:
                 driver_path = IEDriverManager().install()
                 os.chmod(driver_path, 0o755)
-                browserAttempt = webdriver.Ie(executable_path=IEService(driver_path))
+                # browserAttempt = webdriver.Ie(executable_path=IEService(driver_path))
+                browserAttempt = webdriver.Ie(service=IEService(IEDriverManager().install()))
                 return browserAttempt
             except Exception as e:
                 browser_error(e, "ie")

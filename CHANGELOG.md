@@ -638,6 +638,7 @@
 **4.4.7: 3/17/2023**
   - prep for project cleanup and python update
   - pruned prompts
+  - fixed webdriver manager configurations for most browsers: brave, chrome, chromium, and firefox
 
 ------------------------------------------------------------------------------------
 
@@ -771,6 +772,8 @@ what helps in general:
   - message: drag&drop has decided to occasionally stop working; maybe a selenium version issue?
 **4.4.0**
   - discount: amount&months still require 2 passes on average to update values correctly
+**4.4.6**
+  - followed instructions here for enabled firefox on ubuntu 22.04: https://www.reddit.com/r/learnpython/comments/umft75/selenium_your_firefox_profile_cannot_be_loaded_it/ -> https://support.mozilla.org/en-US/kb/install-firefox-linux#w_install-firefox-from-mozilla-builds-for-advanced-users
 
 # Web Browser Versions
 
