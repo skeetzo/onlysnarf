@@ -3,10 +3,7 @@ from datetime import datetime
 from ..lib.driver import Driver
 from ..util.settings import Settings
 from .user import User
-from PyInquirer import prompt
-from PyInquirer import Validator, ValidationError
 ##
-from ..util.validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ListValidator
 from .file import File, Folder
 
 class Poll:
@@ -54,20 +51,6 @@ class Poll:
         if int(self.duration) > 30: self.duration = "No limit"
         return self.duration
 
-        # # prompt skip
-        # if not Settings.prompt("duration"): return None
-        # question = {
-        #     'type': 'input',
-        #     'name': 'duration',
-        #     'message': 'Duration [1, 3, 7, 99 (\'No Limit\')]',
-        #     'validate': DurationValidator
-        # }
-        # duration = prompt(question)["duration"]
-        # # confirm duration
-        # if not Settings.confirm(duration): return self.get_duration()
-        # self.duration = duration
-        # return self.duration
-
     def get_questions(self):
         """
         Gets the questions value if not none else sets it from args or prompts.
@@ -82,23 +65,6 @@ class Poll:
         if len(self.questions) > 0: return self.questions
         self.questions = Settings.get_questions()
         return self.questions
-
-        # # prompt skip
-        # if not Settings.prompt("questions"): return []
-        # print("Enter Questions")
-        # while True:
-        #     question = {
-        #         'type': 'input',
-        #         'name': 'question',
-        #         'message': 'Question:',
-        #     }
-        #     answers = prompt(question)["question"]
-        #     if str(question) == "": break
-        #     questions.append(question)
-        # # confirm questions
-        # if not Settings.confirm(questions): return self.get_questions()
-        # self.questions = questions
-        # return self.questions
 
     def validate(self):
         """

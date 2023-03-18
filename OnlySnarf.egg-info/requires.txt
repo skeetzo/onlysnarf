@@ -1,0 +1,6 @@
+chromedriver-binary
+ffmpeg
+geckodriver-autoinstaller
+selenium
+webdriver-manager
+wget

@@ -3,7 +3,6 @@ import time
 import os
 import threading
 from datetime import datetime, timedelta
-import PyInquirer
 ##
 from ..util.colorize import colorize
 from ..lib.driver import Driver

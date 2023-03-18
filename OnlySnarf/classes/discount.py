@@ -1,9 +1,7 @@
 from ..lib.driver import Driver
 from ..util.settings import Settings
 from .user import User
-from PyInquirer import prompt
 ##
-from ..util.validators import AmountValidator, MonthValidator
 from ..util.defaults import DISCOUNT_MAX_AMOUNT, DISCOUNT_MIN_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_MONTHS
 
 class Discount:

@@ -10,8 +10,11 @@ if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "Non
 configFile = "config.conf"
 if os.environ.get('ENV') == "test":
   configFile = os.path.join(os.getcwd(), "OnlySnarf/conf", "test-config.conf")
-else:
+elif os.path.isfile(os.path.join("/home/{}/.onlysnarf".format(USER), "config.conf")):
   configFile = os.path.join("/home/{}/.onlysnarf".format(USER), "config.conf")
+else:
+  configFile = os.path.join(os.getcwd(), "OnlySnarf/conf", "config.conf")
+
 config_file = configparser.ConfigParser()
 config_file.read(configFile)
 

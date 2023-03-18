@@ -2,7 +2,6 @@ import re
 from datetime import datetime
 from decimal import Decimal
 from re import sub
-from PyInquirer import prompt
 ##
 from ..lib.driver import Driver
 from .file import File, Folder
@@ -10,7 +9,6 @@ from .poll import Poll
 from .user import User
 from ..util.settings import Settings
 from .schedule import Schedule
-from ..util.validators import PriceValidator, ListValidator
 
 class Message():
     """OnlyFans message (and post) class"""
@@ -279,12 +277,12 @@ class Message():
             return text
         # prompt skip
         if not Settings.prompt("text"): return ""
-        question = {
-            'type': 'input',
-            'name': 'text',
-            'message': 'Text:'
-        }
-        text = prompt(question)["text"]
+        # question = {
+        #     'type': 'input',
+        #     'name': 'text',
+        #     'message': 'Text:'
+        # }
+        # text = prompt(question)["text"]
         # confirm text
         # if not Settings.confirm(text): return self.get_text(again=again)
         self.text = text
@@ -383,13 +381,13 @@ class Post(Message):
             return expires
         # prompt skip
         if not Settings.prompt("expiration"): return 0
-        question = {
-            'type': 'input',
-            'name': 'expiration',
-            'message': 'Expiration [any number, 999 for \'No Limit\']',
-            # 'validate': 
-        }
-        expiration = prompt(question)["expiration"]
+        # question = {
+        #     'type': 'input',
+        #     'name': 'expiration',
+        #     'message': 'Expiration [any number, 999 for \'No Limit\']',
+        #     # 'validate': 
+        # }
+        # expiration = prompt(question)["expiration"]
         # confirm expiration
         # if not Settings.confirm(expiration): return self.get_expiration(again=again)
         self.expiration = expiration

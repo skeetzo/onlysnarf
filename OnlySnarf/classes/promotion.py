@@ -1,13 +1,10 @@
 import re
 from datetime import datetime
-from PyInquirer import prompt
-from PyInquirer import Validator, ValidationError
 ##
 
 from ..lib.driver import Driver
 from ..util import defaults as DEFAULT
 from ..util.settings import Settings
-from ..util.validators import AmountValidator, MonthValidator, LimitValidator, PriceValidator, NumberValidator, TimeValidator, DateValidator, DurationValidator, PromoDurationValidator, ListValidator
 from .file import File, Folder
 from .user import User
 
@@ -178,15 +175,6 @@ class Promotion:
             return amount
         # prompt skip
         if not Settings.prompt("amount"): return None
-        question = {
-            'type': 'input',
-            'name': 'amount',
-            'message': 'Amount:',
-            'validate': AmountValidator,
-            'filter': lambda val: int(myround(int(val)))
-        }
-        amount = prompt(question)["amount"]
-        # confirm amount
         if not Settings.confirm(amount): return self.get_amount()
         self.amount = amount
         return self.amount
@@ -210,13 +198,6 @@ class Promotion:
             return expiration
         # prompt skip
         if not Settings.prompt("expiration"): return None
-        question = {
-            'type': 'input',
-            'name': 'expiration',
-            'message': 'Expiration [any number, 999 for \'No Limit\']',
-            # 'validate': 
-        }
-        expiration = prompt(question)["expiration"]
         # confirm expiration
         if not Settings.confirm(expiration): return self.get_expiration()
         self.expiration = expiration
@@ -241,13 +222,6 @@ class Promotion:
             return limit
         # prompt skip
         if not Settings.prompt("limit"): return None
-        question = {
-            'type': 'input',
-            'name': 'limit',
-            'message': 'Limit (in days or months)',
-            'validate': LimitValidator
-        }
-        limit = prompt(question)["limit"]
         # confirm limit
         if not Settings.confirm(limit): return self.get_limit()
         self.limit = limit
@@ -272,12 +246,6 @@ class Promotion:
             return message
         # prompt skip
         if not Settings.prompt("message"): return ""
-        question = {
-            'type': 'input',
-            'name': 'message',
-            'message': 'Message:'
-        }
-        message = prompt(question)["message"]
         # confirm message
         if not Settings.confirm(message): return self.get_text()
         self.message = message
@@ -302,13 +270,6 @@ class Promotion:
             return duration
         # duration skip
         if not Settings.prompt("duration"): return None
-        question = {
-            'type': 'input',
-            'name': 'duration',
-            'message': 'Duration [1 day, 3 days, 7 days, ...]',
-            'validate': PromoDurationValidator
-        }
-        duration = prompt(question)["duration"]
         # confirm duration
         if not Settings.confirm(duration): return self.get_duration()
         self.duration = duration
@@ -383,45 +344,3 @@ class Promotion:
             except Exception as e:
                 Settings.dev_print(e)
         return True
-
-    @staticmethod
-    def menu():
-        """Promotion menu interface"""
-
-        if not Settings.is_debug():
-            print("### Not Available ###")
-            return
-        action = Promotion.ask_action()
-        if (action == 'Back'): pass
-        elif (action == 'trial'): Promotion.create_trial_link()
-        elif (action == 'campaign'): Promotion.create_campaign()
-        elif (action == 'user'): Promotion.apply_to_user()
-        elif (action == 'grandfather'): Promotion.grandfathered()
-
-    @staticmethod
-    def ask_action():
-        """Promotion menu selection
-
-        Returns
-        -------
-        str
-            The menu action to take
-
-        """
-
-        # arg - promotion_method: campaign, trial, user, grandfather
-        options = ["back", 
-            "campaign", # 
-            "grandfather" # this mostly completely works
-            "trial", # this isn't even finished but it does mostly work
-            "user", # should this be here?
-        ]
-        menu_prompt = {
-            'type': 'list',
-            'name': 'action',
-            'message': 'Please select a promotion action:',
-            'choices': [str(option).title() for option in options],
-            'filter': lambda val: str(val).lower()
-        }
-        answers = prompt(menu_prompt)
-        return answers['action']

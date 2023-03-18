@@ -4,7 +4,7 @@ import os
 import shutil
 import json
 import pathlib
-import chromedriver_binary
+# import chromedriver_binary
 import time
 import wget
 import pickle
@@ -1124,8 +1124,6 @@ class Driver:
                 Settings.maybe_print("logging in via form")
                 username = str(Settings.get_username_onlyfans())
                 password = str(Settings.get_password())
-                if not username or username == "": username = Settings.prompt_email()
-                if not password or password == "": password = Settings.prompt_password()
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing onlyfans login info")
                     return False
@@ -1187,10 +1185,6 @@ class Driver:
                 Settings.maybe_print("logging in via google")
                 username = str(Settings.get_username_google())
                 password = str(Settings.get_password_google())
-                if not username or username == "":
-                    username = Settings.prompt_username_google()
-                if not password or password == "":
-                    password = Settings.prompt_password_google()
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing google login info")
                     return False
@@ -1230,8 +1224,6 @@ class Driver:
                 Settings.maybe_print("logging in via twitter")
                 username = str(Settings.get_username_twitter())
                 password = str(Settings.get_password_twitter())
-                if not username or username == "": username = Settings.prompt_username_twitter()
-                if not password or password == "": password = Settings.prompt_password_twitter()
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing twitter login info")
                     return False
@@ -2714,6 +2706,10 @@ class Driver:
         def attempt_chrome():
             Settings.maybe_print("attempting chrome web browser...")
             try:
+                from webdriver_manager.chrome import ChromeDriverManager
+
+                driver = webdriver.Chrome(ChromeDriverManager().install())
+                
                 options = webdriver.ChromeOptions()
                 if str(Settings.is_show_window()) == "False":
                     options.add_argument('--headless')
@@ -2754,7 +2750,7 @@ class Driver:
                     service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
                 # else:
                 # options.add_experimental_option('excludeSwitches', ['enable-logging'])
-                Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
+                # Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
                 # options.binary_location = chromedriver_binary.chromedriver_filename
                 browserAttempt = webdriver.Chrome(options=options, service_args=service_args)
                 # browserAttempt = webdriver.Chrome(options=options)
