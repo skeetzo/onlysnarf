@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # Profile Settings
 import json
-from PyInquirer import prompt
 ##
 from ..lib.driver import Driver
 from ..util.settings import Settings
@@ -19,32 +18,6 @@ class Profile:
             setattr(self, str(key), value)
 
     # Backup
-
-    def ask_backup():
-        menu_prompt = {
-            'type': 'list',
-            'name': 'action',
-            'message': 'Please select a backup action:',
-            'choices': ['Back', 'Content', 'Messages', 'Content & Messages'],
-            'filter': lambda val: str(val).lower()
-        }
-        answers = prompt(menu_prompt)
-        return answers['action']
-
-    def backup_menu():
-        if not Settings.is_debug():
-            print("### Not Available ###")
-            return
-        backup = Profile.ask_backup()
-        if (backup == 'back'): return Profile.menu()
-        elif (backup == 'content'):
-            Profile.backup_content()
-        elif (backup == 'messages'):
-            Profile.backup_messages()
-        elif (backup == 'content & messages'):
-            Profile.backup_content()
-            Profile.backup_messages()
-        Profile.menu()
 
     @staticmethod
     def backup_content():
@@ -172,17 +145,6 @@ class Profile:
 
         Profile.menu()
 
-    def ask_new():
-        menu_prompt = {
-            'type': 'list',
-            'name': 'action',
-            'message': 'Please select a backup action:',
-            'choices': ['Back', 'Setup', 'Advertise', 'Posts'],
-            'filter': lambda val: str(val).lower()
-        }
-        answers = prompt(menu_prompt)
-        return answers['action']
-
     @staticmethod
     def menu():
         action = Profile.ask_action()
@@ -196,42 +158,6 @@ class Profile:
         elif (action == 'sync'): Profile.sync_from_profile()
         # elif (action == 'sync to'): Profile.sync_to_profile()
         
-    def ask_action():
-        menu_prompt = {
-            'type': 'list',
-            'name': 'action',
-            'message': 'Please select a profile action:',
-            'choices': ['Back', 'Backup','Sync', 
-                # 'Sync To',
-                'Check',
-                'Posts',
-                'Setup'
-            ],
-            'filter': lambda val: str(val).lower()
-        }
-        answers = prompt(menu_prompt)
-        return answers['action']
-
-    @staticmethod
-    def create():
-        if not Settings.is_prompt():
-            return Profile()
-        if not Settings.prompt("create profile"):
-            return Profile()
-        profile = Profile()
-        print("Follow the prompts to create a Profile of settings.")
-        print("Enter 'n' or nothing to not change the value.")
-        for key, value in profile.items():
-            question = {
-                'type': 'input',
-                'message': '{}:'.format(str(key).title()),
-                'name': 'answer'
-            }
-            value_ = prompt(question)["answer"]
-            if str(value_) == "n" or str(value_) == "" or str(value_) == " ": continue
-            setattr(profile, str(key), value_)
-        return profile
-
     @staticmethod
     def get_profile():
         print("Getting Profile")

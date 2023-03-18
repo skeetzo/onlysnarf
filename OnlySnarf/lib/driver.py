@@ -1143,8 +1143,6 @@ class Driver:
                 Settings.maybe_print("logging in via form")
                 username = str(Settings.get_username_onlyfans())
                 password = str(Settings.get_password())
-                if not username or username == "": username = Settings.prompt_email()
-                if not password or password == "": password = Settings.prompt_password()
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing onlyfans login info")
                     return False
@@ -1206,10 +1204,6 @@ class Driver:
                 Settings.maybe_print("logging in via google")
                 username = str(Settings.get_username_google())
                 password = str(Settings.get_password_google())
-                if not username or username == "":
-                    username = Settings.prompt_username_google()
-                if not password or password == "":
-                    password = Settings.prompt_password_google()
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing google login info")
                     return False
@@ -1249,8 +1243,6 @@ class Driver:
                 Settings.maybe_print("logging in via twitter")
                 username = str(Settings.get_username_twitter())
                 password = str(Settings.get_password_twitter())
-                if not username or username == "": username = Settings.prompt_username_twitter()
-                if not password or password == "": password = Settings.prompt_password_twitter()
                 if str(username) == "" or str(password) == "":
                     Settings.err_print("missing twitter login info")
                     return False
@@ -2785,29 +2777,17 @@ class Driver:
             else:
                 Settings.maybe_print("attempting chrome web browser...")
             try:
-                # options = get_options()
-                # capabilities = {
-                #   'browserName': 'chrome',
-                #   'platform': 'LINUX',
-                #   'chromeOptions':  {
-                #     'acceptInsecureCerts': True,
-                #     'useAutomationExtension': False,
-                #     'forceDevToolsScreenshot': True,
-                #     'args': ['--start-maximized', '--disable-infobars']
-                #   }
-                # }  
+                from webdriver_manager.chrome import ChromeDriverManager
 
+                driver = webdriver.Chrome(ChromeDriverManager().install())
                 options = webdriver.ChromeOptions()
-                add_options(options)
-
-                service_args = []
-                if str(Settings.is_debug("chrome")) == "True":
-                    service_args = ["--verbose", "--log-path={}".format(Settings.get_logs_path("google"))]
+                
                 if brave:
-                    browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()))
+                    browserAttempt = webdriver.Chrome(options=options, executable_path=ChromeDriverManager(chrome_type=ChromeType.BRAVE).install())
                 elif chromium:
-                    browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
+                    browserAttempt = webdriver.Chrome(options=options, executable_path=ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
                 elif edge:
+
                     from msedge.selenium_tools import Edge,EdgeOptions
                     options = EdgeOptions()
                     # options = webdriver.EdgeOptions()
@@ -2818,7 +2798,16 @@ class Driver:
                     os.chmod(options.binary_location, 0o755)
                     shutil.chown(options.binary_location, user=os.getenv('USER'), group=None)
                     browserAttempt = Edge(executable_path=options.binary_location, options=options)
-                    # browserAttempt = webdriver.Edge(options=options, service=EdgeService(EdgeChromiumDriverManager().install()))
+                    # browserAttempt = webdriver.Edge(options=options, executable_path=EdgeService(EdgeChromiumDriverManager().install()))
+                # else:
+                # options.add_experimental_option('excludeSwitches', ['enable-logging'])
+                # Settings.dev_print("executable_path: {}".format(chromedriver_binary.chromedriver_filename))
+                # options.binary_location = chromedriver_binary.chromedriver_filename
+                # browserAttempt = webdriver.Chrome(options=options, service_args=service_args)
+                browserAttempt = webdriver.Chrome(options=options)
+                # browserAttempt = webdriver.Chrome(options=options)
+                if str(Settings.is_show_window()) == "False":
+                    Settings.print("browser created - chrome (headless)")
                 else:
 
                     # TODO: maybe needed for RPi:
@@ -2827,7 +2816,7 @@ class Driver:
                     # display.start()
 
 
-                    browserAttempt = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
+                    browserAttempt = webdriver.Chrome(options=options, executable_path=ChromeDriverManager().install())
 
                 # TODO
                 # Settings.dev_print("updating permissions...")
@@ -2861,7 +2850,10 @@ class Driver:
                     options.add_argument("--headless")
                 options.add_argument("--enable-file-cookies")
                 options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
-                browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options, service_log_path=Settings.get_logs_path("firefox"))
+                # FirefoxService(GeckoDriverManager().install())
+                GeckoDriverManager().install()
+                # browserAttempt = webdriver.Firefox(executable_path="/home/skeetzo/.wdm/drivers/geckodriver/linux64/0.32/geckodriver", options=options, service_log_path=Settings.get_logs_path("firefox"))
+                browserAttempt = webdriver.Firefox(executable_path="/home/skeetzo/.wdm/drivers/geckodriver/linux64/0.32/geckodriver")
                 return browserAttempt
             except Exception as e:
                 browser_error(e, "firefox")
@@ -2872,7 +2864,7 @@ class Driver:
             try:
                 driver_path = IEDriverManager().install()
                 os.chmod(driver_path, 0o755)
-                browserAttempt = webdriver.Ie(executable_path=driver_path, service=IEService(driver_path))
+                browserAttempt = webdriver.Ie(executable_path=IEService(driver_path))
                 return browserAttempt
             except Exception as e:
                 browser_error(e, "ie")

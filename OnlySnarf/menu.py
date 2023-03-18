@@ -5,7 +5,7 @@ import time
 import random
 import os
 import sys
-from PyInquirer import prompt
+# from PyInquirer import prompt
 ##
 from OnlySnarf.snarf import Snarf
 from OnlySnarf.lib.driver import Driver

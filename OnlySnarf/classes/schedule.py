@@ -1,9 +1,7 @@
 from datetime import datetime
-from PyInquirer import prompt
 
 from ..util import defaults as DEFAULT
 from ..util.settings import Settings
-from ..util.validators import TimeValidator, DateValidator
 
 class Schedule:
 
@@ -85,13 +83,6 @@ class Schedule:
 
         # prompt skip
         if not Settings.prompt("date"): return None
-        question = {
-            'type': 'input',
-            'name': 'date',
-            'message': 'Enter a date (MM-DD-YYYY):',
-            'validate': DateValidator
-        }
-        date = prompt(question)["date"]
         # confirm date
         if not Settings.confirm(date): return self.get_date()
         self.date = date
@@ -134,13 +125,6 @@ class Schedule:
             return self.time
         # prompt skip
         if not Settings.prompt("time"): return None
-        question = {
-            'type': 'input',
-            'name': 'time',
-            'message': 'Enter a time (HH:MM:SS):',
-            'validate': TimeValidator
-        }
-        time = prompt(question)["time"]
         # confirm time
         if not Settings.confirm(time): return self.get_time()
         self.time = time

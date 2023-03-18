@@ -77,3 +77,43 @@ destructor()@TargetList.jsm:109
 close()@RemoteAgent.jsm:136
 1666829903531	geckodriver::browser	DEBUG	Browser process stopped: exit status: 0
 1666829903538	webdriver::server	DEBUG	<- 200 OK {"value":null}
+1679117175053	geckodriver	INFO	Listening on 127.0.0.1:33649
+1679117175646	mozrunner::runner	INFO	Running command: "/snap/bin/firefox" "--marionette" "--enable-file-cookies" "user-data-dir=/tmp/selenium" "--remote-debugging-port" "41779" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileSbYWt2"
+Gtk-Message: 22:26:15.735: Not loading module "atk-bridge": The functionality is provided by GTK natively. Please try to not load it.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+amdgpu: os_same_file_description couldn't determine if two DRM fds reference the same file description.
+If they do, bad things may happen!
+ATTENTION: default value of option mesa_glthread overridden by environment.
+1679117415959	geckodriver	INFO	Listening on 127.0.0.1:43583
+1679117416553	mozrunner::runner	INFO	Running command: "/snap/bin/firefox" "--marionette" "--enable-file-cookies" "user-data-dir=/tmp/selenium" "--remote-debugging-port" "49193" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileXh8uKE"
+Gtk-Message: 22:30:16.646: Not loading module "atk-bridge": The functionality is provided by GTK natively. Please try to not load it.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+amdgpu: os_same_file_description couldn't determine if two DRM fds reference the same file description.
+If they do, bad things may happen!
+ATTENTION: default value of option mesa_glthread overridden by environment.
+1679117752624	geckodriver	INFO	Listening on 127.0.0.1:59055
+1679117753241	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--enable-file-cookies" "user-data-dir=/tmp/selenium" "--remote-debugging-port" "46597" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilem19VTF"
+Gtk-Message: 22:35:53.360: Not loading module "atk-bridge": The functionality is provided by GTK natively. Please try to not load it.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+amdgpu: os_same_file_description couldn't determine if two DRM fds reference the same file description.
+If they do, bad things may happen!
+ATTENTION: default value of option mesa_glthread overridden by environment.
+1679117803622	geckodriver	INFO	Listening on 127.0.0.1:54981
+1679117804240	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--enable-file-cookies" "user-data-dir=/tmp/selenium" "--remote-debugging-port" "35003" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofileBu4bxX"
+Gtk-Message: 22:36:44.346: Not loading module "atk-bridge": The functionality is provided by GTK natively. Please try to not load it.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+amdgpu: os_same_file_description couldn't determine if two DRM fds reference the same file description.
+If they do, bad things may happen!
+ATTENTION: default value of option mesa_glthread overridden by environment.
+1679118850212	geckodriver	INFO	Listening on 127.0.0.1:38573
+1679118851327	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "-no-remote" "-profile" "/tmp/rust_mozprofileenlbR8"
+Gtk-Message: 22:54:11.442: Not loading module "atk-bridge": The functionality is provided by GTK natively. Please try to not load it.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+ATTENTION: default value of option mesa_glthread overridden by environment.
+amdgpu: os_same_file_description couldn't determine if two DRM fds reference the same file description.
+If they do, bad things may happen!
+ATTENTION: default value of option mesa_glthread overridden by environment.

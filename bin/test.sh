@@ -20,6 +20,7 @@ pytest tests/snarf/test_profile.py
 pytest tests/snarf/test_users.py
 
 ## Authentication ##
+<<<<<<< HEAD
 python -m pip install -e .[dev] && python tests/selenium/test_auth.py
 
 ## Selenium Processes ##
@@ -56,6 +57,22 @@ python -m pip install -e .[dev] && python tests/snarf/test_post.py
 python -m pip install -e .[dev] && python tests/snarf/test_profile.py
 python -m pip install -e .[dev] && python tests/snarf/test_promotion.py
 python -m pip install -e .[dev] && python tests/snarf/test_users.py
+=======
+python setup.py install && pytest tests/selenium/test_auth.py
+
+## Selenium Processes ##
+python setup.py install && pytest tests/selenium/test_browsers.py
+python setup.py install && pytest tests/selenium/test_reconnect.py
+python setup.py install && pytest tests/selenium/test_remote.py
+
+## Snarf Processes ##
+python setup.py install && pytest tests/snarf/test_discount.py
+python setup.py install && pytest tests/snarf/test_message.py
+python setup.py install && pytest tests/snarf/test_post.py
+python setup.py install && pytest tests/snarf/test_profile.py
+python setup.py install && pytest tests/snarf/test_promotion.py
+python setup.py install && pytest tests/snarf/test_users.py
+>>>>>>> master
 
 #############################################################################
 
