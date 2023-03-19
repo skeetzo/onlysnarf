@@ -641,8 +641,12 @@
   - fixed webdriver manager configurations for most browsers: brave, chrome, chromium, and firefox
   **3/18/2023**
   - fixed cookies for chrome but not firefox
+  - rpi4 testing and prep for selenium cleanup
   
 ------------------------------------------------------------------------------------
+
+
+- update binary installation steps for geckodriver and chromedriver; required for use on RPi4
 
 - update any webscraping as necessary
 
@@ -748,10 +752,12 @@ https://stackoverflow.com/questions/58686471/how-to-use-edge-chromium-webdriver-
 notes:
 
 - edge:
+requires: msedge-selenium-tools
 -- might only work for selenium v102
 -- might only work on Windows
 "There are various issues for chromium drivers for browser v103 used by Edge and Google Chrome. These are being addressed in v104, but they are still in beta. Advise that you downgrade for now to v102."
 https://stackoverflow.com/questions/72773330/when-running-selenium-edge-in-pyton-getting-sedgedriver-exe-unexpectedly-exite
+
 
 - ie:
 -- might only work on Windows
