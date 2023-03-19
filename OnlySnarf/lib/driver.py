@@ -39,9 +39,9 @@ from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.ie.service import Service as IEService
 from webdriver_manager.microsoft import IEDriverManager
 # edge
-from selenium.webdriver.edge.service import Service as EdgeService
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
-from msedge.selenium_tools import Edge,EdgeOptions
+# from selenium.webdriver.edge.service import Service as EdgeService
+# from webdriver_manager.microsoft import EdgeChromiumDriverManager
+# from msedge.selenium_tools import Edge, EdgeOptions
 # opera
 from webdriver_manager.opera import OperaDriverManager
 ##
@@ -2779,16 +2779,15 @@ class Driver:
                     # doesn't work
                     browserName = "edge"
                     Settings.maybe_print("attempting {} web browser...".format(browserName))
-                    options = EdgeOptions()
-                    options.use_chromium = True
-                    add_options(options)
-                    options.binary_location="/home/{user}/.wdm/drivers/edgedriver/linux64/111.0.1661/msedgedriver".format(user=os.getenv('USER'))
+                    # options = EdgeOptions()
+                    # options.use_chromium = True
+                    # add_options(options)
+                    # options.binary_location="/home/{user}/.wdm/drivers/edgedriver/linux64/111.0.1661/msedgedriver".format(user=os.getenv('USER'))
                     # fix any permissions issues
                     # os.chmod(options.binary_location, 0o755)
-                    shutil.chown(options.binary_location, user=os.getenv('USER'), group=None)
+                    # shutil.chown(options.binary_location, user=os.getenv('USER'), group=None)
                     # browserAttempt = Edge(executable_path=options.binary_location, options=options)
-                    # browserAttempt = webdriver.Edge(options=options, executable_path=EdgeService(EdgeChromiumDriverManager().install()))
-                    browserAttempt = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
+                    # browserAttempt = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
                     Settings.print("browser created - {}".format(browserName))
                 else:
                     browserName = "chrome"

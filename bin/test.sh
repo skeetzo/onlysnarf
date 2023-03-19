@@ -3,6 +3,8 @@
 # python -m unittest test_snarf.TestSnarf.test_users
 # python tests/test_snarf.py -p "users"
 
+git clone --depth 1  --branch development git@github.com:skeetzo/onlysnarf
+
 python -m pip install -e .[dev]
 
 onlysnarf -debug -vvv post -text "balls"
@@ -12,6 +14,9 @@ pytest tests/selenium/browsers
 pytest tests/selenium/reconnect
 
 pytest tests/snarf
+
+python -m unittest tests/snarf/test_discount.py
+python -m unittest tests/selenium/browsers/test_firefox.py
 
 pytest tests/snarf/test_discount.py
 pytest tests/snarf/test_message.py
