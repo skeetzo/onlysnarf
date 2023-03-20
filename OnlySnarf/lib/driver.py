@@ -2790,21 +2790,15 @@ class Driver:
                     # browserAttempt = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
                     Settings.print("browser created - {}".format(browserName))
                 else:
-                    import platform
-                    print(platform.processor())
-                    print(platform.processor())
-                    print(platform.processor())
                     browserName = "chrome"
-                    # browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
-                    browserAttempt = webdriver.Chrome('/usr/bin/chromedriver', options=options)
-                    # browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
-                # TODO
-                # Settings.dev_print("updating permissions...")
-                # https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
-                # check if permissions are off, possibly adjust:
-                # os.chmod("/home/{}/.wdm/drivers/*".format(os.getenv('USER')), 0o755) # e.g. os.chmod('/Users/user/Documents/my_project/chromedriver', 0755)
-                # shutil.chown("/home/{}/.wdm/drivers/*".format(os.getenv('USER')), user=os.getenv('USER'), group=None)
-
+                    # linux = x86_64
+                    # rpi = aarch64
+                    import platform
+                    # raspberrypi arm processors don't work with webdriver manager
+                    if platform.processor() == "aarch64":
+                        browserAttempt = webdriver.Chrome('/usr/bin/chromedriver', options=options)
+                    else:
+                        browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
                 return browserAttempt
             except Exception as e:
                 browser_error(e, browserName)

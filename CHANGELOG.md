@@ -636,57 +636,39 @@
   - added travisci for testing python versions & os installs
   - more rpi debugging attempts; added attempt scripts
 **4.4.7: 3/17/2023**
+  - upgraded selenium to 4.0
   - prep for project cleanup and python update
   - pruned prompts
   - fixed webdriver manager configurations for most browsers: brave, chrome, chromium, and firefox
   **3/18/2023**
   - fixed cookies for chrome but not firefox
   - rpi4 testing and prep for selenium cleanup
-  
+  - added a way for installation to work for webdrivers for pypi
+**4.4.8: 3/20/2023**
+  - added check for rpi processor for chrome only
+  - finished testing new browser changes
+  - finished debugging web browser on rpi4
+  - checked current instructions for installing from github
+  - updated to python10
+  - updated install scripts and organize by usability by platform; distinguish arm scripts for rpis
+  - finished debugging new webdriver manager system
+
 ------------------------------------------------------------------------------------
 
-
-- update binary installation steps for geckodriver and chromedriver; required for use on RPi4
-
+(publish new changes)
 - update any webscraping as necessary
-
-- finish adding travisci for continuous integration
-- finish testing new browser changes
-
-- finish debugging web browser on rpi4
 
 ## TODO
 
-- update scripts for python10
-- update install scripts and organize by usability by platform; distinguish arm scripts for rpis
-
-- add current instructions for installing from github
-- add a way for installation to work for webdrivers for pypi
-
 (travis ci)
+- finish adding travisci for continuous integration
 - finish debugging travis tests w/ multiple versions & os
-
-(publish new changes)
-- finish debugging new webdriver manager system w/ updated install scripts for browsers
-- add / update current instructions for installing from github
-
-(webdriver)
-- figure out how to request specific webdriver versions installs to test v102 for edge
-
--> CLI Menu
-- fix any new cli menu errors made while updating major processes
-- re-enable prompting for discount amount&months in Settings or somewhere else (at some point)
-- re-add removed user select code in notes/selectstuff.py (for menu prompts)
-- re-enable menu command
 
 (review usability and code first)
 -> OnlyFans: Promos
 - clean up / fix & test
 - add min/max to args & validators
 - re-enable / add promo subcommands and config variables
-
-- update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
-- update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
 
 -> OnlyFans: Profile
 - new - setup - Twitter -> profile, banner; Price and Settings
@@ -700,6 +682,8 @@
 -> OnlyFans
 - add quiz & target interactions (onlyfans buttons)
 - add functionality that follows profiles that are free for a month
+- update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
+- update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
 
 (once everything else in app works again)
 -> Twitter
@@ -719,9 +703,16 @@
 - finish adding tests for individual message entry parts, individual post entry parts
 - add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi
 
-(break things)
--> Upgrade Selenium to 4.0
-https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-has-been-deprecated-selenium-python
+(webdriver)
+- finish integrating edge, ie, and opera
+- figure out how to request specific webdriver versions installs to test v102 for edge
+
+-> CLI Menu
+- re-add menu system
+- fix any new cli menu errors made while updating major processes
+- re-enable prompting for discount amount&months in Settings or somewhere else (at some point)
+- re-add removed user select code in notes/selectstuff.py (for menu prompts)
+- re-enable menu command
 
 ## Fix / Debug
 
@@ -751,19 +742,20 @@ https://stackoverflow.com/questions/58686471/how-to-use-edge-chromium-webdriver-
 
 notes:
 
-- edge:
+#### edge:
 requires: msedge-selenium-tools
--- might only work for selenium v102
--- might only work on Windows
+- might only work for selenium v102
+- might only work on Windows
 "There are various issues for chromium drivers for browser v103 used by Edge and Google Chrome. These are being addressed in v104, but they are still in beta. Advise that you downgrade for now to v102."
 https://stackoverflow.com/questions/72773330/when-running-selenium-edge-in-pyton-getting-sedgedriver-exe-unexpectedly-exite
 
 
-- ie:
--- might only work on Windows
-
+#### ie:
+- might only work on Windows
 https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
-- opera: might have a version limit requirement
+
+#### opera:
+- might have a version limit requirement
 
 updating permissions didn't work:
 chown -R ubuntu /home/ubuntu/.wdm/drivers
@@ -772,7 +764,6 @@ what helps in general:
 >> using correct webdriver options generator
 >> specifying binary paths
 >> correct permissions on binary paths
-
 
 # Bugs
 

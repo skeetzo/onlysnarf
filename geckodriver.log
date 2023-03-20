@@ -3159,3 +3159,424 @@ JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error:
 JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
 console.error: (new TypeError("NetworkError: Network request failed", "resource://services-settings/Utils.jsm", 237))
 JavaScript error: resource://services-settings/Utils.jsm, line 237: TypeError: NetworkError: Network request failed
+1679338492632	geckodriver	INFO	Listening on 127.0.0.1:47545
+1679338493134	geckodriver::capabilities	DEBUG	Trying to read firefox version from ini files
+1679338493140	geckodriver::capabilities	DEBUG	Found version 111.0
+1679338493141	mozrunner::runner	INFO	Running command: "/usr/local/bin/firefox" "--marionette" "--headless" "--no-sandbox" "--disable-gpu" "--disable-extensions" " ... um" "--remote-debugging-port" "34565" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofilee3IhSs"
+1679338493141	geckodriver::marionette	DEBUG	Waiting 60s to connect to browser on 127.0.0.1
+1679338493141	geckodriver::browser	TRACE	Failed to open /tmp/rust_mozprofilee3IhSs/MarionetteActivePort
+1679338493141	geckodriver::marionette	TRACE	Retrying in 100ms
+*** You are running in headless mode.
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1679338493241	geckodriver::browser	TRACE	Failed to open /tmp/rust_mozprofilee3IhSs/MarionetteActivePort
+1679338493241	geckodriver::marionette	TRACE	Retrying in 100ms
+[GFX1-]: glxtest: VA-API test failed: missing or old libva-drm library.
+1679338493341	geckodriver::browser	TRACE	Failed to open /tmp/rust_mozprofilee3IhSs/MarionetteActivePort
+1679338493341	geckodriver::marionette	TRACE	Retrying in 100ms
+1679338493350	RemoteAgent	DEBUG	WebDriver BiDi enabled
+1679338493351	RemoteAgent	DEBUG	CDP enabled
+1679338493351	Marionette	INFO	Marionette enabled
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref apz.content_response_timeout to 60000
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.contentblocking.introCount to 99
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.download.panel.shown to true
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.newtabpage.enabled to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.pagethumbnails.capturing_disabled to true
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.search.update to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.startup.couldRestoreSession.count to -1
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.tabs.closeWindowWithLastTab to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.tabs.disableBackgroundZombification to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.tabs.unloadOnLowMemory to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.tabs.warnOnClose to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.tabs.warnOnCloseOtherTabs to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.tabs.warnOnOpen to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.toolbars.bookmarks.visibility to never
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.topsites.contile.enabled to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.usedOnWindows10.introURL to 
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.urlbar.merino.endpointURL to 
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref browser.urlbar.suggest.searches to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref datareporting.policy.dataSubmissionPolicyAccepted to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref dom.disable_open_during_load to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref dom.file.createInChild to true
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref dom.max_chrome_script_run_time to 0
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref dom.max_script_run_time to 0
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref dom.navigation.locationChangeRateLimit.count to 0
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref dom.push.connection.enabled to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref dom.screenorientation.allow-lock to true
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref dom.successive_dialog_time_limit to 0
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref extensions.getAddons.cache.enabled to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref extensions.getAddons.discovery.api_url to data:, 
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref network.http.phishy-userpass-length to 255
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref network.http.prompt-temp-redirect to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref privacy.trackingprotection.enabled to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref security.fileuri.strict_origin_policy to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref security.notification_enable_delay to 0
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref signon.autofillForms to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref signon.rememberSignons to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref widget.windows.window_occlusion_tracking.enabled to false
+1679338493352	RemoteAgent	DEBUG	Setting recommended pref dom.disable_beforeunload to true
+1679338493353	Marionette	TRACE	Received observer notification final-ui-startup
+1679338493353	Marionette	INFO	Listening on port 44083
+1679338493353	Marionette	DEBUG	Marionette is listening
+1679338493353	RemoteAgent	TRACE	Received observer notification final-ui-startup
+console.error: "Warning: unrecognized command line flag -no-sandbox\n"
+console.error: "Warning: unrecognized command line flag -disable-extensions\n"
+1679338493412	RemoteAgent	TRACE	Available local IP addresses: 127.0.0.1, [::1]
+WebDriver BiDi listening on ws://127.0.0.1:34565
+1679338493416	RemoteAgent	DEBUG	Setting recommended pref browser.contentblocking.features.standard to -tp,tpPrivate,cookieBehavior0,-cm,-fp
+1679338493416	RemoteAgent	DEBUG	Setting recommended pref network.cookie.cookieBehavior to 0
+1679338493416	CDP	DEBUG	Waiting for initial application window
+Read port: 44083
+1679338493457	Marionette	DEBUG	Accepted connection 0 from 127.0.0.1:55748
+1679338493463	geckodriver::marionette	DEBUG	Connection to Marionette established on 127.0.0.1:44083.
+1679338493544	Marionette	DEBUG	0 -> [0,1,"WebDriver:NewSession",{"acceptInsecureCerts":true,"browserName":"firefox","pageLoadStrategy":"normal"}]
+1679338493545	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+1679338493546	Marionette	DEBUG	Waiting for initial application window
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.error: ({})
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofilee3IhSs/search.json.mozlz4", (void 0)))
+1679338494110	Marionette	TRACE	Received observer notification browser-idle-startup-tasks-finished
+1679338494110	RemoteAgent	TRACE	Received observer notification browser-idle-startup-tasks-finished
+1679338494116	RemoteAgent	TRACE	[8] ProgressListener Start: expectNavigation=false resolveWhenStarted=false unloadTimeout=200 waitForExplicitStart=false
+1679338494116	RemoteAgent	TRACE	[8] ProgressListener Setting unload timer (200ms)
+1679338494116	RemoteAgent	TRACE	[8] Document already finished loading: http://user-data-dir=/tmp/selenium
+1679338494116	RemoteAgent	TRACE	[8] ProgressListener Stop: has error=false
+DevTools listening on ws://127.0.0.1:34565/devtools/browser/b2bea4c4-913c-42de-88af-3d15235256d2
+1679338494156	Marionette	DEBUG	0 <- [1,1,null,{"sessionId":"5e4b49bc-8ac1-4d80-a875-7919066cff2a","capabilities":{"browserName":"firefox","browserVersion":"111.0","platformName":"linux","acceptInsecureCerts":true,"pageLoadStrategy":"normal","setWindowRect":true,"timeouts":{"implicit":0,"pageLoad":300000,"script":30000},"strictFileInteractability":false,"unhandledPromptBehavior":"dismiss and notify","moz:accessibilityChecks":false,"moz:buildID":"20230309232128","moz:debuggerAddress":"127.0.0.1:34565","moz:headless":true,"moz:platformVersion":"5.19.0-35-generic","moz:processID":10670,"moz:profile":"/tmp/rust_mozprofilee3IhSs","moz:shutdownTimeout":60000,"moz:useNonSpecCompliantPointerOrigin":false,"moz:webdriverClick":true,"moz:windowless":false,"proxy":{}}}]
+1679338494160	webdriver::server	DEBUG	<- 200 OK {"value":{"sessionId":"5e4b49bc-8ac1-4d80-a875-7919066cff2a","capabilities":{"acceptInsecureCerts":true,"browserNam ... ctability":false,"timeouts":{"implicit":0,"pageLoad":300000,"script":30000},"unhandledPromptBehavior":"dismiss and notify"}}}
+1679338494160	webdriver::server	DEBUG	-> POST /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/timeouts {"implicit": 30000}
+1679338494161	Marionette	DEBUG	0 -> [0,2,"WebDriver:SetTimeouts",{"implicit":30000}]
+1679338494161	Marionette	DEBUG	0 <- [1,2,null,{"value":null}]
+1679338494161	webdriver::server	DEBUG	<- 200 OK {"value":null}
+1679338494161	webdriver::server	DEBUG	-> POST /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/timeouts {"pageLoad": 1200000}
+1679338494162	Marionette	DEBUG	0 -> [0,3,"WebDriver:SetTimeouts",{"pageLoad":1200000}]
+1679338494162	Marionette	DEBUG	0 <- [1,3,null,{"value":null}]
+1679338494162	webdriver::server	DEBUG	<- 200 OK {"value":null}
+1679338494162	webdriver::server	DEBUG	-> GET /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/url 
+1679338494162	Marionette	DEBUG	0 -> [0,4,"WebDriver:GetCurrentURL",{}]
+1679338494162	Marionette	DEBUG	0 <- [1,4,null,{"value":"http://user-data-dir=/tmp/selenium"}]
+1679338494163	webdriver::server	DEBUG	<- 200 OK {"value":"http://user-data-dir=/tmp/selenium"}
+1679338494163	webdriver::server	DEBUG	-> GET /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/window 
+1679338494163	Marionette	DEBUG	0 -> [0,5,"WebDriver:GetWindowHandle",{}]
+1679338494163	Marionette	DEBUG	0 <- [1,5,null,{"value":"aae014d6-5a7d-492f-a113-d3a25f8ca18c"}]
+1679338494163	webdriver::server	DEBUG	<- 200 OK {"value":"aae014d6-5a7d-492f-a113-d3a25f8ca18c"}
+1679338494163	webdriver::server	DEBUG	-> GET /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/window 
+1679338494164	Marionette	DEBUG	0 -> [0,6,"WebDriver:GetWindowHandle",{}]
+1679338494164	Marionette	DEBUG	0 <- [1,6,null,{"value":"aae014d6-5a7d-492f-a113-d3a25f8ca18c"}]
+1679338494164	webdriver::server	DEBUG	<- 200 OK {"value":"aae014d6-5a7d-492f-a113-d3a25f8ca18c"}
+1679338494164	webdriver::server	DEBUG	-> GET /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/window/handles 
+1679338494164	Marionette	DEBUG	0 -> [0,7,"WebDriver:GetWindowHandles",{}]
+1679338494164	Marionette	DEBUG	0 <- [1,7,null,["aae014d6-5a7d-492f-a113-d3a25f8ca18c"]]
+1679338494164	webdriver::server	DEBUG	<- 200 OK {"value":["aae014d6-5a7d-492f-a113-d3a25f8ca18c"]}
+1679338494165	webdriver::server	DEBUG	-> GET /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/window/handles 
+1679338494165	Marionette	DEBUG	0 -> [0,8,"WebDriver:GetWindowHandles",{}]
+1679338494165	Marionette	DEBUG	0 <- [1,8,null,["aae014d6-5a7d-492f-a113-d3a25f8ca18c"]]
+1679338494165	webdriver::server	DEBUG	<- 200 OK {"value":["aae014d6-5a7d-492f-a113-d3a25f8ca18c"]}
+1679338494165	webdriver::server	DEBUG	-> POST /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/window {"handle": "aae014d6-5a7d-492f-a113-d3a25f8ca18c"}
+1679338494165	Marionette	DEBUG	0 -> [0,9,"WebDriver:SwitchToWindow",{"handle":"aae014d6-5a7d-492f-a113-d3a25f8ca18c"}]
+1679338494165	Marionette	DEBUG	0 <- [1,9,null,{"value":null}]
+1679338494166	webdriver::server	DEBUG	<- 200 OK {"value":null}
+1679338494166	webdriver::server	DEBUG	-> GET /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/url 
+1679338494166	Marionette	DEBUG	0 -> [0,10,"WebDriver:GetCurrentURL",{}]
+1679338494166	Marionette	DEBUG	0 <- [1,10,null,{"value":"http://user-data-dir=/tmp/selenium"}]
+1679338494166	webdriver::server	DEBUG	<- 200 OK {"value":"http://user-data-dir=/tmp/selenium"}
+1679338494166	webdriver::server	DEBUG	-> POST /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/window {"handle": "aae014d6-5a7d-492f-a113-d3a25f8ca18c"}
+1679338494167	Marionette	DEBUG	0 -> [0,11,"WebDriver:SwitchToWindow",{"handle":"aae014d6-5a7d-492f-a113-d3a25f8ca18c"}]
+1679338494167	Marionette	DEBUG	0 <- [1,11,null,{"value":null}]
+1679338494167	webdriver::server	DEBUG	<- 200 OK {"value":null}
+1679338494167	webdriver::server	DEBUG	-> GET /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/url 
+1679338494167	Marionette	DEBUG	0 -> [0,12,"WebDriver:GetCurrentURL",{}]
+1679338494167	Marionette	DEBUG	0 <- [1,12,null,{"value":"http://user-data-dir=/tmp/selenium"}]
+1679338494167	webdriver::server	DEBUG	<- 200 OK {"value":"http://user-data-dir=/tmp/selenium"}
+1679338494168	webdriver::server	DEBUG	-> GET /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/url 
+1679338494168	Marionette	DEBUG	0 -> [0,13,"WebDriver:GetCurrentURL",{}]
+1679338494168	Marionette	DEBUG	0 <- [1,13,null,{"value":"http://user-data-dir=/tmp/selenium"}]
+1679338494168	webdriver::server	DEBUG	<- 200 OK {"value":"http://user-data-dir=/tmp/selenium"}
+1679338494168	webdriver::server	DEBUG	-> POST /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/url {"url": "https://onlyfans.com"}
+1679338494168	Marionette	DEBUG	0 -> [0,14,"WebDriver:Navigate",{"url":"https://onlyfans.com"}]
+1679338494170	Marionette	TRACE	[8] Received event beforeunload for about:neterror?e=dnsNotFound&u=http%3A//user-data-dir%3D/tmp/selenium&c=UTF-8&d=We%20can%E2%80%99t%20connect%20to%20the%20server%20at%20user-data-dir%3D.
+1679338494612	Marionette	TRACE	Remoteness change detected. Set new top-level browsing context to 8
+1679338494615	Marionette	TRACE	[8] Received event pagehide for about:neterror?e=dnsNotFound&u=http%3A//user-data-dir%3D/tmp/selenium&c=UTF-8&d=We%20can%E2%80%99t%20connect%20to%20the%20server%20at%20user-data-dir%3D.
+1679338494617	Marionette	TRACE	[8] Received event beforeunload for about:blank
+1679338494618	Marionette	TRACE	[8] Received event pagehide for about:blank
+1679338495272	Marionette	TRACE	[8] Received event DOMContentLoaded for https://onlyfans.com/
+1679338495273	Marionette	TRACE	[8] Received event pageshow for https://onlyfans.com/
+1679338495273	Marionette	DEBUG	0 <- [1,14,null,{"value":null}]
+1679338495274	webdriver::server	DEBUG	<- 200 OK {"value":null}
+1679338495275	webdriver::server	DEBUG	-> GET /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/alert/text 
+1679338495278	Marionette	DEBUG	0 -> [0,15,"WebDriver:GetAlertText",{}]
+1679338495278	Marionette	DEBUG	0 <- [1,15,{"error":"no such alert","message":"","stacktrace":"RemoteError@chrome://remote/content/shared/RemoteError.sys.mjs:8:8\nWebDriverError@chrome://remote/content/shared/webdriver/Er ... ote/content/marionette/server.sys.mjs:250:9\n_onJSONObjectReady/<@chrome://remote/content/marionette/transport.sys.mjs:496:20\n"},null]
+1679338495280	webdriver::server	DEBUG	<- 404 Not Found {"value":{"error":"no such alert","message":"","stacktrace":"RemoteError@chrome://remote/content/shared/Remo ... ontent/marionette/server.sys.mjs:250:9\n_onJSONObjectReady/<@chrome://remote/content/marionette/transport.sys.mjs:496:20\n"}}
+1679338497283	webdriver::server	DEBUG	-> POST /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/element {"using": "css selector", "value": ".main-wrapper"}
+1679338497283	Marionette	DEBUG	0 -> [0,16,"WebDriver:FindElement",{"using":"css selector","value":".main-wrapper"}]
+1679338497285	RemoteAgent	TRACE	WebDriverProcessData actor created for PID 10895
+1679338497285	Marionette	TRACE	[8] MarionetteCommands actor created for window id 6442450945
+1679338497289	Marionette	DEBUG	0 <- [1,16,null,{"value":{"element-6066-11e4-a52e-4f735466cecf":"e4de225a-a19e-4a60-ae79-20d9e350a86e"}}]
+1679338497289	webdriver::server	DEBUG	<- 200 OK {"value":{"element-6066-11e4-a52e-4f735466cecf":"e4de225a-a19e-4a60-ae79-20d9e350a86e"}}
+1679338497290	webdriver::server	DEBUG	-> POST /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/execute/sync {"script": "/* isDisplayed */return (function(){return (fu ... ts);}\n).apply(null, arguments);", "args": [{"element-6066-11e4-a52e-4f735466cecf": "e4de225a-a19e-4a60-ae79-20d9e350a86e"}]}
+1679338497292	Marionette	DEBUG	0 -> [0,17,"WebDriver:ExecuteScript",{"args":[{"element-6066-11e4-a52e-4f735466cecf":"e4de225a-a19e-4a60-ae79-20d9e350a86e"}],"script":"/* isDisplayed */return (function(){return (function(){var k=this||self;function aa(a){return\"string\"==typeof a}function ba(a ... ined'?window.navigator:null,document:typeof window!='undefined'?window.document:null}, arguments);}\n).apply(null, arguments);"}]
+1679338497296	Marionette	DEBUG	0 <- [1,17,null,{"value":true}]
+1679338497296	webdriver::server	DEBUG	<- 200 OK {"value":true}
+1679338497297	webdriver::server	DEBUG	-> GET /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a/cookie 
+1679338497297	Marionette	DEBUG	0 -> [0,18,"WebDriver:GetCookies",{}]
+1679338497298	Marionette	DEBUG	0 <- [1,18,null,[{"name":"fp","value":"25e0311ca9ac39c899fd6fbce274894f","path":"/","domain":".onlyfans.com","secure":false,"httpOnly":false,"expiry":1710960895,"sameSite":"None"},{"name":"sess","value":"g72s28e9tt2ttpe94dm9bh8fev","path":"/","domain":".onlyfans.com","secure":true,"httpOnly":true,"expiry":1680202495,"sameSite":"None"},{"name":"csrf","value":"MRqbh7Ygf33d16226d1d5e3c2de8518a4bb6b376","path":"/","domain":".onlyfans.com","secure":true,"httpOnly":true,"expiry":1765738495,"sameSite":"None"}]]
+1679338497298	webdriver::server	DEBUG	<- 200 OK {"value":[{"name":"fp","value":"25e0311ca9ac39c899fd6fbce274894f","path":"/","domain":".onlyfans.com","secure":fals ... c2de8518a4bb6b376","path":"/","domain":".onlyfans.com","secure":true,"httpOnly":true,"expiry":1765738495,"sameSite":"None"}]}
+1679338497299	webdriver::server	DEBUG	-> DELETE /session/5e4b49bc-8ac1-4d80-a875-7919066cff2a 
+1679338497299	Marionette	DEBUG	0 -> [0,19,"Marionette:Quit",{"flags":["eForceQuit"]}]
+1679338497299	Marionette	INFO	Stopped listening on port 44083
+1679338497299	Marionette	TRACE	[8] MarionetteCommands actor destroyed for window id 6442450945
+1679338497316	Marionette	TRACE	Received observer notification quit-application
+1679338497317	Marionette	TRACE	Received observer notification quit-application
+1679338497317	Marionette	DEBUG	Marionette stopped listening
+1679338497317	RemoteAgent	DEBUG	Resetting recommended pref apz.content_response_timeout
+1679338497317	RemoteAgent	DEBUG	Resetting recommended pref browser.contentblocking.introCount
+1679338497317	RemoteAgent	DEBUG	Resetting recommended pref browser.download.panel.shown
+1679338497317	RemoteAgent	DEBUG	Resetting recommended pref browser.newtabpage.enabled
+1679338497318	RemoteAgent	DEBUG	Resetting recommended pref browser.pagethumbnails.capturing_disabled
+1679338497318	RemoteAgent	DEBUG	Resetting recommended pref browser.search.update
+1679338497318	RemoteAgent	DEBUG	Resetting recommended pref browser.startup.couldRestoreSession.count
+1679338497318	RemoteAgent	DEBUG	Resetting recommended pref browser.tabs.closeWindowWithLastTab
+1679338497318	RemoteAgent	DEBUG	Resetting recommended pref browser.tabs.disableBackgroundZombification
+1679338497318	RemoteAgent	DEBUG	Resetting recommended pref browser.tabs.unloadOnLowMemory
+1679338497318	RemoteAgent	DEBUG	Resetting recommended pref browser.tabs.warnOnClose
+1679338497318	RemoteAgent	DEBUG	Resetting recommended pref browser.tabs.warnOnCloseOtherTabs
+1679338497318	RemoteAgent	DEBUG	Resetting recommended pref browser.tabs.warnOnOpen
+1679338497318	RemoteAgent	DEBUG	Resetting recommended pref browser.toolbars.bookmarks.visibility
+1679338497318	RemoteAgent	DEBUG	Resetting recommended pref browser.topsites.contile.enabled
+1679338497318	RemoteAgent	DEBUG	Resetting recommended pref browser.usedOnWindows10.introURL
+1679338497319	RemoteAgent	DEBUG	Resetting recommended pref browser.urlbar.merino.endpointURL
+1679338497319	RemoteAgent	DEBUG	Resetting recommended pref browser.urlbar.suggest.searches
+1679338497319	RemoteAgent	DEBUG	Resetting recommended pref datareporting.policy.dataSubmissionPolicyAccepted
+1679338497319	RemoteAgent	DEBUG	Resetting recommended pref dom.disable_open_during_load
+1679338497319	RemoteAgent	DEBUG	Resetting recommended pref dom.file.createInChild
+1679338497319	RemoteAgent	DEBUG	Resetting recommended pref dom.max_chrome_script_run_time
+1679338497319	RemoteAgent	DEBUG	Resetting recommended pref dom.max_script_run_time
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref dom.navigation.locationChangeRateLimit.count
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref dom.push.connection.enabled
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref dom.screenorientation.allow-lock
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref dom.successive_dialog_time_limit
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref extensions.getAddons.cache.enabled
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref extensions.getAddons.discovery.api_url
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref network.http.phishy-userpass-length
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref network.http.prompt-temp-redirect
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref privacy.trackingprotection.enabled
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref security.fileuri.strict_origin_policy
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref security.notification_enable_delay
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref signon.autofillForms
+1679338497320	RemoteAgent	DEBUG	Resetting recommended pref signon.rememberSignons
+1679338497321	RemoteAgent	DEBUG	Resetting recommended pref widget.windows.window_occlusion_tracking.enabled
+1679338497321	RemoteAgent	DEBUG	Resetting recommended pref dom.disable_beforeunload
+1679338497321	RemoteAgent	DEBUG	Resetting recommended pref browser.contentblocking.features.standard
+1679338497321	RemoteAgent	DEBUG	Resetting recommended pref network.cookie.cookieBehavior
+1679338497321	RemoteAgent	TRACE	Received observer notification quit-application
+1679338497321	Marionette	DEBUG	0 <- [1,19,null,{"cause":"shutdown","forced":false,"in_app":true}]
+1679338497331	RemoteAgent	DEBUG	Resetting recommended pref browser.contentblocking.features.standard
+1679338497331	RemoteAgent	DEBUG	Resetting recommended pref network.cookie.cookieBehavior
+1679338497331	webdriver::server	DEBUG	Teardown session
+1679338497333	Marionette	DEBUG	Closed connection 0
+console.error: (new TypeError("NetworkError: Network request failed", "resource://services-settings/Utils.jsm", 237))
+JavaScript error: resource://services-settings/Utils.jsm, line 237: TypeError: NetworkError: Network request failed
+WARNING: A blocker encountered an error while we were waiting.
+          Blocker:  Waiting for ping task
+          Phase: TelemetryController: Waiting for pending ping activity
+          State: (none)
+WARNING: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+WARNING: addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:727:15
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:523:26
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:458:15
+setupShutdown@resource://gre/modules/osfile/osfile_async_front.jsm:1548:28
+@resource://gre/modules/osfile/osfile_async_front.jsm:1568:16
+@resource://gre/modules/osfile.jsm:12:30
+@resource://gre/modules/TelemetryStorage.sys.mjs:10:28
+_checkPendingPings@resource://gre/modules/TelemetrySend.sys.mjs:863:17
+setup@resource://gre/modules/TelemetrySend.sys.mjs:803:18
+setup@resource://gre/modules/TelemetrySend.sys.mjs:241:30
+setupTelemetry/this._delayedInitTask<@resource://gre/modules/TelemetryControllerParent.sys.mjs:828:36
+observe@resource://gre/modules/AsyncShutdown.sys.mjs:576:16
+
+console.error: "TelemetryScheduler.shutdown - Already shut down"
+WARNING: A blocker encountered an error while we were waiting.
+          Blocker:  Waiting for ping task
+          Phase: TelemetryController: Waiting for pending ping activity
+          State: (none)
+WARNING: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+WARNING: addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:727:15
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:523:26
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:458:15
+setupShutdown@resource://gre/modules/osfile/osfile_async_front.jsm:1548:28
+@resource://gre/modules/osfile/osfile_async_front.jsm:1568:16
+@resource://gre/modules/osfile.jsm:12:30
+@resource://gre/modules/TelemetryStorage.sys.mjs:10:28
+_checkPendingPings@resource://gre/modules/TelemetrySend.sys.mjs:863:17
+setup@resource://gre/modules/TelemetrySend.sys.mjs:803:18
+setup@resource://gre/modules/TelemetrySend.sys.mjs:241:30
+setupTelemetry/this._delayedInitTask<@resource://gre/modules/TelemetryControllerParent.sys.mjs:828:36
+observe@resource://gre/modules/AsyncShutdown.sys.mjs:576:16
+
+WARNING: A blocker encountered an error while we were waiting.
+          Blocker:  Waiting for ping task
+          Phase: TelemetryController: Waiting for pending ping activity
+          State: (none)
+WARNING: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+WARNING: addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:727:15
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:523:26
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:458:15
+setupShutdown@resource://gre/modules/osfile/osfile_async_front.jsm:1548:28
+@resource://gre/modules/osfile/osfile_async_front.jsm:1568:16
+@resource://gre/modules/osfile.jsm:12:30
+@resource://gre/modules/TelemetryStorage.sys.mjs:10:28
+_checkPendingPings@resource://gre/modules/TelemetrySend.sys.mjs:863:17
+setup@resource://gre/modules/TelemetrySend.sys.mjs:803:18
+setup@resource://gre/modules/TelemetrySend.sys.mjs:241:30
+setupTelemetry/this._delayedInitTask<@resource://gre/modules/TelemetryControllerParent.sys.mjs:828:36
+observe@resource://gre/modules/AsyncShutdown.sys.mjs:576:16
+
+WARNING: A blocker encountered an error while we were waiting.
+          Blocker:  TelemetryController: shutting down
+          Phase: profile-before-change-telemetry
+          State: Error getting state: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange" at addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:727:15
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:523:26
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:458:15
+setupShutdown@resource://gre/modules/osfile/osfile_async_front.jsm:1548:28
+@resource://gre/modules/osfile/osfile_async_front.jsm:1568:16
+@resource://gre/modules/osfile.jsm:12:30
+@resource://gre/modules/TelemetryStorage.sys.mjs:10:28
+_checkPendingPings@resource://gre/modules/TelemetrySend.sys.mjs:863:17
+setup@resource://gre/modules/TelemetrySend.sys.mjs:803:18
+setup@resource://gre/modules/TelemetrySend.sys.mjs:241:30
+setupTelemetry/this._delayedInitTask<@resource://gre/modules/TelemetryControllerParent.sys.mjs:828:36
+observe@resource://gre/modules/AsyncShutdown.sys.mjs:576:16
+
+WARNING: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+WARNING: addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:727:15
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:523:26
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:458:15
+setupShutdown@resource://gre/modules/osfile/osfile_async_front.jsm:1548:28
+@resource://gre/modules/osfile/osfile_async_front.jsm:1568:16
+@resource://gre/modules/osfile.jsm:12:30
+@resource://gre/modules/TelemetryStorage.sys.mjs:10:28
+_checkPendingPings@resource://gre/modules/TelemetrySend.sys.mjs:863:17
+setup@resource://gre/modules/TelemetrySend.sys.mjs:803:18
+setup@resource://gre/modules/TelemetrySend.sys.mjs:241:30
+setupTelemetry/this._delayedInitTask<@resource://gre/modules/TelemetryControllerParent.sys.mjs:828:36
+observe@resource://gre/modules/AsyncShutdown.sys.mjs:576:16
+
+JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+1679338511942	geckodriver::browser	DEBUG	Browser process stopped: exit status: 0
+1679338511949	webdriver::server	DEBUG	<- 200 OK {"value":null}
+1679338521293	geckodriver	INFO	Listening on 127.0.0.1:50897
+1679338521797	mozrunner::runner	INFO	Running command: "/usr/local/bin/firefox" "--marionette" "--headless" "--no-sandbox" "--disable-gpu" "--disable-extensions" " ... um" "--remote-debugging-port" "51445" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "/tmp/rust_mozprofile4uEvdc"
+*** You are running in headless mode.
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+[GFX1-]: glxtest: VA-API test failed: missing or old libva-drm library.
+1679338521952	Marionette	INFO	Marionette enabled
+1679338521954	Marionette	INFO	Listening on port 36461
+console.error: "Warning: unrecognized command line flag -no-sandbox\n"
+console.error: "Warning: unrecognized command line flag -disable-extensions\n"
+Read port: 36461
+WebDriver BiDi listening on ws://127.0.0.1:51445
+1679338522026	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.error: ({})
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofile4uEvdc/search.json.mozlz4", (void 0)))
+DevTools listening on ws://127.0.0.1:51445/devtools/browser/ca10beae-51cf-491f-83f4-1b76b3cc3d0e
+1679338525865	Marionette	INFO	Stopped listening on port 36461
+console.error: (new TypeError("NetworkError: Network request failed", "resource://services-settings/Utils.jsm", 237))
+JavaScript error: resource://services-settings/Utils.jsm, line 237: TypeError: NetworkError: Network request failed
+WARNING: A blocker encountered an error while we were waiting.
+          Blocker:  Waiting for ping task
+          Phase: TelemetryController: Waiting for pending ping activity
+          State: (none)
+WARNING: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+WARNING: addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:727:15
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:523:26
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:458:15
+setupShutdown@resource://gre/modules/osfile/osfile_async_front.jsm:1548:28
+@resource://gre/modules/osfile/osfile_async_front.jsm:1568:16
+@resource://gre/modules/osfile.jsm:12:30
+@resource://gre/modules/TelemetryStorage.sys.mjs:10:28
+_checkPendingPings@resource://gre/modules/TelemetrySend.sys.mjs:863:17
+setup@resource://gre/modules/TelemetrySend.sys.mjs:803:18
+setup@resource://gre/modules/TelemetrySend.sys.mjs:241:30
+setupTelemetry/this._delayedInitTask<@resource://gre/modules/TelemetryControllerParent.sys.mjs:828:36
+observe@resource://gre/modules/AsyncShutdown.sys.mjs:576:16
+
+console.error: "TelemetryScheduler.shutdown - Already shut down"
+WARNING: A blocker encountered an error while we were waiting.
+          Blocker:  Waiting for ping task
+          Phase: TelemetryController: Waiting for pending ping activity
+          State: (none)
+WARNING: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+WARNING: addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:727:15
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:523:26
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:458:15
+setupShutdown@resource://gre/modules/osfile/osfile_async_front.jsm:1548:28
+@resource://gre/modules/osfile/osfile_async_front.jsm:1568:16
+@resource://gre/modules/osfile.jsm:12:30
+@resource://gre/modules/TelemetryStorage.sys.mjs:10:28
+_checkPendingPings@resource://gre/modules/TelemetrySend.sys.mjs:863:17
+setup@resource://gre/modules/TelemetrySend.sys.mjs:803:18
+setup@resource://gre/modules/TelemetrySend.sys.mjs:241:30
+setupTelemetry/this._delayedInitTask<@resource://gre/modules/TelemetryControllerParent.sys.mjs:828:36
+observe@resource://gre/modules/AsyncShutdown.sys.mjs:576:16
+
+WARNING: A blocker encountered an error while we were waiting.
+          Blocker:  Waiting for ping task
+          Phase: TelemetryController: Waiting for pending ping activity
+          State: (none)
+WARNING: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+WARNING: addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:727:15
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:523:26
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:458:15
+setupShutdown@resource://gre/modules/osfile/osfile_async_front.jsm:1548:28
+@resource://gre/modules/osfile/osfile_async_front.jsm:1568:16
+@resource://gre/modules/osfile.jsm:12:30
+@resource://gre/modules/TelemetryStorage.sys.mjs:10:28
+_checkPendingPings@resource://gre/modules/TelemetrySend.sys.mjs:863:17
+setup@resource://gre/modules/TelemetrySend.sys.mjs:803:18
+setup@resource://gre/modules/TelemetrySend.sys.mjs:241:30
+setupTelemetry/this._delayedInitTask<@resource://gre/modules/TelemetryControllerParent.sys.mjs:828:36
+observe@resource://gre/modules/AsyncShutdown.sys.mjs:576:16
+
+WARNING: A blocker encountered an error while we were waiting.
+          Blocker:  TelemetryController: shutting down
+          Phase: profile-before-change-telemetry
+          State: Error getting state: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange" at addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:727:15
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:523:26
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:458:15
+setupShutdown@resource://gre/modules/osfile/osfile_async_front.jsm:1548:28
+@resource://gre/modules/osfile/osfile_async_front.jsm:1568:16
+@resource://gre/modules/osfile.jsm:12:30
+@resource://gre/modules/TelemetryStorage.sys.mjs:10:28
+_checkPendingPings@resource://gre/modules/TelemetrySend.sys.mjs:863:17
+setup@resource://gre/modules/TelemetrySend.sys.mjs:803:18
+setup@resource://gre/modules/TelemetrySend.sys.mjs:241:30
+setupTelemetry/this._delayedInitTask<@resource://gre/modules/TelemetryControllerParent.sys.mjs:828:36
+observe@resource://gre/modules/AsyncShutdown.sys.mjs:576:16
+
+WARNING: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+WARNING: addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:727:15
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:523:26
+addBlocker@resource://gre/modules/AsyncShutdown.sys.mjs:458:15
+setupShutdown@resource://gre/modules/osfile/osfile_async_front.jsm:1548:28
+@resource://gre/modules/osfile/osfile_async_front.jsm:1568:16
+@resource://gre/modules/osfile.jsm:12:30
+@resource://gre/modules/TelemetryStorage.sys.mjs:10:28
+_checkPendingPings@resource://gre/modules/TelemetrySend.sys.mjs:863:17
+setup@resource://gre/modules/TelemetrySend.sys.mjs:803:18
+setup@resource://gre/modules/TelemetrySend.sys.mjs:241:30
+setupTelemetry/this._delayedInitTask<@resource://gre/modules/TelemetryControllerParent.sys.mjs:828:36
+observe@resource://gre/modules/AsyncShutdown.sys.mjs:576:16
+
+JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"
+JavaScript error: resource://gre/modules/AsyncShutdown.sys.mjs, line 727: Error: Phase "profile-before-change" is finished, it is too late to register completion condition "OS.File: flush I/O queued before profileBeforeChange"

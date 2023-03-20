@@ -84,14 +84,7 @@ class Settings:
         return config["amount"]
 
     def get_base_directory():
-        USER = os.getenv('USER')
-        if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "None":
-            USER = os.getenv('SUDO_USER')
-        baseDir = "/home/{}/.onlysnarf".format(USER)
-        # if os.environ.get('ENV') == "test":
-        baseDir = os.path.join(os.getcwd(),"OnlySnarf")
-          # baseDir = os.path.dirname(__file__)
-        return baseDir
+        return DEFAULT.ROOT_PATH
 
     def get_browser_type():
         return config["browser"]
