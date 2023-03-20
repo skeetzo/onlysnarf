@@ -1,3 +1,4 @@
+#!/bin/bash
 # apt-get install python3-venv
 python3 -m pip install --user virtualenv
 virtualenv --python=/usr/bin/python3.8 venv
