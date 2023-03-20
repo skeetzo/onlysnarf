@@ -2790,6 +2790,10 @@ class Driver:
                     # browserAttempt = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
                     Settings.print("browser created - {}".format(browserName))
                 else:
+                    import platform
+                    print(platform.processor())
+                    print(platform.processor())
+                    print(platform.processor())
                     browserName = "chrome"
                     # browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
                     browserAttempt = webdriver.Chrome('/usr/bin/chromedriver', options=options)
