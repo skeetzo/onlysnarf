@@ -2791,7 +2791,9 @@ class Driver:
                     Settings.print("browser created - {}".format(browserName))
                 else:
                     browserName = "chrome"
-                    browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+                    # browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+                    browserAttempt = webdriver.Chrome('/usr/bin/chromedriver', options=options)
+                    # browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
                 # TODO
                 # Settings.dev_print("updating permissions...")
                 # https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
