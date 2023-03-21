@@ -27,9 +27,6 @@ class Discount:
 
         """
 
-        # skip prompt if disabled
-        if Settings.is_prompt():
-            if not Settings.prompt("Discount"): return
         Settings.maybe_print("discounting: {}".format(self.username))
         return Driver.discount_user(self.get())
 

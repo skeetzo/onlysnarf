@@ -82,7 +82,6 @@ class Schedule:
         return self.date
 
         # prompt skip
-        if not Settings.prompt("date"): return None
         # confirm date
         if not Settings.confirm(date): return self.get_date()
         self.date = date
@@ -124,7 +123,6 @@ class Schedule:
             self.time = time
             return self.time
         # prompt skip
-        if not Settings.prompt("time"): return None
         # confirm time
         if not Settings.confirm(time): return self.get_time()
         self.time = time

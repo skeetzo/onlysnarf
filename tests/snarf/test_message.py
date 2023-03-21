@@ -27,17 +27,18 @@ class TestSnarf(unittest.TestCase):
     def test_message(self):
         assert Snarf.message(), "unable to send message"
 
-    @unittest.skip("todo")
-    def test_message_files(self):
-        assert Snarf.message(), "unable to upload message files"
+    # @unittest.skip("pointless")
+    # def test_message_files(self):
+    #     successful, results = Snarf.message()
+    #     assert Snarf.message(), "unable to upload message files"
 
-    @unittest.skip("todo")
-    def test_message_price(self):
-        assert Snarf.message(), "unable to set message price"
+    # @unittest.skip("pointless")
+    # def test_message_price(self):
+    #     assert Snarf.message(), "unable to set message price"
 
-    @unittest.skip("todo")
-    def test_message_text(self):
-        assert Snarf.message(), "unable to set message text"
+    # @unittest.skip("pointless")
+    # def test_message_text(self):
+    #     assert Snarf.message(), "unable to set message text"
 
 ############################################################################################
 

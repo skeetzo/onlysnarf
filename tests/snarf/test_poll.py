@@ -11,6 +11,7 @@ class TestSnarf(unittest.TestCase):
 
     def setUp(self):
         config["text"] = "test balls"
+        config["input"] = []
         Settings.set_debug("tests")
 
     def tearDown(self):

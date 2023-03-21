@@ -47,7 +47,7 @@ class Snarf:
         try:
             successful = []
             for user in Settings.get_users():
-                Settings.print("> Discounting user: {}".format(user.username))
+                Settings.print("> Discounting fan: {}".format(user.username))
                 discount = Discount(user.username)
                 successful.append(discount.apply())
             return all(successful)
@@ -66,7 +66,7 @@ class Snarf:
         try:
             successful = []
             for user in Settings.get_users():
-                Settings.print("> Messaging user: {}".format(user.username))
+                Settings.print("> Messaging fan: {}".format(user.username))
                 message = Message(user.username)
                 successful.append(message.send(user.username, user_id=user.id))
             return all(successful)

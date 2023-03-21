@@ -34,8 +34,7 @@ class Profile:
         print("Backing Up: Messages")
         # select user
         user = "all"
-        if Settings.prompt("select user"):
-            user = User.select_user()
+        # user = User.select_user()
         Driver.download_messages(user)
         print("Backed Up: Messages")
 
