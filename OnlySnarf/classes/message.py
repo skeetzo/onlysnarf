@@ -151,7 +151,6 @@ class Message():
             self.files = files
             return files
         # prompt skip
-        if not Settings.is_prompt(): return []
         files = File.get_files()
         # if files is empty this all basically just skips to the end and returns blank 
         filed = []
@@ -275,16 +274,6 @@ class Message():
         if text != "":
             self.text = text
             return text
-        # prompt skip
-        if not Settings.prompt("text"): return ""
-        # question = {
-        #     'type': 'input',
-        #     'name': 'text',
-        #     'message': 'Text:'
-        # }
-        # text = prompt(question)["text"]
-        # confirm text
-        # if not Settings.confirm(text): return self.get_text(again=again)
         self.text = text
         return self.text
 
@@ -375,21 +364,10 @@ class Post(Message):
 
         if self.expiration: return self.expiration
         # retrieve from args and return if exists
-        expires = Settings.get_expiration() or 0
-        if expires: 
-            self.expiration = expires
-            return expires
-        # prompt skip
-        if not Settings.prompt("expiration"): return 0
-        # question = {
-        #     'type': 'input',
-        #     'name': 'expiration',
-        #     'message': 'Expiration [any number, 999 for \'No Limit\']',
-        #     # 'validate': 
-        # }
-        # expiration = prompt(question)["expiration"]
-        # confirm expiration
-        # if not Settings.confirm(expiration): return self.get_expiration(again=again)
+        expiration = Settings.get_expiration() or 0
+        if expiration: 
+            self.expiration = expiration
+            return expiration
         self.expiration = expiration
         return self.expiration
 
@@ -467,7 +445,6 @@ class Post(Message):
         
         self.init()
         Settings.print("post > {}".format(self.get_text()))
-        # if not Settings.confirm("Send post?"): return False
         if not self.get_files() and self.get_text() == "":
             Settings.err_print("Missing files and text!")
             return False

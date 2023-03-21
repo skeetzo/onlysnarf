@@ -57,8 +57,6 @@ class Promotion:
         gotten = p.get_user()
         if not gotten: return False
         # prompt skip
-        if Settings.is_prompt():
-            if not Settings.prompt("Promotion"): return False
         from .driver import Driver
         # get default driver and apply the promotion directly
         Driver.promotion_user_directly(promotion=p)
@@ -95,8 +93,6 @@ class Promotion:
         gotten = p.get_message()
         if not gotten: return False
         # prompt skip
-        if Settings.is_prompt():
-            if not Settings.prompt("Promotion"): return False
         from .driver import Driver
         # get the default driver and enter the promotion campaign
         Driver.promotional_campaign(promotion=p)
@@ -134,8 +130,6 @@ class Promotion:
         gotten = p.get_user()
         if not gotten: return False
         # if not self.gotten: return
-        if Settings.is_prompt():
-            if not Settings.prompt("Promotion"): return False
         # limit, expiration, months, user
         from .driver import Driver
         link = Driver.promotional_trial_link(promotion=p)
@@ -174,7 +168,6 @@ class Promotion:
             self.amount = amount
             return amount
         # prompt skip
-        if not Settings.prompt("amount"): return None
         if not Settings.confirm(amount): return self.get_amount()
         self.amount = amount
         return self.amount
@@ -197,7 +190,6 @@ class Promotion:
             self.expiration = expiration
             return expiration
         # prompt skip
-        if not Settings.prompt("expiration"): return None
         # confirm expiration
         if not Settings.confirm(expiration): return self.get_expiration()
         self.expiration = expiration
@@ -221,7 +213,6 @@ class Promotion:
             self.limit = limit
             return limit
         # prompt skip
-        if not Settings.prompt("limit"): return None
         # confirm limit
         if not Settings.confirm(limit): return self.get_limit()
         self.limit = limit
@@ -245,7 +236,6 @@ class Promotion:
             self.message = message
             return message
         # prompt skip
-        if not Settings.prompt("message"): return ""
         # confirm message
         if not Settings.confirm(message): return self.get_text()
         self.message = message
@@ -269,7 +259,6 @@ class Promotion:
             self.duration = duration
             return duration
         # duration skip
-        if not Settings.prompt("duration"): return None
         # confirm duration
         if not Settings.confirm(duration): return self.get_duration()
         self.duration = duration
@@ -306,8 +295,6 @@ class Promotion:
 
         print("Promotion - Grandfather")
         # prompt skip
-        if Settings.is_prompt():
-            if not Settings.prompt("Grandfather"): return False
         Settings.maybe_print("getting users to grandfather")
         # get all users
         users = User.get_all_users()

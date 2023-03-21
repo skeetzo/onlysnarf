@@ -644,7 +644,7 @@
   - fixed cookies for chrome but not firefox
   - rpi4 testing and prep for selenium cleanup
   - added a way for installation to work for webdrivers for pypi
-**4.4.8: 3/20/2023**
+  **4.4.8: 3/20/2023**
   - added check for rpi processor for chrome only
   - finished testing new browser changes
   - finished debugging web browser on rpi4
@@ -652,8 +652,15 @@
   - updated to python10
   - updated install scripts and organize by usability by platform; distinguish arm scripts for rpis
   - finished debugging new webdriver manager system
+**4.4.9: 3/21/2023**
+  - fixed unknown bug when fetching random user
+  - fixed applying discounts and updated min/max tests for discounts 
+  - fixed messaging, posting, poll 
+
 
 ------------------------------------------------------------------------------------
+
+- debugging poll resulted in an odd bug where it thought the test_file.py was input for a file upload
 
 (publish new changes)
 - update any webscraping as necessary

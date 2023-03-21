@@ -173,7 +173,12 @@ class Settings:
         return DEFAULT.PROMOTION_DURATION_ALLOWED or []
 
     def get_expiration():
-        return config["expiration"]
+        try:
+            return config["expiration"]
+        except Exception as e:
+            pass
+            # print(e)
+        return DEFAULT.EXPIRATION_NONE
 
     def get_promo_expiration():
         return config["promotion_expiration"]
@@ -223,9 +228,13 @@ class Settings:
         return config["sort"] or "random"
 
     def get_performers():
-        performers = config["performers"] or []
-        performers = [n.strip() for n in performers]
-        return performers
+        try:
+            performers = config["performers"] or []
+            performers = [n.strip() for n in performers]
+            return performers
+        except Exception as e:
+            # Settings.dev_print(e)
+            return []
 
     def get_profile_path():
         return config["path_profile"] or DEFAULT.PROFILE_PATH
@@ -365,7 +374,7 @@ class Settings:
             elif str(config["user"]) == "favorite":
                 config["users"].extend([user.username for user in User.get_favorite_users()])
             elif str(config["user"]) == "random":
-                config["users"].append(User.get_random_user().username)
+                config["users"] = [User.get_random_user().username]
             else: config["users"].append(config["user"])
         users = []
         for user in [n.strip() for n in config["users"]]:

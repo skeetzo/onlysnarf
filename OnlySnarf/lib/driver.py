@@ -205,11 +205,9 @@ class Driver:
         if not discount:
             Settings.err_print("missing discount")
             return False
-        Settings.dev_print("discounting user...")
         try:
             driver = Driver.get_driver()
             driver.auth()
-
             months = int(discount["months"])
             amount = int(discount["amount"])
             username = str(discount["username"])
@@ -218,7 +216,7 @@ class Driver:
             end_ = True
             count = 0
             user_ = None
-            Settings.print("searching for user...")
+            Settings.maybe_print("searching for fan...")
             # scroll through users on page until user is found
             while end_:
                 elements = driver.browser.find_elements(By.CLASS_NAME, "m-fans")
@@ -237,11 +235,11 @@ class Driver:
             Settings.print("")
             Settings.dev_print("successfully found fans")
             if not user_:
-                Settings.err_print("unable to find user - {}".format(username))
+                Settings.err_print("unable to find fan - {}".format(username))
                 return False
             Settings.maybe_print("found: {}".format(username))
             ActionChains(driver.browser).move_to_element(user_).perform()
-            Settings.dev_print("successfully moved to user")
+            Settings.dev_print("successfully moved to fan")
             Settings.dev_print("finding discount btn")
             buttons = user_.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUser").getClass())
             clicked = False
@@ -334,11 +332,11 @@ class Driver:
                     Settings.dev_print("successfully canceled discount")
                     Settings.dev_print("### Discount Successful ###")
                     return True
-                # elif "Cancel" in button.get_attribute("innerHTML") and int(discountAmount) == int(amount) and int(monthsAmount) == int(months):
-                    # Settings.print("skipping existing discount")
-                    # button.click()
-                    # Settings.dev_print("successfully skipped existing discount")
-                    # Settings.dev_print("### Discount Successful ###")
+                elif "Cancel" in button.get_attribute("innerHTML") and int(discountAmount) == int(amount) and int(monthsAmount) == int(months):
+                    Settings.print("skipping existing discount")
+                    button.click()
+                    Settings.dev_print("successfully skipped existing discount")
+                    Settings.dev_print("### Discount Successful ###")
                     # return True
                 elif "Apply" in button.get_attribute("innerHTML"):
                     button.click()
@@ -1427,7 +1425,7 @@ class Driver:
             except Exception as e:
                 Settings.dev_print(e)
             Settings.dev_print("entering price...")
-            self.browser.find_element(By.CLASS_NAME, "b-make-post__actions").find_elements(By.XPATH, "./child::*")[6].click()
+            self.browser.find_element(By.CLASS_NAME, "b-make-post__actions__btns").find_elements(By.XPATH, "./child::*")[7].click()
             priceText = WebDriverWait(self.browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(self.browser.find_element(By.ID, "priceInput_1")))
             priceText.click()
             priceText.send_keys(str(price))
@@ -1697,7 +1695,7 @@ class Driver:
             # self.open_more_options()
             # add a poll
             Settings.dev_print("adding poll")
-            self.browser.find_element(By.CLASS_NAME, "b-make-post__actions").find_elements(By.XPATH, "./child::*")[4].click()
+            self.browser.find_element(By.CLASS_NAME, "b-make-post__actions__btns").find_elements(By.XPATH, "./child::*")[5].click()
             # open the poll duration
             Settings.dev_print("adding duration")
             # self.find_element_to_click("pollDuration").click()
@@ -3100,6 +3098,7 @@ class Driver:
         if all(successful):
             if self.error_window_upload(): Settings.dev_print("files uploaded successfully")
             else: Settings.dev_print("files probably uploaded succesfully")
+            time.sleep(1) # bug prevention
             return True
         Settings.warn_print("a file failed to upload!")
         return False
@@ -3200,23 +3199,23 @@ class Driver:
         try:
             driver = Driver.get_driver()
             driver.go_to_page(page)
-            # user_count = int(self.browser.find_element(By.CLASS_NAME, "l-sidebar__user-data__item__count").get_attribute("innerHTML").strip())
             user_count = driver.browser.find_elements(By.TAG_NAME, "a")
             # for debugging new regexes:
-            # for ele in user_count:
-            #     Settings.print("{}  -  {}".format(ele.get_attribute("href"), ele.get_attribute("innerHTML")))
+            for ele in user_count:
+                Settings.dev_print("{}  -  {}".format(ele.get_attribute("href"), ele.get_attribute("innerHTML")))
             user_count = [ele.get_attribute("innerHTML").strip() for ele in user_count
-                            if "/my/subscribers/active" in str(ele.get_attribute("href"))][2] # get 3rd occurrence
+                            if "/my/subscribers/active" in str(ele.get_attribute("href"))]
+            user_count = user_count[2] # get 3rd occurrence
             # should be:
-            # <span class="l-sidebar__user-data__item__count">423</span> Fans
-            user_count = re.search(r'>[0-9]*<', str(user_count))
+            # '<span data-v-601d81dd="" class="l-sidebar__user-data__item__count"> 190 </span><span data-v-601d81dd="" class="l-sidebar__user-data__item__text m-break-word"> Fans </span>', 
+            user_count = re.search(r'>\s*[0-9]+\s*<', str(user_count))
+            Settings.dev_print(user_count)
             user_count = user_count.group()
-            user_count = user_count.replace("<","").replace(">","")
-            print(user_count)
-            if not user_count:
-                raise Exception("unable to find user count")
-
-                
+            user_count = user_count.replace("<","").replace(">","").strip()
+            Settings.dev_print(user_count)
+            if not user_count or not user_count.isnumeric():
+                raise Exception("unable to find fan count!")
+            Settings.maybe_print("num fans found: "+user_count)
             thirdTime = 0
             count = 0
             while True:
@@ -3231,10 +3230,10 @@ class Driver:
                 thirdTime += 1
             Settings.print("")
             elements = driver.browser.find_elements(By.CLASS_NAME, "m-fans")
-            Settings.dev_print("successfully found fans")
-            Settings.dev_print("finding users")
+            Settings.dev_print("searching fan elements...")
             for ele in elements:
 
+                # TODO ?
                 # add checks for lists here
 
                 # /my/favorites
@@ -3267,20 +3266,16 @@ class Driver:
                 name = re.sub("<!-*>", "", name)
                 name = re.sub("<.*\">", "", name)
                 name = re.sub("</.*>", "", name).strip()
-                # Settings.print("username: {}".format(username))
-                # Settings.print("name: {}".format(name))
                 # start = datetime.strptime(str(datetime.now()), "%m-%d-%Y:%H:%M")
                 # users.append({"name":name, "username":username.replace("@",""), "isFavorite":isFavorite, "lists":lists}) # ,"id":user_id, "started":start})
                 users.append({"name":name, "username":username.replace("@","")}) # ,"id":user_id, "started":start})
-            Settings.dev_print("found users")
-            Settings.maybe_print("found: {}".format(len(users)))
-            for user in users:
-                Settings.dev_print(user)
-            Settings.dev_print("successfully found users")
+                Settings.dev_print(users[-1])
+            Settings.maybe_print("found {} fans".format(len(users)))
+            Settings.dev_print("successfully found fans")
         except Exception as e:
-            print(e)
+            Settings.print(e)
             Driver.error_checker(e)
-            Settings.err_print("failed to find users")
+            Settings.err_print("failed to find fans")
         return users
 
     @staticmethod

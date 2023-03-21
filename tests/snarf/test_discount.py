@@ -10,8 +10,8 @@ from OnlySnarf.snarf import Snarf
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
-        config["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT
-        config["months"] = DEFAULT.DISCOUNT_MAX_MONTHS
+        config["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT/2 # 55 / 2 = 27 or 28 -> 25
+        config["months"] = DEFAULT.DISCOUNT_MAX_MONTHS/2 # 12 / 2 = 6
         config["user"] = "random"
         Settings.set_debug("tests")
 
@@ -23,6 +23,18 @@ class TestSnarf(unittest.TestCase):
 
     def test_discount(self):
         assert Snarf.discount(), "unable to apply discount"
+
+    def test_discount_max(self):
+        config["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT # 55
+        config["months"] = DEFAULT.DISCOUNT_MAX_MONTHS # 12
+        assert Snarf.discount(), "unable to apply discount maximum"
+
+    def test_discount_min(self):
+        config["amount"] = DEFAULT.DISCOUNT_MIN_AMOUNT # 1
+        config["months"] = DEFAULT.DISCOUNT_MIN_MONTHS # 1
+        assert Snarf.discount(), "unable to apply discount minimum"
+
+    # add a test for applying the same discount to an existing discount
         
 ############################################################################################
 
