@@ -148,24 +148,23 @@ class Message():
         files = Settings.get_input_as_files()
         if len(files) > 0:
             Settings.dev_print("fetched input files for upload")
-            self.files = files
-            return files
-        # prompt skip
-        files = File.get_files()
+            self.files = files[:int(Settings.get_upload_max())] # reduce by max
+            # self.files = files
+            # return files
+        return self.files
+        # files = Folder.get_files()
         # if files is empty this all basically just skips to the end and returns blank 
-        filed = []
-        for file in files:
+        # filed = []
+        # for file in files:
             # turn all folders into their files
-            if isinstance(file, Folder): filed.extend(file.get_files())
-            else:
-                filed.append(file)
+            # if isinstance(file, Folder): filed.extend(file.get_files())
+            # else:
+                # filed.append(file)
                 # TODO
                 # this goes elsewhere
                 # flag that the files include a performer
                 # if hasattr(file, "performer"):
                     # self.performers.append(getattr("performer", file))
-        self.files = filed[:int(Settings.get_upload_max())] # reduce by max
-        return self.files
 
     def get_message(self):
         """
