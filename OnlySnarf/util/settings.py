@@ -28,6 +28,7 @@ class Settings:
 
     def debug_delay_check():
         if str(Settings.is_debug()) == "True" and str(Settings.is_debug_delay()) == "True":
+            Settings.dev_print("napping...")
             time.sleep(10)
 
     ##

@@ -655,12 +655,11 @@
 **4.4.9: 3/21/2023**
   - fixed unknown bug when fetching random user
   - fixed applying discounts and updated min/max tests for discounts 
-  - fixed messaging, posting, poll 
-
+  - fixed messaging and posting 
+  **3/22/2023**
+  - fixed poll
 
 ------------------------------------------------------------------------------------
-
-- debugging poll resulted in an odd bug where it thought the test_file.py was input for a file upload
 
 (publish new changes)
 - update any webscraping as necessary

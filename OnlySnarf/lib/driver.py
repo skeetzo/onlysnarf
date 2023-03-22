@@ -79,6 +79,8 @@ class Driver:
     NOT_INFORMED_KEPT = False # whether or not "Keep"ing the Driver.browser session has been printed once upon exit
     NOT_INFORMED_CLOSED = False # same dumb shit as above
 
+    initialScrollDelay = 0.5
+    scrollDelay = 0.5
 
     def __init__(self):
 
@@ -181,7 +183,7 @@ class Driver:
     ####################
 
     @staticmethod
-    def discount_user(discount):
+    def discount_user(discount, reattempt=False):
         """
         Enter and apply discount to user
 
@@ -218,25 +220,38 @@ class Driver:
             user_ = None
             Settings.maybe_print("searching for fan...")
             # scroll through users on page until user is found
+            attempts = 0
             while end_:
                 elements = driver.browser.find_elements(By.CLASS_NAME, "m-fans")
                 for ele in elements:
                     username_ = ele.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()
-                    if str(username) == str(username_).replace("@",""):
+                    # if str(username) == str(username_).replace("@",""):
+                    if username in username_:
                         driver.browser.execute_script("arguments[0].scrollIntoView();", ele)
                         user_ = ele
                         end_ = False
                 if not end_: continue
-                if len(elements) == int(count): break
+
+                if len(elements) == int(count):
+                    Driver.scrollDelay += Driver.initialScrollDelay
+                    attempts+=1
+                    if attempts == 5:
+                        break
+
                 Settings.print_same_line("({}/{}) scrolling...".format(count, len(elements)))
                 count = len(elements)
                 driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(2)
+                time.sleep(Driver.scrollDelay)
+
             Settings.print("")
             Settings.dev_print("successfully found fans")
             if not user_:
                 Settings.err_print("unable to find fan - {}".format(username))
+                if not reattempt:
+                    Settings.maybe_print("reattempting fan search...")
+                    return Driver.discount_user(discount, reattempt=True)
                 return False
+
             Settings.maybe_print("found: {}".format(username))
             ActionChains(driver.browser).move_to_element(user_).perform()
             Settings.dev_print("successfully moved to fan")
@@ -565,11 +580,14 @@ class Driver:
         """
 
         try:
-            Settings.dev_print("entering text")
+            Settings.dev_print("entering text: "+text)
             # for clearing text field with action chain:
             # https://stackoverflow.com/questions/45690688/clear-selenium-action-chains
-            ActionChains(self.browser).move_to_element(self.browser.find_element(By.ID, Element.get_element_by_name("enterText").getId())).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(text)).perform()
-            Settings.dev_print("entered text")
+            ActionChains(self.browser).move_to_element(self.browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(text)).perform()
+            if self.browser.find_element(By.ID, "new_post_text_input").get_attribute('innerHTML') != text:
+                Settings.dev_print("failed to enter text")
+                return False  
+            Settings.dev_print("successfully entered text")
             return True
         except Exception as e:
             Settings.dev_print(e)
@@ -1776,6 +1794,12 @@ class Driver:
         Settings.dev_print("posting...")
         driver = Driver.get_driver()
         driver.auth()
+
+
+        ## TODO
+        # add check for clearing any text or images already in post field
+
+
         #################### Formatted Text ####################
         Settings.print("====================")
         Settings.print("Posting:")
@@ -1790,18 +1814,23 @@ class Driver:
         if message["poll"].validate() and not driver.poll(message["poll"].get()): return False
         Settings.print("====================")
         ############################################################
+
         ## Tweeting ##
-        if str(Settings.is_tweeting()) == "True":
-            Settings.dev_print("tweeting...")
+        ## TODO
+        ## test this
+        # if str(Settings.is_tweeting()) == "True":
+            # Settings.dev_print("tweeting...")
             # twitter tweet button is 1st, post is 2nd
-            ActionChains(driver.browser).move_to_element(driver.browser.find_element(By.CLASS_NAME, "b-btns-group").find_elements(By.XPATH, "./child::*")[0]).click().perform()
+            # ActionChains(driver.browser).move_to_element(driver.browser.find_element(By.CLASS_NAME, "b-btns-group").find_elements(By.XPATH, "./child::*")[0]).click().perform()
             # WebDriverWait(driver.browser, 30, poll_frequency=3).until(EC.element_to_be_clickable((By.XPATH, Element.get_element_by_name("tweet").getXPath()))).click()
-        else: Settings.dev_print("not tweeting")
+        # else: Settings.dev_print("not tweeting")
+
         ## Upload Files ##
         try:
             if not driver.enter_text(message["text"]) or not driver.upload_files(message["files"]):
                 Settings.err_print("unable to post!")
                 return False
+
             # twitter tweet button is 1st, post is 2nd
             postButton = WebDriverWait(driver.browser, Settings.get_upload_max_duration(), poll_frequency=3).until(EC.element_to_be_clickable(driver.browser.find_element(By.CLASS_NAME, "b-btns-group").find_elements(By.XPATH, "./child::*")[1]))
             Settings.dev_print("upload complete")
@@ -1812,17 +1841,16 @@ class Driver:
                     Settings.dev_print(e)
                     # refresh and reclick on text area to spawn cancel button
                     driver.go_to_home(force=True)
-                    try:
-                        driver.enter_text(message["text"])
-                        driver.find_element_to_click("postCancel").click()
-                    except Exception as e:
-                        Settings.dev_print(e)
-                        driver.go_to_home(force=True)
+                    # try:
+                        # driver.enter_text(message["text"])
+                        # driver.find_element_to_click("postCancel").click()
+                    # except Exception as e:
+                        # Settings.dev_print(e)
+                        # driver.go_to_home(force=True)
                 Settings.print('skipped post (debug)')
                 Settings.debug_delay_check()
                 return True
             Settings.dev_print("uploading post")
-            # twitter tweet button is 1st, post is 2nd
             ActionChains(driver.browser).move_to_element(postButton).click().perform()
             Settings.print('posted to OnlyFans!')
             return True
