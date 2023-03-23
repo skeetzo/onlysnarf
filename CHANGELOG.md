@@ -657,14 +657,21 @@
   - fixed applying discounts and updated min/max tests for discounts 
   - fixed messaging and posting 
   **3/22/2023**
-  - fixed poll
+  - fixed poll and schedule
+  - pytest bug w/ final arg
+  - updated any webscraping as necessary
+  - added tests for alternate logins (that probably won't work anyways *cough* google)
+  - begin prepping for merging new changes to main and publishing to pypi
 
 ------------------------------------------------------------------------------------
 
-(publish new changes)
-- update any webscraping as necessary
+- run new auth tests w/ appropriately connected accounts
+- super duper verify test results
 
 ## TODO
+
+- merge w/ main
+- publish changes to pypi
 
 (travis ci)
 - finish adding travisci for continuous integration
@@ -710,7 +717,7 @@
 - add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi
 
 (webdriver)
-- finish integrating edge, ie, and opera
+- (if necessary) finish integrating edge, ie, and opera
 - figure out how to request specific webdriver versions installs to test v102 for edge
 
 -> CLI Menu
@@ -732,7 +739,6 @@
 
 - figure out how to suppress the chrome stacktrace debugging messages
 - fix driver.firefox: DeprecationWarning: service_log_path has been deprecated, please pass in a Service object
-
 
 ### Browser Changes
 
@@ -781,8 +787,11 @@ what helps in general:
   - discount: amount&months still require 2 passes on average to update values correctly
 **4.4.6**
   - followed instructions here for enabled firefox on ubuntu 22.04: https://www.reddit.com/r/learnpython/comments/umft75/selenium_your_firefox_profile_cannot_be_loaded_it/ -> https://support.mozilla.org/en-US/kb/install-firefox-linux#w_install-firefox-from-mozilla-builds-for-advanced-users
+**4.4.9:**
+  - when running pytest, the final arg is mistakenly picked up as an input (and passes validation, because it's a file) and tests therefore have multiple repeat file uploads    
 
 # Web Browser Versions
+(no longer as relevant as of 4.4.7ish updates)
 
 Version Check:
 stable => Google Chrome 106.0.5249.40 beta

@@ -10,8 +10,10 @@ from OnlySnarf.snarf import Snarf
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
+        config["duration"] = DEFAULT.DURATION_ALLOWED[-1]
+        config["expiration"] = 999
+        config["questions"] = ["suck","my","dick","please?"]
         config["text"] = "test balls"
-        config["input"] = []
         Settings.set_debug("tests")
 
     def tearDown(self):
@@ -21,9 +23,6 @@ class TestSnarf(unittest.TestCase):
         Snarf.close()
 
     def test_poll(self):
-        config["duration"] = DEFAULT.DURATION_ALLOWED[-1]
-        config["expiration"] = 999
-        config["questions"] = ["suck","my","dick","please?"]
         assert Snarf.post(), "unable to post poll"
 
 ############################################################################################

@@ -21,8 +21,8 @@ class TestSnarf(unittest.TestCase):
         config["input"] = []
         config["price"] = 0
         config["user"] = None
-        Snarf.close()
         # config["keep"] = False
+        Snarf.close()
 
     def test_message(self):
         assert Snarf.message(), "unable to send message"
