@@ -7,9 +7,12 @@
 
 # testing
 /coverage
+log/
 
 # production
 /build
+/dist
+OnlySnarf.egg-info
 
 # misc
 .DS_Store
@@ -23,11 +26,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# python
 /venv
 __pycache__
 .pytest_cache
 
+# credentials
 OnlySnarf/conf/users/alexdicksdown.conf
-log/
-
-.egg-info
