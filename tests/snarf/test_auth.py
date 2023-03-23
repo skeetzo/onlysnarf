@@ -9,21 +9,18 @@ from OnlySnarf.util.settings import Settings
 class TestAuth(unittest.TestCase):
 
     def setUp(self):
-        config["login"] = "google"
+        config["login"] = "auto"
         Settings.set_debug("tests")
         self.driver = Driver()
 
     def tearDown(self):
-        config["login"] = "auto"
         self.driver.exit()
 
-    @unittest.skip("todo")
     def test_login(self):
         config["cookies"] = False
         assert self.driver.auth(), "unable to login"
         config["cookies"] = True # saves cookies for next test
 
-    @unittest.skip("todo")
     def test_login_via_cookies(self):
         config["cookies"] = True
         config["debug_cookies"] = True

@@ -2490,7 +2490,7 @@ class Driver:
                 self.go_to_home()
                 self.schedule_open()
 
-            return self.schedule_cancel()
+            # return self.schedule_cancel()
 
             # set month, year, and day
             if not self.schedule_date(schedule["month"], schedule["year"]):

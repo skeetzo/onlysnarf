@@ -15,6 +15,7 @@ class TestUsers(unittest.TestCase):
         Settings.set_debug("tests")
         
     def tearDown(self):
+        config["prefer_local"] = True
         Snarf.close()
 
     def test_get_users(self):

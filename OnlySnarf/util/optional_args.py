@@ -83,6 +83,10 @@ def apply_args(parser):
   # keep the browser window open
   parser.add_argument('-keep', '-K', action='store_true', dest='keep', help='keep browser window open after scripting ends')
   ##
+  # -prefer-local
+  # prefers local user cache over refreshing first call
+  parser.add_argument('-prefer-local', default=True, action='store_false', dest='prefer_local', help='prefer recently cached data')
+  ##
   # -show
   # shows window
   parser.add_argument('-show', '-SW', dest='show', action='store_true',  help='enable displaying browser window')

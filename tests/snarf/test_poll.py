@@ -14,6 +14,7 @@ class TestSnarf(unittest.TestCase):
         config["expiration"] = 999
         config["questions"] = ["suck","my","dick","please?"]
         config["text"] = "test balls"
+        config["input"] = []
         Settings.set_debug("tests")
 
     def tearDown(self):

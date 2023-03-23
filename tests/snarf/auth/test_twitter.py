@@ -17,11 +17,13 @@ class TestAuth(unittest.TestCase):
         config["login"] = "auto"
         self.driver.exit()
 
+    @unittest.skip("todo")
     def test_login(self):
         config["cookies"] = False
         assert self.driver.auth(), "unable to login"
         config["cookies"] = True # saves cookies for next test
 
+    @unittest.skip("todo")
     def test_login_via_cookies(self):
         config["cookies"] = True
         config["debug_cookies"] = True

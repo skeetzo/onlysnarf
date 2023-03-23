@@ -665,6 +665,8 @@
 
 ------------------------------------------------------------------------------------
 
+- finish completely fixing schedule
+
 - run new auth tests w/ appropriately connected accounts
 - super duper verify test results
 
