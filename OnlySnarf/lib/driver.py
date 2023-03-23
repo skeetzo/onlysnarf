@@ -581,12 +581,27 @@ class Driver:
 
         try:
             Settings.dev_print("entering text: "+text)
+            # extra redundancy in action chain for getting the text entry area
             # for clearing text field with action chain:
             # https://stackoverflow.com/questions/45690688/clear-selenium-action-chains
-            ActionChains(self.browser).move_to_element(self.browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(text)).perform()
-            if self.browser.find_element(By.ID, "new_post_text_input").get_attribute('innerHTML') != text:
-                Settings.dev_print("failed to enter text")
-                return False  
+            textEntry = self.browser.find_element(By.ID, "new_post_text_input")
+            action = ActionChains(self.browser)
+            action.move_to_element(textEntry)
+            action.click(on_element = textEntry)
+            action.double_click()
+            action.click_and_hold()
+            action.send_keys(Keys.CLEAR)
+            action.send_keys(str(text))
+            action.perform()
+            ## TODO
+            ## check text was entered properly
+            ## does not work
+            # print(self.browser.find_element(By.ID, "new_post_text_input").get_attribute('innerHTML'))
+            # Settings.debug_delay_check()
+            # print(self.browser.find_element(By.ID, "new_post_text_input").get_attribute('innerHTML'))
+            # if self.browser.find_element(By.ID, "new_post_text_input").get_attribute('innerHTML') != text:
+                # Settings.dev_print("failed to enter text")
+                # return False  
             Settings.dev_print("successfully entered text")
             return True
         except Exception as e:
@@ -2474,6 +2489,8 @@ class Driver:
                 Settings.dev_print(e)
                 self.go_to_home()
                 self.schedule_open()
+
+            return self.schedule_cancel()
 
             # set month, year, and day
             if not self.schedule_date(schedule["month"], schedule["year"]):

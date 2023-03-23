@@ -19,7 +19,9 @@ class TestSnarf(unittest.TestCase):
 
     def tearDown(self):
         config["input"] = []
+        config["performers"] = []
         config["price"] = 0
+        config["tags"] = []
         Snarf.close()
 
     def test_post(self):

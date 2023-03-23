@@ -9,12 +9,12 @@ from OnlySnarf.util.settings import Settings
 class TestAuth(unittest.TestCase):
 
     def setUp(self):
-        config["keep"] = False
-        config["show"] = True # requires same browser logic for all tests for cookies
+        config["login"] = "google"
         Settings.set_debug("tests")
         self.driver = Driver()
 
     def tearDown(self):
+        config["login"] = "auto"
         self.driver.exit()
 
     def test_login(self):
