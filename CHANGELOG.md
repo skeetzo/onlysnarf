@@ -666,14 +666,12 @@
   - completely finished fixing schedule
   - super duper verified test results
   - full test coverage
+  - merged w/ main
+  - published changes to pypi
 
 ------------------------------------------------------------------------------------
 
-
 ## TODO
-
-- merge w/ main
-- publish changes to pypi
 
 (review usability and code first)
 -> OnlyFans: Promos
