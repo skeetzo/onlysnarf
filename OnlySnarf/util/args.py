@@ -9,7 +9,7 @@ args: Dict[str, Any] = {}
 # Argument Parser
 ##
 
-parser = argparse.ArgumentParser(prog='onlysnarf', allow_abbrev=False, epilog="Shnarrf!", 
+parser = argparse.ArgumentParser(prog='snarf', allow_abbrev=False, epilog="Shnarrf!", 
   description="No mention of old Shnarf, I notice. Go ahead, just take all the glory, and leave it to Snarf to clean up after you. I don't mind!", conflict_handler='resolve')
 
 ############

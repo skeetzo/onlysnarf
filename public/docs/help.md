@@ -1,6 +1,6 @@
 # -h
 
-usage: onlysnarf [-h] [-browser {auto,chrome,firefox,remote}] [-login {auto,onlyfans,twitter}] [-reduce] [-save] [-tweet]
+usage: snarf [-h] [-browser {auto,chrome,firefox,remote}] [-login {auto,onlyfans,twitter}] [-reduce] [-save] [-tweet]
                  [--username USERNAME] [-config PATH_CONFIG] [-debug] [-keep] [-show] [-v] [-version]
                  {discount,message,post,users} ...
 
@@ -35,7 +35,7 @@ Shnarrf!
 
 # Discount
 
-usage: onlysnarf discount [-h] [-amount AMOUNT] [-months MONTHS] [-user USER | -users USERS]
+usage: snarf discount [-h] [-amount AMOUNT] [-months MONTHS] [-user USER | -users USERS]
 
 optional arguments:
   -h, --help      show this help message and exit
@@ -46,7 +46,7 @@ optional arguments:
 
 # Message
 
-usage: onlysnarf message [-h] [-date DATE] [-performers PERFORMERS] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-tags TAGS]
+usage: snarf message [-h] [-date DATE] [-performers PERFORMERS] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-tags TAGS]
                          [-text TEXT] [-user USER | -users USERS]
                          ...
 
@@ -68,7 +68,7 @@ optional arguments:
 
 # Post
 
-usage: onlysnarf post [-h] [-date DATE] [-duration {1,3,7,30,99} | -expiration EXPIRATION] [-performers PERFORMERS] [-price PRICE]
+usage: snarf post [-h] [-date DATE] [-duration {1,3,7,30,99} | -expiration EXPIRATION] [-performers PERFORMERS] [-price PRICE]
                       [-schedule SCHEDULE] [-time TIME] [-tags TAGS] [-text TEXT] [-question QUESTIONS]
                       ...
 
@@ -94,7 +94,7 @@ optional arguments:
 
 # Users
 
-usage: onlysnarf users [-h]
+usage: snarf users [-h]
 
 optional arguments:
   -h, --help  show this help message and exit

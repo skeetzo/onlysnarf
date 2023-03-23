@@ -635,7 +635,7 @@
   **4.4.6: 10/27/2022**
   - added travisci for testing python versions & os installs
   - more rpi debugging attempts; added attempt scripts
-**4.4.7: 3/17/2023**
+  **4.4.7: 3/17/2023**
   - upgraded selenium to 4.0
   - prep for project cleanup and python update
   - pruned prompts
@@ -652,7 +652,7 @@
   - updated to python10
   - updated install scripts and organize by usability by platform; distinguish arm scripts for rpis
   - finished debugging new webdriver manager system
-**4.4.9: 3/21/2023**
+  **4.4.9: 3/21/2023**
   - fixed unknown bug when fetching random user
   - fixed applying discounts and updated min/max tests for discounts 
   - fixed messaging and posting 
@@ -668,6 +668,9 @@
   - full test coverage
   - merged w/ main
   - published changes to pypi
+**4.4.11**
+  - fixed 'onlysnarf' cmd references
+  - removed nonworking browser references in optional args
 
 ------------------------------------------------------------------------------------
 
@@ -718,6 +721,7 @@
 - figure out how to request specific webdriver versions installs to test v102 for edge
 
 -> CLI Menu
+(probably never)
 - re-add menu system
 - fix any new cli menu errors made while updating major processes
 - re-enable prompting for discount amount&months in Settings or somewhere else (at some point)

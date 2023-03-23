@@ -1,15 +1,15 @@
 # Menu
 
-`onlysnarf *args`
+`snarf *args`
 
 Please refer to the example config file provided for a complete listing of available options.
 
 ## Actions
 
 An action is performed by including the required combination of subcommands, arguments, and input. OnlySnarf actions can be fulfilled as a promptless script via:
-`onlysnarf post /path/to/fileOrDirectory`
+`snarf post /path/to/fileOrDirectory`
 
-For more help with an action: `onlysnarf post -h`
+For more help with an action: `snarf post -h`
 
 Users are easily referenced using keywords:
 **All**: all users  
@@ -205,7 +205,7 @@ Shows additional log output (up to 3).
 Prints the version
 
 Complete Debugging:
-  `onlysnarf -debug -verbose -verbose -verbose -show -debug-delay`
+  `snarf -debug -verbose -verbose -verbose -show -debug-delay`
 
 ## Config File Only
 
