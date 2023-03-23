@@ -34,7 +34,7 @@ class TestSnarf(unittest.TestCase):
         assert Snarf.post(), "unable to post schedule via date"
 
     def test_schedule_time(self):
-        config["time"] = (today + datetime.timedelta(hours=3, minutes=30)).strftime(DEFAULT.TIME_FORMAT)
+        config["time"] = (today + datetime.timedelta(hours=1, minutes=30)).strftime(DEFAULT.TIME_FORMAT)
         assert Snarf.post(), "unable to post schedule via time"
 
     ## TODO:

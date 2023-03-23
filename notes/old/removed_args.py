@@ -200,12 +200,6 @@ parser.add_argument('-notkeyword', dest='notkeyword', default=None,
   help="search for folder not by keyword")
 
 ##
-# -prefer-local
-# prefers local user cache over refreshing first call
-parser.add_argument('-prefer-local', default=True, action='store_false', dest='prefer_local',
-  help='prefer recently cached data')
-
-##
 # -repair
 # enables file repair (buggy)
 parser.add_argument('-repair', action='store_true', dest='repair',

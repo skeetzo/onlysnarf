@@ -19,7 +19,6 @@ class Settings:
     FILES = None
     PERFORMER_CATEGORY = None
 
-    PREFER_LOCAL = True
     PREFER_LOCAL_FOLLOWING = True
 
     #####################
@@ -495,7 +494,7 @@ class Settings:
         return config["keep"]
 
     def is_prefer_local():
-        return Settings.PREFER_LOCAL
+        return config["prefer_local"]
         
     def is_prefer_local_following():
         return Settings.PREFER_LOCAL_FOLLOWING

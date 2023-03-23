@@ -18,14 +18,18 @@ pytest tests/snarf
 python -m unittest tests/snarf/test_discount.py
 python -m unittest tests/selenium/browsers/test_firefox.py
 
+pytest tests/snarf/test_auth.py
 pytest tests/snarf/test_discount.py
 pytest tests/snarf/test_message.py
+pytest tests/snarf/test_poll.py
 pytest tests/snarf/test_post.py
-pytest tests/snarf/test_profile.py
+pytest tests/snarf/test_schedule.py
 pytest tests/snarf/test_users.py
 
+pytest tests/snarf/test_profile.py
+
 ## Authentication ##
-python setup.py install && pytest tests/selenium/test_auth.py
+python setup.py install && pytest tests/snarf/test_auth.py
 
 ## Selenium Processes ##
 python setup.py install && pytest tests/selenium/test_browsers.py
