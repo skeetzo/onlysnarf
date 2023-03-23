@@ -45,11 +45,6 @@ For example: `$HOME/.onlysnarf/users/alexdicksdown.conf`
 ## Dependencies
 Selenium's webdriver manager should install everything it needs automatically. If you are using a Raspberry Pi 4, be sure to run `sudo apt-get install chromium-chromedriver` on your device to be able to launch chrome.
 
-## Changes
-Previous versions (before v4.1) included the ability to download/upload from Google Drive (and was supposed to add Dropbox). I have decided to drop everything that is not a core function of interacting with the OnlyFans site.
-
-The runtime command has changed to just "snarf".
-
 ## Referral
 Feel free to make use of my referral code ;)  
 https://onlyfans.com/?ref=409408
