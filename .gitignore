@@ -29,3 +29,5 @@ __pycache__
 
 OnlySnarf/conf/users/alexdicksdown.conf
 log/
+
+.egg-info
