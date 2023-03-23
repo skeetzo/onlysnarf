@@ -1400,6 +1400,37 @@ class Driver:
             Settings.err_print("failure to message - {}".format(username))
         return False
      
+    def message_clear(self):
+        """
+        Enter the provided text into the message on the page
+
+        Parameters
+        ----------
+        text : str
+            The text to enter
+
+        Returns
+        -------
+        bool
+            Whether or not entering the text was successful
+
+        """
+
+        try:
+            Settings.dev_print("clearing message")
+            clearButton = [ele for ele in self.browser.find_elements(By.TAG_NAME, "button") if "Clear" in ele.get_attribute("innerHTML")]
+            if len(clearButton) > 0:
+                clearButton[0].click()
+            else:
+                self.go_to_home(force=True)
+                ActionChains(self.browser).move_to_element(self.browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).perform()
+            Settings.dev_print("successfully cleared message")
+            return True
+        except Exception as e:
+            Driver.error_checker(e)
+            Settings.err_print("failure to clear message")
+        return False
+
     def message_confirm(self):
         """
         Wait for the message open on the page's Confirm button to be clickable and click it
@@ -1429,6 +1460,7 @@ class Driver:
         except Exception as e:
             Driver.error_checker(e)
             Settings.err_print("failure to confirm message!")
+        self.message_clear()
         return False
 
     def message_price(self, price):
@@ -1813,7 +1845,12 @@ class Driver:
 
         ## TODO
         # add check for clearing any text or images already in post field
+        driver.message_clear()
 
+        # try:
+        #     driver.find_element_to_click("postCancel").click()
+        # except Exception as e:
+        #     Settings.dev_print(e)
 
         #################### Formatted Text ####################
         Settings.print("====================")
@@ -1842,30 +1879,24 @@ class Driver:
 
         ## Upload Files ##
         try:
-            if not driver.enter_text(message["text"]) or not driver.upload_files(message["files"]):
+            postButton = [ele for ele in driver.browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
+
+            if not driver.enter_text(message["text"]):
                 Settings.err_print("unable to post!")
                 return False
 
-            # twitter tweet button is 1st, post is 2nd
-            postButton = WebDriverWait(driver.browser, Settings.get_upload_max_duration(), poll_frequency=3).until(EC.element_to_be_clickable(driver.browser.find_element(By.CLASS_NAME, "b-btns-group").find_elements(By.XPATH, "./child::*")[1]))
-            Settings.dev_print("upload complete")
+            successful, skipped = driver.upload_files(message["files"])
+            if successful and not skipped:
+                # twitter tweet button is 1st, post is 2nd
+                WebDriverWait(driver.browser, Settings.get_upload_max_duration(), poll_frequency=3).until(EC.element_to_be_clickable(postButton))
+                Settings.dev_print("upload complete")
+
             if str(Settings.is_debug()) == "True":
-                try:
-                    driver.find_element_to_click("postCancel").click()
-                except Exception as e:
-                    Settings.dev_print(e)
-                    # refresh and reclick on text area to spawn cancel button
-                    driver.go_to_home(force=True)
-                    # try:
-                        # driver.enter_text(message["text"])
-                        # driver.find_element_to_click("postCancel").click()
-                    # except Exception as e:
-                        # Settings.dev_print(e)
-                        # driver.go_to_home(force=True)
+                driver.message_clear()
                 Settings.print('skipped post (debug)')
                 Settings.debug_delay_check()
                 return True
-            Settings.dev_print("uploading post")
+            Settings.dev_print("uploading post...")
             ActionChains(driver.browser).move_to_element(postButton).click().perform()
             Settings.print('posted to OnlyFans!')
             return True
@@ -1874,6 +1905,7 @@ class Driver:
         except Exception as e:
             Settings.dev_print(e)
             Settings.err_print("unable to send post")
+        driver.go_to_home(force=True)
         return False
 
     ######################
@@ -2413,7 +2445,8 @@ class Driver:
         Settings.dev_print("setting hours")
         eles = self.browser.find_element(By.CLASS_NAME, "vdatetime-time-picker__list--hours").find_elements(By.XPATH, "./child::*")
         for ele in eles:
-            if str(hour) == ele.get_attribute("innerHTML").strip():
+            if str(hour) in ele.get_attribute("innerHTML").strip():
+                # ActionChains(self.browser).move_to_element(ele).click().perform()
                 ele.click()
                 Settings.dev_print("set hour")
                 return True
@@ -2425,7 +2458,7 @@ class Driver:
         Settings.dev_print("setting minutes")
         eles = self.browser.find_element(By.CLASS_NAME, "vdatetime-time-picker__list--minutes").find_elements(By.XPATH, "./child::*")
         for ele in eles:
-            if str(minutes) == ele.get_attribute("innerHTML").strip():
+            if str(minutes) in ele.get_attribute("innerHTML").strip():
                 ele.click()
                 Settings.dev_print("set minutes")
                 return True
@@ -2437,7 +2470,7 @@ class Driver:
         Settings.dev_print("setting suffix")
         eles = self.browser.find_element(By.CLASS_NAME, "vdatetime-time-picker__list--suffix").find_elements(By.XPATH, "./child::*")
         for ele in eles:
-            if str(suffix).lower() == ele.get_attribute("innerHTML").strip().lower():
+            if str(suffix).lower() in ele.get_attribute("innerHTML").strip().lower():
                 ele.click()
                 Settings.dev_print("set suffix")
                 return True
@@ -2494,17 +2527,22 @@ class Driver:
 
             # set month, year, and day
             if not self.schedule_date(schedule["month"], schedule["year"]):
+                Settings.debug_delay_check()
                 raise Exception("failed to enter date!")
             if not self.schedule_day(schedule["day"]):
+                Settings.debug_delay_check()
                 raise Exception("failed to enter day!")
             Settings.debug_delay_check()
             self.schedule_save_date()
             # set time
             if not self.schedule_hour(schedule["hour"]):
+                Settings.debug_delay_check()
                 raise Exception("failed to enter hour!")
             if not self.schedule_minutes(schedule["minute"]):
+                Settings.debug_delay_check()
                 raise Exception("failed to enter minutes!")
             if not self.schedule_suffix(schedule["suffix"]):
+                Settings.debug_delay_check()
                 raise Exception("failed to enter suffix!")
             # save time
             Settings.debug_delay_check()
@@ -3077,16 +3115,16 @@ class Driver:
 
         if str(Settings.is_skip_download()) == "True": 
             Settings.print("skipping upload (download)")
-            return True
+            return True, True
         elif str(Settings.is_skip_upload()) == "True": 
             Settings.print("skipping upload (upload)")
-            return True
+            return True, True
         if len(files) == 0:
             Settings.maybe_print("skipping upload (empty file list)")
-            return True
+            return True, True
         if str(Settings.is_skip_upload()) == "True":
             Settings.print("skipping upload (disabled)")
-            return True
+            return True, True
         files = files[:int(Settings.get_upload_max())]
         Settings.print("uploading file(s): {}".format(len(files)))
 
@@ -3108,7 +3146,7 @@ class Driver:
         Settings.dev_print("files prepared: {}".format(len(files_)))
         if len(files_) == 0:
             Settings.err_print("skipping upload (unable to prepare files)")
-            return False
+            return False, True
 
         ####
 
@@ -3144,9 +3182,9 @@ class Driver:
             if self.error_window_upload(): Settings.dev_print("files uploaded successfully")
             else: Settings.dev_print("files probably uploaded succesfully")
             time.sleep(1) # bug prevention
-            return True
+            return True, False
         Settings.warn_print("a file failed to upload!")
-        return False
+        return False, True
 
     #################
     ##### Users #####
