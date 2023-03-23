@@ -19,7 +19,6 @@ class TestSnarf(unittest.TestCase):
         config["schedule"] = DEFAULT.SCHEDULE
         config["date"] = DEFAULT.DATE
         config["time"] = DEFAULT.TIME
-        config["input"] = []
         Settings.set_debug("tests")
 
     def tearDown(self):

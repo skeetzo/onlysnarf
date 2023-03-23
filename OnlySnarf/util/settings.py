@@ -184,7 +184,12 @@ class Settings:
         return config["promotion_expiration"]
 
     def get_input():
-        return config["input"] or []
+        # fix pytest bug from 4.4.9
+        files = []
+        for file_path in config["input"]:
+            if ".py" not in str(file_path):
+                files.append[file_path]
+        return set(files)
 
     def get_input_as_files():
         if Settings.FILES: return Settings.FILES

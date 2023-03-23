@@ -662,22 +662,18 @@
   - updated any webscraping as necessary
   - added tests for alternate logins (that probably won't work anyways *cough* google)
   - begin prepping for merging new changes to main and publishing to pypi
+**4.4.10: 3/23/2023**
+  - completely finished fixing schedule
+  - super duper verified test results
+  - full test coverage
 
 ------------------------------------------------------------------------------------
 
-- finish completely fixing schedule
-
-- run new auth tests w/ appropriately connected accounts
-- super duper verify test results
 
 ## TODO
 
 - merge w/ main
 - publish changes to pypi
-
-(travis ci)
-- finish adding travisci for continuous integration
-- finish debugging travis tests w/ multiple versions & os
 
 (review usability and code first)
 -> OnlyFans: Promos
@@ -701,6 +697,7 @@
 - update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
 
 (once everything else in app works again)
+- run new auth tests w/ appropriately connected accounts
 -> Twitter
 - actually test if tweeting behavior works in driver
 - needs a dummy account to test actual tweeting w/
