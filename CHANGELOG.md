@@ -662,17 +662,22 @@
   - updated any webscraping as necessary
   - added tests for alternate logins (that probably won't work anyways *cough* google)
   - begin prepping for merging new changes to main and publishing to pypi
-**4.4.10: 3/23/2023**
+  **4.4.10: 3/23/2023**
   - completely finished fixing schedule
   - super duper verified test results
   - full test coverage
   - merged w/ main
   - published changes to pypi
-**4.4.11**
+  **4.4.11**
   - fixed 'onlysnarf' cmd references
   - removed nonworking browser references in optional args
   - fixed discount bug
-
+**4.4.12: 3/24/2023**
+  - RPi4 debugging
+  - fixed element bug when posting
+  - fixed users
+  - fixed error message on close
+  
 ------------------------------------------------------------------------------------
 
 ## TODO

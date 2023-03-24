@@ -1,8 +1,5 @@
 #!/usr/bin/python3
-# OnlySnarf interface class
 
-import sys
-##
 from OnlySnarf.lib.driver import Driver
 from OnlySnarf.util.settings import Settings
 from OnlySnarf.classes.discount import Discount
@@ -159,12 +156,16 @@ class Snarf:
 
 ################################################################################################################################################
 
+# import sys
+
 def exit_handler():
     """Exit cleanly"""
 
-    Driver.exit_all()
-    Settings.print("shnarrf!")
-    sys.exit(0)
+    try:
+        Driver.exit_all()
+        # sys.exit(0)
+    except Exception as e:
+        print(e)
 
 import atexit
 atexit.register(exit_handler)
@@ -182,8 +183,9 @@ def main():
     except Exception as e:
         Settings.dev_print(e)
         Settings.print("shnarf??")
-    # finally:
-        # exit_handler()
+    finally:
+        Settings.print("shnarrf!")
+        exit_handler()
 
 ################################################################################################################################################
 

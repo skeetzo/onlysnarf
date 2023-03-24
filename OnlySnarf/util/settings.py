@@ -15,11 +15,8 @@ class Settings:
     
     LAST_UPDATED_KEY = None
     CATEGORY = None
-    CONFIRM = True
     FILES = None
     PERFORMER_CATEGORY = None
-
-    PREFER_LOCAL_FOLLOWING = True
 
     #####################
     ##### Functions #####
@@ -470,7 +467,7 @@ class Settings:
     # Bools
 
     def is_confirm():
-        return Settings.CONFIRM or config["confirm"]
+        return config["confirm"]
 
     def is_cookies():
         return config["cookies"]
@@ -502,7 +499,7 @@ class Settings:
         return config["prefer_local"]
         
     def is_prefer_local_following():
-        return Settings.PREFER_LOCAL_FOLLOWING
+        return config["prefer_local_following"]
 
     def is_save_users():
         return config["save_users"]
@@ -547,7 +544,6 @@ class Settings:
     def set_debug(newValue):
         if str(newValue) == "tests":
             # config["confirm"] = False
-            Settings.CONFIRM = False
         else:
             config["debug"] = newValue
 
@@ -570,10 +566,10 @@ class Settings:
         config["password_twitter"] = str(password)
 
     def set_prefer_local(buul):
-        Settings.PREFER_LOCAL = buul
+        config["prefer_local"] = buul
     
     def set_prefer_local_following(buul):
-        Settings.PREFER_LOCAL_FOLLOWING = buul
+        config["prefer_local_following"] = buul
 
 ###########################################################################
 
