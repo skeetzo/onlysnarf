@@ -207,6 +207,9 @@ class Driver:
         if not discount:
             Settings.err_print("missing discount")
             return False
+        
+        originalAmount = None
+        originalMonths = None
         try:
             driver = Driver.get_driver()
             driver.auth()
@@ -275,9 +278,6 @@ class Driver:
                 Settings.warn_print("unable to find discount btn for: {}".format(username))
                 return False
             time.sleep(1)
-
-            originalAmount = None
-            originalMonths = None
 
             def apply_discount():
                 Settings.maybe_print("attempting discount entry...")
