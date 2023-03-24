@@ -208,6 +208,8 @@ class Driver:
             Settings.err_print("missing discount")
             return False
 
+        # BUG
+        # doesn't want to work with local variables
         Driver.originalAmount = None
         Driver.originalMonths = None
         try:
