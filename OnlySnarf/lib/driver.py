@@ -207,9 +207,9 @@ class Driver:
         if not discount:
             Settings.err_print("missing discount")
             return False
-        
-        originalAmount = None
-        originalMonths = None
+
+        originalAmount = False
+        originalMonths = False
         try:
             driver = Driver.get_driver()
             driver.auth()
