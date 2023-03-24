@@ -543,6 +543,7 @@ class Settings:
 
     def set_debug(newValue):
         if str(newValue) == "tests":
+            pass
             # config["confirm"] = False
         else:
             config["debug"] = newValue
