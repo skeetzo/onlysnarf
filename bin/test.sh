@@ -85,23 +85,23 @@ python setup.py install && pytest tests/snarf/test_users.py
 ##################
 
 # Discount
-snarf -debug -show discount -user random -amount max -months max
+snarf -debug discount -user random -amount max -months max
 
 # Message
-snarf -debug -show message -user random -text shnarf! -price min ~/Projects/onlysnarf/public/images/snarf-missionary.jpg
+snarf -debug message -user random -text shnarf! -price min ~/Projects/onlysnarf/public/images/snarf-missionary.jpg
 
 # Post
-snarf -debug -show post -text "shnarf" -tags "suck" -tags "my" -tags "balls" -performers "yourmom" -performers  "yourdad" ~/Projects/onlysnarf/public/images/snarf-missionary.jpg
+snarf -debug post -text "shnarf" -tags "suck" -tags "my" -tags "balls" -performers "yourmom" -performers  "yourdad" ~/Projects/onlysnarf/public/images/snarf-missionary.jpg
 
 # Poll
-snarf -debug -show post -text shnarff! -question "sharnf shnarf?" -question "shnarf shhhnarff snarf?" -duration min
+snarf -debug post -text shnarff! -question "sharnf shnarf?" -question "shnarf shhhnarff snarf?" -duration min
 
 # Schedule
-snarf -debug -show post -text shnarff! -schedule "10/31/2022 16:20:00"
+snarf -debug post -text shnarff! -schedule "10/31/2022 16:20:00"
 
 # User
-snarf -debug -show users
+snarf -debug users
 
-snarf -debug -show -browser brave users
+snarf -debug -browser brave users
 
 snarf post -text "are you ready for nft nudes?" -question "yes" -question "maybe?" -question "no" -question "double no" -duration "max"
