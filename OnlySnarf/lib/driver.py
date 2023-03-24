@@ -1886,7 +1886,6 @@ class Driver:
 
         ## Upload Files ##
         try:
-            postButton = [ele for ele in driver.browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
 
             if not driver.enter_text(message["text"]):
                 Settings.err_print("unable to post!")
@@ -1895,6 +1894,7 @@ class Driver:
             successful, skipped = driver.upload_files(message["files"])
             if successful and not skipped:
                 # twitter tweet button is 1st, post is 2nd
+                postButton = [ele for ele in driver.browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
                 WebDriverWait(driver.browser, Settings.get_upload_max_duration(), poll_frequency=3).until(EC.element_to_be_clickable(postButton))
                 Settings.dev_print("upload complete")
 
@@ -1904,6 +1904,7 @@ class Driver:
                 Settings.debug_delay_check()
                 return True
             Settings.dev_print("uploading post...")
+            postButton = [ele for ele in driver.browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
             ActionChains(driver.browser).move_to_element(postButton).click().perform()
             Settings.print('posted to OnlyFans!')
             return True
@@ -2488,7 +2489,6 @@ class Driver:
 
         self.browser.find_element(By.CLASS_NAME, "vdatetime-popup__actions__button--cancel").find_elements(By.XPATH, "./child::*")[0].click()
         Settings.print("canceled schedule")
-        time.sleep(0.5)
         return True
 
     def schedule_save(self):
