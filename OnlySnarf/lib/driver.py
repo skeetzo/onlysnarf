@@ -2488,6 +2488,7 @@ class Driver:
 
         self.browser.find_element(By.CLASS_NAME, "vdatetime-popup__actions__button--cancel").find_elements(By.XPATH, "./child::*")[0].click()
         Settings.print("canceled schedule")
+        time.sleep(0.5)
         return True
 
     def schedule_save(self):
