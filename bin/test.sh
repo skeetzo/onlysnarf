@@ -104,4 +104,4 @@ snarf -debug users
 
 snarf -debug -browser brave users
 
-snarf post -text "are you ready for nft nudes?" -question "yes" -question "maybe?" -question "no" -question "double no" -duration "max"
+snarf post -text "are you ready for nft nudes?" -question "yes" -question "maybe?" -question "no" -question "double no" -duration "min"
