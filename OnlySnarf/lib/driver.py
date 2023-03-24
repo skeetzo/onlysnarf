@@ -1427,8 +1427,10 @@ class Driver:
             Settings.dev_print("clearing message")
             clearButton = [ele for ele in self.browser.find_elements(By.TAG_NAME, "button") if "Clear" in ele.get_attribute("innerHTML")]
             if len(clearButton) > 0:
+                Settings.dev_print("clicking clear button...")
                 clearButton[0].click()
             else:
+                Settings.dev_print("refreshing page and clearing text...")
                 self.go_to_home(force=True)
                 ActionChains(self.browser).move_to_element(self.browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).perform()
             Settings.dev_print("successfully cleared message")
@@ -1887,22 +1889,24 @@ class Driver:
         ## Upload Files ##
         try:
 
+            print(0)
             if not driver.enter_text(message["text"]):
                 Settings.err_print("unable to post!")
                 return False
-
+            print(1)
             successful, skipped = driver.upload_files(message["files"])
             if successful and not skipped:
                 # twitter tweet button is 1st, post is 2nd
                 postButton = [ele for ele in driver.browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
                 WebDriverWait(driver.browser, Settings.get_upload_max_duration(), poll_frequency=3).until(EC.element_to_be_clickable(postButton))
                 Settings.dev_print("upload complete")
-
+            print(2)
             if str(Settings.is_debug()) == "True":
                 driver.message_clear()
                 Settings.print('skipped post (debug)')
                 Settings.debug_delay_check()
                 return True
+            print(3)
             Settings.dev_print("uploading post...")
             postButton = [ele for ele in driver.browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
             ActionChains(driver.browser).move_to_element(postButton).click().perform()
