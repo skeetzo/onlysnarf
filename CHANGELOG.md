@@ -671,10 +671,16 @@
 **4.4.11**
   - fixed 'onlysnarf' cmd references
   - removed nonworking browser references in optional args
+  - fixed discount bug
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- add bypass for 2fa
+https://www.geeksforgeeks.org/two-factor-authentication-using-google-authenticator-in-python/
+https://stackoverflow.com/questions/55870489/how-to-handle-google-authenticator-with-selenium
+https://stackoverflow.com/questions/8529265/google-authenticator-implementation-in-python
 
 (review usability and code first)
 -> OnlyFans: Promos
