@@ -208,8 +208,8 @@ class Driver:
             Settings.err_print("missing discount")
             return False
 
-        originalAmount = False
-        originalMonths = False
+        Driver.originalAmount = None
+        Driver.originalMonths = None
         try:
             driver = Driver.get_driver()
             driver.auth()
@@ -285,7 +285,7 @@ class Driver:
                 ## amount
                 discountEle = driver.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserAmount").getClass())[0]
                 discountAmount = int(discountEle.get_attribute("innerHTML").replace("% discount", ""))
-                if not originalAmount: originalAmount = discountAmount
+                if not Driver.originalAmount: Driver.originalAmount = discountAmount
                 Settings.dev_print("amount: {}".format(discountAmount))
                 Settings.dev_print("entering discount amount")
                 if int(discountAmount) != int(amount):
@@ -308,7 +308,7 @@ class Driver:
                 ## months
                 monthsEle = driver.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserMonths").getClass())[1]
                 monthsAmount = int(monthsEle.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
-                if not originalMonths: originalMonths = monthsAmount
+                if not Driver.originalMonths: Driver.originalMonths = monthsAmount
                 Settings.dev_print("months: {}".format(monthsAmount))
                 Settings.dev_print("entering discount months")
                 if int(monthsAmount) != int(months):
@@ -352,7 +352,7 @@ class Driver:
                     Settings.dev_print("successfully canceled discount")
                     Settings.dev_print("### Discount Successful ###")
                     return True
-                elif "Cancel" in button.get_attribute("innerHTML") and int(discountAmount) == int(originalAmount) and int(monthsAmount) == int(originalMonths):
+                elif "Cancel" in button.get_attribute("innerHTML") and int(discountAmount) == int(Driver.originalAmount) and int(monthsAmount) == int(Driver.originalMonths):
                     Settings.print("skipping existing discount")
                     button.click()
                     Settings.dev_print("successfully skipped existing discount")
