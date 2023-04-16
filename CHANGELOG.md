@@ -672,7 +672,9 @@
   - fixed 'onlysnarf' cmd references
   - removed nonworking browser references in optional args
   - fixed discount bug
-
+**4/15/2023**
+  - cleaned up git repo size / long clone time
+  
 ------------------------------------------------------------------------------------
 
 ## TODO
