@@ -677,6 +677,8 @@
   - fixed element bug when posting
   - fixed users
   - fixed error message on close
+**4/15/2023**
+  - cleaned up git repo size / long clone time
   
 ------------------------------------------------------------------------------------
 
