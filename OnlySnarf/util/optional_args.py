@@ -18,6 +18,7 @@ def apply_args(parser):
   ##
   # -login
   # method to prefer when logging in
+  # note: "google" is disabled due to updates&testing requirements
   parser.add_argument('-login', '-L', dest='login', default="auto", choices=["auto","onlyfans","twitter"], help='method of user login to prefer')
   ##
   # -reduce

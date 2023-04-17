@@ -2828,7 +2828,13 @@ class Driver:
             options.add_argument("--disable-gpu")
             options.add_argument("--disable-extensions")
             options.add_argument("--disable-dev-shm-usage")
-            options.add_argument("user-data-dir=/tmp/selenium") # do not disable, required for cookies to work 
+
+            # if os.name == 'nt':
+                # options.add_argument(r"--user-data-dir=C:\Users\brain\AppData\Local\Google\Chrome\User Data")
+            # else:
+                # options.add_argument("--user-data-dir="+os.path.join(Settings.get_base_directory(),"tmp","selenium")) # do not disable, required for cookies to work 
+            options.add_argument(r'--profile-directory=Alex D') #e.g. Profile 3
+            
             # options.add_argument("--allow-insecure-localhost")            
             # possibly linux only
             # options.add_argument('disable-notifications')
@@ -3065,9 +3071,9 @@ class Driver:
         browser.set_page_load_timeout(1200)
         browser.file_detector = LocalFileDetector() # for uploading via remote sessions
         if str(Settings.is_show_window()) == "False":
-            Settings.print("browser created - {} (headless)".format(browserType))
+            Settings.print("browser spawned successfully (headless)".format(browserType))
         else:
-            Settings.print("browser created - {}".format(browserType))
+            Settings.print("browser spawned successfully".format(browserType))
         return browser
 
     ## possibly move these functions elsewhere (again)

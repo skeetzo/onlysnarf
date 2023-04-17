@@ -407,10 +407,11 @@ class Settings:
         config_file.read(os.path.join(Settings.get_base_directory(), "conf", "users", username+".conf"))
         userConfig = {}
         for section in config_file.sections():
-            # print(section)
+            # Settings.dev_print(section)
             for key in config_file[section]:
-                # print(section, key, config_file[section][key].strip("\""))
+                # Settings.dev_print(section, key, config_file[section][key].strip("\""))
                 userConfig[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
+        # Settings.dev_print(userConfig)
         return userConfig
 
     def get_username():
@@ -425,14 +426,14 @@ class Settings:
 
     def get_username_google():
         try:
-            return config["google_username"] or Settings.get_user_config(Settings.get_username())["google_username"]
+            return Settings.get_user_config(Settings.get_username())["google_username"]
         except Exception as e:
             Settings.err_print(e)
         return ""            
 
     def get_username_twitter():
         try:
-            return config["twitter_username"] or Settings.get_user_config(Settings.get_username())["twitter_username"]
+            return Settings.get_user_config(Settings.get_username())["twitter_username"]
         except Exception as e:
             Settings.err_print(e)
         return ""

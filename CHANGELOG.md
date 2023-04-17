@@ -682,6 +682,7 @@
 **4.4.13: 4/17/2023**
   - Windows compatability testing
   - updated pathings for Windows
+  - retested google login (remains disabled)
 
 ------------------------------------------------------------------------------------
 
