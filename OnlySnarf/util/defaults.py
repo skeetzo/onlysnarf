@@ -70,11 +70,19 @@ USER_LIMIT = 10
 # Paths #
 #########
 
-USER = os.getenv('USER')
+import getpass
+USER = getpass.getuser()
+# USER = os.getenv('USER')
 if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "None":
     USER = os.getenv('SUDO_USER')
 
-ROOT_PATH = "/home/{}/.onlysnarf".format(USER)
+# linux default
+HOME_DIR = "/home"
+# check for Windows
+if os.name == 'nt':
+    HOME_DIR = "C:\\Users"
+ROOT_PATH = os.path.join(HOME_DIR, USER, ".onlysnarf")
+    
 DOWNLOAD_PATH = os.path.join(ROOT_PATH, "downloads")
 UPLOAD_PATH = os.path.join(ROOT_PATH, "uploads")
 LOG_PATH = os.path.join(ROOT_PATH, "snarf.log")
@@ -85,7 +93,7 @@ PROFILE_PATH = os.path.join(CONFIGS_PATH, "profile.json")
 CONFIG_PATH = os.path.join(CONFIGS_PATH, "config.conf")
 if os.environ.get('ENV') == "test":
     # CONFIG_PATH = os.path.join(CONFIGS_PATH, "test-config.conf")
-    CONFIG_PATH = os.path.join(os.getcwd(), "OnlySnarf/conf", "test-config.conf")
+    CONFIG_PATH = os.path.join(os.getcwd(), "OnlySnarf", "conf", "test-config.conf")
 PROFILES_PATH = os.path.join(CONFIGS_PATH, "users")
 
 if os.environ.get('ENV') == "test":
