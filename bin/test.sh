@@ -7,7 +7,7 @@ git clone --depth 1  --branch development git@github.com:skeetzo/onlysnarf
 
 python -m pip install -e .[dev]
 
-onlysnarf -debug -vvv post -text "balls"
+snarf -debug -vvv post -text "balls"
 
 pytest tests/selenium
 pytest tests/selenium/browsers
