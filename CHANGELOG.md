@@ -677,7 +677,12 @@
   - fixed element bug when posting
   - fixed users
   - fixed error message on close
-  
+  **4/15/2023**
+  - cleaned up git repo size / long clone time
+**4.4.13: 4/17/2023**
+  - Windows compatability testing
+  - updated pathings for Windows
+
 ------------------------------------------------------------------------------------
 
 ## TODO
