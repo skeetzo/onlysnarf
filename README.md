@@ -66,6 +66,5 @@ Pytests available under /tests:
 ## Updates
 4/18/2023 : To further reduce repo size, preview gifs have been relocated to [IPFS](//ipfs.io/ipfs/QmVpjSy9NXy3VUM474hSDoPSsmsb5WVYkN9WN6N7nFxZuj).
 
-## Referral
-Feel free to make use of my referral code ;)  
-//onlyfans.com/?ref=409408
+<hr>
+Feel free to make use of my [referral code](https://onlyfans.com/?ref=409408) ;)  
