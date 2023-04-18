@@ -672,18 +672,20 @@
   - fixed 'onlysnarf' cmd references
   - removed nonworking browser references in optional args
   - fixed discount bug
-**4.4.12: 3/24/2023**
+**4.4.12 : 3/24/2023**
   - RPi4 debugging
   - fixed element bug when posting
   - fixed users
   - fixed error message on close
   **4/15/2023**
   - cleaned up git repo size / long clone time
-**4.4.13: 4/17/2023**
+  **4.4.13 : 4/17/2023**
   - Windows compatability testing
   - updated pathings for Windows
   - retested google login (remains disabled)
-
+**4.4.14 : 4/18/2023**
+  - moved preview gifs to IPFS
+  
 ------------------------------------------------------------------------------------
 
 ## TODO
