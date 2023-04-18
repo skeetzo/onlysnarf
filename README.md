@@ -45,8 +45,8 @@ For example: `$HOME/.onlysnarf/users/alexdicksdown.conf`
 ## Dependencies
 Selenium's webdriver manager should install everything it needs automatically. If you are using a Raspberry Pi 4, be sure to run `sudo apt-get install chromium-chromedriver` on your device to be able to launch chrome.
 
-## Previews
-To further reduce repo size, preview gifs have been relocated to [IPFS](//ipfs.io/ipfs/QmVpjSy9NXy3VUM474hSDoPSsmsb5WVYkN9WN6N7nFxZuj)
+## Updates
+4/18/2023 : To further reduce repo size, preview gifs have been relocated to [IPFS](//ipfs.io/ipfs/QmVpjSy9NXy3VUM474hSDoPSsmsb5WVYkN9WN6N7nFxZuj).
 
 ## Referral
 Feel free to make use of my referral code ;)  
