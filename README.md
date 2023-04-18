@@ -33,19 +33,35 @@ clone repo & install: `git clone git@github.com:skeetzo/onlysnarf && python setu
 Example: `snarf -text "suck my giant balls" /path/to/balls.jpeg`
 
 ## Config
-The config process has been updated as well from the previous format. Example config files are provided. There are now 2 main config files that should be provided to affect runtime behavior as well as 1 optional method to distinguish between user logins.
+Example config files are provided. There are two main config files that should be provided to affect runtime behavior as well as one optional method to help distinguish between user logins.
 1) the config for the general app's behavior: `$HOME/.onlysnarf/config.conf`
 2) one config for each user containing their credentials: `$HOME/.onlysnarf/users/$username.conf`
-3) an optional default user config containing the default credentials to use: `$HOME/.onlysnarf/users/default.conf`
+3) (optional) one config containing the default user credentials to use: `$HOME/.onlysnarf/users/default.conf`
 
 For example: `$HOME/.onlysnarf/users/alexdicksdown.conf`
 
-Note: for Windows users the $HOME path works out to: "C:\Users\YOUR_USERNAME" so the base directory can be found at "C:\Users\YOUR_USERNAME\.onlysnarf"
+**Note**: for Windows users the $HOME path works out to: "C:\Users\YOUR_USERNAME" so the base directory can be found at "C:\Users\YOUR_USERNAME\.onlysnarf"
 
 **No**, the user credentials *are not* handled in the safest manner because they are very clearly stored in plain text and without any encryption. Yes, a better way can be figured out. Do I think a better way is necessary for this project? No. So please be careful with your own credentials.
 
 ## Dependencies
 Selenium's webdriver manager should install everything it needs automatically. If you are using a Raspberry Pi 4, be sure to run `sudo apt-get install chromium-chromedriver` on your device to be able to launch chrome.
+
+## Platforms
+Runs successfully on:
+- Linux Ubuntu
+- Windows 11
+
+## Tests
+Basic unittesting:
+- `python -m unittest tests/snarf/test_discount.py`
+- `python -m unittest tests/snarf/test_post.py`
+- `python -m unittest tests/snarf/test_message.py`
+- `python -m unittest tests/snarf/test_users.py`
+
+Pytests available under /tests:
+- `pytest tests/selenium`
+- `pytest tests/snarf`
 
 ## Updates
 4/18/2023 : To further reduce repo size, preview gifs have been relocated to [IPFS](//ipfs.io/ipfs/QmVpjSy9NXy3VUM474hSDoPSsmsb5WVYkN9WN6N7nFxZuj).
