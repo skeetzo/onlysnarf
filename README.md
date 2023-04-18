@@ -1,17 +1,17 @@
 <h1 align="center">OnlySnarf</h1>
 <p align="center"><img src="public/images/snarf-missionary.jpg" alt="Shnarf" width="400"/></p>
-<p align="center">Please refer to the <a href="/OnlySnarf/docs/menu.md">Menu</a> for help with the available arguments and config settings.</p> 
+<p align="center">Please refer to the <a href="public/docs/menu.md">Menu</a> for help with the available arguments and config settings.</p> 
 
 ## Description
 OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans by interacting with the site via web scraping. OnlySnarf carries no weapons, but it has been known to use its tail, teeth and claws when improperly configured.
 
 Here are some debugging previews of how it looks when everything works:
-- [Discount](public/previews/discount.gif)
-- [Message](public/previews/message.gif)
-- [Poll](public/previews/poll.gif)
-- [Post](public/previews/post.gif)
-- [Schedule](public/previews/schedule.gif)
-- [Users](public/previews/users.gif)
+- [Discount](//ipfs.io/ipfs/QmboqfpCeAAbbhqGhPQ8cCscqm7CNH4mxTPR42g8Cg7iLW?filename=discount.gif)
+- [Message](//ipfs.io/ipfs/QmXitqxkRuMXb6XnUJw7MHUxLii7UNEXjENc5k4PyfTWfY?filename=message.gif)
+- [Poll](//ipfs.io/ipfs/QmNkE4GpBoiQ3tGLLfxtTGS96jJJJixS4qbkx9fxN9GeYC?filename=poll.gif)
+- [Post](//ipfs.io/ipfs/QmUBjuLK3yh5v4U9SSPmSG3NAGgYaY6rYoYACGi1smZpJ7?filename=post.gif)
+- [Schedule](//ipfs.io/ipfs/QmUd843FXXyMP2eyfkB1d1erZyrKN1hmKchuviruzN8ctD?filename=schedule.gif)
+- [Users](//ipfs.io/ipfs/Qmc9zPytgSKx4EK6V1A8DABNeCpMxBybcRs4hNtAMSKDyi?filename=users.gif)
 
 ## Installation
 
@@ -26,7 +26,7 @@ clone repo & install: `git clone git@github.com:skeetzo/onlysnarf && python setu
 > optional arguments:
 >  -h, --help  show this help message and exit
 >  -version    show program's version number and exit
->  -[refer to [menu](OnlySnarf/docs/menu.md) for more options] ...
+>  -[refer to [menu](public/docs/menu.md) for more options] ...
 >
 > Shnarrf!
   
@@ -46,8 +46,8 @@ For example: `$HOME/.onlysnarf/users/alexdicksdown.conf`
 Selenium's webdriver manager should install everything it needs automatically. If you are using a Raspberry Pi 4, be sure to run `sudo apt-get install chromium-chromedriver` on your device to be able to launch chrome.
 
 ## Previews
-To further reduce repo size, preview gifs have been relocated to IPFS: https://ipfs.io/ipfs/QmVpjSy9NXy3VUM474hSDoPSsmsb5WVYkN9WN6N7nFxZuj
+To further reduce repo size, preview gifs have been relocated to [IPFS](//ipfs.io/ipfs/QmVpjSy9NXy3VUM474hSDoPSsmsb5WVYkN9WN6N7nFxZuj)
 
 ## Referral
 Feel free to make use of my referral code ;)  
-https://onlyfans.com/?ref=409408
+//onlyfans.com/?ref=409408
