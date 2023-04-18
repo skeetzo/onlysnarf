@@ -685,7 +685,8 @@
   - retested google login (remains disabled)
 **4.4.14 : 4/18/2023**
   - moved preview gifs to IPFS
-  
+  - updated / fixed links in README
+
 ------------------------------------------------------------------------------------
 
 ## TODO

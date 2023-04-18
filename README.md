@@ -40,6 +40,8 @@ The config process has been updated as well from the previous format. Example co
 
 For example: `$HOME/.onlysnarf/users/alexdicksdown.conf`
 
+Note: for Windows users the $HOME path works out to: "C:\Users\YOUR_USERNAME" so the base directory can be found at "C:\Users\YOUR_USERNAME\.onlysnarf"
+
 **No**, the user credentials *are not* handled in the safest manner because they are very clearly stored in plain text and without any encryption. Yes, a better way can be figured out. Do I think a better way is necessary for this project? No. So please be careful with your own credentials.
 
 ## Dependencies
