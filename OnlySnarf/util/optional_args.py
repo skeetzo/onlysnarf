@@ -150,6 +150,12 @@ def apply_subcommand_args(parser):
   # the users to discount
   userAndUsers.add_argument('-users', dest='users', action='append', default=[], help='users to discount')
 
+  ##########
+  ## Menu ##
+  ##########
+
+  parser_menu = subparsers.add_parser('menu', help='> access the cli menu')
+
   #############
   ## Message ##
   #############

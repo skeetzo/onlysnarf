@@ -30,6 +30,8 @@ import pkg_resources
 parser.version = str(pkg_resources.get_distribution("onlysnarf").version)
 parser.add_argument('-version', action='version')
 
+parser.add_argument('-version', action='version')
+
 ############################################################################################
 
 try:

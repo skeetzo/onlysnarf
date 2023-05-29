@@ -672,7 +672,7 @@
   - fixed 'onlysnarf' cmd references
   - removed nonworking browser references in optional args
   - fixed discount bug
-**4.4.12: 3/24/2023**
+  **4.4.12: 3/24/2023**
   - RPi4 debugging
   - fixed element bug when posting
   - fixed users
@@ -683,10 +683,16 @@
   - Windows compatability testing
   - updated pathings for Windows
   - retested google login (remains disabled)
+**4.4.14 : 5/29/2023**
+  - beginning readd of cli menu
+  - switch from pyinquirer to inquirer
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- finish updating cli menu functionality
+- finish updating profile class & menu
 
 - add bypass for 2fa
 https://www.geeksforgeeks.org/two-factor-authentication-using-google-authenticator-in-python/

@@ -67,6 +67,18 @@ class Settings:
         else:
             return time.strftime(DEFAULT.TIME_FORMAT)
 
+    def header():
+        Settings.print("### SETTINGS ###")
+        Settings.print("...")
+        Settings.print("...")
+        Settings.print("...")
+
+    def menu():
+        Settings.print("### SETTINGS MENU ###")
+        Settings.print("...")
+        Settings.print("...")
+        Settings.print("...")
+
     ##
     # Getters
     ##
@@ -389,9 +401,6 @@ class Settings:
 
     def get_user():
         return Settings.get_users()[0]
-
-    def get_email():
-        return config["email"]
 
     def get_user_configs():
         # load configs from .onlysnarf or baseDir

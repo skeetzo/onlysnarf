@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # Profile Settings
 import json
+import inquirer
 ##
 from ..lib.driver import Driver
 from ..util.settings import Settings
@@ -17,25 +18,56 @@ class Profile:
         for key, value in profile.items():
             setattr(self, str(key), value)
 
+    @staticmethod
+    def ask_action():
+        questions = [
+            inquirer.List('action',
+                message= "Please select an action:",
+                choices= ['Back', 'Backup', 'Check', 'Posts', 'Setup', 'Sync']
+            )
+        ]
+        answers = inquirer.prompt(questions)
+        return answers["action"]
+
     # Backup
+
+    @staticmethod
+    def ask_backup():
+        questions = [
+            inquirer.List('backup',
+                message= "Please select a backup action:",
+                choices= ['Back', 'Content', 'Messages']
+            )
+        ]
+        answers = inquirer.prompt(questions)
+        return answers["backup"]
+
+    @staticmethod
+    def backup_menu():
+        action = Profile.ask_backup()
+        if (action == 'Back'): return
+        elif (action == 'Content'): Profile.backup_content()
+        elif (action == 'Messages'): Profile.backup_messages()
 
     @staticmethod
     def backup_content():
         print("Backing Up: Content")
-        Driver.download_content()
+        driver = Driver.get_driver()
+        driver.download_content()
         ## TODO
-        # files = Driver.download_content()
-        # Files.backup(files)
+        # Files.backup()
         print("Backed Up: Content")
         return True
 
     @staticmethod
     def backup_messages():
         print("Backing Up: Messages")
+        # TODO: add user select
         # select user
         user = "all"
         # user = User.select_user()
-        Driver.download_messages(user)
+        driver = Driver.get_driver()
+        driver.download_messages(user)
         print("Backed Up: Messages")
 
     # new - advertise - tweet to advertise new account, tweet to ask about what you should post
@@ -147,14 +179,12 @@ class Profile:
     @staticmethod
     def menu():
         action = Profile.ask_action()
-        if (action == 'Back'): 
-            from OnlySnarf.bin.menu import Menu
-            return Menu.main_menu()
-        elif (action == 'backup'): Profile.backup_menu()
-        elif (action == 'check'): Profile.check()
-        elif (action == 'posts'): Profile.posts_menu()
-        elif (action == 'setup'): Profile.setup()
-        elif (action == 'sync'): Profile.sync_from_profile()
+        if (action == 'Back'): return
+        elif (action == 'Backup'): Profile.backup_menu()
+        elif (action == 'Check'): Profile.check()
+        elif (action == 'Posts'): Profile.posts_menu()
+        elif (action == 'Setup'): Profile.setup()
+        elif (action == 'Sync'): Profile.sync_from_profile()
         # elif (action == 'sync to'): Profile.sync_to_profile()
         
     @staticmethod

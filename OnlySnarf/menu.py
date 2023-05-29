@@ -1,11 +1,10 @@
 #!/usr/bin/python3
-# Snarf.py cli menu
 
+import os
 import time
 import random
-import os
 import sys
-# from PyInquirer import prompt
+import inquirer
 ##
 from OnlySnarf.snarf import Snarf
 from OnlySnarf.lib.driver import Driver
@@ -42,16 +41,14 @@ class Menu:
 
         options = ["back"]
         options.extend(Settings.get_actions())
-        menu_prompt = {
-            'type': 'list',
-            'name': 'action',
-            'message': 'Please select an action:',
-            'choices': [str(option).title() for option in options],
-            'filter': lambda val: str(val).lower()
-        }
-        menu_prompt["choices"].sort()
-        answers = prompt(menu_prompt)
-        return answers['action']
+        questions = [
+            inquirer.List('action',
+                message= "Please select an action:",
+                choices= [str(option).title() for option in options],
+            )
+        ]
+        answers = inquirer.prompt(questions)
+        return answers['action'].lower()
 
     def action_menu():
         """
@@ -65,9 +62,9 @@ class Menu:
         elif (action == 'discount'): Snarf.discount()
         elif (action == 'message'): Snarf.message()
         elif (action == 'post'): Snarf.post()
-        elif (action == 'profile'): Snarf.profile()
+        elif (action == 'profile'): Profile.menu()
         elif (action == 'promotion'): Snarf.promotion()
-        else: print("Missing Action: {}".format(colorize(action,"red")))
+        else: Settings.print("Missing Action: {}".format(colorize(action,"red")))
         Menu.main()
         
     def header():
@@ -99,21 +96,21 @@ class Menu:
 
         """
 
-        print("User:")
-        if Settings.get_email() != "":
-            print(" - Email = {}".format(Settings.get_email()))
-        print(" - Username = {}".format(Settings.get_username()))
+        Settings.print("User:")
+        if Settings.get_username_onlyfans() != "":
+            Settings.print(" - Email = {}".format(Settings.get_username_onlyfans()))
+        Settings.print(" - Username = {}".format(Settings.get_username()))
         pass_ = ""
         if str(Settings.get_password()) != "":
             pass_ = "******"
-        print(" - Password = {}".format(pass_))
+        Settings.print(" - Password = {}".format(pass_))
         if str(Settings.get_username_twitter()) != "":
-            print(" - Twitter = {}".format(Settings.get_username_twitter()))
+            Settings.print(" - Twitter = {}".format(Settings.get_username_twitter()))
             pass_ = ""
             if str(Settings.get_password_twitter()) != "":
                 pass_ = "******"
-            print(" - Password = {}".format(pass_))
-        print('\r')
+            Settings.print(" - Password = {}".format(pass_))
+        Settings.print('\r')
 
     def menu():
         """
@@ -126,13 +123,22 @@ class Menu:
 
         """
 
-        menu_prompt = {
-            'type': 'list',
-            'name': 'menu',
-            'message': 'Please select an option:',
-            'choices': ['Action', 'Profile', 'Settings', 'Exit']
-        }
-        answers = prompt(menu_prompt)
+        questions = [
+            inquirer.List('menu',
+                message= "Please select an option:",
+                choices= ['Action', 'Settings', 'Exit']
+            )
+        ]
+        answers = inquirer.prompt(questions)
+
+        # menu_prompt = {
+        #     'type': 'list',
+        #     'name': 'menu',
+        #     'message': 'Please select an option:',
+        #     'choices': ['Action', 'Profile', 'Settings', 'Exit']
+        # }
+        # answers = prompt(menu_prompt)
+
         return answers['menu']
 
     def main_menu():
@@ -144,10 +150,8 @@ class Menu:
 
         action = Menu.menu()
         if (action == 'Action'): Menu.action_menu()
-        elif (action == 'Profile'): Profile.menu()
         elif (action == 'Settings'): Settings.menu()
         else: exit()
-        # Menu.main_menu()
         Menu.main()
 
     def main():
@@ -167,32 +171,28 @@ class Menu:
 
 #################################################################################################
 
-import atexit
 def exit_handler():
-    print("Shnarrf?")
-    exit()
-atexit.register(exit_handler)
+    """Exit cleanly"""
 
-import signal
-def signal_handler(sig, frame):
-    print('Shnnnarf?')
-    exit()
-signal.signal(signal.SIGINT, signal_handler)
-  
-def exit():
-    Driver.exit()
-    sys.exit(0)
+    try:
+        Driver.exit_all()
+    except Exception as e:
+        print(e)
+
+import atexit
+atexit.register(exit_handler)
 
 ######################################################
 
 def main():
-    Menu.main()
-
-if __name__ == "__main__":
     try:
         Menu.main()
     except Exception as e:
         Settings.dev_print(e)
-        print("Shhhhhnnnnnarf!")
+        Settings.print("shnarf??")
     finally:
-        exit()
+        Settings.print("shnarrf!")
+        exit_handler()
+
+if __name__ == "__main__":
+    main()

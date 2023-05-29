@@ -6,6 +6,8 @@ from pathlib import Path
 # Defaults 
 ##
 
+ACTIONS = [ "Discount", "Message", "Post", "Profile", "Promotion" ]
+
 AMOUNT_NONE = 0
 
 DATE_FORMAT = "%m/%d/%Y"
