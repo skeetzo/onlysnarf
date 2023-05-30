@@ -18,6 +18,7 @@ setuptools.setup(
     include_package_data=True,
     install_requires=[
         'ffmpeg',
+        'inquirer',
         'wget',
         'selenium',
         'webdriver_manager'
@@ -29,6 +30,7 @@ setuptools.setup(
     },
     entry_points={
         'console_scripts' : [
+            'onlysnarf = OnlySnarf.menu:main',
             'snarf = OnlySnarf.snarf:main'
         ]
     },

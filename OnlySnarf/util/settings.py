@@ -67,6 +67,18 @@ class Settings:
         else:
             return time.strftime(DEFAULT.TIME_FORMAT)
 
+    def header():
+        Settings.print("### SETTINGS ###")
+        Settings.print("...")
+        Settings.print("...")
+        Settings.print("...")
+
+    def menu():
+        Settings.print("### SETTINGS MENU ###")
+        Settings.print("...")
+        Settings.print("...")
+        Settings.print("...")
+
     ##
     # Getters
     ##
@@ -224,7 +236,7 @@ class Settings:
         return DEFAULT.MESSAGE_CHOICES
 
     def get_root_path():
-        return config["root_path"] or DEFAULT.ROOT_PATH
+        return DEFAULT.ROOT_PATH
 
     def get_sort_method():
         return config["sort"] or "random"
@@ -389,9 +401,6 @@ class Settings:
 
     def get_user():
         return Settings.get_users()[0]
-
-    def get_email():
-        return config["email"]
 
     def get_user_configs():
         # load configs from .onlysnarf or baseDir
