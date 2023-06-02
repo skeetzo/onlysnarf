@@ -10,6 +10,7 @@ class TestAuth(unittest.TestCase):
 
     def setUp(self):
         config["login"] = "auto"
+        # config["browser"] = "chrome"
         Settings.set_debug("tests")
         self.driver = Driver()
 

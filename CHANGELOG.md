@@ -686,6 +686,8 @@
 **4.4.14 : 5/29/2023**
   - beginning readd of cli menu
   - switch from pyinquirer to inquirer
+**4.4.15 : 6/2/2023**
+  - fixed cookies bug
 
 ------------------------------------------------------------------------------------
 
