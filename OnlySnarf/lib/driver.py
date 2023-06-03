@@ -412,45 +412,61 @@ class Driver:
         """Downloads all images on the page"""
 
         downloaded = []
+        downloadMe = []
         try:
             images = self.browser.find_elements(By.TAG_NAME, "img")
+            end = len(images)
             if len(images) == 0:
                 Settings.warn_print("no images found!")
                 return downloaded
             if not destination: destination = os.path.join(Settings.get_download_path(), "images")
             Path(destination).mkdir(parents=True, exist_ok=True)
-            i=1
-            for thumbnail in images:
-                src = ""
+            i=0
+            for j in range(end):
                 try:
+                    images = self.browser.find_elements(By.TAG_NAME, "img")
                     # click on each image
                     # download each image via class "pswp__img"
-                    self.move_to_then_click_element(thumbnail)
+                    self.move_to_then_click_element(images[i])
                     time.sleep(1)
-                    image = self.browser.find_element(By.CLASS_NAME, "pswp__img")
-                    # if Driver.DOWNLOADING_MAX and i > Driver.DOWNLOAD_MAX_IMAGES: break
-                    src = str(image.get_attribute("src"))
-                    if not src or src == "" or src == "None" or "/thumbs/" in src or "_frame_" in src or "http" not in src: continue
-                    Settings.print_same_line("downloading image: {}/{}".format(i, len(images)))
-                    # Settings.print("Image: {}".format(src[:src.find(".jpg")+4]))
-                    # Settings.dev_print("image src: {}".format(src))
-                        # while os.path.isfile("{}/{}.jpg".format(destination, i)):
-                            # i+=1
-
-                    # TODO: maybe open image in new tab then download it
-
-                    wget.download(src, "{}/{}.jpg".format(destination, i), False)
-                    downloaded.append(i)
+                    hdImages = self.browser.find_elements(By.CLASS_NAME, "pswp__img")
+                    downloadMe.extend(hdImages)
                 except Exception as err:
                     Settings.print("")            
-                    Settings.err_print(err)
-                    Settings.warn_print("skipped image: "+src)
+                    Settings.warn_print(err)
                 finally:
                     ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
                     i+=1
             Settings.print("")
         except Exception as err:
             Settings.err_print(err)
+
+        downloadMe = list(set(downloadMe)) # remove duplicates
+
+        i=1
+        for image in downloadMe:
+            src = ""
+            try:
+                # if Driver.DOWNLOADING_MAX and i > Driver.DOWNLOAD_MAX_IMAGES: break
+                src = str(image.get_attribute("src"))
+                if not src or src == "" or src == "None" or "/thumbs/" in src or "_frame_" in src or "http" not in src: continue
+                Settings.print_same_line("downloading image: {}/{}".format(i, len(images)))
+                # Settings.print("Image: {}".format(src[:src.find(".jpg")+4]))
+                # Settings.dev_print("image src: {}".format(src))
+                    # while os.path.isfile("{}/{}.jpg".format(destination, i)):
+                        # i+=1
+
+                # TODO: maybe open image in new tab then download it
+
+                wget.download(src, "{}/{}.jpg".format(destination, i), False)
+                downloaded.append(i)
+            except Exception as err:
+                Settings.print("")            
+                Settings.err_print(err)
+                Settings.warn_print("skipped image: "+src)
+            finally:
+                i+=1
+
         return downloaded
 
     def download_messages(self, user="all", destination=None):
@@ -500,34 +516,50 @@ class Driver:
         """Downloads all videos on the page"""
 
         downloaded = []
+        downloadMe = []
         try:
             # find all video elements on page
             # videos = self.browser.find_elements(By.TAG_NAME, "video")
             # videos = self.browser.find_elements(By.CLASS_NAME, "m-video-item")
             playButtons = self.browser.find_elements(By.CLASS_NAME, "b-photos__item__play-btn")
+            end = len(playButtons)
 
             if len(playButtons) == 0:
                 Settings.warn_print("no videos found!")
                 return downloaded
             if not destination: destination = os.path.join(Settings.get_download_path(), "videos")
             Path(destination).mkdir(parents=True, exist_ok=True)
-            i=1
-            for play in playButtons:
+            i=0
+            for j in range(end):
                 src = ""
+                playButtons = self.browser.find_elements(By.CLASS_NAME, "b-photos__item__play-btn")
+
                 try:
                     # click on play button
                     # find new and only video ele on page
-                    self.move_to_then_click_element(play)
-                    time.sleep(1)
+                    self.move_to_then_click_element(playButtons[i])
+                    time.sleep(3)
                     video = self.browser.find_element(By.TAG_NAME, "video")
                     # if Driver.DOWNLOADING_MAX and i > Driver.DOWNLOAD_MAX_VIDEOS: break
                     src = str(video.get_attribute("src"))
                     if not src or src == "" or src == "None" or "http" not in src: continue
-                    Settings.print_same_line("downloading video: {}/{}".format(i, len(playButtons)))
+                    downloadMe.append(src)
+                except Exception as e:
+                    Settings.warn_print(e)
+                finally:
+                    ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+                    i+=1
+
+            downloadMe = list(set(downloadMe)) # remove duplicates
+
+            i=1
+            for src in downloadMe:
+                try:
+                    Settings.print_same_line("downloading video: {}/{}".format(i, end))
                     # Settings.print("Video: {}".format(src[:src.find(".mp4")+4]))
                     Settings.dev_print("video src: {}".format(src))
-                    while os.path.isfile("{}/{}.mp4".format(destination, i)):
-                        i+=1
+                    # while os.path.isfile("{}/{}.mp4".format(destination, i)):
+                        # i+=1
                     wget.download(src, "{}/{}.mp4".format(destination, i), False)
                     downloaded.append(i)
                 except Exception as e:

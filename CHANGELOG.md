@@ -693,6 +693,7 @@
 
 ## TODO
 
+- finish updating image/video downloading
 - finish updating cli menu functionality
 - finish updating profile class & menu
 
