@@ -689,17 +689,18 @@
 **4.4.15 : 6/2/2023**
   - fixed cookies bug
 **4.4.16 : 7/5/2023**
-  - update readme and help docs / added personal touchup to help.md
+  - update readme and help&menu docs / added personal touchups
 
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
+- add smart idea for getting statement information
 - add better version notes to readme's list of "works on"
-- readd stuff for testing on multiple platforms ala mac ;) 
+- re-add stuff for testing on multiple platforms ala mac ;) 
 
-- fix tags / performers thing going on in config and text config
+- double check how tags & performers are implemented in config and text config and then re-add to docs
 
 - finish updating image/video downloading
 - finish updating cli menu functionality
