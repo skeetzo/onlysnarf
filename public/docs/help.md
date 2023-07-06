@@ -2,7 +2,7 @@
 
 # -h
 
-`snarf [-h] [-browser {auto,brave,chrome,chromium,firefox,remote}] [-login {auto,onlyfans,twitter}] [-reduce] [-save] [-tweet] [--username $USERNAME] [-config $PATH_CONFIG] [-debug] [-keep] [-prefer-local] [-show] [-v] [-version] {**discount**,**message**,**post**,**users**} ... ` 
+`snarf [-h] [-browser {auto,brave,chrome,chromium,firefox,remote}] [-login {auto,onlyfans,twitter}] [-reduce] [-save] [-tweet] [--username $USERNAME] [-config $PATH_CONFIG] [-debug] [-keep] [-prefer-local] [-show] [-v] [-version] {discount,message,post,users} ... ` 
 
 No mention of old Shnarf, I notice. Go ahead, just take all the glory, and leave it to Snarf to clean up after you. I don't mind!  
 
