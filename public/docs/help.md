@@ -34,7 +34,7 @@ Shnarrf!
 
 # Discount
 
-`snarf `**discount**` [-h] [-amount $AMOUNT] [-months $MONTHS] [-user $USER | -users $USERS]`  
+`snarf discount [-h] [-amount $AMOUNT] [-months $MONTHS] [-user $USER | -users $USERS]`  
 
 options:  
 > -h, --help      show this help message and exit  
@@ -45,7 +45,7 @@ options:
 
 # Message
 
-`snarf `**message**` [-h] [-date $DATE] [-performers $PERFORMERS] [-price $PRICE] [-schedule $SCHEDULE] [-time $TIME] [-tags $TAGS] [-text $TEXT] [-user $USER | -users $USERS] ... `  
+`snarf message [-h] [-date $DATE] [-performers $PERFORMERS] [-price $PRICE] [-schedule $SCHEDULE] [-time $TIME] [-tags $TAGS] [-text $TEXT] [-user $USER | -users $USERS] ... `  
 
 positional arguments:  
 > input                 one or more paths to files (or folder) to include in the message  
@@ -64,7 +64,7 @@ options:
 
 # Post
 
-`snarf **post** [-h] [-date $DATE] [-duration {1,3,7,30,99} | -expiration $EXPIRATION] [-performers $PERFORMERS] [-price $PRICE] [-schedule $SCHEDULE] [-time $TIME] [-tags $TAGS] [-text $TEXT] [-question $QUESTIONS] ... `  
+`snarf post [-h] [-date $DATE] [-duration {1,3,7,30,99} | -expiration $EXPIRATION] [-performers $PERFORMERS] [-price $PRICE] [-schedule $SCHEDULE] [-time $TIME] [-tags $TAGS] [-text $TEXT] [-question $QUESTIONS] ... `  
 
 positional arguments:  
 > input                 one or more paths to files (or folders) to include in the post  
@@ -84,7 +84,7 @@ options:
 
 # Users
 
-`snarf **users** [-h]`  
+`snarf users [-h]`  
 
 options:  
 > -h, --help  show this help message and exit  
