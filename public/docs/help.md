@@ -1,4 +1,5 @@
 **Note**: General options go in front of the chosen subcommand. Options specific to the subcommand go after the subcommand.  
+**Double Note**: These are all modified help outputs for reading on github from running the help commmand or `-h` for each subcommand.
 
 # -h
 
