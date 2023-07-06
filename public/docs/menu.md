@@ -30,10 +30,11 @@ text: ""
 
 (optional)  
 input: "/path/to/fileoOrFolder"  
-(requires input)  
+
+(when input is specified)  
 price ($): "0.00" | "min" | "max"  
 tags: key, words -> #key #words  
-performers: [performerNames or Ids ...]  
+performers: performerName1, performerName2 -> @performerName1 @performerName2  
 
 Schedule: ("date" & "time" or only "schedule")  
 schedule: "mm/dd/YYYY:HH:MM"  
@@ -41,6 +42,7 @@ date: "mm/dd/YYYY"
 time: "HH:MM"  
 
 Message $USER the provided $TEXT with $TAGS and uploaded $IMAGE available for $PRICE.  
+
 If schedule: schedules the message for the provided date and time.  
 
 ### Post
@@ -51,17 +53,18 @@ input: "/path/to/fileoOrFolder"
 tags: key, words -> #key #words  
 performers: performerName1, performerName2 -> @performerName1 @performerName2  
 
-Schedule: ("date" & "time" or only "schedule")  
+**Schedule**: (when specificying "date" & "time" or only "schedule")  
 schedule: "mm/dd/YYYY:HH:MM"  
 date: "mm/dd/YYYY"  
 time: "HH:MM"  
 
-Poll:  
+**Poll**:  
 questions: "your mom", "is very hot", "today"  
 duration: 1, 3, 7, 99 or "No limit" | "min" | "max"  
 expires: 1, 3, 7, 99 or "No limit" | "min" | "max"  
 
 Upload provided $INPUT with $TEXT, $TAGS, and provided list of $PERFORMERS.  
+
 If schedule: schedules the post for the provided date and time.  
 If poll: enters questions as provided in order, the duration, and expiration.  
 
