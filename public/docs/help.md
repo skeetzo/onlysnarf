@@ -1,3 +1,5 @@
+**Note**: General options go in front of the chosen subcommand. Options specific to the subcommand go after the subcommand.  
+
 # -h
 
 usage: snarf [-h] [-browser {auto,brave,chrome,chromium,firefox,remote}] [-login {auto,onlyfans,twitter}] [-reduce] [-save] [-tweet] [--username USERNAME] [-config PATH_CONFIG] [-debug] [-keep] [-prefer-local] [-show] [-v] [-version] {**discount**,**message**,**post**,**users**} ...  
@@ -6,11 +8,11 @@ No mention of old Shnarf, I notice. Go ahead, just take all the glory, and leave
 
 positional arguments: {**discount**,**message**,**post**,**users**}  
 
-Include a sub-command to run a corresponding action:  
->   discount            > discount one or more users  
->   message             > send a message to one or more users  
->   post                > upload a post  
->   users               > scan & save users  
+Include a subcommand to run a corresponding action:  
+   discount            > discount one or more users  
+   message             > send a message to one or more users  
+   post                > upload a post  
+   users               > scan & save users  
 
 options:  
 > -h, --help            show this help message and exit  
