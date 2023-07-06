@@ -34,7 +34,7 @@ Shnarrf!
 
 # Discount
 
-`snarf **discount** [-h] [-amount $AMOUNT] [-months $MONTHS] [-user $USER | -users $USERS]`  
+`snarf `**discount**` [-h] [-amount $AMOUNT] [-months $MONTHS] [-user $USER | -users $USERS]`  
 
 options:  
 > -h, --help      show this help message and exit  
@@ -45,8 +45,7 @@ options:
 
 # Message
 
-usage:
-`snarf **message** [-h] [-date $DATE] [-performers $PERFORMERS] [-price $PRICE] [-schedule $SCHEDULE] [-time $TIME] [-tags $TAGS] [-text $TEXT] [-user $USER | -users $USERS] ... `  
+`snarf `**message**` [-h] [-date $DATE] [-performers $PERFORMERS] [-price $PRICE] [-schedule $SCHEDULE] [-time $TIME] [-tags $TAGS] [-text $TEXT] [-user $USER | -users $USERS] ... `  
 
 positional arguments:  
 > input                 one or more paths to files (or folder) to include in the message  
