@@ -19,7 +19,7 @@ There are two **different** installation options (that I know of):
 1) via pip for the latest official package: `python3 -m pip install onlysnarf`  
 2) or clone the repo & setup a virtual environment to install locally like in the bash script at [bin/virtualenv.sh](/bin/virtualenv.sh) 
 
-Here is an output of the command: [`snarf -h`](/public/help.md/#-h)
+Here is an output of the command: [`snarf -h`](/public/docs/help.md/#-h)
   
 Command example: `snarf -text "suck my giant balls" /path/to/imageOfBalls.jpeg`
 
