@@ -171,12 +171,12 @@ A question to include when posting a questions response. Can be provided in mult
 
 ## more args
 
-Some args are hidden from the help command. All args are available via the config file.
+Some args are hidden from the help command. All args are available via the config file and are (sometimes) further notated there as well.
 
 ### Selenium
 
 -browser, -B [auto|firefox|google|reconnect|remote]
-Browser to connect to. Remote requires $remote-host &| $remote-port or a local session.json file.
+Browser to connect with.
 
 -keep, -K
 Keep the browser open when finished (allows for reconnect).
@@ -204,7 +204,7 @@ Shows additional log output (up to 3).
 -version
 Prints the version
 
-Complete Debugging:
+Basic debugging preface:
   `snarf -debug -verbose -verbose -verbose -show -debug-delay`
 
 ## Config File Only

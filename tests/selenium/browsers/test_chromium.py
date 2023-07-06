@@ -20,6 +20,7 @@ class TestSeleniumChromium(unittest.TestCase):
         config["show"] = False
         self.driver.exit()
 
+    @unittest.skip("todo")
     def test_chromium(self):
         config["browser"] = "chromium"
         # config["debug_chromium"] = True

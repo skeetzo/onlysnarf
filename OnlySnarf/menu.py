@@ -12,6 +12,10 @@ from OnlySnarf.classes.profile import Profile
 from OnlySnarf.util.colorize import colorize
 from OnlySnarf.util.settings import Settings
 
+# from OnlySnarf.util.args import parser
+# print(parser)
+# parser.add_parser('menu', help='> access the cli menu')
+
 ####################
 ##### CLI Menu #####
 ####################

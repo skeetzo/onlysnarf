@@ -42,11 +42,11 @@ class Settings:
         sys.stdout.flush()
 
     def maybe_print(text):
-        if int(config["verbose"]) >= 1:
+        if int(config["verbose"]) >= 1 or str(os.environ.get("ENV")) == "test":
             log.debug(text)
 
     def dev_print(text):
-        if int(config["verbose"]) >= 2:
+        if int(config["verbose"]) >= 2 or str(os.environ.get("ENV")) == "test":
             log.debug(text)
 
     def err_print(error):
@@ -236,7 +236,7 @@ class Settings:
         return DEFAULT.MESSAGE_CHOICES
 
     def get_root_path():
-        return config["root_path"] or DEFAULT.ROOT_PATH
+        return DEFAULT.ROOT_PATH
 
     def get_sort_method():
         return config["sort"] or "random"

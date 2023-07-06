@@ -15,6 +15,7 @@ pytest tests/selenium/reconnect
 
 pytest tests/snarf
 
+python -m unittest tests/snarf/test_auth.py
 python -m unittest tests/snarf/test_discount.py
 python -m unittest tests/selenium/browsers/test_firefox.py
 

@@ -1,8 +1,9 @@
 # -h
 
-usage: snarf [-h] [-browser {auto,chrome,firefox,remote}] [-login {auto,onlyfans,twitter}] [-reduce] [-save] [-tweet]
-                 [--username USERNAME] [-config PATH_CONFIG] [-debug] [-keep] [-show] [-v] [-version]
-                 {discount,message,post,users} ...
+usage: snarf [-h] [-browser {auto,brave,chrome,chromium,firefox,remote}] [-login {auto,onlyfans,twitter}] [-reduce] [-save] [-tweet] [--username USERNAME] [-config PATH_CONFIG] [-debug] [-keep] [-prefer-local] [-show] [-v] [-version]
+             {discount,message,post,users} ...
+
+No mention of old Shnarf, I notice. Go ahead, just take all the glory, and leave it to Snarf to clean up after you. I don't mind!
 
 positional arguments:
   {discount,message,post,users}
@@ -12,9 +13,9 @@ positional arguments:
     post                > upload a post
     users               > scan & save users
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
-  -browser {auto,chrome,firefox,remote}, -B {auto,chrome,firefox,remote}
+  -browser {auto,brave,chrome,chromium,firefox,remote}, -B {auto,brave,chrome,chromium,firefox,remote}
                         web browser to use
   -login {auto,onlyfans,twitter}, -L {auto,onlyfans,twitter}
                         method of user login to prefer
@@ -27,6 +28,7 @@ optional arguments:
                         path to config.conf
   -debug, -D            enable debugging
   -keep, -K             keep browser window open after scripting ends
+  -prefer-local         prefer recently cached data
   -show, -SW            enable displaying browser window
   -v, -verbose          verbosity level (max 3)
   -version              show program's version number and exit
@@ -37,7 +39,7 @@ Shnarrf!
 
 usage: snarf discount [-h] [-amount AMOUNT] [-months MONTHS] [-user USER | -users USERS]
 
-optional arguments:
+options:
   -h, --help      show this help message and exit
   -amount AMOUNT  amount (%) to discount by
   -months MONTHS  number of months to discount
@@ -46,14 +48,12 @@ optional arguments:
 
 # Message
 
-usage: snarf message [-h] [-date DATE] [-performers PERFORMERS] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-tags TAGS]
-                         [-text TEXT] [-user USER | -users USERS]
-                         ...
+usage: snarf message [-h] [-date DATE] [-performers PERFORMERS] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-tags TAGS] [-text TEXT] [-user USER | -users USERS] ...
 
 positional arguments:
   input                 one or more paths to files (or folder) to include in the message
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -date DATE            schedule date (MM-DD-YYYY)
   -performers PERFORMERS
@@ -68,14 +68,12 @@ optional arguments:
 
 # Post
 
-usage: snarf post [-h] [-date DATE] [-duration {1,3,7,30,99} | -expiration EXPIRATION] [-performers PERFORMERS] [-price PRICE]
-                      [-schedule SCHEDULE] [-time TIME] [-tags TAGS] [-text TEXT] [-question QUESTIONS]
-                      ...
+usage: snarf post [-h] [-date DATE] [-duration {1,3,7,30,99} | -expiration EXPIRATION] [-performers PERFORMERS] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-tags TAGS] [-text TEXT] [-question QUESTIONS] ...
 
 positional arguments:
   input                 one or more paths to files (or folders) to include in the post
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -date DATE            schedule date (MM-DD-YYYY)
   -duration {1,3,7,30,99}
@@ -96,5 +94,5 @@ optional arguments:
 
 usage: snarf users [-h]
 
-optional arguments:
+options:
   -h, --help  show this help message and exit

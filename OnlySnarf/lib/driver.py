@@ -109,10 +109,11 @@ class Driver:
 
         if self._initialized_: return
         self.browser = self.spawn_browser(Settings.get_browser_type())
-        self.browsers.append(self.browser)
-        # ## Cookies
-        # if str(Settings.is_cookies()) == "True": self.cookies_load()
         if self.browser:
+            self.browsers.append(self.browser)
+            ## Cookies
+            if str(Settings.is_cookies()) == "True":
+                self.cookies_load()
             self.tabs.append([self.browser.current_url, self.browser.current_window_handle, 0])
         self._initialized_ = True
         Driver.DRIVERS.append(self)
@@ -154,6 +155,7 @@ class Driver:
                 file.close()
                 Settings.dev_print("cookies: ")
                 for cookie in cookies:
+                    Settings.dev_print(cookie)
                     self.browser.add_cookie(cookie)
                 Settings.maybe_print("successfully loaded cookies")
                 self.refresh()
@@ -170,6 +172,7 @@ class Driver:
         try:
             # must be at onlyfans.com to save cookies of onlyfans.com
             self.go_to_home()
+            Settings.dev_print(self.browser.get_cookies())
             file = open(Settings.get_cookies_path(), "wb")
             pickle.dump(self.browser.get_cookies(), file) # "cookies.pkl"
             file.close()
@@ -405,36 +408,68 @@ class Driver:
         Settings.print("downloaded content")
         Settings.print("count: {}".format(len(imagesDownloaded)+len(videosDownloaded)))
 
-    def download_images(self):
+    def download_images(self, destination=None):
         """Downloads all images on the page"""
 
-        imagesDownloaded = []
+        downloaded = []
+        downloadMe = []
         try:
             images = self.browser.find_elements(By.TAG_NAME, "img")
-            downloadPath = os.path.join(Settings.get_download_path(), "images")
-            Path(downloadPath).mkdir(parents=True, exist_ok=True)
-            i=1
-            for image in images:
-                if Driver.DOWNLOADING_MAX and i > Driver.DOWNLOAD_MAX_IMAGES: break
+            end = len(images)
+            if len(images) == 0:
+                Settings.warn_print("no images found!")
+                return downloaded
+            if not destination: destination = os.path.join(Settings.get_download_path(), "images")
+            Path(destination).mkdir(parents=True, exist_ok=True)
+            i=0
+            for j in range(end):
+                try:
+                    images = self.browser.find_elements(By.TAG_NAME, "img")
+                    # click on each image
+                    # download each image via class "pswp__img"
+                    self.move_to_then_click_element(images[i])
+                    time.sleep(1)
+                    hdImages = self.browser.find_elements(By.CLASS_NAME, "pswp__img")
+                    downloadMe.extend(hdImages)
+                except Exception as err:
+                    Settings.print("")            
+                    Settings.warn_print(err)
+                finally:
+                    ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+                    i+=1
+            Settings.print("")
+        except Exception as err:
+            Settings.err_print(err)
+
+        downloadMe = list(set(downloadMe)) # remove duplicates
+
+        i=1
+        for image in downloadMe:
+            src = ""
+            try:
+                # if Driver.DOWNLOADING_MAX and i > Driver.DOWNLOAD_MAX_IMAGES: break
                 src = str(image.get_attribute("src"))
                 if not src or src == "" or src == "None" or "/thumbs/" in src or "_frame_" in src or "http" not in src: continue
                 Settings.print_same_line("downloading image: {}/{}".format(i, len(images)))
                 # Settings.print("Image: {}".format(src[:src.find(".jpg")+4]))
-                # Settings.print("Image: {}".format(src))
-                if Driver.DOWNLOADING:
-                    try:
-                        while os.path.isfile("{}/{}.jpg".format(downloadPath, i)):
-                            i+=1
-                        wget.download(src, "{}/{}.jpg".format(downloadPath, i), False)
-                        imagesDownloaded.append(i)
-                    except Exception as e: Settings.print(e)
-                i+=1
-            Settings.print("")
-        except Exception as e:
-            Settings.print(e)
-        return imagesDownloaded
+                # Settings.dev_print("image src: {}".format(src))
+                    # while os.path.isfile("{}/{}.jpg".format(destination, i)):
+                        # i+=1
 
-    def download_messages(self, user="all"):
+                # TODO: maybe open image in new tab then download it
+
+                wget.download(src, "{}/{}.jpg".format(destination, i), False)
+                downloaded.append(i)
+            except Exception as err:
+                Settings.print("")            
+                Settings.err_print(err)
+                Settings.warn_print("skipped image: "+src)
+            finally:
+                i+=1
+
+        return downloaded
+
+    def download_messages(self, user="all", destination=None):
         """
         Downloads all content in messages with the user
 
@@ -452,6 +487,7 @@ class Driver:
                 from ..classes.user import User
                 user = random.choice(User.get_all_users())
             self.message_user(user.username)
+            time.sleep(1)
             contentCount = 0
             while True:
                 self.browser.execute_script("document.querySelector('div[id=chatslist]').scrollTop=1e100")
@@ -466,43 +502,77 @@ class Driver:
                 if contentCount == len(images)+len(videos): break
                 contentCount = len(images)+len(videos)
             # download all images and videos
+
+            # TODO: download into correct user folders by username
             imagesDownloaded = self.download_images()
             videosDownloaded = self.download_videos()
+
             Settings.print("downloaded messages")
             Settings.print("count: {}".format(len(imagesDownloaded)+len(videosDownloaded)))
         except Exception as e:
-            Settings.maybe_print(e)
+            Settings.err_print(e)
 
-    def download_videos(self):
+    def download_videos(self, destination=None):
         """Downloads all videos on the page"""
 
-        videosDownloaded = []
+        downloaded = []
+        downloadMe = []
         try:
             # find all video elements on page
-            videos = self.browser.find_elements(By.TAG_NAME, "video")
-            downloadPath = os.path.join(Settings.get_download_path(), "videos")
-            Path(downloadPath).mkdir(parents=True, exist_ok=True)
+            # videos = self.browser.find_elements(By.TAG_NAME, "video")
+            # videos = self.browser.find_elements(By.CLASS_NAME, "m-video-item")
+            playButtons = self.browser.find_elements(By.CLASS_NAME, "b-photos__item__play-btn")
+            end = len(playButtons)
+
+            if len(playButtons) == 0:
+                Settings.warn_print("no videos found!")
+                return downloaded
+            if not destination: destination = os.path.join(Settings.get_download_path(), "videos")
+            Path(destination).mkdir(parents=True, exist_ok=True)
+            i=0
+            for j in range(end):
+                src = ""
+                playButtons = self.browser.find_elements(By.CLASS_NAME, "b-photos__item__play-btn")
+
+                try:
+                    # click on play button
+                    # find new and only video ele on page
+                    self.move_to_then_click_element(playButtons[i])
+                    time.sleep(3)
+                    video = self.browser.find_element(By.TAG_NAME, "video")
+                    # if Driver.DOWNLOADING_MAX and i > Driver.DOWNLOAD_MAX_VIDEOS: break
+                    src = str(video.get_attribute("src"))
+                    if not src or src == "" or src == "None" or "http" not in src: continue
+                    downloadMe.append(src)
+                except Exception as e:
+                    Settings.warn_print(e)
+                finally:
+                    ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+                    i+=1
+
+            downloadMe = list(set(downloadMe)) # remove duplicates
+
             i=1
-            # download all video.src -> /arrrg/$username/videos            
-            for video in videos:
-                if Driver.DOWNLOADING_MAX and i > Driver.DOWNLOAD_MAX_VIDEOS: break
-                src = str(video.get_attribute("src"))
-                if not src or src == "" or src == "None" or "http" not in src: continue
-                Settings.print_same_line("downloading video: {}/{}".format(i, len(videos)))
-                # Settings.print("Video: {}".format(src[:src.find(".mp4")+4]))
-                # Settings.print("Video: {}".format(src))
-                if Driver.DOWNLOADING:
-                    try:
-                        while os.path.isfile("{}/{}.mp4".format(downloadPath, i)):
-                            i+=1
-                        wget.download(src, "{}/{}.mp4".format(downloadPath, i), False)
-                        videosDownloaded.append(i)
-                    except Exception as e: Settings.print(e)
-                i+=1
+            for src in downloadMe:
+                try:
+                    Settings.print_same_line("downloading video: {}/{}".format(i, end))
+                    # Settings.print("Video: {}".format(src[:src.find(".mp4")+4]))
+                    Settings.dev_print("video src: {}".format(src))
+                    # while os.path.isfile("{}/{}.mp4".format(destination, i)):
+                        # i+=1
+                    wget.download(src, "{}/{}.mp4".format(destination, i), False)
+                    downloaded.append(i)
+                except Exception as e:
+                    Settings.print("")            
+                    Settings.err_print(e)
+                    Settings.warn_print("skipped video: "+src)
+                finally:
+                    ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+                    i+=1
             Settings.print("")
         except Exception as e:
-            Settings.print(e)
-        return videosDownloaded
+            Settings.err_print(e)
+        return downloaded
 
     @staticmethod
     def drag_and_drop_file(drop_target, path):
@@ -1321,18 +1391,18 @@ class Driver:
             Settings.err_print(e)
             return False
 
-        if str(Settings.is_cookies()) == "True":
-            self.cookies_load()
-            if loggedin_check():
-                self.logged_in = True
-                return True
-            elif str(Settings.is_cookies()) == "True" and str(Settings.is_debug("cookies")) == "True":
-                Settings.err_print("failed to login from cookies!")
-                Settings.set_cookies(False)
-                return False
-            elif str(Settings.is_cookies()) == "True":
-                Settings.set_cookies(False)
-                Settings.maybe_print("failed to login from cookies!")
+        # if str(Settings.is_cookies()) == "True":
+        #     self.cookies_load()
+        #     if loggedin_check():
+        #         self.logged_in = True
+        #         return True
+        #     elif str(Settings.is_cookies()) == "True" and str(Settings.is_debug("cookies")) == "True":
+        #         Settings.err_print("failed to login from cookies!")
+        #         Settings.set_cookies(False)
+        #         return False
+        #     elif str(Settings.is_cookies()) == "True":
+        #         Settings.set_cookies(False)
+        #         Settings.maybe_print("failed to login from cookies!")
 
         Settings.dev_print("attempting login...")
         successful = False
@@ -2832,8 +2902,8 @@ class Driver:
             # if os.name == 'nt':
                 # options.add_argument(r"--user-data-dir=C:\Users\brain\AppData\Local\Google\Chrome\User Data")
             # else:
-                # options.add_argument("--user-data-dir="+os.path.join(Settings.get_base_directory(),"tmp","selenium")) # do not disable, required for cookies to work 
-            options.add_argument(r'--profile-directory=Alex D') #e.g. Profile 3
+            options.add_argument("--user-data-dir="+os.path.join(Settings.get_base_directory(),"tmp","selenium")) # do not disable, required for cookies to work 
+            # options.add_argument(r'--profile-directory=Alex D') #e.g. Profile 3
             
             # options.add_argument("--allow-insecure-localhost")            
             # possibly linux only
