@@ -690,7 +690,9 @@
   - fixed cookies bug
 **4.4.16 : 7/5/2023**
   - update readme and help docs
+  - added personal touchup to help.md
 
+  
 ------------------------------------------------------------------------------------
 
 ## TODO
