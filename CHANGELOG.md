@@ -688,10 +688,17 @@
   - switch from pyinquirer to inquirer
 **4.4.15 : 6/2/2023**
   - fixed cookies bug
+**4.4.16 : 7/5/2023**
+  - update readme and help docs
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- add better version notes to readme's list of "works on"
+- readd stuff for testing on multiple platforms ala mac ;) 
+
+
 
 - finish updating image/video downloading
 - finish updating cli menu functionality
@@ -740,7 +747,7 @@ https://stackoverflow.com/questions/8529265/google-authenticator-implementation-
 - add tests for additional config variables such as browser and image/video options, limits
 - finish adding tests for individual messaging circumstances: all, recent, favorite, renew on
 - finish adding tests for individual message entry parts, individual post entry parts
-- add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi
+- add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi; readd references to remote in config files and such
 
 (webdriver)
 - (if necessary) finish integrating edge, ie, and opera
