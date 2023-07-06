@@ -2,7 +2,7 @@
 
 # -h
 
-usage: snarf [-h] [-browser {auto,brave,chrome,chromium,firefox,remote}] [-login {auto,onlyfans,twitter}] [-reduce] [-save] [-tweet] [--username USERNAME] [-config PATH_CONFIG] [-debug] [-keep] [-prefer-local] [-show] [-v] [-version] {**discount**,**message**,**post**,**users**} ...  
+usage: `snarf [-h] [-browser {auto,brave,chrome,chromium,firefox,remote}] [-login {auto,onlyfans,twitter}] [-reduce] [-save] [-tweet] [--username $USERNAME] [-config $PATH_CONFIG] [-debug] [-keep] [-prefer-local] [-show] [-v] [-version] {**discount**,**message**,**post**,**users**} ... ` 
 
 No mention of old Shnarf, I notice. Go ahead, just take all the glory, and leave it to Snarf to clean up after you. I don't mind!  
 
@@ -21,8 +21,8 @@ options:
 > -reduce               enable reducing files over 50 MB  
 > -save, -S             enable saving users locally on exit  
 > -tweet                enable tweeting when posting  
-> --username USERNAME, --u USERNAME OnlyFans username to use  
-> -config PATH_CONFIG, -C PATH_CONFIG path to config.conf  
+> --username $USERNAME, --u USERNAME OnlyFans username to use  
+> -config $PATH_CONFIG, -C PATH_CONFIG path to config.conf  
 > -debug, -D            enable debugging  
 > -keep, -K             keep browser window open after scripting ends  
 > -prefer-local         prefer recently cached data  
@@ -34,7 +34,7 @@ Shnarrf!
 
 # Discount
 
-usage: snarf **discount** [-h] [-amount $AMOUNT] [-months $MONTHS] [-user $USER | -users $USERS]  
+usage: `snarf **discount** [-h] [-amount $AMOUNT] [-months $MONTHS] [-user $USER | -users $USERS]`  
 
 options:  
 > -h, --help      show this help message and exit  
@@ -45,7 +45,7 @@ options:
 
 # Message
 
-usage: snarf **message** [-h] [-date $DATE] [-performers $PERFORMERS] [-price $PRICE] [-schedule $SCHEDULE] [-time $TIME] [-tags $TAGS] [-text $TEXT] [-user $USER | -users $USERS] ...  
+usage: `snarf **message** [-h] [-date $DATE] [-performers $PERFORMERS] [-price $PRICE] [-schedule $SCHEDULE] [-time $TIME] [-tags $TAGS] [-text $TEXT] [-user $USER | -users $USERS] ... `  
 
 positional arguments:  
 > input                 one or more paths to files (or folder) to include in the message  
@@ -64,7 +64,7 @@ options:
 
 # Post
 
-usage: snarf **post** [-h] [-date $DATE] [-duration {1,3,7,30,99} | -expiration $EXPIRATION] [-performers $PERFORMERS] [-price $PRICE] [-schedule $SCHEDULE] [-time $TIME] [-tags $TAGS] [-text $TEXT] [-question $QUESTIONS] ...  
+usage: `snarf **post** [-h] [-date $DATE] [-duration {1,3,7,30,99} | -expiration $EXPIRATION] [-performers $PERFORMERS] [-price $PRICE] [-schedule $SCHEDULE] [-time $TIME] [-tags $TAGS] [-text $TEXT] [-question $QUESTIONS] ... `  
 
 positional arguments:  
 > input                 one or more paths to files (or folders) to include in the post  
@@ -84,7 +84,7 @@ options:
 
 # Users
 
-usage: snarf **users** [-h]  
+usage: `snarf **users** [-h]`  
 
 options:  
 > -h, --help  show this help message and exit  
