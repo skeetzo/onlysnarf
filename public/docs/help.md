@@ -54,7 +54,7 @@ options:
 > -h, --help            show this help message and exit  
 > -date $DATE            schedule date (MM-DD-YYYY)  
 > -performers $PERFORMERS  performers to reference. adds "@[...performers]"  
-> -price $PRICE          price to charge ($)  
+> -price \$PRICE          price to charge ($)  
 > -schedule $SCHEDULE    schedule (MM-DD-YYYY:HH:MM:SS)  
 > -time $TIME            time (HH:MM)  
 > -tags $TAGS            the tags (@[tag])  
@@ -75,7 +75,7 @@ options:
 > -duration {1,3,7,30,99} duration in days (99 for 'No Limit') for a poll  
 > -expiration $EXPIRATION  expiration in days (999 for 'No Limit')  
 > -performers $PERFORMERS  performers to reference. adds "@[...performers]"  
-> -price $PRICE          price to charge ($)  
+> -price \$PRICE          price to charge ($)  
 > -schedule $SCHEDULE    schedule (MM-DD-YYYY:HH:MM:SS)  
 > -time $TIME            time (HH:MM)  
 > -tags $TAGS            tags (@[tag])  
