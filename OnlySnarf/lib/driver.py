@@ -3369,30 +3369,13 @@ class Driver:
         try:
             driver = Driver.get_driver()
             driver.go_to_page(page)
-            user_count = driver.browser.find_elements(By.TAG_NAME, "a")
-            # for debugging new regexes:
-            for ele in user_count:
-                Settings.dev_print("{}  -  {}".format(ele.get_attribute("href"), ele.get_attribute("innerHTML")))
-            user_count = [ele.get_attribute("innerHTML").strip() for ele in user_count
-                            if "/my/subscribers/active" in str(ele.get_attribute("href"))]
-            user_count = user_count[2] # get 3rd occurrence
-            # should be:
-            # '<span data-v-601d81dd="" class="l-sidebar__user-data__item__count"> 190 </span><span data-v-601d81dd="" class="l-sidebar__user-data__item__text m-break-word"> Fans </span>', 
-            user_count = re.search(r'>\s*[0-9]+\s*<', str(user_count))
-            Settings.dev_print(user_count)
-            user_count = user_count.group()
-            user_count = user_count.replace("<","").replace(">","").strip()
-            Settings.dev_print(user_count)
-            if not user_count or not user_count.isnumeric():
-                raise Exception("unable to find fan count!")
-            Settings.maybe_print("num fans found: "+user_count)
+            # scroll until elements stop spawning
             thirdTime = 0
             count = 0
             while True:
                 elements = driver.browser.find_elements(By.CLASS_NAME, "m-fans")
-                if len(elements) == int(user_count): break
                 if len(elements) == int(count) and thirdTime >= 3: break
-                Settings.print_same_line("({}/{}) scrolling...".format(count, user_count))
+                Settings.print_same_line("({}) scrolling...".format(count))
                 count = len(elements)
                 driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(2)
@@ -3402,43 +3385,12 @@ class Driver:
             elements = driver.browser.find_elements(By.CLASS_NAME, "m-fans")
             Settings.dev_print("searching fan elements...")
             for ele in elements:
-
-                # TODO ?
-                # add checks for lists here
-
-                # /my/favorites
-                # /my/lists/34324234
-
-                # eles_ = ele.find_elements(By.TAG_NAME, "a")
-                # isFavorite = False
-                # eles = [ele for ele in eles_
-                #     if "/my/favorites" in str(ele.get_attribute("href"))]
-                # if len(eles) > 0: isFavorite = True
-
-                # lists = []
-                # eles = [ele.get_attribute("href") for ele in eles_
-                #     if "/my/lists" in str(ele.get_attribute("href"))]
-                # for list_ in eles:
-                #     listNum = str(list_).replace("https://onlyfans.com/my/lists/", "")
-                #     Settings.maybe_print("list #: {}".format(listNum))
-                #     lists.append(listNum)
-
-                    ##
-                    # need to open tab and find name of list if not already known
-                    ##
-                    # check if list name is already known
-                    # open tab to list page
-                    # find html on page with list name
-                    # save list
-                # Settings.dev_print("successfully found lists")
                 username = ele.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()
                 name = ele.find_element(By.CLASS_NAME, "g-user-name").get_attribute("innerHTML")
                 name = re.sub("<!-*>", "", name)
                 name = re.sub("<.*\">", "", name)
                 name = re.sub("</.*>", "", name).strip()
-                # start = datetime.strptime(str(datetime.now()), "%m-%d-%Y:%H:%M")
-                # users.append({"name":name, "username":username.replace("@",""), "isFavorite":isFavorite, "lists":lists}) # ,"id":user_id, "started":start})
-                users.append({"name":name, "username":username.replace("@","")}) # ,"id":user_id, "started":start})
+                users.append({"name":name, "username":username.replace("@","")})
                 Settings.dev_print(users[-1])
             Settings.maybe_print("found {} fans".format(len(users)))
             Settings.dev_print("successfully found fans")

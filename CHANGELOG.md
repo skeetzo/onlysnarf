@@ -690,11 +690,14 @@
   - fixed cookies bug
 **4.4.16 : 7/5/2023**
   - update readme and help&menu docs / added personal touchups
-
+  - fixed get random user for discount test 
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+
+- fix how tabs open and scroll and then the process opens another tab to find the same elements and scroll again ala: find users then discount user
 
 - add smart idea for getting statement information
 - add better version notes to readme's list of "works on"

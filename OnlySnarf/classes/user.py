@@ -213,13 +213,13 @@ class User:
         """
 
         Settings.dev_print("getting all users...")
+        users = []
         if Settings.is_prefer_local():
             users = User.read_users_local()
-            if len(users) > 0: return users
-        users = []
-        for user in Driver.users_get():
-            if user is None: continue
-            users.append(User(user))
+        else:
+            for user in Driver.users_get():
+                if user is None: continue
+                users.append(User(user))
         Settings.maybe_print("users: {}".format(len(users)))
         User.write_users_local(users=users)
         Settings.set_prefer_local(True)
@@ -330,7 +330,9 @@ class User:
 
         Settings.dev_print("getting random user...")
         import random
-        return random.choice(User.get_all_users())
+        randomUser = random.choice(User.get_all_users())
+        Settings.dev_print("random user: {}".format(randomUser.username))
+        return randomUser
 
     @staticmethod
     def get_recent_messagers():

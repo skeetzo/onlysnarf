@@ -13,6 +13,7 @@ class TestSnarf(unittest.TestCase):
         config["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT/2 # 55 / 2 = 27 or 28 -> 25
         config["months"] = DEFAULT.DISCOUNT_MAX_MONTHS/2 # 12 / 2 = 6
         config["user"] = "random"
+        config["prefer_local"] = True
         Settings.set_debug("tests")
 
     def tearDown(self):
@@ -22,6 +23,7 @@ class TestSnarf(unittest.TestCase):
         Snarf.close()
 
     def test_discount(self):
+        config["prefer_local"] = False
         assert Snarf.discount(), "unable to apply discount"
 
     def test_discount_max(self):
