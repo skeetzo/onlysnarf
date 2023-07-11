@@ -18,6 +18,28 @@ pytest tests/snarf
 python -m unittest tests/snarf/test_auth.py
 python -m unittest tests/snarf/test_discount.py
 python -m unittest tests/selenium/browsers/test_firefox.py
+python -m unittest tests/snarf/test_poll.py
+
+## Selenium Processes ##
+pytest tests/selenium/test_browsers.py
+pytest tests/selenium/test_reconnect.py
+pytest tests/selenium/test_remote.py
+
+pytest tests/selenium/browsers/test_brave.py
+pytest tests/selenium/browsers/test_chrome.py
+pytest tests/selenium/browsers/test_chromium.py
+pytest tests/selenium/browsers/test_edge.py
+pytest tests/selenium/browsers/test_firefox.py
+pytest tests/selenium/browsers/test_ie.py
+pytest tests/selenium/browsers/test_opera.py
+
+pytest tests/selenium/reconnect
+pytest tests/selenium/reconnect/...
+
+## Snarf Processes ##
+
+## Authentication ##
+pytest tests/snarf/auth/test_onlyfans.py
 
 pytest tests/snarf/test_auth.py
 pytest tests/snarf/test_discount.py
@@ -27,59 +49,11 @@ pytest tests/snarf/test_post.py
 pytest tests/snarf/test_schedule.py
 pytest tests/snarf/test_users.py
 
-pytest tests/snarf/test_auth.py && pytest tests/snarf/test_discount.py && pytest tests/snarf/test_message.py && pytest tests/snarf/test_poll.py && pytest tests/snarf/test_post.py && pytest tests/snarf/test_schedule.py && pytest tests/snarf/test_users.py
-
+# Unfinished
+pytest tests/snarf/auth/test_google.py
+pytest tests/snarf/auth/test_twitter.py
 pytest tests/snarf/test_profile.py
-
-## Authentication ##
-python setup.py install && pytest tests/snarf/test_auth.py
-
-## Selenium Processes ##
-python setup.py install && pytest tests/selenium/test_browsers.py
-python setup.py install && pytest tests/selenium/test_reconnect.py
-python setup.py install && pytest tests/selenium/test_remote.py
-
-## Snarf Processes ##
-python setup.py install && pytest tests/snarf/test_discount.py
-python setup.py install && pytest tests/snarf/test_message.py
-python setup.py install && pytest tests/snarf/test_post.py
-python setup.py install && pytest tests/snarf/test_profile.py
-python setup.py install && pytest tests/snarf/test_promotion.py
-python setup.py install && pytest tests/snarf/test_users.py
-
-#############################################################################
-
-# Pass:
-
-## Selenium:
-# auth
-# browsers
-# reconnect
-
-## Snarf:
-# discount
-# message
-# post (basic)
-# post - schedule, date, time
-# post - poll
-# users
-
-#############################################################################
-
-# Fail
-
-
-#############################################################################
-
-# Untested
-
-# profile
-# promotion
-# remote
-
-# (individual driver / message tests)
-
-#############################################################################
+pytest tests/snarf/test_promotion.py
 
 ##################
 ## Demo Scripts ##
@@ -106,3 +80,6 @@ snarf -debug users
 snarf -debug -browser brave users
 
 snarf post -text "are you ready for nft nudes?" -question "yes" -question "maybe?" -question "no" -question "double no" -duration "min"
+
+# debug remote path upload
+snarf -debug -debug-delay -verbose -verbose -verbose -show post -text "shnarrff" "https://github.com/skeetzo/onlysnarf/blob/master/public/images/shnarf.jpg?raw=true"

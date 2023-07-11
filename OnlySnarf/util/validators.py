@@ -1,4 +1,5 @@
 import argparse, os
+import validators
 from datetime import datetime
 from . import defaults as DEFAULT
 
@@ -91,7 +92,15 @@ def valid_path(s):
 			for f in s: os.stat(s)
 		else: os.stat(s)
 	except FileNotFoundError:
-		msg = "Not a valid path: '{0}'.".format(s)
+		# check as url
+		return valid_url(s)
+		# msg = "Not a valid path: '{0}'.".format(s)
+		# raise argparse.ArgumentTypeError(msg)
+	return s
+
+def valid_url(s):
+	if not validators.url(s):
+		msg = "Not a valid path or url: '{0}'.".format(s)
 		raise argparse.ArgumentTypeError(msg)
 	return s
 

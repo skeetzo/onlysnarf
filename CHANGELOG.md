@@ -691,11 +691,13 @@
 **4.4.16 : 7/5/2023**
   - update readme and help&menu docs / added personal touchups
   - fixed get random user for discount test 
-
+**4.5.0 : 7/11/2023**
+  - added wget functionality to input for when a url is provided
+  - cleaned up bin/test scripts
+  
 ------------------------------------------------------------------------------------
 
 ## TODO
-
 
 - fix how tabs open and scroll and then the process opens another tab to find the same elements and scroll again ala: find users then discount user
 

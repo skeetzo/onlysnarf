@@ -3,6 +3,7 @@ from os import walk
 ##
 from ..lib.ffmpeg import ffmpeg
 from ..util.settings import Settings
+import wget
 
 ###############################################################
 
@@ -70,6 +71,15 @@ class File():
         return True
 
     ##############################
+
+    def download(self):
+        """Download a url. An input can only be a valid path or a valid url."""
+
+        Settings.maybe_print("downloading file...")
+        filename = wget.download(self.path, out=self.get_tmp())
+        Settings.print("") # resume same line after wget download
+        Settings.maybe_print("downloaded: "+filename)
+        self.path = filename
 
     def get_ext(self):
         """Get the file's extension"""
@@ -158,6 +168,8 @@ class File():
 
         Settings.maybe_print("preparing file: {}".format(self.get_title()))
         # self.get_type().prepare()
+        if not self.check_size():
+            self.download()
         return self.check_size()
 
     @staticmethod
