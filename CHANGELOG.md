@@ -694,6 +694,9 @@
 **4.5.0 : 7/11/2023**
   - added wget functionality to input for when a url is provided
   - cleaned up bin/test scripts
+  - added basic api setup
+  - added test scripts for flask & api
+  - beginning modifications for receiving api calls
   
 ------------------------------------------------------------------------------------
 

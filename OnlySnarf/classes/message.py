@@ -326,7 +326,7 @@ class Post(Message):
 
         """
 
-        super().__init__()
+        super().__init__(self)
         self.expiration = 0
         self.poll = None
         self.schedule = None
@@ -427,7 +427,7 @@ class Post(Message):
         """
 
         if self.schedule: return self.schedule
-        self.schedule = Schedule()
+        # self.schedule = Schedule()
         return self.schedule
 
     def send(self):

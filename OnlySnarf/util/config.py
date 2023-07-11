@@ -33,6 +33,7 @@ for section in config_file.sections():
       # print(key, config[section.lower()+"_"+key.lower()])
 
 config = {}
+
 # continue to overwrite values from config file with args
 from .args import args
 # print(args.items())

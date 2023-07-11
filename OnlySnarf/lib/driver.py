@@ -47,6 +47,8 @@ from webdriver_manager.opera import OperaDriverManager
 ##
 from ..classes.element import Element
 from ..util.settings import Settings
+#
+from ..classes.file import File
 
 ###################
 ##### Globals #####
@@ -1962,7 +1964,7 @@ class Driver:
             if not driver.enter_text(message["text"]):
                 Settings.err_print("unable to post!")
                 return False
-            
+
             successful, skipped = driver.upload_files(message["files"])
             if successful and not skipped:
                 # twitter tweet button is 1st, post is 2nd
@@ -3223,7 +3225,12 @@ class Driver:
         files_ = []
 
         def prepare(file):
-            uploadable = file.prepare() # downloads if Google_File
+            # add a better check for this w/ the new API
+            if not isinstance(file, File):
+                _file = File()
+                setattr(_file, "path", file)
+                file = _file
+            uploadable = file.prepare() # downloads if necessary
             if not uploadable: Settings.err_print("unable to upload - {}".format(file.get_title()))
             else: files_.append(file)    
 

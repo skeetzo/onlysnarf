@@ -30,8 +30,6 @@ import pkg_resources
 parser.version = str(pkg_resources.get_distribution("onlysnarf").version)
 parser.add_argument('-version', action='version')
 
-parser.add_argument('-version', action='version')
-
 ############################################################################################
 
 try:
@@ -39,9 +37,9 @@ try:
   # print("unknown args: {}".format(unknownargs))
   args.update(vars(parsedargs))
 except Exception as e:
-  print(e)
-  print("Error: Incorrect arg format")
-  parser.exit(1)
+    print(e)
+    print("Error: Incorrect arg format")
+    parser.exit(1)
 
 #############
 # Debugging #

@@ -120,7 +120,12 @@ class Settings:
         return os.path.join(Settings.get_base_directory(), "cookies.pkl")
 
     def get_price():
-        return config["price"]
+        price = 0
+        try:
+            price = config["price"]
+        except Exception as e:
+            pass
+        return price
 
     def get_price_minimum():
         return DEFAULT.PRICE_MINIMUM
@@ -204,15 +209,19 @@ class Settings:
         if Settings.FILES: return Settings.FILES
         from ..classes.file import File
         files = []
-        if isinstance(config["input"], list):
-            for file_path in config["input"]:
+        try:
+            _input = config["input"]
+            if isinstance(_input, list):
+                for file_path in _input:
+                    file = File()
+                    setattr(file, "path", file_path)
+                    files.append(file)
+            else:
                 file = File()
-                setattr(file, "path", file_path)
+                setattr(file, "path", _input)
                 files.append(file)
-        else:
-            file = File()
-            setattr(file, "path", config["input"])
-            files.append(file)
+        except Exception as e:
+            pass
         Settings.FILES = files
         return files
 
@@ -328,16 +337,27 @@ class Settings:
         return config["profile_method"] or None
 
     def get_schedule():
-        if str(config["schedule"]) == DEFAULT.SCHEDULE:
-            config["schedule"] = datetime.strptime("{} {}".format(Settings.get_date(), Settings.get_time()), DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
-        elif not isinstance(config["schedule"], str):
-            config["schedule"] = config["schedule"].strftime(DEFAULT.SCHEDULE_FORMAT)
-        Settings.maybe_print("schedule (settings): {}".format(config["schedule"]))
-        return config["schedule"]
+        schedule = ""
+        try:
+            schedule = config["schedule"]
+            if str(schedule) == DEFAULT.SCHEDULE:
+                schedule = datetime.strptime("{} {}".format(Settings.get_date(), Settings.get_time()), DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
+            elif not isinstance(schedule, str):
+                schedule = schedule.strftime(DEFAULT.SCHEDULE_FORMAT)
+            Settings.maybe_print("schedule (settings): {}".format(schedule))
+            return schedule
+        except Exception as e:
+            pass
+        return None
 
     def get_tags():
-        tags = config["tags"] or []
-        tags = [n.strip() for n in tags]
+        tags = []
+        try:
+            tags = config["tags"]
+            tags = [n.strip() for n in tags]
+        except Exception as e:
+            pass
+            # Settings.err_print(e)
         return tags
 
     def get_text():

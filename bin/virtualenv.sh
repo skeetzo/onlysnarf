@@ -11,3 +11,6 @@ virtualenv venv
 echo "This script fails to update source automatically so copy and paste or type the following code to update the virtual environment for development:"
 echo "source venv/bin/activate"
 echo "python -m pip install --upgrade pip setuptools wheel build twine pytest"
+
+
+## are all of these handled by `pipenv`???
