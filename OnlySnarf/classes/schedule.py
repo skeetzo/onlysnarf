@@ -143,6 +143,7 @@ class Schedule:
         today = datetime.strptime(str(datetime.now().strftime(DEFAULT.SCHEDULE_FORMAT)), DEFAULT.SCHEDULE_FORMAT)
         # schedule = datetime.strptime(str(Settings.get_schedule().now().strftime(DEFAULT.SCHEDULE_FORMAT)), DEFAULT.SCHEDULE_FORMAT)
         schedule = Settings.get_schedule()
+        if not schedule: return False
         if isinstance(schedule, str):
             schedule = datetime.strptime(schedule, DEFAULT.SCHEDULE_FORMAT)
         # should invalidate if all default settings
@@ -156,7 +157,3 @@ class Schedule:
             return False
         Settings.dev_print("valid schedule!")
         return True
-
-# round to 5
-def myround(x, base=5):
-    return base * round(x/base)

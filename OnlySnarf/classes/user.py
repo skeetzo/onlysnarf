@@ -154,14 +154,15 @@ class User:
                 if not price: return True
                 return driver.message_price(price)
             def enter_files(files):
-                for file in files:
+                # TODO: requires proper debugging
+                # for file in files:
                     # enter files by filepath while checking for already sent files
-                    file_name = file.get_title()
-                    if str(file_name) in self.sent_files:
-                        Settings.warn_print("file already sent to user: {} <-- {}".format(self.username, file_name))
-                        Settings.maybe_print("skipping...")
-                        continue
-                    self.sent_files.append(file_name)
+                    # file_name = file.get_title()
+                    # if str(file_name) in self.sent_files:
+                    #     Settings.warn_print("file already sent to user: {} <-- {}".format(self.username, file_name))
+                    #     Settings.maybe_print("skipping...")
+                    #     continue
+                    # self.sent_files.append(file_name)
                 return driver.upload_files(files)
             if all([enter_text(message["text"]), enter_price(message["price"]), enter_files(message["files"])]): return confirm_message()
         except Exception as e:
@@ -216,7 +217,7 @@ class User:
         users = []
         if Settings.is_prefer_local():
             users = User.read_users_local()
-        else:
+        if len(users) == 0:
             for user in Driver.users_get():
                 if user is None: continue
                 users.append(User(user))
@@ -445,8 +446,10 @@ class User:
             The message to send as a serialized Message object from get_message.
         """
 
-        user = User({"username":username,"id":user_id})
-        return user.message(message) 
+        if str(username).lower() == "random":
+            User.get_random_user().message(message)
+        else:
+            User({"username":username,"id":user_id}).message(message)
 
     @staticmethod
     def read_following_local():

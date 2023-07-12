@@ -1463,6 +1463,9 @@ class Driver:
             elif str(username).lower() == "recent": type__ = "messageRecent"
             elif str(username).lower() == "favorite": type__ = "messageFavorite"
             elif str(username).lower() == "renew on": type__ = "messageRenewers"
+            elif str(username).lower() == "random":
+                from ..classes.user import User
+                username = User.get_random_user().username
             successful = False
             if type__ != None:
                 driver.go_to_page(ONLYFANS_NEW_MESSAGE_URL)
@@ -1943,7 +1946,7 @@ class Driver:
         Settings.print("- Tweeting: {}".format(Settings.is_tweeting()))
         ## Expires, Schedule, Poll ##
         if not driver.expires(message["expiration"]): return False
-        if message["schedule"].validate() and not driver.schedule(message["schedule"].get()): return False
+        if message["schedule"] and message["schedule"].validate() and not driver.schedule(message["schedule"].get()): return False
         if message["poll"].validate() and not driver.poll(message["poll"].get()): return False
         Settings.print("====================")
         ############################################################

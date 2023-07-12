@@ -383,10 +383,18 @@ class Settings:
         return config["skipped_users"] or []
         
     def get_questions():
-        return config["questions"] or []
+        try:
+            return config["questions"]
+        except Exception as e:
+            pass
+        return []
         
     def get_upload_max():
-        return config["upload_max"] or DEFAULT.IMAGE_LIMIT
+        try:
+            return config["upload_max"]
+        except Exception as e:
+            pass
+        return DEFAULT.IMAGE_LIMIT
         
     # def get_upload_max_messages():
         # return config["upload_max_messages"] or UPLOAD_MAX_MESSAGES

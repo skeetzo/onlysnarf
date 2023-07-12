@@ -21,7 +21,8 @@ setuptools.setup(
         'inquirer',
         'wget',
         'selenium',
-        'webdriver_manager'
+        'webdriver_manager',
+        'validators'
         ],
     extras_require={
         'dev': [

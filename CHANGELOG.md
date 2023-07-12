@@ -679,16 +679,16 @@
   - fixed error message on close
   **4/15/2023**
   - cleaned up git repo size / long clone time
-**4.4.13: 4/17/2023**
+  **4.4.13: 4/17/2023**
   - Windows compatability testing
   - updated pathings for Windows
   - retested google login (remains disabled)
-**4.4.14 : 5/29/2023**
+  **4.4.14 : 5/29/2023**
   - beginning readd of cli menu
   - switch from pyinquirer to inquirer
-**4.4.15 : 6/2/2023**
+  **4.4.15 : 6/2/2023**
   - fixed cookies bug
-**4.4.16 : 7/5/2023**
+  **4.4.16 : 7/5/2023**
   - update readme and help&menu docs / added personal touchups
   - fixed get random user for discount test 
 **4.5.0 : 7/11/2023**
@@ -697,10 +697,18 @@
   - added basic api setup
   - added test scripts for flask & api
   - beginning modifications for receiving api calls
-  
+**4.5.1 : 7/12/2023**
+  - fixed package req: validators
+  - added modifications for running via api
+
+
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+
+- look into Marshmellow package for class / object cleanup
+- reconfigure how args & config values are passed through into Settings --> to fix when setting a variable like post.schedule = "text" is referenced after the args check step
 
 - fix how tabs open and scroll and then the process opens another tab to find the same elements and scroll again ala: find users then discount user
 

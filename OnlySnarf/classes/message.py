@@ -144,7 +144,17 @@ class Message():
 
         """
 
-        if len(self.files) > 0: return self.files[:int(Settings.get_upload_max())]
+        if len(self.files) > 0:
+            files_ = []
+            for file in self.files[:int(Settings.get_upload_max())]:
+                if not isinstance(file, File):
+                    file_ = File()
+                    setattr(file_, "path", file)
+                    files_.append(file_)
+                else:
+                    files_.append(file)
+            return files_
+            # return self.files[:int(Settings.get_upload_max())]
         files = Settings.get_input_as_files()
         if len(files) > 0:
             Settings.dev_print("fetched input files for upload")
