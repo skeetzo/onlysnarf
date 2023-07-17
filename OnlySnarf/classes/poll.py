@@ -78,7 +78,7 @@ class Poll:
         """
 
         Settings.dev_print("validating poll...")
-        if len(self.get_questions()) > 0 and self.get_duration():
+        if len(self.get_questions()) > 0 and str(self.get_duration()) != "0":
             Settings.dev_print("valid poll!")
             return True
         Settings.dev_print("invalid poll!")

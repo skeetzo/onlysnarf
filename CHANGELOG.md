@@ -700,12 +700,17 @@
 **4.5.1 : 7/12/2023**
   - fixed package req: validators
   - added modifications for running via api
-
+**4.5.2 : 7/16/2023**
+  - relocated api structure for testing
+  - added tests for flask api
+  - updates to tests, code flow for missing config / args values
+  - added individual message funcationality tests 
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
+- continue testing new message tests
 
 - look into Marshmellow package for class / object cleanup
 - reconfigure how args & config values are passed through into Settings --> to fix when setting a variable like post.schedule = "text" is referenced after the args check step

@@ -27,7 +27,7 @@ class Message():
         self.files = []
         self.performers = []
         self.price = 0 # $3 - $100
-        self.tags = []
+        self.keywords = []
         self.__initialized__ = False
 
     def init(self):
@@ -35,7 +35,7 @@ class Message():
 
         if self.__initialized__: return
         self.get_text()
-        self.get_tags()
+        self.get_keywords()
         self.get_price()
         self.get_files()
         self.get_performers()
@@ -93,7 +93,7 @@ class Message():
 
         """
 
-        return "{}{}{}".format(self.get_text(), Message.format_performers(self.get_performers()), Message.format_keywords(self.get_tags())).strip()
+        return "{}{}{}".format(self.get_text(), Message.format_performers(self.get_performers()), Message.format_keywords(self.get_keywords())).strip()
 
     @staticmethod
     def is_tip(text):
@@ -193,7 +193,7 @@ class Message():
             "files": self.get_files(),
             "performers": self.get_performers(),
             "price": self.get_price(),
-            "tags": self.get_tags()
+            "keywords": self.get_keywords()
         })
 
     def get_performers(self):
@@ -241,20 +241,20 @@ class Message():
         self.price = price
         return self.price
 
-    def get_tags(self):
+    def get_keywords(self):
         """
-        Gets the tags for the text.
+        Gets the keywords for the text.
 
         Returns
         -------
         list
-            The tags
+            The keywords
 
         """
 
-        if len(self.tags) > 0: return self.tags
-        self.tags = Settings.get_tags()
-        return self.tags
+        if len(self.keywords) > 0: return self.keywords
+        self.keywords = Settings.get_keywords()
+        return self.keywords
 
     def get_text(self, again=True):
         """
@@ -306,7 +306,7 @@ class Message():
                 pass
         text = text.replace("_", " ")
         # redo keyword parsing (unsure if necessary call)
-        text = self.update_tags(text)
+        text = self.update_keywords(text)
         return text
 
     def send(self, username, user_id=None):
@@ -422,7 +422,7 @@ class Post(Message):
             "expiration": self.get_expiration(),
             "schedule": self.get_schedule(),
             "poll": self.get_poll(),
-            "tags": self.get_tags()
+            "keywords": self.get_keywords()
         })
 
     def get_schedule(self):

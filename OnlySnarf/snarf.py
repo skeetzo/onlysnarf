@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 
-from OnlySnarf.lib.driver import Driver
-from OnlySnarf.util.settings import Settings
-from OnlySnarf.classes.discount import Discount
-from OnlySnarf.classes.message import Message, Post
-from OnlySnarf.classes.profile import Profile
-from OnlySnarf.classes.promotion import Promotion
-from OnlySnarf.classes.user import User
+from .lib.driver import Driver
+from .util.settings import Settings
+from .classes.discount import Discount
+from .classes.message import Message, Post
+from .classes.profile import Profile
+from .classes.promotion import Promotion
+from .classes.user import User
 
 #################
 ##### Snarf #####

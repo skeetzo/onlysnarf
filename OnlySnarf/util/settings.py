@@ -120,12 +120,9 @@ class Settings:
         return os.path.join(Settings.get_base_directory(), "cookies.pkl")
 
     def get_price():
-        price = 0
-        try:
-            price = config["price"]
-        except Exception as e:
-            pass
-        return price
+        try: return config["price"]
+        except Exception as e: pass
+        return 0
 
     def get_price_minimum():
         return DEFAULT.PRICE_MINIMUM
@@ -134,18 +131,22 @@ class Settings:
         return DEFAULT.PRICE_MAXIMUM
 
     def get_date():
-        config["date"] = Settings.format_date(config["date"])
-        if str(config["date"]) == DEFAULT.DATE and str(config["schedule"]) != DEFAULT.SCHEDULE:
-            if isinstance(config["schedule"], str):
-                config["date"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT).date().strftime(DEFAULT.DATE_FORMAT)
+        try:
+            config["date"] = Settings.format_date(config["date"])
+            if str(config["date"]) == DEFAULT.DATE and str(config["schedule"]) != DEFAULT.SCHEDULE:
+                if isinstance(config["schedule"], str):
+                    config["date"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT).date().strftime(DEFAULT.DATE_FORMAT)
+                else:
+                    config["date"] = config["schedule"].date().strftime(DEFAULT.DATE_FORMAT)
+                config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
             else:
-                config["date"] = config["schedule"].date().strftime(DEFAULT.DATE_FORMAT)
-            config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
-        else:
-            config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
-        config["date"] = config["date"].strftime(DEFAULT.DATE_FORMAT)    
-        Settings.maybe_print("date (settings): {}".format(config["date"]))
-        return config["date"]
+                config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
+            config["date"] = config["date"].strftime(DEFAULT.DATE_FORMAT)    
+            Settings.maybe_print("date (settings): {}".format(config["date"]))
+            return config["date"]
+        except Exception as e:
+            pass
+        return datetime.strptime(DEFAULT.DATE, DEFAULT.DATE_FORMAT)
 
     def get_default_greeting():
         return DEFAULT.GREETING or ""
@@ -167,18 +168,16 @@ class Settings:
 
     def get_download_max():
         return config["download_limit"] or DEFAULT.IMAGE_LIMIT
-        
-    def get_drive_ignore():
-        return config["notkeyword"] or None
-        
-    def get_drive_keyword():
-        return config["bykeyword"] or None
-        
+
     def get_duration():
-        return config["duration"] or None
+        try: return config["duration"]
+        except Exception as e: pass
+        return None
 
     def get_promo_duration():
-        return config["duration_promo"] or None
+        try: return config["duration_promo"]
+        except Exception as e: pass
+        return None
         
     def get_duration_allowed():
         return DEFAULT.DURATION_ALLOWED or []
@@ -187,11 +186,8 @@ class Settings:
         return DEFAULT.PROMOTION_DURATION_ALLOWED or []
 
     def get_expiration():
-        try:
-            return config["expiration"]
-        except Exception as e:
-            pass
-            # print(e)
+        try: return config["expiration"]
+        except Exception as e: pass
         return DEFAULT.EXPIRATION_NONE
 
     def get_promo_expiration():
@@ -224,12 +220,7 @@ class Settings:
             pass
         Settings.FILES = files
         return files
-
-    def get_keywords():
-        keywords = config["keywords"] or []
-        keywords = [n.strip() for n in keywords]
-        return keywords
-
+        
     def get_logs_path(process):
         if process == "firefox":
             path_ = os.path.join(Settings.get_base_directory(), "log")
@@ -255,12 +246,13 @@ class Settings:
             performers = config["performers"] or []
             performers = [n.strip() for n in performers]
             return performers
-        except Exception as e:
-            # Settings.dev_print(e)
-            return []
+        except Exception as e: pass
+        return []
 
     def get_profile_path():
-        return config["path_profile"] or DEFAULT.PROFILE_PATH
+        try: return config["path_profile"]
+        except Exception as e: pass
+        return DEFAULT.PROFILE_PATH
 
     def get_recent_user_count():
         return config["recent_users_count"] or 0
@@ -287,13 +279,19 @@ class Settings:
         return ""
 
     def get_download_path():
-        return config["path_download"]
+        try: return config["path_download"]
+        except Exception as e: pass
+        return DEFAULT.DOWNLOAD_PATH
 
     def get_users_path():
-        return config["path_users"]
+        try: return config["path_users"]
+        except Exception as e: pass
+        return DEFAULT.USERS_PATH
 
     def get_config_path():
-        return config["path_config"]   
+        try: return config["path_config"]   
+        except Exception as e: pass
+        return DEFAULT.CONFIG_PATH
 
     def get_local_path():
         localPath = os.path.join(Settings.get_root_path(), Settings.get_username())
@@ -302,15 +300,6 @@ class Settings:
         for cat in Settings.get_categories():
             Path(os.path.join(localPath, cat)).mkdir(parents=True, exist_ok=True)
         return localPath
-
-    def get_destination():
-        return config["destination"] or ""
-
-    def get_source():
-        return config["source"] or ""
-
-    def get_source_options():
-        return DEFAULT.SOURCES
 
     def get_reconnect_id():
         return config["session_id"] or ""
@@ -348,33 +337,37 @@ class Settings:
             return schedule
         except Exception as e:
             pass
-        return None
+        return datetime.strptime("{} {}".format(Settings.get_date(), Settings.get_time()), DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
 
-    def get_tags():
-        tags = []
+    def get_keywords():
+        keywords = []
         try:
-            tags = config["tags"]
-            tags = [n.strip() for n in tags]
+            keywords = config["keywords"]
+            keywords = [n.strip() for n in keywords]
         except Exception as e:
             pass
             # Settings.err_print(e)
-        return tags
+        return keywords
 
     def get_text():
         return config["text"] or ""
 
     def get_time():
-        config["time"] = Settings.format_time(config["time"])        
-        if (str(config["time"]) == DEFAULT.TIME or str(config["time"]) == DEFAULT.TIME_NONE) and str(config["schedule"]) != DEFAULT.SCHEDULE:
-            Settings.dev_print("time from schedule")
-            date = datetime.strptime(str(config["schedule"]), DEFAULT.SCHEDULE_FORMAT)
-            config["time"] = datetime.strptime(str(date.time().strftime(DEFAULT.TIME_FORMAT)), DEFAULT.TIME_FORMAT)
-        else:
-            Settings.dev_print("time from config")
-            config["time"] = datetime.strptime(str(config["time"]), DEFAULT.TIME_FORMAT)
-        config["time"] = config["time"].strftime(DEFAULT.TIME_FORMAT)
-        Settings.maybe_print("time (settings): {}".format(config["time"]))
-        return config["time"]
+        try:
+            config["time"] = Settings.format_time(config["time"])        
+            if (str(config["time"]) == DEFAULT.TIME or str(config["time"]) == DEFAULT.TIME_NONE) and str(config["schedule"]) != DEFAULT.SCHEDULE:
+                Settings.dev_print("time from schedule")
+                date = datetime.strptime(str(config["schedule"]), DEFAULT.SCHEDULE_FORMAT)
+                config["time"] = datetime.strptime(str(date.time().strftime(DEFAULT.TIME_FORMAT)), DEFAULT.TIME_FORMAT)
+            else:
+                Settings.dev_print("time from config")
+                config["time"] = datetime.strptime(str(config["time"]), DEFAULT.TIME_FORMAT)
+            config["time"] = config["time"].strftime(DEFAULT.TIME_FORMAT)
+            Settings.maybe_print("time (settings): {}".format(config["time"]))
+            return config["time"]
+        except Exception as e:
+            pass
+        return DEFAULT.TIME.strftime(DEFAULT.TIME_FORMAT)
 
     def get_title():
         return config["title"] or ""
@@ -400,7 +393,9 @@ class Settings:
         # return config["upload_max_messages"] or UPLOAD_MAX_MESSAGES
 
     def get_login_method():
-        return config["login"]
+        try: return config["login"]
+        except Exception as e: pass
+        return "auto"
         
     def get_upload_max_duration():
         return config["upload_max_duration"] or DEFAULT.UPLOAD_MAX_DURATION # 1 hour

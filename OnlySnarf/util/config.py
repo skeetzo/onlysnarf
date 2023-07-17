@@ -10,7 +10,8 @@ USER = getpass.getuser()
 if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "None":
     USER = os.getenv('SUDO_USER')
 configFile = "config.conf"
-if os.environ.get('ENV') == "test":
+
+if not os.environ.get('ENV') or os.environ.get('ENV') == "test":
   configFile = os.path.join(os.getcwd(), "OnlySnarf/conf", "test-config.conf")
 elif os.path.isfile(os.path.join("/home/{}/.onlysnarf/conf".format(USER), "config.conf")):
   configFile = os.path.join("/home/{}/.onlysnarf/conf".format(USER), "config.conf")
@@ -35,10 +36,11 @@ for section in config_file.sections():
 config = {}
 
 # continue to overwrite values from config file with args
-from .args import args
 # print(args.items())
-for key, value in args.items():
-  config[key] = value
+if os.environ.get('ENV') and os.environ.get('ENV') != "test":
+  from .args import args
+  for key, value in args.items():
+    config[key] = value
 for key, value in configs.items():
   config[key] = value  
 

@@ -746,7 +746,7 @@ class Driver:
 
         """
 
-        if not expiration: return True
+        if str(expiration) == "0" or not expiration: return True
         try:
             Settings.print("Expiration:")
             Settings.print("- Period: {}".format(expiration))
@@ -1941,7 +1941,7 @@ class Driver:
         Settings.print("Posting:")
         Settings.print("- Files: {}".format(len(message["files"])))
         Settings.print("- Performers: {}".format(message["performers"]))
-        Settings.print("- Tags: {}".format(message["tags"]))
+        Settings.print("- Keywords: {}".format(message["keywords"]))
         Settings.print("- Text: {}".format(message["text"]))
         Settings.print("- Tweeting: {}".format(Settings.is_tweeting()))
         ## Expires, Schedule, Poll ##

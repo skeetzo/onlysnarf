@@ -6,13 +6,13 @@ import random
 import sys
 import inquirer
 ##
-from OnlySnarf.snarf import Snarf
-from OnlySnarf.lib.driver import Driver
-from OnlySnarf.classes.profile import Profile
-from OnlySnarf.util.colorize import colorize
-from OnlySnarf.util.settings import Settings
+from .snarf import Snarf
+from .lib.driver import Driver
+from .classes.profile import Profile
+from .util.colorize import colorize
+from .util.settings import Settings
 
-# from OnlySnarf.util.args import parser
+# from .util.args import parser
 # print(parser)
 # parser.add_parser('menu', help='> access the cli menu')
 
