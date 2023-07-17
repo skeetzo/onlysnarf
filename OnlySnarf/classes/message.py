@@ -437,7 +437,7 @@ class Post(Message):
         """
 
         if self.schedule: return self.schedule
-        # self.schedule = Schedule()
+        self.schedule = Schedule()
         return self.schedule
 
     def send(self):

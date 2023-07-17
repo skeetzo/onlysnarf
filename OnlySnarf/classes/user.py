@@ -1,12 +1,15 @@
 import json
 import time
 import os
+import random
 import threading
 from datetime import datetime, timedelta
 ##
 from ..util.colorize import colorize
 from ..lib.driver import Driver
 from ..util.settings import Settings
+
+ALREADY_RANDOMIZED_USERS = []
 
 class User:
     """OnlyFans users."""
@@ -60,7 +63,7 @@ class User:
             The user to compare another user object against
         """
 
-        if str(user.username) == str(self.username) or str(user.id) == str(self.id): return True
+        if (str(user.username) != "None" and str(user.username) == str(self.username)) or (str(user.id) != "None" and str(user.id) == str(self.id)): return True
         return False
 
     def get_id(self):
@@ -168,6 +171,7 @@ class User:
         except Exception as e:
             Settings.err_print("message failed!")
             Settings.dev_print(e)
+        Settings.err_print("message somehow failed!")
         return False
 
     def update(self, user):
@@ -330,10 +334,63 @@ class User:
         """
 
         Settings.dev_print("getting random user...")
-        import random
-        randomUser = random.choice(User.get_all_users())
-        Settings.dev_print("random user: {}".format(randomUser.username))
-        return randomUser
+
+        users = User.get_all_users_usernames()
+
+        randomUser = None
+        randomizedUsers = User.get_already_randomized_users()
+
+        while randomUser not in randomizedUsers:
+            randomUser = random.choice(users)
+            if randomUser not in randomizedUsers:
+                User.add_to_randomized_users(randomUser, users=randomizedUsers)
+                randomizedUsers.append(randomUser)
+
+        Settings.dev_print("random user: {}".format(randomUser))
+
+        users = User.get_all_users()
+        for user in users:
+            if str(user.username) == str(randomUser):
+                return user
+        return User({"username":randomUser})
+
+    @staticmethod
+    def get_all_users_usernames():
+        users = User.get_all_users()
+        usernames = []
+        for user in users:
+            usernames.append(user.username)
+        return usernames
+
+    # return from json file 
+    @staticmethod
+    def get_already_randomized_users():
+        Settings.dev_print("getting already randomized users...")
+        users = []
+        try:
+            with open(str(Settings.get_users_path().replace("users.json","random_users.json"))) as json_file:  
+                for user in json.load(json_file)['randomized_users']:
+                    users.append(user)
+            Settings.maybe_print("loaded randomized users")
+        except Exception as e:
+            Settings.dev_print(e)
+        return users
+
+    # add to json file
+    @staticmethod
+    def add_to_randomized_users(newUser, users=[]):
+        data = {}
+        data['randomized_users'] = []
+        for user in users:
+            data['randomized_users'].append(user)
+        data['randomized_users'].append(newUser)
+        try:
+            with open(str(Settings.get_users_path().replace("users.json","random_users.json")), 'w') as outfile:  
+                json.dump(data, outfile, indent=4, sort_keys=True)
+        except FileNotFoundError:
+            Settings.err_print("missing random users!")
+        except OSError:
+            Settings.err_print("missing random users path!")
 
     @staticmethod
     def get_recent_messagers():
@@ -447,9 +504,9 @@ class User:
         """
 
         if str(username).lower() == "random":
-            User.get_random_user().message(message)
+            return User.get_random_user().message(message)
         else:
-            User({"username":username,"id":user_id}).message(message)
+            return User({"username":username,"id":user_id}).message(message)
 
     @staticmethod
     def read_following_local():

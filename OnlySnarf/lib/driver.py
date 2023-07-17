@@ -752,40 +752,32 @@ class Driver:
             Settings.print("- Period: {}".format(expiration))
             # if expiration is 'no limit', then there's no expiration and hence no point here
             if expiration == 999: return True
-            self.open_more_options()
-            # open expires window
-            Settings.dev_print("adding expiration")
-            self.find_element_to_click("expiresAdd").click()
-            # select duration
-            Settings.dev_print("entering expiration")
 
-            # leave in case needed again
-            # nums = self.find_elements_by_name("expiresPeriods")
-            # for num in nums:
-            #     inner = num.get_attribute("innerHTML")
-            #     if int(expiration) == 1  and ">1<" in str(inner): num.click()
-            #     if int(expiration) == 3  and ">3<" in str(inner): num.click()
-            #     if int(expiration) == 7  and ">7<" in str(inner): num.click()
-            #     if int(expiration) == 30 and ">30<" in str(inner): num.click()
-            #     if int(expiration) == 99 and ">o limit<" in str(inner): num.click()
+            def enter_expiration(expires):
+                # enter duration
+                Settings.dev_print("entering expiration")
+                action = ActionChains(self.browser)
+                action.click(on_element=self.find_element_to_click("expiresAdd"))
+                action.pause(int(1))
+                action.send_keys(Keys.TAB)
+                action.send_keys(str(expires))
+                action.pause(int(1))
+                action.key_down(Keys.SHIFT).send_keys(Keys.TAB).key_up(Keys.SHIFT)
+                action.pause(int(1))
+                action.send_keys(Keys.ENTER)
+                action.perform()
+                Settings.dev_print("successfully entered expiration")
 
-            # expiration can now have any int, so update for entering any int less than 30
-            self.find_element_by_name("periodValue").send_keys(expiration)
+            # not really necessary with 'Clear' button
+            def cancel_expiration():
+                #icon-close
+                elements = self.browser.find_elements(By.TAG_NAME, "use")
+                element = [elem for elem in elements if '#icon-close' in str(elem.get_attribute('href'))][0]
+                ActionChains(self.browser).move_to_element(element).click().perform()
 
-            Settings.dev_print("successfully selected expiration")
+            enter_expiration(expiration)
             Settings.debug_delay_check()
-            # save
-            if str(Settings.is_debug()) == "True":
-                Settings.maybe_print("skipping expiration (debug)")
-                Settings.dev_print("skipping expiration")
-                self.find_element_to_click("expiresCancel").click()
-                Settings.dev_print("successfully canceled expires")
-                Settings.dev_print("### Expiration Successfully Canceled ###")
-            else:
-                Settings.dev_print("saving expiration")
-                self.find_element_to_click("expiresSave").click()
-                Settings.dev_print("successfully saved expires")
-                Settings.dev_print("### Expiration Successful ###")
+            Settings.dev_print("### Expiration Successful ###")
             return True
         except Exception as e:
             Driver.error_checker(e)
@@ -1108,6 +1100,7 @@ class Driver:
         """
 
         original_handle = self.browser.current_window_handle
+        Settings.dev_print("searching for page: {}".format(page))
         Settings.dev_print("tabs: {}".format(self.tabs))
         Settings.dev_print("handles: {}".format(self.browser.window_handles))
         try:
@@ -1161,7 +1154,6 @@ class Driver:
         # self.browser.execute_script("window.open('{}')".format(url))
         self.handle_alert()
         self.get_page_load()
-        # self.browser.execute_script("window.open('https://www.yahoo.com')")
         WebDriverWait(self.browser, 10).until(EC.number_of_windows_to_be(len(windows)+1))
         windows_after = self.browser.window_handles
         new_window = [x for x in windows_after if x not in windows][0]
@@ -1456,6 +1448,7 @@ class Driver:
         try:
             driver = Driver.get_driver()
             driver.auth()
+            driver.go_to_home(force=True)
             Settings.dev_print("attempting to start message for {}...".format(username))
             type__ = None # default
             # if the username is a key string it will behave differently
@@ -1498,22 +1491,40 @@ class Driver:
 
         """
 
+        def close_icons():
+            try:
+                #icon-close
+                elements = self.browser.find_elements(By.TAG_NAME, "use")
+                for element in [elem for elem in elements if '#icon-close' in str(elem.get_attribute('href'))]:
+                    ActionChains(self.browser).move_to_element(element).click().perform()
+            except Exception as e:
+                # Settings.err_print(e)
+                Settings.dev_print("unable to click: #icon-close")
+
+        def clear_text():
+            try:
+                ActionChains(self.browser).move_to_element(self.browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).perform()
+            except Exception as e:
+                # Settings.err_print(e)
+                Settings.dev_print("unable to clear text")
+
         try:
             Settings.dev_print("clearing message")
-            clearButton = [ele for ele in self.browser.find_elements(By.TAG_NAME, "button") if "Clear" in ele.get_attribute("innerHTML")]
+            clearButton = [ele for ele in self.browser.find_elements(By.TAG_NAME, "button") if "Clear" in ele.get_attribute("innerHTML") and ele.is_enabled()]
             if len(clearButton) > 0:
                 Settings.dev_print("clicking clear button...")
                 clearButton[0].click()
             else:
                 Settings.dev_print("refreshing page and clearing text...")
                 self.go_to_home(force=True)
-                ActionChains(self.browser).move_to_element(self.browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).perform()
+                clear_text()
+                close_icons()
             Settings.dev_print("successfully cleared message")
-            return True
+            # return True
         except Exception as e:
             Driver.error_checker(e)
-            Settings.err_print("failure to clear message")
-        return False
+            Settings.warn_print("failure to clear message")
+        # return False
 
     def message_confirm(self):
         """
@@ -1532,8 +1543,8 @@ class Driver:
             Settings.dev_print("message confirm is clickable")
             if str(Settings.is_debug()) == "True":
                 Settings.debug_delay_check()
-                self.go_to_home()
-                Settings.print('skipped message (debug)')
+                Settings.print('skipping message (debug)')
+                self.message_clear()
                 return True
             Settings.dev_print("clicking confirm")
             confirm.click()
@@ -1838,50 +1849,66 @@ class Driver:
         if str(poll) == "None" or not poll: return True
         try:
             Settings.print("Poll:")
-            Settings.print("- Duration: {}".format(poll["duration"]))
-            Settings.print("- Questions:")
-            # make sure the extra options are shown
-            # self.open_more_options()
-            # add a poll
-            Settings.dev_print("adding poll")
-            self.browser.find_element(By.CLASS_NAME, "b-make-post__actions__btns").find_elements(By.XPATH, "./child::*")[5].click()
-            # open the poll duration
-            Settings.dev_print("adding duration")
-            # self.find_element_to_click("pollDuration").click()
-            self.browser.find_element(By.CLASS_NAME, "b-post-piece__value").click()
-            # click on the correct duration number
-            Settings.dev_print("setting duration")
-            time.sleep(0.5)
-            ActionChains(self.browser).move_to_element(self.browser.find_element(By.NAME, "periodValue")).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(poll["duration"])).perform()
-            # save the duration
-            Settings.dev_print("saving duration")
-            self.find_element_to_click("pollSave").click()
-            Settings.dev_print("successfully saved duration")
-            questions = self.browser.find_elements(By.CLASS_NAME, "v-text-field__slot")
-            Settings.dev_print("configuring question paths...")
-            # add extra question space
-            OFFSET = 2 # number of preexisting questions
-            if OFFSET + len(poll["questions"]) > len(questions):
-                for i in range(OFFSET + len(poll["questions"])-len(questions)):
-                    Settings.dev_print("adding question")
-                    question_ = self.find_element_to_click("pollQuestionAdd").click()
-                    Settings.dev_print("added question")
-            # find the question inputs
-            # questions_ = self.browser.find_elements(By.XPATH, Element.get_element_by_name("pollInput").getXPath())
-            questions = self.browser.find_elements(By.CLASS_NAME, "v-text-field__slot")
-            Settings.dev_print("question paths: {}".format(len(questions)))
-            # enter the questions
-            i = 0
-            Settings.dev_print("questions: {}".format(poll["questions"]))
-            for question in list(poll["questions"]):
-                Settings.print("> {}".format(question))
-                Settings.dev_print("entering question: {}".format(question))
-                questions[i].find_elements(By.XPATH, "./child::*")[0].send_keys(str(question))
-                Settings.dev_print("entered question")
+
+            # open the poll model
+            def open_model():
+                Settings.dev_print("adding poll")
+                elements = self.browser.find_elements(By.TAG_NAME, "use")
+                element = [elem for elem in elements if '#icon-poll' in str(elem.get_attribute('href'))][0]
+                ActionChains(self.browser).move_to_element(element).click().perform()
                 time.sleep(1)
-                i+=1
-            Settings.dev_print("successfully entered questions")
+
+            # open the poll duration
+            # can click anywhere near the top label
+            # TODO: finish updating any inserted wait times to be more dynamic
+            def add_duration(duration, wait=1):
+                # self.find_element_to_click("pollDuration").click()
+                Settings.print("- Duration: {}".format(duration))
+                Settings.dev_print("setting duration")
+                action = ActionChains(self.browser)
+                action.click(on_element=self.browser.find_element(By.CLASS_NAME, "b-post-piece__value"))
+                action.pause(int(wait))
+                action.send_keys(Keys.TAB)
+                action.send_keys(str(duration))
+                action.perform()
+                # save the duration
+                Settings.dev_print("saving duration")
+                self.find_element_to_click("pollSave").click()
+                Settings.dev_print("successfully saved duration")
+
+            def add_questions(questions):
+                Settings.dev_print("configuring question paths...")
+                questionsElement = self.browser.find_elements(By.CLASS_NAME, "v-text-field__slot")
+                # add extra question space
+                OFFSET = 2 # number of preexisting questionsElement
+                if OFFSET + len(questions) > len(questionsElement):
+                    for i in range(OFFSET + len(questions)-len(questionsElement)):
+                        Settings.dev_print("adding question")
+                        question_ = self.find_element_to_click("pollQuestionAdd").click()
+                        Settings.dev_print("added question")
+                # find the question inputs again
+                questionsElement = self.browser.find_elements(By.CLASS_NAME, "v-text-field__slot")
+                Settings.dev_print("question paths: {}".format(len(questionsElement)))
+                # enter the questions
+                i = 0
+                Settings.dev_print("questions: {}".format(questions))
+                Settings.print("- Questions:")
+                for question in list(questions):
+                    Settings.print("> {}".format(question))
+                    Settings.dev_print("entering question: {}".format(question))
+                    questionsElement[i].find_elements(By.XPATH, "./child::*")[0].send_keys(str(question))
+                    Settings.dev_print("entered question")
+                    time.sleep(1)
+                    i+=1
+                Settings.dev_print("successfully entered questions")
+
+            open_model()
             Settings.debug_delay_check()
+            add_duration(poll["duration"])
+            Settings.debug_delay_check()
+            add_questions(poll["questions"])
+            Settings.debug_delay_check()
+
             if str(Settings.is_debug()) == "True":
                 Settings.maybe_print("skipping poll (debug)")
                 cancel = self.find_element_to_click("pollCancel")
@@ -2633,11 +2660,11 @@ class Driver:
             # save time
             Settings.debug_delay_check()
             Settings.dev_print("saving schedule")
-            if str(Settings.is_debug()) == "True":
-                Settings.print("skipping schedule save (debug)")
-                return self.schedule_cancel()
-            else:
-                return self.schedule_save()
+            # if str(Settings.is_debug()) == "True":
+            #     Settings.print("skipping schedule save (debug)")
+            #     return self.schedule_cancel()
+            # else:
+            return self.schedule_save()
         except Exception as e:
             Driver.error_checker(e)
         # attempt to cancel window
@@ -3281,7 +3308,7 @@ class Driver:
             time.sleep(1) # bug prevention
             return True, False
         Settings.warn_print("a file failed to upload!")
-        return False, True
+        return False, False
 
     #################
     ##### Users #####

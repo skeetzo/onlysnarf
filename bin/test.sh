@@ -20,11 +20,21 @@ pytest tests/api
 # Unit Test #
 #############
 
+python -m unittest tests/selenium/test_browsers.py
+python -m unittest tests/selenium/browsers/test_firefox.py
+
 python -m unittest tests/snarf/test_auth.py
 python -m unittest tests/snarf/test_discount.py
-python -m unittest tests/snarf/test_post.py
-python -m unittest tests/selenium/browsers/test_firefox.py
+
+python -m unittest tests/snarf/test_expiration.py
+python -m unittest tests/snarf/test_message.py
 python -m unittest tests/snarf/test_poll.py
+python -m unittest tests/snarf/test_post.py
+python -m unittest tests/snarf/test_schedule.py
+
+
+
+python -m unittest tests/snarf/test_users.py
 
 ##########
 # pytest #
@@ -57,6 +67,7 @@ pytest tests/snarf/auth/test_onlyfans.py
 
 pytest tests/snarf/test_auth.py
 pytest tests/snarf/test_discount.py
+pytest tests/snarf/test_expiration.py
 pytest tests/snarf/test_message.py
 pytest tests/snarf/test_poll.py
 pytest tests/snarf/test_post.py

@@ -31,7 +31,9 @@ DISCOUNT_MIN_AMOUNT = 5
 DISCOUNT_MAX_MONTHS = 12
 DISCOUNT_MIN_MONTHS = 1
 
-DURATION_ALLOWED = [1,3,7,30,99] # in days
+## note: '99' aka 'No Limit' no longer allowed?
+# DURATION_ALLOWED = [1,3,7,30, 99] # in days
+DURATION_ALLOWED = [1,3,7,30] # in days
 DURATION_NONE = 0
 
 EXPIRATION_MIN = 1

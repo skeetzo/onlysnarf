@@ -705,15 +705,20 @@
   - added tests for flask api
   - updates to tests, code flow for missing config / args values
   - added individual message funcationality tests 
+  **7/17/2023**
+  - continued debugging message tests
+  - fixed random user functionality
+  - updated driver.poll
+  - fixed new message tests
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- continue testing new message tests
+
+- add system for checking online for updates --> then updating
 
 - look into Marshmellow package for class / object cleanup
-- reconfigure how args & config values are passed through into Settings --> to fix when setting a variable like post.schedule = "text" is referenced after the args check step
 
 - fix how tabs open and scroll and then the process opens another tab to find the same elements and scroll again ala: find users then discount user
 
@@ -844,8 +849,12 @@ what helps in general:
   - discount: amount&months still require 2 passes on average to update values correctly
 **4.4.6**
   - followed instructions here for enabled firefox on ubuntu 22.04: https://www.reddit.com/r/learnpython/comments/umft75/selenium_your_firefox_profile_cannot_be_loaded_it/ -> https://support.mozilla.org/en-US/kb/install-firefox-linux#w_install-firefox-from-mozilla-builds-for-advanced-users
-**4.4.9:**
+**4.4.9**
   - when running pytest, the final arg is mistakenly picked up as an input (and passes validation, because it's a file) and tests therefore have multiple repeat file uploads    
+**4.5.2**
+  - message tests come up negative when they're all passing basic functionality
+
+
 
 # Web Browser Versions
 (no longer as relevant as of 4.4.7ish updates)

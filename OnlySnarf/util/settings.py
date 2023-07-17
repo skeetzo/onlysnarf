@@ -133,7 +133,7 @@ class Settings:
     def get_date():
         try:
             config["date"] = Settings.format_date(config["date"])
-            if str(config["date"]) == DEFAULT.DATE and str(config["schedule"]) != DEFAULT.SCHEDULE:
+            if str(config["date"]) == DEFAULT.DATE and str(config["schedule"]) != DEFAULT.SCHEDULE and str(config["schedule"] != "None"):
                 if isinstance(config["schedule"], str):
                     config["date"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT).date().strftime(DEFAULT.DATE_FORMAT)
                 else:
@@ -329,8 +329,9 @@ class Settings:
         schedule = ""
         try:
             schedule = config["schedule"]
+            if str(schedule) == "None": schedule = DEFAULT.SCHEDULE
             if str(schedule) == DEFAULT.SCHEDULE:
-                schedule = datetime.strptime("{} {}".format(Settings.get_date(), Settings.get_time()), DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
+                schedule = datetime.strptime(schedule, DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
             elif not isinstance(schedule, str):
                 schedule = schedule.strftime(DEFAULT.SCHEDULE_FORMAT)
             Settings.maybe_print("schedule (settings): {}".format(schedule))
@@ -355,7 +356,7 @@ class Settings:
     def get_time():
         try:
             config["time"] = Settings.format_time(config["time"])        
-            if (str(config["time"]) == DEFAULT.TIME or str(config["time"]) == DEFAULT.TIME_NONE) and str(config["schedule"]) != DEFAULT.SCHEDULE:
+            if (str(config["time"]) == DEFAULT.TIME or str(config["time"]) == DEFAULT.TIME_NONE) and str(config["schedule"]) != DEFAULT.SCHEDULE and str(config["schedule"]) != "None":
                 Settings.dev_print("time from schedule")
                 date = datetime.strptime(str(config["schedule"]), DEFAULT.SCHEDULE_FORMAT)
                 config["time"] = datetime.strptime(str(date.time().strftime(DEFAULT.TIME_FORMAT)), DEFAULT.TIME_FORMAT)
