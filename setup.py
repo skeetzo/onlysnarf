@@ -14,7 +14,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     # packages=setuptools.find_packages(),
-    packages=["OnlySnarf", "OnlySnarf/api", "OnlySnarf/classes","OnlySnarf/conf","OnlySnarf/elements","OnlySnarf/lib","OnlySnarf/util"],
+    packages=["OnlySnarf", "OnlySnarf/classes","OnlySnarf/conf","OnlySnarf/elements","OnlySnarf/lib","OnlySnarf/util"],
     include_package_data=True,
     install_requires=[
         'ffmpeg',
@@ -22,7 +22,8 @@ setuptools.setup(
         'wget',
         'selenium',
         'webdriver_manager',
-        'validators'
+        'validators',
+        'flask'
         ],
     extras_require={
         'dev': [
@@ -32,9 +33,9 @@ setuptools.setup(
     },
     entry_points={
         'console_scripts' : [
-            'api = OnlySnarf.api:main',
             'onlysnarf = OnlySnarf.menu:main',
-            'snarf = OnlySnarf.snarf:main'
+            'snarf = OnlySnarf.snarf:main',
+            'snarfapi = OnlySnarf.api:main'
         ]
     },
     classifiers=[

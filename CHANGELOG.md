@@ -710,17 +710,16 @@
   - fixed random user functionality
   - updated driver.poll
   - fixed new message tests
+  - added flask to package reqs
+  - updated install script
+  - updated api scripts to route through snarf
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-
-- add system for checking online for updates --> then updating
-
 - look into Marshmellow package for class / object cleanup
 
-- fix how tabs open and scroll and then the process opens another tab to find the same elements and scroll again ala: find users then discount user
 
 - add smart idea for getting statement information
 - add better version notes to readme's list of "works on"
@@ -791,6 +790,8 @@ https://stackoverflow.com/questions/8529265/google-authenticator-implementation-
 
 ## Fix / Debug
 
+- fix how tabs open and scroll and then the process opens another tab to find the same elements and scroll again ala: find users then discount user
+
 (unlikely to be fixed soon, if ever)
 - google login: unsafe browser warning --> possibly end of usability --> should I just remove this? form login works, twitter login works (i think)
 -- maybe just cut out / leave as is until can debug "unsafe browser" issue?
@@ -852,7 +853,7 @@ what helps in general:
 **4.4.9**
   - when running pytest, the final arg is mistakenly picked up as an input (and passes validation, because it's a file) and tests therefore have multiple repeat file uploads    
 **4.5.2**
-  - message tests come up negative when they're all passing basic functionality
+  - [fixed] message tests come up negative when they're all passing basic functionality
 
 
 

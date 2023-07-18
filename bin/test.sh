@@ -25,15 +25,11 @@ python -m unittest tests/selenium/browsers/test_firefox.py
 
 python -m unittest tests/snarf/test_auth.py
 python -m unittest tests/snarf/test_discount.py
-
 python -m unittest tests/snarf/test_expiration.py
 python -m unittest tests/snarf/test_message.py
 python -m unittest tests/snarf/test_poll.py
 python -m unittest tests/snarf/test_post.py
 python -m unittest tests/snarf/test_schedule.py
-
-
-
 python -m unittest tests/snarf/test_users.py
 
 ##########

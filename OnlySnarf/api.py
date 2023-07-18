@@ -1,8 +1,9 @@
 import json
 from flask import Flask, request
 
-from .classes.message import Message, Post
+from .util.config import config
 from .util.settings import Settings
+from .snarf import Snarf
 
 def create_app():
     app = Flask(__name__)
@@ -12,19 +13,21 @@ def create_app():
         Settings.dev_print(request.data)
         args = json.loads(request.data)
         Settings.dev_print(args)
-        Settings.print("Messaging...")
-        message = Message()
-        message.text = args["text"]
-        try: message.files = args["input"].split(",")
+        config["text"] = args["text"]
+        config["user"] = args["user"]
+        try: config["files"] = args["input"].split(",")
         except Exception as e: pass
-        try: message.price = args["price"] or 0
+        try: config["price"] = args["price"] or 0
         except Exception as e: pass
-        try: message.schedule = args["schedule"]
+        try: config["schedule"] = args["schedule"]
         except Exception as e: pass
-        try: message.performers = args["performers"]
+        try: config["performers"] = args["performers"]
         except Exception as e: pass
         if not app.testing:
-            message.send(args["user"])
+            config["debug"] = True
+            config["verbose"] = 3
+        Snarf.message()
+        Snarf.close()
 
         return "", 200
 
@@ -33,28 +36,32 @@ def create_app():
         Settings.dev_print(request.data)
         args = json.loads(request.data)
         Settings.dev_print(args)
-        Settings.print("Posting...")
-        post = Post()
-        post.text = args["text"]
-        try: post.files = args["input"].split(",")
+        config["text"] = args["text"]
+        try: config["files"] = args["input"].split(",")
         except Exception as e: pass
-        try: post.performers = args["performers"]
+        try: config["performers"] = args["performers"]
         except Exception as e: pass
-        try: post.schedule = args["schedule"]
+        try: config["schedule"] = args["schedule"]
         except Exception as e: pass
-        try: post.questions = args["questions"]
+        try: config["questions"] = args["questions"]
         except Exception as e: pass
-        try: post.duration = args["duration"]
+        try: config["duration"] = args["duration"]
         except Exception as e: pass
-        try: post.expires = args["expires"]
+        try: config["expires"] = args["expires"]
         except Exception as e: pass
         if not app.testing:
-            post.send()
+            config["debug"] = True
+            config["verbose"] = 3
+        Snarf.post()
+        Snarf.close()
 
         return "", 200
 
     return app
 
-if __name__ == "__main__":
+def main():
     app = create_app()
     app.run(host="0.0.0.0")
+
+if __name__ == "__main__":
+    main()

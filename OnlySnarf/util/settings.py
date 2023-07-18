@@ -368,7 +368,7 @@ class Settings:
             return config["time"]
         except Exception as e:
             pass
-        return DEFAULT.TIME.strftime(DEFAULT.TIME_FORMAT)
+        return datetime.strptime(DEFAULT.TIME, DEFAULT.TIME_FORMAT).strftime(DEFAULT.TIME_FORMAT)
 
     def get_title():
         return config["title"] or ""
