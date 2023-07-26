@@ -23,7 +23,7 @@ def create_app():
         except Exception as e: pass
         try: config["performers"] = args["performers"]
         except Exception as e: pass
-        if not app.testing:
+        if app.testing:
             config["debug"] = True
             config["verbose"] = 3
         Snarf.message()
@@ -49,7 +49,7 @@ def create_app():
         except Exception as e: pass
         try: config["expires"] = args["expires"]
         except Exception as e: pass
-        if not app.testing:
+        if app.testing:
             config["debug"] = True
             config["verbose"] = 3
         Snarf.post()

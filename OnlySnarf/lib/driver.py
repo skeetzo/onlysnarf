@@ -395,6 +395,7 @@ class Driver:
                 self.go_to_profile()
                 # count number of content elements to scroll to bottom
                 num = self.browser.find_element(By.CLASS_NAME, "b-profile__sections__count").get_attribute("innerHTML")
+                num = num.replace("K","00").replace(".","")
                 Settings.maybe_print("content count: {}".format(num))
                 for n in range(int(int(int(num)/5)+1)):
                     Settings.print_same_line("({}/{}) scrolling...".format(n,int(int(int(num)/5)+1)))
@@ -416,7 +417,16 @@ class Driver:
         downloaded = []
         downloadMe = []
         try:
-            images = self.browser.find_elements(By.TAG_NAME, "img")
+            images_ = self.browser.find_elements(By.TAG_NAME, "img")
+            images = []
+
+            for image in images_:
+                # print(image)
+                # print(image.get_attribute("src"))
+                if "thumbs.onlyfans.com" not in str(image.get_attribute("src")):
+                    # print(image.get_attribute("src"))
+                    images.append(image)
+
             end = len(images)
             if len(images) == 0:
                 Settings.warn_print("no images found!")
@@ -426,13 +436,28 @@ class Driver:
             i=0
             for j in range(end):
                 try:
-                    images = self.browser.find_elements(By.TAG_NAME, "img")
+                    images_ = self.browser.find_elements(By.TAG_NAME, "img")
+                    images = []
+
+                    for image in images_:
+                        if "thumbs.onlyfans.com" not in str(image.get_attribute("src")):
+                            # print(image.get_attribute("src"))
+                            images.append(image)
+
                     # click on each image
                     # download each image via class "pswp__img"
-                    self.move_to_then_click_element(images[i])
+                    successful = self.move_to_then_click_element(images[j])
+
+                    while not successful:
+                        driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                        time.sleep(1)
+                        successful = self.move_to_then_click_element(images[j])
+
                     time.sleep(1)
                     hdImages = self.browser.find_elements(By.CLASS_NAME, "pswp__img")
-                    downloadMe.extend(hdImages)
+                    for image in hdImages:
+                        downloadMe.append(image.get_attribute("src"))
+                    # print(len(downloadMe))
                 except Exception as err:
                     Settings.print("")            
                     Settings.warn_print(err)
@@ -443,14 +468,17 @@ class Driver:
         except Exception as err:
             Settings.err_print(err)
 
+        # print(downloadMe)
         downloadMe = list(set(downloadMe)) # remove duplicates
+        # print(downloadMe)
 
         i=1
-        for image in downloadMe:
-            src = ""
+        for src in downloadMe:
+            # src = ""
             try:
                 # if Driver.DOWNLOADING_MAX and i > Driver.DOWNLOAD_MAX_IMAGES: break
-                src = str(image.get_attribute("src"))
+                # src = str(image.get_attribute("src"))
+                # print(src)
                 if not src or src == "" or src == "None" or "/thumbs/" in src or "_frame_" in src or "http" not in src: continue
                 Settings.print_same_line("downloading image: {}/{}".format(i, len(images)))
                 # Settings.print("Image: {}".format(src[:src.find(".jpg")+4]))
@@ -539,7 +567,12 @@ class Driver:
                 try:
                     # click on play button
                     # find new and only video ele on page
+                    
+
                     self.move_to_then_click_element(playButtons[i])
+
+
+
                     time.sleep(3)
                     video = self.browser.find_element(By.TAG_NAME, "video")
                     # if Driver.DOWNLOADING_MAX and i > Driver.DOWNLOAD_MAX_VIDEOS: break
@@ -1769,18 +1802,22 @@ class Driver:
         #
         try:
             ActionChains(self.browser).move_to_element(element).click().perform()
+            return True
         except Exception as e:
-            Settings.dev_print(e)
-            if 'firefox' in self.browser.capabilities['browserName']:
-                scroll_shim(self.browser, element)
+            # Settings.dev_print(e)
+            # if 'firefox' in self.browser.capabilities['browserName']:
             try:
+                scroll_shim(self.browser, element)
                 ActionChains(self.browser).move_to_element(element).click().perform()
             except Exception as e:
-                Settings.dev_print(e)
+                # Settings.dev_print(e)
             # self.browser.execute_script("arguments[0].scrollIntoView();", ele)
-                self.browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.CONTROL + Keys.HOME)
-                ActionChains(self.browser).move_to_element(element).click().perform()
-
+                try:
+                    self.browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.CONTROL + Keys.HOME)
+                    ActionChains(self.browser).move_to_element(element).click().perform()
+                except Exception as e:
+                    Settings.dev_print(e)
+        return False
 
     ####################################################################################################
     ####################################################################################################

@@ -37,7 +37,8 @@ config = {}
 
 # continue to overwrite values from config file with args
 # print(args.items())
-if os.environ.get('ENV') and os.environ.get('ENV') != "test":
+# print(os.environ.get('ENV'))
+if str(os.environ.get('ENV')) != "test":
   from .args import args
   for key, value in args.items():
     config[key] = value
