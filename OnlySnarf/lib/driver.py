@@ -567,14 +567,21 @@ class Driver:
                 try:
                     # click on play button
                     # find new and only video ele on page
-                    
-
                     self.move_to_then_click_element(playButtons[i])
 
+                    time.sleep(2)
 
+                    video = self.browser.find_element(By.CLASS_NAME, "vjs-tech")
+                    # try:
+                    # except Exception as e:
+                        # pass
+                        # try:
+                            # video = self.browser.find_element(By.TAG_NAME, "video")
+                        # except Exception as e:
+                            # pass
 
-                    time.sleep(3)
-                    video = self.browser.find_element(By.TAG_NAME, "video")
+                    # if not video: continue
+
                     # if Driver.DOWNLOADING_MAX and i > Driver.DOWNLOAD_MAX_VIDEOS: break
                     src = str(video.get_attribute("src"))
                     if not src or src == "" or src == "None" or "http" not in src: continue
@@ -582,6 +589,7 @@ class Driver:
                 except Exception as e:
                     Settings.warn_print(e)
                 finally:
+                    # self.browser.switch_to.default_content()
                     ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
                     i+=1
 
@@ -592,7 +600,7 @@ class Driver:
                 try:
                     Settings.print_same_line("downloading video: {}/{}".format(i, end))
                     # Settings.print("Video: {}".format(src[:src.find(".mp4")+4]))
-                    Settings.dev_print("video src: {}".format(src))
+                    # Settings.dev_print("video src: {}".format(src))
                     # while os.path.isfile("{}/{}.mp4".format(destination, i)):
                         # i+=1
                     wget.download(src, "{}/{}.mp4".format(destination, i), False)
@@ -1810,13 +1818,14 @@ class Driver:
                 scroll_shim(self.browser, element)
                 ActionChains(self.browser).move_to_element(element).click().perform()
             except Exception as e:
+                pass
                 # Settings.dev_print(e)
-            # self.browser.execute_script("arguments[0].scrollIntoView();", ele)
-                try:
-                    self.browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.CONTROL + Keys.HOME)
-                    ActionChains(self.browser).move_to_element(element).click().perform()
-                except Exception as e:
-                    Settings.dev_print(e)
+                self.browser.execute_script("arguments[0].scrollIntoView();", element)
+                # try:
+                #     self.browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.CONTROL + Keys.HOME)
+                #     ActionChains(self.browser).move_to_element(element).click().perform()
+                # except Exception as e:
+                #     Settings.dev_print(e)
         return False
 
     ####################################################################################################
