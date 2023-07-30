@@ -2977,6 +2977,9 @@ class Driver:
             options.add_argument("--disable-extensions")
             options.add_argument("--disable-dev-shm-usage")
 
+            options.add_argument("enable-automation")
+            options.add_argument("--disable-infobars")
+
             # if os.name == 'nt':
                 # options.add_argument(r"--user-data-dir=C:\Users\brain\AppData\Local\Google\Chrome\User Data")
             # else:
