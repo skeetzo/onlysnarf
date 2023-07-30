@@ -8,4 +8,4 @@
 curl -X POST -H "Content-Type: application/json" -d '{
   "text": "your mom",
   "input": "https://github.com/skeetzo/onlysnarf/blob/master/public/images/shnarf.jpg?raw=true"
-}' http://16.170.229.207:5000
+}' http://13.51.198.26/post:5000

@@ -10,9 +10,11 @@ def create_app():
 
     @app.route('/message', methods=['POST'])
     def message():
-        Settings.dev_print(request.data)
+        # Settings.dev_print(request.data)
+        print(request.data)
         args = json.loads(request.data)
-        Settings.dev_print(args)
+        # Settings.dev_print(args)
+        print(args)
         config["text"] = args["text"]
         config["user"] = args["user"]
         try: config["files"] = args["input"].split(",")
@@ -26,6 +28,7 @@ def create_app():
         if app.testing:
             config["debug"] = True
             config["verbose"] = 3
+        print("messaging")
         Snarf.message()
         Snarf.close()
 
@@ -33,9 +36,11 @@ def create_app():
 
     @app.route('/post', methods=['POST'])
     def post():
-        Settings.dev_print(request.data)
+        print(request.data)
+        # Settings.dev_print(request.data)
         args = json.loads(request.data)
-        Settings.dev_print(args)
+        # Settings.dev_print(args)
+        print(args)
         config["text"] = args["text"]
         try: config["files"] = args["input"].split(",")
         except Exception as e: pass
@@ -52,6 +57,7 @@ def create_app():
         if app.testing:
             config["debug"] = True
             config["verbose"] = 3
+        print("posting")
         Snarf.post()
         Snarf.close()
 
