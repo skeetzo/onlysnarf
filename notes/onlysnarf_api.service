@@ -3,8 +3,8 @@ Description=OnlySnarf API
 After=network.target
 
 [Service]
-WorkingDirectory=/home/zapier/api/
-ExecStart=/usr/bin/snarfapi -verbose users
+WorkingDirectory=/home/zapier/
+ExecStart=/home/zapier/.local/bin/snarfapi -verbose users
 Restart=always
 User=zapier
 

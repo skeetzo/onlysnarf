@@ -10,36 +10,37 @@ def create_app():
 
     @app.route('/message', methods=['POST'])
     def message():
-        # Settings.dev_print(request.data)
-        print(request.data)
-        args = json.loads(request.data)
-        # Settings.dev_print(args)
-        print(args)
-        config["text"] = args["text"]
-        config["user"] = args["user"]
-        try: config["files"] = args["input"].split(",")
-        except Exception as e: pass
-        try: config["price"] = args["price"] or 0
-        except Exception as e: pass
-        try: config["schedule"] = args["schedule"]
-        except Exception as e: pass
-        try: config["performers"] = args["performers"]
-        except Exception as e: pass
-        if app.testing:
-            config["debug"] = True
-            config["verbose"] = 3
-        print("messaging")
-        Snarf.message()
-        Snarf.close()
-
-        return "", 200
+        try:
+            return "", 200
+        finally:
+            Settings.dev_print(request.data)
+            print(request.data)
+            args = json.loads(request.data)
+            Settings.dev_print(args)
+            print(args)
+            config["text"] = args["text"]
+            config["user"] = args["user"]
+            try: config["files"] = args["input"].split(",")
+            except Exception as e: pass
+            try: config["price"] = args["price"] or 0
+            except Exception as e: pass
+            try: config["schedule"] = args["schedule"]
+            except Exception as e: pass
+            try: config["performers"] = args["performers"]
+            except Exception as e: pass
+            if app.testing:
+                config["debug"] = True
+                config["verbose"] = 3
+            print("messaging")
+            Snarf.message()
+            Snarf.close()
 
     @app.route('/post', methods=['POST'])
     def post():
         print(request.data)
-        # Settings.dev_print(request.data)
+        Settings.dev_print(request.data)
         args = json.loads(request.data)
-        # Settings.dev_print(args)
+        Settings.dev_print(args)
         print(args)
         config["text"] = args["text"]
         try: config["files"] = args["input"].split(",")
