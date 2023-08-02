@@ -717,6 +717,7 @@
   - api debugging
   **4.5.7,8 : 8/2/2023**
   - fixed twitter login; added phone number to args&config
+  - more api debugging w/ aws
 
 ------------------------------------------------------------------------------------
 

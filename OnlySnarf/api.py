@@ -11,8 +11,6 @@ def create_app():
     @app.route('/message', methods=['POST'])
     def message():
         try:
-            return "", 200
-        finally:
             args = json.loads(request.data)
             Settings.dev_print(args)
             config["text"] = args["text"]
@@ -30,12 +28,14 @@ def create_app():
                 config["verbose"] = 3
             Snarf.message()
             Snarf.close()
+        except Exception as e:
+            Settings.dev_print(e)
+        finally:
+            return "", 200
 
     @app.route('/post', methods=['POST'])
     def post():
         try:
-            return "", 200
-        finally:
             args = json.loads(request.data)
             Settings.dev_print(args)
             config["text"] = args["text"]
@@ -56,6 +56,10 @@ def create_app():
                 config["verbose"] = 3
             Snarf.post()
             Snarf.close()
+        except Exception as e:
+            Settings.dev_print(e)
+        finally:
+            return "", 200
 
     return app
 
