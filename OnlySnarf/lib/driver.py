@@ -1408,12 +1408,18 @@ class Driver:
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
+                # check for phone number page
+                time.sleep(1)
+                if "Verify your identity by entering the phone number associated with your Twitter account." in str(self.browser.find_element(By.TAG_NAME, 'body').text):
+                    element = self.browser.switch_to.active_element
+                    element.send_keys(str(Settings.get_phone_number()))
+                    element.send_keys(Keys.ENTER)
+                    time.sleep(1)
                 return login_check("twitter")
             except Exception as e:
                 Settings.dev_print("twitter login failure")
                 Driver.error_checker(e)
             return False
-
 
         # this needs to go after them because they reconnect then need to login check
         # if Settings.get_browser_type() == "reconnect" or Settings.get_browser_type() == "remote" or 

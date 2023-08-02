@@ -96,6 +96,9 @@ Reduce the file size before uploading.
 --username, --u ""  
 The OnlyFans username to login as.  
 
+-phone ##########
+The OnlyFans phone number associated with the account for verifying Twitter login.
+
 ### Discount
 -amount #  
 The amount in percent to discount.  

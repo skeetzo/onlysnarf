@@ -23,6 +23,9 @@ pytest tests/api
 python -m unittest tests/selenium/test_browsers.py
 python -m unittest tests/selenium/browsers/test_firefox.py
 
+python -m unittest tests/snarf/auth/test_twitter.py
+
+
 python -m unittest tests/snarf/test_auth.py
 python -m unittest tests/snarf/test_discount.py
 python -m unittest tests/snarf/test_expiration.py

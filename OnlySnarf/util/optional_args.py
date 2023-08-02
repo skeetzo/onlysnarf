@@ -33,9 +33,13 @@ def apply_args(parser):
   # enabled tweeting
   parser.add_argument('-tweet', action='store_true', dest='tweeting', help='enable tweeting when posting')
   ##
-  # -username
+  # --username
   # OnlyFans username to use
   parser.add_argument('--username', '--u', type=str, default="", dest='username', help='OnlyFans username to use')
+  ##
+  # -phone
+  # OnlyFans phone number to use for additional login steps
+  parser.add_argument('-phone', type=str, default="", dest='phone', help='OnlyFans phone number to use')
 
   ###############
   ## DEBUGGING ##

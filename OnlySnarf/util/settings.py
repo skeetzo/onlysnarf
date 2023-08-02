@@ -241,6 +241,13 @@ class Settings:
     def get_sort_method():
         return config["sort"] or "random"
 
+    def get_phone_number():
+        try:
+            return config["phone"]
+        except Exception as e:
+            Settings.err_print("missing phone number!")
+        return None
+
     def get_performers():
         try:
             performers = config["performers"] or []

@@ -28,7 +28,6 @@ def create_app():
             if app.testing:
                 config["debug"] = True
                 config["verbose"] = 3
-            print("messaging")
             Snarf.message()
             Snarf.close()
 
@@ -55,7 +54,6 @@ def create_app():
             if app.testing:
                 config["debug"] = True
                 config["verbose"] = 3
-            print("posting")
             Snarf.post()
             Snarf.close()
 

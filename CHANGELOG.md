@@ -715,6 +715,8 @@
   - updated api scripts to route through snarf
   **4.5.3,4,5,6 : 7/30/2023**
   - api debugging
+  **4.5.7 : 8/2/2023**
+  - fixed twitter login; added phone number to args&config
 
 ------------------------------------------------------------------------------------
 

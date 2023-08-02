@@ -9,4 +9,10 @@ curl -X POST -H "Content-Type: application/json" -d '{
   "text": "your mom",
   "user": "random",
   "input": "https://github.com/skeetzo/onlysnarf/blob/master/public/images/shnarf.jpg?raw=true"
-}' http://13.51.198.26:5000/post
+}' http://16.171.174.96:5000/message
+
+
+# curl -X POST -H "Content-Type: application/json" -d '{
+#   "text": "your mom",
+#   "input": "https://github.com/skeetzo/onlysnarf/blob/master/public/images/shnarf.jpg?raw=true"
+# }' http://16.171.174.96:5000/post

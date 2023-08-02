@@ -23,6 +23,7 @@ options:
 > -save, -S             enable saving users locally on exit  
 > -tweet                enable tweeting when posting  
 > --username USERNAME, --u USERNAME OnlyFans username to use  
+> -phone PHONE          OnlyFans phone number to use
 > -config PATH_CONFIG, -C PATH_CONFIG path to config.conf  
 > -debug, -D            enable debugging  
 > -keep, -K             keep browser window open after scripting ends  
