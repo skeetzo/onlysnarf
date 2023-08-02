@@ -20,8 +20,8 @@ setuptools.setup(
         'ffmpeg',
         'inquirer',
         'wget',
-        'selenium==4.0.0',
-        'webdriver_manager',
+        'selenium>=4',
+        'webdriver_manager==3.9.0',
         'validators',
         'flask'
         ],

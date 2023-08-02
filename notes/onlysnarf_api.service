@@ -3,10 +3,10 @@ Description=OnlySnarf API
 After=network.target
 
 [Service]
-WorkingDirectory=/home/zapier/
-ExecStart=/home/zapier/.local/bin/snarfapi -verbose users
+WorkingDirectory=/home/snarf/
+ExecStart=/home/snarf/.local/bin/snarfapi -verbose users
 Restart=always
-User=zapier
+User=snarf
 
 [Install]
 WantedBy=multi-user.target
