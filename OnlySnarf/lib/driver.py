@@ -1410,7 +1410,7 @@ class Driver:
                 password_.send_keys(Keys.ENTER)
                 # check for phone number page
                 time.sleep(3)
-                WebDriverWait(self.browser, 10, poll_frequency=2).until(EC.visibility_of_element_located(By.TAG_NAME, "body"))
+                WebDriverWait(self.browser, 10, poll_frequency=2).until(EC.visibility_of_element_located((By.TAG_NAME, "body")))
                 if "Verify your identity by entering the phone number associated with your Twitter account." in str(self.browser.find_element(By.TAG_NAME, "body").text):
                     Settings.maybe_print("verifying phone number...")
                     element = self.browser.switch_to.active_element
