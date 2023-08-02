@@ -1266,9 +1266,18 @@ class Driver:
 
             def try_email():
                 Settings.print("email verification required - please enter the code sent to your email!")
-                element = self.browser.switch_to.active_element
-                element.send_keys(str(input("Enter code: ")))
-                element.send_keys(Keys.ENTER)
+                # element = self.browser.switch_to.active_element
+                # element.send_keys(str(input("Enter code: ")))
+                # element.send_keys(Keys.SHIFT + Keys.TAB)
+                # element.send_keys(Keys.ENTER)
+
+                action = ActionChains(self.browser)
+                action.click(on_element=self.browser.switch_to.active_element)
+                action.key_down(Keys.SHIFT).send_keys(Keys.TAB).key_up(Keys.SHIFT)
+                action.send_keys(Keys.ENTER)
+                action.perform()
+                time.sleep(1)
+                print(self.browser.find_element(By.TAG_NAME, "body").text)
 
             try:
                 Settings.dev_print("waiting for login check...")
@@ -1278,6 +1287,7 @@ class Driver:
                 return True
             except TimeoutException as te:
                 bodyText = self.browser.find_element(By.TAG_NAME, "body").text
+                Settings.dev_print(bodyText)
                 # check for phone number page
                 if "Verify your identity by entering the phone number associated with your Twitter account." in str(bodyText):
                     try_phone()
@@ -1291,7 +1301,6 @@ class Driver:
                     Settings.print("Login Failure: Timed Out! Please check your credentials.")
                     Settings.print(": If the problem persists, OnlySnarf may require an update.")
                     # output page text for debugging
-                    Settings.dev_print(str(self.browser.find_element(By.TAG_NAME, "body").text))
                 return False
             except Exception as e:
                 Driver.error_checker(e)
