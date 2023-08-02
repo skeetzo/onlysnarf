@@ -3131,7 +3131,9 @@ class Driver:
             Settings.dev_print("reconnect id: {}".format(self.session_id))
             Settings.dev_print("reconnect url: {}".format(self.session_url))
             try:
-                browserAttempt = webdriver.Remote(command_executor=self.session_url)
+                options = webdriver.ChromeOptions()
+                add_options(options)
+                browserAttempt = webdriver.Remote(command_executor=self.session_url, options=options)
                 browserAttempt.close()   # this closes the session's window - it is currently the only one, thus the session itself will be auto-killed, yet:
                 # take the session that's already running
                 browserAttempt.session_id = self.session_id
