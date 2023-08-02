@@ -1280,7 +1280,7 @@ class Driver:
                 return True
             except TimeoutException as te:
                 bodyText = self.browser.find_element(By.TAG_NAME, "body").text
-                Settings.dev_print()
+                Settings.dev_print(bodyText)
                 # check for phone number page
                 if "Verify your identity by entering the phone number associated with your Twitter account." in str(bodyText):
                     try_phone()
@@ -3131,7 +3131,7 @@ class Driver:
             Settings.dev_print("reconnect id: {}".format(self.session_id))
             Settings.dev_print("reconnect url: {}".format(self.session_url))
             try:
-                browserAttempt = webdriver.Remote(command_executor=self.session_url, desired_capabilities={})
+                browserAttempt = webdriver.Remote(command_executor=self.session_url)
                 browserAttempt.close()   # this closes the session's window - it is currently the only one, thus the session itself will be auto-killed, yet:
                 # take the session that's already running
                 browserAttempt.session_id = self.session_id
