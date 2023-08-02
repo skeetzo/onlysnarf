@@ -1257,6 +1257,19 @@ class Driver:
 
             """
 
+
+            def try_phone():
+                Settings.maybe_print("verifying phone number...")
+                element = self.browser.switch_to.active_element
+                element.send_keys(str(Settings.get_phone_number()))
+                element.send_keys(Keys.ENTER)
+
+            def try_email():
+                Settings.print("email verification required - please enter the code sent to your email!")
+                element = self.browser.switch_to.active_element
+                element.send_keys(str(input("Enter code: ")))
+                element.send_keys(Keys.ENTER)
+
             try:
                 Settings.dev_print("waiting for login check...")
                 WebDriverWait(self.browser, 30, poll_frequency=2).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
@@ -1264,14 +1277,21 @@ class Driver:
                 Settings.dev_print("login successful - {}".format(which))
                 return True
             except TimeoutException as te:
-                Settings.dev_print(str(te))
-                Settings.print("Login Failure: Timed Out! Please check your credentials.")
-                Settings.print(": If the problem persists, OnlySnarf may require an update.")
-
-
-                print(str(self.browser.find_element(By.TAG_NAME, "body").text))
-
-
+                bodyText = self.browser.find_element(By.TAG_NAME, "body").text
+                # check for phone number page
+                if "Verify your identity by entering the phone number associated with your Twitter account." in str(bodyText):
+                    try_phone()
+                    login_check(which)
+                # check for email notification
+                elif "Check your email" in str(bodyText):
+                    try_email()
+                    login_check(which)
+                else:
+                    # Settings.dev_print(str(te))
+                    Settings.print("Login Failure: Timed Out! Please check your credentials.")
+                    Settings.print(": If the problem persists, OnlySnarf may require an update.")
+                    # output page text for debugging
+                    Settings.dev_print(str(self.browser.find_element(By.TAG_NAME, "body").text))
                 return False
             except Exception as e:
                 Driver.error_checker(e)
@@ -1413,15 +1433,6 @@ class Driver:
                 password_.send_keys(password)
                 Settings.dev_print("password entered")
                 password_.send_keys(Keys.ENTER)
-                # check for phone number page
-                time.sleep(3)
-                WebDriverWait(self.browser, 10, poll_frequency=2).until(EC.visibility_of_element_located((By.TAG_NAME, "body")))
-                if "Verify your identity by entering the phone number associated with your Twitter account." in str(self.browser.find_element(By.TAG_NAME, "body").text):
-                    Settings.maybe_print("verifying phone number...")
-                    element = self.browser.switch_to.active_element
-                    element.send_keys(str(Settings.get_phone_number()))
-                    element.send_keys(Keys.ENTER)
-                    time.sleep(1)
                 return login_check("twitter")
             except Exception as e:
                 Settings.dev_print("twitter login failure")
