@@ -1259,7 +1259,7 @@ class Driver:
 
             try:
                 Settings.dev_print("waiting for login check...")
-                WebDriverWait(self.browser, 16, poll_frequency=2).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
+                WebDriverWait(self.browser, 30, poll_frequency=2).until(EC.visibility_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass())))
                 Settings.print("OnlyFans login successful!")
                 Settings.dev_print("login successful - {}".format(which))
                 return True
@@ -1411,6 +1411,7 @@ class Driver:
                 # check for phone number page
                 time.sleep(1)
                 if "Verify your identity by entering the phone number associated with your Twitter account." in str(self.browser.find_element(By.TAG_NAME, 'body').text):
+                    Settings.maybe_print("verifying phone number...")
                     element = self.browser.switch_to.active_element
                     element.send_keys(str(Settings.get_phone_number()))
                     element.send_keys(Keys.ENTER)
