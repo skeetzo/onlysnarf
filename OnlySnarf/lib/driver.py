@@ -1271,11 +1271,16 @@ class Driver:
                 # element.send_keys(Keys.SHIFT + Keys.TAB)
                 # element.send_keys(Keys.ENTER)
 
-                action = ActionChains(self.browser)
-                action.click(on_element=self.browser.switch_to.active_element)
-                action.key_down(Keys.SHIFT).send_keys(Keys.TAB).key_up(Keys.SHIFT)
-                action.send_keys(Keys.ENTER)
-                action.perform()
+                elements = self.browser.find_elements(By.TAG_NAME, "a")
+                
+                element = [elem for elem in elements if "I didn\'t receive the email" in str(elem.get_attribute('innerHTML'))][0]
+                element.click()
+
+                # action = ActionChains(self.browser)
+                # action.click(on_element=self.browser.switch_to.active_element)
+                # action.key_down(Keys.SHIFT).send_keys(Keys.TAB).key_up(Keys.SHIFT)
+                # action.send_keys(Keys.ENTER)
+                # action.perform()
                 time.sleep(1)
                 print(self.browser.find_element(By.TAG_NAME, "body").text)
 
