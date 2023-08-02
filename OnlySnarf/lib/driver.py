@@ -1267,6 +1267,11 @@ class Driver:
                 Settings.dev_print(str(te))
                 Settings.print("Login Failure: Timed Out! Please check your credentials.")
                 Settings.print(": If the problem persists, OnlySnarf may require an update.")
+
+
+                print(str(self.browser.find_element(By.TAG_NAME, "body").text))
+
+
                 return False
             except Exception as e:
                 Driver.error_checker(e)
