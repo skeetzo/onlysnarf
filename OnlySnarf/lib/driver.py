@@ -138,6 +138,8 @@ class Driver:
             if str(Settings.is_debug()) == "True":
                 return False
             os._exit(1)
+        if str(Settings.is_cookies()) == "True":
+            self.cookies_save()
         return True
 
     ###################
