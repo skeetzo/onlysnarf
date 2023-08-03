@@ -718,10 +718,14 @@
   **4.5.7,8 : 8/2/2023**
   - fixed twitter login; added phone number to args&config
   - more api debugging w/ aws
+  - updated date&time formats
+  - debugged api: /message & /post
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- minor version bump for working api
 
 - look into Marshmellow package for class / object cleanup
 

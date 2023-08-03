@@ -319,19 +319,14 @@ class Settings:
             config["date"] = Settings.format_date(config["date"])
             if str(config["date"]) == DEFAULT.DATE and str(config["schedule"]) != DEFAULT.SCHEDULE and str(config["schedule"] != "None"):
                 if isinstance(config["schedule"], str):
-                    print(0)
                     config["date"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT).date().strftime(DEFAULT.DATE_FORMAT)
                 else:
-                    print(1)
                     config["date"] = config["schedule"].date().strftime(DEFAULT.DATE_FORMAT)
-                print(2)
                 config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
             else:
-                print(3)
                 config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
             config["date"] = config["date"].strftime(DEFAULT.DATE_FORMAT)    
         except Exception as e:
-            print(4)
             config["date"] = datetime.strptime(DEFAULT.DATE, DEFAULT.DATE_FORMAT)
         Settings.maybe_print("date (settings): {}".format(str(config["date"])[:10]))
         return str(config["date"])[:10]
