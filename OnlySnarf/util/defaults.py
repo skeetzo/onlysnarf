@@ -10,7 +10,7 @@ ACTIONS = [ "Discount", "Message", "Post", "Profile", "Promotion" ]
 
 AMOUNT_NONE = 0
 
-DATE_FORMAT = "%m/%d/%Y"
+DATE_FORMAT = "%m-%d-%Y"
 TIME_FORMAT = "%H:%M:%S"
 SCHEDULE_FORMAT = "{} {}".format(DATE_FORMAT, TIME_FORMAT)
 
