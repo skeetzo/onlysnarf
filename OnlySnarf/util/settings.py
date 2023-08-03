@@ -130,23 +130,6 @@ class Settings:
     def get_price_maximum():
         return DEFAULT.PRICE_MAXIMUM
 
-    def get_date():
-        try:
-            config["date"] = Settings.format_date(config["date"])
-            if str(config["date"]) == DEFAULT.DATE and str(config["schedule"]) != DEFAULT.SCHEDULE and str(config["schedule"] != "None"):
-                if isinstance(config["schedule"], str):
-                    config["date"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT).date().strftime(DEFAULT.DATE_FORMAT)
-                else:
-                    config["date"] = config["schedule"].date().strftime(DEFAULT.DATE_FORMAT)
-                config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
-            else:
-                config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
-            config["date"] = config["date"].strftime(DEFAULT.DATE_FORMAT)    
-        except Exception as e:
-            config["date"] = datetime.strptime(DEFAULT.DATE, DEFAULT.DATE_FORMAT)
-        Settings.maybe_print("date (settings): {}".format(config["date"]))
-        return str(config["date"])[:10]
-
     def get_default_greeting():
         return DEFAULT.GREETING or ""
 
@@ -331,6 +314,39 @@ class Settings:
     def get_profile_method():
         return config["profile_method"] or None
 
+    def get_date():
+        try:
+            config["date"] = Settings.format_date(config["date"])
+            if str(config["date"]) == DEFAULT.DATE and str(config["schedule"]) != DEFAULT.SCHEDULE and str(config["schedule"] != "None"):
+                if isinstance(config["schedule"], str):
+                    config["date"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT).date().strftime(DEFAULT.DATE_FORMAT)
+                else:
+                    config["date"] = config["schedule"].date().strftime(DEFAULT.DATE_FORMAT)
+                config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
+            else:
+                config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
+            config["date"] = config["date"].strftime(DEFAULT.DATE_FORMAT)    
+        except Exception as e:
+            config["date"] = datetime.strptime(DEFAULT.DATE, DEFAULT.DATE_FORMAT)
+        Settings.maybe_print("date (settings): {}".format(str(config["date"])[:10]))
+        return str(config["date"])[:10]
+
+    def get_time():
+        try:
+            config["time"] = Settings.format_time(config["time"])        
+            if (str(config["time"]) == DEFAULT.TIME or str(config["time"]) == DEFAULT.TIME_NONE) and str(config["schedule"]) != DEFAULT.SCHEDULE and str(config["schedule"]) != "None":
+                Settings.dev_print("time from schedule")
+                date = datetime.strptime(str(config["schedule"]), DEFAULT.SCHEDULE_FORMAT)
+                config["time"] = datetime.strptime(str(date.time().strftime(DEFAULT.TIME_FORMAT)), DEFAULT.TIME_FORMAT)
+            else:
+                Settings.dev_print("time from config")
+                config["time"] = datetime.strptime(str(config["time"]), DEFAULT.TIME_FORMAT)
+            config["time"] = config["time"].strftime(DEFAULT.TIME_FORMAT)
+        except Exception as e:
+            config["time"] = datetime.strptime(DEFAULT.TIME, DEFAULT.TIME_FORMAT).strftime(DEFAULT.TIME_FORMAT)
+        Settings.maybe_print("time (settings): {}".format(str(config["time"])[:9]))
+        return str(config["time"])[:9]
+
     def get_schedule():
         schedule = ""
         try:
@@ -357,22 +373,6 @@ class Settings:
 
     def get_text():
         return config["text"] or ""
-
-    def get_time():
-        try:
-            config["time"] = Settings.format_time(config["time"])        
-            if (str(config["time"]) == DEFAULT.TIME or str(config["time"]) == DEFAULT.TIME_NONE) and str(config["schedule"]) != DEFAULT.SCHEDULE and str(config["schedule"]) != "None":
-                Settings.dev_print("time from schedule")
-                date = datetime.strptime(str(config["schedule"]), DEFAULT.SCHEDULE_FORMAT)
-                config["time"] = datetime.strptime(str(date.time().strftime(DEFAULT.TIME_FORMAT)), DEFAULT.TIME_FORMAT)
-            else:
-                Settings.dev_print("time from config")
-                config["time"] = datetime.strptime(str(config["time"]), DEFAULT.TIME_FORMAT)
-            config["time"] = config["time"].strftime(DEFAULT.TIME_FORMAT)
-        except Exception as e:
-            config["time"] = datetime.strptime(DEFAULT.TIME, DEFAULT.TIME_FORMAT).strftime(DEFAULT.TIME_FORMAT)
-        Settings.maybe_print("time (settings): {}".format(config["time"]))
-        return str(config["time"])[:9]
 
     def get_title():
         return config["title"] or ""
