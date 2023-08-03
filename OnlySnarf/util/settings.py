@@ -145,7 +145,7 @@ class Settings:
         except Exception as e:
             config["date"] = datetime.strptime(DEFAULT.DATE, DEFAULT.DATE_FORMAT)
         Settings.maybe_print("date (settings): {}".format(config["date"]))
-        return config["date"][:10]
+        return str(config["date"])[:10]
 
     def get_default_greeting():
         return DEFAULT.GREETING or ""
@@ -343,7 +343,7 @@ class Settings:
         except Exception as e:
             schedule = datetime.strptime("{} {}".format(Settings.get_date(), Settings.get_time()), DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
         Settings.maybe_print("schedule (settings): {}".format(schedule))
-        return schedule[:20] # must be less than 19 characters
+        return str(schedule)[:20] # must be less than 19 characters
 
     def get_keywords():
         keywords = []
@@ -372,7 +372,7 @@ class Settings:
         except Exception as e:
             config["time"] = datetime.strptime(DEFAULT.TIME, DEFAULT.TIME_FORMAT).strftime(DEFAULT.TIME_FORMAT)
         Settings.maybe_print("time (settings): {}".format(config["time"]))
-        return config["time"][:9]
+        return str(config["time"])[:9]
 
     def get_title():
         return config["title"] or ""
