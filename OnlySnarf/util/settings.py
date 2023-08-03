@@ -341,11 +341,10 @@ class Settings:
                 schedule = datetime.strptime(schedule, DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
             elif not isinstance(schedule, str):
                 schedule = schedule.strftime(DEFAULT.SCHEDULE_FORMAT)
-            Settings.maybe_print("schedule (settings): {}".format(schedule))
-            return schedule
         except Exception as e:
-            pass
-        return datetime.strptime("{} {}".format(Settings.get_date(), Settings.get_time()), DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
+            schedule = datetime.strptime("{} {}".format(Settings.get_date(), Settings.get_time()), DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
+        Settings.maybe_print("schedule (settings): {}".format(schedule))
+        return schedule[:20] # must be less than 19 characters
 
     def get_keywords():
         keywords = []
