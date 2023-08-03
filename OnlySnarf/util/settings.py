@@ -142,11 +142,10 @@ class Settings:
             else:
                 config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
             config["date"] = config["date"].strftime(DEFAULT.DATE_FORMAT)    
-            Settings.maybe_print("date (settings): {}".format(config["date"]))
-            return config["date"]
         except Exception as e:
-            pass
-        return datetime.strptime(DEFAULT.DATE, DEFAULT.DATE_FORMAT)
+            config["date"] = datetime.strptime(DEFAULT.DATE, DEFAULT.DATE_FORMAT)
+        Settings.maybe_print("date (settings): {}".format(config["date"]))
+        return config["date"]
 
     def get_default_greeting():
         return DEFAULT.GREETING or ""
@@ -370,11 +369,10 @@ class Settings:
                 Settings.dev_print("time from config")
                 config["time"] = datetime.strptime(str(config["time"]), DEFAULT.TIME_FORMAT)
             config["time"] = config["time"].strftime(DEFAULT.TIME_FORMAT)
-            Settings.maybe_print("time (settings): {}".format(config["time"]))
-            return config["time"]
         except Exception as e:
-            pass
-        return datetime.strptime(DEFAULT.TIME, DEFAULT.TIME_FORMAT).strftime(DEFAULT.TIME_FORMAT)
+            config["time"] = datetime.strptime(DEFAULT.TIME, DEFAULT.TIME_FORMAT).strftime(DEFAULT.TIME_FORMAT)
+        Settings.maybe_print("time (settings): {}".format(config["time"]))
+        return config["time"]
 
     def get_title():
         return config["title"] or ""

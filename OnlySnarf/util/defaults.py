@@ -17,7 +17,7 @@ SCHEDULE_FORMAT = "{} {}".format(DATE_FORMAT, TIME_FORMAT)
 date_ = datetime.strptime(str(datetime.now().strftime(SCHEDULE_FORMAT)), SCHEDULE_FORMAT)
 
 DATE = date_.date().strftime(DATE_FORMAT)[:10]
-TIME = date_.time().strftime(TIME_FORMAT)
+TIME = date_.time().strftime(TIME_FORMAT)[:9]
 SCHEDULE = date_.strftime(SCHEDULE_FORMAT)
 
 TIME_NONE = "00:00:00"
