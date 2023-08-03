@@ -145,7 +145,7 @@ class Settings:
         except Exception as e:
             config["date"] = datetime.strptime(DEFAULT.DATE, DEFAULT.DATE_FORMAT)
         Settings.maybe_print("date (settings): {}".format(config["date"]))
-        return config["date"]
+        return config["date"][:10]
 
     def get_default_greeting():
         return DEFAULT.GREETING or ""
@@ -372,7 +372,7 @@ class Settings:
         except Exception as e:
             config["time"] = datetime.strptime(DEFAULT.TIME, DEFAULT.TIME_FORMAT).strftime(DEFAULT.TIME_FORMAT)
         Settings.maybe_print("time (settings): {}".format(config["time"]))
-        return config["time"]
+        return config["time"][:9]
 
     def get_title():
         return config["title"] or ""
