@@ -324,13 +324,14 @@ class Settings:
                 else:
                     print(1)
                     config["date"] = config["schedule"].date().strftime(DEFAULT.DATE_FORMAT)
+                print(2)
                 config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
             else:
-                print(2)
+                print(3)
                 config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
             config["date"] = config["date"].strftime(DEFAULT.DATE_FORMAT)    
         except Exception as e:
-            print(3)
+            print(4)
             config["date"] = datetime.strptime(DEFAULT.DATE, DEFAULT.DATE_FORMAT)
         Settings.maybe_print("date (settings): {}".format(str(config["date"])[:10]))
         return str(config["date"])[:10]
