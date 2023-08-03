@@ -1031,9 +1031,8 @@ class Driver:
         def goto():
             Settings.maybe_print("goto -> onlyfans.com")
             try:
+                self.browser.set_page_load_timeout(10)
                 self.browser.get(ONLYFANS_HOME_URL)
-                # element_present = EC.presence_of_element_located((By.CLASS_NAME, Element.get_element_by_name("loginCheck").getClass()))
-                # WebDriverWait(self.browser, 10).until(element_present)
             except TimeoutException:
                 Settings.dev_print("timed out waiting for page to check login element")
             except WebDriverException as e:
