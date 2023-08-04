@@ -79,6 +79,14 @@ class Settings:
         Settings.print("...")
         Settings.print("...")
 
+    def ensure_paths():
+        Path(DEFAULT.ROOT_PATH).mkdir(parents=True, exist_ok=True)
+        Path(DEFAULT.DOWNLOAD_PATH).mkdir(parents=True, exist_ok=True)
+        Path(DEFAULT.UPLOAD_PATH).mkdir(parents=True, exist_ok=True)
+        Path(DEFAULT.CONFIGS_PATH).mkdir(parents=True, exist_ok=True)
+        Path(DEFAULT.PROFILES_PATH).mkdir(parents=True, exist_ok=True)
+
+
     ##
     # Getters
     ##
@@ -284,7 +292,6 @@ class Settings:
 
     def get_local_path():
         localPath = os.path.join(Settings.get_root_path(), Settings.get_username())
-        from pathlib import Path
         Path(localPath).mkdir(parents=True, exist_ok=True)
         for cat in Settings.get_categories():
             Path(os.path.join(localPath, cat)).mkdir(parents=True, exist_ok=True)

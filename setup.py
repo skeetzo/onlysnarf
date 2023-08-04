@@ -36,6 +36,7 @@ setuptools.setup(
             'onlysnarf = OnlySnarf.menu:main',
             'snarf = OnlySnarf.snarf:main',
             'snarfapi = OnlySnarf.api:main'
+            'snarfconfig = OnlySnarf.config:main'
         ]
     },
     classifiers=[

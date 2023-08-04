@@ -722,10 +722,13 @@
   - debugged api: /message & /post
 **4.5.9 : 8/3/2023**
   - added update script meant to be run by systemd service script
+  - added config script; requires testing
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- test new config script
 
 - bump minor version for working api
 
