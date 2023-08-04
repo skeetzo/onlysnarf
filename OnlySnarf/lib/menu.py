@@ -6,11 +6,10 @@ import random
 import sys
 import inquirer
 ##
-from .snarf import Snarf
-from .lib.driver import Driver
-from .classes.profile import Profile
-from .util.colorize import colorize
-from .util.settings import Settings
+from ..lib.driver import Driver
+from ..classes.profile import Profile
+from ..util.colorize import colorize
+from ..util.settings import Settings
 
 # from .util.args import parser
 # print(parser)
@@ -61,6 +60,7 @@ class Menu:
 
         """
 
+        from ..snarf import Snarf
         action = Menu.ask_action()
         if (action == 'back'): return Menu.main()
         elif (action == 'discount'): Snarf.discount()
@@ -155,7 +155,7 @@ class Menu:
         action = Menu.menu()
         if (action == 'Action'): Menu.action_menu()
         elif (action == 'Settings'): Settings.menu()
-        else: exit()
+        else: exit_handler()
         Menu.main()
 
     def main():

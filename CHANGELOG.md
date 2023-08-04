@@ -723,14 +723,18 @@
 **4.5.9 : 8/3/2023**
   - added update script meant to be run by systemd service script
   - added config script; requires testing
+**4.5.10 : 8/4/2023**
+  - moved api & menu to cli
+  - updates to config script
+  - tested new config script
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- test new config script
+- add cli args for config to autoconfigure more easily
 
-- bump minor version for working api
+- bump minor version for working api & cli changes
 
 - look into Marshmellow package for class / object cleanup
 

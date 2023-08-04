@@ -86,7 +86,6 @@ class Settings:
         Path(DEFAULT.CONFIGS_PATH).mkdir(parents=True, exist_ok=True)
         Path(DEFAULT.PROFILES_PATH).mkdir(parents=True, exist_ok=True)
 
-
     ##
     # Getters
     ##
@@ -260,19 +259,25 @@ class Settings:
     def get_promotion_method():
         return config["promotion_method"] or None
 
-    def get_password():
-        try: return Settings.get_user_config(Settings.get_username())["onlyfans_password"]
-        except Exception as e: Settings.err_print(e)
+    def get_password(username=None):
+        try:
+            if not username: username = Settings.get_username()
+            return Settings.get_user_config(username)["onlyfans_password"]
+        except Exception as e: pass
         return ""
 
-    def get_password_google():
-        try: return Settings.get_user_config(Settings.get_username())["google_password"]
-        except Exception as e: Settings.err_print(e)
+    def get_password_google(username=None):
+        try:
+            if not username: username = Settings.get_username()
+            return Settings.get_user_config(username)["google_password"]
+        except Exception as e: pass
         return ""
 
-    def get_password_twitter():
-        try: return Settings.get_user_config(Settings.get_username())["twitter_password"]
-        except Exception as e: Settings.err_print(e)
+    def get_password_twitter(username=None):
+        try: 
+            if not username: username = Settings.get_username()
+            return Settings.get_user_config(username)["twitter_password"]
+        except Exception as e: pass
         return ""
 
     def get_download_path():
@@ -446,9 +451,10 @@ class Settings:
         config_file = configparser.ConfigParser()
         # strip email
         if "@" in username: username = username[0 : username.index("@")]
+        username = username.replace(".conf", "") # filename formatting
         Settings.dev_print("retrieving user config: {}".format(username))
-        Settings.dev_print(os.path.join(Settings.get_base_directory(), "conf", "users", username+".conf"))
-        config_file.read(os.path.join(Settings.get_base_directory(), "conf", "users", username+".conf"))
+        Settings.dev_print(os.path.join(Settings.get_base_directory(), "conf/users", username+".conf"))
+        config_file.read(os.path.join(Settings.get_base_directory(), "conf/users", username+".conf"))
         userConfig = {}
         for section in config_file.sections():
             # Settings.dev_print(section)
@@ -458,28 +464,32 @@ class Settings:
         # Settings.dev_print(userConfig)
         return userConfig
 
+    def get_user_config_path(username="default"):
+        if ".conf" not in str(username): username = username+".conf"
+        return os.path.join(Settings.get_base_directory(), "conf/users", username)
+
     def get_username():
         return config["username"] or "default"
 
-    def get_username_onlyfans():
+    def get_username_onlyfans(username=None):
         try:
-            return Settings.get_user_config(Settings.get_username())["onlyfans_username"]
-        except Exception as e:
-            Settings.err_print(e)
+            if not username: username = Settings.get_username()
+            return Settings.get_user_config(username)["onlyfans_username"]
+        except Exception as e: pass
         return ""
 
-    def get_username_google():
+    def get_username_google(username=None):
         try:
-            return Settings.get_user_config(Settings.get_username())["google_username"]
-        except Exception as e:
-            Settings.err_print(e)
+            if not username: username = Settings.get_username()
+            return Settings.get_user_config(username)["google_username"]
+        except Exception as e: pass
         return ""            
 
-    def get_username_twitter():
+    def get_username_twitter(username=None):
         try:
-            return Settings.get_user_config(Settings.get_username())["twitter_username"]
-        except Exception as e:
-            Settings.err_print(e)
+            if not username: username = Settings.get_username()
+            return Settings.get_user_config(username)["twitter_username"]
+        except Exception as e: pass
         return ""
 
     def get_remote_browser_host():

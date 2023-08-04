@@ -1,12 +1,15 @@
 #!/usr/bin/python3
 
 from .lib.driver import Driver
+from .lib.menu import Menu
 from .util.settings import Settings
+from .classes.config import Config
 from .classes.discount import Discount
 from .classes.message import Message, Post
 from .classes.profile import Profile
 from .classes.promotion import Promotion
 from .classes.user import User
+from .server import api as API
 
 #################
 ##### Snarf #####
@@ -31,6 +34,18 @@ class Snarf:
     def close():
         Driver.exit_all()
         Settings.print("*snarf waves goodbye*")
+
+    @staticmethod
+    def api():
+        API.main()
+
+    @staticmethod
+    def config():
+        Config.main()
+
+    @staticmethod
+    def menu():
+        Menu.main()
 
     @staticmethod
     def discount():
@@ -173,8 +188,8 @@ atexit.register(exit_handler)
 def main():
     try:
         # purge local tmp files
-        from .classes.file import File
-        File.remove_local()
+        # from .classes.file import File
+        # File.remove_local()
         # get the thing, do the thing
         action = Settings.get_action()
         Settings.print("Running - {}".format(action))

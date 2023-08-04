@@ -2,9 +2,8 @@ import os
 import json
 from flask import Flask, request
 
-from .util.config import config
-from .util.settings import Settings
-from .snarf import Snarf
+from ..util.config import config
+from ..util.settings import Settings
 
 def create_app():
     app = Flask(__name__)
@@ -24,6 +23,7 @@ def create_app():
             except Exception as e: pass
             try: config["performers"] = args["performers"]
             except Exception as e: pass
+            from ..snarf import Snarf
             Snarf.message()
             Snarf.close()
         except Exception as e:
@@ -49,6 +49,7 @@ def create_app():
             except Exception as e: pass
             try: config["expires"] = args["expires"]
             except Exception as e: pass
+            from ..snarf import Snarf
             Snarf.post()
             Snarf.close()
         except Exception as e:

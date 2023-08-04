@@ -1,9 +1,13 @@
 # Config
-include OnlySnarf/conf/*
+include OnlySnarf/conf/*/**
 
+exclude OnlySnarf/bin
+exclude OnlySnarf/build
+exclude OnlySnarf/dist
+exclude OnlySnarf/log
 exclude OnlySnarf/notes
 
-# Include the README
+# Include the README and CHANGELOG
 include *.md
 
 # Include the license file

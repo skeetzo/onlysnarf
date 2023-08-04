@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="4.5.9",
+    version="4.5.10",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
@@ -14,7 +14,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     # packages=setuptools.find_packages(),
-    packages=["OnlySnarf", "OnlySnarf/classes","OnlySnarf/conf","OnlySnarf/elements","OnlySnarf/lib","OnlySnarf/util"],
+    packages=["OnlySnarf", "OnlySnarf/classes","OnlySnarf/conf","OnlySnarf/elements","OnlySnarf/lib","OnlySnarf/util","OnlySnarf/server"],
     include_package_data=True,
     install_requires=[
         'ffmpeg',
@@ -24,7 +24,7 @@ setuptools.setup(
         'webdriver_manager==3.9.0',
         'validators',
         'flask'
-        ],
+    ],
     extras_require={
         'dev': [
             'pytest',
@@ -33,10 +33,7 @@ setuptools.setup(
     },
     entry_points={
         'console_scripts' : [
-            'onlysnarf = OnlySnarf.menu:main',
-            'snarf = OnlySnarf.snarf:main',
-            'snarfapi = OnlySnarf.api:main'
-            'snarfconfig = OnlySnarf.config:main'
+            'snarf = OnlySnarf.snarf:main'
         ]
     },
     classifiers=[

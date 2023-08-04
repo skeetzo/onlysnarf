@@ -35,7 +35,7 @@ def apply_args(parser):
   ##
   # --username
   # OnlyFans username to use
-  parser.add_argument('--username', '--u', type=str, default="", dest='username', help='OnlyFans username to use')
+  parser.add_argument('--username', '--u', type=str, default="default", dest='username', help='OnlyFans username to use')
   ##
   # -phone
   # OnlyFans phone number to use for additional login steps
@@ -128,6 +128,18 @@ def apply_args(parser):
 def apply_subcommand_args(parser):
 
   subparsers = parser.add_subparsers(help='Include a sub-command to run a corresponding action:', dest="action", required=True)
+
+  #########
+  ## API ##
+  #########
+
+  parser_config = subparsers.add_parser('api', help='> flask server')
+
+  ############
+  ## Config ##
+  ############
+
+  parser_config = subparsers.add_parser('config', help='> configuration options')
 
   ##############
   ## Discount ##
