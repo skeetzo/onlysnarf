@@ -697,15 +697,15 @@
   - added basic api setup
   - added test scripts for flask & api
   - beginning modifications for receiving api calls
-**4.5.1 : 7/12/2023**
+  **4.5.1 : 7/12/2023**
   - fixed package req: validators
   - added modifications for running via api
-**4.5.2 : 7/16/2023**
+  **4.5.2 : 7/16/2023**
   - relocated api structure for testing
   - added tests for flask api
   - updates to tests, code flow for missing config / args values
   - added individual message funcationality tests 
-  **7/17/2023**
+    **7/17/2023**
   - continued debugging message tests
   - fixed random user functionality
   - updated driver.poll
@@ -715,17 +715,19 @@
   - updated api scripts to route through snarf
   **4.5.3,4,5,6 : 7/30/2023**
   - api debugging
-  **4.5.7,8 : 8/2/2023**
+**4.5.7,8 : 8/2/2023**
   - fixed twitter login; added phone number to args&config
   - more api debugging w/ aws
   - updated date&time formats
   - debugged api: /message & /post
+**4.5.9 : 8/3/2023**
+  - added update script meant to be run by systemd service script
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- minor version bump for working api
+- bump minor version for working api
 
 - look into Marshmellow package for class / object cleanup
 
@@ -848,6 +850,10 @@ what helps in general:
 >> using correct webdriver options generator
 >> specifying binary paths
 >> correct permissions on binary paths
+
+# API
+
+note: the 
 
 # Bugs
 
