@@ -15,5 +15,5 @@
 curl -X POST -H "Content-Type: application/json" -d '{
   "text": "your mom",
   "input": "https://github.com/skeetzo/onlysnarf/blob/master/public/images/shnarf.jpg?raw=true"
-}' http://3.101.56.69:5000/post
+}' http://3.101.69.182:5000/post
 
