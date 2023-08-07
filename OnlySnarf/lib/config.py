@@ -130,7 +130,8 @@ class Config:
     def ask_username():
         options = ["back"]
         options.extend(Config.get_users())
-        options.remove("example-user.conf") # should not update the example / template file
+        if "example-user.conf" in options:
+            options.remove("example-user.conf") # should not update the example / template file
         questions = [
             inquirer.List('username',
                 message= "Please select a username:",

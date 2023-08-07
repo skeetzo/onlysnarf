@@ -727,7 +727,7 @@
   - moved api & menu to cli
   - updates to config script
   - tested new config script
-**4.6.0 : 8/7/2023**
+**4.6.0,1 : 8/7/2023**
   - minor version bump for working api & cli changes
 
 ------------------------------------------------------------------------------------

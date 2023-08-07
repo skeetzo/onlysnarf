@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
 from .lib.driver import Driver
+from .lib.config import Config
 from .lib.menu import Menu
 from .util.settings import Settings
-from .classes.config import Config
 from .classes.discount import Discount
 from .classes.message import Message, Post
 from .classes.profile import Profile
