@@ -727,14 +727,15 @@
   - moved api & menu to cli
   - updates to config script
   - tested new config script
+**4.6.0 : 8/7/2023**
+  - minor version bump for working api & cli changes
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
 - add cli args for config to autoconfigure more easily
-
-- bump minor version for working api & cli changes
+- update 'snarf config' to interact with main config file and variables
 
 - look into Marshmellow package for class / object cleanup
 
