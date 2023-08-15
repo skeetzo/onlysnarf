@@ -3012,8 +3012,8 @@ class Driver:
             # else:
             options.add_argument('--profile-directory=Default')
             # options.add_argument("--user-data-dir="+os.path.join(Settings.get_base_directory(),"tmp","selenium")) # do not disable, required for cookies to work 
-            # options.add_argument("--user-data-dir="+Settings.get_base_directory()) # do not disable, required for cookies to work 
-            options.add_argument("--user-data-dir=/home/ubuntu") # do not disable, required for cookies to work 
+            options.add_argument("--user-data-dir="+Settings.get_base_directory()) # do not disable, required for cookies to work 
+            # options.add_argument("--user-data-dir=/home/ubuntu") # do not disable, required for cookies to work 
             # options.add_argument(r'--profile-directory=Alex D') #e.g. Profile 3
             
             # options.add_argument("--allow-insecure-localhost")            
