@@ -11,7 +11,7 @@ if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "Non
     USER = os.getenv('SUDO_USER')
 configFile = "config.conf"
 
-if not os.environ.get('ENV') or os.environ.get('ENV') == "test":
+if os.environ.get('ENV') == "test":
   configFile = os.path.join(os.getcwd(), "OnlySnarf/conf", "test-config.conf")
 elif os.path.isfile(os.path.join("/home/{}/.onlysnarf/conf".format(USER), "config.conf")):
   configFile = os.path.join("/home/{}/.onlysnarf/conf".format(USER), "config.conf")
@@ -47,6 +47,6 @@ for key, value in configs.items():
 
 ###############
 ## Debugging ##
-import sys
-print(config)
-sys.exit(0)
+# import sys
+# print(config)
+# sys.exit(0)
