@@ -3074,7 +3074,7 @@ class Driver:
                     processor = platform.processor()
                     Settings.dev_print("cpu processor: {}".format(processor))
                     if str(processor) == "aarch64":
-                        browserAttempt = webdriver.Chrome('/usr/bin/chromedriver')
+                        browserAttempt = webdriver.Chrome(executable_path='/usr/bin/chromedriver', options=options)
                     else:
                         browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
                 return browserAttempt
