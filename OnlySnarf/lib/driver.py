@@ -4,6 +4,7 @@ import os
 import shutil
 import json
 import pathlib
+import platform
 import time
 import wget
 import pickle
@@ -3019,13 +3020,13 @@ class Driver:
                 # options.add_argument(r"--user-data-dir=C:\Users\brain\AppData\Local\Google\Chrome\User Data")
             # else:
             options.add_argument('--profile-directory=Default')
-            options.add_argument("--user-data-dir="+os.path.join(Settings.get_base_directory(),"tmp","selenium")) # do not disable, required for cookies to work 
-            # options.add_argument("--user-data-dir="+Settings.get_base_directory()) # do not disable, required for cookies to work 
-            # options.add_argument("--user-data-dir=/home/ubuntu/selenium") # do not disable, required for cookies to work 
-            # options.add_argument(r'--profile-directory=Alex D') #e.g. Profile 3
+
+            if str(platform.processor()) == "aarch64": # raspi
+                options.add_argument("--user-data-dir=/home/ubuntu/selenium") # do not disable, required for cookies to work 
+            else:
+                options.add_argument("--user-data-dir="+os.path.join(Settings.get_base_directory(),"tmp","selenium")) # do not disable, required for cookies to work 
 
             options.add_argument("--disable-browser-side-navigation") # https://stackoverflow.com/a/49123152/1689770
-
 
             # options.add_argument("--allow-insecure-localhost")            
             # possibly linux only
@@ -3083,7 +3084,7 @@ class Driver:
                     browserName = "chrome"
                     # linux = x86_64
                     # rpi = aarch64
-                    import platform
+                    
                     # raspberrypi arm processors don't work with webdriver manager
                     processor = platform.processor()
                     Settings.dev_print("cpu processor: {}".format(processor))

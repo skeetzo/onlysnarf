@@ -11,30 +11,73 @@ from ..util.settings import Settings
 
 ALREADY_RANDOMIZED_USERS = []
 
+from marshmallow import Schema, fields, validate, ValidationError, post_load
+
+# https://marshmallow.readthedocs.io/en/stable/
+class UserSchema(Schema):
+    username = fields.Str(required=True, error_messages={"required": "Username is required."}, validate=validate.Length(min=4))
+    name = fields.Str()
+    user_id = fields.Str()
+
+    # messages = fields.Dict(keys=fields.Str(), values=fields.Str(), required=False)
+    messages = fields.Nested(MessagesSchema(), dump_only=True)
+
+    sent_files = fields.List(fields.Str())
+
+    start_date = fields.DateTime()
+
+    # email = fields.Email()
+    # created_at = fields.DateTime()
+
+
+    @post_load
+    def make_user(self, data, **kwargs):
+        return User(**data)
+
+class MessagesSchema(Schema):
+    parsed = fields.List(fields.Str())
+    sent = fields.List(fields.Str())
+    received = fields.List(fields.Str())
+
 class User:
     """OnlyFans users."""
 
-    def __init__(self, data):
+    def __init__(self, username):
         """User object"""
 
-        data = json.loads(json.dumps(data))
-        self.name               =   data.get('name')                            or None
-        self.username           =   str(data.get('username')).replace("@","")   or None
-        self.id                 =   data.get('id')                              or None
+        self.username = str(username).replace("@","")
+        self.user_id = None
 
-        self.messages_parsed    =   data.get('messages_parsed')                 or []
-        self.messages_sent      =   data.get('messages_sent')                   or []
-        self.messages_received  =   data.get('messages_received')               or []
-        self.messages           =   data.get('messages')                        or []
 
-        self.sent_files         =   data.get('sent_files')                      or []
-        self.isFavorite         =   data.get('isFavorite')                      or False
-        # self.lists              =   data.get('lists')                           or []
-        self.start_date         =   data.get('started')                         or None
+        # TODO: check that code doesn't actually rely on any of this and uses getters/setters to update the messages and sent_files etc
+        # data = json.loads(json.dumps(data))
+        # self.name               =   data.get('name')                            or None
+
+        # self.messages_parsed    =   data.get('messages_parsed')                 or []
+        # self.messages_sent      =   data.get('messages_sent')                   or []
+        # self.messages_received  =   data.get('messages_received')               or []
+        # self.messages           =   data.get('messages')                        or []
+
+        # self.sent_files         =   data.get('sent_files')                      or []
+        # self.isFavorite         =   data.get('isFavorite')                      or False
+        # # self.lists              =   data.get('lists')                           or []
+        # self.start_date         =   data.get('started')                         or None
 
         # BUG: fix empty array
-        if len(self.sent_files) > 0 and self.sent_files[0] == "":
-            self.sent_files = []
+        # if len(self.sent_files) > 0 and self.sent_files[0] == "":
+        #     self.sent_files = []
+
+    @staticmethod
+    def create_user(user_data):
+        schema = UserSchema()
+        user = schema.load(user_data)
+        return user
+
+    def dump(self):
+        schema = UserSchema()
+        result = schema.dump(self)
+        # pprint(result, indent=2)
+        return result
 
     def toJSON(self):
         """
@@ -44,7 +87,7 @@ class User:
         return json.dumps({
             "name":str(self.name),
             "username":str(self.username),
-            "id":str(self.id),
+            "id":str(self.user_id),
             "messages_parsed":str(self.messages_parsed),
             "messages_sent":str(self.messages_sent),
             "messages_received":str(self.messages_received),
@@ -63,7 +106,7 @@ class User:
             The user to compare another user object against
         """
 
-        if (str(user.username) != "None" and str(user.username) == str(self.username)) or (str(user.id) != "None" and str(user.id) == str(self.id)): return True
+        if (str(user.username) != "None" and str(user.username) == str(self.username)) or (str(user.user_id) != "None" and str(user.user_id) == str(self.user_id)): return True
         return False
 
     def get_id(self):
@@ -76,9 +119,9 @@ class User:
             The user id
         """
 
-        if self.id: return self.id
-        self.id = Driver.user_get_id(self.get_username())
-        return self.id
+        if self.user_id: return self.user_id
+        self.user_id = Driver.user_get_id(self.get_username())
+        return self.user_id
 
     def get_username(self):
         """
@@ -110,11 +153,11 @@ class User:
         """
 
         if not self.get_username() and not self.get_id(): return Settings.err_print("missing user identifiers!")
-        if self.id:
-            Settings.print("messaging user (id): {} ({}) - \"{}\"".format(self.username, self.id, message["text"]))
+        if self.user_id:
+            Settings.print("messaging user (id): {} ({}) - \"{}\"".format(self.username, self.user_id, message["text"]))
         else:
             Settings.print("messaging user: {} - \"{}\"".format(self.username, message["text"]))
-        if not Driver.message(self.username, user_id=self.id): return False
+        if not Driver.message(self.username, user_id=self.user_id): return False
         return self.message_send(message)
 
     def messages_read(self):
@@ -122,12 +165,12 @@ class User:
         Read the chat of the user.
         """
 
-        Settings.print("reading user chat: {} ({})".format(self.username, self.id))
-        # messages, messages_received, messages_sent = Driver.read_user_messages(self.username, user_id=self.id)
+        Settings.print("reading user chat: {} ({})".format(self.username, self.user_id))
+        # messages, messages_received, messages_sent = Driver.read_user_messages(self.username, user_id=self.user_id)
         # self.messages = messages
         # self.messages_received = messages_received
         # self.messages_sent = messages_sent
-        self.messages, self.messages_received, self.messages_sent = Driver.read_user_messages(self.username, user_id=self.id)
+        self.messages, self.messages_received, self.messages_sent = Driver.read_user_messages(self.username, user_id=self.user_id)
         # self.messages_and_timestamps = messages[1]
         Settings.maybe_print("chat read!")
 
@@ -446,7 +489,7 @@ class User:
             Settings.err_print("missing user id")
             return None
         for user in User.get_all_users():
-            if str(user.id) == "@u"+str(userid) or str(user.id) == "@"+str(userid) or str(user.id) == str(userid):
+            if str(user.user_id) == "@u"+str(userid) or str(user.user_id) == "@"+str(userid) or str(user.user_id) == str(userid):
                 Settings.maybe_print("found user id: {}".format(userid))
                 return user
         Settings.err_print("missing user by user id - {}".format(userid))
@@ -506,7 +549,7 @@ class User:
         if str(username).lower() == "random":
             return User.get_random_user().message(message)
         else:
-            return User({"username":username,"id":user_id}).message(message)
+            return User(username, user_id=user_id).message(message)
 
     @staticmethod
     def read_following_local():
@@ -581,7 +624,7 @@ class User:
             The same user provided (if not skipped)
 
         """
-        if str(user.id).lower() in Settings.get_skipped_users() or str(user.username).lower() in Settings.get_skipped_users():
+        if str(user.user_id).lower() in Settings.get_skipped_users() or str(user.username).lower() in Settings.get_skipped_users():
             Settings.maybe_print("skipping: {}".format(user.username))
             return None
         return user

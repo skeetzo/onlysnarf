@@ -738,6 +738,9 @@
 
 ## TODO
 
+- finish and test marshmallow updates to User class
+
+
 - add cli args for config to autoconfigure more easily
 - update 'snarf config' to interact with main config file and variables
 

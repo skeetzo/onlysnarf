@@ -19,6 +19,7 @@ setuptools.setup(
     install_requires=[
         'ffmpeg',
         'inquirer',
+        'marshmallow',
         'wget',
         'selenium>=4',
         'webdriver_manager==3.9.0',
