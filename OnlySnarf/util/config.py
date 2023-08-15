@@ -47,6 +47,6 @@ for key, value in configs.items():
 
 ###############
 ## Debugging ##
-# import sys
-# print(config)
-# sys.exit(0)
+import sys
+print(config)
+sys.exit(0)
