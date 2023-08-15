@@ -723,14 +723,16 @@
   **4.5.9 : 8/3/2023**
   - added update script meant to be run by systemd service script
   - added config script; requires testing
-**4.5.10 : 8/4/2023**
+  **4.5.10 : 8/4/2023**
   - moved api & menu to cli
   - updates to config script
   - tested new config script
-**4.6.0,1 : 8/7/2023**
+  **4.6.0,1 : 8/7/2023**
   - minor version bump for working api & cli changes
-**4.6.2 : 8/12/2023**
+  **4.6.2 : 8/12/2023**
   - added watchdogger.py
+**4.6.3 : 8/14/2023**
+  - rpi debugging
 
 ------------------------------------------------------------------------------------
 
