@@ -2997,9 +2997,9 @@ class Driver:
         Settings.print("spawning web browser...")
 
         def add_options(options):
+            options.add_argument("--no-sandbox") # Bypass OS security model
             if str(Settings.is_show_window()) == "False":
                 options.add_argument('--headless')
-            options.add_argument("--no-sandbox") # Bypass OS security model
             options.add_argument("--disable-gpu")
             options.add_argument("--disable-extensions")
             options.add_argument("--disable-dev-shm-usage")
@@ -3031,7 +3031,7 @@ class Driver:
             # TODO: to be added to list of removed (if not truly needed by then)
             # options.add_argument('--disable-software-rasterizer')
             # options.add_argument('--ignore-certificate-errors')
-            # options.add_argument("--remote-debugging-address=localhost")    
+            options.add_argument("--remote-debugging-address=localhost")    
             options.add_argument("--remote-debugging-port=9223")
 
         def browser_error(err, browserName):
