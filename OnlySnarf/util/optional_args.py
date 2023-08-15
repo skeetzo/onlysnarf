@@ -25,10 +25,6 @@ def apply_args(parser):
   # enables file reduction
   parser.add_argument('-reduce', action='store_true', dest='reduce', help='enable reducing files over 50 MB')
   ##
-  # --save
-  # saves OnlyFans users upon exit
-  parser.add_argument('-save', '-S', action='store_true', dest='save_users', help='enable saving users locally on exit')
-  ##
   # -tweet
   # enabled tweeting
   parser.add_argument('-tweet', action='store_true', dest='tweeting', help='enable tweeting when posting')

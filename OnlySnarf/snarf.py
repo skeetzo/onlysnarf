@@ -177,7 +177,7 @@ def exit_handler():
     """Exit cleanly"""
 
     try:
-        Driver.exit_all()
+        Driver.exit()
         # sys.exit(0)
     except Exception as e:
         print(e)

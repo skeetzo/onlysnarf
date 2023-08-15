@@ -1,5 +1,34 @@
+import os
+# import shutil
+import platform
+## selenium
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.remote.file_detector import LocalFileDetector
+## webdriver_manager
+# brave
+# chrome
+# chromium
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.core.utils import ChromeType
+# firefox
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.firefox import GeckoDriverManager
+# ie
+from selenium.webdriver.ie.service import Service as IEService
+from webdriver_manager.microsoft import IEDriverManager
+# edge
+from selenium.webdriver.edge.service import Service as EdgeService
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from msedge.selenium_tools import Edge, EdgeOptions
+# opera
+from webdriver_manager.opera import OperaDriverManager
+##
+from ..util.settings import Settings
 
-def spawn_browser(self, browserType):
+def create_browser(self, browserType):
     """
     Spawns a browser according to args.
 
@@ -17,40 +46,26 @@ def spawn_browser(self, browserType):
 
     """
 
-    if str(Settings.is_debug("selenium")) == "False":
-        import logging
-        from selenium.webdriver.remote.remote_connection import LOGGER as SeleniumLogger
-        SeleniumLogger.setLevel(logging.ERROR)
-        logging.getLogger("urllib3").setLevel(logging.ERROR)
-        logging.getLogger("requests").setLevel(logging.ERROR)
-        logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.ERROR)
-
-        if int(Settings.get_verbosity()) >= 2:
-            SeleniumLogger.setLevel(logging.WARNING)
-            logging.getLogger("urllib3").setLevel(logging.WARNING)
-            logging.getLogger("requests").setLevel(logging.WARNING)
-            logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.WARNING)
-
     browser = None
     Settings.print("spawning web browser...")
 
     if "auto" in browserType:
         browser = attempt_reconnect()
-        if not browser: browser = attempt_chrome(brave=True, chromium=False, edge=False)
-        if not browser: browser = attempt_chrome(brave=False, chromium=False, edge=False)
-        if not browser: browser = attempt_chrome(brave=False, chromium=True, edge=False)
-        if not browser: browser = attempt_chrome(brave=False, chromium=False, edge=True)
+        if not browser: browser = attempt_brave()
+        if not browser: browser = attempt_chrome()
+        if not browser: browser = attempt_chromium()
+        if not browser: browser = attempt_edge()
         if not browser: browser = attempt_firefox()
         if not browser: browser = attempt_ie()
         if not browser: browser = attempt_opera()
     elif "brave" in browserType:
-        browser = attempt_chrome(brave=True, chromium=False, edge=False)
+        browser = attempt_brave()
     elif "chrome" in browserType:
-        browser = attempt_chrome(brave=False, chromium=False, edge=False)
+        browser = attempt_chrome()
     elif "chromium" in browserType:
-        browser = attempt_chrome(brave=False, chromium=True, edge=False)
+        browser = attempt_chromium()
     elif "edge" in browserType:
-        browser = attempt_chrome(brave=False, chromium=False, edge=True)
+        browser = attempt_edge()
     elif "firefox" in browserType:
         browser = attempt_firefox()
     elif "ie" in browserType:
@@ -59,11 +74,6 @@ def spawn_browser(self, browserType):
         browser = attempt_opera()
     elif "remote" in browserType:
         browser = attempt_remote()
-
-    if browser and str(Settings.is_keep()) == "True":
-        self.session_id = browser.session_id
-        self.session_url = browser.command_executor._url
-        self.write_session_data()
 
     if not browser:
         Settings.err_print("unable to spawn a web browser!")
@@ -74,20 +84,14 @@ def spawn_browser(self, browserType):
     browser.set_page_load_timeout(1200)
     browser.file_detector = LocalFileDetector() # for uploading via remote sessions
     if str(Settings.is_show_window()) == "False":
-        Settings.print("browser spawned successfully (headless)".format(browserType))
+        Settings.print("headless browser spawned successfully!")
     else:
-        Settings.print("browser spawned successfully".format(browserType))
+        Settings.print("browser spawned successfully!")
     return browser
 
-
-
-
-
-
-
-
-
-
+################################################################################################
+################################################################################################
+################################################################################################
 
 def add_options(options):
     options.add_argument("--no-sandbox") # Bypass OS security model
@@ -157,7 +161,7 @@ def attempt_brave():
     browserAttempt = None
     try:
         Settings.maybe_print("attempting Brave web browser...")
-        browserAttempt = webdriver.Chrome(service=BraveService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()), options=chrome_options())
+        browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()), options=chrome_options())
         Settings.print("browser created - Brave")
     except Exception as e:
         browser_error(e, "brave")
@@ -204,8 +208,8 @@ def attempt_ie():
     browserAttempt = None
     try:
         Settings.maybe_print("attempting IE web browser...")
-        driver_path = IEDriverManager().install()
-        os.chmod(driver_path, 0o755)
+        # driver_path = IEDriverManager().install()
+        # os.chmod(driver_path, 0o755)
         # browserAttempt = webdriver.Ie(executable_path=IEService(driver_path))
         browserAttempt = webdriver.Ie(service=IEService(IEDriverManager().install()))
         Settings.print("browser created - IE")
@@ -225,20 +229,20 @@ def attempt_opera():
     return browserAttempt
 
 def attempt_reconnect():
-    self.read_session_data()
-    if not self.session_id and not self.session_url:
+    session_id, session_url = read_session_data()
+    if not session_id and not session_url:
         Settings.warn_print("unable to read session data!")
         return None
     Settings.maybe_print("reconnecting to web browser...")
-    Settings.dev_print("reconnect id: {}".format(self.session_id))
-    Settings.dev_print("reconnect url: {}".format(self.session_url))
+    Settings.dev_print("reconnect id: {}".format(session_id))
+    Settings.dev_print("reconnect url: {}".format(session_url))
     try:
         options = webdriver.ChromeOptions()
         add_options(options)
-        browserAttempt = webdriver.Remote(command_executor=self.session_url, options=options)
+        browserAttempt = webdriver.Remote(command_executor=session_url, options=options)
         browserAttempt.close()   # this closes the session's window - it is currently the only one, thus the session itself will be auto-killed, yet:
         # take the session that's already running
-        browserAttempt.session_id = self.session_id
+        browserAttempt.session_id = session_id
         browserAttempt.title # fails check with: 'NoneType' object has no attribute 'title'
         Settings.print("browser reconnected!")
         return browserAttempt
@@ -274,7 +278,9 @@ def attempt_remote():
     Settings.warn_print("unable to connect remotely via {}!".format(browserType))
     return None
 
-
+################################################################################################
+################################################################################################
+################################################################################################
 
 def brave_options():
     dC = DesiredCapabilities.BRAVE
@@ -294,7 +300,8 @@ def chromium_options():
 
 def edge_options():
     dC = DesiredCapabilities.EDGE
-    options = webdriver.EdgeOptions()
+    options = EdgeOptions()
+    # options = webdriver.EdgeOptions()
     options.use_chromium = True
     # options.binary_location="/home/{user}/.wdm/drivers/edgedriver/linux64/111.0.1661/msedgedriver".format(user=os.getenv('USER'))
     # os.chmod(options.binary_location, 0o755)
@@ -309,7 +316,8 @@ def edge_options():
 
 def firefox_options():
     dC = DesiredCapabilities.FIREFOX
-    options = webdriver.FirefoxOptions()
+    # options = webdriver.FirefoxOptions()
+    options = FirefoxOptions()
     if str(Settings.is_debug("firefox")) == "True":
         options.log.level = "trace"
     add_options(options)
@@ -327,40 +335,3 @@ def opera_options():
     # options.add_argument('allow-elevated-browser')
     # options.binary_location = "C:\\Users\\USERNAME\\FOLDERLOCATION\\Opera\\VERSION\\opera.exe"
     return dC, options
-
-
-
-
-
-
-## possibly move these functions elsewhere (again)
-def read_session_data(self):
-    Settings.maybe_print("reading local session")
-    path_ = os.path.join(Settings.get_base_directory(), "session.json")
-    Settings.dev_print("local session path: "+str(path_))
-    try:
-        with open(str(path_)) as json_file:  
-            data = json.load(json_file)
-            self.session_id = data['id']
-            self.session_url = data['url']
-        Settings.maybe_print("loaded local users")
-    except Exception as e:
-        Settings.dev_print(e)
-
-def write_session_data(self):
-    Settings.maybe_print("writing local session")
-    Settings.dev_print("saving session id: {}".format(self.session_id))        
-    Settings.dev_print("saving session url: {}".format(self.session_url))
-    path_ = os.path.join(Settings.get_base_directory(), "session.json")
-    Settings.dev_print("local session path: "+str(path_))
-    data = {}
-    data['id'] = self.session_id
-    data['url'] = self.session_url
-    try:
-        with open(str(path_), 'w') as outfile:  
-            json.dump(data, outfile, indent=4, sort_keys=True)
-        Settings.maybe_print("saved session data")
-    except FileNotFoundError:
-        Settings.err_print("Missing Session File")
-    except OSError:
-        Settings.err_print("Missing Session Path")

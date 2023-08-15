@@ -556,9 +556,6 @@ class Settings:
         
     def is_prefer_local_following():
         return config["prefer_local_following"]
-
-    def is_save_users():
-        return config["save_users"]
         
     def is_reduce():
         return config["reduce"]
