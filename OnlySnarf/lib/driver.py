@@ -1196,7 +1196,15 @@ class Driver:
         # self.browser.execute_script("window.open('{}')".format(url))
         self.handle_alert()
         self.get_page_load()
-        WebDriverWait(self.browser, 10).until(EC.number_of_windows_to_be(len(windows)+1))
+        try:
+            WebDriverWait(self.browser, 10, poll_frequency=1).until(EC.number_of_windows_to_be(len(windows)+1))
+        except TimeoutException as te:
+            Settings.dev_print("Timeout Exception:")
+            Settings.err_print(str(te))
+            return
+        except Exception as e:
+            Settings.err_print(e)
+            return
         windows_after = self.browser.window_handles
         new_window = [x for x in windows_after if x not in windows][0]
         # self.browser.switch_to.window(new_window) <!---deprecated>
@@ -3005,7 +3013,7 @@ class Driver:
             options.add_argument("--disable-dev-shm-usage")
 
             options.add_argument("enable-automation")
-            options.add_argument("--disable-infobars")
+            # options.add_argument("--disable-infobars")
 
             # if os.name == 'nt':
                 # options.add_argument(r"--user-data-dir=C:\Users\brain\AppData\Local\Google\Chrome\User Data")
@@ -3015,7 +3023,10 @@ class Driver:
             # options.add_argument("--user-data-dir="+Settings.get_base_directory()) # do not disable, required for cookies to work 
             options.add_argument("--user-data-dir=/home/ubuntu/selenium") # do not disable, required for cookies to work 
             # options.add_argument(r'--profile-directory=Alex D') #e.g. Profile 3
-            
+
+            options.add_argument("--disable-browser-side-navigation") # https://stackoverflow.com/a/49123152/1689770
+
+
             # options.add_argument("--allow-insecure-localhost")            
             # possibly linux only
             # options.add_argument('disable-notifications')
