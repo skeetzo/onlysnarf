@@ -3071,7 +3071,9 @@ class Driver:
                     # rpi = aarch64
                     import platform
                     # raspberrypi arm processors don't work with webdriver manager
-                    if platform.processor() == "aarch64":
+                    processor = platform.processor()
+                    Settings.dev_print("cpu processor: {}".format(processor))
+                    if str(processor) == "aarch64":
                         browserAttempt = webdriver.Chrome('/usr/bin/chromedriver', options=options)
                     else:
                         browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
