@@ -733,6 +733,7 @@
   - added watchdogger.py
 **4.6.3 : 8/14/2023**
   - rpi debugging
+  - beginning of long overdue driver reorg 
 
 ------------------------------------------------------------------------------------
 
