@@ -735,7 +735,8 @@
   - rpi debugging
   - beginning of long overdue driver reorg 
 **4.6.4 : 8/16/2023**
-
+- added / copied script for uploading to dropbox
+- added dotenv and dropbox keys
 
 
 ------------------------------------------------------------------------------------

@@ -5,3 +5,6 @@
 # - check json file for proper metadata
 # else, use default data
 # - post / message via OnlySnarf
+
+import json
+import os
