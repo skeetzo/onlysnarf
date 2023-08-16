@@ -17,6 +17,7 @@ setuptools.setup(
     packages=["OnlySnarf", "OnlySnarf/classes","OnlySnarf/conf","OnlySnarf/elements","OnlySnarf/lib","OnlySnarf/util","OnlySnarf/server"],
     include_package_data=True,
     install_requires=[
+        'dropbox',
         'ffmpeg',
         'inquirer',
         'marshmallow',

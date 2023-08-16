@@ -734,10 +734,19 @@
 **4.6.3 : 8/14/2023**
   - rpi debugging
   - beginning of long overdue driver reorg 
+**4.6.4 : 8/16/2023**
+
+
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- update adding uploads to being able to set previews
+- add process to clear upload/download space
+
+- finish adding dropbox upload/download scripts
+
 
 - finish and test marshmallow updates to User class
 
