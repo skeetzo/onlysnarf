@@ -1,4 +1,4 @@
-# TODO: copy this in a way that uses the download method in place of the upload method, so reverse it
+# TODO: copy this in a way that uses the download method in place of the upload method, so reverse it for download-from-dropbox.py
 
 
 # https://github.com/dropbox/dropbox-sdk-python/blob/main/example/updown.py

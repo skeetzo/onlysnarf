@@ -8,3 +8,11 @@
 
 import json
 import os
+
+
+# metadata with all the basic config / args for input:
+# {
+# 	text: "text",
+# 	files: [ file/path, file/path]
+# 	etc ...
+# }
