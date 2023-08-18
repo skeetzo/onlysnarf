@@ -34,3 +34,4 @@ __pycache__
 
 # credentials
 OnlySnarf/conf/users/alexdicksdown.conf
+dropbox-access-token.txt

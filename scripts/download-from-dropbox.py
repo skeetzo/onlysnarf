@@ -1,3 +1,5 @@
+#!/bin/python3
+
 # https://github.com/dropbox/dropbox-sdk-python/blob/main/example/updown.py
 
 """Download the contents of your OnlySnarf Downloads folder to local uploads folders.
@@ -8,6 +10,7 @@
 """
 
 from __future__ import print_function
+from pathlib import Path
 
 import argparse
 import contextlib
@@ -22,21 +25,22 @@ if sys.version.startswith('2'):
     input = raw_input  # noqa: E501,F821; pylint: disable=redefined-builtin,undefined-variable,useless-suppression
 
 import dropbox
+from dropbox import DropboxOAuth2FlowNoRedirect
 
 from dotenv import load_dotenv
 load_dotenv()  # take environment variables from .env.
 
 # OAuth2 access token.  TODO: login etc.
-TOKEN = str(os.getenv("DROPBOX_ACCESS_TOKEN"))
+# TOKEN = str(os.getenv("DROPBOX_ACCESS_TOKEN"))
 
 parser = argparse.ArgumentParser(description='Sync ~/.onlysnarf/uploads from Dropbox')
 parser.add_argument('folder', nargs='?', default='Uploads',
                     help='Folder name in your Dropbox')
 parser.add_argument('rootdir', nargs='?', default='~/.onlysnarf/uploads',
                     help='Local directory to download to')
-parser.add_argument('--token', default=TOKEN,
-                    help='Access token '
-                    '(see https://www.dropbox.com/developers/apps)')
+# parser.add_argument('--token', default=TOKEN,
+#                     help='Access token '
+#                     '(see https://www.dropbox.com/developers/apps)')
 parser.add_argument('--yes', '-y', action='store_true',
                     help='Answer yes to all questions')
 parser.add_argument('--no', '-n', action='store_true',
@@ -47,8 +51,8 @@ parser.add_argument('--default', '-d', action='store_true',
 def main():
     """Main program.
 
-    Parse command line, then iterate over files and directories under
-    rootdir and upload all files.  Skips some temporary files and
+    Parse command line, then iterate over files and directories in 
+    Dropbox rootdir and download all files. Skips some temporary files and
     directories, and avoids duplicate uploads by comparing size and
     mtime with the server.
     """
@@ -56,9 +60,9 @@ def main():
     if sum([bool(b) for b in (args.yes, args.no, args.default)]) > 1:
         print('At most one of --yes, --no, --default is allowed')
         sys.exit(2)
-    if not args.token:
-        print('--token is mandatory')
-        sys.exit(2)
+    # if not args.token:
+    #     print('--token is mandatory')
+    #     sys.exit(2)
 
     folder = args.folder
     rootdir = os.path.expanduser(args.rootdir)
@@ -71,34 +75,31 @@ def main():
         print(rootdir, 'is not a folder on your filesystem')
         sys.exit(1)
 
-    dbx = dropbox.Dropbox(args.token)
-
+    dbx = dropbox.Dropbox(
+            app_key = str(os.getenv("DROPBOX_KEY")),
+            app_secret = str(os.getenv("DROPBOX_SECRET")),
+            oauth2_refresh_token = str(os.getenv("DROPBOX_REFRESH_TOKEN"))
+        )
 
     listing = list_folder(dbx, folder)
-    # print(listing)
+    downloadMe = []
 
     for list_ in listing:
-        # print(listing[list_])
         try:
-            if listing[list_].is_downloadable:
-                print("downloading")
-                print(listing[list_])
-                download2(dbx, listing[list_])
+            if isinstance(listing[list_], dropbox.files.FolderMetadata):
+                pass
+            elif isinstance(listing[list_], dropbox.files.FileMetadata) and listing[list_].is_downloadable:
+                downloadMe.append(listing[list_])
+
         except Exception as e:
-            print(e)
-            # pass
+            if "has no attribute" not in str(e):
+                print(e)
 
-    return
-
-    for dn, dirs, files in os.walk(rootdir):
-        subfolder = dn[len(rootdir):].strip(os.path.sep)
-        # listing = list_folder(dbx, folder, subfolder)
-        # print(listing)
-        print('Descending into', subfolder, '...')
-
-        # First do all the files.
-        for name in files:
-            fullname = os.path.join(dn, name)
+    for listing in downloadMe:
+        path = os.path.join(rootdir, folder, listing.path_lower).replace("/uploads/Uploads", "/uploads") 
+        path = (rootdir + path).replace("/uploads/uploads/", "/uploads/")
+        if os.path.isfile(path):
+            name = listing.name
             if not isinstance(name, six.text_type):
                 name = name.decode('utf-8')
             nname = unicodedata.normalize('NFC', name)
@@ -108,44 +109,43 @@ def main():
                 print('Skipping temporary file:', name)
             elif name.endswith('.pyc') or name.endswith('.pyo'):
                 print('Skipping generated file:', name)
-            elif nname in listing:
-                md = listing[nname]
-                mtime = os.path.getmtime(fullname)
+            else:
+                mtime = os.path.getmtime(path)
                 mtime_dt = datetime.datetime(*time.gmtime(mtime)[:6])
-                size = os.path.getsize(fullname)
-                if (isinstance(md, dropbox.files.FileMetadata) and
-                        mtime_dt == md.client_modified and size == md.size):
+                size = os.path.getsize(path)
+                if (isinstance(listing, dropbox.files.FileMetadata) and
+                        mtime_dt == listing.client_modified and size == listing.size):
                     print(name, 'is already synced [stats match]')
                 else:
                     print(name, 'exists with different stats, downloading')
-                    res = download(dbx, folder, subfolder, name)
-                    # with open(fullname) as f:
-                    #     data = f.read()
-                    # if res == data:
-                    #     print(name, 'is already synced [content match]')
-                    # else:
-                    #     print(name, 'has changed since last sync')
-                    #     if yesno('Refresh %s' % name, False, args):
-                    #         upload(dbx, fullname, folder, subfolder, name,
-                    #                overwrite=True)
-            elif yesno('Download %s' % name, True, args):
-                download(dbx, folder, subfolder, name)
+                    # res = download(dbx, folder, subfolder, name)
+                    res = download(dbx, rootdir, listing)
+                    with open(path, 'rb') as f:
+                        data = f.read()
+                    if res == data:
+                        print(name, 'is already synced [content match]')
+                    else:
+                        print(name, 'has changed since last sync')
+                        if yesno('Refresh %s' % name, False, args):
+                            upload(dbx, path, listing.path_display, overwrite=True)
+        elif yesno('Download %s' % listing.name, True, args):
+            download(dbx, rootdir, listing)
 
-        # Then choose which subdirectories to traverse.
-        keep = []
-        for name in dirs:
-            if name.startswith('.'):
-                print('Skipping dot directory:', name)
-            elif name.startswith('@') or name.endswith('~'):
-                print('Skipping temporary directory:', name)
-            elif name == '__pycache__':
-                print('Skipping generated directory:', name)
-            elif yesno('Descend into %s' % name, True, args):
-                print('Keeping directory:', name)
-                keep.append(name)
-            else:
-                print('OK, skipping directory:', name)
-        dirs[:] = keep
+            # Then choose which subdirectories to traverse.
+            keep = []
+            for name in dirs:
+                if name.startswith('.'):
+                    print('Skipping dot directory:', name)
+                elif name.startswith('@') or name.endswith('~'):
+                    print('Skipping temporary directory:', name)
+                elif name == '__pycache__':
+                    print('Skipping generated directory:', name)
+                elif yesno('Descend into %s' % name, True, args):
+                    print('Keeping directory:', name)
+                    keep.append(name)
+                else:
+                    print('OK, skipping directory:', name)
+            dirs[:] = keep
 
     dbx.close()
 
@@ -169,79 +169,45 @@ def list_folder(dbx, folder):
         rv = {}
         for entry in res.entries:
             rv[entry.name] = entry
+        # print(rv)
         return rv
 
 
-def download2(dbx, file):
+def download(dbx, folder, file):
     """Download a file.
 
     Return the bytes of the file, or None if it doesn't exist.
     """
-    # path = '/%s/%s/%s' % (folder, subfolder.replace(os.path.sep, '/'), name)
-
-
-
-    # TODO: fix
-    # downloads successfully but hard coded
-    # needs to walk the directory tree in Dropbox and make any missing paths but theres always a permissions error when creating new directories
-
-
-
-    print(os.path.join("~/.onlysnarf/", file.path_lower))
-
-    # from pathlib import Path
-    # Path(os.path.dirname(os.path.join("~/.onlysnarf/", file.path_lower))).mkdir(parents=True, exist_ok=True)
-    # print(1)
-
-    # while '//' in path:
-        # path = path.replace('//', '/')
+    path = '/%s/%s' % (folder, file.path_lower.replace(os.path.sep, '/'))
+    while "//" in path or "/uploads/uploads/" in path:
+        path = path.replace("//", "/").replace("/uploads/uploads/", "/uploads/")
+    Path(os.path.dirname(path)).mkdir(parents=True, exist_ok=True)
+    # print("downloading: {}".format(file.path_display.replace("/Uploads","")))
     with stopwatch('download'):
         try:
-            md, res = dbx.files_download_to_file("/home/skeetzo/.onlysnarf" + file.path_lower  , file.path_display)
+            res = dbx.files_download_to_file(path, file.path_display)
+            return res
         except dropbox.exceptions.HttpError as err:
             print('*** HTTP error', err)
             return None
-    data = res.content
-    print(len(data), 'bytes; md:', md)
-    return data
+        except Exception as e:
+            print(e)
 
-def download(dbx, folder, subfolder, name):
-    """Download a file.
-
-    Return the bytes of the file, or None if it doesn't exist.
-    """
-    path = '/%s/%s/%s' % (folder, subfolder.replace(os.path.sep, '/'), name)
-    while '//' in path:
-        path = path.replace('//', '/')
-    with stopwatch('download'):
-        try:
-            print(path)
-            md, res = dbx.files_download(path)
-        except dropbox.exceptions.HttpError as err:
-            print('*** HTTP error', err)
-            return None
-    data = res.content
-    print(len(data), 'bytes; md:', md)
-    return data
-
-def upload(dbx, fullname, folder, subfolder, name, overwrite=False):
+def upload(dbx, path, path_display, overwrite=False):
     """Upload a file.
 
     Return the request response, or None in case of error.
     """
-    path = '/%s/%s/%s' % (folder, subfolder.replace(os.path.sep, '/'), name)
-    while '//' in path:
-        path = path.replace('//', '/')
     mode = (dropbox.files.WriteMode.overwrite
             if overwrite
             else dropbox.files.WriteMode.add)
-    mtime = os.path.getmtime(fullname)
-    with open(fullname, 'rb') as f:
+    mtime = os.path.getmtime(path)
+    with open(path, 'rb') as f:
         data = f.read()
     with stopwatch('upload %d bytes' % len(data)):
         try:
             res = dbx.files_upload(
-                data, path, mode,
+                data, path_display, mode,
                 client_modified=datetime.datetime(*time.gmtime(mtime)[:6]),
                 mute=True)
         except dropbox.exceptions.ApiError as err:

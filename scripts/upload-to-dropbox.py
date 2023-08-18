@@ -1,3 +1,5 @@
+#!/bin/python3
+
 # https://github.com/dropbox/dropbox-sdk-python/blob/main/example/updown.py
 
 """Upload the contents of your OnlySnarf Uploads folder to Dropbox.
@@ -27,16 +29,16 @@ from dotenv import load_dotenv
 load_dotenv()  # take environment variables from .env.
 
 # OAuth2 access token.  TODO: login etc.
-TOKEN = str(os.getenv("DROPBOX_ACCESS_TOKEN"))
+# TOKEN = str(os.getenv("DROPBOX_ACCESS_TOKEN"))
 
 parser = argparse.ArgumentParser(description='Sync ~/.onlysnarf/uploads to Dropbox')
 parser.add_argument('folder', nargs='?', default='Uploads',
                     help='Folder name in your Dropbox')
 parser.add_argument('rootdir', nargs='?', default='~/.onlysnarf/uploads',
                     help='Local directory to upload')
-parser.add_argument('--token', default=TOKEN,
-                    help='Access token '
-                    '(see https://www.dropbox.com/developers/apps)')
+# parser.add_argument('--token', default=TOKEN,
+#                     help='Access token '
+#                     '(see https://www.dropbox.com/developers/apps)')
 parser.add_argument('--yes', '-y', action='store_true',
                     help='Answer yes to all questions')
 parser.add_argument('--no', '-n', action='store_true',
@@ -48,7 +50,7 @@ def main():
     """Main program.
 
     Parse command line, then iterate over files and directories under
-    rootdir and upload all files.  Skips some temporary files and
+    rootdir and upload all files. Skips some temporary files and
     directories, and avoids duplicate uploads by comparing size and
     mtime with the server.
     """
@@ -56,9 +58,9 @@ def main():
     if sum([bool(b) for b in (args.yes, args.no, args.default)]) > 1:
         print('At most one of --yes, --no, --default is allowed')
         sys.exit(2)
-    if not args.token:
-        print('--token is mandatory')
-        sys.exit(2)
+    # if not args.token:
+    #     print('--token is mandatory')
+    #     sys.exit(2)
 
     folder = args.folder
     rootdir = os.path.expanduser(args.rootdir)
@@ -71,7 +73,11 @@ def main():
         print(rootdir, 'is not a folder on your filesystem')
         sys.exit(1)
 
-    dbx = dropbox.Dropbox(args.token)
+    dbx = dropbox.Dropbox(
+            app_key = str(os.getenv("DROPBOX_KEY")),
+            app_secret = str(os.getenv("DROPBOX_SECRET")),
+            oauth2_refresh_token = str(os.getenv("DROPBOX_REFRESH_TOKEN"))
+        )
 
     for dn, dirs, files in os.walk(rootdir):
         subfolder = dn[len(rootdir):].strip(os.path.sep)
@@ -101,7 +107,7 @@ def main():
                 else:
                     print(name, 'exists with different stats, downloading')
                     res = download(dbx, folder, subfolder, name)
-                    with open(fullname) as f:
+                    with open(fullname, 'rb') as f:
                         data = f.read()
                     if res == data:
                         print(name, 'is already synced [content match]')
@@ -168,8 +174,8 @@ def download(dbx, folder, subfolder, name):
             print('*** HTTP error', err)
             return None
     data = res.content
-    print(len(data), 'bytes; md:', md)
-    return data
+    print(len(data), 'bytes; md:', md.path_display)
+    return res
 
 def upload(dbx, fullname, folder, subfolder, name, overwrite=False):
     """Upload a file.

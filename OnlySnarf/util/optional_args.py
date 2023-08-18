@@ -13,7 +13,7 @@ def apply_args(parser):
 
   ##
   # -browser
-  parser.add_argument('-browser', '-B', type=str, default="auto", choices=["auto","brave","chrome","chromium","firefox","remote"], dest='browser', help='web browser to use')
+  parser.add_argument('-browser', '-B', type=str, default="auto", choices=["auto","brave","chrome","chromium","firefox"], dest='browser', help='web browser to use')
   # parser.add_argument('-browser', '-B', type=str, default="auto", choices=["auto","brave","chrome","chromium","firefox","ie","edge","opera","remote"], dest='browser', help='web browser to use')
   ##
   # -login

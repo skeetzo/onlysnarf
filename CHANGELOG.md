@@ -734,21 +734,25 @@
 **4.6.3 : 8/14/2023**
   - rpi debugging
   - beginning of long overdue driver reorg 
-**4.6.4 : 8/16/2023**
-- added / copied script for uploading to dropbox
-- added dotenv and dropbox keys
+  **4.6.4 : 8/16/2023**
+  - added / copied script for uploading to dropbox
+  - added dotenv and dropbox keys
 **4.6.5 : 8/17/2023**
 - updates to download-from-dropbox
+- finishing touches on upload-to-dropbox and download-from-dropbox
+- finished adding dropbox upload/download scripts
+- beginning work on scan.py
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- update adding uploads to being able to set previews
+- finish scan.py
+- test dropbox scripts on rpi
+- test upload script on android
+
+- update adding uploads to being able to set previews to messages
 - add process to clear upload/download space
-
-- finish adding dropbox upload/download scripts
-
 
 - finish and test marshmallow updates to User class
 
