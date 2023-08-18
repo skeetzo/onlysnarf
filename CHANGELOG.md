@@ -753,6 +753,10 @@
 
 ## TODO
 
+- finish updates to codebase
+
+- test scan.py for final touches
+
 - finish scan.py
 - test dropbox scripts on rpi
 - test upload script on android
@@ -761,7 +765,6 @@
 - add process to clear upload/download space
 
 - finish and test marshmallow updates to User class
-
 
 - add cli args for config to autoconfigure more easily
 - update 'snarf config' to interact with main config file and variables
