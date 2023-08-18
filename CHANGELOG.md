@@ -731,20 +731,23 @@
   - minor version bump for working api & cli changes
   **4.6.2 : 8/12/2023**
   - added watchdogger.py
-**4.6.3 : 8/14/2023**
+  **4.6.3 : 8/14/2023**
   - rpi debugging
   - beginning of long overdue driver reorg 
   **4.6.4 : 8/16/2023**
   - added / copied script for uploading to dropbox
   - added dotenv and dropbox keys
-**4.6.5 : 8/17/2023**
-- updates to download-from-dropbox
-- finishing touches on upload-to-dropbox and download-from-dropbox
-- finished adding dropbox upload/download scripts
-- beginning work on scan.py
-- a lot of reorg
-- beginning of logging rework
-- beginning of args/config rework / fix
+  **4.6.5 : 8/17/2023**
+  - updates to download-from-dropbox
+  - finishing touches on upload-to-dropbox and download-from-dropbox
+  - finished adding dropbox upload/download scripts
+  - beginning work on scan.py
+  - a lot of reorg
+  - beginning of logging rework
+  - beginning of args/config rework / fix
+**4.6.6 : 8/18/2023**
+- updates to scan
+
 
 ------------------------------------------------------------------------------------
 

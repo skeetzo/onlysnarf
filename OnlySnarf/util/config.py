@@ -46,6 +46,12 @@ def get_config(args={}):
   for key, value in config.items():
     config[key] = value
 
+def get_args_config_file():
+  return os.path.join(os.path.abspath(__file__), "../conf", "config-args.conf")
+
+
+
+
   ###############
   ## Debugging ##
   # import sys
