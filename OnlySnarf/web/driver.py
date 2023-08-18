@@ -816,3 +816,16 @@ class Driver:
             Driver._initialized_ = False
             Driver.browser.quit()
             Settings.print("closed browser!")
+
+def exit_handler():
+    """Exit cleanly"""
+
+    try:
+        Driver.exit()
+        # import sys
+        # sys.exit(0)
+    except Exception as e:
+        webdriver_logger.error(e)
+
+import atexit
+atexit.register(exit_handler)

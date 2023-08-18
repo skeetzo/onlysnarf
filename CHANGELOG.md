@@ -742,6 +742,9 @@
 - finishing touches on upload-to-dropbox and download-from-dropbox
 - finished adding dropbox upload/download scripts
 - beginning work on scan.py
+- a lot of reorg
+- beginning of logging rework
+- beginning of args/config rework / fix
 
 ------------------------------------------------------------------------------------
 

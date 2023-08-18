@@ -2,24 +2,33 @@ import os
 import logging
 from pathlib import Path
 from . import defaults as DEFAULT
-from .config import config
+# from .config import config
 
-loglevel = logging.INFO
-if config["debug"]: loglevel = logging.DEBUG
-if int(config["verbose"]) >= 2: loglevel = logging.DEBUG
+def configure_logging(loglevel=logging.INFO):
+    # loglevel = logging.INFO
+    # if config["debug"]: loglevel = logging.DEBUG
+    # if int(config["verbose"]) >= 2: loglevel = logging.DEBUG
 
-logPath = DEFAULT.LOG_PATH
-if os.environ.get('ENV') == "test":
-    logPath = os.path.join(os.getcwd(), "log", "snarf.log")
+    logPath = DEFAULT.LOG_PATH
+    if str(os.environ.get('ENV')) == "test":
+        logPath = os.path.join(os.getcwd(), "log", "snarf.log")
 
-Path(os.path.dirname(logPath)).mkdir(parents=True, exist_ok=True)
+    Path(os.path.dirname(logPath)).mkdir(parents=True, exist_ok=True)
 
-# set up logging to file - see previous section for more details
-logging.basicConfig(level=loglevel,
-                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
-                    datefmt='%m-%d %H:%M',
-                    filename=logPath,
-                    filemode='w')
+    # set up logging to file - see previous section for more details
+    logging.basicConfig(level=loglevel,
+                        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                        datefmt='%m-%d %H:%M',
+                        filename=logPath,
+                        filemode='w')
+
+    # define a Handler which writes INFO messages or higher to the sys.stderr
+    console = logging.StreamHandler()
+    # tell the handler to use this format
+    console.setFormatter(CustomFormatter())
+    # add the handler to the root logger
+    logging.getLogger('').addHandler(console)
+
 
 # https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
 class CustomFormatter(logging.Formatter):
@@ -47,10 +56,3 @@ class CustomFormatter(logging.Formatter):
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
-
-# define a Handler which writes INFO messages or higher to the sys.stderr
-console = logging.StreamHandler()
-# tell the handler to use this format
-console.setFormatter(CustomFormatter())
-# add the handler to the root logger
-logging.getLogger('').addHandler(console)
