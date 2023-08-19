@@ -1,4 +1,42 @@
 
+def search_for_fan(driver, fan, reattempt=False):
+    driver.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
+    count = 0
+    Settings.maybe_print("searching for fan: {} ...".format(fan))
+    # scroll through users on page until user is found
+    attempts = 0
+    attemptsLimit = 5
+    while True:
+        # elements = driver.browser.find_elements(By.CLASS_NAME, "m-fans")
+        elements = driver.browser.find_elements(By.CLASS_NAME, "g-user-username")
+        for ele in elements:
+            username = ele.get_attribute("innerHTML").strip()
+            print("username: {}".format(username))
+            print("fan: {}".format(fan))
+            if str(fan) == str(username):
+                driver.browser.execute_script("arguments[0].scrollIntoView();", ele)
+                Settings.print("")
+                Settings.dev_print("successfully found fan: {}".format(fan))
+                return ele
+        if len(elements) == int(count):
+            Driver.scrollDelay += Driver.initialScrollDelay
+            attempts+=1
+            if attempts == attemptsLimit:
+                break
+        Settings.print_same_line("({}/{}) scrolling...".format(count, len(elements)))
+        count = len(elements)
+        driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(Driver.scrollDelay)
+
+    Settings.warn_print("unable to find fan!")
+
+    if reattempt: return search_for_fan(driver, fan)
+    return None
+
+
+
+
+
     ######################################################################
 
     @staticmethod

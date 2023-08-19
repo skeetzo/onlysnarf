@@ -30,6 +30,11 @@ class Discount:
         Settings.maybe_print("discounting: {}".format(self.username))
         return Driver.discount_user(self.get())
 
+    def is_valid(self):
+        if self.amount and self.months and self.username:
+            return True
+        return False
+
     def get(self):
         """
         Get the discount's values in a dict.

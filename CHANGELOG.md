@@ -747,7 +747,7 @@
   - beginning of args/config rework / fix
 **4.6.6 : 8/18/2023**
 - updates to scan
-
+- updates to webdriver/discount
 
 ------------------------------------------------------------------------------------
 

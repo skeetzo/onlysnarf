@@ -1,7 +1,7 @@
 
 from ..util.settings import Settings
 
-def discount_user(discount, reattempt=False):
+def discount_user(discount):
     """
     Enter and apply discount to user
 
@@ -22,181 +22,158 @@ def discount_user(discount, reattempt=False):
 
     """
 
-    if not discount:
-        Settings.err_print("missing discount")
+    if not discount or not discount.is_valid():
+        Settings.err_print("missing or invalid discount!")
         return False
 
-    # BUG
-    # doesn't want to work with local variables
-    Driver.originalAmount = None
-    Driver.originalMonths = None
+    driver = Driver.get_driver()
+    driver.auth()
+    
+    Settings.print(f"Discounting {discount["username"]} {discount["amount"]}% for {discount["months"]} month(s)")
+
     try:
-        driver = Driver.get_driver()
-        driver.auth()
-        months = int(discount["months"])
-        amount = int(discount["amount"])
-        username = str(discount["username"])
-        Settings.print("discounting: {} {} for {} month(s)".format(username, amount, months))
+        user = search_for_fan(driver, username, reattempt=True)
+        # ActionChains(driver.browser).move_to_element(user).perform()
 
-        user_ = None
-
-        def search_for_fan(username):
-            driver.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
-            end_ = True
-            count = 0
-            Settings.maybe_print("searching for fan...")
-            # scroll through users on page until user is found
-            attempts = 0
-            while end_:
-                elements = driver.browser.find_elements(By.CLASS_NAME, "m-fans")
-                for ele in elements:
-                    username_ = ele.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()
-                    # if str(username) == str(username_).replace("@",""):
-                    if username in username_:
-                        driver.browser.execute_script("arguments[0].scrollIntoView();", ele)
-                        Settings.print("")
-                        Settings.dev_print("successfully found fan: {}".format(username))
-                        return ele
-                if len(elements) == int(count):
-                    Driver.scrollDelay += Driver.initialScrollDelay
-                    attempts+=1
-                    if attempts == 5:
-                        break
-                Settings.print_same_line("({}/{}) scrolling...".format(count, len(elements)))
-                count = len(elements)
-                driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(Driver.scrollDelay)
-            return None
-
-        user_ = search_for_fan(username)
-
-
-        if not user_:
-            Settings.err_print("unable to find fan - {}".format(username))
-            if not reattempt:
-                Settings.maybe_print("reattempting fan search...")
-                return Driver.discount_user(discount, reattempt=True)
-            return False
-
-        Settings.maybe_print("found: {}".format(username))
-        ActionChains(driver.browser).move_to_element(user_).perform()
-        Settings.dev_print("successfully moved to fan")
-        Settings.dev_print("finding discount btn")
-        buttons = user_.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUser").getClass())
-        clicked = False
-        for button in buttons:
-            # print(button.get_attribute("innerHTML"))
-            if "Discount" in button.get_attribute("innerHTML") and button.is_enabled() and button.is_displayed():
-                try:
-                    Settings.dev_print("clicking discount btn")
-                    button.click()
-                    Settings.dev_print("clicked discount btn")
-                    clicked = True
-                    break
-                except Exception as e:
-                    Driver.error_checker(e)
-                    Settings.warn_print("unable to click discount btn for: {}".format(username))
-                    return False
-        if not clicked:
-            Settings.warn_print("unable to find discount btn for: {}".format(username))
-            return False
-        time.sleep(1)
-
-        def apply_discount():
-            Settings.maybe_print("attempting discount entry...")
-            Settings.dev_print("finding months and discount amount btns")
-            ## amount
-            discountEle = driver.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserAmount").getClass())[0]
-            discountAmount = int(discountEle.get_attribute("innerHTML").replace("% discount", ""))
-            if not Driver.originalAmount: Driver.originalAmount = discountAmount
-            Settings.dev_print("amount: {}".format(discountAmount))
-            Settings.dev_print("entering discount amount")
-            if int(discountAmount) != int(amount):
-                up_ = int((discountAmount / 5) - 1)
-                down_ = int((int(amount) / 5) - 1)
-                Settings.dev_print("up: {}".format(up_))
-                Settings.dev_print("down: {}".format(down_))
-                action = ActionChains(driver.browser)
-                action.click(on_element=discountEle)
-                action.pause(1)
-                for n in range(up_):
-                    action.send_keys(Keys.UP)
-                    action.pause(0.5)
-                for n in range(down_):
-                    action.send_keys(Keys.DOWN)
-                    action.pause(0.5)                
-                action.send_keys(Keys.TAB)
-                action.perform()
-            Settings.dev_print("successfully entered discount amount")
-            ## months
-            monthsEle = driver.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserMonths").getClass())[1]
-            monthsAmount = int(monthsEle.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
-            if not Driver.originalMonths: Driver.originalMonths = monthsAmount
-            Settings.dev_print("months: {}".format(monthsAmount))
-            Settings.dev_print("entering discount months")
-            if int(monthsAmount) != int(months):
-                up_ = int(monthsAmount - 1)
-                down_ = int(int(months) - 1)
-                Settings.dev_print("up: {}".format(up_))
-                Settings.dev_print("down: {}".format(down_))
-                action = ActionChains(driver.browser)
-                action.click(on_element=monthsEle)
-                action.pause(1)
-                for n in range(up_):
-                    action.send_keys(Keys.UP)
-                    action.pause(0.5)
-                for n in range(down_):
-                    action.send_keys(Keys.DOWN)
-                    action.pause(0.5)
-                action.send_keys(Keys.TAB)
-                action.perform()
-            Settings.dev_print("successfully entered discount months")
-            discountEle = driver.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserAmount").getClass())[0]
-            discountAmount = int(discountEle.get_attribute("innerHTML").replace("% discount", ""))
-            monthsEle = driver.browser.find_elements(By.CLASS_NAME, Element.get_element_by_name("discountUserMonths").getClass())[1]
-            monthsAmount = int(monthsEle.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
-            return discountAmount, monthsAmount
-
+        click_discount_button(user)
+        
         # discount method is repeated until values are correct because somehow it occasionally messes up...
-        discountAmount, monthsAmount = apply_discount()
-        while int(discountAmount) != int(amount) and int(monthsAmount) != int(months):
-            # Settings.print("{} = {}    {} = {}".format(discountAmount, amount, monthsAmount, months))
-            discountAmount, monthsAmount = apply_discount()
+        discount_amount, discount_months = apply_discount_values(driver, discount["amount"], discount["months"])
+        while int(discount_amount) != int(discount["amount"]) and int(discount_months) != int(discount["months"]):
+            Settings.dev_print("repeating discount amount & months...")
+            discount_amount, discount_months = apply_discount()
 
         Settings.debug_delay_check()
-        ## apply
+
         Settings.dev_print("applying discount")
-        buttons_ = driver.find_elements_by_name("discountUserButton")
-        for button in buttons_:
-            if not button.is_enabled() and not button.is_displayed(): continue
-            if "Cancel" in button.get_attribute("innerHTML") and str(Settings.is_debug()) == "True":
-                Settings.print("skipping save discount (debug)")
-                button.click()
-                Settings.dev_print("successfully canceled discount")
-                Settings.dev_print("### Discount Successful ###")
-                return True
-            elif "Cancel" in button.get_attribute("innerHTML") and int(discountAmount) == int(Driver.originalAmount) and int(monthsAmount) == int(Driver.originalMonths):
-                Settings.print("skipping existing discount")
-                button.click()
-                Settings.dev_print("successfully skipped existing discount")
-                Settings.dev_print("### Discount Successful ###")
-                # return True
-            elif "Apply" in button.get_attribute("innerHTML"):
-                button.click()
-                Settings.print("discounted: {}".format(username))
-                Settings.dev_print("successfully applied discount")
-                Settings.dev_print("### Discount Successful ###")
-                return True
-        Settings.dev_print("### Discount Failure ###")
-        return False
+
+        if Settings.is_debug():
+            return cancel_discount(driver)
+        else:
+            return apply_discount(driver)
+
     except Exception as e:
-        Settings.print(e)
         Driver.error_checker(e)
-        buttons_ = driver.find_elements_by_name("discountUserButton")
-        for button in buttons_:
-            if "Cancel" in button.get_attribute("innerHTML"):
-                button.click()
-                Settings.dev_print("### Discount Successful Failure ###")
+    return cancel_discount(driver, onsuccess=False)
+
+def apply_discount_values(driver, amount, months):
+    apply_discount_amount(driver, int(amount))
+    apply_discount_months(driver, int(months))
+    amount_element, discount_amount = get_discount_amount(driver)
+    months_element, discount_months = get_discount_months(driver)
+    return discount_amount, discount_months
+
+def apply_discount(driver):
+    buttons = driver.find_elements_by_name("discountUserButton")
+    for button in buttons:
+        if not button.is_enabled() and not button.is_displayed(): continue
+        if "Apply" in button.get_attribute("innerHTML"):
+            button.click()
+            Settings.dev_print("### Discount Successful ###")
+            Settings.print("Discount successful!")
+            return True
+    Settings.err_print("### Discount Failure - Missing Apply Button ###")
+    return False
+
+def cancel_discount(driver, onsuccess=True):
+    # {
+    #     "name": "discountUserButton",
+    #     "classes": ["g-btn.m-flat.m-btn-gaps.m-reset-width", "g-btn.m-rounded"],
+    #     "text": ["Apply"],
+    #     "id": []
+    # }
+    buttons = driver.find_elements_by_name("discountUserButton")
+    for button in buttons:
+        if "Cancel" in button.get_attribute("innerHTML"):
+            button.click()
+            if onsuccess:
+                Settings.dev_print("### Discount Successfully Canceled ###")
+                Settings.print("Discount canceled!")
+                return True
+            else:
+                Settings.print("Discount failed!")
+                Settings.dev_print("### Discount Failure ###")
                 return False
-        Settings.dev_print("### Discount Failure ###")
-        return False
+    Settings.err_print("### Discount Failure - Missing Cancel Button ###")
+    return False
+
+def click_discount_button(element):
+    buttons = element.find_elements(By.CLASS_NAME, "b-tabs__nav__text")
+    Settings.dev_print("finding discount btn")
+    for button in buttons:
+        # print(button.get_attribute("innerHTML"))
+        if "Discount" in button.get_attribute("innerHTML") and button.is_enabled() and button.is_displayed():
+            try:
+                Settings.dev_print("clicking discount btn")
+                button.click()
+                Settings.dev_print("clicked discount btn")
+                time.sleep(0.5)
+                return True
+            except Exception as e:
+                Driver.error_checker(e)
+                Settings.warn_print("unable to click discount btn for: {}".format(element.get_attribute("innerHTML").strip()))
+                return False
+    Settings.warn_print("unable to find discount btn for: {}".format(element.get_attribute("innerHTML").strip()))
+    return False
+
+def get_discount_amount(driver):
+    amount_element = driver.browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[0]
+    amount = int(amount_element.get_attribute("innerHTML").replace("% discount", ""))
+    Settings.dev_print(f"discount amount: {amount}")
+    return amount_element, amount
+
+def get_discount_months(driver):
+    months_element = driver.browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[1]
+    months = int(months_element.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
+    Settings.dev_print(f"discount months: {months}")
+    return months_element, months
+    
+def apply_discount_amount(driver, amount):
+    Settings.maybe_print("attempting discount amount entry...")
+    # amount_element = driver.browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[0]
+    # discount_amount = int(amount_element.get_attribute("innerHTML").replace("% discount", ""))
+    amount_element, discount_amount = get_discount_amount(driver)
+    Settings.dev_print("amount: {}".format(discount_amount))
+    Settings.dev_print("entering discount amount")
+    if int(discount_amount) != int(amount):
+        up_ = int((discount_amount / 5) - 1)
+        down_ = int((int(amount) / 5) - 1)
+        Settings.dev_print("up: {}".format(up_))
+        Settings.dev_print("down: {}".format(down_))
+        action = ActionChains(driver.browser)
+        action.click(on_element=amount_element)
+        action.pause(1)
+        for n in range(up_):
+            action.send_keys(Keys.UP)
+            action.pause(0.5)
+        for n in range(down_):
+            action.send_keys(Keys.DOWN)
+            action.pause(0.5)                
+        action.send_keys(Keys.TAB)
+        action.perform()
+    Settings.dev_print("successfully entered discount amount!")
+
+def apply_discount_months(driver, months):
+    Settings.maybe_print("attempting discount months entry...")
+    # months_element = driver.browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[1]
+    # discount_months = int(months_element.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
+    months_element, discount_months = get_discount_months(driver)
+    Settings.dev_print("months: {}".format(discount_months))
+    Settings.dev_print("entering discount months")
+    if int(discount_months) != int(months):
+        up_ = int(discount_months - 1)
+        down_ = int(int(months) - 1)
+        Settings.dev_print("up: {}".format(up_))
+        Settings.dev_print("down: {}".format(down_))
+        action = ActionChains(driver.browser)
+        action.click(on_element=months_element)
+        action.pause(1)
+        for n in range(up_):
+            action.send_keys(Keys.UP)
+            action.pause(0.5)
+        for n in range(down_):
+            action.send_keys(Keys.DOWN)
+            action.pause(0.5)
+        action.send_keys(Keys.TAB)
+        action.perform()
+    Settings.dev_print("successfully entered discount months")
