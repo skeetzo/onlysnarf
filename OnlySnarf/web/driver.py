@@ -129,72 +129,6 @@ class Driver:
             Settings.print("failed to save cookies!")
             Settings.dev_print(e)
 
-    #####################
-    ### Drag and Drop ###
-    #####################
-
-    @staticmethod
-    def drag_and_drop_file(drop_target, path):
-        """
-        Drag and drop the provided file path onto the provided element target.
-
-
-        Parameters
-        ----------
-        drop_target : WebElement
-            The web element to drop the file at path on
-
-        path : str
-            The file path to drag onto the web element
-
-        Returns
-        -------
-        bool
-            Whether or not dragging the file was successful
-
-        """
-
-        # https://stackoverflow.com/questions/43382447/python-with-selenium-drag-and-drop-from-file-system-to-webdriver
-        JS_DROP_FILE = """
-            var target = arguments[0],
-                offsetX = arguments[1],
-                offsetY = arguments[2],
-                document = target.ownerDocument || document,
-                window = document.defaultView || window;
-
-            var input = document.createElement('INPUT');
-            input.type = 'file';
-            input.onchange = function () {
-              var rect = target.getBoundingClientRect(),
-                  x = rect.left + (offsetX || (rect.width >> 1)),
-                  y = rect.top + (offsetY || (rect.height >> 1)),
-                  dataTransfer = { files: this.files };
-
-              ['dragenter', 'dragover', 'drop'].forEach(function (name) {
-                var evt = document.createEvent('MouseEvent');
-                evt.initMouseEvent(name, !0, !0, window, 0, 0, 0, x, y, !1, !1, !1, !1, 0, null);
-                evt.dataTransfer = dataTransfer;
-                target.dispatchEvent(evt);
-              });
-
-              setTimeout(function () { document.body.removeChild(input); }, 25);
-            };
-            document.body.appendChild(input);
-            return input;
-        """
-        try:
-            Settings.maybe_print("dragging and dropping...")
-            Settings.dev_print("drop target: {}".format(drop_target.get_attribute("innerHTML")))
-            # BUG: requires double to register file upload
-            file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 0, 0)
-            file_input.send_keys(path)
-            file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 50, 50)
-            file_input.send_keys(path)
-            Settings.debug_delay_check()
-            return True
-        except Exception as e:
-            Settings.err_print(e) 
-        return False
 
     ##############
     ### Errors ###
@@ -644,6 +578,7 @@ class Driver:
     ####################################################################################################
     ####################################################################################################
 
+    # no longer used?
     # tries both and throws error for not found element internally
     def open_more_options():
         """
