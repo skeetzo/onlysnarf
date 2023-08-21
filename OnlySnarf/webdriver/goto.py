@@ -1,3 +1,9 @@
+import time
+
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import WebDriverException
 
 from .user import get_current_username
 from ..util import defaults as DEFAULT
@@ -208,8 +214,10 @@ def get_page_load(browser):
     """Attempt to generic page load"""
 
     time.sleep(2)
-    try: WebDriverWait(browser, 60*3, poll_frequency=10).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
-    except Exception as e: Settings.dev_print(e)
+    try:
+        WebDriverWait(browser, 60*3, poll_frequency=10).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
+    except Exception as e:
+        Settings.err_print(e)
 
 def handle_alert(browser):
     """Switch to alert pop up"""

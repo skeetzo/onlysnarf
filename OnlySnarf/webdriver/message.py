@@ -1,4 +1,13 @@
-# TODO: clean up this huge file
+# TODO: clean up this huge file and reorganize it properly to mesh with User class
+
+import time
+
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
+# from selenium.common.exceptions import WebDriverException
 
 from .element import find_element_to_click
 from .driver import go_to_home
@@ -117,7 +126,7 @@ def message_clear(browser):
         Settings.warn_print("failed to clear message!")
     return False
 
-def message_confirm(self):
+def message_confirm(browser):
     """
     Wait for the message open on the page's Confirm button to be clickable and click it
 
@@ -130,12 +139,13 @@ def message_confirm(self):
 
     try:
         Settings.dev_print("waiting for message confirm to be clickable...")
-        confirm = WebDriverWait(self.browser, int(Settings.get_upload_max_duration()), poll_frequency=3).until(EC.element_to_be_clickable((By.CLASS_NAME, "g-btn.m-rounded.b-chat__btn-submit")))
+        confirm = WebDriverWait(browser, int(Settings.get_upload_max_duration()), poll_frequency=3).until(EC.element_to_be_clickable((By.CLASS_NAME, "g-btn.m-rounded.b-chat__btn-submit")))
         Settings.dev_print("message confirm is clickable")
         Settings.debug_delay_check()
-        if Settings.is_debug():
+        # TODO: switch to regular type after extra debugging
+        if str(Settings.is_debug()) == "True":
             Settings.print('skipping message (debug)')
-            self.message_clear()
+            message_clear(browser)
             return True
         Settings.dev_print("clicking confirm...")
         confirm.click()
@@ -146,7 +156,7 @@ def message_confirm(self):
     except Exception as e:
         Driver.error_checker(e)
         Settings.err_print("failure to confirm message!")
-    self.message_clear()
+    message_clear(browser)
     return False
 
 def message_price(browser, price):
@@ -216,7 +226,7 @@ def message_price_save(browser):
         Settings.err_print(e)
     return False
 
-def message_text(self, text):
+def message_text(browser, text=""):
     """
     Enter the provided text into the message on the page
 
@@ -233,12 +243,12 @@ def message_text(self, text):
     """
 
     try:
-        if not text or str(text) == "None":
+        if not text:
             Settings.err_print("missing text for message!")
             return False
         Settings.dev_print("entering text...")
         # clear any preexisting text first
-        ActionChains(self.browser).move_to_element(self.browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(text)).perform()
+        ActionChains(browser).move_to_element(browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(text)).perform()
         Settings.dev_print("successfully entered text")
         time.sleep(0.5)
         return True
@@ -252,7 +262,7 @@ def message_text(self, text):
 ######################################################################
 ######################################################################
 
-def message_user_by_id(self, user_id=None):
+def message_user_by_id(browser, user_id=""):
     """
     Message the provided user id
 
@@ -268,12 +278,12 @@ def message_user_by_id(self, user_id=None):
 
     """
 
-    user_id = str(user_id).replace("@u","").replace("@","")
-    if not user_id or str(user_id) == "None":
+    if not user_id:
         Settings.err_print("missing user id!")
         return False
+    user_id = str(user_id).replace("@u","").replace("@","")
     try:
-        self.go_to_page("{}{}".format(ONLYFANS_CHAT_URL, user_id))
+        go_to_page(browser, "{}{}".format(ONLYFANS_CHAT_URL, user_id))
         Settings.dev_print("successfully messaging user id: {}".format(user_id))
         return True
     except Exception as e:
@@ -353,19 +363,17 @@ def messages_scan(num=0):
     Settings.dev_print("scanning messages")
     users = []
     try:
-        driver = Driver.get_driver()
-        driver.auth()
-        driver.go_to_page("/my/chats")
-        users_ = driver.browser.find_elements(By.CLASS_NAME, "g-user-username")
+        browser = Driver.get_browser()
+        go_to_page(browser, "/my/chats")
+        users_ = browser.find_elements(By.CLASS_NAME, "g-user-username")
         Settings.dev_print("users: {}".format(len(users_)))
-        user_ids = driver.browser.find_elements(By.CLASS_NAME, "b-chats__item__link")
+        user_ids = browser.find_elements(By.CLASS_NAME, "b-chats__item__link")
         Settings.dev_print("ids: {}".format(len(user_ids)))
         for user in user_ids:
             if not user or not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
             users.append(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
-        return users[:10]
     except Exception as e:
         Settings.print(e)
         Driver.error_checker(e)
         Settings.err_print("failed to scan messages")
-    return users
+    return users[:10]

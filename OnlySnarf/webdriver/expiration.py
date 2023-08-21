@@ -1,3 +1,5 @@
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
 from ..util.settings import Settings
@@ -6,7 +8,7 @@ from ..util.settings import Settings
 ##### Expiration #####
 ######################
 
-def expires(browser, expiration="0"):
+def expiration(browser, expires="0"):
     """
     Enters the provided expiration duration for a post
 
@@ -14,7 +16,7 @@ def expires(browser, expiration="0"):
 
     Parameters
     ----------
-    expiration : str
+    expires : str
         The duration (in days) until the post expires
     
     Returns
@@ -24,16 +26,16 @@ def expires(browser, expiration="0"):
 
     """
 
-    if str(expiration) == "0":
+    if str(expires) == "0":
         Settings.dev_print("skipping empty expiration")
         return True
     # if expiration is 'no limit', then there's no expiration and hence no point here
-    elif str(expiration) == "999":
+    elif str(expires) == "999":
         Settings.dev_print("skipping no-limit expiration")
         return True
     try:
-        Settings.print(f"Expiration: {expiration}")
-        enter_expiration(browser, expiration)
+        Settings.print(f"Expiration: {expires}")
+        enter_expiration(browser, expires)
         Settings.dev_print("### Expiration Successful ###")
         return True
     except Exception as e:
@@ -64,3 +66,4 @@ def cancel_expiration(browser):
     element = [elem for elem in elements if '#icon-close' in str(elem.get_attribute('href'))][0]
     ActionChains(browser).move_to_element(element).click().perform()
     Settings.dev_print("### Expiration Canceled ###")
+    Settings.debug_delay_check()

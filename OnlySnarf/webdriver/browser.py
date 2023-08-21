@@ -77,7 +77,7 @@ def create_browser(browserType):
 
     if not browser:
         Settings.err_print("unable to spawn a web browser!")
-        return None
+        os._exit(1)
 
     browser.implicitly_wait(30) # seconds
     browser.set_page_load_timeout(1200)

@@ -756,6 +756,7 @@
 ## TODO
 
 - finish updates to codebase
+- cleanup maybe_ & dev_  & err_ prints
 
 - test scan.py for final touches
 

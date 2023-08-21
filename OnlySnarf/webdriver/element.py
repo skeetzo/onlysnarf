@@ -1,3 +1,5 @@
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 from ..util.settings import Settings
 
@@ -5,7 +7,7 @@ from ..util.settings import Settings
 ### Elements ###
 ################
 
-def find_element_to_click(browser, name, text=""):
+def find_element_to_click(browser, name, text="", isID=False):
     """
     Find element on page by name to click
 
@@ -26,7 +28,7 @@ def find_element_to_click(browser, name, text=""):
 
     Settings.dev_print("finding element: {}".format(name))
     try:
-        elements = browser.find_elements(By.CLASS_NAME, className)
+        elements = browser.find_elements(By.ID if isID else By.CLASS_NAME, className)
         Settings.dev_print(f"elements found: {len(elements)}")
         for element in elements:
             Settings.dev_print(f"element: {element.get_attribute("innerHTML").strip()}")

@@ -1,3 +1,10 @@
+import time
+
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
 
 from .goto import go_to_home
 from ..util.settings import Settings
@@ -21,21 +28,20 @@ def login(browser):
 
     if check_if_already_logged_in(browser): return True
     Settings.print('Logging into OnlyFans for {}...'.format(Settings.get_username()))
-    successful = False
     try:
         if Settings.get_login_method() == "auto":
-            successful = via_form(browser)
-            if not successful: successful = via_twitter(browser)
-            if not successful: successful = via_google(browser)
+            if via_form(browser) or via_google(browser) or via_twitter(browser):
+                Settings.maybe_print("auto login successful!")
+                return True
         elif Settings.get_login_method() == "onlyfans":
-            successful = via_form(browser)
+            return via_form(browser)
         elif Settings.get_login_method() == "twitter":
-            successful = via_twitter(browser)
+            return via_twitter(browser)
         elif Settings.get_login_method() == "google":
-            successful = via_google(browser)
+            return via_google(browser)
     except Exception as e:
         Driver.error_checker(e)
-    return successful
+    return False
 
 ################################################################################################
 ################################################################################################
@@ -66,47 +72,32 @@ def check_if_logged_in(browser):
 
     """
 
-    def try_phone():
-        Settings.maybe_print("verifying phone number...")
-        element = browser.switch_to.active_element
-        element.send_keys(str(Settings.get_phone_number()))
-        element.send_keys(Keys.ENTER)
-
-    # TODO: requires testing, not successfuly receiving email w/ code to test further
-    def try_email():
-        Settings.print("email verification required - please enter the code sent to your email!")
-        element = browser.switch_to.active_element
-        element.send_keys(str(input("Enter code: ")))
-        element.send_keys(Keys.SHIFT + Keys.TAB)
-        element.send_keys(Keys.ENTER)
-
     try:
         Settings.dev_print("waiting for login check...")
         WebDriverWait(browser, 30, poll_frequency=2).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-make-post__streaming-link")))
         Settings.print("OnlyFans login successful!")
         return True
     except TimeoutException as te:
+        Settings.warn_print("timeout during login check!")
+        Settings.dev_print(str(te))
         bodyText = browser.find_element(By.TAG_NAME, "body").text
         # output page text for debugging
         Settings.dev_print(bodyText)
         # check for phone number page
         if "Verify your identity by entering the phone number associated with your Twitter account." in str(bodyText):
-            try_phone()
+            verify_phone()
             check_if_logged_in(browser)
         # check for email notification
         elif "Check your email" in str(bodyText):
-            try_email()
+            verify_email()
             check_if_logged_in(browser)
         else:
-            # Settings.dev_print(str(te))
-            Settings.print("Login Failure: Timed Out! Please check your credentials.")
-            Settings.print("If the problem persists, OnlySnarf may require an update.")
-        return False
+            Settings.err_print("Login Failure: Timed Out! Please check your credentials.")
+            Settings.err_print("If the problem persists, OnlySnarf may require an update.")
     except Exception as e:
         Driver.error_checker(e)
         Settings.err_print("Login Failure!")
-        Settings.print("If the problem persists, OnlySnarf may require an update.")
-        return False
+        Settings.err_print("If the problem persists, OnlySnarf may require an update.")
     return False
 
 def via_form(browser):
@@ -236,3 +227,27 @@ def check_captcha(browser):
     except Exception as e:
         if "Unable to locate element: [name=\"password\"]" not in str(e):
             Settings.dev_print(e)
+
+# Twitter second chance verification
+def verify_phone(browser):
+    try:
+        Settings.maybe_print("verifying phone number...")
+        element = browser.switch_to.active_element
+        element.send_keys(str(Settings.get_phone_number()))
+        element.send_keys(Keys.ENTER)
+    except Exception as e:
+        Settings.err_print("Unable to verify phone number!")
+        Settings.dev_print(e)
+
+# TODO: requires testing, not successfuly receiving email w/ code to test further
+# Twitter second chance verification
+def verify_email(browser):
+    try:
+        Settings.print("email verification required - please enter the code sent to your email!")
+        element = browser.switch_to.active_element
+        element.send_keys(str(input("Enter code: ")))
+        element.send_keys(Keys.SHIFT + Keys.TAB)
+        element.send_keys(Keys.ENTER)
+    except Exception as e:
+        Settings.err_print("Unable to verify email!")
+        Settings.dev_print(e)

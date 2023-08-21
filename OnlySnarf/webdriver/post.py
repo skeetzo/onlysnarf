@@ -1,3 +1,8 @@
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
 
 from .expiration import expires as EXPIRES
 from .message import message_clear
@@ -54,23 +59,16 @@ def post(post_object=Post()):
     if post_object["poll"].validate() and not POLL(browser, post_object["poll"].get()): return False
     Settings.print("====================")
     ############################################################
-    ## Tweeting ##
-    # TODO: test this
-    if Settings.is_tweeting():
-        Settings.dev_print("tweeting...")
-        # twitter tweet button is 1st, post is 2nd
-        ActionChains(browser).move_to_element(browser.find_element(By.CLASS_NAME, "b-btns-group").find_elements(By.XPATH, "./child::*")[0]).click().perform()
-        WebDriverWait(browser, 30, poll_frequency=3).until(EC.element_to_be_clickable((By.XPATH, "//label[@for='new_post_tweet_send']"))).click()
     try:
+        if Settings.is_tweeting(): enable_tweeting(browser)
         if not enter_text(browser, post_object["text"]):
             Settings.err_print("failed to post!")
             return False
         successful, skipped = upload_files(browser, post_object["files"])
         if successful and not skipped:
-            # twitter tweet button is 1st, post is 2nd
             postButton = [ele for ele in browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
             WebDriverWait(browser, Settings.get_upload_max_duration(), poll_frequency=3).until(EC.element_to_be_clickable(postButton))
-            Settings.dev_print("upload complete")
+            Settings.dev_print("upload complete!")
         send_post(browser)
     except TimeoutException:
         Settings.err_print("timed out waiting for post upload!")
@@ -116,6 +114,12 @@ def enter_text(browser, text):
             Settings.dev_print(e)
         return False
 
+# TODO: test this
+def enable_tweeting(brower):
+    Settings.dev_print("enabling tweeting...")
+    ActionChains(browser).move_to_element(browser.find_element(By.CLASS_NAME, "b-btns-group").find_elements(By.XPATH, "./child::*")[0]).click().perform()
+    Settings.maybe_print("enabled tweeting")
+
 def send_post(browser):
     ## TODO: switch to boolean check last / never
     if str(Settings.is_debug()) == "True":
@@ -128,3 +132,47 @@ def send_post(browser):
     ActionChains(browser).move_to_element(button).click().perform()
     Settings.print('Posted to OnlyFans!')
     return True
+
+# no longer used?
+# tries both and throws error for not found element internally
+def open_more_options(browser):
+    """
+    Click to open more options on a post.
+
+    Returns
+    -------
+    bool
+        Whether or not opening more options was successful
+
+    """
+
+    def option_one():
+        """Click on '...' element"""
+
+        Settings.dev_print("opening options (1)")
+        moreOptions = find_element_to_click(browser, "button.g-btn.m-flat.b-make-post__more-btn")
+        if not moreOptions: return False    
+        moreOptions.click()
+        Settings.dev_print("successfully opened more options (1)")
+        return True
+    def option_two():
+        """Click in empty space"""
+
+        Settings.dev_print("opening options (2)")
+        moreOptions = find_element_to_click(browser, "new_post_text_input", isID=True)
+        if not moreOptions: return False    
+        moreOptions.click()
+        Settings.dev_print("successfully opened more options (2)")
+        return True
+
+    try:
+        return option_one()
+    except Exception as e:
+        Driver.error_checker(e)
+
+    try:
+        return option_two()
+    except Exception as e:
+        Driver.error_checker(e)
+    
+    raise Exception("unable to locate 'More Options' element")
