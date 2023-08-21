@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from selenium.webdriver.remote.remote_connection import LOGGER as SeleniumLogger
 
 from ..util.settings import Settings
@@ -19,10 +20,10 @@ def enable_logging():
 
 def read_session_data():
     Settings.maybe_print("reading local session...")
-    path_ = os.path.join(Settings.get_base_directory(), "session.json")
-    Settings.dev_print("local session path: "+str(path_))
+    path = os.path.join(Settings.get_base_directory(), "session.json")
+    Settings.dev_print("local session path: "+str(path))
     try:
-        with open(str(path_)) as json_file:  
+        with open(str(path)) as json_file:  
             data = json.load(json_file)
             return data['id'], data['url']
         Settings.maybe_print("loaded local users!")
@@ -34,13 +35,13 @@ def write_session_data(session_id, session_url):
     Settings.maybe_print("writing local session...")
     Settings.dev_print("saving session id: {}".format(session_id))        
     Settings.dev_print("saving session url: {}".format(session_url))
-    path_ = os.path.join(Settings.get_base_directory(), "session.json")
-    Settings.dev_print("local session path: "+str(path_))
+    path = os.path.join(Settings.get_base_directory(), "session.json")
+    Settings.dev_print("local session path: "+str(path))
     data = {}
     data['id'] = session_id
     data['url'] = session_url
     try:
-        with open(str(path_), 'w') as outfile:  
+        with open(str(path), 'w') as outfile:  
             json.dump(data, outfile, indent=4, sort_keys=True)
         Settings.maybe_print("saved session data!")
     except FileNotFoundError:

@@ -1,9 +1,13 @@
 
+from .element import find_element_to_click
+from ..classes.poll import Poll
+from ..util.settings import Settings
+
 ################
 ##### Poll #####
 ################
 
-def poll(self, poll):
+def poll(browser, poll_object=Poll()):
     """
     Enter the Poll object into the current post
 
@@ -19,32 +23,17 @@ def poll(self, poll):
 
     """
 
-    if not poll or str(poll) == "None": return True
+    if not poll_object:
+        Settings.dev_print("skipping empty poll")
+        return True
     try:
         Settings.print("Poll:")
-
-        open_model(self.browser)
-        
-        Settings.debug_delay_check()
-        
-        add_duration(self.browser, poll["duration"])
-        
-        Settings.debug_delay_check()
-        
-        add_questions(self.browser, poll["questions"])
-
-        Settings.debug_delay_check()
-
+        open_poll_model(browser)        
+        add_poll_duration(browser, poll_object["duration"])
+        add_poll_questions(browser, poll_object["questions"])
         if Settings.is_debug():
             Settings.maybe_print("skipping poll (debug)")
-            cancel = self.find_element_to_click("pollCancel")
-            # {
-            #     "name": "pollCancel",
-            #     "classes": ["b-dropzone__preview__delete"],
-            #     "text": ["Cancel"],
-            #     "id": []
-            # },
-            cancel.click()
+            find_element_to_click(browser, "b-dropzone__preview__delete", text="Cancel").click()
         Settings.dev_print("### Poll Successful ###")
         return True
     except Exception as e:
@@ -52,19 +41,10 @@ def poll(self, poll):
         Settings.err_print("failed to enter poll!")
     return False
 
-# open the poll model
-def open_model(browser):
-    Settings.dev_print("adding poll")
-    elements = browser.find_elements(By.TAG_NAME, "use")
-    element = [elem for elem in elements if '#icon-poll' in str(elem.get_attribute('href'))][0]
-    ActionChains(browser).move_to_element(element).click().perform()
-    time.sleep(1)
-
 # open the poll duration
 # can click anywhere near the top label
 # TODO: finish updating any inserted wait times to be more dynamic
-def add_duration(browser, duration, wait=1):
-    # self.find_element_to_click("pollDuration").click()
+def add_poll_duration(browser, duration, wait=1):
     Settings.print("- Duration: {}".format(duration))
     Settings.dev_print("setting duration")
     action = ActionChains(browser)
@@ -75,30 +55,19 @@ def add_duration(browser, duration, wait=1):
     action.perform()
     # save the duration
     Settings.dev_print("saving duration")
-    self.find_element_to_click("pollSave").click()
-    # {
-    #     "name": "pollSave",
-    #     "classes": ["g-btn.m-flat.m-btn-gaps.m-reset-width"],
-    #     "text": ["Save"],
-    #     "id": []
-    # },
+    find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Save").click()
     Settings.dev_print("successfully saved duration")
+    Settings.debug_delay_check()
 
-def add_questions(browser, questions):
+def add_poll_questions(browser, questions):
     Settings.dev_print("configuring question paths...")
     questionsElement = browser.find_elements(By.CLASS_NAME, "v-text-field__slot")
     # add extra question space
     OFFSET = 2 # number of preexisting questionsElement
     if OFFSET + len(questions) > len(questionsElement):
         for i in range(OFFSET + len(questions)-len(questionsElement)):
-            Settings.dev_print("adding question")
-            question_ = self.find_element_to_click("pollQuestionAdd").click()
-            # {
-            #     "name": "pollQuestionAdd",
-            #     "classes": ["g-btn.m-flat.new_vote_add_option", "button.g-btn.m-flat.new_vote_add_option"],
-            #     "text": [],
-            #     "id": []
-            # },
+            Settings.dev_print("adding question...")
+            find_element_to_click(browser, "g-btn.m-flat.new_vote_add_option").click()
             Settings.dev_print("added question")
     # find the question inputs again
     questionsElement = browser.find_elements(By.CLASS_NAME, "v-text-field__slot")
@@ -115,3 +84,13 @@ def add_questions(browser, questions):
         time.sleep(1)
         i+=1
     Settings.dev_print("successfully entered questions")
+    Settings.debug_delay_check()
+
+# open the poll model
+def open_poll_model(browser):
+    Settings.dev_print("adding poll")
+    elements = browser.find_elements(By.TAG_NAME, "use")
+    element = [elem for elem in elements if '#icon-poll' in str(elem.get_attribute('href'))][0]
+    ActionChains(browser).move_to_element(element).click().perform()
+    time.sleep(1)
+    Settings.debug_delay_check()

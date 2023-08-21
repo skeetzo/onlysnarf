@@ -7,6 +7,7 @@ class Schedule:
 
     def __init__(self):
         self._initialized_ = False
+        self.schedule = None
         self.date = None
         self.time = None
         ##
@@ -24,8 +25,8 @@ class Schedule:
 
         if self._initialized_: return
         Settings.dev_print("initiliazing schedule...")
-        schedule = Settings.get_schedule()
-        date = datetime.strptime(str(schedule), DEFAULT.SCHEDULE_FORMAT)
+        self.schedule = Settings.get_schedule()
+        date = datetime.strptime(str(self.schedule), DEFAULT.SCHEDULE_FORMAT)
         self.year = date.year
         self.month = date.strftime("%B")
         self.day = date.day
@@ -86,6 +87,11 @@ class Schedule:
         if not Settings.confirm(date): return self.get_date()
         self.date = date
         return self.date
+
+    def get_schedule(self):
+        if self.schedule: return self.schedule
+        self.schedule = Settings.get_schedule()
+        return self.schedule
 
     def get_time(self):
         """

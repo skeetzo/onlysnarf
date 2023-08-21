@@ -1,5 +1,124 @@
 
-def search_for_fan(driver, fan, reattempt=False):
+from ..util.settings import Settings
+
+#################
+##### Users #####
+#################
+
+def get_current_username():
+    """
+    Gets the username of the logged in user.
+
+    Returns
+    -------
+    str
+        The username of the logged in user
+
+    """
+
+    try:
+        driver = Driver.get_driver()
+        driver.auth()
+        eles = [ele for ele in driver.browser.find_elements(By.TAG_NAME, "a") if "@" in str(ele.get_attribute("innerHTML")) and "onlyfans" not in str(ele.get_attribute("innerHTML"))]
+        Settings.dev_print("successfully found users...")
+        if Settings.is_debug():
+            for ele in eles:
+                Settings.dev_print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+        if len(eles) == 0:
+            Settings.err_print("unable to find username!")
+        else:
+            username = str(eles[0].get_attribute("href")).replace(ONLYFANS_HOME_URL2, "")
+            Settings.dev_print("successfully found active username: {}".format(username))
+            return username
+    except Exception as e:
+        Driver.error_checker(e)
+        Settings.err_print("failed to find username")
+    return None
+
+def get_userid_by_username(username):
+    """
+    Get the user id of the user by username.
+
+    Parameters
+    ----------
+    username : str
+        The username to find the id of
+
+    Returns
+    -------
+    str
+        The user id of the located user
+
+    """
+
+    user_id = None
+    try:
+        driver = Driver.get_driver()
+        driver.go_to_page(username)
+        elements = driver.browser.find_elements(By.TAG_NAME, "a")
+        user_id = [ele.get_attribute("href") for ele in elements if "/my/chats/chat/" in str(ele.get_attribute("href"))]
+        if len(user_id) == 0: 
+            Settings.warn_print(f"unable to find user id for {username}!")
+            return None
+        user_id = user_id[0]
+        user_id = user_id.replace("https://onlyfans.com/my/chats/chat/", "")
+        Settings.dev_print(f"successfully found user id: {user_id}")
+    except Exception as e:
+        Settings.dev_print(f"failure to find id: {username}")
+        Driver.error_checker(e)
+        Settings.err_print("failed to find user id")
+    return user_id
+
+
+# TODO: figure out a better way to handle this overlap
+# fansOrFollowers should be 'fans' or 'subscriptions/following'
+def get_users_by_type(fansOrFollowers="fans"):
+
+    if "follow" in str(fansOrFollowers):
+        fansOrFollowers = "subscriptions"
+
+    page = ONLYFANS_USERS_ACTIVE_URL
+    # if fansOrFollowers == "fans":
+        # page = ONLYFANS_USERS_ACTIVE_URL
+    if fansOrFollowers == "subscriptions":
+        page = ONLYFANS_USERS_FOLLOWING_URL
+
+    users = []
+    try:
+        driver = Driver.get_driver()
+        driver.go_to_page(page)
+        # scroll until elements stop spawning
+        thirdTime = 0
+        count = 0
+        while True:
+            elements = driver.browser.find_elements(By.CLASS_NAME, f"m-{fansOrFollowers}")
+            if len(elements) == int(count) and thirdTime >= 3: break
+            Settings.print_same_line("({}) scrolling...".format(count))
+            count = len(elements)
+            driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(2)
+            if thirdTime >= 3 and len(elements) == 0: break
+            thirdTime += 1
+        Settings.print("")
+        elements = driver.browser.find_elements(By.CLASS_NAME, f"m-{fansOrFollowers}")
+        Settings.dev_print(f"searching {fansOrFollowers}...")
+        for ele in elements:
+            username = ele.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()
+            name = ele.find_element(By.CLASS_NAME, "g-user-name").get_attribute("innerHTML")
+            name = re.sub("<!-*>", "", name)
+            name = re.sub("<.*\">", "", name)
+            name = re.sub("</.*>", "", name).strip()
+            users.append({"name":name, "username":username.replace("@","")})
+            Settings.dev_print(users[-1])
+        Settings.maybe_print(f"found {len(users)} {fansOrFollowers}")
+        Settings.dev_print(f"successfully found {fansOrFollowers}!")
+    except Exception as e:
+        Settings.print(e)
+        Driver.error_checker(e)
+        Settings.err_print(f"failed to find {fansOrFollowers}!")
+    return users
+
+def get_user_by_username(driver, fan, reattempt=False):
     driver.go_to_page(ONLYFANS_USERS_ACTIVE_URL)
     count = 0
     Settings.maybe_print("searching for fan: {} ...".format(fan))
@@ -30,14 +149,18 @@ def search_for_fan(driver, fan, reattempt=False):
 
     Settings.warn_print("unable to find fan!")
 
-    if reattempt: return search_for_fan(driver, fan)
+    if reattempt: return get_user_by_username(driver, fan)
     return None
 
-
-
-
+# TODO: this
+def get_username_by_id(user_id):
+    pass
 
 ######################################################################
+######################################################################
+######################################################################
+
+# TODO: update this lastish
 
 @staticmethod
 def read_user_messages(username, user_id=None):
@@ -140,127 +263,3 @@ def read_user_messages(username, user_id=None):
         Driver.error_checker(e)
         Settings.err_print("failure to read chat - {}".format(username))
         return [[],[],[],[]]
-
-
-
-#################
-##### Users #####
-#################
-
-@staticmethod
-def get_username():
-    """
-    Gets the username of the logged in user.
-
-    Returns
-    -------
-    str
-        The username of the logged in user
-
-    """
-
-    try:
-        driver = Driver.get_driver()
-        driver.auth()
-        eles = [ele for ele in driver.browser.find_elements(By.TAG_NAME, "a") if "@" in str(ele.get_attribute("innerHTML")) and "onlyfans" not in str(ele.get_attribute("innerHTML"))]
-        Settings.dev_print("successfully found users...")
-        if Settings.is_debug():
-            for ele in eles:
-                Settings.dev_print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
-        if len(eles) == 0:
-            Settings.err_print("unable to find username!")
-        else:
-            username = str(eles[0].get_attribute("href")).replace(ONLYFANS_HOME_URL2, "")
-            Settings.dev_print("successfully found active username: {}".format(username))
-            return username
-    except Exception as e:
-        Driver.error_checker(e)
-        Settings.err_print("failed to find username")
-    return None
-
-fansOrFollowers should be 'fans' or 'subscriptions/following'
-def get_users(fansOrFollowers="fans"):
-
-    if "follow" in str(fansOrFollowers):
-        fansOrFollowers = "subscriptions"
-
-    page = ONLYFANS_USERS_ACTIVE_URL
-    # if fansOrFollowers == "fans":
-        # page = ONLYFANS_USERS_ACTIVE_URL
-    if fansOrFollowers == "subscriptions":
-        page = ONLYFANS_USERS_FOLLOWING_URL
-
-    users = []
-    try:
-        driver = Driver.get_driver()
-        driver.go_to_page(page)
-        # scroll until elements stop spawning
-        thirdTime = 0
-        count = 0
-        while True:
-            elements = driver.browser.find_elements(By.CLASS_NAME, f"m-{fansOrFollowers}")
-            if len(elements) == int(count) and thirdTime >= 3: break
-            Settings.print_same_line("({}) scrolling...".format(count))
-            count = len(elements)
-            driver.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(2)
-            if thirdTime >= 3 and len(elements) == 0: break
-            thirdTime += 1
-        Settings.print("")
-        elements = driver.browser.find_elements(By.CLASS_NAME, f"m-{fansOrFollowers}")
-        Settings.dev_print(f"searching {fansOrFollowers}...")
-        for ele in elements:
-            username = ele.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()
-            name = ele.find_element(By.CLASS_NAME, "g-user-name").get_attribute("innerHTML")
-            name = re.sub("<!-*>", "", name)
-            name = re.sub("<.*\">", "", name)
-            name = re.sub("</.*>", "", name).strip()
-            users.append({"name":name, "username":username.replace("@","")})
-            Settings.dev_print(users[-1])
-        Settings.maybe_print(f"found {len(users)} {fansOrFollowers}")
-        Settings.dev_print(f"successfully found {fansOrFollowers}!")
-    except Exception as e:
-        Settings.print(e)
-        Driver.error_checker(e)
-        Settings.err_print(f"failed to find {fansOrFollowers}!")
-    return users
-
-@staticmethod
-def user_get_id(username):
-    """
-    Get the user id of the user by username.
-
-    Parameters
-    ----------
-    username : str
-        The username to find the id of
-
-    Returns
-    -------
-    str
-        The user id of the located user
-
-    """
-
-    user_id = None
-    try:
-        driver = Driver.get_driver()
-        driver.go_to_page(username)
-        elements = driver.browser.find_elements(By.TAG_NAME, "a")
-        ele = [ele.get_attribute("href") for ele in elements
-                if "/my/chats/chat/" in str(ele.get_attribute("href"))]
-        if len(ele) == 0: 
-            Settings.warn_print("unable to find user id")
-            return None
-        ele = ele[0]
-        ele = ele.replace("https://onlyfans.com/my/chats/chat/", "")
-        user_id = ele
-        Settings.dev_print("successfully found user id: {}".format(user_id))
-    except Exception as e:
-        Settings.dev_print("failure to find id: {}".format(username))
-        Driver.error_checker(e)
-        Settings.err_print("failed to find user id")
-    return user_id
-
-
-    

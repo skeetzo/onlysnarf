@@ -120,7 +120,7 @@ class User:
         """
 
         if self.user_id: return self.user_id
-        self.user_id = Driver.user_get_id(self.get_username())
+        self.user_id = Driver.get_userid_by_username(self.get_username())
         return self.user_id
 
     def get_username(self):
@@ -134,7 +134,7 @@ class User:
         """
 
         if self.username: return self.username
-        self.username = Driver.get_username(self.get_id())
+        self.username = Driver.get_username_by_id(self.get_id())
         return self.username
 
     def message(self, message):

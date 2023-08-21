@@ -1,10 +1,12 @@
+
+from .element import find_element_to_click
 from ..util.settings import Settings
 
 ######################
 ##### Expiration #####
 ######################
 
-def expires(self, expiration):
+def expires(browser, expiration="0"):
     """
     Enters the provided expiration duration for a post
 
@@ -12,7 +14,7 @@ def expires(self, expiration):
 
     Parameters
     ----------
-    expiration : int
+    expiration : str
         The duration (in days) until the post expires
     
     Returns
@@ -22,37 +24,28 @@ def expires(self, expiration):
 
     """
 
-    if str(expiration) == "0" or not expiration: return True
+    if str(expiration) == "0":
+        Settings.dev_print("skipping empty expiration")
+        return True
+    # if expiration is 'no limit', then there's no expiration and hence no point here
+    elif str(expiration) == "999":
+        Settings.dev_print("skipping no-limit expiration")
+        return True
     try:
-        Settings.print("Expiration:")
-        Settings.print("- Period: {}".format(expiration))
-        # if expiration is 'no limit', then there's no expiration and hence no point here
-        if expiration == 999: return True
-
-        enter_expiration(self.browser, expiration)
-
-        Settings.debug_delay_check()
-
+        Settings.print(f"Expiration: {expiration}")
+        enter_expiration(browser, expiration)
         Settings.dev_print("### Expiration Successful ###")
         return True
     except Exception as e:
         Driver.error_checker(e)
         Settings.err_print("failed to enter expiration!")
-
-    cancel_expiration(self.browser)
-
+    cancel_expiration(browser)
     return False
 
 def enter_expiration(browser, expires):
     Settings.dev_print("entering expiration...")
-    # {
-    #     "name": "expiresAdd",
-    #     "classes": ["b-make-post__expire-period-btn"],
-    #     "text": ["Save"],
-    #     "id": []
-    # },
     action = ActionChains(browser)
-    action.click(on_element=self.find_element_to_click("expiresAdd"))
+    action.click(on_element=find_element_to_click(browser, "b-make-post__expire-period-btn", text="Save"))
     action.pause(int(1))
     action.send_keys(Keys.TAB)
     action.send_keys(str(expires))
@@ -61,7 +54,8 @@ def enter_expiration(browser, expires):
     action.pause(int(1))
     action.send_keys(Keys.ENTER)
     action.perform()
-    Settings.dev_print("successfully entered expiration")
+    Settings.dev_print("successfully entered expiration!")
+    Settings.debug_delay_check()
 
 # not really necessary with 'Clear' button
 def cancel_expiration(browser):

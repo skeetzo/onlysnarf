@@ -1,9 +1,14 @@
+# TODO: clean up this huge file
+
+from .element import find_element_to_click
+from .driver import go_to_home
+from .message import message_user
+from ..util.settings import Settings
 
 ####################
 ##### Messages #####
 ####################
 
-@staticmethod
 def message(username, user_id=None):
     """
     Start a message to the username (or group of users) or user_id.
@@ -26,18 +31,18 @@ def message(username, user_id=None):
         Settings.err_print("missing user to message!")
         return False
     try:
-        driver = Driver.get_driver()
-        driver.auth()
-        driver.go_to_home(force=True)
+        browser = Driver.get_browser()
+
+        go_to_home(browser, force=True)
         Settings.dev_print("attempting to message {}...".format(username))
         
         # if the username is a key string it will behave differently
-        if str(username).lower() == "all": return message_all(driver)
-        elif str(username).lower() == "recent": return message_recent(driver)
-        elif str(username).lower() == "favorite": return message_favorite(driver)
-        elif str(username).lower() == "renew on": return message_renewers(driver)
-        elif str(username).lower() == "random": return message_random(driver)
-        else: return driver.message_user(username, user_id=user_id)
+        if str(username).lower() == "all": return message_all(browser)
+        elif str(username).lower() == "recent": return message_recent(browser)
+        elif str(username).lower() == "favorite": return message_favorite(browser)
+        elif str(username).lower() == "renew on": return message_renewers(browser)
+        elif str(username).lower() == "random": return message_random(browser)
+        else: return message_user(browser, username, user_id=user_id)
         # if successful: Settings.dev_print("started message for {}".format(username))
         # else: Settings.warn_print("failed to start message for {}!".format(username))
         # return successful
@@ -47,10 +52,10 @@ def message(username, user_id=None):
     return False
  
 # TODO: add these behaviors
-def message_all():
+def message_all(browser):
     pass
 
-def message_recent():
+def message_recent(browser):
         
         # successful = False
         # if type__ != None:
@@ -60,16 +65,19 @@ def message_recent():
         #     successful = True
     pass
 
-def message_favorite():
+def message_favorite(browser):
     pass
 
-def message_renewers():
+def message_renewers(browser):
     pass
 
-def message_random(driver):
+def message_random(browser):
     from ..classes.user import User
     username = User.get_random_user().username
 
+######################################################################
+######################################################################
+######################################################################
 
 def close_icons(browser):
     try:
@@ -88,18 +96,20 @@ def clear_text(browser):
         Settings.err_print(e)
         Settings.dev_print("unable to clear text!")
 
-def message_clear(self):
+## TODO
+# add check for clearing any text or images already in post field
+def message_clear(browser):
     try:
         Settings.dev_print("clearing message...")
-        clearButton = [ele for ele in self.browser.find_elements(By.TAG_NAME, "button") if "Clear" in ele.get_attribute("innerHTML") and ele.is_enabled()]
+        clearButton = [ele for ele in browser.find_elements(By.TAG_NAME, "button") if "Clear" in ele.get_attribute("innerHTML") and ele.is_enabled()]
         if len(clearButton) > 0:
             Settings.dev_print("clicking clear button...")
             clearButton[0].click()
         else:
             Settings.dev_print("refreshing page and clearing text...")
-            self.go_to_home(force=True)
-            clear_text(self.browser)
-            close_icons(self.browser)
+            go_to_home(browser, force=True)
+            clear_text(browser)
+            close_icons(browser)
         Settings.dev_print("successfully cleared message!")
         return True
     except Exception as e:
@@ -139,7 +149,7 @@ def message_confirm(self):
     self.message_clear()
     return False
 
-def message_price(self, price):
+def message_price(browser, price):
     """
     Enter the provided price into the message on the page
 
@@ -159,31 +169,51 @@ def message_price(self, price):
         if not price or str(price) == "None":
             Settings.err_print("missing price!")
             return False
-        try:
-            Settings.dev_print("clearing any preexisting price...")
-            self.browser.find_element(By.CLASS_NAME, "m-btn-remove").click()
-        except Exception as e:
-            Settings.dev_print(e)
-        Settings.dev_print("entering price...")
-        self.browser.find_element(By.CLASS_NAME, "b-make-post__actions__btns").find_elements(By.XPATH, "./child::*")[7].click()
-        priceText = WebDriverWait(self.browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(self.browser.find_element(By.ID, "priceInput_1")))
-        priceText.click()
-        priceText.send_keys(str(price))
-        Settings.dev_print("entered price")
-        Settings.debug_delay_check()
-        Settings.dev_print("saving price...")
-        self.find_element_to_click("priceSave").click()    
-        # {
-        #     "name": "priceSave",
-        #     "classes": ["g-btn.m-flat.m-btn-gaps.m-reset-width", "g-btn.m-transparent-bg", "g-btn.m-rounded"], # "b-chat__btn-set-price", "button.g-btn.m-rounded"
-        #     "text": ["Save"],
-        #     "id": []
-        # },
-        Settings.dev_print("saved price")
-        return True
+        # clear any pre-existing message
+        message_price_clear(browser)
+        successful = []
+        successful.append(message_price_enter(browser, price))
+        successful.append(message_price_save(browser))
+        if all(successful):
+            Settings.dev_print("successfully entered message price!")
+            return True
     except Exception as e:
         Driver.error_checker(e)
-        Settings.err_print("failure to enter price")
+        Settings.err_print("failed to enter message price!")
+    return False
+
+def message_price_clear(browser):
+    try:
+        Settings.dev_print("clearing any preexisting price...")
+        browser.find_element(By.CLASS_NAME, "m-btn-remove").click()
+    except Exception as e:
+        Settings.dev_print(e)
+
+def message_price_enter(browser, price):
+    try:
+        Settings.dev_print("entering price...")
+        browser.find_element(By.CLASS_NAME, "b-make-post__actions__btns").find_elements(By.XPATH, "./child::*")[7].click()
+        element = WebDriverWait(browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(browser.find_element(By.ID, "priceInput_1")))
+        element.click()
+        element.send_keys(str(price))
+        Settings.dev_print("entered price!")
+        Settings.debug_delay_check()
+        return True
+    except Exception as e:
+        Settings.dev_print("failed to enter price!")
+        Settings.err_print(e)
+    return False
+
+def message_price_save(browser):
+    try:
+        Settings.dev_print("saving price...")
+        find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Save").click()    
+        Settings.dev_print("saved price!")
+        Settings.debug_delay_check()
+        return True
+    except Exception as e:
+        Settings.dev_print("failed to save price!")
+        Settings.err_print(e)
     return False
 
 def message_text(self, text):
@@ -217,6 +247,11 @@ def message_text(self, text):
         Settings.err_print("failure to enter message")
     return False
 
+
+######################################################################
+######################################################################
+######################################################################
+
 def message_user_by_id(self, user_id=None):
     """
     Message the provided user id
@@ -246,7 +281,7 @@ def message_user_by_id(self, user_id=None):
         Settings.err_print("failed to message user by id!")
     return False
 
-def message_user(self, username, user_id=None):
+def message_user(browser, username, user_id=None):
     """
     Message the matching username or user id
 
@@ -265,17 +300,15 @@ def message_user(self, username, user_id=None):
     """
 
     Settings.dev_print("username: {} : {}: user_id".format(username, user_id))
-    if user_id: return self.message_user_by_id(user_id=user_id)
+    if user_id: return message_user_by_id(user_id=user_id)
     if not username:
         Settings.err_print("missing username to message!")
         return False
     try:
-        self.go_to_page(username)
-
+        go_to_page(browser, username)
         # time.sleep(5) # for whatever reason this constantly errors out from load times
-        WebDriverWait(self.browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.TAG_NAME, "a")))
-
-        elements = self.browser.find_elements(By.TAG_NAME, "a")
+        WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.TAG_NAME, "a")))
+        elements = browser.find_elements(By.TAG_NAME, "a")
         ele = [ele for ele in elements if ONLYFANS_CHAT_URL in str(ele.get_attribute("href"))]
         if len(ele) == 0:
             Settings.warn_print("user cannot be messaged - unable to locate id!")
@@ -286,7 +319,7 @@ def message_user(self, username, user_id=None):
         # Settings.dev_print("clicking send message")
         # ele.click()
         Settings.maybe_print("user id found: {}".format(ele.replace(ONLYFANS_HOME_URL2, "")))
-        self.go_to_page(ele)
+        go_to_page(browser, ele)
         Settings.dev_print("successfully messaging username: {}".format(username))
         return True
     except Exception as e:
@@ -294,9 +327,11 @@ def message_user(self, username, user_id=None):
         Settings.err_print("failed to message user")
     return False
 
+######################################################################
+######################################################################
+######################################################################
 
 # TODO: update, test, and probably rename
-@staticmethod
 def messages_scan(num=0):
     """
     Scan messages page for recent users

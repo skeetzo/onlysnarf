@@ -4,7 +4,6 @@ import concurrent.futures
 
 from ..util.settings import Settings
 
-
 #####################
 ### Drag and Drop ###
 #####################
@@ -75,7 +74,7 @@ def drag_and_drop_file(drop_target, path):
 ##### Upload #####
 ##################
 
-def upload_files(self, files):
+def upload_files(browser, files):
     """
     Upload the files to a post or message.
 
@@ -123,33 +122,45 @@ def upload_files(self, files):
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
         executor.map(prepare_file, files)
-
+        
     Settings.dev_print("files prepared: {}".format(len(prepared_files)))
     if len(prepared_files) == 0:
         Settings.err_print("skipping upload (unable to prepare files)")
         return False, True
-
-    enter_file = self.browser.find_element(By.ID, "attach_file_photo")
+    enter_file = browser.find_element(By.ID, "attach_file_photo")
     successful = []
-
     i = 1
     for file in prepared_files:
         Settings.print('> {} - {}/{}'.format(file.get_title(), i, len(files)))
         i += 1
         successful.append(drag_and_drop_file(enter_file , file.get_path()))
         time.sleep(1)
-
     if all(successful):
-        if self.error_window_upload(): Settings.dev_print("files uploaded successfully!")
+        if error_window_upload(browser): Settings.dev_print("files uploaded successfully!")
         else: Settings.dev_print("files probably uploaded succesfully!")
         time.sleep(1) # bug prevention
         return True, False
-        
     Settings.warn_print("a file failed to upload!")
     return False, False
 
+def error_window_upload(browser):
+    """Closes error window that appears during uploads for 'duplicate' files"""
 
-
+    try:
+        buttons = browser.find_elements(By.CLASS_NAME, "g-btn.m-flat.m-btn-gaps.m-reset-width")
+        Settings.dev_print("errors btns: {}".format(len(buttons)))
+        if len(buttons) == 0: return True
+        for button in buttons:
+            if button.get_attribute("innerHTML").strip() == "Close" and button.is_enabled():
+                Settings.maybe_print("upload error message, closing")
+                button.click()
+                Settings.maybe_print("success: upload error message closed")
+                time.sleep(0.5)
+                return True
+        return False
+    except Exception as e:
+        Driver.error_checker(e)
+    return False
 
 # TODO: used at all?
 def fix_filename(file):

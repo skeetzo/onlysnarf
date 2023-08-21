@@ -28,7 +28,7 @@ from webdriver_manager.opera import OperaDriverManager
 ##
 from ..util.settings import Settings
 
-def create_browser(self, browserType):
+def create_browser(browserType):
     """
     Spawns a browser according to args.
 
@@ -77,8 +77,7 @@ def create_browser(self, browserType):
 
     if not browser:
         Settings.err_print("unable to spawn a web browser!")
-        if os.environ.get("ENV") and str(os.environ.get("ENV")) == "test": return False
-        os._exit(1)
+        return None
 
     browser.implicitly_wait(30) # seconds
     browser.set_page_load_timeout(1200)

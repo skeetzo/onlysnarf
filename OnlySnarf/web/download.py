@@ -1,4 +1,5 @@
 
+from ..util.settings import Settings
 
 def download_content(self):
     """Downloads all content (images and video) from the user's profile page"""
