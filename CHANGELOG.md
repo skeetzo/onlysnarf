@@ -748,7 +748,7 @@
 **4.6.6 : 8/18/2023**
 - updates to scan
 - updates to webdriver/discount
-**8/19/2023, 8/20/2023**
+**8/19/2023, 8/20/2023, 8/21/2023**
 - more driver cleanup
 
 ------------------------------------------------------------------------------------
@@ -757,6 +757,7 @@
 
 - finish updates to codebase
 - cleanup maybe_ & dev_  & err_ prints
+- finishes updates to logging process
 
 - test scan.py for final touches
 

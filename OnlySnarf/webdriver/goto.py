@@ -8,6 +8,7 @@ from selenium.common.exceptions import WebDriverException
 from .user import get_current_username
 from ..util import defaults as DEFAULT
 from ..util.settings import Settings
+from ..util.urls import ONLYFANS_HOME_URL, ONLYFANS_SETTINGS_URL
 
 ##############
 ### Go Tos ###

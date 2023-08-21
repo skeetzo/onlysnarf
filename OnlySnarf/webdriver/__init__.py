@@ -1,10 +1,12 @@
-# from .driver import Driver
+from .driver import Driver
 
-# from .expiration import expires
-# from .post import post
-# from .poll import poll
-# from .schedule import schedule
+def exit_handler():
+    """Exit cleanly"""
 
-# TODO:
-# figure out how to properly manage imports so that the only necessary things loaded are a Driver class with methods to access the total functionality
-# or don't if thats not necessary
+    try:
+        Driver.exit(Driver.BROWSER)
+    except Exception as e:
+        print(e)
+
+import atexit
+atexit.register(exit_handler)

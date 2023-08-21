@@ -11,14 +11,47 @@ from selenium.common.exceptions import TimeoutException
 
 from .element import find_element_to_click
 from .driver import go_to_home
-from .message import message_user
 from ..util.settings import Settings
+from ..util.urls import ONLYFANS_CHAT_URL
 
 ####################
 ##### Messages #####
 ####################
 
-def message(username, user_id=None):
+
+## TODO: I don't think i want to have the code here for user -> send message
+# because it would make it difficult to run per user and save information directly back to each user
+# maybe just take a break and come back and rework the user class into this new webdriver class more cleanly
+
+
+def message(browser, message_object={}):
+
+    """
+    Complete the various components of sending a message to a user.
+    
+    Parameters
+    ----------
+    message : Object
+        The message to send as a serialized Message object from get_message.
+
+    Returns
+    -------
+    bool
+        Whether or not the message was successful
+    """
+
+    Settings.print("Entering message: (${}) {}".format(message_object["price"], message_object["text"]))
+    try:
+        for recipient in message_object['recipients']:
+        message_username(browser, recipient)
+        if all([message_text(browser, message_object["text"]), message_price(browser, message_object["price"]), upload_files(browser, message_object["files"])]):
+            return message_confirm(browser)
+    except Exception as e:
+        Settings.dev_print(e)
+    Settings.err_print("Message failed to send!")
+    return False
+
+def message_username(browser, username, user_id=None):
     """
     Start a message to the username (or group of users) or user_id.
 
@@ -40,18 +73,15 @@ def message(username, user_id=None):
         Settings.err_print("missing user to message!")
         return False
     try:
-        browser = Driver.get_browser()
-
         go_to_home(browser, force=True)
         Settings.dev_print("attempting to message {}...".format(username))
-        
         # if the username is a key string it will behave differently
         if str(username).lower() == "all": return message_all(browser)
         elif str(username).lower() == "recent": return message_recent(browser)
         elif str(username).lower() == "favorite": return message_favorite(browser)
         elif str(username).lower() == "renew on": return message_renewers(browser)
         elif str(username).lower() == "random": return message_random(browser)
-        else: return message_user(browser, username, user_id=user_id)
+        else: return message_user_by_username(browser, username, user_id=user_id)
         # if successful: Settings.dev_print("started message for {}".format(username))
         # else: Settings.warn_print("failed to start message for {}!".format(username))
         # return successful
@@ -257,7 +287,6 @@ def message_text(browser, text=""):
         Settings.err_print("failure to enter message")
     return False
 
-
 ######################################################################
 ######################################################################
 ######################################################################
@@ -291,7 +320,7 @@ def message_user_by_id(browser, user_id=""):
         Settings.err_print("failed to message user by id!")
     return False
 
-def message_user(browser, username, user_id=None):
+def message_user_by_username(browser, username, user_id=None):
     """
     Message the matching username or user id
 
@@ -336,44 +365,3 @@ def message_user(browser, username, user_id=None):
         Driver.error_checker(e)
         Settings.err_print("failed to message user")
     return False
-
-######################################################################
-######################################################################
-######################################################################
-
-# TODO: update, test, and probably rename
-def messages_scan(num=0):
-    """
-    Scan messages page for recent users
-
-    Parameters
-    ----------
-    num : int
-        The number of users to consider recent (doesn't work)
-
-    Returns
-    -------
-    list
-        The list of users found
-
-    """
-
-    # go to /messages page
-    # get top n users
-    Settings.dev_print("scanning messages")
-    users = []
-    try:
-        browser = Driver.get_browser()
-        go_to_page(browser, "/my/chats")
-        users_ = browser.find_elements(By.CLASS_NAME, "g-user-username")
-        Settings.dev_print("users: {}".format(len(users_)))
-        user_ids = browser.find_elements(By.CLASS_NAME, "b-chats__item__link")
-        Settings.dev_print("ids: {}".format(len(user_ids)))
-        for user in user_ids:
-            if not user or not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
-            users.append(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
-    except Exception as e:
-        Settings.print(e)
-        Driver.error_checker(e)
-        Settings.err_print("failed to scan messages")
-    return users[:10]

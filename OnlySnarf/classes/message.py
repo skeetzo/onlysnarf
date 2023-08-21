@@ -13,12 +13,11 @@ from .schedule import Schedule
 class Message():
     """OnlyFans message (and post) class"""
 
-    def __init__(self, users=[]):
+    def __init__(self, recipients=[]):
         """
         OnlyFans message and post object
 
-        A post is just a message on a profile with different options made available. So all posts are messages, as all messages are messages.
-            Squares and rectangles.
+        A post is just a message on a profile with different options made available.
 
         """
 
@@ -28,6 +27,7 @@ class Message():
         self.performers = []
         self.price = 0 # $3 - $100
         self.keywords = []
+        self.recipients = recipients
         self.__initialized__ = False
 
     def init(self):
@@ -256,6 +256,10 @@ class Message():
         self.keywords = Settings.get_keywords()
         return self.keywords
 
+    def get_recipients(self):
+        return self.recipients
+        # if len(self.recipients) > 0: 
+
     def get_text(self, again=True):
         """
         Gets the text value if not none else sets it from args or prompts.
@@ -309,9 +313,9 @@ class Message():
         text = self.update_keywords(text)
         return text
 
-    def send(self, username, user_id=None):
+    def send(self):
         """
-        Sends a message.
+        Sends this message.
 
 
         Returns
@@ -322,7 +326,7 @@ class Message():
         """
 
         self.init()
-        return User.message_user(self.get_message(), username, user_id=user_id)            
+        return Driver.message(Driver.get_browser(), self.get_message())        
 
 class Post(Message):
     """OnlyFans message (and post) class"""
@@ -442,7 +446,7 @@ class Post(Message):
 
     def send(self):
         """
-        Sends a post.
+        Sends this post.
 
 
         Returns

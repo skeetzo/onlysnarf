@@ -44,6 +44,8 @@ IMAGE_LIMIT = 15
 
 LIMIT_ALLOWED = [0,1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100] # in %
 
+MAX_TABS = 20
+
 MESSAGE_CHOICES = ["all", "recent", "favorite", "renew on"]
 
 PROMOTION_EXPIRATION_ALLOWED = [int(i) for i in range(30)] # in %
