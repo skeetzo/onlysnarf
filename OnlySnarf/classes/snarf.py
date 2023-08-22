@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-from .lib.driver import Driver
 from .lib.config import Config
 from .lib.menu import Menu
 from .util.settings import Settings
@@ -29,11 +28,6 @@ class Snarf:
         """Snarf object"""
 
         self.config = config
-
-    @staticmethod
-    def close():
-        Driver.exit_all()
-        Settings.print("*snarf waves goodbye*")
 
     @staticmethod
     def api():

@@ -5,18 +5,18 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
 from .expiration import expires as EXPIRES
+from .driver import Driver
 from .message import message_clear
 from .poll import poll as POLL
 from .schedule import schedule as SCHEDULE
 from .upload import upload_files
-from ..classes.message import Post
 from ..util.settings import Settings
 
 ################
 ##### Post #####
 ################
 
-def post(post_object=Post()):
+def post(post_object={}):
     """
     Post the message to OnlyFans.
 

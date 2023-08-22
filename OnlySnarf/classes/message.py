@@ -2,13 +2,12 @@ import re
 from datetime import datetime
 from decimal import Decimal
 from re import sub
-##
-from ..lib.driver import Driver
+
 from .file import File, Folder
 from .poll import Poll
-from .user import User
-from ..util.settings import Settings
 from .schedule import Schedule
+from ..util.settings import Settings
+from ..util.webdriver import message, post
 
 class Message():
     """OnlyFans message (and post) class"""
@@ -326,7 +325,7 @@ class Message():
         """
 
         self.init()
-        return Driver.message(Driver.get_browser(), self.get_message())        
+        return message(self.get_message())        
 
 class Post(Message):
     """OnlyFans message (and post) class"""
@@ -461,5 +460,5 @@ class Post(Message):
         if not self.get_files() and self.get_text() == "":
             Settings.err_print("Missing files and text!")
             return False
-        return Driver.post(self.get_post())
+        return post(self.get_post())
             

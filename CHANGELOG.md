@@ -755,9 +755,16 @@
 
 ## TODO
 
+- finish and test marshmallow updates to User class
+
 - finish updates to codebase
 - cleanup maybe_ & dev_  & err_ prints
 - finishes updates to logging process
+
+- restructure snarf "class" & method of interfacing with general behavior
+
+- test updates to webdriver 
+
 
 - test scan.py for final touches
 
@@ -768,7 +775,6 @@
 - update adding uploads to being able to set previews to messages
 - add process to clear upload/download space
 
-- finish and test marshmallow updates to User class
 
 - add cli args for config to autoconfigure more easily
 - update 'snarf config' to interact with main config file and variables

@@ -1,10 +1,10 @@
 
 from .element import find_element_to_click
+from .driver import Driver
 from .user import get_user_by_username
-from ..classes.discount import Discount
 from ..util.settings import Settings
 
-def discount_user(discount_object=Discount()):
+def discount_user(discount_object={}):
     """
     Enter and apply discount to user
 

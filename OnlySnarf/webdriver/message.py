@@ -10,7 +10,8 @@ from selenium.common.exceptions import TimeoutException
 # from selenium.common.exceptions import WebDriverException
 
 from .element import find_element_to_click
-from .driver import go_to_home
+from .driver import Driver
+from .goto import go_to_home, go_to_page
 from ..util.settings import Settings
 from ..util.urls import ONLYFANS_CHAT_URL
 
@@ -24,7 +25,7 @@ from ..util.urls import ONLYFANS_CHAT_URL
 # maybe just take a break and come back and rework the user class into this new webdriver class more cleanly
 
 
-def message(browser, message_object={}):
+def message(message_object={}):
 
     """
     Complete the various components of sending a message to a user.
@@ -40,6 +41,7 @@ def message(browser, message_object={}):
         Whether or not the message was successful
     """
 
+    browser = Driver.get_browser()
     Settings.print("Entering message: (${}) {}".format(message_object["price"], message_object["text"]))
     try:
         for recipient in message_object['recipients']:

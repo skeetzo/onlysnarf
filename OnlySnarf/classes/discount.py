@@ -1,8 +1,8 @@
-from ..lib.driver import Driver
-from ..util.settings import Settings
+
 from .user import User
-##
 from ..util.defaults import DISCOUNT_MAX_AMOUNT, DISCOUNT_MIN_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_MONTHS
+from ..util.settings import Settings
+from ..webdriver import discount_user
 
 class Discount:
 
@@ -28,7 +28,7 @@ class Discount:
         """
 
         Settings.maybe_print("discounting: {}".format(self.username))
-        return Driver.discount_user(self.get())
+        return discount_user(self.get())
 
     def is_valid(self):
         if self.amount and self.months and self.username:
@@ -144,6 +144,6 @@ class Discount:
             self.username = user.username
             print("Grandfathering: {}".format(self.username))
             try:
-                Driver.get_driver().discount_user(discount=self)
+                discount_user(discount=self)
             except Exception as e:
                 print(e)

@@ -1,9 +1,11 @@
-#!/usr/bin/python3
+# TODO: update all of this
+
 # Profile Settings
+
 import json
 import inquirer
-##
-from ..lib.driver import Driver
+
+# from ..lib.driver import Driver
 from ..util.settings import Settings
 from .user import User
 

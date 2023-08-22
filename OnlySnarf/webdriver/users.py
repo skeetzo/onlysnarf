@@ -1,4 +1,5 @@
 
+from .driver import Driver
 from .goto import go_to_home, go_to_page
 from .message import message_user
 from ..util.settings import Settings
@@ -108,7 +109,8 @@ def get_users_at_page(browser, page):
         Settings.err_print(f"failed to find {class_name}!")
     return users
 
-def get_users_by_type(browser, isFan=True, isFollowing=False):
+def get_users_by_type(isFan=True, isFollowing=False):
+    browser = Driver.get_browser()
     users = []
     if isFan:
         users.extend(get_users_at_page(browser, ONLYFANS_USERS_ACTIVE_URL))

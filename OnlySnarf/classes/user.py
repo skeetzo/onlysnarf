@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from ..util.colorize import colorize
 from ..lib.driver import Driver
 from ..util.settings import Settings
+from ..webdriver import get_recent_chat_users, get_userid_by_username, get_username_by_id, message, read_user_messages
 
 ALREADY_RANDOMIZED_USERS = []
 
@@ -120,7 +121,7 @@ class User:
         """
 
         if self.user_id: return self.user_id
-        self.user_id = Driver.get_userid_by_username(self.get_username())
+        self.user_id = get_userid_by_username(self.get_username())
         return self.user_id
 
     def get_username(self):
@@ -134,7 +135,8 @@ class User:
         """
 
         if self.username: return self.username
-        self.username = Driver.get_username_by_id(self.get_id())
+        # TODO: doesn't actually work / do anything
+        self.username = get_username_by_id(self.get_id())
         return self.username
 
     def message(self, message):
@@ -157,7 +159,7 @@ class User:
             Settings.print("messaging user (id): {} ({}) - \"{}\"".format(self.username, self.user_id, message["text"]))
         else:
             Settings.print("messaging user: {} - \"{}\"".format(self.username, message["text"]))
-        if not Driver.message(self.username, user_id=self.user_id): return False
+        if not message(self.username, user_id=self.user_id): return False
         return self.message_send(message)
 
     def messages_read(self):
@@ -170,7 +172,7 @@ class User:
         # self.messages = messages
         # self.messages_received = messages_received
         # self.messages_sent = messages_sent
-        self.messages, self.messages_received, self.messages_sent = Driver.read_user_messages(self.username, user_id=self.user_id)
+        self.messages, self.messages_received, self.messages_sent = read_user_messages(self.username, user_id=self.user_id)
         # self.messages_and_timestamps = messages[1]
         Settings.maybe_print("chat read!")
 
@@ -265,7 +267,7 @@ class User:
         if Settings.is_prefer_local():
             users = User.read_users_local()
         if len(users) == 0:
-            for user in Driver.users_get():
+            for user in get_users_by_type(isFan=True):
                 if user is None: continue
                 users.append(User(user))
         Settings.maybe_print("users: {}".format(len(users)))
@@ -312,7 +314,7 @@ class User:
             users = User.read_following_local()
             if len(users) > 0: return users
         users = []
-        for user in Driver.following_get():
+        for user in get_users_by_type(isFollowing=True):
             user = User(user)
             users.append(user)
         Settings.maybe_print("following: {}".format(len(users)))
@@ -448,7 +450,7 @@ class User:
         """
         Settings.dev_print("getting recent users from messages...")
         users = []
-        for user in Driver.messages_scan():
+        for user in get_recent_chat_users():
             users.append(User({"id":user}))
         return users
 
