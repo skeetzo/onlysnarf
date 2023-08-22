@@ -41,12 +41,13 @@ class MessagesSchema(Schema):
 class User:
     """OnlyFans users."""
 
-    def __init__(self, username):
+    def __init__(self, username, user_id, messages, start_date):
         """User object"""
 
         self.username = str(username).replace("@","")
-        self.user_id = None
-
+        self.user_id = user_id
+        self.messages = message
+        self.start_date = start_date
 
         # TODO: check that code doesn't actually rely on any of this and uses getters/setters to update the messages and sent_files etc
         # data = json.loads(json.dumps(data))
@@ -77,23 +78,6 @@ class User:
         result = schema.dump(self)
         # pprint(result, indent=2)
         return result
-
-    def toJSON(self):
-        """
-        Dumps relevant user data to JSON.
-        """
-
-        return json.dumps({
-            "name":str(self.name),
-            "username":str(self.username),
-            "id":str(self.user_id),
-            "messages_parsed":str(self.messages_parsed),
-            "messages_sent":str(self.messages_sent),
-            "messages_received":str(self.messages_received),
-            "messages":str(self.messages),
-            "sent_files":str(self.sent_files),
-            "isFavorite":str(self.isFavorite)
-        })
 
     def equals(self, user):
         """
@@ -218,7 +202,7 @@ class User:
         return False
 
     def update(self, user):
-        for key, value in json.loads(user.toJSON()).items():
+        for key, value in json.loads(user.dump()).items():
             # Settings.print("updating: {} = {}".format(key, value))
             setattr(self, str(key), value)
 
@@ -652,7 +636,7 @@ class User:
         data = {}
         data['users'] = []
         for user in users:
-            data['users'].append(user.toJSON())
+            data['users'].append(user.dump())
         try:
             with open(str(Settings.get_users_path()), 'w') as outfile:  
                 json.dump(data, outfile, indent=4, sort_keys=True)
@@ -677,7 +661,7 @@ class User:
         data = {}
         data['users'] = []
         for user in users:
-            data['users'].append(user.toJSON())
+            data['users'].append(user.dump())
         try:
             with open(str(Settings.get_users_path().replace("users.json", "following.json")), 'w') as outfile:  
                 json.dump(data, outfile, indent=4, sort_keys=True)

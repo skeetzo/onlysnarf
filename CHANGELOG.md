@@ -754,11 +754,13 @@
 - restructure snarf "class" & method of interfacing with general behavior
 - more driver cleanup and updates to rounding out codebase
 - added list of default urls in .utils
+- removal of elements mess (finally)
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
+- finish user messaging process
 - finish and test marshmallow updates to User class
 
 - finish updates to codebase
