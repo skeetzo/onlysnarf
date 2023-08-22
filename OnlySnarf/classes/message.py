@@ -6,13 +6,30 @@ from re import sub
 from .file import File, Folder
 from .poll import Poll
 from .schedule import Schedule
+from ..util.defaults import PRICE_MAXIMUM, PRICE_MINIMUM
 from ..util.settings import Settings
 from ..util.webdriver import message, post
+
+from marshmallow import Schema, fields, validate, post_load
+
+# https://marshmallow.readthedocs.io/en/stable/
+class MessageSchema(Schema):
+    text = fields.Str()
+    files = fields.List(fields.Str())
+    keywords = fields.List(fields.Str())
+    performers = fields.List(fields.Str())
+    price = fields.Float(validate=validate.Range(min=PRICE_MINIMUM, max=PRICE_MAXIMUM))
+    schedule = fields.Str()
+    recipients = fields.List(fields.Str())
+
+    @post_load
+    def make_message(self, data, **kwargs):
+        return Message(**data)
 
 class Message():
     """OnlyFans message (and post) class"""
 
-    def __init__(self, recipients=[]):
+    def __init__(self, files, keywords, performers, price, recipients, schedule, text):
         """
         OnlyFans message and post object
 
@@ -20,14 +37,25 @@ class Message():
 
         """
 
-        # universal message variables
-        self.text = ""
-        self.files = []
-        self.performers = []
-        self.price = 0 # $3 - $100
-        self.keywords = []
+        self.files = files
+        self.keywords = keywords
+        self.performers = performers
+        self.price = price
         self.recipients = recipients
+        self.schedule = schedule        
+        self.text = text
         self.__initialized__ = False
+
+    @staticmethod
+    def create_message(message_data):
+        schema = MessageSchema()
+        return schema.load(message_data)
+
+    def dump(self):
+        schema = MessageSchema()
+        result = schema.dump(self)
+        # pprint(result, indent=2)
+        return result
 
     def init(self):
         """Initialize."""
@@ -314,6 +342,8 @@ class Message():
         text = self.update_keywords(text)
         return text
 
+    def on_success(self):
+
     def send(self):
         """
         Sends this message.
@@ -326,8 +356,11 @@ class Message():
 
         """
 
-        self.init()
-        return message(self.get_message())        
+        try:
+            self.init()
+            return message(self.get_message())        
+        finally:
+            self.on_success()
 
 class Post(Message):
     """OnlyFans message (and post) class"""
@@ -344,7 +377,6 @@ class Post(Message):
         super().__init__(self)
         self.expiration = 0
         self.poll = None
-        self.schedule = None
 
     # def __str__(self):
     #     return "fooPost"

@@ -326,52 +326,53 @@ class Settings:
     def get_profile_method():
         return config["profile_method"] or None
 
-    def get_date():
-        try:
-            config["date"] = Settings.format_date(config["date"])
-            if str(config["date"]) == DEFAULT.DATE and str(config["schedule"]) != DEFAULT.SCHEDULE and str(config["schedule"] != "None"):
-                if isinstance(config["schedule"], str):
-                    config["date"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT).date().strftime(DEFAULT.DATE_FORMAT)
-                else:
-                    config["date"] = config["schedule"].date().strftime(DEFAULT.DATE_FORMAT)
-                config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
-            else:
-                config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
-            config["date"] = config["date"].strftime(DEFAULT.DATE_FORMAT)    
-        except Exception as e:
-            config["date"] = datetime.strptime(DEFAULT.DATE, DEFAULT.DATE_FORMAT)
-        Settings.maybe_print("date (settings): {}".format(str(config["date"])[:10]))
-        return str(config["date"])[:10]
+    # TODO: finish moving these to Schedule class
+    # def get_date():
+    #     try:
+    #         config["date"] = Settings.format_date(config["date"])
+    #         if str(config["date"]) == DEFAULT.DATE and str(config["schedule"]) != DEFAULT.SCHEDULE and str(config["schedule"] != "None"):
+    #             if isinstance(config["schedule"], str):
+    #                 config["date"] = datetime.strptime(config["schedule"], DEFAULT.SCHEDULE_FORMAT).date().strftime(DEFAULT.DATE_FORMAT)
+    #             else:
+    #                 config["date"] = config["schedule"].date().strftime(DEFAULT.DATE_FORMAT)
+    #             config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
+    #         else:
+    #             config["date"] = datetime.strptime(str(config["date"]), DEFAULT.DATE_FORMAT)
+    #         config["date"] = config["date"].strftime(DEFAULT.DATE_FORMAT)    
+    #     except Exception as e:
+    #         config["date"] = datetime.strptime(DEFAULT.DATE, DEFAULT.DATE_FORMAT)
+    #     Settings.maybe_print("date (settings): {}".format(str(config["date"])[:10]))
+    #     return str(config["date"])[:10]
 
-    def get_time():
-        try:
-            config["time"] = Settings.format_time(config["time"])        
-            if (str(config["time"]) == DEFAULT.TIME or str(config["time"]) == DEFAULT.TIME_NONE) and str(config["schedule"]) != DEFAULT.SCHEDULE and str(config["schedule"]) != "None":
-                Settings.dev_print("time from schedule")
-                date = datetime.strptime(str(config["schedule"]), DEFAULT.SCHEDULE_FORMAT)
-                config["time"] = datetime.strptime(str(date.time().strftime(DEFAULT.TIME_FORMAT)), DEFAULT.TIME_FORMAT)
-            else:
-                Settings.dev_print("time from config")
-                config["time"] = datetime.strptime(str(config["time"]), DEFAULT.TIME_FORMAT)
-            config["time"] = config["time"].strftime(DEFAULT.TIME_FORMAT)
-        except Exception as e:
-            config["time"] = datetime.strptime(DEFAULT.TIME, DEFAULT.TIME_FORMAT).strftime(DEFAULT.TIME_FORMAT)
-        Settings.maybe_print("time (settings): {}".format(str(config["time"])[:9]))
-        return str(config["time"])[:9]
+    # def get_time():
+    #     try:
+    #         config["time"] = Settings.format_time(config["time"])        
+    #         if (str(config["time"]) == DEFAULT.TIME or str(config["time"]) == DEFAULT.TIME_NONE) and str(config["schedule"]) != DEFAULT.SCHEDULE and str(config["schedule"]) != "None":
+    #             Settings.dev_print("time from schedule")
+    #             date = datetime.strptime(str(config["schedule"]), DEFAULT.SCHEDULE_FORMAT)
+    #             config["time"] = datetime.strptime(str(date.time().strftime(DEFAULT.TIME_FORMAT)), DEFAULT.TIME_FORMAT)
+    #         else:
+    #             Settings.dev_print("time from config")
+    #             config["time"] = datetime.strptime(str(config["time"]), DEFAULT.TIME_FORMAT)
+    #         config["time"] = config["time"].strftime(DEFAULT.TIME_FORMAT)
+    #     except Exception as e:
+    #         config["time"] = datetime.strptime(DEFAULT.TIME, DEFAULT.TIME_FORMAT).strftime(DEFAULT.TIME_FORMAT)
+    #     Settings.maybe_print("time (settings): {}".format(str(config["time"])[:9]))
+    #     return str(config["time"])[:9]
 
-    def get_schedule():
-        schedule = ""
-        try:
-            schedule = config["schedule"]
-            if str(schedule) == "None": schedule = DEFAULT.SCHEDULE
-            if str(schedule) == DEFAULT.SCHEDULE:
-                schedule = datetime.strptime(schedule, DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
-            elif not isinstance(schedule, str):
-                schedule = schedule.strftime(DEFAULT.SCHEDULE_FORMAT)
-        except Exception as e:
-            schedule = datetime.strptime("{} {}".format(Settings.get_date(), Settings.get_time()), DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
-        Settings.maybe_print("schedule (settings): {}".format(schedule))
-        return str(schedule)[:20] # must be less than 19 characters
+    # def get_schedule():
+    #     schedule = ""
+    #     try:
+    #         schedule = config["schedule"]
+    #         if str(schedule) == "None": schedule = DEFAULT.SCHEDULE
+    #         if str(schedule) == DEFAULT.SCHEDULE:
+    #             schedule = datetime.strptime(schedule, DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
+    #         elif not isinstance(schedule, str):
+    #             schedule = schedule.strftime(DEFAULT.SCHEDULE_FORMAT)
+    #     except Exception as e:
+    #         schedule = datetime.strptime("{} {}".format(Settings.get_date(), Settings.get_time()), DEFAULT.SCHEDULE_FORMAT).strftime(DEFAULT.SCHEDULE_FORMAT)
+    #     Settings.maybe_print("schedule (settings): {}".format(schedule))
+    #     return str(schedule)[:20] # must be less than 19 characters
 
     def get_keywords():
         keywords = []

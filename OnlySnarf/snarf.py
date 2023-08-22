@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 
-import logging
-logger = logging.getLogger('snarf_logger')
-
+# import logging
+# logger = logging.getLogger('snarf_logger')
 
 from .classes.discount import Discount
 from .classes.message import Message, Post
@@ -16,16 +15,16 @@ from .util.args import args as ARGS
 from .util.config import get_config, apply_args
 from .util.settings import Settings
 
-def api():
-    API.main()
+def api(config={}):
+    API.main(config)
 
-def config():
-    Config.main()
+def config(config={}):
+    Config.main(config)
 
-def menu():
-    Menu.main()
+def menu(config={}):
+    Menu.main(config)
 
-def discount():
+def discount(config={'user':None,'users':[]}):
 
     """
     Applies a discount to users as provided from args / prompts.
@@ -33,17 +32,10 @@ def discount():
 
     """
 
-    try:
-        successful = []
-        for user in Settings.get_users():
-            Settings.print("> Discounting fan: {}".format(user.username))
-            discount = Discount(user.username)
-            successful.append(discount.apply())
-        return all(successful)
-    except Exception as e: Settings.dev_print(e)
-    return False
+    Settings.print("Beginning discount process...")
+    return create_discount(config).apply()
 
-def message():
+def message(config={'user':None,'users':[]}):
 
     """
     Sends the configured message from args / prompts.
@@ -51,17 +43,10 @@ def message():
     
     """
 
-    try:
-        successful = []
-        for user in Settings.get_users():
-            Settings.print("> Messaging fan: {}".format(user.username))
-            message = Message(user.username)
-            successful.append(message.send(user.username, user_id=user.id))
-        return all(successful)
-    except Exception as e: Settings.dev_print(e)
-    return False
+    Settings.print("Beginning message process...")
+    return create_message(config).send()
             
-def post():
+def post(config={'text':"",'input':[]}):
 
     """
     Posts the configured text from args / prompts.
@@ -69,12 +54,11 @@ def post():
     
     """
 
-    post = Post()
-    try: return post.send()
-    except Exception as e: Settings.dev_print(e)
-    return False
+    Settings.print("Beginning post process...")
+    return create_post(config).send()
 
-def profile():
+# TODO: update this
+# def profile():
 
     """
     Runs the profile method specified at runtime.
@@ -89,18 +73,19 @@ def profile():
 
     """
 
-    profile = Profile()
-    try: 
-        # get profile method
-        method = Settings.get_profile_method()
-        if method == "backup": return Profile.backup_content()
-        elif method == "syncfrom": return Profile.sync_from_profile()
-        elif method == "syncto": return Profile.sync_to_profile()
-        else: Settings.err_print("Missing Profile Method")
-    except Exception as e: Settings.dev_print(e)
-    return False
+    # profile = Profile()
+    # try: 
+    #     # get profile method
+    #     method = Settings.get_profile_method()
+    #     if method == "backup": return Profile.backup_content()
+    #     elif method == "syncfrom": return Profile.sync_from_profile()
+    #     elif method == "syncto": return Profile.sync_to_profile()
+    #     else: Settings.err_print("Missing Profile Method")
+    # except Exception as e: Settings.dev_print(e)
+    # return False
     
-def promotion():
+# TODO: update this
+# def promotion():
 
     """
     Runs the promotion method specified at runtime.
@@ -115,18 +100,18 @@ def promotion():
 
     """
 
-    try: 
-        # get promotion method
-        method = Settings.get_promotion_method()
-        if method == "campaign": return Promotion.create_campaign()
-        elif method == "trial": return Promotion.create_trial_link()
-        elif method == "user": return Promotion.apply_to_user()
-        elif method == "grandfather": return Promotion.grandfathered()
-        else: Settings.err_print("Missing Promotion Method")
-    except Exception as e: Settings.dev_print(e)
-    return False
+    # try: 
+    #     # get promotion method
+    #     method = Settings.get_promotion_method()
+    #     if method == "campaign": return Promotion.create_campaign()
+    #     elif method == "trial": return Promotion.create_trial_link()
+    #     elif method == "user": return Promotion.apply_to_user()
+    #     elif method == "grandfather": return Promotion.grandfathered()
+    #     else: Settings.err_print("Missing Promotion Method")
+    # except Exception as e: Settings.dev_print(e)
+    # return False
 
-def users():
+def users(config={'prefer_local':False}):
 
     """
     Scan users.
@@ -135,8 +120,7 @@ def users():
     """
 
     try:
-        Settings.set_prefer_local(False)
-        User.get_all_users()
+        User.get_all_users(prefer_local=config.prefer_local)
         return True
     except Exception as e: Settings.dev_print(e)
     return False
@@ -148,9 +132,9 @@ def users():
 def main(args={}, config=None):
     try:
         if not config: config = get_config()
-        if args: apply_args(args)
+        if args: apply_args(args, config)
         Settings.print("Running - {}".format(ARGS.action))
-        eval(f"{ARGS.action}()")
+        eval(f"{ARGS.action}(config)")
     except Exception as e:
         Settings.err_print(e)
         Settings.print("shnarf??")

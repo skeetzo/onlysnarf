@@ -6,18 +6,35 @@ from .user import User
 ##
 from .file import File, Folder
 
+class PollSchema(Schema):
+    duration = fields.Int(validate=validate.Range(min=1))
+    questions = fields.List(fields.Str())
+
+    @post_load
+    def make_poll(self, data, **kwargs):
+        return Poll(**data)
+
 class Poll:
     """OnlyFans Poll class"""
 
-    def __init__(self):
+    def __init__(self, duration, questions):
         """OnlyFans Poll object"""
 
         # duration of poll
-        self.duration = None
+        self.duration = duration
         # list of strings
-        self.questions = []
-        # prevents double prompts
-        self.gotten = False
+        self.questions = questions
+
+    @staticmethod
+    def create_poll(poll_data):
+        schema = PollSchema()
+        return schema.load(poll_data)
+
+    def dump(self):
+        schema = PollSchema()
+        result = schema.dump(self)
+        # pprint(result, indent=2)
+        return result
 
     def get(self):
         """

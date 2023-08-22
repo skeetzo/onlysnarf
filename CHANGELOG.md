@@ -755,60 +755,51 @@
 - more driver cleanup and updates to rounding out codebase
 - added list of default urls in .utils
 - removal of elements mess (finally)
+- looked into Marshmellow package for class / object cleanup and expanded from User to other classes
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- finish user messaging process
-- finish and test marshmallow updates to User class
-
-- finish updates to codebase
-- cleanup maybe_ & dev_  & err_ prints
-- finishes updates to logging process
-
-
-- test updates to webdriver 
-
-
-- test scan.py for final touches
-
-- finish scan.py
-- test dropbox scripts on rpi
-- test upload script on android
-
+(update)
+- ensure that config / arg variables properly affect processes / finish updating their removal references from Settings
+- update / check how exiration, poll, schedule interact with post&message
 - update adding uploads to being able to set previews to messages
-- add process to clear upload/download space
+- update 'snarf config' command to properly interact with main config file and variables
 
-
-- add cli args for config to autoconfigure more easily
-- update 'snarf config' to interact with main config file and variables
-
-- look into Marshmellow package for class / object cleanup
-
-
-- add smart idea for getting statement information
-- add better version notes to readme's list of "works on"
-- re-add stuff for testing on multiple platforms ala mac ;) 
-
+(cleanup)
 - double check how tags & performers are implemented in config and text config and then re-add to docs
+- cleanup maybe_ & dev_  & err_ prints
+- add better version notes to readme's list of "works on"
 
+(finish)
+- finish updates to codebase
+- finish and test marshmallow updates to classes
+- finish message ability to add_user_to_message
+- finish updates to logging process
+- finish scan.py
 - finish updating image/video downloading
 - finish updating cli menu functionality
 - finish updating profile class & menu
 
-- add bypass for 2fa
-https://www.geeksforgeeks.org/two-factor-authentication-using-google-authenticator-in-python/
-https://stackoverflow.com/questions/55870489/how-to-handle-google-authenticator-with-selenium
-https://stackoverflow.com/questions/8529265/google-authenticator-implementation-in-python
+------------------------------------------------------------------------------------
 
-(review usability and code first)
--> OnlyFans: Promos
+-> OnlyFans
+- add process to clear upload/download space
+- add cli args for config to autoconfigure more easily
+- add smart idea for getting statement information
+--
+- add quiz & price target interactions (missing onlyfans buttons)
+- add functionality that follows profiles that are free for a month
+- update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
+- update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
+
+-> OnlyFans: Promos (review usability and code first)
 - clean up / fix & test
 - add min/max to args & validators
 - re-enable / add promo subcommands and config variables
 
--> OnlyFans: Profile
+-> OnlyFans: Profile (review usability and code first)
 - new - setup - Twitter -> profile, banner; Price and Settings
 - new - advertise
 - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
@@ -816,12 +807,6 @@ https://stackoverflow.com/questions/8529265/google-authenticator-implementation-
 - add config for profile templates when testing profile features again
 - add tests for profile integration / behavior
 - re-enable / add profile subcommands and config variables
-
--> OnlyFans
-- add quiz & target interactions (onlyfans buttons)
-- add functionality that follows profiles that are free for a month
-- update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
-- update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
 
 (once everything else in app works again)
 - run new auth tests w/ appropriately connected accounts
@@ -835,6 +820,13 @@ https://stackoverflow.com/questions/8529265/google-authenticator-implementation-
 -- keep track of tweets (somehow)
 
 -> Tests
+- test updates to webdriver 
+- test scan.py for final touches
+- test dropbox scripts on rpi
+- test upload script on android
+- test user messaging processes: all fans, recent, favorite, renew, bookmarks, random
+- re-add stuff for testing on multiple platforms ala mac ;) 
+--
 - separate driver functions into individual components ala schedule --> individual steps; for easier testing (and to clean up the giant ass driver file)
 - add tests for newly separated driver files / functions
 - add tests for additional config variables such as browser and image/video options, limits
@@ -853,6 +845,12 @@ https://stackoverflow.com/questions/8529265/google-authenticator-implementation-
 - re-enable prompting for discount amount&months in Settings or somewhere else (at some point)
 - re-add removed user select code in notes/selectstuff.py (for menu prompts)
 - re-enable menu command
+
+(probably never)
+- add bypass for 2fa
+https://www.geeksforgeeks.org/two-factor-authentication-using-google-authenticator-in-python/
+https://stackoverflow.com/questions/55870489/how-to-handle-google-authenticator-with-selenium
+https://stackoverflow.com/questions/8529265/google-authenticator-implementation-in-python
 
 ## Fix / Debug
 

@@ -2,19 +2,42 @@
 from .user import User
 from ..util.defaults import DISCOUNT_MAX_AMOUNT, DISCOUNT_MIN_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_MONTHS
 from ..util.settings import Settings
-from ..webdriver import discount_user
+from ..webdriver import discount_user as WEBDRIVER_discount_user
+
+from marshmallow import Schema, fields, validate, post_load
+
+# https://marshmallow.readthedocs.io/en/stable/
+class DiscountSchema(Schema):
+    amount = fields.Int(required=True, error_messages={"required": "Amount is required."}, validate=validate.Range(min=DISCOUNT_MIN_AMOUNT, max=DISCOUNT_MAX_AMOUNT))
+    months = fields.Int(required=True, error_messages={"required": "Months is required."}, validate=validate.Range(min=DISCOUNT_MIN_MONTHS, max=DISCOUNT_MAX_MONTHS))
+    username = fields.Str(required=True, error_messages={"required": "Username is required."}, validate=validate.Length(min=4))
+
+    @post_load
+    def make_discount(self, data, **kwargs):
+        return Discount(**data)
 
 class Discount:
 
     """OnlyFans discount class"""
 
-    def __init__(self, username, amount=None, months=None):
+    def __init__(self, amount, months, username):
 
         """OnlyFans discount action."""
 
         self.amount = amount
         self.months = months
         self.username = username # the recipient username
+
+    @staticmethod
+    def create_discount(discount_data):
+        schema = DiscountSchema()
+        return schema.load(discount_data)
+
+    def dump(self):
+        schema = DiscountSchema()
+        result = schema.dump(self)
+        # pprint(result, indent=2)
+        return result
 
     def apply(self):
 
@@ -28,7 +51,7 @@ class Discount:
         """
 
         Settings.maybe_print("discounting: {}".format(self.username))
-        return discount_user(self.get())
+        return WEBDRIVER_discount_user(self.get())
 
     def is_valid(self):
         if self.amount and self.months and self.username:

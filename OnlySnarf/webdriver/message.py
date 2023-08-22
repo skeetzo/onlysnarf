@@ -149,7 +149,7 @@ def message_bookmarks(browser, exclude=False):
     return False
 
 def message_random(browser):
-    username = User.get_random_user().username
+    username = get_random_user().username
     return message_user_by_username(browser, username)
 
 # TODO: finish and test this functionality of mass messaging
