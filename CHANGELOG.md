@@ -745,11 +745,15 @@
   - a lot of reorg
   - beginning of logging rework
   - beginning of args/config rework / fix
-**4.6.6 : 8/18/2023**
-- updates to scan
-- updates to webdriver/discount
-**8/19/2023, 8/20/2023, 8/21/2023**
-- more driver cleanup
+  **4.6.6 : 8/18/2023**
+  - updates to scan
+  - updates to webdriver/discount
+  **8/19/2023, 8/20/2023, 8/21/2023**
+  - more driver cleanup
+**4.6.7 : 8/22/2023**
+- restructure snarf "class" & method of interfacing with general behavior
+- more driver cleanup and updates to rounding out codebase
+- added list of default urls in .utils
 
 ------------------------------------------------------------------------------------
 
@@ -761,7 +765,6 @@
 - cleanup maybe_ & dev_  & err_ prints
 - finishes updates to logging process
 
-- restructure snarf "class" & method of interfacing with general behavior
 
 - test updates to webdriver 
 

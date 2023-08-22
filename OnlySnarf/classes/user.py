@@ -24,12 +24,10 @@ class UserSchema(Schema):
     messages = fields.Nested(MessagesSchema(), dump_only=True)
 
     sent_files = fields.List(fields.Str())
-
     start_date = fields.DateTime()
 
     # email = fields.Email()
     # created_at = fields.DateTime()
-
 
     @post_load
     def make_user(self, data, **kwargs):
@@ -168,7 +166,7 @@ class User:
         """
 
         Settings.print("reading user chat: {} ({})".format(self.username, self.user_id))
-        # messages, messages_received, messages_sent = Driver.read_user_messages(self.username, user_id=self.user_id)
+        # messages, messages_received, messages_sent = read_user_messages(self.username, user_id=self.user_id)
         # self.messages = messages
         # self.messages_received = messages_received
         # self.messages_sent = messages_sent
@@ -531,9 +529,10 @@ class User:
         """
         Settings.maybe_print("getting users by list: {} - {}".format(number, name))
         listUsers = []
-        for user in Driver.get_list(number=number, name=name):
-            Settings.maybe_print("user: {}".format(user.username))
-            listUsers.append(user)
+        # TODO: finish lists
+        # for user in Driver.get_list(number=number, name=name):
+        #     Settings.maybe_print("user: {}".format(user.username))
+        #     listUsers.append(user)
         return listUsers
 
     @staticmethod

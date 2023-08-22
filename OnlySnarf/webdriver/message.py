@@ -12,18 +12,14 @@ from selenium.common.exceptions import TimeoutException
 from .element import find_element_to_click
 from .driver import Driver
 from .goto import go_to_home, go_to_page
+from .upload import upload_files
+from ..classes.user import User
 from ..util.settings import Settings
-from ..util.urls import ONLYFANS_CHAT_URL
+from ..util.urls import ONLYFANS_CHAT_URL, ONLYFANS_NEW_MESSAGE_URL
 
 ####################
 ##### Messages #####
 ####################
-
-
-## TODO: I don't think i want to have the code here for user -> send message
-# because it would make it difficult to run per user and save information directly back to each user
-# maybe just take a break and come back and rework the user class into this new webdriver class more cleanly
-
 
 def message(message_object={}):
 
@@ -42,79 +38,124 @@ def message(message_object={}):
     """
 
     browser = Driver.get_browser()
-    Settings.print("Entering message: (${}) {}".format(message_object["price"], message_object["text"]))
     try:
-        for recipient in message_object['recipients']:
-        message_username(browser, recipient)
-        if all([message_text(browser, message_object["text"]), message_price(browser, message_object["price"]), upload_files(browser, message_object["files"])]):
-            return message_confirm(browser)
+        Settings.print(f"Entering message to {message_object["recipients"]}: (${message_object["price"]}) {message_object["text"]}")
+        successful = []
+        if message_object["includes"] or message_object["excludes"]:
+            # if not messaging a user directly, all these can be stacked in a single message
+            for label in message_object['includes']:
+                if str(label).lower() == "all" or str(label).lower() == "fans": successful.append(message_fans(browser))
+                if str(label).lower() == "recent": successful.append(message_recent(browser))
+                if str(label).lower() == "favorite": successful.append(message_favorites(browser))
+                if str(label).lower() == "renew on": successful.append(message_renewers(browser))
+                if str(label).lower() == "renew off": successful.append(message_renewers(browser, on=False))
+                if str(label).lower() == "bookmarks": successful.append(message_bookmarks(browser))
+                if str(label).lower() == "random": successful.append(message_random(browser))
+            for label in message_object["excluded_recipients"]:
+                if str(label).lower() == "all" or str(label).lower() == "fans": successful.append(message_fans(browser, exclude=True))
+                if str(label).lower() == "recent": successful.append(message_recent(browser, exclude=True))
+                if str(label).lower() == "favorite": successful.append(message_favorites(browser, exclude=True))
+                if str(label).lower() == "renew on": successful.append(message_renewers(browser, exclude=True))
+                if str(label).lower() == "renew off": successful.append(message_renewers(browser, exclude=True, on=False))
+                if str(label).lower() == "bookmarks": successful.append(message_bookmarks(browser, exclude=True))
+                if str(label).lower() == "random": successful.append(message_random(browser, exclude=True))
+            # use same page to add additional users to message 
+            for username in message_object["recipients"]:
+                successful.append(add_user_to_message(browser, username))
+        else:
+            # if none of the above have been run, switch to normal user messaging (locates user_id on profile page and opens url link)
+            successful.append(message_user_by_username(browser, username))
+        if not all(successful): raise Exception(f"Failed to message {message_object["recipients"]}!")
+        successful.append(all([message_text(browser, message_object["text"]), message_price(browser, message_object["price"]), upload_files(browser, message_object["files"]), message_confirm(browser)]))
+        return all(successful)
     except Exception as e:
-        Settings.dev_print(e)
+        Settings.err_print(e)
+    message_clear(browser)
     Settings.err_print("Message failed to send!")
     return False
 
-def message_username(browser, username, user_id=None):
-    """
-    Start a message to the username (or group of users) or user_id.
-
-    Parameters
-    ----------
-    username : str
-        The username of the user to message
-    user_id : str
-        The user id of the user to message
-
-    Returns
-    -------
-    bool
-        Whether or not the message was successful
-
-    """
-
-    if not username and not user_id:
-        Settings.err_print("missing user to message!")
-        return False
+# TODO: test all these added behaviors
+def message_fans(browser, exclude=False):
     try:
-        go_to_home(browser, force=True)
-        Settings.dev_print("attempting to message {}...".format(username))
-        # if the username is a key string it will behave differently
-        if str(username).lower() == "all": return message_all(browser)
-        elif str(username).lower() == "recent": return message_recent(browser)
-        elif str(username).lower() == "favorite": return message_favorite(browser)
-        elif str(username).lower() == "renew on": return message_renewers(browser)
-        elif str(username).lower() == "random": return message_random(browser)
-        else: return message_user_by_username(browser, username, user_id=user_id)
-        # if successful: Settings.dev_print("started message for {}".format(username))
-        # else: Settings.warn_print("failed to start message for {}!".format(username))
-        # return successful
+        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        Settings.dev_print("clicking message recipients: fans")
+        find_element_to_click(browser, "b-tabs__nav__text", text="Fans", fuzzyMatch=True, index=1 if exclude else 0).click()
+        return True
     except Exception as e:
-        Driver.error_checker(e)
-        Settings.err_print("failure to message - {}".format(username))
+        Setings.dev_print("unable to message all fans!")
     return False
- 
-# TODO: add these behaviors
-def message_all(browser):
-    pass
 
-def message_recent(browser):
-        
-        # successful = False
-        # if type__ != None:
-        #     driver.go_to_page(ONLYFANS_NEW_MESSAGE_URL)
-        #     Settings.dev_print("clicking message type: {}".format(username))
-        #     driver.find_element_to_click(type__).click()
-        #     successful = True
-    pass
+def message_recent(browser, exclude=False):
+    try:
+        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        Settings.dev_print("clicking message recipients: recent")
+        find_element_to_click(browser, "b-tabs__nav__text", text="Recent", fuzzyMatch=True, index=1 if exclude else 0).click()
 
-def message_favorite(browser):
-    pass
+        # TODO: add method for interacting with popup calendar for selecting date for recent subscribers
 
-def message_renewers(browser):
-    pass
+        return True
+    except Exception as e:
+        Setings.dev_print("unable to message all recent!")
+    return False
+
+def message_following(browser, exclude=False):
+    try:
+        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        Settings.dev_print("clicking message recipients: following")
+        find_element_to_click(browser, "b-tabs__nav__text", text="Following", fuzzyMatch=True, index=1 if exclude else 0).click()
+        return True
+    except Exception as e:
+        Setings.dev_print("unable to message all following!")
+    return False
+
+def message_favorites(browser, exclude=False):
+    try:
+        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        Settings.dev_print("clicking message recipients: favorites")
+        find_element_to_click(browser, "b-tabs__nav__text", text="Favorites", index=1 if exclude else 0).click()
+        return True
+    except Exception as e:
+        Setings.dev_print("unable to message all favorites!")
+    return False
+
+def message_friends(browser, exclude=False):
+    try:
+        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        Settings.dev_print("clicking message recipients: friends")
+        find_element_to_click(browser, "b-tabs__nav__text", text="Friends", index=1 if exclude else 0).click()
+        return True
+    except Exception as e:
+        Setings.dev_print("unable to message all friends!")
+    return False
+
+def message_renewers(browser, exclude=False, on=True):
+    try:
+        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        Settings.dev_print(f"clicking message recipients: renew ({on})")
+        find_element_to_click(browser, "b-tabs__nav__text", text="Renew On" if on else "Renew Off", index=1 if exclude else 0).click()
+        return True
+    except Exception as e:
+        Setings.dev_print("unable to message all renewals!")
+    return False
+
+def message_bookmarks(browser, exclude=False):
+    try:
+        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        Settings.dev_print(f"clicking message recipients: bookmarks")
+        find_element_to_click(browser, "b-tabs__nav__text", text="Bookmarks", index=1 if exclude else 0).click()
+        return True
+    except Exception as e:
+        Setings.dev_print("unable to message all bookmarks!")
+    return False
 
 def message_random(browser):
-    from ..classes.user import User
     username = User.get_random_user().username
+    return message_user_by_username(browser, username)
+
+# TODO: finish and test this functionality of mass messaging
+# add username to existing mass message being started
+def add_user_to_message(browser, username):
+    pass
 
 ######################################################################
 ######################################################################
@@ -177,17 +218,16 @@ def message_confirm(browser):
         # TODO: switch to regular type after extra debugging
         if str(Settings.is_debug()) == "True":
             Settings.print('skipping message (debug)')
-            message_clear(browser)
-            return True
+            return message_clear(browser)
         Settings.dev_print("clicking confirm...")
         confirm.click()
         Settings.print('OnlyFans message sent!')
         return True
     except TimeoutException:
-        Settings.warn_print("timed out waiting for message confirm!")
+        Settings.err_print("Timed out waiting for message confirm!")
     except Exception as e:
         Driver.error_checker(e)
-        Settings.err_print("failure to confirm message!")
+        Settings.err_print("Failure to confirm message!")
     message_clear(browser)
     return False
 
@@ -211,12 +251,8 @@ def message_price(browser, price):
         if not price or str(price) == "None":
             Settings.err_print("missing price!")
             return False
-        # clear any pre-existing message
         message_price_clear(browser)
-        successful = []
-        successful.append(message_price_enter(browser, price))
-        successful.append(message_price_save(browser))
-        if all(successful):
+        if message_price_enter(browser, price) and message_price_save(browser):
             Settings.dev_print("successfully entered message price!")
             return True
     except Exception as e:
@@ -224,6 +260,7 @@ def message_price(browser, price):
         Settings.err_print("failed to enter message price!")
     return False
 
+# clear any pre-existing message price
 def message_price_clear(browser):
     try:
         Settings.dev_print("clearing any preexisting price...")
@@ -293,7 +330,7 @@ def message_text(browser, text=""):
 ######################################################################
 ######################################################################
 
-def message_user_by_id(browser, user_id=""):
+def message_user_by_id(browser, user_id):
     """
     Message the provided user id
 
@@ -322,7 +359,7 @@ def message_user_by_id(browser, user_id=""):
         Settings.err_print("failed to message user by id!")
     return False
 
-def message_user_by_username(browser, username, user_id=None):
+def message_user_by_username(browser, username):
     """
     Message the matching username or user id
 
@@ -330,8 +367,6 @@ def message_user_by_username(browser, username, user_id=None):
     ----------
     username : str
         The username of the user to message
-    user_id : str
-        The user id of the user to message
 
     Returns
     -------
@@ -340,8 +375,7 @@ def message_user_by_username(browser, username, user_id=None):
 
     """
 
-    Settings.dev_print("username: {} : {}: user_id".format(username, user_id))
-    if user_id: return message_user_by_id(user_id=user_id)
+    Settings.dev_print(f"username: {username}")
     if not username:
         Settings.err_print("missing username to message!")
         return False
@@ -359,9 +393,9 @@ def message_user_by_username(browser, username, user_id=None):
         # clicking no longer works? just open href in self.browser
         # Settings.dev_print("clicking send message")
         # ele.click()
-        Settings.maybe_print("user id found: {}".format(ele.replace(ONLYFANS_HOME_URL2, "")))
+        Settings.maybe_print(f"user id found: {ele.replace(ONLYFANS_HOME_URL2, "")}")
         go_to_page(browser, ele)
-        Settings.dev_print("successfully messaging username: {}".format(username))
+        Settings.dev_print(f"successfully messaging username: {username}")
         return True
     except Exception as e:
         Driver.error_checker(e)

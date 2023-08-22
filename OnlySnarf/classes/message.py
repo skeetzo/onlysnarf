@@ -255,7 +255,9 @@ class Message():
         self.keywords = Settings.get_keywords()
         return self.keywords
 
+    # cannot have duplicates
     def get_recipients(self):
+        self.recipients = list(set(self.recipients))
         return self.recipients
         # if len(self.recipients) > 0: 
 

@@ -1,19 +1,11 @@
-#!/usr/bin/python3
 
 import os
-import time
-import random
-import sys
 import inquirer
-##
-from ..lib.driver import Driver
+
 from ..classes.profile import Profile
+from ..snarf import main as MAIN, discount, message, post, profile, promotion, users
 from ..util.colorize import colorize
 from ..util.settings import Settings
-
-# from .util.args import parser
-# print(parser)
-# parser.add_parser('menu', help='> access the cli menu')
 
 ####################
 ##### CLI Menu #####
@@ -60,15 +52,15 @@ class Menu:
 
         """
 
-        from ..snarf import Snarf
         action = Menu.ask_action()
-        if (action == 'back'): return Menu.main()
-        elif (action == 'discount'): Snarf.discount()
-        elif (action == 'message'): Snarf.message()
-        elif (action == 'post'): Snarf.post()
-        elif (action == 'profile'): Profile.menu()
-        elif (action == 'promotion'): Snarf.promotion()
-        else: Settings.print("Missing Action: {}".format(colorize(action,"red")))
+        if (action == 'back'): return MAIN()
+        elif (action == 'discount'): discount()
+        elif (action == 'message'): message()
+        elif (action == 'post'): post()
+        elif (action == 'profile'): profile()
+        elif (action == 'promotion'): promotion()
+        elif (action == 'users'): users()
+        else: Settings.print("Missing Action: {}".format(colorize(action, "red")))
         Menu.main()
         
     def header():
@@ -165,38 +157,9 @@ class Menu:
 
         """
 
-        time.sleep(1)
         try:
             Menu.header()
             Menu.settings_header()
             Menu.main_menu()
         except Exception as e:
             Settings.dev_print(e)
-
-#################################################################################################
-
-def exit_handler():
-    """Exit cleanly"""
-
-    try:
-        Driver.exit_all()
-    except Exception as e:
-        print(e)
-
-import atexit
-atexit.register(exit_handler)
-
-######################################################
-
-def main():
-    try:
-        Menu.main()
-    except Exception as e:
-        Settings.dev_print(e)
-        Settings.print("shnarf??")
-    finally:
-        Settings.print("shnarrf!")
-        exit_handler()
-
-if __name__ == "__main__":
-    main()

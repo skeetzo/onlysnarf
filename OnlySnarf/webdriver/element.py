@@ -7,7 +7,11 @@ from ..util.settings import Settings
 ### Elements ###
 ################
 
-def find_element_to_click(browser, name, text="", isID=False):
+# text: the text that should be included in the element text
+# isID: use id instead of class_name
+# fuzzymatch: use "in" instead of "==" when matching text
+# index: the index of the element to search for, used to ignore early matches
+def find_element_to_click(browser, name, text="", isID=False, fuzzyMatch=False, index=0):
     """
     Find element on page by name to click
 
@@ -30,15 +34,20 @@ def find_element_to_click(browser, name, text="", isID=False):
     try:
         elements = browser.find_elements(By.ID if isID else By.CLASS_NAME, className)
         Settings.dev_print(f"elements found: {len(elements)}")
+        i = 0
         for element in elements:
             Settings.dev_print(f"element: {element.get_attribute("innerHTML").strip()}")
-            if element.is_displayed() and element.is_enabled():
-                if text and element.get_attribute("innerHTML").strip().lower() == str(text):
+            if element.is_displayed() and element.is_enabled() and i == index:
+                if text and str(text) == element.get_attribute("innerHTML").strip().lower():
                     Settings.dev_print("found matching element!")
+                    return element
+                elif text and fuzzyMatch and str(text) in element.get_attribute("innerHTML").strip().lower():
+                    Settings.dev_print("found matching fuzzy element!")
                     return element
                 else:
                     Settings.dev_print("found matching element!")
                     return element
+            i += 1
     except Exception as e:
         Settings.dev_print(e)
     raise Exception(f"unable to find element: {name}")
