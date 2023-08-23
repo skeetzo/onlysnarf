@@ -756,10 +756,14 @@
 - added list of default urls in .utils
 - removal of elements mess (finally)
 - looked into Marshmellow package for class / object cleanup and expanded from User to other classes
+**8/23/2023**
+- more code cleanup
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- finish updates to schedule class parsing schedule vs date & time
 
 (update)
 - ensure that config / arg variables properly affect processes / finish updating their removal references from Settings

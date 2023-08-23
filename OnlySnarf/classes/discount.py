@@ -24,8 +24,8 @@ class Discount:
 
         """OnlyFans discount action."""
 
-        self.amount = amount
-        self.months = months
+        self.amount = Discount.format_amount(amount)
+        self.months = Discount.format_months(months)
         self.username = username # the recipient username
 
     @staticmethod
@@ -50,98 +50,30 @@ class Discount:
 
         """
 
-        Settings.maybe_print("discounting: {}".format(self.username))
-        return WEBDRIVER_discount_user(self.get())
+        Settings.maybe_print(f"applying discount to: {self.username}")
+        return WEBDRIVER_discount_user(self.dump())
 
-    def is_valid(self):
-        if self.amount and self.months and self.username:
-            return True
-        return False
+    @staticmethod
+    def format_amount(amount):
+        if int(amount) > int(DISCOUNT_MAX_AMOUNT):
+            Settings.warn_print(f"discount amount too high, max -> {DISCOUNT_MAX_AMOUNT}%")
+            return int(DISCOUNT_MAX_AMOUNT)
+        elif int(amount) < int(DISCOUNT_MIN_AMOUNT):
+            Settings.warn_print(f"discount amount too low, min -> {DISCOUNT_MIN_AMOUNT}%")
+            return int(DISCOUNT_MIN_AMOUNT)
+        return amount
 
-    def get(self):
-        """
-        Get the discount's values in a dict.
+    @staticmethod
+    def format_months(months):
+        if int(months) > int(DISCOUNT_MAX_MONTHS):
+            Settings.warn_print(f"discount months too high, max -> {DISCOUNT_MAX_MONTHS} months")
+            return int(DISCOUNT_MAX_MONTHS)
+        elif int(months) < int(DISCOUNT_MIN_MONTHS):
+            Settings.warn_print(f"discount months too low, min -> {DISCOUNT_MIN_MONTHS} months")
+            return int(DISCOUNT_MIN_MONTHS)
+        return months
 
-        Returns
-        -------
-        dict
-            A dict containing the values of the discount
-
-        """
-
-        return dict({
-            "amount": self.get_amount(),
-            "months": self.get_months(),
-            "username": self.get_username()
-        })
-
-    def get_amount(self):
-
-        """
-        Populate and get the amount value
-
-        If not found in args and prompt is enabled, ask for value.
-
-        Returns
-        -------
-        int
-            the discounted amount to apply
-
-        """
-
-        amount = self.amount or Settings.get_amount()
-        if int(amount) > int(Settings.get_discount_max_amount()):
-            Settings.warn_print("discount amount too high, max -> {}%".format(Settings.get_discount_max_months()))
-            amount = int(Settings.get_discount_max_amount())
-        elif int(amount) < int(Settings.get_discount_min_amount()):
-            Settings.warn_print("discount amount too low, min -> {}%".format(Settings.get_discount_min_months()))
-            amount = int(Settings.get_discount_min_amount())
-        self.amount = amount
-        return self.amount
-
-    def get_months(self):
-
-        """
-        Populate and get the months value
-
-        If not found in args and prompt is enabled, ask for value.
-
-        Returns
-        -------
-        int
-            the number of months to discount for
-
-        """
-
-        months = self.months or Settings.get_months()
-        # check variable constraints
-        if int(months) > int(Settings.get_discount_max_months()):
-            Settings.warn_print("discount months too high, max -> {} months".format(Settings.get_discount_max_months()))
-            months = int(Settings.get_discount_max_months())
-        elif int(months) < int(Settings.get_discount_min_months()):
-            Settings.warn_print("discount months too low, min -> {} months".format(Settings.get_discount_min_months()))
-            months = int(Settings.get_discount_min_months())
-        self.months = months
-        return self.months
-
-    def get_username(self):
-
-        """
-        Populate and get the username value
-
-        If not found in args and prompt is enabled, ask for value.
-
-        Returns
-        -------
-        str
-            the username to discount
-
-        """
-
-        # if self.username: return self.username
-        # self.username = Settings.get_user().username
-        return self.username
-
+    # TODO: update or move
     def grandfatherer(self, users=[]):
 
         """

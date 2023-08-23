@@ -55,8 +55,8 @@ def post(post_object={}):
     Settings.print("- Tweeting: {}".format(Settings.is_tweeting()))
     ## Expires, Schedule, Poll ##
     if not EXPIRES(browser, post_object["expiration"]): return False
-    if post_object["schedule"] and post_object["schedule"].validate() and not SCHEDULE(browser, post_object["schedule"].get()): return False
-    if post_object["poll"].validate() and not POLL(browser, post_object["poll"].get()): return False
+    if post_object["schedule"] and not SCHEDULE(browser, post_object["schedule"]): return False
+    if post_object["poll"] and not POLL(browser, post_object["poll"]): return False
     Settings.print("====================")
     ############################################################
     try:

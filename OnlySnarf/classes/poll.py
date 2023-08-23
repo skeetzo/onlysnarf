@@ -17,11 +17,11 @@ class PollSchema(Schema):
 class Poll:
     """OnlyFans Poll class"""
 
-    def __init__(self, duration, questions):
+    def __init__(self, duration=1, questions=[]):
         """OnlyFans Poll object"""
 
         # duration of poll
-        self.duration = duration
+        self.duration = Poll.format_duration(duration)
         # list of strings
         self.questions = questions
 
@@ -36,23 +36,8 @@ class Poll:
         # pprint(result, indent=2)
         return result
 
-    def get(self):
-        """
-        Get the poll's values in a dict.
-
-        Returns
-        -------
-        dict
-            A dict containing the values of the poll
-
-        """
-
-        return dict({
-            "duration": self.get_duration(),
-            "questions": self.get_questions()
-        })
-
-    def get_duration(self):
+    @staticmethod
+    def format_duration(duration):
         """
         Gets the duration value if not none else sets it from args or prompts.
 
@@ -63,40 +48,5 @@ class Poll:
 
         """
 
-        if self.duration: return self.duration
-        self.duration = Settings.get_duration()
-        if int(self.duration) > 30: self.duration = "No limit"
-        return self.duration
-
-    def get_questions(self):
-        """
-        Gets the questions value if not none else sets it from args or prompts.
-
-        Returns
-        -------
-        list
-            The questions as strings in a list
-
-        """
-
-        if len(self.questions) > 0: return self.questions
-        self.questions = Settings.get_questions()
-        return self.questions
-
-    def validate(self):
-        """
-        Determines whether or not the poll settings are valid.
-
-        Returns
-        -------
-        bool
-            Whether or not the poll is valid
-
-        """
-
-        Settings.dev_print("validating poll...")
-        if len(self.get_questions()) > 0 and str(self.get_duration()) != "0":
-            Settings.dev_print("valid poll!")
-            return True
-        Settings.dev_print("invalid poll!")
-        return False
+        if int(duration) > 30: return "No limit"
+        return duration

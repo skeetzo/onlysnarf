@@ -3,8 +3,8 @@
 # import logging
 # logger = logging.getLogger('snarf_logger')
 
-from .classes.discount import Discount
-from .classes.message import Message, Post
+from .classes.discount import create_discount
+from .classes.message import create_message, create_post
 from .classes.profile import Profile
 from .classes.promotion import Promotion
 from .classes.user import User

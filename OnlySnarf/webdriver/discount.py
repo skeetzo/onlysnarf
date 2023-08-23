@@ -25,8 +25,8 @@ def discount_user(discount_object={}):
 
     """
 
-    if not discount_object or not discount_object.is_valid():
-        Settings.err_print("missing or invalid discount!")
+    if not discount_object:
+        Settings.err_print("missing discount!")
         return False
 
     browser = Driver.get_browser()    

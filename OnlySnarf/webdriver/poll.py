@@ -1,13 +1,12 @@
 
 from .element import find_element_to_click
-from ..classes.poll import Poll
 from ..util.settings import Settings
 
 ################
 ##### Poll #####
 ################
 
-def poll(browser, poll_object=Poll()):
+def poll(browser, poll_object={}):
     """
     Enter the Poll object into the current post
 
@@ -23,7 +22,7 @@ def poll(browser, poll_object=Poll()):
 
     """
 
-    if not poll_object:
+    if not poll_object or len(poll_object["questions"]) == 0:
         Settings.dev_print("skipping empty poll")
         return True
     try:

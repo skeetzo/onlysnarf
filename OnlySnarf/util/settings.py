@@ -237,14 +237,6 @@ class Settings:
             Settings.err_print("missing phone number!")
         return None
 
-    def get_performers():
-        try:
-            performers = config["performers"] or []
-            performers = [n.strip() for n in performers]
-            return performers
-        except Exception as e: pass
-        return []
-
     def get_profile_path():
         try: return config["path_profile"]
         except Exception as e: pass
@@ -374,31 +366,11 @@ class Settings:
     #     Settings.maybe_print("schedule (settings): {}".format(schedule))
     #     return str(schedule)[:20] # must be less than 19 characters
 
-    def get_keywords():
-        keywords = []
-        try:
-            keywords = config["keywords"]
-            keywords = [n.strip() for n in keywords]
-        except Exception as e:
-            pass
-            # Settings.err_print(e)
-        return keywords
-
-    def get_text():
-        return config["text"] or ""
-
     def get_title():
         return config["title"] or ""
         
     def get_skipped_users():
         return config["skipped_users"] or []
-        
-    def get_questions():
-        try:
-            return config["questions"]
-        except Exception as e:
-            pass
-        return []
         
     def get_upload_max():
         try:

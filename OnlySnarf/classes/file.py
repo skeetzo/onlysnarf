@@ -24,11 +24,11 @@ class File():
     MIMETYPES_ALL_LIST.extend(MIMETYPES_IMAGES_LIST)
     MIMETYPES_ALL_LIST.extend(MIMETYPES_VIDEOS_LIST)
 
-    def __init__(self):
+    def __init__(self, path):
         """File object represents local image/video file"""
 
         # the path to the file locally
-        self.path = ""
+        self.path = path
         # the file extension
         self.ext = ""
         # image|video, default image

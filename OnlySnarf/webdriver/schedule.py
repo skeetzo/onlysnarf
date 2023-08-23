@@ -1,13 +1,12 @@
 
 from .element import find_element_to_click
-from ..classes.schedule import Schedule
 from ..util.settings import Settings
 
 ####################
 ##### Schedule #####
 ####################
 
-def schedule(browser, schedule_object=Schedule()):
+def schedule(browser, schedule_object={}):
     """
     Enter the provided schedule
 
