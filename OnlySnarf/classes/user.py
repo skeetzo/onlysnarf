@@ -1,18 +1,15 @@
 import json
-import time
 import os
 import random
-import threading
 from datetime import datetime, timedelta
-##
+from marshmallow import Schema, fields, validate, ValidationError, post_load
+
 from ..util.colorize import colorize
 from ..lib.driver import Driver
 from ..util.settings import Settings
 from ..webdriver import get_recent_chat_users, get_userid_by_username, get_username_by_id, message, read_user_messages
 
 ALREADY_RANDOMIZED_USERS = []
-
-from marshmallow import Schema, fields, validate, ValidationError, post_load
 
 # https://marshmallow.readthedocs.io/en/stable/
 class UserSchema(Schema):
@@ -34,9 +31,13 @@ class UserSchema(Schema):
         return User(**data)
 
 class MessagesSchema(Schema):
-    parsed = fields.List(fields.Str())
-    sent = fields.List(fields.Str())
-    received = fields.List(fields.Str())
+    parsed = fields.List(fields.Str(), default=[])
+    sent = fields.List(fields.Str(), default=[])
+    received = fields.List(fields.Str(), default=[])
+
+class FilesSchema(Schema):
+    sent = fields.List(fields.Str(), default=[])
+    received = fields.List(fields.Str(), default=[])
 
 class User:
     """OnlyFans users."""
@@ -48,24 +49,6 @@ class User:
         self.user_id = user_id
         self.messages = message
         self.start_date = start_date
-
-        # TODO: check that code doesn't actually rely on any of this and uses getters/setters to update the messages and sent_files etc
-        # data = json.loads(json.dumps(data))
-        # self.name               =   data.get('name')                            or None
-
-        # self.messages_parsed    =   data.get('messages_parsed')                 or []
-        # self.messages_sent      =   data.get('messages_sent')                   or []
-        # self.messages_received  =   data.get('messages_received')               or []
-        # self.messages           =   data.get('messages')                        or []
-
-        # self.sent_files         =   data.get('sent_files')                      or []
-        # self.isFavorite         =   data.get('isFavorite')                      or False
-        # # self.lists              =   data.get('lists')                           or []
-        # self.start_date         =   data.get('started')                         or None
-
-        # BUG: fix empty array
-        # if len(self.sent_files) > 0 and self.sent_files[0] == "":
-        #     self.sent_files = []
 
     @staticmethod
     def create_user(user_data):
@@ -103,7 +86,7 @@ class User:
         """
 
         if self.user_id: return self.user_id
-        self.user_id = get_userid_by_username(self.get_username())
+        self.user_id = get_userid_by_username(self.username)
         return self.user_id
 
     def get_username(self):
@@ -205,6 +188,20 @@ class User:
         for key, value in json.loads(user.dump()).items():
             # Settings.print("updating: {} = {}".format(key, value))
             setattr(self, str(key), value)
+
+    def delete(self):
+        pass # necessary?
+
+    # TODO: add this
+    # save the individual users information in the users file
+    def save(self):
+        pass
+
+    # TODO: should have a static method that saves computation time compared to saving an individual user
+    # probably should not incorporate the above method and should open the file once only
+    @staticmethod
+    def save_users(users=[]):
+        pass
 
     #############
     ## Statics ##

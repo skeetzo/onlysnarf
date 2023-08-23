@@ -26,7 +26,7 @@ class Discount:
 
         self.amount = Discount.format_amount(amount)
         self.months = Discount.format_months(months)
-        self.username = username # the recipient username
+        self.username = str(username).replace("@","") # the recipient username
 
     @staticmethod
     def create_discount(discount_data):

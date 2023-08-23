@@ -6,7 +6,7 @@ from re import sub
 from .file import File, Folder
 from .poll import Poll
 from .schedule import Schedule
-from ..util.defaults import PRICE_MAXIMUM, PRICE_MINIMUM
+from ..util.defaults import PRICE_MAXIMUM, PRICE_MINIMUM, SCHEDULE
 from ..util.settings import Settings
 from ..util.webdriver import message as WEBDRIVER_message, post as WEBDRIVER_post
 
@@ -14,13 +14,13 @@ from marshmallow import Schema, fields, validate, post_load
 
 # https://marshmallow.readthedocs.io/en/stable/
 class MessageSchema(Schema):
-    text = fields.Str()
-    files = fields.List(fields.Str())
-    keywords = fields.List(fields.Str())
-    performers = fields.List(fields.Str())
+    text = fields.Str(default="")
+    files = fields.List(fields.Str(), default=[])
+    keywords = fields.List(fields.Str(), default=[])
+    performers = fields.List(fields.Str(), default=[])
     price = fields.Float(validate=validate.Range(min=PRICE_MINIMUM, max=PRICE_MAXIMUM))
-    schedule = fields.Str()
-    recipients = fields.List(fields.Str())
+    schedule = fields.Str(default=SCHEDULE)
+    recipients = fields.List(fields.Str(), default=[])
 
     @post_load
     def make_message(self, data, **kwargs):
@@ -38,12 +38,12 @@ class Message():
         """
 
         self.files = Message.format_files(files)
-        self.keywords = keywords
-        self.performers = performers
+        self.keywords = [k.strip() for k in keywords]
+        self.performers = [p.strip() for p in performers]
         self.price = Message.format_price(price)
-        self.recipients = list(set(recipients))
+        self.recipients = list(set([username.replace("@","") for username in recipients])) # usernames
         self.schedule = Message.format_schedule(schedule)        
-        self.text = Message.format_text(text, keywords, performers, files)
+        self.text = Message.format_text(text, self.keywords, self.performers, files)
 
     @staticmethod
     def create_message(message_data):
@@ -72,7 +72,6 @@ class Message():
             The generated keywords into a string
         """
 
-        keywords = [n.strip() for n in keywords]
         return "#{}".format(" #".join(keywords)) if len(keywords) > 0 else ""
 
     @staticmethod
@@ -92,7 +91,6 @@ class Message():
             The generated performers into a string
         """
 
-        performers = [n.strip() for n in performers]
         return " @{} ".format(" @".join(performers)) if len(performers) > 0 else ""
 
     @staticmethod
@@ -159,7 +157,17 @@ class Message():
 
     # TODO: add updates to user object upon successful message?
     def on_success(self):
-        pass
+        
+        # add files to list of files sent to help prevent duplicates
+        # add message text to list of messages (cause why not, though it gets scraped anyways eventually)
+        users = []
+        for username in self.recipients:
+            user = USER_get_user_by_username(username)
+            user.messages.sent.append(self.text)
+            user.files.sent.extend(self.files)
+            user.files.sent = list(set(user.files.sent))
+            users.append(user)
+        USER_save_users(users)
 
     def send(self):
         """

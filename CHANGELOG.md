@@ -758,12 +758,13 @@
 - looked into Marshmellow package for class / object cleanup and expanded from User to other classes
 **8/23/2023**
 - more code cleanup
+- finished updates to schedule class parsing schedule vs date & time
+
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- finish updates to schedule class parsing schedule vs date & time
 
 (update)
 - ensure that config / arg variables properly affect processes / finish updating their removal references from Settings
@@ -829,6 +830,7 @@
 - test dropbox scripts on rpi
 - test upload script on android
 - test user messaging processes: all fans, recent, favorite, renew, bookmarks, random
+- test updates to schedule, date, and time
 - re-add stuff for testing on multiple platforms ala mac ;) 
 --
 - separate driver functions into individual components ala schedule --> individual steps; for easier testing (and to clean up the giant ass driver file)

@@ -1,10 +1,5 @@
-import re
-from datetime import datetime
-from ..lib.driver import Driver
-from ..util.settings import Settings
-from .user import User
-##
-from .file import File, Folder
+
+from marshmallow import Schema, fields, validate, ValidationError, post_load
 
 class PollSchema(Schema):
     duration = fields.Int(validate=validate.Range(min=1))
@@ -31,6 +26,7 @@ class Poll:
         return schema.load(poll_data)
 
     def dump(self):
+        if not self.validate(): return {}
         schema = PollSchema()
         result = schema.dump(self)
         # pprint(result, indent=2)
@@ -50,3 +46,7 @@ class Poll:
 
         if int(duration) > 30: return "No limit"
         return duration
+
+    def validate(self):
+        if len(self.questions) > 0: return True
+        return False
