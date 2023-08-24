@@ -11,8 +11,8 @@ from .classes.user import User
 from .lib.config import Config
 from .lib.menu import Menu
 from .lib import api as API
-from .util.args import args as ARGS
-from .util.config import get_config, apply_args
+from .util.args import get_args
+from .util.config import get_config
 from .util.settings import Settings
 
 def api(config={}):
@@ -105,7 +105,7 @@ def post(config={'text':"",'input':[]}):
     #     method = Settings.get_promotion_method()
     #     if method == "campaign": return Promotion.create_campaign()
     #     elif method == "trial": return Promotion.create_trial_link()
-    #     elif method == "user": return Promotion.apply_to_user()
+    #     elif method == "user": return Promotion.aato_user()
     #     elif method == "grandfather": return Promotion.grandfathered()
     #     else: Settings.err_print("Missing Promotion Method")
     # except Exception as e: Settings.dev_print(e)
@@ -129,12 +129,11 @@ def users(config={'prefer_local':False}):
 ################################################################################################
 ################################################################################################
 
-def main(args={}, config=None):
+def main():
     try:
-        if not config: config = get_config()
-        if args: apply_args(args, config)
-        Settings.print("Running - {}".format(ARGS.action))
-        eval(f"{ARGS.action}(config)")
+        config = get_config(get_args())
+        Settings.print("Running - {}".format(config["action"]))
+        eval(f"{config["action"]}(config)")
     except Exception as e:
         Settings.err_print(e)
         Settings.print("shnarf??")

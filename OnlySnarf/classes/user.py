@@ -189,19 +189,11 @@ class User:
             # Settings.print("updating: {} = {}".format(key, value))
             setattr(self, str(key), value)
 
-    def delete(self):
-        pass # necessary?
-
-    # TODO: add this
-    # save the individual users information in the users file
-    def save(self):
-        pass
-
-    # TODO: should have a static method that saves computation time compared to saving an individual user
-    # probably should not incorporate the above method and should open the file once only
-    @staticmethod
-    def save_users(users=[]):
-        pass
+    # necessary?
+    # def delete(self):
+        # pass
+    # def save(self):
+    #     User.write_users_local([self.dump()])
 
     #############
     ## Statics ##
@@ -612,27 +604,26 @@ class User:
         return user
 
     @staticmethod
-    def write_users_local(users=None):
+    def write_users_local(users=[]):
         """
         Write to local users file.
 
         """
-        if users is None:
+        if len(users) == 0:
             users = User.get_all_users()
         if len(users) == 0:
             Settings.maybe_print("skipping: local users save - empty")
             return
-        Settings.print("saving users...")
+        Settings.maybe_print("saving users...")
         Settings.dev_print("local users path: "+str(Settings.get_users_path()))
         # merge with existing user data
+        data = {}
+        data['users'] = []
         existingUsers = User.read_users_local()
         for user in users:
             for u in existingUsers:
                 if user.equals(u):
                     user.update(u)
-        data = {}
-        data['users'] = []
-        for user in users:
             data['users'].append(user.dump())
         try:
             with open(str(Settings.get_users_path()), 'w') as outfile:  
@@ -641,6 +632,7 @@ class User:
             Settings.err_print("missing local users!")
         except OSError:
             Settings.err_print("missing local path!")
+        Settings.dev_print("saved users!")
 
     @staticmethod
     def write_following_local(users=None):

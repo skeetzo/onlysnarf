@@ -156,8 +156,11 @@ class Message():
         return text.replace("_", " ")
 
     # TODO: add updates to user object upon successful message?
-    def on_success(self):
+    def on_success(self, successful_recipients):
         
+
+        # TODO: finish figuring out how to incorporate saving users
+
         # add files to list of files sent to help prevent duplicates
         # add message text to list of messages (cause why not, though it gets scraped anyways eventually)
         users = []
@@ -181,15 +184,14 @@ class Message():
 
         """
 
-        try:
-            return WEBDRIVER_message(self.dump())        
-        finally:
-            self.on_success()
-
-
-
-
-
+        if WEBDRIVER_message(self.dump()):
+            self.on_success()        
+            return True
+        return False
+            
+########################################################################################################################            
+########################################################################################################################
+########################################################################################################################
 
     # TODO: probably move this to webdriver equivalent
     @staticmethod

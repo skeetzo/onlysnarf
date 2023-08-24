@@ -3,7 +3,11 @@ import configparser
 import getpass
 import os
 
-def get_config_file():
+CONFIG = {}
+
+def get_config_file(file_path):
+
+
   USER = getpass.getuser()
   # USER = os.getenv('USER')
   if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "None":
@@ -28,36 +32,37 @@ def get_config_file():
 
     return configFile
 
-def get_config(configFile=None):
-
-  if not configFile:
-    configFile = get_config_file()
-
-  config_file = configparser.ConfigParser()
-  config_file.read(configFile)
-
-  config = {}
-  # relabels config for cleaner usage
-  for section in config_file.sections():
-    for key in config_file[section]:
-      if section == "ARGS":
-        config[key] = config_file[section][key]
-        # print(key, config[key])
-      else:
-        config[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
-        # print(key, config[section.lower()+"_"+key.lower()])
-  for key, value in config.items():
-    config[key] = value
-
-  return config
+def get_config(args={}):
+  parsed_config = {}
+  try:
+    # overwrite any fetched config path with args
+    args_path = args["path_config"]
+    config_path = get_config_file()
+    if args_path != config_path:
+      config_path = args_path
+    config_file = configparser.ConfigParser()
+    config_file.read(config_path)
+    # relabels config for cleaner usage
+    for section in config_file.sections():
+      for key in config_file[section]:
+        if section == "ARGS":
+          parsed_config[key] = config_file[section][key]
+          # print(key, parsed_config[key])
+        else:
+          parsed_config[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
+          # print(key, parsed_config[section.lower()+"_"+key.lower()])
+    # overwrite with provided args
+    for key, value in args.items():
+      parsed_config[key] = value
+  except Exception as e:
+    print(e)
+  global CONFIG
+  if not CONFIG:
+    CONFIG = parsed_config
+  return parsed_config
 
 def get_args_config_file():
   return os.path.join(os.path.abspath(__file__), "../conf", "config-args.conf")
-
-def apply_args(args, config):
-  if args and str(os.environ.get('ENV')) != "test":
-    for key, value in args.items():
-      config[key] = value
 
 
 
@@ -67,5 +72,4 @@ def apply_args(args, config):
   # print(config)
   # sys.exit(0)
 
-  return config
 
