@@ -9,6 +9,13 @@ from ..util.urls import ONLYFANS_HOME_URL2, ONLYFANS_USERS_ACTIVE_URL, ONLYFANS_
 ##### Users #####
 #################
 
+
+# TODO: add and weave these through newly added list urls
+# get_active_users()
+# get_active_subscriptions()
+
+
+
 def get_current_username(browser):
     """
     Gets the username of the logged in user.
@@ -150,11 +157,3 @@ def get_user_by_username(browser, username, reattempt=False):
     Settings.print("Are you sure that user really exists? shnarf")
     if reattempt: return get_user_by_username(browser, username)
     return None
-
-# TODO: this
-def get_username_by_id(user_id):
-    pass
-
-######################################################################
-######################################################################
-######################################################################

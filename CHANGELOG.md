@@ -759,7 +759,9 @@
 **8/23/2023**
 - more code cleanup
 - finished updates to schedule class parsing schedule vs date & time
-
+**8/24/2023**
+- more code cleanup
+- added collection urls
 
 ------------------------------------------------------------------------------------
 

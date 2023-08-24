@@ -40,48 +40,41 @@ def message(message_object={}):
     browser = Driver.get_browser()
     try:
         Settings.print(f"Entering message to {message_object["recipients"]}: (${message_object["price"]}) {message_object["text"]}")
-        messages_sent = []
-        # prepare the message
-        if message_object["includes"] or message_object["excludes"]:
-            # if not messaging a user directly, all these can be stacked in a single message
-            for label in message_object['includes']:
-                if str(label).lower() == "all" or str(label).lower() == "fans": messages_sent.append(message_fans(browser))
-                if str(label).lower() == "recent": messages_sent.append(message_recent(browser))
-                if str(label).lower() == "favorite": messages_sent.append(message_favorites(browser))
-                if str(label).lower() == "renew on": messages_sent.append(message_renewers(browser))
-                if str(label).lower() == "renew off": messages_sent.append(message_renewers(browser, on=False))
-                if str(label).lower() == "bookmarks": messages_sent.append(message_bookmarks(browser))
-                if str(label).lower() == "random": messages_sent.append(message_random(browser))
-            for label in message_object["excluded_recipients"]:
-                if str(label).lower() == "all" or str(label).lower() == "fans": messages_sent.append(message_fans(browser, exclude=True))
-                if str(label).lower() == "recent": messages_sent.append(message_recent(browser, exclude=True))
-                if str(label).lower() == "favorite": messages_sent.append(message_favorites(browser, exclude=True))
-                if str(label).lower() == "renew on": messages_sent.append(message_renewers(browser, exclude=True))
-                if str(label).lower() == "renew off": messages_sent.append(message_renewers(browser, exclude=True, on=False))
-                if str(label).lower() == "bookmarks": messages_sent.append(message_bookmarks(browser, exclude=True))
-                if str(label).lower() == "random": messages_sent.append(message_random(browser, exclude=True))
+        successful_message_steps = []
+
+        if len(message_object["recipients"]) > 1 or message_object["includes"] or message_object["excludes"]:
+            # prepare the message
+            # TODO: add ability to select other custom lists of users
+            if message_object["includes"]:
+                # if not messaging a user directly, all these can be stacked in a single message
+                for label in message_object['includes']:
+                    if str(label).lower() == "all" or str(label).lower() == "fans": successful_message_steps.append(message_fans(browser))
+                    if str(label).lower() == "recent": successful_message_steps.append(message_recent(browser))
+                    if str(label).lower() == "favorite": successful_message_steps.append(message_favorites(browser))
+                    if str(label).lower() == "renew on": successful_message_steps.append(message_renewers(browser))
+                    if str(label).lower() == "renew off": successful_message_steps.append(message_renewers(browser, on=False))
+                    if str(label).lower() == "bookmarks": successful_message_steps.append(message_bookmarks(browser))
+                    if str(label).lower() == "random": successful_message_steps.append(message_random(browser))
+            if message_object["excludes"]:
+                for label in message_object["excluded_recipients"]:
+                    if str(label).lower() == "all" or str(label).lower() == "fans": successful_message_steps.append(message_fans(browser, exclude=True))
+                    if str(label).lower() == "recent": successful_message_steps.append(message_recent(browser, exclude=True))
+                    if str(label).lower() == "favorite": successful_message_steps.append(message_favorites(browser, exclude=True))
+                    if str(label).lower() == "renew on": successful_message_steps.append(message_renewers(browser, exclude=True))
+                    if str(label).lower() == "renew off": successful_message_steps.append(message_renewers(browser, exclude=True, on=False))
+                    if str(label).lower() == "bookmarks": successful_message_steps.append(message_bookmarks(browser, exclude=True))
+                    if str(label).lower() == "random": successful_message_steps.append(message_random(browser, exclude=True))
             # use same page to add additional users to message 
             for username in message_object["recipients"]:
-                messages_sent.append(add_user_to_message(browser, username))
+                successful_message_steps.append(add_user_to_message(browser, username))
         else:
-            # if none of the above have been run, switch to normal user messaging (locates user_id on profile page and opens url link)
-            messages_sent.append(message_user_by_username(browser, username))
+            # if none of above or solo messaging, switch to normal user messaging (locates user_id on profile page and opens url link)
+            successful_message_steps.append(message_user_by_username(browser, username))
 
-        if not all(messages_sent): raise Exception(f"Failed to begin message for {message_object["recipients"]}!")
+        if not all(successful_message_steps): raise Exception(f"Failed to begin message for {message_object["recipients"]}!")
 
         # actually send the message
-        messages_sent.append(all([message_text(browser, message_object["text"]), message_price(browser, message_object["price"]), upload_files(browser, message_object["files"]), message_confirm(browser)]))
-
-
-        if all(messages_sent):
-            user = create_user({"username":username})
-            user.messages.sent.append(self.text)
-            user.files.sent.extend(self.files)
-            user.files.sent = list(set(user.files.sent))
-
-
-
-        return all(messages_sent)
+        return all([message_text(browser, message_object["text"]), message_price(browser, message_object["price"]), upload_files(browser, message_object["files"]), message_confirm(browser)])
     except Exception as e:
         Settings.err_print(e)
     message_clear(browser)
@@ -169,6 +162,7 @@ def message_random(browser):
 # TODO: finish and test this functionality of mass messaging
 # add username to existing mass message being started
 def add_user_to_message(browser, username):
+    Settings.err_print("TODO: finish me!")
     pass
 
 ######################################################################

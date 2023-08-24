@@ -6,6 +6,7 @@ from re import sub
 from .file import File, Folder
 from .poll import Poll
 from .schedule import Schedule
+from .user import User
 from ..util.defaults import PRICE_MAXIMUM, PRICE_MINIMUM, SCHEDULE
 from ..util.settings import Settings
 from ..util.webdriver import message as WEBDRIVER_message, post as WEBDRIVER_post
@@ -21,6 +22,8 @@ class MessageSchema(Schema):
     price = fields.Float(validate=validate.Range(min=PRICE_MINIMUM, max=PRICE_MAXIMUM))
     schedule = fields.Str(default=SCHEDULE)
     recipients = fields.List(fields.Str(), default=[])
+    includes = fields.List(fields.Str(), default=[])
+    excludes = fields.List(fields.Str(), default=[])
 
     @post_load
     def make_message(self, data, **kwargs):
@@ -29,7 +32,7 @@ class MessageSchema(Schema):
 class Message():
     """OnlyFans message (and post) class"""
 
-    def __init__(self, files, keywords, performers, price, recipients, schedule, text):
+    def __init__(self, files, keywords, performers, price, recipients, schedule, text, includes, excludes):
         """
         OnlyFans message and post object
 
@@ -42,6 +45,8 @@ class Message():
         self.performers = [p.strip() for p in performers]
         self.price = Message.format_price(price)
         self.recipients = list(set([username.replace("@","") for username in recipients])) # usernames
+        self.includes = list(set([username.replace("@","") for username in includes]))
+        self.excludes = list(set([username.replace("@","") for username in excludes]))
         self.schedule = Message.format_schedule(schedule)        
         self.text = Message.format_text(text, self.keywords, self.performers, files)
 
@@ -156,21 +161,20 @@ class Message():
         return text.replace("_", " ")
 
     # TODO: add updates to user object upon successful message?
-    def on_success(self, successful_recipients):
-        
+    def on_success(self):
 
-        # TODO: finish figuring out how to incorporate saving users
+        # TODO: if was sent to 'all' or 'recent' then recipients might be empty
 
         # add files to list of files sent to help prevent duplicates
         # add message text to list of messages (cause why not, though it gets scraped anyways eventually)
         users = []
         for username in self.recipients:
-            user = USER_get_user_by_username(username)
+            user = User.get_user_by_username(username)
             user.messages.sent.append(self.text)
             user.files.sent.extend(self.files)
             user.files.sent = list(set(user.files.sent))
             users.append(user)
-        USER_save_users(users)
+        User.save_users(users)
 
     def send(self):
         """

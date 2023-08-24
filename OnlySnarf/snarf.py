@@ -120,7 +120,7 @@ def users(config={'prefer_local':False}):
     """
 
     try:
-        User.get_all_users(prefer_local=config.prefer_local)
+        User.get_all_users(prefer_local=config["prefer_local"])
         return True
     except Exception as e: Settings.dev_print(e)
     return False
