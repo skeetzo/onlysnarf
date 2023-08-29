@@ -3,8 +3,8 @@ os.environ['ENV'] = "test"
 import unittest
 
 from OnlySnarf.util.config import config
-from OnlySnarf.lib.driver import Driver
 from OnlySnarf.util.settings import Settings
+from OnlySnarf.util.webdriver import Driver
 
 class TestSeleniumReconnectFirefox(unittest.TestCase):
 
@@ -13,21 +13,18 @@ class TestSeleniumReconnectFirefox(unittest.TestCase):
         config["keep"] = True
         # config["show"] = True
         Settings.set_debug("tests")
-        self.driver = Driver()
 
     def tearDown(self):
         config["debug_selenium"] = False
         config["keep"] = False
         config["show"] = False
-        self.driver.exit()
 
     def test_reconnect_firefox(self):
         config["browser"] = "firefox"
-        self.driver.init()
-        self.driver.exit()
+        Driver.get_browser()
+        Driver.exit()
         config["browser"] = "auto"
-        self.driver.init()
-        assert self.driver.browser, "unable to launch via reconnect firefox"
+        assert Driver.get_browser(), "unable to launch via reconnect firefox"
 
 ############################################################################################
 

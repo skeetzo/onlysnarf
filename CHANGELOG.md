@@ -764,6 +764,7 @@
 - added collection urls
 **8/29/2023**
 - user file writes moved to utils/data.py
+- beginnning updates on test scripts
 
 ------------------------------------------------------------------------------------
 

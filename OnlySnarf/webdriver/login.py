@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
+from .driver import Driver
 from .goto import go_to_home
 from ..util.settings import Settings
 
@@ -26,6 +27,7 @@ def login(browser):
 
     """
 
+    if not browser: browser = Driver.get_browser()
     if check_if_already_logged_in(browser): return True
     Settings.print('Logging into OnlyFans for {}...'.format(Settings.get_username()))
     try:
@@ -137,7 +139,7 @@ def via_form(browser):
     return False
 
 # TODO: requires testing
-def via_google():
+def via_google(browser):
     """
     Logs in via linked Google account. (doesn't work)
     

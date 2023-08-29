@@ -2,21 +2,23 @@ import os
 os.environ['ENV'] = "test"
 import unittest
 
-from OnlySnarf.util.config import config
+from OnlySnarf.util.config import get_config
 # from OnlySnarf.util import defaults as DEFAULT
 from OnlySnarf.util.settings import Settings
 from OnlySnarf.snarf import Snarf
 from OnlySnarf.classes.user import User
 
+config = {}
+
 class TestUsers(unittest.TestCase):
 
     def setUp(self):
+        config = get_config()
         config["prefer_local"] = False
         Settings.set_debug("tests")
         
     def tearDown(self):
         config["prefer_local"] = True
-        Snarf.close()
 
     def test_get_users(self):
         assert User.get_all_users(), "unable to read users"

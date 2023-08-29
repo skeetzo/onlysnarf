@@ -3,8 +3,8 @@ os.environ['ENV'] = "test"
 import unittest
 
 from OnlySnarf.util.config import config
-from OnlySnarf.lib.driver import Driver
 from OnlySnarf.util.settings import Settings
+from OnlySnarf.util.webdriver import Driver
 
 class TestSeleniumReconnectOpera(unittest.TestCase):
 
@@ -13,22 +13,19 @@ class TestSeleniumReconnectOpera(unittest.TestCase):
         config["keep"] = True
         # config["show"] = True
         Settings.set_debug("tests")
-        self.driver = Driver()
 
     def tearDown(self):
         config["debug_selenium"] = False
         config["keep"] = False
         config["show"] = False
-        self.driver.exit()
     
     @unittest.skip("todo")
     def test_reconnect_opera(self):
         config["browser"] = "opera"
-        self.driver.init()
-        self.driver.exit()
+        Driver.get_browser()
+        Driver.exit()
         config["browser"] = "auto"
-        self.driver.init()
-        assert self.driver.browser, "unable to launch via reconnect opera"
+        assert Driver.get_browser(), "unable to launch via reconnect opera"
 
 ############################################################################################
 

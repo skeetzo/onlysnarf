@@ -2,14 +2,17 @@ import os
 os.environ['ENV'] = "test"
 import unittest
 
-from OnlySnarf.util.config import config
+from OnlySnarf.util.config import get_config
 from OnlySnarf.util import defaults as DEFAULT
 from OnlySnarf.util.settings import Settings
 from OnlySnarf.snarf import Snarf
 
+config = {}
+
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
+        config = get_config()
         config["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]
         config["price"] = DEFAULT.PRICE_MINIMUM
         config["text"] = "test balls"
@@ -22,22 +25,21 @@ class TestSnarf(unittest.TestCase):
         config["performers"] = []
         config["price"] = 0
         config["keywords"] = []
-        Snarf.close()
 
     def test_post(self):
-        assert Snarf.post(), "unable to post"
+        assert Snarf.post(config), "unable to post"
 
     @unittest.skip("todo")
     def test_post_files(self):
-        assert Snarf.post(), "unable to upload post files"
+        assert Snarf.post(config), "unable to upload post files"
 
     @unittest.skip("todo")
     def test_post_price(self):
-        assert Snarf.post(), "unable to set post price"
+        assert Snarf.post(config), "unable to set post price"
 
     @unittest.skip("todo")
     def test_post_text(self):
-        assert Snarf.post(), "unable to set post text"
+        assert Snarf.post(config), "unable to set post text"
 
 ############################################################################################
 

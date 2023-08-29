@@ -135,7 +135,7 @@ class User:
     #############
 
     @staticmethod
-    def get_all_users(prefer_local=True):
+    def get_all_users():
         """
         Get all users.
 
@@ -148,7 +148,7 @@ class User:
 
         Settings.dev_print("getting all users...")
         users = []
-        if prefer_local:
+        if Settings.is_prefer_local():
             users = read_users_local()
         if len(users) == 0:
             for user in get_users_by_type(isFan=True, isFollower=True):

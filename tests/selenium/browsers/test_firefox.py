@@ -3,8 +3,8 @@ os.environ['ENV'] = "test"
 import unittest
 
 from OnlySnarf.util.config import config
-from OnlySnarf.lib.driver import Driver
 from OnlySnarf.util.settings import Settings
+from OnlySnarf.util.webdriver import Driver
 
 class TestSeleniumFirefox(unittest.TestCase):
 
@@ -13,18 +13,15 @@ class TestSeleniumFirefox(unittest.TestCase):
         config["keep"] = False
         # config["show"] = True
         Settings.set_debug("tests")
-        self.driver = Driver()
 
     def tearDown(self):
         config["debug_firefox"] = False
         config["show"] = False
-        self.driver.exit()
 
     def test_firefox(self):
         config["browser"] = "firefox"
         config["debug_firefox"] = True
-        self.driver.init()
-        assert self.driver.browser, "unable to launch firefox"
+        assert Driver.get_browser(), "unable to launch firefox"
 
 ############################################################################################
 
