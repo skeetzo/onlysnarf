@@ -762,6 +762,8 @@
 **8/24/2023**
 - more code cleanup
 - added collection urls
+**8/29/2023**
+- user file writes moved to utils/data.py
 
 ------------------------------------------------------------------------------------
 

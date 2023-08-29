@@ -6,6 +6,7 @@ from marshmallow import Schema, fields, validate, ValidationError, post_load
 
 from ..util.colorize import colorize
 from ..lib.driver import Driver
+from ..util.data import add_to_randomized_users, get_already_randomized_users, read_users_local, write_users_local
 from ..util.settings import Settings
 from ..webdriver import get_recent_chat_users, get_userid_by_username as WEBDRIVER_get_userid_by_username, message, read_user_messages as WEBDRIVER_read_user_messages
 
@@ -134,14 +135,6 @@ class User:
     #############
 
     @staticmethod
-    def get_all_users_usernames():
-        users = User.get_all_users()
-        usernames = []
-        for user in users:
-            usernames.append(user.username)
-        return usernames
-
-    @staticmethod
     def get_all_users(prefer_local=True):
         """
         Get all users.
@@ -153,170 +146,108 @@ class User:
 
         """
 
-
-        # TODO: update this to return following as well?
-
         Settings.dev_print("getting all users...")
         users = []
         if prefer_local:
-            users = User.read_users_local()
+            users = read_users_local()
         if len(users) == 0:
-            for user in get_users_by_type(isFan=True):
-                if user is None: continue
+            for user in get_users_by_type(isFan=True, isFollower=True):
                 users.append(User(user))
-        Settings.maybe_print("users: {}".format(len(users)))
-        User.write_users_local(users=users)
-        Settings.set_prefer_local(True)
-        return users
-
-
-
-def get_users_by_type(type="fan")
-    active users (fans)
-    active subscriptions (followers)
-    friends
-    rebill on & off
-    recent
-    tagged
-    muted
-    restricted
-    blocked
-
-    # TODO: route user fetches through single fx to save calls to save user json files?
-
-
-
-
-
-    # TODO: update with more accurate "active"ness
-    # gets users from local or refreshes from onlyfans.com
-    @staticmethod
-    def get_active_users(prefer_local=True):
-        """
-        Get active users.
-
-        Returns
-        -------
-        list
-            The active users
-
-        """
-
-        Settings.dev_print("getting active users...")
-        users = []
-        active_users = []
-        if prefer_local:
-            users = User.read_users_local()
-        if len(users) == 0:
-            for user in WEBDRIVER_get_active_users():
-                users.append(User(user, isFan=True))
-        for user in users:
-            if user.isFan:
-                active_users.append(user)
-        Settings.maybe_print("active users: {}".format(len(active_users)))
-        return active_users
-
-    @staticmethod
-    def get_active_subscriptions(prefer_local=True):
-        """
-        Get active users.
-
-        Returns
-        -------
-        list
-            The active users
-
-        """
-
-        Settings.dev_print("getting active followers...")
-        users = []
-        active_users = []
-        if prefer_local:
-            users = User.read_following_local() # TODO: update these references to match 'subscriptions'
-        if len(users) == 0:
-            for user in WEBDRIVER_get_active_subscriptions():
-                users.append(User(user, isFollower=True))
-        for user in users:
-            if user.isFollower:
-                active_users.append(user)
-        Settings.maybe_print("active followers: {}".format(len(active_users)))
-
-
-
-        User.write_following_local(users=users)
-
-
-
-        return active_users
-    
-
-    ## TODO
-    # make this actually do something
-    @staticmethod
-    def get_favorite_users():
-        """
-        Get all favorite users.
-
-        Returns
-        -------
-        list
-            The favorite users
-
-        """
-
-        Settings.dev_print("getting favorite users...")
-        users = []
-        for user in User.get_all_users():
-            if user.isFavorite:
-                Settings.maybe_print("fav user: {}".format(user.username))
-                users.append(user)
-        return users
-
-    @staticmethod
-    def get_following():
-        """
-        Get all following.
-
-        Returns
-        -------
-        list
-            The users being followed
-
-        """
-
-        Settings.dev_print("getting following...")
-        if Settings.is_prefer_local():
-            users = User.read_following_local()
-            if len(users) > 0: return users
-        users = []
-        for user in get_users_by_type(isFollowing=True):
-            user = User(user)
-            users.append(user)
-        Settings.maybe_print("following: {}".format(len(users)))
-        User.write_following_local(users=users)
+        Settings.maybe_print(f"users: {len(users)}")
+        write_users_local(users)
         Settings.set_prefer_local(True)
         return users
 
     @staticmethod
-    def get_never_messaged_users():
+    def get_random_user():
         """
-        Get all users that have never been messaged before.
+        Get a random user.
 
         Returns
         -------
-        list
-            The users that have not been messaged
+        classes.User
+            A random user
 
         """
 
-        Settings.dev_print("getting users that have never been messaged...")
-        users = []
-        for user in User.get_all_users():
-            if len(user.messages_received) == 0:
-                Settings.maybe_print("never messaged user: {}".format(user.username))
-                users.append(user)
-        return users
+        Settings.dev_print("getting random user...")
+        users = User.get_all_users()
+        randomizedUsers = get_already_randomized_users()
+        # check each user in users
+        # if user is not in random users, return user
+        randomUser = random.choice(users)
+        while randomUser:
+            found = False
+            randomUser = random.choice(users)
+            for user in randomizedUsers:
+                if randomUser.equal(user):
+                    found = True
+            if not found: break
+        add_to_randomized_users(randomUser)
+        Settings.dev_print(f"random user: {randomUser.username}")
+        return randomUser
 
+    # TODO: change to enum?
+    # active users (fans)
+    # active subscriptions (followers)
+    # friends
+    # rebill on & off
+    # recent
+    # tagged
+    # muted
+    # restricted
+    # blocked
+    @staticmethod
+    def get_users_by_type(typeOf="fan")
+        Settings.dev_print(f"getting users: {typeOf}")
+        users = User.get_all_users()
+        foundUsers = []
+        for user in users:
+            if typeOf == "fan" and user.isFan:
+                foundUsers.append(user)
+            elif typeOf == "follower" and user.isFollower:
+                foundUsers.append(user)
+            elif typeOf == "friend" and user.isFriend:
+                foundUsers.append(user)
+            elif typeOf == "renew_on" and user.isRenew:
+                foundUsers.append(user)
+            elif typeOf == "renew_off" and not user.isRenew:
+                foundUsers.append(user)
+            elif typeOf == "recent" and user.isRecent:
+                foundUsers.append(user)
+            elif typeOf == "tagged" and user.isTagged:
+                foundUsers.append(user)
+            elif typeOf == "muted" and user.isMuted:
+                foundUsers.append(user)
+            elif typeOf == "restricted" and user.isRestricted:
+                foundUsers.append(user)
+            elif typeOf == "blocked" and user.isBlocked:
+                foundUsers.append(user)
+        Settings.maybe_print(f"found users: {len(foundUsers)}")
+        return foundUsers    
+
+    # TODO: use this?
+    # @staticmethod
+    # def get_never_messaged_users():
+    #     """
+    #     Get all users that have never been messaged before.
+
+    #     Returns
+    #     -------
+    #     list
+    #         The users that have not been messaged
+
+    #     """
+
+    #     Settings.dev_print("getting users that have never been messaged...")
+    #     users = []
+    #     for user in User.get_all_users():
+    #         if len(user.messages_received) == 0:
+    #             Settings.maybe_print("never messaged user: {}".format(user.username))
+    #             users.append(user)
+    #     return users
+
+    # TODO: test and actually use this
     @staticmethod
     def get_new_users():
         """
@@ -341,66 +272,24 @@ def get_users_by_type(type="fan")
             newUsers.append(user)
         return newUsers
 
+    # TODO: finish lists
+    # @staticmethod
+    # def get_users_by_list(number=None, name=None, ):
+    #     """
+    #     Get users by custom list.
 
-    
+    #     Returns
+    #     -------
+    #     list
+    #         The users on the list
 
-
-
-    ## TODO: maybe update this so it actually works?
-    @staticmethod
-    def get_recent_users():
-        """
-        Get recent users.
-
-        Returns
-        -------
-        list
-            The recent users
-
-        """
-        Settings.dev_print("getting recent users...")
-        i = 0
-        users = []
-        for user in User.get_all_users():
-            Settings.maybe_print("recent user: {}".format(user.username))
-            users.append(user)
-            i += 1
-            if i == int(Settings.get_recent_user_count()): break
-        return users
-
-
-    @staticmethod
-    def get_users_by_list(number=None, name=None, ):
-        """
-        Get users by custom list.
-
-        Returns
-        -------
-        list
-            The users on the list
-
-        """
-        Settings.maybe_print("getting users by list: {} - {}".format(number, name))
-        listUsers = []
-        # TODO: finish lists
-        for user in Driver.get_list(number=number, name=name):
-            Settings.maybe_print("user: {}".format(user.username))
-            listUsers.append(user)
-        return listUsers
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    #     """
+    #     Settings.maybe_print("getting users by list: {} - {}".format(number, name))
+    #     listUsers = []
+    #     for user in Driver.get_list(number=number, name=name):
+    #         Settings.maybe_print("user: {}".format(user.username))
+    #         listUsers.append(user)
+    #     return listUsers
 
     @staticmethod
     def get_user_by_id(userid):
@@ -479,68 +368,7 @@ def get_users_by_type(type="fan")
 
 
 
-        @staticmethod
-    def get_random_user():
-        """
-        Get a random user.
-
-        Returns
-        -------
-        classes.User
-            A random user
-
-        """
-
-        Settings.dev_print("getting random user...")
-
-        users = User.get_all_users_usernames()
-
-        randomUser = None
-        randomizedUsers = User.get_already_randomized_users()
-
-        while randomUser not in randomizedUsers:
-            randomUser = random.choice(users)
-            if randomUser not in randomizedUsers:
-                User.add_to_randomized_users(randomUser, users=randomizedUsers)
-                randomizedUsers.append(randomUser)
-
-        Settings.dev_print("random user: {}".format(randomUser))
-
-        users = User.get_all_users()
-        for user in users:
-            if str(user.username) == str(randomUser):
-                return user
-        return User({"username":randomUser})
-
-    # return from json file 
-    @staticmethod
-    def get_already_randomized_users():
-        Settings.dev_print("getting already randomized users...")
-        users = []
-        try:
-            with open(str(Settings.get_users_path().replace("users.json","random_users.json"))) as json_file:  
-                for user in json.load(json_file)['randomized_users']:
-                    users.append(user)
-            Settings.maybe_print("loaded randomized users")
-        except Exception as e:
-            Settings.dev_print(e)
-        return users
-
-    # add to json file
-    @staticmethod
-    def add_to_randomized_users(newUser, users=[]):
-        data = {}
-        data['randomized_users'] = []
-        for user in users:
-            data['randomized_users'].append(user)
-        data['randomized_users'].append(newUser)
-        try:
-            with open(str(Settings.get_users_path().replace("users.json","random_users.json")), 'w') as outfile:  
-                json.dump(data, outfile, indent=4, sort_keys=True)
-        except FileNotFoundError:
-            Settings.err_print("missing random users!")
-        except OSError:
-            Settings.err_print("missing random users path!")
+    
 
 
 
@@ -580,6 +408,14 @@ def get_users_by_type(type="fan")
 
 
 
+
+
+
+
+
+
+
+    # i don't think i really want these to be here?
 
 
     @staticmethod
@@ -651,103 +487,4 @@ def get_users_by_type(type="fan")
 
 
 
-    @staticmethod
-    def read_following_local():
-        """
-        Read the locally saved following file.
-
-        Returns
-        -------
-        list
-            The locally saved followers
-
-        """
-        Settings.dev_print("getting local following...")
-        users = []
-        try:
-            with open(str(Settings.get_users_path().replace("users.json", "following.json"))) as json_file:  
-                for user in json.load(json_file)['users']:
-                    users.append(User(json.loads(user)))
-            Settings.maybe_print("loaded local following")
-        except Exception as e:
-            Settings.dev_print(e)
-        return users
-
-    @staticmethod
-    def read_users_local():
-        """
-        Read the locally saved users file.
-
-        Returns
-        -------
-        list
-            The locally saved users
-
-        """
-        Settings.dev_print("getting local users...")
-        users = []
-        try:
-            with open(str(Settings.get_users_path())) as json_file:  
-                for user in json.load(json_file)['users']:
-                    users.append(User(json.loads(user)))
-            Settings.maybe_print("loaded local users")
-        except Exception as e:
-            Settings.dev_print(e)
-        return users
-
-
-    @staticmethod
-    def write_users_local(users=[]):
-        """
-        Write to local users file.
-
-        """
-        if len(users) == 0:
-            users = User.get_all_users()
-        if len(users) == 0:
-            Settings.maybe_print("skipping: local users save - empty")
-            return
-        Settings.maybe_print("saving users...")
-        Settings.dev_print("local users path: "+str(Settings.get_users_path()))
-        # merge with existing user data
-        data = {}
-        data['users'] = []
-        existingUsers = User.read_users_local()
-        for user in users:
-            for u in existingUsers:
-                if user.equals(u):
-                    user.update(u)
-            data['users'].append(user.dump())
-        try:
-            with open(str(Settings.get_users_path()), 'w') as outfile:  
-                json.dump(data, outfile, indent=4, sort_keys=True)
-        except FileNotFoundError:
-            Settings.err_print("missing local users!")
-        except OSError:
-            Settings.err_print("missing local path!")
-        Settings.dev_print("saved users!")
-
-    @staticmethod
-    def write_following_local(users=None):
-        """
-        Write to local followers file.
-
-        """
-        if users is None:
-            users = User.get_following()
-        if len(users) == 0:
-            Settings.maybe_print("skipping: local following save - empty following")
-            return
-        Settings.print("saving following...")
-        Settings.dev_print("local users path: "+str(Settings.get_users_path().replace("users.json", "following.json")))
-        data = {}
-        data['users'] = []
-        for user in users:
-            data['users'].append(user.dump())
-        try:
-            with open(str(Settings.get_users_path().replace("users.json", "following.json")), 'w') as outfile:  
-                json.dump(data, outfile, indent=4, sort_keys=True)
-        except FileNotFoundError:
-            Settings.err_print("missing local following")
-        except OSError:
-            Settings.err_print("missing local path")
+    
