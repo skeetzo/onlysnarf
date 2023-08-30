@@ -1,6 +1,6 @@
 
 from .element import find_element_to_click
-from ..util.settings import Settings
+from .. import Settings
 
 ####################
 ##### Schedule #####
@@ -27,8 +27,8 @@ def schedule(browser, schedule_object={}):
         return True
     try:
         Settings.print("Schedule:")
-        Settings.print(f"- Date: {Settings.format_date(schedule_object["date"])}")
-        Settings.print(f"- Time: {Settings.format_time(schedule_object["time"])}")
+        Settings.print(f"- Date: {Settings.format_date(schedule_object['date'])}")
+        Settings.print(f"- Time: {Settings.format_time(schedule_object['time'])}")
 
         # TODO: fix
         ## BUG: tries twice to solve whatever issue is occurring
@@ -45,17 +45,17 @@ def schedule(browser, schedule_object={}):
 
         schedule_open(browser)
         # individually set month, year, and day
-        if not self.schedule_date(browser, schedule_object["month"], schedule_object["year"]):
+        if not self.schedule_date(browser, schedule_object['month'], schedule_object['year']):
             raise Exception("failed to enter date!")
-        if not self.schedule_day(schedule_object["day"]):
+        if not self.schedule_day(schedule_object['day']):
             raise Exception("failed to enter day!")
         self.schedule_save_date(browser)
         # individually set hour, minutes, and suffix
-        if not self.schedule_hour(browser, schedule_object["hour"]):
+        if not self.schedule_hour(browser, schedule_object['hour']):
             raise Exception("failed to enter hour!")
-        if not self.schedule_minutes(browser, schedule_object["minute"]):
+        if not self.schedule_minutes(browser, schedule_object['minute']):
             raise Exception("failed to enter minutes!")
-        if not self.schedule_suffix(browser, schedule_object["suffix"]):
+        if not self.schedule_suffix(browser, schedule_object['suffix']):
             raise Exception("failed to enter suffix!")
         Settings.dev_print("saving schedule...")
         if Settings.is_debug():

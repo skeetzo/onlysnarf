@@ -1,9 +1,8 @@
 
-from .driver import Driver
+from .errors import error_checker
 from .goto import go_to_home, go_to_page
-from .message import message_user
-from ..util.settings import Settings
-from ..util.urls import ONLYFANS_HOME_URL2, ONLYFANS_USERS_ACTIVE_URL, ONLYFANS_USERS_FOLLOWING_URL
+from .. import Settings
+from .. import ONLYFANS_HOME_URL2, ONLYFANS_USERS_ACTIVE_URL, ONLYFANS_USERS_FOLLOWING_URL
 
 #################
 ##### Users #####
@@ -41,7 +40,7 @@ def get_current_username(browser):
             Settings.dev_print("successfully found active username: {}".format(username))
             return username
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
         Settings.err_print("failed to find active username!")
     return None
 
@@ -73,7 +72,7 @@ def get_userid_by_username(browser, username):
         user_id = user_id.replace("https://onlyfans.com/my/chats/chat/", "")
         Settings.dev_print(f"successfully found user id: {user_id}")
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
         Settings.err_print(f"failed to find user id for username: {username}")
     return user_id
 
@@ -112,7 +111,7 @@ def get_users_at_page(browser, page):
         Settings.dev_print(f"successfully found {class_name}!")
     except Exception as e:
         Settings.print(e)
-        Driver.error_checker(e)
+        error_checker(e)
         Settings.err_print(f"failed to find {class_name}!")
     return users
 

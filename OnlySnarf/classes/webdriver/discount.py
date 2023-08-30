@@ -1,10 +1,9 @@
 
 from .element import find_element_to_click
-from .driver import Driver
 from .user import get_user_by_username
-from ..util.settings import Settings
+from .. import Settings
 
-def discount_user(discount_object={}):
+def discount_user(browser, discount_object):
     """
     Enter and apply discount to user
 
@@ -29,7 +28,6 @@ def discount_user(discount_object={}):
         Settings.err_print("missing discount!")
         return False
 
-    browser = Driver.get_browser()    
     Settings.print(f"Discounting {discount_object["username"]} {discount_object["amount"]}% for {discount_object["months"]} month(s)")
 
     try:

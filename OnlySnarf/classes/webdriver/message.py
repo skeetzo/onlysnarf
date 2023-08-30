@@ -1,5 +1,3 @@
-# TODO: clean up this huge file and reorganize it properly to mesh with User class
-
 import time
 
 from selenium.webdriver.common.action_chains import ActionChains
@@ -10,18 +8,17 @@ from selenium.common.exceptions import TimeoutException
 # from selenium.common.exceptions import WebDriverException
 
 from .element import find_element_to_click
-from .driver import Driver
+from .errors import error_checker
 from .goto import go_to_home, go_to_page
 from .upload import upload_files
-from ..classes.user import User
-from ..util.settings import Settings
-from ..util.urls import ONLYFANS_CHAT_URL, ONLYFANS_NEW_MESSAGE_URL
+from .. import Settings
+from .. import ONLYFANS_CHAT_URL, ONLYFANS_NEW_MESSAGE_URL
 
 ####################
 ##### Messages #####
 ####################
 
-def message(message_object={}):
+def message(browser, message_object):
 
     """
     Complete the various components of sending a message to a user.
@@ -37,9 +34,8 @@ def message(message_object={}):
         Whether or not the message was successful
     """
 
-    browser = Driver.get_browser()
     try:
-        Settings.print(f"Entering message to {message_object["recipients"]}: (${message_object["price"]}) {message_object["text"]}")
+        Settings.print(f"Entering message to {message_object['recipients']}: (${message_object['price']}) {message_object['text']}")
         successful_message_steps = []
 
         if len(message_object["recipients"]) > 1 or message_object["includes"] or message_object["excludes"]:
@@ -71,10 +67,10 @@ def message(message_object={}):
             # if none of above or solo messaging, switch to normal user messaging (locates user_id on profile page and opens url link)
             successful_message_steps.append(message_user_by_username(browser, username))
 
-        if not all(successful_message_steps): raise Exception(f"Failed to begin message for {message_object["recipients"]}!")
+        if not all(successful_message_steps): raise Exception(f"Failed to begin message for {message_object['recipients']}!")
 
         # actually send the message
-        return all([message_text(browser, message_object["text"]), message_price(browser, message_object["price"]), upload_files(browser, message_object["files"]), message_confirm(browser)])
+        return all([message_text(browser, message_object['text']), message_price(browser, message_object['price']), upload_files(browser, message_object['files']), message_confirm(browser)])
     except Exception as e:
         Settings.err_print(e)
     message_clear(browser)
@@ -203,7 +199,7 @@ def message_clear(browser):
         Settings.dev_print("successfully cleared message!")
         return True
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
         Settings.warn_print("failed to clear message!")
     return False
 
@@ -234,7 +230,7 @@ def message_confirm(browser):
     except TimeoutException:
         Settings.err_print("Timed out waiting for message confirm!")
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
         Settings.err_print("Failure to confirm message!")
     message_clear(browser)
     return False
@@ -264,7 +260,7 @@ def message_price(browser, price):
             Settings.dev_print("successfully entered message price!")
             return True
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
         Settings.err_print("failed to enter message price!")
     return False
 
@@ -330,7 +326,7 @@ def message_text(browser, text=""):
         time.sleep(0.5)
         return True
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
         Settings.err_print("failure to enter message")
     return False
 
@@ -363,7 +359,7 @@ def message_user_by_id(browser, user_id):
         Settings.dev_print("successfully messaging user id: {}".format(user_id))
         return True
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
         Settings.err_print("failed to message user by id!")
     return False
 
@@ -401,11 +397,11 @@ def message_user_by_username(browser, username):
         # clicking no longer works? just open href in self.browser
         # Settings.dev_print("clicking send message")
         # ele.click()
-        Settings.maybe_print(f"user id found: {ele.replace(ONLYFANS_HOME_URL2, "")}")
+        Settings.maybe_print(f"user id found: {ele.replace(ONLYFANS_HOME_URL2, '')}")
         go_to_page(browser, ele)
         Settings.dev_print(f"successfully messaging username: {username}")
         return True
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
         Settings.err_print("failed to message user")
     return False

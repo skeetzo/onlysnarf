@@ -4,19 +4,19 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
-from .expiration import expires as EXPIRES
-from .driver import Driver
+from .expiration import expiration as EXPIRES
+from .errors import error_checker
 from .message import message_clear
 from .poll import poll as POLL
 from .schedule import schedule as SCHEDULE
 from .upload import upload_files
-from ..util.settings import Settings
+from .. import Settings
 
 ################
 ##### Post #####
 ################
 
-def post(post_object={}):
+def post(browser, post_object):
     """
     Post the message to OnlyFans.
 
@@ -43,7 +43,6 @@ def post(post_object={}):
     if not post_object:
         Settings.dev_print("skipping empty post")
         return True
-    browser = Driver.get_browser()
     message_clear(browser)
     #################### Formatted Text ####################
     Settings.print("====================")
@@ -168,11 +167,11 @@ def open_more_options(browser):
     try:
         return option_one()
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
 
     try:
         return option_two()
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
     
     raise Exception("unable to locate 'More Options' element")

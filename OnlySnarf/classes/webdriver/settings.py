@@ -1,5 +1,5 @@
 
-from ..util.settings import Settings
+from .. import Settings
 
 # TODO: also last
 

@@ -10,4 +10,6 @@ rm -rf log/* $HOME/OnlySnarf/snarf.log $HOME/.onlysnarf/log/*
 rm -rf $HOME/.onlysnarf/session.json $HOME/.onlysnarf/cookies.pkl
 
 # any remaining files
-rm -rf $HOME/OnlySnarf/downloads/* $HOME/OnlySnarf/uploads/*
+# rm -rf $HOME/OnlySnarf/downloads/* $HOME/OnlySnarf/uploads/*
+
+rm -rf OnlySnarf/__pycache__ OnlySnarf/classes/__pycache__ OnlySnarf/classes/webdriver/__pycache__ OnlySnarf/lib/__pycache__ OnlySnarf/util/__pycache__

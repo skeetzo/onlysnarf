@@ -1,6 +1,6 @@
 
-from .message import message_user
-from ..util.settings import Settings
+from .message import message_user_by_username
+from .. import Settings
 
 ############
 ### Chat ###
@@ -77,7 +77,7 @@ def get_user_chat(browser, username, user_id=None):
 
     try:
         # go to onlyfans.com/my/subscribers/active
-        message_user(browser, username, user_id=user_id)
+        message_user_by_username(browser, username)
         messages_sent_ = []
 
         try:

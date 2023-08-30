@@ -3,7 +3,7 @@ import logging
 import os
 from selenium.webdriver.remote.remote_connection import LOGGER as SeleniumLogger
 
-from ..util.settings import Settings
+from .. import Settings
 
 def enable_logging():
     if str(Settings.is_debug("selenium")) == "False":

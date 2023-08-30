@@ -2,7 +2,7 @@ import os
 import pickle
 
 from .goto import go_to_home
-from ..util.settings import Settings
+from .. import Settings
 
 ###################
 ##### Cookies #####

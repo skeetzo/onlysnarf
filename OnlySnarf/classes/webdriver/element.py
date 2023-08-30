@@ -1,7 +1,7 @@
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
-from ..util.settings import Settings
+from .. import Settings
 
 ################
 ### Elements ###
@@ -36,7 +36,7 @@ def find_element_to_click(browser, name, text="", isID=False, fuzzyMatch=False, 
         Settings.dev_print(f"elements found: {len(elements)}")
         i = 0
         for element in elements:
-            Settings.dev_print(f"element: {element.get_attribute("innerHTML").strip()}")
+            Settings.dev_print(f"element: {element.get_attribute('innerHTML').strip()}")
             if element.is_displayed() and element.is_enabled() and i == index:
                 if text and str(text) == element.get_attribute("innerHTML").strip().lower():
                     Settings.dev_print("found matching element!")

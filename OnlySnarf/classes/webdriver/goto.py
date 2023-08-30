@@ -5,10 +5,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 
-from .user import get_current_username
-from ..util import defaults as DEFAULT
-from ..util.settings import Settings
-from ..util.urls import ONLYFANS_HOME_URL, ONLYFANS_SETTINGS_URL
+from .. import Settings
+from .. import ONLYFANS_HOME_URL, ONLYFANS_SETTINGS_URL
 
 ##############
 ### Go Tos ###
@@ -77,7 +75,7 @@ def go_to_page(browser, page):
 def go_to_profile(browser):
     """Go to OnlyFans profile page"""
 
-    username = Settings.get_username() or get_current_username(browser)
+    username = Settings.get_username()
     page = "{}/{}".format(ONLYFANS_HOME_URL, username)
     if search_for_tab(browser, page):
         Settings.maybe_print("found -> /{}".format(username))

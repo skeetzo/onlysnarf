@@ -14,7 +14,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     # packages=setuptools.find_packages(),
-    packages=["OnlySnarf", "OnlySnarf/classes","OnlySnarf/conf","OnlySnarf/elements","OnlySnarf/lib","OnlySnarf/util","OnlySnarf/server"],
+    packages=["OnlySnarf", "OnlySnarf/classes","OnlySnarf/conf","OnlySnarf/lib","OnlySnarf/util"],
     include_package_data=True,
     install_requires=[
         'dropbox',

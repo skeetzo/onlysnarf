@@ -1,6 +1,5 @@
 import json
 
-from ..classes.user import User
 from .settings import Settings
 
 # add random user to json file
@@ -27,6 +26,7 @@ def add_to_randomized_users(newUser):
 def get_already_randomized_users():
     Settings.dev_print("getting already randomized users...")
     users = []
+    from ..classes.user import User
     try:
         with open(str(Settings.get_users_path())) as json_file:  
             for user in json.load(json_file)['randomized_users']:
@@ -48,6 +48,7 @@ def read_users_local():
     """
     Settings.dev_print("getting local users...")
     users = []
+    from ..classes.user import User
     try:
         with open(str(Settings.get_users_path())) as json_file:  
             for user in json.load(json_file)['users']:

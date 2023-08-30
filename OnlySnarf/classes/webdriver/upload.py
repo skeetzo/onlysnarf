@@ -1,7 +1,7 @@
 import threading
 import concurrent.futures
 
-from ..util.settings import Settings
+from .. import Settings
 
 #####################
 ### Drag and Drop ###

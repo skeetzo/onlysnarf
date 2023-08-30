@@ -2,7 +2,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
-from ..util.settings import Settings
+from .. import Settings
 
 ######################
 ##### Expiration #####

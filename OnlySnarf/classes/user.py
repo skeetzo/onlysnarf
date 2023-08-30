@@ -5,12 +5,21 @@ from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError, post_load
 
 from ..util.colorize import colorize
-from ..lib.driver import Driver
 from ..util.data import add_to_randomized_users, get_already_randomized_users, read_users_local, write_users_local
 from ..util.settings import Settings
-from ..webdriver import get_recent_chat_users, get_userid_by_username as WEBDRIVER_get_userid_by_username, message, read_user_messages as WEBDRIVER_read_user_messages
+from .driver import get_recent_chat_users, get_userid_by_username as WEBDRIVER_get_userid_by_username, message
+ # read_user_messages as WEBDRIVER_read_user_messages
 
 ALREADY_RANDOMIZED_USERS = []
+
+class MessagesSchema(Schema):
+    parsed = fields.List(fields.Str(), default=[])
+    sent = fields.List(fields.Str(), default=[])
+    received = fields.List(fields.Str(), default=[])
+
+class FilesSchema(Schema):
+    sent = fields.List(fields.Str(), default=[])
+    received = fields.List(fields.Str(), default=[])
 
 # https://marshmallow.readthedocs.io/en/stable/
 class UserSchema(Schema):
@@ -33,15 +42,6 @@ class UserSchema(Schema):
     @post_load
     def make_user(self, data, **kwargs):
         return User(**data)
-
-class MessagesSchema(Schema):
-    parsed = fields.List(fields.Str(), default=[])
-    sent = fields.List(fields.Str(), default=[])
-    received = fields.List(fields.Str(), default=[])
-
-class FilesSchema(Schema):
-    sent = fields.List(fields.Str(), default=[])
-    received = fields.List(fields.Str(), default=[])
 
 class User:
     """OnlyFans users."""
@@ -69,7 +69,7 @@ class User:
     @staticmethod
     def create_user(user_data):
         schema = UserSchema()
-        user = schema.load(user_data**)
+        user = schema.load(**user_data)
         return user
 
     def dump(self):
@@ -198,7 +198,7 @@ class User:
     # restricted
     # blocked
     @staticmethod
-    def get_users_by_type(typeOf="fan")
+    def get_users_by_type(typeOf="fan"):
         Settings.dev_print(f"getting users: {typeOf}")
         users = User.get_all_users()
         foundUsers = []

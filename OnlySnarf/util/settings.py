@@ -5,7 +5,9 @@ from datetime import datetime
 from pathlib import Path
 ##
 from .colorize import colorize
-from .config import config
+
+from .config import CONFIG as config
+
 from . import defaults as DEFAULT
 from .validators import valid_schedule, valid_time
 from .logger import logging

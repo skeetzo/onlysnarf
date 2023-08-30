@@ -6,9 +6,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
-from .driver import Driver
+from .errors import error_checker
 from .goto import go_to_home
-from ..util.settings import Settings
+from .. import Settings
 
 ##################
 ###### Login #####
@@ -27,7 +27,6 @@ def login(browser):
 
     """
 
-    if not browser: browser = Driver.get_browser()
     if check_if_already_logged_in(browser): return True
     Settings.print('Logging into OnlyFans for {}...'.format(Settings.get_username()))
     try:
@@ -42,7 +41,7 @@ def login(browser):
         elif Settings.get_login_method() == "google":
             return via_google(browser)
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
     return False
 
 ################################################################################################
@@ -97,7 +96,7 @@ def check_if_logged_in(browser):
             Settings.err_print("Login Failure: Timed Out! Please check your credentials.")
             Settings.err_print("If the problem persists, OnlySnarf may require an update.")
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
         Settings.err_print("Login Failure!")
         Settings.err_print("If the problem persists, OnlySnarf may require an update.")
     return False
@@ -135,7 +134,7 @@ def via_form(browser):
         return check_if_logged_in(browser)
     except Exception as e:
         Settings.dev_print("form login failure!")
-        Driver.error_checker(e)
+        error_checker(e)
     return False
 
 # TODO: requires testing
@@ -171,7 +170,7 @@ def via_google(browser):
         return check_if_logged_in(browser)
     except Exception as e:
         Settings.dev_print("google login failure!")
-        Driver.error_checker(e)
+        error_checker(e)
     return False
 
 def via_twitter(browser):
@@ -202,7 +201,7 @@ def via_twitter(browser):
         return check_if_logged_in(browser)
     except Exception as e:
         Settings.dev_print("twitter login failure!")
-        Driver.error_checker(e)
+        error_checker(e)
     return False
 
 

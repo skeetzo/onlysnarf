@@ -1,6 +1,6 @@
 
 from .element import find_element_to_click
-from ..util.settings import Settings
+from .. import Settings
 
 ################
 ##### Poll #####

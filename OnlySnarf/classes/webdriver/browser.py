@@ -1,3 +1,4 @@
+import logging
 import os
 # import shutil
 import platform
@@ -22,11 +23,11 @@ from webdriver_manager.microsoft import IEDriverManager
 # edge
 from selenium.webdriver.edge.service import Service as EdgeService
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
-from msedge.selenium_tools import Edge, EdgeOptions
+# from msedge.selenium_tools import Edge, EdgeOptions
 # opera
 from webdriver_manager.opera import OperaDriverManager
-##
-from ..util.settings import Settings
+
+from .. import Settings
 
 def create_browser(browserType):
     """
@@ -47,7 +48,7 @@ def create_browser(browserType):
     """
 
     browser = None
-    Settings.print("spawning web browser...")
+    logging.info("spawning web browser...")
 
     if "auto" in browserType:
         browser = attempt_reconnect()
@@ -76,16 +77,16 @@ def create_browser(browserType):
         browser = attempt_remote()
 
     if not browser:
-        Settings.err_print("unable to spawn a web browser!")
+        logging.error("unable to spawn a web browser!")
         os._exit(1)
 
     browser.implicitly_wait(30) # seconds
     browser.set_page_load_timeout(1200)
     browser.file_detector = LocalFileDetector() # for uploading via remote sessions
     if str(Settings.is_show_window()) == "False":
-        Settings.print("headless browser spawned successfully!")
+        logging.info("headless browser spawned successfully!")
     else:
-        Settings.print("browser spawned successfully!")
+        logging.info("browser spawned successfully!")
     return browser
 
 ################################################################################################
@@ -134,24 +135,24 @@ def add_options(options):
     # options.add_argument("--remote-debugging-port=9223")
 
 def browser_error(err, browserName):
-    Settings.warn_print("unable to launch {}!".format(browserName))
-    Settings.dev_print(err)
+    logging.warn("unable to launch {}!".format(browserName))
+    logging.debug(err)
 
 def attempt_chrome():
     browserAttempt = None
     try:
-        Settings.maybe_print("attempting Chrome web browser...")
+        logging.debug("attempting Chrome web browser...")
         # raspberrypi arm processors don't work with webdriver manager
         # linux = x86_64
         # rpi = aarch64
         processor = platform.processor()
-        Settings.dev_print("cpu processor: {}".format(processor))
+        logging.debug("cpu processor: {}".format(processor))
         if str(processor) == "aarch64":
             # TODO: add file check for chromedriver w/ reminder warning for rpi install requirement
             browserAttempt = webdriver.Chrome(service=ChromeService('/usr/bin/chromedriver'), options=chrome_options())
         else:
             browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options())
-        Settings.print("browser created - Chrome")        
+        logging.info("browser created - Chrome")        
     except Exception as e:
         browser_error(e, "chrome")
     return browserAttempt
@@ -159,9 +160,9 @@ def attempt_chrome():
 def attempt_brave():
     browserAttempt = None
     try:
-        Settings.maybe_print("attempting Brave web browser...")
+        logging.debug("attempting Brave web browser...")
         browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()), options=chrome_options())
-        Settings.print("browser created - Brave")
+        logging.info("browser created - Brave")
     except Exception as e:
         browser_error(e, "brave")
     return browserAttempt
@@ -169,9 +170,9 @@ def attempt_brave():
 def attempt_chromium():
     browserAttempt = None
     try:
-        Settings.maybe_print("attempting Chromium web browser...")
+        logging.debug("attempting Chromium web browser...")
         browserAttempt = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install(), options=chrome_options())
-        Settings.print("browser created - Chromium")        
+        logging.info("browser created - Chromium")        
     except Exception as e:
         browser_error(e, "chromium")
     return browserAttempt
@@ -180,10 +181,10 @@ def attempt_chromium():
 def attempt_edge():
     browserAttempt = None
     try:
-        Settings.maybe_print("attempting Edge web browser...")
+        logging.debug("attempting Edge web browser...")
         # browserAttempt = Edge(executable_path=options.binary_location, options=edge_options())
         browserAttempt = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
-        Settings.print("browser created - Edge")
+        logging.info("browser created - Edge")
     except Exception as e:
         browser_error(e, "edge")
     return browserAttempt
@@ -192,12 +193,12 @@ def attempt_firefox():
     browserAttempt = None
     # firefox needs non root
     if os.geteuid() == 0:
-        Settings.print("You must run `onlysnarf` as non-root for Firefox to work correctly!")
+        logging.info("You must run `onlysnarf` as non-root for Firefox to work correctly!")
         return False
     try:
-        Settings.maybe_print("attempting Firefox web browser...")
+        logging.debug("attempting Firefox web browser...")
         browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=firefox_options())
-        Settings.print("browser created - Firefox")
+        logging.info("browser created - Firefox")
     except Exception as e:
         browser_error(e, "firefox")
     return browserAttempt
@@ -206,12 +207,12 @@ def attempt_firefox():
 def attempt_ie():
     browserAttempt = None
     try:
-        Settings.maybe_print("attempting IE web browser...")
+        logging.debug("attempting IE web browser...")
         # driver_path = IEDriverManager().install()
         # os.chmod(driver_path, 0o755)
         # browserAttempt = webdriver.Ie(executable_path=IEService(driver_path))
         browserAttempt = webdriver.Ie(service=IEService(IEDriverManager().install()))
-        Settings.print("browser created - IE")
+        logging.info("browser created - IE")
     except Exception as e:
         browser_error(e, "ie")
     return browserAttempt
@@ -220,9 +221,9 @@ def attempt_ie():
 def attempt_opera():
     browserAttempt = None
     try:
-        Settings.maybe_print("attempting Opera web browser...")
+        logging.debug("attempting Opera web browser...")
         browserAttempt = webdriver.Opera(executable_path=OperaDriverManager().install())
-        Settings.print("browser created - Opera")
+        logging.info("browser created - Opera")
     except Exception as e:
         browser_error(e, "opera")
     return browserAttempt
@@ -230,11 +231,11 @@ def attempt_opera():
 def attempt_reconnect():
     session_id, session_url = read_session_data()
     if not session_id and not session_url:
-        Settings.warn_print("unable to read session data!")
+        logging.warn("unable to read session data!")
         return None
-    Settings.maybe_print("reconnecting to web browser...")
-    Settings.dev_print("reconnect id: {}".format(session_id))
-    Settings.dev_print("reconnect url: {}".format(session_url))
+    logging.debug("reconnecting to web browser...")
+    logging.debug("reconnect id: {}".format(session_id))
+    logging.debug("reconnect url: {}".format(session_url))
     try:
         options = webdriver.ChromeOptions()
         add_options(options)
@@ -243,28 +244,28 @@ def attempt_reconnect():
         # take the session that's already running
         browserAttempt.session_id = session_id
         browserAttempt.title # fails check with: 'NoneType' object has no attribute 'title'
-        Settings.print("browser reconnected!")
+        logging.info("browser reconnected!")
         return browserAttempt
     except Exception as e:
-        Settings.warn_print("unable to reconnect!")
-        Settings.dev_print(e)
+        logging.warn("unable to reconnect!")
+        logging.debug(e)
     return None
 
 # TODO: update and debug
 def attempt_remote():
     link = 'http://{}:{}/wd/hub'.format(Settings.get_remote_browser_host(), Settings.get_remote_browser_port())
-    Settings.dev_print("remote url: {}".format(link))
+    logging.debug("remote url: {}".format(link))
     def attempt(dc, opts):
         try:
             if str(Settings.is_show_window()) == "False":
                 opts.add_argument('--headless')
-            Settings.dev_print("attempting remote: {}".format(browserType))
+            logging.debug("attempting remote: {}".format(browserType))
             browserAttempt = webdriver.Remote(command_executor=link, desired_capabilities=dc, options=opts)
-            Settings.print("remote browser created - {}".format(browserType))
+            logging.info("remote browser created - {}".format(browserType))
             return browserAttempt
         except Exception as e:
-            Settings.warn_print("unable to connect remotely!")
-            Settings.dev_print(e)
+            logging.warn("unable to connect remotely!")
+            logging.debug(e)
         return None
 
     if "brave" in browserType: return attempt(*brave_options())
@@ -274,7 +275,7 @@ def attempt_remote():
     elif "firefox" in browserType: return attempt(*firefox_options())
     elif "ie" in browserType: return attempt(*ie_options())
     elif "opera" in browserType: return attempt(*opera_options())
-    Settings.warn_print("unable to connect remotely via {}!".format(browserType))
+    logging.warn("unable to connect remotely via {}!".format(browserType))
     return None
 
 ################################################################################################
@@ -299,8 +300,8 @@ def chromium_options():
 
 def edge_options():
     dC = DesiredCapabilities.EDGE
-    options = EdgeOptions()
-    # options = webdriver.EdgeOptions()
+    # options = EdgeOptions()
+    options = webdriver.EdgeOptions()
     options.use_chromium = True
     # options.binary_location="/home/{user}/.wdm/drivers/edgedriver/linux64/111.0.1661/msedgedriver".format(user=os.getenv('USER'))
     # os.chmod(options.binary_location, 0o755)

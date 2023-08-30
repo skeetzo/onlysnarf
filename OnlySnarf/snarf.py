@@ -3,13 +3,13 @@
 # import logging
 # logger = logging.getLogger('snarf_logger')
 
-from .classes.discount import create_discount
-from .classes.message import create_message, create_post
+from .classes.discount import Discount
+from .classes.message import Message, Post
 from .classes.profile import Profile
-from .classes.promotion import Promotion
+# from .classes.promotion import Promotion
 from .classes.user import User
 from .lib.config import Config
-from .lib.menu import Menu
+# from .lib.menu import Menu
 from .lib import api as API
 from .util.args import get_args
 from .util.config import get_config
@@ -21,8 +21,8 @@ def api(config={}):
 def config(config={}):
     Config.main(config)
 
-def menu(config={}):
-    Menu.main(config)
+# def menu(config={}):
+#     Menu.main(config)
 
 def discount(config={'user':None,'users':[]}):
 
@@ -33,7 +33,7 @@ def discount(config={'user':None,'users':[]}):
     """
 
     Settings.print("Beginning discount process...")
-    return create_discount(config).apply()
+    return Discount.create_discount(config).apply()
 
 def message(config={'user':None,'users':[]}):
 
@@ -44,7 +44,7 @@ def message(config={'user':None,'users':[]}):
     """
 
     Settings.print("Beginning message process...")
-    return create_message(config).send()
+    return Message.create_message(config).send()
             
 def post(config={'text':"",'input':[]}):
 
@@ -55,7 +55,7 @@ def post(config={'text':"",'input':[]}):
     """
 
     Settings.print("Beginning post process...")
-    return create_post(config).send()
+    return Post.create_post(config).send()
 
 # TODO: update this
 # def profile():
@@ -132,8 +132,9 @@ def users(config={'prefer_local':False}):
 def main():
     try:
         config = get_config(get_args())
+        print(config)
         Settings.print("Running - {}".format(config["action"]))
-        eval(f"{config["action"]}(config)")
+        eval(f"{config['action']}(config)")
     except Exception as e:
         Settings.err_print(e)
         Settings.print("shnarf??")
