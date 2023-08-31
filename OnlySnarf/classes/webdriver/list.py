@@ -319,7 +319,7 @@ def add_users_to_list(self, users=[], number=None, name=None):
             self.browser.refresh()
             Settings.dev_print("### List Add Successfully Skipped ###")
             return True
-        if str(Settings.is_debug()) == "True":
+        if str(CONFIG["debug"]) == "True":
             Settings.print("skipping list add (debug)")
             Settings.dev_print("skipping list save")
             self.browser.refresh()

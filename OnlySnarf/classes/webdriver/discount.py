@@ -1,6 +1,7 @@
 
 from .element import find_element_to_click
 from .user import get_user_by_username
+from ..util import debug_delay_check
 from .. import Settings
 
 def discount_user(browser, discount_object):
@@ -40,7 +41,7 @@ def discount_user(browser, discount_object):
             Settings.dev_print("repeating discount amount & months...")
             discount_amount, discount_months = apply_discount()
 
-        if Settings.is_debug():
+        if CONFIG["debug"]:
             return cancel_discount(browser)
         else:
             return apply_discount(browser)
@@ -61,7 +62,7 @@ def apply_discount(browser):
         find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Apply").click()
         Settings.dev_print("### Discount Successful ###")
         Settings.print("Discount successful!")
-        Settings.debug_delay_check()
+        debug_delay_check()
         return True
     except Exception as e:
         Settings.dev_print("### Discount Failure - Missing Apply Button ###")
@@ -75,7 +76,7 @@ def cancel_discount(browser, onsuccess=True):
         if onsuccess:
             Settings.dev_print("### Discount Successfully Canceled ###")
             Settings.print("Discount canceled!")
-            Settings.debug_delay_check()
+            debug_delay_check()
             return True
         else:
             Settings.print("Discount failed!")
@@ -91,7 +92,7 @@ def click_discount_button(user_element):
         find_element_to_click(user_element, "b-tabs__nav__text", text="Discount").click()
         Settings.dev_print("clicked discount btn")
         time.sleep(0.5)
-        Settings.debug_delay_check()
+        debug_delay_check()
         return True
     except Exception as e:
         Driver.error_checker(e)
@@ -134,7 +135,7 @@ def apply_discount_amount(browser, amount):
         action.send_keys(Keys.TAB)
         action.perform()
     Settings.dev_print("successfully entered discount amount!")
-    Settings.debug_delay_check()
+    debug_delay_check()
 
 def apply_discount_months(browser, months):
     Settings.maybe_print("attempting discount months entry")
@@ -160,4 +161,4 @@ def apply_discount_months(browser, months):
         action.send_keys(Keys.TAB)
         action.perform()
     Settings.dev_print("successfully entered discount months!")
-    Settings.debug_delay_check()
+    debug_delay_check()

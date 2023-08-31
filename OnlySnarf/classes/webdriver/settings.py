@@ -157,7 +157,7 @@ def sync_to_settings_page(self, profile=None, page=None):
                 element.send_keys(getattr(profile, str(name)))
             elif str(type_) == "checkbox":
                 element.click()
-        if str(Settings.is_debug()) == "True":
+        if str(CONFIG["debug"]) == "True":
             Settings.dev_print("successfully cancelled settings page: {}".format(page))
         else:
             self.settings_save(page=page)
@@ -208,7 +208,7 @@ def settings_save(self, page=None):
         Settings.dev_print("derp")
         element = self.find_element_to_click("profileSave")
         Settings.dev_print("found page save")
-        if str(Settings.is_debug()) == "True":
+        if str(CONFIG["debug"]) == "True":
             Settings.print("skipping settings save (debug)")
         else:
             Settings.dev_print("saving page")

@@ -1,5 +1,6 @@
 
 from .element import find_element_to_click
+from ..util import debug_delay_check
 from .. import Settings
 
 ################
@@ -30,7 +31,7 @@ def poll(browser, poll_object={}):
         open_poll_model(browser)        
         add_poll_duration(browser, poll_object["duration"])
         add_poll_questions(browser, poll_object["questions"])
-        if Settings.is_debug():
+        if CONFIG["debug"]:
             Settings.maybe_print("skipping poll (debug)")
             find_element_to_click(browser, "b-dropzone__preview__delete", text="Cancel").click()
         Settings.dev_print("### Poll Successful ###")
@@ -56,7 +57,7 @@ def add_poll_duration(browser, duration, wait=1):
     Settings.dev_print("saving duration")
     find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Save").click()
     Settings.dev_print("successfully saved duration")
-    Settings.debug_delay_check()
+    debug_delay_check()
 
 def add_poll_questions(browser, questions):
     Settings.dev_print("configuring question paths...")
@@ -83,7 +84,7 @@ def add_poll_questions(browser, questions):
         time.sleep(1)
         i+=1
     Settings.dev_print("successfully entered questions")
-    Settings.debug_delay_check()
+    debug_delay_check()
 
 # open the poll model
 def open_poll_model(browser):
@@ -92,4 +93,4 @@ def open_poll_model(browser):
     element = [elem for elem in elements if '#icon-poll' in str(elem.get_attribute('href'))][0]
     ActionChains(browser).move_to_element(element).click().perform()
     time.sleep(1)
-    Settings.debug_delay_check()
+    debug_delay_check()

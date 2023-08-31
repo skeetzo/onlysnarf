@@ -10,6 +10,7 @@ from .message import message_clear
 from .poll import poll as POLL
 from .schedule import schedule as SCHEDULE
 from .upload import upload_files
+from ..util import debug_delay_check
 from .. import Settings
 
 ################
@@ -121,10 +122,10 @@ def enable_tweeting(brower):
 
 def send_post(browser):
     ## TODO: switch to boolean check last / never
-    if str(Settings.is_debug()) == "True":
+    if str(CONFIG["debug"]) == "True":
         message_clear(browser)
         Settings.print('skipped post (debug)')
-        Settings.debug_delay_check()
+        debug_delay_check()
         return True
     Settings.dev_print("sending post...")
     button = [ele for ele in browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]

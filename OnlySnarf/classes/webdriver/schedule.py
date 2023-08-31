@@ -1,5 +1,6 @@
 
 from .element import find_element_to_click
+from ..util import debug_delay_check
 from .. import Settings
 
 ####################
@@ -58,7 +59,7 @@ def schedule(browser, schedule_object={}):
         if not self.schedule_suffix(browser, schedule_object['suffix']):
             raise Exception("failed to enter suffix!")
         Settings.dev_print("saving schedule...")
-        if Settings.is_debug():
+        if CONFIG["debug"]:
             Settings.print("skipping schedule save (debug)")
             return self.schedule_cancel(browser)
         return self.schedule_save(browser)
@@ -83,7 +84,7 @@ def schedule_date(browser, month, year):
         Settings.dev_print(f"date: {date} - {month} {year}")
         if str(month) in str(date) and str(year) in str(date):
             Settings.dev_print("set month and year")
-            Settings.debug_delay_check()
+            debug_delay_check()
             return True
         else:
             find_element_to_click(browser, "vdatetime-calendar__navigation--next").click()
@@ -97,7 +98,7 @@ def schedule_day(browser, day):
         if str(day) in ele.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>",""):
             ele.click()
             Settings.dev_print("set day")
-            Settings.debug_delay_check()
+            debug_delay_check()
             return True
     return False
 
@@ -116,7 +117,7 @@ def schedule_hour(browser, hour):
         if str(hour) in ele.get_attribute("innerHTML").strip():
             ele.click()
             Settings.dev_print("set hour")
-            Settings.debug_delay_check()
+            debug_delay_check()
             return True
     return False
 
@@ -129,7 +130,7 @@ def schedule_minutes(browser, minutes):
         if str(minutes) in ele.get_attribute("innerHTML").strip():
             ele.click()
             Settings.dev_print("set minutes")
-            Settings.debug_delay_check()
+            debug_delay_check()
             return True
     return False
 
@@ -142,7 +143,7 @@ def schedule_suffix(browser, suffix):
         if str(suffix).lower() in ele.get_attribute("innerHTML").strip().lower():
             ele.click()
             Settings.dev_print("set suffix")
-            Settings.debug_delay_check()
+            debug_delay_check()
             return True
     return False
 

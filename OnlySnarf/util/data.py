@@ -1,11 +1,14 @@
 import json
+import logging
 
-from .settings import Settings
+from .config import CONFIG
+
+USERS_PATH = CONFIG["path_users"]
 
 # add random user to json file
 def add_to_randomized_users(newUser):
     if not newUser: return
-    Settings.maybe_print("saving random user...")
+    logging.debug("saving random user...")
     data = {}
     data['randomized_users'] = []
     existingUsers = get_already_randomized_users()
@@ -14,26 +17,26 @@ def add_to_randomized_users(newUser):
             user.update(newUser)
         data['randomized_users'].append(user.dump())
     try:
-        with open(str(Settings.get_users_path()), 'w') as outfile:  
+        with open(str(USERS_PATH), 'w') as outfile:  
             json.dump(data, outfile, indent=4, sort_keys=True)
     except FileNotFoundError:
-        Settings.err_print("missing local users!")
+        logging.error("missing local users!")
     except OSError:
-        Settings.err_print("missing local path!")
-    Settings.dev_print("saved users!")
+        logging.error("missing local path!")
+    logging.debug("saved users!")
 
 # return random user from json file 
 def get_already_randomized_users():
-    Settings.dev_print("getting already randomized users...")
+    logging.debug("getting already randomized users...")
     users = []
     from ..classes.user import User
     try:
-        with open(str(Settings.get_users_path())) as json_file:  
+        with open(str(USERS_PATH)) as json_file:  
             for user in json.load(json_file)['randomized_users']:
                 users.append(User(json.loads(user)))
-        Settings.maybe_print("loaded randomized users")
+        logging.debug("loaded randomized users")
     except Exception as e:
-        Settings.dev_print(e)
+        logging.debug(e)
     return users
 
 def read_users_local():
@@ -46,16 +49,16 @@ def read_users_local():
         The locally saved users
 
     """
-    Settings.dev_print("getting local users...")
+    logging.debug("getting local users...")
     users = []
     from ..classes.user import User
     try:
-        with open(str(Settings.get_users_path())) as json_file:  
+        with open(str(USERS_PATH)) as json_file:  
             for user in json.load(json_file)['users']:
                 users.append(User(json.loads(user)))
-        Settings.maybe_print("loaded local users")
+        logging.debug("loaded local users")
     except Exception as e:
-        Settings.dev_print(e)
+        logging.debug(e)
     return users
 
 def write_users_local(users=[]):
@@ -65,10 +68,10 @@ def write_users_local(users=[]):
     """
 
     if len(users) == 0:
-        Settings.maybe_print("skipping local users save - empty")
+        logging.debug("skipping local users save - empty")
         return
-    Settings.maybe_print("saving users...")
-    Settings.dev_print(f"local users path: {Settings.get_users_path()}")
+    logging.debug("saving users...")
+    logging.debug(f"local users path: {USERS_PATH}")
     # merge with existing user data
     data = {}
     data['users'] = []
@@ -79,10 +82,10 @@ def write_users_local(users=[]):
                 user.update(u)
         data['users'].append(user.dump())
     try:
-        with open(str(Settings.get_users_path()), 'w') as outfile:  
+        with open(str(USERS_PATH), 'w') as outfile:  
             json.dump(data, outfile, indent=4, sort_keys=True)
     except FileNotFoundError:
-        Settings.err_print("missing local users!")
+        logging.error("missing local users!")
     except OSError:
-        Settings.err_print("missing local path!")
-    Settings.dev_print("saved users!")
+        logging.error("missing local path!")
+    logging.debug("saved users!")

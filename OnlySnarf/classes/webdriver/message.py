@@ -11,7 +11,8 @@ from .element import find_element_to_click
 from .errors import error_checker
 from .goto import go_to_home, go_to_page
 from .upload import upload_files
-from .. import Settings
+from .. import debug_delay_check
+from .. import CONFIG
 from .. import ONLYFANS_CHAT_URL, ONLYFANS_NEW_MESSAGE_URL
 
 ####################
@@ -35,7 +36,7 @@ def message(browser, message_object):
     """
 
     try:
-        Settings.print(f"Entering message to {message_object['recipients']}: (${message_object['price']}) {message_object['text']}")
+        logging.info(f"Entering message to {message_object['recipients']}: (${message_object['price']}) {message_object['text']}")
         successful_message_steps = []
 
         if len(message_object["recipients"]) > 1 or message_object["includes"] or message_object["excludes"]:
@@ -72,16 +73,16 @@ def message(browser, message_object):
         # actually send the message
         return all([message_text(browser, message_object['text']), message_price(browser, message_object['price']), upload_files(browser, message_object['files']), message_confirm(browser)])
     except Exception as e:
-        Settings.err_print(e)
+        logging.error(e)
     message_clear(browser)
-    Settings.err_print("Message failed to send!")
+    logging.error("Message failed to send!")
     return False
 
 # TODO: test all these added behaviors
 def message_fans(browser, exclude=False):
     try:
         go_to_page(ONLYFANS_NEW_MESSAGE_URL)
-        Settings.dev_print("clicking message recipients: fans")
+        logging.debug("clicking message recipients: fans")
         find_element_to_click(browser, "b-tabs__nav__text", text="Fans", fuzzyMatch=True, index=1 if exclude else 0).click()
         return True
     except Exception as e:
@@ -91,7 +92,7 @@ def message_fans(browser, exclude=False):
 def message_recent(browser, exclude=False):
     try:
         go_to_page(ONLYFANS_NEW_MESSAGE_URL)
-        Settings.dev_print("clicking message recipients: recent")
+        logging.debug("clicking message recipients: recent")
         find_element_to_click(browser, "b-tabs__nav__text", text="Recent", fuzzyMatch=True, index=1 if exclude else 0).click()
 
         # TODO: add method for interacting with popup calendar for selecting date for recent subscribers
@@ -104,7 +105,7 @@ def message_recent(browser, exclude=False):
 def message_following(browser, exclude=False):
     try:
         go_to_page(ONLYFANS_NEW_MESSAGE_URL)
-        Settings.dev_print("clicking message recipients: following")
+        logging.debug("clicking message recipients: following")
         find_element_to_click(browser, "b-tabs__nav__text", text="Following", fuzzyMatch=True, index=1 if exclude else 0).click()
         return True
     except Exception as e:
@@ -114,7 +115,7 @@ def message_following(browser, exclude=False):
 def message_favorites(browser, exclude=False):
     try:
         go_to_page(ONLYFANS_NEW_MESSAGE_URL)
-        Settings.dev_print("clicking message recipients: favorites")
+        logging.debug("clicking message recipients: favorites")
         find_element_to_click(browser, "b-tabs__nav__text", text="Favorites", index=1 if exclude else 0).click()
         return True
     except Exception as e:
@@ -124,7 +125,7 @@ def message_favorites(browser, exclude=False):
 def message_friends(browser, exclude=False):
     try:
         go_to_page(ONLYFANS_NEW_MESSAGE_URL)
-        Settings.dev_print("clicking message recipients: friends")
+        logging.debug("clicking message recipients: friends")
         find_element_to_click(browser, "b-tabs__nav__text", text="Friends", index=1 if exclude else 0).click()
         return True
     except Exception as e:
@@ -134,7 +135,7 @@ def message_friends(browser, exclude=False):
 def message_renewers(browser, exclude=False, on=True):
     try:
         go_to_page(ONLYFANS_NEW_MESSAGE_URL)
-        Settings.dev_print(f"clicking message recipients: renew ({on})")
+        logging.debug(f"clicking message recipients: renew ({on})")
         find_element_to_click(browser, "b-tabs__nav__text", text="Renew On" if on else "Renew Off", index=1 if exclude else 0).click()
         return True
     except Exception as e:
@@ -144,7 +145,7 @@ def message_renewers(browser, exclude=False, on=True):
 def message_bookmarks(browser, exclude=False):
     try:
         go_to_page(ONLYFANS_NEW_MESSAGE_URL)
-        Settings.dev_print(f"clicking message recipients: bookmarks")
+        logging.debug(f"clicking message recipients: bookmarks")
         find_element_to_click(browser, "b-tabs__nav__text", text="Bookmarks", index=1 if exclude else 0).click()
         return True
     except Exception as e:
@@ -158,7 +159,7 @@ def message_random(browser):
 # TODO: finish and test this functionality of mass messaging
 # add username to existing mass message being started
 def add_user_to_message(browser, username):
-    Settings.err_print("TODO: finish me!")
+    logging.error("TODO: finish me!")
     pass
 
 ######################################################################
@@ -172,35 +173,35 @@ def close_icons(browser):
         for element in [elem for elem in elements if '#icon-close' in str(elem.get_attribute('href'))]:
             ActionChains(browser).move_to_element(element).click().perform()
     except Exception as e:
-        Settings.err_print(e)
-        Settings.dev_print("unable to click: #icon-close")
+        logging.error(e)
+        logging.debug("unable to click: #icon-close")
 
 def clear_text(browser):
     try:
         ActionChains(browser).move_to_element(browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).perform()
     except Exception as e:
-        Settings.err_print(e)
-        Settings.dev_print("unable to clear text!")
+        logging.error(e)
+        logging.debug("unable to clear text!")
 
 ## TODO
 # add check for clearing any text or images already in post field
 def message_clear(browser):
     try:
-        Settings.dev_print("clearing message...")
+        logging.debug("clearing message...")
         clearButton = [ele for ele in browser.find_elements(By.TAG_NAME, "button") if "Clear" in ele.get_attribute("innerHTML") and ele.is_enabled()]
         if len(clearButton) > 0:
-            Settings.dev_print("clicking clear button...")
+            logging.debug("clicking clear button...")
             clearButton[0].click()
         else:
-            Settings.dev_print("refreshing page and clearing text...")
+            logging.debug("refreshing page and clearing text...")
             go_to_home(browser, force=True)
             clear_text(browser)
             close_icons(browser)
-        Settings.dev_print("successfully cleared message!")
+        logging.debug("successfully cleared message!")
         return True
     except Exception as e:
         error_checker(e)
-        Settings.warn_print("failed to clear message!")
+        logging.warning("failed to clear message!")
     return False
 
 def message_confirm(browser):
@@ -215,23 +216,23 @@ def message_confirm(browser):
     """
 
     try:
-        Settings.dev_print("waiting for message confirm to be clickable...")
-        confirm = WebDriverWait(browser, int(Settings.get_upload_max_duration()), poll_frequency=3).until(EC.element_to_be_clickable((By.CLASS_NAME, "g-btn.m-rounded.b-chat__btn-submit")))
-        Settings.dev_print("message confirm is clickable")
-        Settings.debug_delay_check()
+        logging.debug("waiting for message confirm to be clickable...")
+        confirm = WebDriverWait(browser, int(CONFIG["upload_max_duration"]), poll_frequency=3).until(EC.element_to_be_clickable((By.CLASS_NAME, "g-btn.m-rounded.b-chat__btn-submit")))
+        logging.debug("message confirm is clickable")
+        debug_delay_check()
         # TODO: switch to regular type after extra debugging
-        if str(Settings.is_debug()) == "True":
-            Settings.print('skipping message (debug)')
+        if str(CONFIG["debug"]) == "True":
+            logging.info('skipping message (debug)')
             return message_clear(browser)
-        Settings.dev_print("clicking confirm...")
+        logging.debug("clicking confirm...")
         confirm.click()
-        Settings.print('OnlyFans message sent!')
+        logging.info('OnlyFans message sent!')
         return True
     except TimeoutException:
-        Settings.err_print("Timed out waiting for message confirm!")
+        logging.error("Timed out waiting for message confirm!")
     except Exception as e:
         error_checker(e)
-        Settings.err_print("Failure to confirm message!")
+        logging.error("Failure to confirm message!")
     message_clear(browser)
     return False
 
@@ -253,50 +254,50 @@ def message_price(browser, price):
 
     try:
         if not price or str(price) == "None":
-            Settings.err_print("missing price!")
+            logging.error("missing price!")
             return False
         message_price_clear(browser)
         if message_price_enter(browser, price) and message_price_save(browser):
-            Settings.dev_print("successfully entered message price!")
+            logging.debug("successfully entered message price!")
             return True
     except Exception as e:
         error_checker(e)
-        Settings.err_print("failed to enter message price!")
+        logging.error("failed to enter message price!")
     return False
 
 # clear any pre-existing message price
 def message_price_clear(browser):
     try:
-        Settings.dev_print("clearing any preexisting price...")
+        logging.debug("clearing any preexisting price...")
         browser.find_element(By.CLASS_NAME, "m-btn-remove").click()
     except Exception as e:
-        Settings.dev_print(e)
+        logging.debug(e)
 
 def message_price_enter(browser, price):
     try:
-        Settings.dev_print("entering price...")
+        logging.debug("entering price...")
         browser.find_element(By.CLASS_NAME, "b-make-post__actions__btns").find_elements(By.XPATH, "./child::*")[7].click()
         element = WebDriverWait(browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(browser.find_element(By.ID, "priceInput_1")))
         element.click()
         element.send_keys(str(price))
-        Settings.dev_print("entered price!")
-        Settings.debug_delay_check()
+        logging.debug("entered price!")
+        debug_delay_check()
         return True
     except Exception as e:
-        Settings.dev_print("failed to enter price!")
-        Settings.err_print(e)
+        logging.debug("failed to enter price!")
+        logging.error(e)
     return False
 
 def message_price_save(browser):
     try:
-        Settings.dev_print("saving price...")
+        logging.debug("saving price...")
         find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Save").click()    
-        Settings.dev_print("saved price!")
-        Settings.debug_delay_check()
+        logging.debug("saved price!")
+        debug_delay_check()
         return True
     except Exception as e:
-        Settings.dev_print("failed to save price!")
-        Settings.err_print(e)
+        logging.debug("failed to save price!")
+        logging.error(e)
     return False
 
 def message_text(browser, text=""):
@@ -317,17 +318,17 @@ def message_text(browser, text=""):
 
     try:
         if not text:
-            Settings.err_print("missing text for message!")
+            logging.error("missing text for message!")
             return False
-        Settings.dev_print("entering text...")
+        logging.debug("entering text...")
         # clear any preexisting text first
         ActionChains(browser).move_to_element(browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(text)).perform()
-        Settings.dev_print("successfully entered text")
+        logging.debug("successfully entered text")
         time.sleep(0.5)
         return True
     except Exception as e:
         error_checker(e)
-        Settings.err_print("failure to enter message")
+        logging.error("failure to enter message")
     return False
 
 ######################################################################
@@ -351,16 +352,16 @@ def message_user_by_id(browser, user_id):
     """
 
     if not user_id:
-        Settings.err_print("missing user id!")
+        logging.error("missing user id!")
         return False
     user_id = str(user_id).replace("@u","").replace("@","")
     try:
         go_to_page(browser, "{}{}".format(ONLYFANS_CHAT_URL, user_id))
-        Settings.dev_print("successfully messaging user id: {}".format(user_id))
+        logging.debug("successfully messaging user id: {}".format(user_id))
         return True
     except Exception as e:
         error_checker(e)
-        Settings.err_print("failed to message user by id!")
+        logging.error("failed to message user by id!")
     return False
 
 def message_user_by_username(browser, username):
@@ -379,9 +380,9 @@ def message_user_by_username(browser, username):
 
     """
 
-    Settings.dev_print(f"username: {username}")
+    logging.debug(f"username: {username}")
     if not username:
-        Settings.err_print("missing username to message!")
+        logging.error("missing username to message!")
         return False
     try:
         go_to_page(browser, username)
@@ -390,18 +391,18 @@ def message_user_by_username(browser, username):
         elements = browser.find_elements(By.TAG_NAME, "a")
         ele = [ele for ele in elements if ONLYFANS_CHAT_URL in str(ele.get_attribute("href"))]
         if len(ele) == 0:
-            Settings.warn_print("user cannot be messaged - unable to locate id!")
+            logging.warning("user cannot be messaged - unable to locate id!")
             return False
         ele = ele[0]
         ele = ele.get_attribute("href").replace("https://onlyfans.com", "")
         # clicking no longer works? just open href in self.browser
-        # Settings.dev_print("clicking send message")
+        # logging.debug("clicking send message")
         # ele.click()
-        Settings.maybe_print(f"user id found: {ele.replace(ONLYFANS_HOME_URL2, '')}")
+        logging.debug(f"user id found: {ele.replace(ONLYFANS_HOME_URL2, '')}")
         go_to_page(browser, ele)
-        Settings.dev_print(f"successfully messaging username: {username}")
+        logging.debug(f"successfully messaging username: {username}")
         return True
     except Exception as e:
         error_checker(e)
-        Settings.err_print("failed to message user")
+        logging.error("failed to message user")
     return False

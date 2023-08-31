@@ -1,7 +1,6 @@
+import logging
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-
-from .. import Settings
 
 ################
 ### Elements ###
@@ -30,26 +29,26 @@ def find_element_to_click(browser, name, text="", isID=False, fuzzyMatch=False, 
 
     """
 
-    Settings.dev_print("finding element: {}".format(name))
+    logging.debug("finding element: {}".format(name))
     try:
         elements = browser.find_elements(By.ID if isID else By.CLASS_NAME, className)
-        Settings.dev_print(f"elements found: {len(elements)}")
+        logging.debug(f"elements found: {len(elements)}")
         i = 0
         for element in elements:
-            Settings.dev_print(f"element: {element.get_attribute('innerHTML').strip()}")
+            logging.debug(f"element: {element.get_attribute('innerHTML').strip()}")
             if element.is_displayed() and element.is_enabled() and i == index:
                 if text and str(text) == element.get_attribute("innerHTML").strip().lower():
-                    Settings.dev_print("found matching element!")
+                    logging.debug("found matching element!")
                     return element
                 elif text and fuzzyMatch and str(text) in element.get_attribute("innerHTML").strip().lower():
-                    Settings.dev_print("found matching fuzzy element!")
+                    logging.debug("found matching fuzzy element!")
                     return element
                 else:
-                    Settings.dev_print("found matching element!")
+                    logging.debug("found matching element!")
                     return element
             i += 1
     except Exception as e:
-        Settings.dev_print(e)
+        logging.debug(e)
     raise Exception(f"unable to find element: {name}")
 
 def move_to_then_click_element(element):
@@ -80,20 +79,20 @@ def move_to_then_click_element(element):
         ActionChains(Driver.browser).move_to_element(element).click().perform()
         return True
     except Exception as e:
-        # Settings.dev_print(e)
+        # logging.debug(e)
         # if 'firefox' in Driver.browser.capabilities['browserName']:
         try:
             scroll_shim(Driver.browser, element)
             ActionChains(Driver.browser).move_to_element(element).click().perform()
         except Exception as e:
             pass
-            # Settings.dev_print(e)
+            # logging.debug(e)
             Driver.browser.execute_script("arguments[0].scrollIntoView();", element)
             # try:
             #     Driver.browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.CONTROL + Keys.HOME)
             #     ActionChains(Driver.browser).move_to_element(element).click().perform()
             # except Exception as e:
-            #     Settings.dev_print(e)
+            #     logging.debug(e)
     return False
 
 
@@ -121,7 +120,7 @@ def find_element_by_name(name):
     """
     element = Element.get_element_by_name(name)
     if not element:
-        Settings.err_print("unable to find element reference")
+        logging.error("unable to find element reference")
         return None
     # prioritize id over class name
     eleID = None
@@ -135,7 +134,7 @@ def find_element_by_name(name):
         except: ele = None
         # try: eleCSS = Driver.browser.find_element(By.CSS_SELECTOR, className)
         # except: eleCSS = None
-        Settings.dev_print("class: {} - {}:css".format(ele, eleCSS))
+        logging.debug("class: {} - {}:css".format(ele, eleCSS))
         if ele: return ele
         # if eleCSS: return eleCSS
     raise Exception("unable to locate element")
@@ -159,7 +158,7 @@ def find_elements_by_name(name):
 
     element = Element.get_element_by_name(name)
     if not element:
-        Settings.err_print("unable to find element reference")
+        logging.error("unable to find element reference")
         return []
     eles = []
     for className in element.getClasses():
@@ -169,14 +168,14 @@ def find_elements_by_name(name):
         except: eles_ = []
         # try: elesCSS_ = Driver.browser.find_elements(By.CSS_SELECTOR, className)
         # except: elesCSS_ = []
-        Settings.dev_print("class: {} - {}:css".format(len(eles_), len(elesCSS_)))
+        logging.debug("class: {} - {}:css".format(len(eles_), len(elesCSS_)))
         eles.extend(eles_)
         # eles.extend(elesCSS_)
     eles_ = []
     for i in range(len(eles)):
-        # Settings.dev_print("ele: {} -> {}".format(eles[i].get_attribute("innerHTML").strip(), element.getText()))
+        # logging.debug("ele: {} -> {}".format(eles[i].get_attribute("innerHTML").strip(), element.getText()))
         if eles[i].is_displayed():
-            Settings.dev_print("found displayed ele: {}".format(eles[i].get_attribute("innerHTML").strip()))
+            logging.debug("found displayed ele: {}".format(eles[i].get_attribute("innerHTML").strip()))
             eles_.append(eles[i])
     if len(eles_) == 0:
         raise Exception("unable to locate elements: {}".format(name))

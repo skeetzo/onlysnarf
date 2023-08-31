@@ -2,7 +2,8 @@ import os
 import logging
 from pathlib import Path
 from . import defaults as DEFAULT
-# from .config import config
+
+# from .config import CONFIG
 
 def configure_logging(loglevel=logging.INFO):
     # loglevel = logging.INFO

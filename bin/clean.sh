@@ -4,7 +4,7 @@
 rm -rf dist/ build/ *.egg-info .pytest_cache
 
 # project logs
-rm -rf log/* $HOME/OnlySnarf/snarf.log $HOME/.onlysnarf/log/* 
+rm -rf log/* $HOME/OnlySnarf/snarf.log $HOME/.onlysnarf/log/* geckodriver.log
 
 # session data and cookies
 rm -rf $HOME/.onlysnarf/session.json $HOME/.onlysnarf/cookies.pkl

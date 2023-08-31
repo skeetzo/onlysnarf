@@ -70,7 +70,7 @@ class Menu:
 
         """
 
-        if not Settings.is_debug(): os.system('clear')
+        if not CONFIG["debug"]: os.system('clear')
         print(colorize(Menu.ASCII, 'header'))
         print(colorize('version {}\n'.format(Settings.get_version()), 'green'))
         Menu.user_header()

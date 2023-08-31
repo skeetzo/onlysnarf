@@ -1,7 +1,11 @@
 #!/usr/bin/python3
 
-# import logging
+import logging
 # logger = logging.getLogger('snarf_logger')
+
+from .util.args import get_args
+from .util.config import set_config
+CONFIG = set_config(get_args())
 
 from .classes.discount import Discount
 from .classes.message import Message, Post
@@ -11,9 +15,7 @@ from .classes.user import User
 from .lib.config import Config
 # from .lib.menu import Menu
 from .lib import api as API
-from .util.args import get_args
-from .util.config import get_config
-from .util.settings import Settings
+
 
 def api(config={}):
     API.main(config)
@@ -32,7 +34,7 @@ def discount(config={'user':None,'users':[]}):
 
     """
 
-    Settings.print("Beginning discount process...")
+    logging.info("Beginning discount process...")
     return Discount.create_discount(config).apply()
 
 def message(config={'user':None,'users':[]}):
@@ -43,7 +45,7 @@ def message(config={'user':None,'users':[]}):
     
     """
 
-    Settings.print("Beginning message process...")
+    logging.info("Beginning message process...")
     return Message.create_message(config).send()
             
 def post(config={'text':"",'input':[]}):
@@ -54,7 +56,7 @@ def post(config={'text':"",'input':[]}):
     
     """
 
-    Settings.print("Beginning post process...")
+    logging.info("Beginning post process...")
     return Post.create_post(config).send()
 
 # TODO: update this
@@ -122,7 +124,7 @@ def users(config={'prefer_local':False}):
     try:
         User.get_all_users(prefer_local=config["prefer_local"])
         return True
-    except Exception as e: Settings.dev_print(e)
+    except Exception as e: logging.debug(e)
     return False
 
 ################################################################################################
@@ -131,15 +133,14 @@ def users(config={'prefer_local':False}):
 
 def main():
     try:
-        config = get_config(get_args())
-        print(config)
-        Settings.print("Running - {}".format(config["action"]))
-        eval(f"{config['action']}(config)")
+        print(CONFIG)
+        logging.info(f"Running - {CONFIG['action']}")
+        eval(f"{CONFIG['action']}(CONFIG)")
     except Exception as e:
-        Settings.err_print(e)
-        Settings.print("shnarf??")
+        logging.error(e)
+        logging.info("shnarf??")
     finally:
-        Settings.print("shnarrf!")
+        logging.info("shnarrf!")
 
 if __name__ == "__main__":
     main()

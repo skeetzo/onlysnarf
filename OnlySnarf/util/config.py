@@ -5,8 +5,7 @@ import os
 
 CONFIG = {}
 
-def get_config_file(file_path):
-
+def get_config_file():
 
   USER = getpass.getuser()
   # USER = os.getenv('USER')
@@ -14,11 +13,6 @@ def get_config_file(file_path):
       USER = os.getenv('SUDO_USER')
 
   configFile = "config.conf"
-
-  print(os.path.expanduser(os.path.join(".onlysnarf/conf", "config.conf")))
-  print(os.path.expanduser(os.path.join(".onlysnarf/conf", "config.conf")))
-  print(os.path.expanduser(os.path.join(".onlysnarf/conf", "config.conf")))
-  print(os.path.expanduser(os.path.join(".onlysnarf/conf", "config.conf")))
 
   if os.environ.get('ENV') == "test":
     configFile = os.path.join(os.getcwd(), "OnlySnarf/conf", "test-config.conf")
@@ -32,7 +26,7 @@ def get_config_file(file_path):
 
     return configFile
 
-def get_config(args={}):
+def set_config(args):
   parsed_config = {}
   try:
     # overwrite any fetched config path with args
@@ -57,9 +51,11 @@ def get_config(args={}):
   except Exception as e:
     print(e)
   global CONFIG
-  if not CONFIG:
-    CONFIG = parsed_config
+  CONFIG = parsed_config
   return parsed_config
+
+# def get_config():
+#   return CONFIG
 
 def get_args_config_file():
   return os.path.join(os.path.abspath(__file__), "../conf", "config-args.conf")
@@ -71,5 +67,3 @@ def get_args_config_file():
   # import sys
   # print(config)
   # sys.exit(0)
-
-

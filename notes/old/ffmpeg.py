@@ -2,7 +2,7 @@ import ffmpeg
 import datetime
 import os
 ##
-from ..util.settings import Settings
+# from ..util.settings import Settings
 
 ##################
 ##### FFMPEG #####
@@ -11,20 +11,20 @@ from ..util.settings import Settings
 # all videos in folder into single mp4
 def combine(folderPath):
     # if str(Settings.COMBINE) == "False":
-    #     Settings.warn_print("skipping combine")
+    #     print("skipping combine")
     #     return False
     if ".mp4" not in str(folderPath):
-        Settings.err_print("unable to combine")
+        print("unable to combine")
         return False
     combinePath = str(folderPath).replace(".mp4", "_full.mp4")
     try:    
         ffmpeg.input(str(folderPath), format='concat', safe=0).output(combinePath, c='copy').run()
     except Exception as e:
-        Settings.dev_print(e)
+        print(e)
         if "Conversion failed!" in str(e):
-            Settings.err_print("combine failure")
+            print("combine failure")
             return combinePath                    
-    Settings.print("Combine Complete")
+    print("Combine Complete")
     return combinePath
 
 
@@ -42,12 +42,12 @@ def gifify(path):
 # frames for preview gallery
 def frames(path):
     try:
-        Settings.maybe_print("capturing frames: {}".format(path))
+        print("capturing frames: {}".format(path))
         try:
             clip = VideoFileClip(str(path))
-            Settings.maybe_print("length: {}".format(clip.duration))
+            print("length: {}".format(clip.duration))
         except FileNotFoundError:
-            Settings.err_print("missing file to capture frames")
+            print("missing file to capture frames")
             return path
     except: pass
     screenshots = []
@@ -63,17 +63,17 @@ def frames(path):
 # or change to some other repair method for videos
 # def repair(path):
 #     if str(Settings.get_repair()) == "False":
-#         Settings.warn_print("skipping repair")
+#         print("skipping repair")
 #         return path
 #     if ".mp4" not in str(path):
-#         Settings.err_print("unable to repair")
+#         print("unable to repair")
 #         return path
 #     if not os.path.isfile(str(Settings.WORKING_VIDEO)):
-#         Settings.err_print("missing working video")
+#         print("missing working video")
 #         return path
 #     repairedPath = str(path).replace(".mp4", "_fixed.mp4")
 #     try:
-#         Settings.print("Repairing: {} <-> {}".format(path, Settings.WORKING_VIDEO))
+#         print("Repairing: {} <-> {}".format(path, Settings.WORKING_VIDEO))
 #         if Settings.is_debug():
 #             subprocess.call(['untrunc', str(Settings.WORKING_VIDEO), str(path)]).communicate()
 #         else:
@@ -81,31 +81,31 @@ def frames(path):
 #     except AttributeError:
 #         if os.path.isfile(str(path)+"_fixed.mp4"):
 #             shutil.move(str(path)+"_fixed.mp4", repairedPath)
-#             Settings.print("Repair Complete")
+#             print("Repair Complete")
 #     except:
-#         Settings.maybe_print(sys.exc_info()[0])
-#         Settings.warn_print("skipping repair")
+#         print(sys.exc_info()[0])
+#         print("skipping repair")
 #         return path
-#     Settings.print("Repair Successful")
+#     print("Repair Successful")
 #     return str(repairedPath)
 
 def reduce(path):
     if not Settings.is_reduce():
-        Settings.warn_print("skipping reduction")
+        print("skipping reduction")
         return path
     if ".mp4" not in str(path):
-        Settings.err_print("unable to reduce")
+        print("unable to reduce")
         return path
     reducedPath = str(path).replace(".mp4", "_reduced.mp4")
     try:
-        Settings.maybe_print("reducing: {}".format(path))
+        print("reducing: {}".format(path))
         try:
             clip = VideoFileClip(str(path))
-            Settings.maybe_print("length: {}".format(clip.duration))
+            print("length: {}".format(clip.duration))
             bitrate = 1000000000 / int(clip.duration)
-            Settings.maybe_print("bitrate: {}".format(bitrate))
+            print("bitrate: {}".format(bitrate))
         except FileNotFoundError:
-            Settings.err_print("missing file to reduce")
+            print("missing file to reduce")
             return path
         loglevel = "quiet"
         if Settings.is_debug():
@@ -113,23 +113,23 @@ def reduce(path):
         p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-err_detect', 'ignore_err', '-y', '-i', str(path), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', '-crf', '26', '-b:v', str(bitrate), str(reducedPath)])
         # p.communicate()
     except FileNotFoundError:
-        Settings.warn_print("ignoring fixed video")
+        print("ignoring fixed video")
         return reduce(str(path).replace(".mp4", "_fixed.mp4"))
     except Exception as e:
-        Settings.dev_print(e)
+        print(e)
         if "Conversion failed!" in str(e):
-            Settings.err_print("conversion failure")
+            print("conversion failure")
             return path                    
-    Settings.print("Reduction Complete")
+    print("Reduction Complete")
     originalSize = os.path.getsize(str(path))
     newSize = os.path.getsize(str(reducedPath))
-    Settings.print("Original Size: {}kb - {}mb".format(originalSize/1000, originalSize/1000000))
-    Settings.print("Reduced Size: {}kb - {}mb".format(newSize/1000, newSize/1000000))
+    print("Original Size: {}kb - {}mb".format(originalSize/1000, originalSize/1000000))
+    print("Reduced Size: {}kb - {}mb".format(newSize/1000, newSize/1000000))
     if int(originalSize) < int(newSize):
-        Settings.warn_print("original size smaller")
+        print("original size smaller")
         return path
     if int(newSize) == 0:
-        Settings.err_print("missing reduced file")
+        print("missing reduced file")
         return path
     return reducedPath
 
@@ -138,20 +138,20 @@ def reduce(path):
 # segment: minutes
 def split(path, segment):
     if not Settings.is_split():
-        Settings.warn_print("skipping split")
+        print("skipping split")
         return path
     if ".mp4" not in str(path):
-        Settings.err_print("unable to split")
+        print("unable to split")
         return path
     splitPaths = []
     splitPath = str(path).replace(".mp4", "_split$.mp4")
     try:
-        Settings.maybe_print("splitting: {}".format(path))
+        print("splitting: {}".format(path))
         try:
             clip = VideoFileClip(str(path))
-            Settings.maybe_print("length: {}".format(clip.duration))
+            print("length: {}".format(clip.duration))
         except FileNotFoundError:
-            Settings.err_print("missing file to split")
+            print("missing file to split")
             return path
         i = 0
         index = 0
@@ -168,52 +168,52 @@ def split(path, segment):
             i += 1
         # p.communicate()
     except Exception as e:
-        Settings.dev_print(e)
+        print(e)
         if "Conversion failed!" in str(e):
-            Settings.err_print("split failure")
+            print("split failure")
             return splitPaths                    
-    Settings.print("Split Complete")
+    print("Split Complete")
     return splitPaths
 
 def thumbnail_fix(path):
     # if str(Settings.THUMBNAILING_PREVIEW) == "False":
-    #     Settings.warn_print("preview thumbnailing disabled")
+    #     print("preview thumbnailing disabled")
     #     return path
     try:
-        Settings.print("Thumbnailing: {}".format(path))
+        print("Thumbnailing: {}".format(path))
         loglevel = "quiet"
         if Settings.is_debug():
             loglevel = "debug"
         thumbnail_path = os.path.join(os.path.dirname(str(path)), 'thumbnail.png')
-        Settings.maybe_print("thumbnail path: {}".format(thumbnail_path))
+        print("thumbnail path: {}".format(thumbnail_path))
         p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-i', str(path),'-ss', '00:00:00.000', '-vframes', '1', str(thumbnail_path)])
         p.communicate()
-        Settings.print("Thumbnailing Complete")
+        print("Thumbnailing Complete")
         return thumbedPath
     except FileNotFoundError:
-        Settings.warn_print("ignoring thumbnail")
+        print("ignoring thumbnail")
     except AttributeError:
-        Settings.print("Thumbnailing: Captured PNG")
+        print("Thumbnailing: Captured PNG")
     except:
-        Settings.maybe_print(sys.exc_info()[0])
-        Settings.err_print("thumbnailing fuckup")    
+        print(sys.exc_info()[0])
+        print("thumbnailing fuckup")    
 
 #seconds off front or back
 def trim(path):
     if not Settings.is_trim():
-        Settings.warn_print("skipping trim")
+        print("skipping trim")
         return path
     if ".mp4" not in str(path):
-        Settings.err_print("unable to trim")
+        print("unable to trim")
         return path
     reducedPath = str(path).replace(".mp4", "_trimmed.mp4")
     try:
-        Settings.maybe_print("trimming: {}".format(path))
+        print("trimming: {}".format(path))
         try:
             clip = VideoFileClip(str(path))
-            Settings.maybe_print("length: {}".format(clip.duration))
+            print("length: {}".format(clip.duration))
         except FileNotFoundError:
-            Settings.err_print("missing file to reduce")
+            print("missing file to reduce")
             return path
         start = datetime.timedelta(seconds=60)
         end = datetime.timedelta(seconds=clip.duration-60)
@@ -223,11 +223,11 @@ def trim(path):
         p = subprocess.call(['ffmpeg', '-loglevel', str(loglevel), '-ss', str(start), '-y', '-i', str(path), '-to', str(end), '-c', 'copy', '-c:v', 'libx264', '-c:a', 'aac', '-strict', '2', str(reducedPath)])
         # p.communicate()
     except Exception as e:
-        Settings.dev_print(e)
+        print(e)
         if "Conversion failed!" in str(e):
-            Settings.err_print("trim failure")
+            print("trim failure")
             return path                    
-    Settings.print("Trim Complete")
+    print("Trim Complete")
     return reducedPath
 
 # unnecessary, handled by onlyfans

@@ -1,7 +1,9 @@
+import logging
 import threading
 import concurrent.futures
 
-from .. import Settings
+from .. import debug_delay_check
+from .. import CONFIG
 
 #####################
 ### Drag and Drop ###
@@ -56,17 +58,17 @@ def drag_and_drop_file(drop_target, path):
         return input;
     """
     try:
-        Settings.maybe_print("dragging and dropping file...")
-        Settings.dev_print("drop target: {}".format(drop_target.get_attribute("innerHTML")))
+        logging.debug("dragging and dropping file...")
+        logging.debug("drop target: {}".format(drop_target.get_attribute("innerHTML")))
         # BUG: requires double to register file upload
         file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 0, 0)
         file_input.send_keys(path)
         file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 50, 50)
         file_input.send_keys(path)
-        Settings.debug_delay_check()
+        debug_delay_check()
         return True
     except Exception as e:
-        Settings.err_print(e) 
+        logging.error(e) 
     return False
 
 ##################
@@ -91,20 +93,20 @@ def upload_files(browser, files):
 
     """
 
-    if Settings.is_skip_download(): 
-        Settings.print("skipping upload (download)")
+    if CONFIG["skip_download"]: 
+        logging.info("skipping upload (download)")
         return True, True
-    elif Settings.is_skip_upload(): 
-        Settings.print("skipping upload (upload)")
+    elif CONFIG["skip_upload"]: 
+        logging.info("skipping upload (upload)")
         return True, True
     if len(files) == 0:
-        Settings.maybe_print("skipping upload (empty file list)")
+        logging.debug("skipping upload (empty file list)")
         return True, True
-    if Settings.is_skip_upload():
-        Settings.print("skipping upload (disabled)")
+    if CONFIG["skip_upload"]:
+        logging.info("skipping upload (disabled)")
         return True, True
-    files = files[:int(Settings.get_upload_max())]
-    Settings.print("uploading file(s): {}".format(len(files)))
+    files = files[:int(CONFIG["upload_max"])]
+    logging.info("uploading file(s): {}".format(len(files)))
 
     prepared_files = []
 
@@ -115,31 +117,31 @@ def upload_files(browser, files):
             setattr(_file, "path", file)
             file = _file
         if not file.prepare():
-            Settings.err_print("unable to upload - {}".format(file.get_title()))
+            logging.error("unable to upload - {}".format(file.get_title()))
         else:
             prepared_files.append(file)    
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
         executor.map(prepare_file, files)
         
-    Settings.dev_print("files prepared: {}".format(len(prepared_files)))
+    logging.debug("files prepared: {}".format(len(prepared_files)))
     if len(prepared_files) == 0:
-        Settings.err_print("skipping upload (unable to prepare files)")
+        logging.error("skipping upload (unable to prepare files)")
         return False, True
     enter_file = browser.find_element(By.ID, "attach_file_photo")
     successful = []
     i = 1
     for file in prepared_files:
-        Settings.print('> {} - {}/{}'.format(file.get_title(), i, len(files)))
+        logging.info('> {} - {}/{}'.format(file.get_title(), i, len(files)))
         i += 1
         successful.append(drag_and_drop_file(enter_file , file.get_path()))
         time.sleep(1)
     if all(successful):
-        if error_window_upload(browser): Settings.dev_print("files uploaded successfully!")
-        else: Settings.dev_print("files probably uploaded succesfully!")
+        if error_window_upload(browser): logging.debug("files uploaded successfully!")
+        else: logging.debug("files probably uploaded succesfully!")
         time.sleep(1) # bug prevention
         return True, False
-    Settings.warn_print("a file failed to upload!")
+    logging.warning("a file failed to upload!")
     return False, False
 
 def error_window_upload(browser):
@@ -147,13 +149,13 @@ def error_window_upload(browser):
 
     try:
         buttons = browser.find_elements(By.CLASS_NAME, "g-btn.m-flat.m-btn-gaps.m-reset-width")
-        Settings.dev_print("errors btns: {}".format(len(buttons)))
+        logging.debug("errors btns: {}".format(len(buttons)))
         if len(buttons) == 0: return True
         for button in buttons:
             if button.get_attribute("innerHTML").strip() == "Close" and button.is_enabled():
-                Settings.maybe_print("upload error message, closing")
+                logging.debug("upload error message, closing")
                 button.click()
-                Settings.maybe_print("success: upload error message closed")
+                logging.debug("success: upload error message closed")
                 time.sleep(0.5)
                 return True
         return False
@@ -167,10 +169,10 @@ def fix_filename(file):
     filename = os.path.basename(file.get_path())
     filename = os.path.splitext(filename)[0]
     if "_fixed" in str(filename): return
-    Settings.dev_print("fixing filename...")
+    logging.debug("fixing filename...")
     filename += "_fixed"
     ext = os.path.splitext(filename)[1].lower()
-    Settings.dev_print("{} -> {}.{}".format(os.path.dirname(file.get_path()), filename, ext))
+    logging.debug("{} -> {}.{}".format(os.path.dirname(file.get_path()), filename, ext))
     dst = "{}/{}.{}".format(os.path.dirname(file), filename, ext)
     shutil.move(file.get_path(), dst)
     file.path = dst

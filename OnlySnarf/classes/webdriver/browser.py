@@ -27,7 +27,7 @@ from webdriver_manager.microsoft import EdgeChromiumDriverManager
 # opera
 from webdriver_manager.opera import OperaDriverManager
 
-from .. import Settings
+from .. import DEFAULT
 
 def create_browser(browserType):
     """
@@ -83,7 +83,7 @@ def create_browser(browserType):
     browser.implicitly_wait(30) # seconds
     browser.set_page_load_timeout(1200)
     browser.file_detector = LocalFileDetector() # for uploading via remote sessions
-    if str(Settings.is_show_window()) == "False":
+    if not CONFIG["show"]:
         logging.info("headless browser spawned successfully!")
     else:
         logging.info("browser spawned successfully!")
@@ -95,7 +95,7 @@ def create_browser(browserType):
 
 def add_options(options):
     options.add_argument("--no-sandbox") # Bypass OS security model
-    if str(Settings.is_show_window()) == "False":
+    if not CONFIG["show"]:
         options.add_argument('--headless')
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-extensions")
@@ -112,7 +112,7 @@ def add_options(options):
     if str(platform.processor()) == "aarch64": # raspi
         options.add_argument("--user-data-dir=/home/ubuntu/selenium") # do not disable, required for cookies to work 
     else:
-        options.add_argument("--user-data-dir="+os.path.join(Settings.get_base_directory(),"tmp","selenium")) # do not disable, required for cookies to work 
+        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
 
     options.add_argument("--disable-browser-side-navigation") # https://stackoverflow.com/a/49123152/1689770
 
@@ -253,11 +253,11 @@ def attempt_reconnect():
 
 # TODO: update and debug
 def attempt_remote():
-    link = 'http://{}:{}/wd/hub'.format(Settings.get_remote_browser_host(), Settings.get_remote_browser_port())
+    link = 'http://{}:{}/wd/hub'.format(CONFIG["remote_browser_host"], CONFIG["remote_browser_port"])
     logging.debug("remote url: {}".format(link))
     def attempt(dc, opts):
         try:
-            if str(Settings.is_show_window()) == "False":
+            if not CONFIG["show"]:
                 opts.add_argument('--headless')
             logging.debug("attempting remote: {}".format(browserType))
             browserAttempt = webdriver.Remote(command_executor=link, desired_capabilities=dc, options=opts)
@@ -318,7 +318,7 @@ def firefox_options():
     dC = DesiredCapabilities.FIREFOX
     # options = webdriver.FirefoxOptions()
     options = FirefoxOptions()
-    if str(Settings.is_debug("firefox")) == "True":
+    if CONFIG["debug_firefox"]:
         options.log.level = "trace"
     add_options(options)
     # options.add_argument("--enable-file-cookies")

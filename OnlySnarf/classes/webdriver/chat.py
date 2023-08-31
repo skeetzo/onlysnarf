@@ -1,6 +1,6 @@
+import logging
 
 from .message import message_user_by_username
-from .. import Settings
 
 ############
 ### Chat ###
@@ -31,20 +31,20 @@ def get_recent_chat_users(browser, num=0):
 
     """
 
-    Settings.dev_print("scanning recent chats...")
+    logging.debug("scanning recent chats...")
     users = []
     try:
         go_to_page(browser, "/my/chats")
         users_ = browser.find_elements(By.CLASS_NAME, "g-user-username")
-        Settings.dev_print("users: {}".format(len(users_)))
+        logging.debug("users: {}".format(len(users_)))
         user_ids = browser.find_elements(By.CLASS_NAME, "b-chats__item__link")
-        Settings.dev_print("ids: {}".format(len(user_ids)))
+        logging.debug("ids: {}".format(len(user_ids)))
         for user in user_ids:
             if not user or not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
             users.append(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
     except Exception as e:
         Driver.error_checker(e)
-        Settings.err_print("Failed to scan messages!")
+        logging.error("Failed to scan messages!")
     return users[:10]
 
 
@@ -85,7 +85,7 @@ def get_user_chat(browser, username, user_id=None):
         except Exception as e:
             if "Unable to locate elements" in str(e):
                 pass
-            else: Settings.dev_print(e)
+            else: logging.debug(e)
         
         messages_all_ = []
         try:
@@ -93,7 +93,7 @@ def get_user_chat(browser, username, user_id=None):
         except Exception as e:
             if "Unable to locate elements" in str(e):
                 pass
-            else: Settings.dev_print(e)
+            else: logging.debug(e)
 
 
         # TODO: cleanup this process
@@ -105,26 +105,26 @@ def get_user_chat(browser, username, user_id=None):
         # timestamps_ = browser.find_elements(By.CLASS_NAME, "b-chat__message__time")
         # timestamps = []
         # for timestamp in timestamps_:
-            # Settings.maybe_print("timestamp1: {}".format(timestamp))
+            # logging.debug("timestamp1: {}".format(timestamp))
             # timestamp = timestamp["data-timestamp"]
             # timestamp = timestamp.get_attribute("innerHTML")
-            # Settings.maybe_print("timestamp: {}".format(timestamp))
+            # logging.debug("timestamp: {}".format(timestamp))
             # timestamps.append(timestamp)
         for message in messages_all_:
             message = message.get_attribute("innerHTML")
             message = re.sub(r'<[a-zA-Z0-9=\"\\/_\-!&;%@#$\(\)\.:\+\s]*>', "", message)
-            Settings.maybe_print("all: {}".format(message))
+            logging.debug("all: {}".format(message))
             messages_all.append(message)
         messages_and_timestamps = []
         # messages_and_timestamps = [j for i in zip(timestamps,messages_all) for j in i]
-        # Settings.maybe_print("chat log:")
+        # logging.debug("chat log:")
         # for f in messages_and_timestamps:
-            # Settings.maybe_print(": {}".format(f))
+            # logging.debug(": {}".format(f))
         for message in messages_sent_:
-            # Settings.maybe_print("from1: {}".format(message.get_attribute("innerHTML")))
+            # logging.debug("from1: {}".format(message.get_attribute("innerHTML")))
             message = message.find_element(By.CLASS_NAME, Element.get_element_by_name("enterMessage").getClass()).get_attribute("innerHTML")
             message = re.sub(r'<[a-zA-Z0-9=\"\\/_\-!&;%@#$\(\)\.:\+\s]*>', "", message)
-            Settings.maybe_print("sent: {}".format(message))
+            logging.debug("sent: {}".format(message))
             messages_sent.append(message)
         i = 0
 
@@ -151,13 +151,13 @@ def get_user_chat(browser, username, user_id=None):
             if message not in messages_sent:
                 messages_received.append(message)
             i += 1
-        Settings.maybe_print("received: {}".format(messages_received))
-        Settings.maybe_print("sent: {}".format(messages_sent))
-        Settings.maybe_print("messages sent: {}".format(len(messages_sent)))
-        Settings.maybe_print("messages received: {}".format(len(messages_received)))
-        Settings.maybe_print("messages all: {}".format(len(messages_all)))
+        logging.debug("received: {}".format(messages_received))
+        logging.debug("sent: {}".format(messages_sent))
+        logging.debug("messages sent: {}".format(len(messages_sent)))
+        logging.debug("messages received: {}".format(len(messages_received)))
+        logging.debug("messages all: {}".format(len(messages_all)))
         return [messages_all, messages_and_timestamps, messages_received, messages_sent]
     except Exception as e:
         Driver.error_checker(e)
-        Settings.err_print("failure to read chat - {}".format(username))
+        logging.error("failure to read chat - {}".format(username))
         return [[],[],[],[]]

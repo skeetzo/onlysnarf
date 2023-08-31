@@ -1,4 +1,5 @@
 
+from ..util import debug_delay_check
 from .. import Settings
 
 # TODO: last
@@ -92,7 +93,7 @@ def promotional_campaign(self, promotion=None):
         # todo: [] apply to expired subscribers checkbox
         Settings.debug_delay_check()
         # find and click promotionalTrialConfirm
-        if str(Settings.is_debug()) == "True":
+        if str(CONFIG["debug"]) == "True":
             Settings.dev_print("finding campaign cancel")
             self.find_element_to_click("promotionalTrialCancel").click()
             Settings.maybe_print("skipping promotion (debug)")
@@ -209,7 +210,7 @@ def promotional_trial_link(self, promotion=None):
         Settings.dev_print("successfully set trial duration")
         Settings.debug_delay_check()
         # find and click promotionalTrialConfirm
-        # if Settings.is_debug():
+        # if CONFIG["debug"]:
         #     Settings.dev_print("finding trial cancel")
         #     self.find_element_to_click("promotionalTrialCancel").click()
         #     Settings.print("skipping: Promotion (debug)")
@@ -327,7 +328,7 @@ def promotion_user_directly(self, promotion=None):
         Settings.dev_print("successfully entered message")
         Settings.dev_print("applying discount")
         save = self.find_element_by_name("promotionalTrialApply")
-        if str(Settings.is_debug()) == "True":
+        if str(CONFIG["debug"]) == "True":
             self.find_element_by_name("promotionalTrialCancel").click()
             Settings.maybe_print("skipping save discount (debug)")
             Settings.dev_print("successfully canceled discount")

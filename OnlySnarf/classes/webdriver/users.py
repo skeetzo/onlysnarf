@@ -30,7 +30,7 @@ def get_current_username(browser):
         Settings.dev_print("searching for active username...")
         go_to_home(browser)
         eles = [ele for ele in browser.find_elements(By.TAG_NAME, "a") if "@" in str(ele.get_attribute("innerHTML")) and "onlyfans" not in str(ele.get_attribute("innerHTML"))]
-        if Settings.is_debug():
+        if CONFIG["debug"]:
             for ele in eles:
                 Settings.dev_print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
         if len(eles) == 0:

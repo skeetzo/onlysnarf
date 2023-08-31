@@ -2,10 +2,7 @@ import os
 import json
 from flask import Flask, request
 
-from ..util.config import get_config
-from ..util.settings import Settings
-
-config = get_config()
+from ..util import CONFIG, Settings
 
 def create_app():
     app = Flask(__name__)

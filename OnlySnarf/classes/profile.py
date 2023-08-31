@@ -88,7 +88,7 @@ class Profile:
     # |- two step authentication
     # |- watermark enabled & custom text
     def check():
-        if not Settings.is_debug():
+        if not CONFIG["debug"]:
             print("### Not Available ###")
             return
         print("Checking Profile Settings")
@@ -132,7 +132,7 @@ class Profile:
     # About, Price, Wishlist
     # watermark enabled & custom text == username
     def setup():
-        if not Settings.is_debug():
+        if not CONFIG["debug"]:
             print("### Not Available ###")
             return
         print("Setting up basic profile settings")
@@ -166,7 +166,7 @@ class Profile:
         Profile.sync_to_profile(profile=profile)
 
     def posts_menu():
-        if not Settings.is_debug():
+        if not CONFIG["debug"]:
             print("### Not Available ###")
             return
         action = Profile.ask_new()

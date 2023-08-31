@@ -2,6 +2,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
+from ..util import debug_delay_check
 from .. import Settings
 
 ######################
@@ -57,7 +58,7 @@ def enter_expiration(browser, expires):
     action.send_keys(Keys.ENTER)
     action.perform()
     Settings.dev_print("successfully entered expiration!")
-    Settings.debug_delay_check()
+    debug_delay_check()
 
 # not really necessary with 'Clear' button
 def cancel_expiration(browser):
@@ -66,4 +67,4 @@ def cancel_expiration(browser):
     element = [elem for elem in elements if '#icon-close' in str(elem.get_attribute('href'))][0]
     ActionChains(browser).move_to_element(element).click().perform()
     Settings.dev_print("### Expiration Canceled ###")
-    Settings.debug_delay_check()
+    debug_delay_check()

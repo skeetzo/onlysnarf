@@ -1,5 +1,4 @@
-
-from .. import Settings
+import logging
 
 ##############
 ### Errors ###
@@ -17,8 +16,8 @@ def error_checker(e):
     """
 
     if "Unable to locate element" in str(e):
-        Settings.err_print("Unable to locate element; OnlySnarf may require an update!")
+        logging.error("Unable to locate element; OnlySnarf may require an update!")
     elif "Message: " in str(e):
-        Settings.dev_print(e)
+        logging.debug(e)
     else:
-        Settings.err_print(e)
+        logging.error(e)
