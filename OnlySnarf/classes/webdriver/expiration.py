@@ -3,7 +3,7 @@ from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
 from ..util import debug_delay_check
-from .. import Settings
+from .. import CONFIG
 
 ######################
 ##### Expiration #####

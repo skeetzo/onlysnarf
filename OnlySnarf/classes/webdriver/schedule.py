@@ -1,7 +1,7 @@
 
 from .element import find_element_to_click
 from ..util import debug_delay_check
-from .. import Settings
+from .. import CONFIG
 
 ####################
 ##### Schedule #####

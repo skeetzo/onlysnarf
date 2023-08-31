@@ -1,5 +1,5 @@
 
-from .. import Settings
+from .. import CONFIG
 
 # TODO: also last
 

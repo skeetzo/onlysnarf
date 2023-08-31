@@ -1,7 +1,7 @@
 
 from .errors import error_checker
 from .goto import go_to_home, go_to_page
-from .. import Settings
+from .. import CONFIG
 from .. import ONLYFANS_HOME_URL2, ONLYFANS_USERS_ACTIVE_URL, ONLYFANS_USERS_FOLLOWING_URL
 
 #################

@@ -1,6 +1,6 @@
 ## TODO: update lists functionality
 
-from .. import Settings
+from .. import CONFIG, DEFAULT
 
 def search_for_list(self, name=None, number=None):
     """

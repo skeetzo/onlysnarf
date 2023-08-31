@@ -27,7 +27,7 @@ from webdriver_manager.microsoft import EdgeChromiumDriverManager
 # opera
 from webdriver_manager.opera import OperaDriverManager
 
-from .. import DEFAULT
+from .. import CONFIG, DEFAULT
 
 def create_browser(browserType):
     """

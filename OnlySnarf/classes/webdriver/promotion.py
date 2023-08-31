@@ -1,6 +1,6 @@
 
 from ..util import debug_delay_check
-from .. import Settings
+from .. import CONFIG, DEFAULT
 
 # TODO: last
 

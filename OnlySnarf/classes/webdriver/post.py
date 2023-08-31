@@ -11,7 +11,7 @@ from .poll import poll as POLL
 from .schedule import schedule as SCHEDULE
 from .upload import upload_files
 from ..util import debug_delay_check
-from .. import Settings
+from .. import CONFIG
 
 ################
 ##### Post #####

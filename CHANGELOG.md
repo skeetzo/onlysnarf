@@ -773,6 +773,8 @@
 
 ## TODO
 
+- finish removing Settings references in /webdriver
+- finish merging all old code from notes/old/re-add-me
 
 (update)
 - ensure that config / arg variables properly affect processes / finish updating their removal references from Settings

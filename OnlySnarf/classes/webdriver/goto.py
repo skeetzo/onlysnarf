@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import WebDriverException
 
-from .. import CONFIG
+from .. import CONFIG, DEFAULT
 from .. import ONLYFANS_HOME_URL, ONLYFANS_SETTINGS_URL
 
 ##############

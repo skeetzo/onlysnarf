@@ -1,7 +1,7 @@
 import os
 import pickle
 
-from .. import DEFAULT
+from .. import CONFIG, DEFAULT
 from .goto import go_to_home
 
 ###################

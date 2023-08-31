@@ -2,7 +2,7 @@
 from .element import find_element_to_click
 from .user import get_user_by_username
 from ..util import debug_delay_check
-from .. import Settings
+from .. import CONFIG
 
 def discount_user(browser, discount_object):
     """
