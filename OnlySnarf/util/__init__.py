@@ -1,7 +1,6 @@
 import sys
 
 from .config import CONFIG
-from .settings import Settings
 from . import defaults as DEFAULT
 
 def debug_delay_check():
@@ -43,18 +42,16 @@ def print_same_line(text):
 
 ## TODO
 
-def set_debug(newValue):
-    if str(newValue) == "tests":
-        pass
-        # CONFIG["confirm"] = False
-    else:
-        CONFIG["debug"] = newValue
-
-
-def set_prefer_local(buul):
-    CONFIG["prefer_local"] = buul
-
-
+def get_logs_path(process):
+    if process == "firefox":
+        path_ = os.path.join(Settings.get_base_directory(), "log")
+        Path(path_).mkdir(parents=True, exist_ok=True)
+        return os.path.join(path_, "geckodriver.log")
+    elif process == "google":
+        path_ = os.path.join(Settings.get_base_directory(), "log")
+        Path(path_).mkdir(parents=True, exist_ok=True)
+        return os.path.join(path_, "chromedriver.log")
+    return ""
 
 # TODO: double check complete removal
 # def is_debug(process=None):

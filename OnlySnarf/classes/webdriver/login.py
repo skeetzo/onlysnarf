@@ -237,7 +237,7 @@ def verify_phone(browser):
     try:
         logging.debug("verifying phone number...")
         element = browser.switch_to.active_element
-        element.send_keys(str(Settings.get_phone_number()))
+        element.send_keys(str(CONFIG["phone"]))
         element.send_keys(Keys.ENTER)
     except Exception as e:
         logging.error("Unable to verify phone number!")

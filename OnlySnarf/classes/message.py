@@ -1,3 +1,5 @@
+
+import logging
 import re
 from datetime import datetime
 from decimal import Decimal
@@ -9,7 +11,7 @@ from .schedule import Schedule
 from .user import User
 from .driver import message as WEBDRIVER_message, post as WEBDRIVER_post
 from ..util.defaults import PRICE_MAXIMUM, PRICE_MINIMUM, SCHEDULE
-from ..util.settings import Settings
+from ..util.config import CONFIG
 
 from marshmallow import Schema, fields, validate, post_load
 
@@ -112,7 +114,7 @@ class Message():
         """
 
         if not text and len(keywords) == 0 and len(performers) == 0 and len(files) == 0:
-            Settings.warn_print("formatting empty message!")
+            logging.warning("formatting empty message!")
             return ""
         if not text and len(files) > 0:
             text = self.get_text_from_filename(files[0])
@@ -127,13 +129,13 @@ class Message():
     def format_files(file_paths):
         files = []
         if len(file_paths) > 0:
-            # for file in files[:int(Settings.get_upload_max())]:
+            # for file in files[:int(CONFIG["upload_max"])]:
             for file in file_paths:
                 if not isinstance(file, File):
                     files.append(File(file))
                 else:
                     files.append(file)
-        # files = files[:int(Settings.get_upload_max())] # reduce by max
+        # files = files[:int(CONFIG["upload_max"])] # reduce by max
         return files
 
     @staticmethod
@@ -142,12 +144,12 @@ class Message():
         if str(price) == "max": return Decimal(PRICE_MAXIMUM)
         elif str(price) == "min": return Decimal(PRICE_MINIMUM)
         elif Decimal(sub(r'[^\d.]', '', str(price))) < Decimal(PRICE_MINIMUM):
-            Settings.warn_print(f"price too low: {price} < {PRICE_MINIMUM}")
-            Settings.maybe_print("adjusting price to minimum...")
+            logging.warning(f"price too low: {price} < {PRICE_MINIMUM}")
+            logging.debug("adjusting price to minimum...")
             return Decimal(PRICE_MINIMUM)
         elif Decimal(sub(r'[^\d.]', '', str(price))) > Decimal(PRICE_MAXIMUM):
-            Settings.warn_print(f"price too high: {price} < {PRICE_MAXIMUM}")
-            Settings.maybe_print("adjusting price to maximum...")
+            logging.warning(f"price too high: {price} < {PRICE_MAXIMUM}")
+            logging.debug("adjusting price to maximum...")
             return Decimal(PRICE_MAXIMUM)    
         return Decimal(price)
 
@@ -219,11 +221,11 @@ class Message():
 
         if re.search(r'I sent you a \$[0-9]*\.00 tip ♥', text):
             amount = re.match(r'I sent you a \$([0-9]*)\.00 tip ♥', text).group(1)
-            Settings.maybe_print("message contains (tip): {}".format(amount))
+            logging.debug("message contains (tip): {}".format(amount))
             return True, int(amount)
         elif re.search(r"I\'ve contributed \$[0-9]*\.00 to your Campaign", text):
             amount = re.match(r'I\'ve contributed \$([0-9]*)\.00 to your Campaign', text).group(1)
-            Settings.maybe_print("message contains (campaign): {}".format(amount))
+            logging.debug("message contains (campaign): {}".format(amount))
             return True, int(amount)
         return False, 0
 
@@ -261,9 +263,9 @@ class Post(Message):
 
         """
 
-        Settings.print("Posting...")
+        logging.info("Posting...")
         if not self.files and not self.text:
-            Settings.err_print("Missing files and text!")
+            logging.error("Missing files and text!")
             return False
         return WEBDRIVER_post(self.dump())
             

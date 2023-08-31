@@ -3,12 +3,10 @@ import logging
 from pathlib import Path
 from . import defaults as DEFAULT
 
-# from .config import CONFIG
-
-def configure_logging(loglevel=logging.INFO):
-    # loglevel = logging.INFO
-    # if config["debug"]: loglevel = logging.DEBUG
-    # if int(config["verbose"]) >= 2: loglevel = logging.DEBUG
+def configure_logging(debug=False, verbose=False):
+    loglevel = logging.INFO
+    if debug: loglevel = logging.DEBUG
+    # if verbose: loglevel = logging.VERBOSE
 
     logPath = DEFAULT.LOG_PATH
     if str(os.environ.get('ENV')) == "test":

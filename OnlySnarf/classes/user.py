@@ -1,14 +1,15 @@
 import json
 import os
 import random
+import logging
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError, post_load
 
 from ..util.colorize import colorize
 from ..util.data import add_to_randomized_users, get_already_randomized_users, read_users_local, write_users_local
-from ..util.settings import Settings
-from .driver import get_recent_chat_users, get_userid_by_username as WEBDRIVER_get_userid_by_username, message
+from .driver import get_recent_chat_users, get_userid_by_username as WEBDRIVER_get_userid_by_username, message, get_users
  # read_user_messages as WEBDRIVER_read_user_messages
+from ..util.config import CONFIG
 
 ALREADY_RANDOMIZED_USERS = []
 
@@ -111,14 +112,14 @@ class User:
     #     Read the chat of the user.
     #     """
 
-    #     Settings.print("reading user chat: {} ({})".format(self.username, self.user_id))
+    #     logging.info("reading user chat: {} ({})".format(self.username, self.user_id))
     #     # messages, messages_received, messages_sent = read_user_messages(self.username, user_id=self.user_id)
     #     # self.messages = messages
     #     # self.messages_received = messages_received
     #     # self.messages_sent = messages_sent
     #     self.messages, self.messages_received, self.messages_sent = WEBDRIVER_read_user_messages(self.username, user_id=self.user_id)
     #     # self.messages_and_timestamps = messages[1]
-    #     Settings.maybe_print("chat read!")
+    #     logging.debug("chat read!")
 
     def update(self, user):
         for key, value in json.loads(user.dump()).items():
@@ -146,16 +147,16 @@ class User:
 
         """
 
-        Settings.dev_print("getting all users...")
+        logging.debug("getting all users...")
         users = []
-        if Settings.is_prefer_local():
+        if CONFIG["prefer_local"]:
             users = read_users_local()
         if len(users) == 0:
-            for user in get_users_by_type(isFan=True, isFollower=True):
+            for user in get_users(isFan=True, isFollower=True):
                 users.append(User(user))
-        Settings.maybe_print(f"users: {len(users)}")
+        logging.debug(f"users: {len(users)}")
         write_users_local(users)
-        Settings.set_prefer_local(True)
+        CONFIG["prefer_local"] = True
         return users
 
     @staticmethod
@@ -170,7 +171,7 @@ class User:
 
         """
 
-        Settings.dev_print("getting random user...")
+        logging.debug("getting random user...")
         users = User.get_all_users()
         randomizedUsers = get_already_randomized_users()
         # check each user in users
@@ -184,7 +185,7 @@ class User:
                     found = True
             if not found: break
         add_to_randomized_users(randomUser)
-        Settings.dev_print(f"random user: {randomUser.username}")
+        logging.debug(f"random user: {randomUser.username}")
         return randomUser
 
     # TODO: change to enum?
@@ -199,7 +200,7 @@ class User:
     # blocked
     @staticmethod
     def get_users_by_type(typeOf="fan"):
-        Settings.dev_print(f"getting users: {typeOf}")
+        logging.debug(f"getting users: {typeOf}")
         users = User.get_all_users()
         foundUsers = []
         for user in users:
@@ -223,7 +224,7 @@ class User:
                 foundUsers.append(user)
             elif typeOf == "blocked" and user.isBlocked:
                 foundUsers.append(user)
-        Settings.maybe_print(f"found users: {len(foundUsers)}")
+        logging.debug(f"found users: {len(foundUsers)}")
         return foundUsers    
 
     # TODO: use this?
@@ -239,11 +240,11 @@ class User:
 
     #     """
 
-    #     Settings.dev_print("getting users that have never been messaged...")
+    #     logging.debug("getting users that have never been messaged...")
     #     users = []
     #     for user in User.get_all_users():
     #         if len(user.messages_received) == 0:
-    #             Settings.maybe_print("never messaged user: {}".format(user.username))
+    #             logging.debug("never messaged user: {}".format(user.username))
     #             users.append(user)
     #     return users
 
@@ -260,15 +261,15 @@ class User:
 
         """
 
-        Settings.dev_print("getting new users...")
+        logging.debug("getting new users...")
         newUsers = []
         date_ = datetime.today() - timedelta(days=10)
         for user in User.get_all_users():
             if not user.start_date: continue
             started = datetime.strptime(str(user.start_date),"%b %d, %Y")
-            # Settings.maybe_print("date: "+str(date_)+" - "+str(started))
+            # logging.debug("date: "+str(date_)+" - "+str(started))
             if started < date_: continue
-            Settings.maybe_print("new user: {}".format(user.username))
+            logging.debug("new user: {}".format(user.username))
             newUsers.append(user)
         return newUsers
 
@@ -284,10 +285,10 @@ class User:
     #         The users on the list
 
     #     """
-    #     Settings.maybe_print("getting users by list: {} - {}".format(number, name))
+    #     logging.debug("getting users by list: {} - {}".format(number, name))
     #     listUsers = []
     #     for user in Driver.get_list(number=number, name=name):
-    #         Settings.maybe_print("user: {}".format(user.username))
+    #         logging.debug("user: {}".format(user.username))
     #         listUsers.append(user)
     #     return listUsers
 
@@ -303,13 +304,13 @@ class User:
 
         """
         if not userid or userid == None:
-            Settings.err_print("missing user id")
+            logging.error("missing user id")
             return None
         for user in User.get_all_users():
             if str(user.user_id) == "@u"+str(userid) or str(user.user_id) == "@"+str(userid) or str(user.user_id) == str(userid):
-                Settings.maybe_print("found user id: {}".format(userid))
+                logging.debug("found user id: {}".format(userid))
                 return user
-        Settings.err_print("missing user by user id - {}".format(userid))
+        logging.error("missing user by user id - {}".format(userid))
         return None
 
     @staticmethod
@@ -324,13 +325,13 @@ class User:
 
         """
         if not username or str(username) == "None":
-            Settings.err_print("missing username!")
+            logging.error("missing username!")
             return None
         for user in User.get_all_users():
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
-                Settings.maybe_print("found username: {}".format(username))
+                logging.debug("found username: {}".format(username))
                 return user
-        Settings.err_print("missing user by username - {}".format(username))
+        logging.error("missing user by username - {}".format(username))
         return None
 
 
@@ -429,7 +430,7 @@ class User:
             The users that have recently sent messages
 
         """
-        Settings.dev_print("getting recent users from messages...")
+        logging.debug("getting recent users from messages...")
         users = []
         for user in get_recent_chat_users():
             users.append(User({"id":user}))
@@ -466,7 +467,7 @@ class User:
         """
 
         if len(users) == 0: users = User.get_all_users()
-        Settings.print("updating chat logs: {}".format(len(users)))
+        logging.info("updating chat logs: {}".format(len(users)))
         for user in users: user.messages_read()
         # User.write_users_local(users=users)
         return users

@@ -1,8 +1,9 @@
 import os
 import json
+import logging
 from flask import Flask, request
 
-from ..util import CONFIG, Settings
+from ..util import CONFIG
 
 def create_app():
     app = Flask(__name__)
@@ -11,22 +12,22 @@ def create_app():
     def message():
         try:
             args = json.loads(request.data)
-            Settings.dev_print(args)
-            config["text"] = args["text"]
-            config["user"] = args["user"]
-            try: config["input"] = args["input"].split(",")
+            logging.debug(args)
+            CONFIG["text"] = args["text"]
+            CONFIG["user"] = args["user"]
+            try: CONFIG["input"] = args["input"].split(",")
             except Exception as e: pass
-            try: config["price"] = args["price"] or 0
+            try: CONFIG["price"] = args["price"] or 0
             except Exception as e: pass
-            try: config["schedule"] = args["schedule"]
+            try: CONFIG["schedule"] = args["schedule"]
             except Exception as e: pass
-            try: config["performers"] = args["performers"]
+            try: CONFIG["performers"] = args["performers"]
             except Exception as e: pass
             from ..snarf import Snarf
             Snarf.message()
             Snarf.close()
         except Exception as e:
-            Settings.dev_print(e)
+            logging.debug(e)
         finally:
             return "", 200
 
@@ -34,25 +35,25 @@ def create_app():
     def post():
         try:
             args = json.loads(request.data)
-            Settings.dev_print(args)
-            config["text"] = args["text"]
-            try: config["input"] = args["input"].split(",")
+            logging.debug(args)
+            CONFIG["text"] = args["text"]
+            try: CONFIG["input"] = args["input"].split(",")
             except Exception as e: pass
-            try: config["performers"] = args["performers"]
+            try: CONFIG["performers"] = args["performers"]
             except Exception as e: pass
-            try: config["schedule"] = args["schedule"]
+            try: CONFIG["schedule"] = args["schedule"]
             except Exception as e: pass
-            try: config["questions"] = args["questions"]
+            try: CONFIG["questions"] = args["questions"]
             except Exception as e: pass
-            try: config["duration"] = args["duration"]
+            try: CONFIG["duration"] = args["duration"]
             except Exception as e: pass
-            try: config["expires"] = args["expires"]
+            try: CONFIG["expires"] = args["expires"]
             except Exception as e: pass
             from ..snarf import Snarf
             Snarf.post()
             Snarf.close()
         except Exception as e:
-            Settings.dev_print(e)
+            logging.debug(e)
         finally:
             return "", 200
 
@@ -60,7 +61,7 @@ def create_app():
 
 def main():
     app = create_app()
-    if str(config["debug"]) == "True":
+    if str(CONFIG["debug"]) == "True":
         app.debug = True
         app.testing = True
     app.run(host="0.0.0.0", port=5000)

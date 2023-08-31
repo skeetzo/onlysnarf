@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-import logging
-# logger = logging.getLogger('snarf_logger')
+from .util.logger import configure_logging, logging
+# log = logging.getLogger('onlysnarf')
 
 from .util.args import get_args
 from .util.config import set_config
@@ -122,7 +122,8 @@ def users(config={'prefer_local':False}):
     """
 
     try:
-        User.get_all_users(prefer_local=config["prefer_local"])
+        CONFIG["prefer_local"] = config["prefer_local"]
+        User.get_all_users()
         return True
     except Exception as e: logging.debug(e)
     return False
@@ -134,6 +135,7 @@ def users(config={'prefer_local':False}):
 def main():
     try:
         print(CONFIG)
+        configure_logging(CONFIG["debug"], True if int(CONFIG["verbose"]) > 0 else False)
         logging.info(f"Running - {CONFIG['action']}")
         eval(f"{CONFIG['action']}(CONFIG)")
     except Exception as e:

@@ -2,11 +2,12 @@
 
 # Profile Settings
 
+import logging
+from ..util.config import CONFIG
 import json
 import inquirer
 
 # from ..lib.driver import Driver
-from ..util.settings import Settings
 from .user import User
 
 class Profile:
@@ -113,7 +114,7 @@ class Profile:
         failed = False
         for key, value in profile.items():
             for key_, value_ in desiredProfile.items():
-                Settings.dev_print("{}: {} = {}".format(key, value, value_))
+                # logging.debug("{}: {} = {}".format(key, value, value_))
                 if value and str(value_) != "avalue":
                     if value != value_:
                         print("Warning: Unrecommended setting - {}".format(key))
@@ -153,7 +154,7 @@ class Profile:
                     # do stuff
                     continue
 
-                Settings.dev_print("{}: {} = {}".format(key, value, value_))
+                logging.debug("{}: {} = {}".format(key, value, value_))
                 setattr(profile, str(key), value_)
 
         # search for twitter banner
@@ -300,18 +301,18 @@ class Profile:
 
     @staticmethod
     def read_local():
-        Settings.maybe_print("Getting Local Profile")
+        logging.debug("Getting Local Profile")
         profile = None
         try:
             profile_ = {}
-            with open(str(Settings.get_profile_path())) as json_file:  
+            with open(str(CONFIG["profile_path"])) as json_file:  
                 profile_ = json.load(json_file)['profile']
-            Settings.maybe_print("Loaded Local Profile")
+            logging.debug("Loaded Local Profile")
             profile = Profile()
             for key, value in profile_:
                 setattr(profile, str(key), value)
         except Exception as e:
-            Settings.dev_print(e)
+            logging.debug(e)
         return profile
 
     @staticmethod
@@ -319,9 +320,9 @@ class Profile:
         if profile is None:
             profile = Profile.get_profile()
         print("Saving Profile Locally")
-        Settings.maybe_print("local profile path: "+str(Settings.get_profile_path()))
+        logging.debug("local profile path: "+str(CONFIG["profile_path"]))
         try:
-            with open(str(Settings.get_profile_path()), 'w') as outfile:  
+            with open(str(CONFIG["profile_path"]), 'w') as outfile:  
                 json.dump({"profile":profile.__dict__}, outfile, indent=4, sort_keys=True)
         except FileNotFoundError:
             print("Error: Missing Profile File")

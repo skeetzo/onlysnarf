@@ -3,13 +3,14 @@ import sys
 import json
 import time
 import shutil
+import logging
 import inquirer
 import fileinput
-# from pathlib import Path
-##
-from ..util.settings import Settings
-from ..util.colorize import colorize
 from pathlib import Path
+
+from ..util import defaults as DEFAULT
+from ..util.colorize import colorize
+from ..util.user_config import get_user_config_path, get_username_onlyfans, get_password, get_username_google, get_password_google, get_username_twitter, get_password_twitter
 
 EMPTY_USER_CONFIG = Path(__file__).parent.joinpath("../conf/users/example-user.conf").resolve()
 
@@ -22,7 +23,7 @@ class Config:
         username = input("OnlyFans username: ")
         # check if user already exists
         if str(username)+".conf" in Config.get_users():
-            Settings.warn_print("user already exists!")
+            logging.warning("user already exists!")
             return Config.main()
         Config.reset_user_config(username)
         Config.update_onlyfans_user(user=username)
@@ -33,7 +34,7 @@ class Config:
 
     def check_config(user):
         try:
-            if not os.path.isfile(Settings.get_user_config_path(user)):
+            if not os.path.isfile(get_user_config_path(user)):
                 Config.reset_user_config(user)
         except Exception as e:
             Config.reset_user_config(user)
@@ -47,66 +48,66 @@ class Config:
 
     def list_users():
         # list all user configs in conf/users
-        for (dirpath, dirnames, filenames) in os.walk(os.path.join(Settings.get_base_directory(), "conf/users")):
+        for (dirpath, dirnames, filenames) in os.walk(os.path.join(DEFAULT.ROOT_PATH, "conf/users")):
             for filename in filenames:
-                Settings.print("> "+filename)
+                logging.info("> "+filename)
             break
 
     def list_user_config(user):
-        Settings.print("-- OnlySnarf Config --")
-        Settings.print(colorize("Green", "green")+": configured")
-        Settings.print(colorize("Blue", "blue")+": system defaults")
-        Settings.print(colorize("Red", "red")+": missing")
-        Settings.print("------------------------------")
-        Settings.print(colorize("Config File", 'conf')+": "+colorize(user, 'green'))
-        if str(Settings.get_username_onlyfans(user)) != "None":
+        logging.info("-- OnlySnarf Config --")
+        logging.info(colorize("Green", "green")+": configured")
+        logging.info(colorize("Blue", "blue")+": system defaults")
+        logging.info(colorize("Red", "red")+": missing")
+        logging.info("------------------------------")
+        logging.info(colorize("Config File", 'conf')+": "+colorize(user, 'green'))
+        if str(get_username_onlyfans(user)) != "None":
             color = "green"
-            if str(Settings.get_username_onlyfans(user)) == "$USERNAME":            
+            if str(get_username_onlyfans(user)) == "$USERNAME":            
                 color = "blue"
-            Settings.print(colorize("OnlyFans Username", 'conf')+": "+colorize(Settings.get_username_onlyfans(user), color))
+            logging.info(colorize("OnlyFans Username", 'conf')+": "+colorize(get_username_onlyfans(user), color))
         else:
-            Settings.print(colorize("OnlyFans Username", 'conf')+": "+colorize("N/A", 'red'))
+            logging.info(colorize("OnlyFans Username", 'conf')+": "+colorize("N/A", 'red'))
 
-        if str(Settings.get_password(user)) != "None":
+        if str(get_password(user)) != "None":
             color = "green"
-            if str(Settings.get_password(user)) == "$PASSWORD":            
+            if str(get_password(user)) == "$PASSWORD":            
                 color = "blue"
-            Settings.print(colorize("OnlyFans Password", 'conf')+": "+colorize("******", color))
+            logging.info(colorize("OnlyFans Password", 'conf')+": "+colorize("******", color))
         else:
-            Settings.print(colorize("OnlyFans Password", 'conf')+": "+colorize("N/A", 'red'))
+            logging.info(colorize("OnlyFans Password", 'conf')+": "+colorize("N/A", 'red'))
 
-        if str(Settings.get_username_google(user)) != "None":
+        if str(get_username_google(user)) != "None":
             color = "green"
-            if str(Settings.get_username_google(user)) == "$UGOOGLE":            
+            if str(get_username_google(user)) == "$UGOOGLE":            
                 color = "blue"
-            Settings.print(colorize("Google Username", 'conf')+": "+colorize(Settings.get_username_google(user), color))
+            logging.info(colorize("Google Username", 'conf')+": "+colorize(get_username_google(user), color))
         else:
-            Settings.print(colorize("Google Username", 'conf')+": "+colorize("N/A", 'red'))
+            logging.info(colorize("Google Username", 'conf')+": "+colorize("N/A", 'red'))
 
-        if str(Settings.get_password_google(user)) != "None":
+        if str(get_password_google(user)) != "None":
             color = "green"
-            if str(Settings.get_password_google(user)) == "$PGOOGLE":            
+            if str(get_password_google(user)) == "$PGOOGLE":            
                 color = "blue"
-            Settings.print(colorize("Google Password", 'conf')+": "+colorize("******", color))
+            logging.info(colorize("Google Password", 'conf')+": "+colorize("******", color))
         else:
-            Settings.print(colorize("Google Password", 'conf')+": "+colorize("N/A", 'red'))
+            logging.info(colorize("Google Password", 'conf')+": "+colorize("N/A", 'red'))
 
-        if str(Settings.get_username_twitter(user)) != "None":
+        if str(get_username_twitter(user)) != "None":
             color = "green"
-            if str(Settings.get_username_twitter(user)) == "$UTWITTER":            
+            if str(get_username_twitter(user)) == "$UTWITTER":            
                 color = "blue"
-            Settings.print(colorize("Twitter Username", 'conf')+": "+colorize(Settings.get_username_twitter(user), color))
+            logging.info(colorize("Twitter Username", 'conf')+": "+colorize(get_username_twitter(user), color))
         else:
-            Settings.print(colorize("Twitter Username", 'conf')+": "+colorize("N/A", 'red'))
+            logging.info(colorize("Twitter Username", 'conf')+": "+colorize("N/A", 'red'))
 
-        if str(Settings.get_password_twitter(user)) != "None":
+        if str(get_password_twitter(user)) != "None":
             color = "green"
-            if str(Settings.get_password_twitter(user)) == "$PTWITTER":            
+            if str(get_password_twitter(user)) == "$PTWITTER":            
                 color = "blue"
-            Settings.print(colorize("Twitter Password", 'conf')+": "+colorize("******", color))
+            logging.info(colorize("Twitter Password", 'conf')+": "+colorize("******", color))
         else:
-            Settings.print(colorize("Twitter Password", 'conf')+": "+colorize("N/A", 'red'))
-        Settings.print("------------------------------")
+            logging.info(colorize("Twitter Password", 'conf')+": "+colorize("N/A", 'red'))
+        logging.info("------------------------------")
 
     def list_user_menu():
         options = ["back"]
@@ -122,7 +123,7 @@ class Config:
 
     def get_users():
         users = []
-        for (dirpath, dirnames, filenames) in os.walk(os.path.join(Settings.get_base_directory(), "conf/users")):
+        for (dirpath, dirnames, filenames) in os.walk(os.path.join(DEFAULT.ROOT_PATH, "conf/users")):
             users.extend(filenames)
             break
         return users
@@ -148,21 +149,21 @@ class Config:
         Config.main()
 
     def user_header(user="default"):
-        Settings.print("User:")
-        if Settings.get_username_onlyfans(user) != "":
-            Settings.print(" - Email = {}".format(Settings.get_username_onlyfans(user)))
-        Settings.print(" - Username = {}".format(Settings.get_username(user)))
+        logging.info("User:")
+        if get_username_onlyfans(user) != "":
+            logging.info(" - Email = {}".format(get_username_onlyfans(user)))
+        logging.info(" - Username = {}".format(get_username(user)))
         pass_ = ""
-        if str(Settings.get_password()) != "":
+        if str(get_password()) != "":
             pass_ = "******"
-        Settings.print(" - Password = {}".format(pass_))
-        if str(Settings.get_username_twitter(user)) != "":
-            Settings.print(" - Twitter = {}".format(Settings.get_username_twitter(user)))
+        logging.info(" - Password = {}".format(pass_))
+        if str(get_username_twitter(user)) != "":
+            logging.info(" - Twitter = {}".format(get_username_twitter(user)))
             pass_ = ""
-            if str(Settings.get_password_twitter(user)) != "":
+            if str(get_password_twitter(user)) != "":
                 pass_ = "******"
-            Settings.print(" - Password = {}".format(pass_))
-        Settings.print('\r')
+            logging.info(" - Password = {}".format(pass_))
+        logging.info('\r')
 
     def remove_menu():
         username = Config.ask_username()
@@ -170,15 +171,15 @@ class Config:
         if input("ARE YOU SURE? N/y ") == "y":
             Config.remove_user(user=username)
         else:
-            Settings.print("canceling deletion!")
+            logging.info("canceling deletion!")
         Config.main()
 
     def remove_user(user="default"):
         try:
-            os.remove(Settings.get_user_config_path(user))
+            os.remove(get_user_config_path(user))
         except Exception as e:
             pass
-        Settings.print("successfully removed {}!".format(user))
+        logging.info("successfully removed {}!".format(user))
 
     def menu():
         questions = [
@@ -205,14 +206,14 @@ class Config:
         try:
             Config.main_menu()
         except Exception as e:
-            Settings.dev_print(e)
+            logging.debug(e)
 
     def prompt_google(user):
         data = {}
-        data['username'] = Settings.get_username_google(user)
-        data['password'] = Settings.get_password_google(user)
-        Settings.print("Username: "+data['username'])
-        Settings.print("Password: "+data['password'])
+        data['username'] = get_username_google(user)
+        data['password'] = get_password_google(user)
+        logging.info("Username: "+data['username'])
+        logging.info("Password: "+data['password'])
         if data['username'] == "" or input("Update Google email? N/y ").lower() == "y":
             data['username'] = input('Google Email: ')
         if data['password'] == "" or input("Update Google password? N/y ").lower() == "y":
@@ -221,10 +222,10 @@ class Config:
 
     def prompt_onlyfans(user):
         data = {}
-        data['username'] = Settings.get_username_onlyfans(user)
-        data['password'] = Settings.get_password(user)
-        Settings.print("Username: "+data['username'])
-        Settings.print("Password: "+data['password'])
+        data['username'] = get_username_onlyfans(user)
+        data['password'] = get_password(user)
+        logging.info("Username: "+data['username'])
+        logging.info("Password: "+data['password'])
         if data['username'] == "" or input("Update OnlyFans email? N/y ").lower() == "y":
             data['username'] = input('OnlyFans Email: ')
         if data['password'] == "" or input("Update OnlyFans password? N/y ").lower() == "y":
@@ -233,10 +234,10 @@ class Config:
 
     def prompt_twitter(user):
         data = {}
-        data['username'] = Settings.get_username_twitter(user)
-        data['password'] = Settings.get_password_twitter(user)
-        Settings.print("Username: "+data['username'])
-        Settings.print("Password: "+data['password'])
+        data['username'] = get_username_twitter(user)
+        data['password'] = get_password_twitter(user)
+        logging.info("Username: "+data['username'])
+        logging.info("Password: "+data['password'])
         if data['username'] == "" or input("Update Twitter username? N/y ").lower() == "y":
             data['username'] = input('Twitter Username: ')
         if data['password'] == "" or input("Update Twitter password? N/y ").lower() == "y":
@@ -244,25 +245,25 @@ class Config:
         return data
     
     def reset_user_config(user="default"):
-        Settings.print("resetting user config files for {}...".format(user))
-        if os.path.exists(Settings.get_user_config_path(user)):
-            os.remove(Settings.get_user_config_path(user))
+        logging.info("resetting user config files for {}...".format(user))
+        if os.path.exists(get_user_config_path(user)):
+            os.remove(get_user_config_path(user))
         else:
-            Settings.warn_print("no config exists to reset!")
-        shutil.copyfile(EMPTY_USER_CONFIG, Settings.get_user_config_path(user))
-        Settings.print("successfully reset config!")
+            logging.warning("no config exists to reset!")
+        shutil.copyfile(EMPTY_USER_CONFIG, get_user_config_path(user))
+        logging.info("successfully reset config!")
 
 
     def update_user_config(user="default"):
         # save user settings in variables
-        username = Settings.get_username_onlyfans(user)
-        password = Settings.get_password(user)
+        username = get_username_onlyfans(user)
+        password = get_password(user)
 
-        googleU = Settings.get_username_google(user)
-        googleP = Settings.get_password_google(user)
+        googleU = get_username_google(user)
+        googleP = get_password_google(user)
         
-        twitterU = Settings.get_username_twitter(user)
-        twitterP = Settings.get_password_twitter(user)
+        twitterU = get_username_twitter(user)
+        twitterP = get_password_twitter(user)
 
         # reset user config
         Config.reset_user_config(user)
@@ -281,40 +282,40 @@ class Config:
         Config.update_onlyfans_user(onlyfans_data, user)
         Config.update_google_user(google_data, user)
         Config.update_twitter_user(twitter_data, user)
-        Settings.print("successfully updated user config for {}!".format(user))
+        logging.info("successfully updated user config for {}!".format(user))
 
     def update_onlyfans_user(data=None, user="default"):
         Config.check_config(user)
         if not data: data = Config.prompt_onlyfans(user)
-        with fileinput.FileInput(Settings.get_user_config_path(user), inplace = True) as f:
+        with fileinput.FileInput(get_user_config_path(user), inplace = True) as f:
             for line in f: 
                 if data['username']:
                     line = line.replace("$USERNAME", data['username'])
                 if data['password']:
                     line = line.replace("$PASSWORD", data['password'])
                 print(line, end ='')
-        Settings.print("OnlyFans user config updated!")
+        logging.info("OnlyFans user config updated!")
 
     def update_google_user(data=None, user="default"):
         Config.check_config(user)
         if not data: data = Config.prompt_google(user)
-        with fileinput.FileInput(Settings.get_user_config_path(user), inplace = True) as f:
+        with fileinput.FileInput(get_user_config_path(user), inplace = True) as f:
             for line in f: 
                 if data['username']:
                     line = line.replace("$UGOOGLE", data['username'])
                 if data['password']:
                     line = line.replace("$PGOOGLE", data['password'])
                 print(line, end ='')
-        Settings.print("Google user config updated!")
+        logging.info("Google user config updated!")
 
     def update_twitter_user(data=None, user="default"):
         Config.check_config(user)
         if not data: data = Config.prompt_twitter(user)
-        with fileinput.FileInput(Settings.get_user_config_path(user), inplace = True) as f:
+        with fileinput.FileInput(get_user_config_path(user), inplace = True) as f:
             for line in f: 
                 if data['username']:
                     line = line.replace("$UTWITTER", data['username'])
                 if data['password']:
                     line = line.replace("$PTWITTER", data['password'])
                 print(line, end ='')
-        Settings.print("Twitter user config updated!")
+        logging.info("Twitter user config updated!")

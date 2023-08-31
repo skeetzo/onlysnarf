@@ -1,8 +1,8 @@
 
+import logging
 from .user import User
 from .driver import discount_user as WEBDRIVER_discount_user
 from ..util.defaults import DISCOUNT_MAX_AMOUNT, DISCOUNT_MIN_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_MONTHS
-from ..util.settings import Settings
 
 from marshmallow import Schema, fields, validate, post_load
 
@@ -50,26 +50,26 @@ class Discount:
 
         """
 
-        Settings.maybe_print(f"applying discount to: {self.username}")
+        logging.debug(f"applying discount to: {self.username}")
         return WEBDRIVER_discount_user(self.dump())
 
     @staticmethod
     def format_amount(amount):
         if int(amount) > int(DISCOUNT_MAX_AMOUNT):
-            Settings.warn_print(f"discount amount too high, max -> {DISCOUNT_MAX_AMOUNT}%")
+            logging.warning(f"discount amount too high, max -> {DISCOUNT_MAX_AMOUNT}%")
             return int(DISCOUNT_MAX_AMOUNT)
         elif int(amount) < int(DISCOUNT_MIN_AMOUNT):
-            Settings.warn_print(f"discount amount too low, min -> {DISCOUNT_MIN_AMOUNT}%")
+            logging.warning(f"discount amount too low, min -> {DISCOUNT_MIN_AMOUNT}%")
             return int(DISCOUNT_MIN_AMOUNT)
         return amount
 
     @staticmethod
     def format_months(months):
         if int(months) > int(DISCOUNT_MAX_MONTHS):
-            Settings.warn_print(f"discount months too high, max -> {DISCOUNT_MAX_MONTHS} months")
+            logging.warning(f"discount months too high, max -> {DISCOUNT_MAX_MONTHS} months")
             return int(DISCOUNT_MAX_MONTHS)
         elif int(months) < int(DISCOUNT_MIN_MONTHS):
-            Settings.warn_print(f"discount months too low, min -> {DISCOUNT_MIN_MONTHS} months")
+            logging.warning(f"discount months too low, min -> {DISCOUNT_MIN_MONTHS} months")
             return int(DISCOUNT_MIN_MONTHS)
         return months
 

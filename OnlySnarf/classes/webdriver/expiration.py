@@ -2,8 +2,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
-from ..util import debug_delay_check
-from .. import CONFIG
+from .. import CONFIG, debug_delay_check
 
 ######################
 ##### Expiration #####

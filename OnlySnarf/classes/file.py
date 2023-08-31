@@ -1,9 +1,9 @@
 import os, shutil, random, sys
 from os import walk
-##
-from ..lib.ffmpeg import ffmpeg
-from ..util.settings import Settings
 import wget
+
+from ..util.config import CONFIG
+from ..lib.ffmpeg import ffmpeg
 
 ###############################################################
 
@@ -57,15 +57,15 @@ class File():
             return False
         if size: return True
         size = os.path.getsize(self.get_path())
-        Settings.maybe_print("file size: {}kb - {}mb".format(size/1000, size/1000000))
+        logging.debug("file size: {}kb - {}mb".format(size/1000, size/1000000))
         if size <= File.ONE_HUNDRED_KILOBYTES:
-            Settings.warn_print("tiny file size")
+            logging.warning("tiny file size")
         elif size <= File.ONE_MEGABYTE:
-            Settings.warn_print("small file size")
+            logging.warning("small file size")
         elif size > 0:
-            Settings.maybe_print("normal file size")
+            logging.debug("normal file size")
         else:
-            Settings.err_print("empty file size")
+            logging.error("empty file size")
             return False
         self.size = size
         return True
@@ -75,10 +75,10 @@ class File():
     def download(self):
         """Download a url. An input can only be a valid path or a valid url."""
 
-        Settings.maybe_print("downloading file...")
+        logging.debug("downloading file...")
         filename = wget.download(self.path, out=self.get_tmp())
-        Settings.print("") # resume same line after wget download
-        Settings.maybe_print("downloaded: "+filename)
+        logging.info("") # resume same line after wget download
+        logging.debug("downloaded: "+filename)
         self.path = filename
 
     def get_ext(self):
@@ -100,7 +100,7 @@ class File():
         """
 
         if self.path == "":
-            Settings.err_print("missing file path")
+            logging.error("missing file path")
             return  ""
         return str(self.path)
 
@@ -118,7 +118,7 @@ class File():
         if self.title != "": return self.title
         path = self.get_path()
         if str(path) == "": 
-            Settings.err_print("missing file title!")
+            logging.error("missing file title!")
             return ""
         title, ext = os.path.splitext(path)
         self.ext = ext.replace(".","")
@@ -129,7 +129,7 @@ class File():
     def get_tmp():
         """Creates / gets the default temporary download directory"""
 
-        download_path = Settings.get_download_path()
+        download_path = CONFIG["download_path"]
         if not os.path.exists(download_path):
             os.mkdir(download_path)
         return download_path
@@ -150,7 +150,7 @@ class File():
             self.type = Video()
         elif str(self.get_ext()) in str(File.MIMETYPES_IMAGES_LIST):
             self.type = Image()
-        else: Settings.warn_print("unable to parse file type")
+        else: logging.warning("unable to parse file type")
         return self.type
 
     def prepare(self):
@@ -166,7 +166,7 @@ class File():
 
         """
 
-        Settings.maybe_print("preparing file: {}".format(self.get_title()))
+        logging.debug("preparing file: {}".format(self.get_title()))
         # self.get_type().prepare()
         if not self.check_size():
             self.download()
@@ -217,7 +217,7 @@ class File():
 
         """
 
-        Settings.dev_print("getting images of folder: {}".format(folder.get_title()))
+        logging.debug("getting images of folder: {}".format(folder.get_title()))
         if not folder: return []
         imgs = []
         files = []
@@ -229,7 +229,7 @@ class File():
             file = File()
             setattr(file, "path", os.path.join(folder.get_path(),f))
             files.append(file)
-            Settings.maybe_print("image path: {}".format(os.path.join(folder.get_path(),f)))
+            logging.debug("image path: {}".format(os.path.join(folder.get_path(),f)))
         return files
 
     @staticmethod
@@ -249,7 +249,7 @@ class File():
 
         """
 
-        Settings.dev_print("getting videos of folder: {}".format(folder.get_title()))
+        logging.debug("getting videos of folder: {}".format(folder.get_title()))
         if not folder: return []
         videos = []
         files = []
@@ -264,7 +264,7 @@ class File():
             file = File()
             setattr(file, "path", os.path.join(folder.get_path(),f))
             files.append(file)
-            Settings.maybe_print("video path: {}".format(os.path.join(folder.get_path(),f)))
+            logging.debug("video path: {}".format(os.path.join(folder.get_path(),f)))
         return files
 
     @staticmethod
@@ -290,11 +290,11 @@ class File():
         # should give you all of the subdirectories, recursively.
         # Note that the second entry in the tuple is the list of child directories of the entry in the first position, so you could use this instead, but it's not likely to save you much.
         # However, you could use it just to give you the immediate child directories:
-        Settings.maybe_print("local walk: {}".format(folderPath))
+        logging.debug("local walk: {}".format(folderPath))
         folders = []
-        # Settings.print(os.walk(folderPath))
+        # logging.info(os.walk(folderPath))
         for folder in next(os.walk(folderPath))[1]:
-            Settings.maybe_print("folder: {}".format(folder))
+            logging.debug("folder: {}".format(folder))
             fol = Folder()
             setattr(fol, "path", os.path.join(folderPath, folder))
             folders.append(fol)
@@ -308,16 +308,16 @@ class File():
         """
 
         try:
-            Settings.maybe_print('deleting local files...')
+            logging.debug('deleting local files...')
             # delete /tmp
             tmp = File.get_tmp()
             if os.path.exists(tmp):
                 shutil.rmtree(tmp)
-                Settings.maybe_print('local files removed!')
+                logging.debug('local files removed!')
             else:
-                Settings.maybe_print('no local files found!')
+                logging.debug('no local files found!')
         except Exception as e:
-            Settings.dev_print(e)
+            logging.debug(e)
 
     # def upload(self):
     #     """
@@ -332,7 +332,7 @@ class File():
 
     #     """
     #     if not self.prepare():
-    #         Settings.err_print("unable to upload file - {}".format(self.get_title()))
+    #         logging.error("unable to upload file - {}".format(self.get_title()))
     #         return False
     #     return True
 
@@ -363,8 +363,8 @@ class Folder(File):
 
     # def combine(self):
     #     if len(self.files) == 0: return
-    #     Settings.dev_print("combining files: {}".format(len(self.files)))
-    #     Settings.dev_print("combine path: {}".format(combinedPath))
+    #     logging.debug("combining files: {}".format(len(self.files)))
+    #     logging.debug("combine path: {}".format(combinedPath))
     #     combinedPath = os.path.join(File.get_tmp(), "{}-combined".format(self.title))
     #     for file in files:
     #         shutil.move(file.get_path(), combinedPath)
@@ -392,12 +392,12 @@ class Folder(File):
                 file_ = File()
                 setattr(file_, "path", os.path.join(self.get_path(), file))
                 self.files.append(file_)
-                Settings.maybe_print("local file found: {}".format(file_.get_title()))
-        if Settings.get_title():
-            for file in self.files:
-                if str(Settings.get_title()) == str(file.get_title()):
-                    self.files = [file]
-                    break
+                logging.debug("local file found: {}".format(file_.get_title()))
+        # if Settings.get_title():
+            # for file in self.files:
+                # if str(Settings.get_title()) == str(file.get_title()):
+                    # self.files = [file]
+                    # break
         return self.files
 
     def get_title(self):
@@ -414,7 +414,7 @@ class Folder(File):
         if self.title: return self.title
         path = self.get_path()
         if str(path) == "": 
-            Settings.err_print("missing file title")
+            logging.error("missing file title")
             return ""
         title = os.path.basename(path)
         self.title = title
@@ -431,7 +431,7 @@ class Folder(File):
 
         """
 
-        Settings.maybe_print("preparing folder: {}".format(self.get_title()))
+        logging.debug("preparing folder: {}".format(self.get_title()))
         prepared = False
         for file in self.get_files():
             prepared_ = file.prepare()
@@ -457,7 +457,7 @@ class Image(File):
 
         """
 
-        Settings.maybe_print("preparing image: {}".format(self.get_title()))
+        logging.debug("preparing image: {}".format(self.get_title()))
         return super().prepare()
 
 ######################################################################################################################
@@ -511,7 +511,7 @@ class Video(File):
 
         """
 
-        Settings.maybe_print("preparing video: {}".format(self.get_title()))
+        logging.debug("preparing video: {}".format(self.get_title()))
         self.reduce()
         self.repair()
         self.watermark()
@@ -520,13 +520,13 @@ class Video(File):
     def reduce(self):
         """Reduce the video file."""
 
-        if not Settings.is_reduce(): 
-            Settings.maybe_print("skipping: video reduction")
+        if not CONFIG["reduce"]: 
+            logging.debug("skipping: video reduction")
             return
         path = self.get_path()
-        if (int(os.stat(str(path)).st_size) < File.FIFTY_MEGABYTES or str(Settings.is_reduce()) == "False"):
+        if (int(os.stat(str(path)).st_size) < File.FIFTY_MEGABYTES or str(CONFIG["reduce"]) == "False"):
             return
-        Settings.dev_print("reduce: {}".format(self.get_title()))
+        logging.debug("reduce: {}".format(self.get_title()))
         self.path = ffmpeg.reduce(path)
     
     # unnecessary
@@ -534,11 +534,11 @@ class Video(File):
     #     """Repair the video file."""
         
     #     if not Settings.is_repair():
-    #         Settings.dev_print("skipping: video repair")
+    #         logging.debug("skipping: video repair")
     #         return
     #     path = self.get_path()
     #     if Settings.is_repair():
     #         return
-    #     Settings.dev_print("repair: {}".format(self.get_title()))
+    #     logging.debug("repair: {}".format(self.get_title()))
     #     self.path = ffmpeg.repair(path)
 

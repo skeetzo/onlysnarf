@@ -115,8 +115,7 @@ def get_users_at_page(browser, page):
         Settings.err_print(f"failed to find {class_name}!")
     return users
 
-def get_users_by_type(isFan=True, isFollower=False):
-    browser = Driver.get_browser()
+def get_users_by_type(browser, isFan=True, isFollower=False):
     users = []
     if isFan:
         users.extend(get_users_at_page(browser, ONLYFANS_USERS_ACTIVE_URL))

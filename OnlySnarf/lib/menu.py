@@ -1,6 +1,7 @@
 
 import os
 import inquirer
+import pkg_resources
 
 from ..classes.profile import Profile
 from ..snarf import main as MAIN, discount, message, post, profile, promotion, users
@@ -72,7 +73,7 @@ class Menu:
 
         if not CONFIG["debug"]: os.system('clear')
         print(colorize(Menu.ASCII, 'header'))
-        print(colorize('version {}\n'.format(Settings.get_version()), 'green'))
+        print(colorize('version {}\n'.format(pkg_resources.get_distribution("onlysnarf").version), 'green'))
         Menu.user_header()
         Menu.settings_header()
 
