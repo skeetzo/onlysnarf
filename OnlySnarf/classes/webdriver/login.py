@@ -1,17 +1,17 @@
 import time
+import logging
 
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
-from .. import CONFIG, DEFAULT
 from .errors import error_checker
 from .goto import go_to_home
-
-# TODO: finish replacing Settings references with methods to fetch user data that need to be readded
-
+from .. import CONFIG, DEFAULT
+from .. import get_username_onlyfans, get_password, get_username_google, get_password_google, get_username_twitter, get_password_twitter
 
 ##################
 ###### Login #####
@@ -31,12 +31,14 @@ def login(browser):
     """
 
     if check_if_already_logged_in(browser): return True
-    logging.info('Logging into OnlyFans for {}...'.format(CONFIG["username"]))
+    logging.info(f"Logging into OnlyFans for {CONFIG['username']}...")
     try:
         if CONFIG["login"] == "auto":
-            if via_form(browser) or via_google(browser) or via_twitter(browser):
-                logging.debug("auto login successful!")
-                return True
+            successful = via_form(browser)
+            if not successful: successful = via_google(browser)
+            if not successful: successful = via_twitter(browser)
+            logging.debug("auto login successful!")
+            return True
         elif CONFIG["login"] == "onlyfans":
             return via_form(browser)
         elif CONFIG["login"] == "twitter":
@@ -117,7 +119,7 @@ def via_form(browser):
 
     try:
         logging.debug("logging in via form...")
-        if not str(Settings.get_username_onlyfans()) or not str(Settings.get_password()):
+        if not str(get_username_onlyfans()) or not str(get_password()):
             logging.warning("missing onlyfans login info!")
             return False
         go_to_home(browser)
@@ -125,12 +127,12 @@ def via_form(browser):
         logging.debug("entering username & password...")
         usernameField = WAIT.until(EC.presence_of_element_located((By.NAME, "email")))
         usernameField.click()
-        usernameField.send_keys(str(Settings.get_username_onlyfans()))
+        usernameField.send_keys(str(get_username_onlyfans()))
         logging.debug("username entered")
         # passwordField = WAIT.until(EC.presence_of_element_located((By.NAME, "password")))
         passwordField = browser.find_element(By.NAME, "password")
         passwordField.click()
-        passwordField.send_keys(str(Settings.get_password()))
+        passwordField.send_keys(str(get_password()))
         passwordField.send_keys(Keys.ENTER)
         logging.debug("password entered")
         check_captcha(browser)
@@ -154,7 +156,7 @@ def via_google(browser):
 
     try:
         logging.debug("logging in via google...")
-        if not str(Settings.get_username_google()) or not str(Settings.get_password_google()):
+        if not str(get_username_google()) or not str(get_password_google()):
             logging.error("missing google login info")
             return False
         # click google login
@@ -162,12 +164,12 @@ def via_google(browser):
         [elem for elem in elements if '/auth/google' in str(elem.get_attribute('href'))][0].click()
         time.sleep(3)
         username = browser.switch_to.active_element
-        username.send_keys(str(Settings.get_username_google()))
+        username.send_keys(str(get_username_google()))
         username.send_keys(Keys.ENTER)
         logging.debug("username entered")
         time.sleep(2)
         password = browser.switch_to.active_element
-        password.send_keys(str(Settings.get_password_google()))
+        password.send_keys(str(get_password_google()))
         password.send_keys(Keys.ENTER)
         logging.debug("password entered")
         return check_if_logged_in(browser)
@@ -189,16 +191,16 @@ def via_twitter(browser):
 
     try:
         logging.debug("logging in via twitter...")
-        if not str(Settings.get_username_twitter()) or not str(Settings.get_password_twitter()):
+        if not str(get_username_twitter()) or not str(get_password_twitter()):
             logging.error("missing twitter login info!")
             return False
         # click twitter login
         elements = browser.find_elements(By.TAG_NAME, "a")
         [elem for elem in elements if '/twitter/auth' in str(elem.get_attribute('href'))][0].click()
-        browser.find_element(By.NAME, "session[username_or_email]").send_keys(str(Settings.get_username_twitter()))
+        browser.find_element(By.NAME, "session[username_or_email]").send_keys(str(get_username_twitter()))
         logging.debug("username entered")
         password = browser.find_element(By.NAME, "session[password]")
-        password.send_keys(str(Settings.get_password_twitter()))
+        password.send_keys(str(get_password_twitter()))
         password.send_keys(Keys.ENTER)
         logging.debug("password entered")
         return check_if_logged_in(browser)
@@ -207,6 +209,9 @@ def via_twitter(browser):
         error_checker(e)
     return False
 
+################################################################################################################################################
+################################################################################################################################################
+################################################################################################################################################
 
 def check_captcha(browser):
     try:

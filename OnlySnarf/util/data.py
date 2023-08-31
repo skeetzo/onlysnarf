@@ -33,7 +33,7 @@ def get_already_randomized_users():
     try:
         with open(str(USERS_PATH)) as json_file:  
             for user in json.load(json_file)['randomized_users']:
-                users.append(User(json.loads(user)))
+                users.append(User.create_user(json.loads(user)))
         logging.debug("loaded randomized users")
     except Exception as e:
         logging.debug(e)
@@ -55,7 +55,7 @@ def read_users_local():
     try:
         with open(str(USERS_PATH)) as json_file:  
             for user in json.load(json_file)['users']:
-                users.append(User(json.loads(user)))
+                users.append(User.create_user(json.loads(user)))
         logging.debug("loaded local users")
     except Exception as e:
         logging.debug(e)

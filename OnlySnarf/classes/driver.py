@@ -55,31 +55,31 @@ class Webdriver:
 
     @staticmethod
     def discount_user(discount_object):
-        WEBDRIVER_discount_user(Webdriver.get_browser(), discount_object)
+        return WEBDRIVER_discount_user(Webdriver.get_browser(), discount_object)
 
     @staticmethod
     def message(message_object):
-        WEBDRIVER_message(Webdriver.get_browser(), message_object)
+        return WEBDRIVER_message(Webdriver.get_browser(), message_object)
 
     @staticmethod
     def post(post_object):
-        WEBDRIVER_post(Webdriver.get_browser(), post_object)
+        return WEBDRIVER_post(Webdriver.get_browser(), post_object)
 
     @staticmethod
     def get_recent_chat_users():
-        WEBDRIVER_get_recent_chat_users(Webdriver.get_browser())
+        return WEBDRIVER_get_recent_chat_users(Webdriver.get_browser())
 
     @staticmethod
     def get_userid_by_username():
-        WEBDRIVER_get_userid_by_username(Webdriver.get_browser())
+        return WEBDRIVER_get_userid_by_username(Webdriver.get_browser())
 
     @staticmethod
     def get_users(isFan=False, isFollower=False):
-        WEBDRIVER_get_users_by_type(Webdriver.get_browser(), isFan=isFan, isFollower=isFollower)
+        return WEBDRIVER_get_users_by_type(Webdriver.get_browser(), isFan=isFan, isFollower=isFollower)
 
     @staticmethod
     def get_user_chat():
-        WEBDRIVER_get_user_chat(Webdriver.get_browser())
+        return WEBDRIVER_get_user_chat(Webdriver.get_browser())
 
 
 # TODO: add remaining functionality like lists, promotion, profile, etc

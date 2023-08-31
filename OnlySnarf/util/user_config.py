@@ -2,6 +2,7 @@ import configparser
 import logging
 import os
 
+from .config import CONFIG
 from . import defaults as DEFAULT
 
 def get_user_config(username="default"):
@@ -25,44 +26,50 @@ def get_user_config_path(username="default"):
     if ".conf" not in str(username): username = username+".conf"
     return os.path.join(DEFAULT.ROOT_PATH, "conf/users", username)
 
-def get_username_onlyfans(username=None):
+def get_username_onlyfans(username=""):
     try:
         if not username: username = CONFIG["username"]
-        return get_user_config(username)["onlyfans_username"]
+        username = get_user_config(username)["onlyfans_username"]
+        if username == DEFAULT.USERNAME: return ""
     except Exception as e: pass
-    return ""
+    return username
 
-def get_username_google(username=None):
+def get_username_google(username=""):
     try:
         if not username: username = CONFIG["username"]
-        return get_user_config(username)["google_username"]
+        username = get_user_config(username)["google_username"]
+        if username == DEFAULT.GOOGLE_USERNAME: return ""
     except Exception as e: pass
-    return ""            
+    return username           
 
-def get_username_twitter(username=None):
+def get_username_twitter(username=""):
     try:
         if not username: username = CONFIG["username"]
-        return get_user_config(username)["twitter_username"]
+        username = get_user_config(username)["twitter_username"]
+        if username == DEFAULT.TWITTER_USERNAME: return ""
     except Exception as e: pass
-    return ""
+    return username
 
-def get_password(username=None):
+def get_password(username=""):
     try:
         if not username: username = CONFIG["username"]
-        return get_user_config(username)["onlyfans_password"]
+        username = get_user_config(username)["onlyfans_password"]
+        if username == DEFAULT.PASSWORD: return ""
     except Exception as e: pass
-    return ""
+    return username
 
-def get_password_google(username=None):
+def get_password_google(username=""):
     try:
         if not username: username = CONFIG["username"]
-        return get_user_config(username)["google_password"]
+        username = get_user_config(username)["google_password"]
+        if username == DEFAULT.GOOGLE_PASSWORD: return ""
     except Exception as e: pass
-    return ""
+    return username
 
-def get_password_twitter(username=None):
-    try: 
+def get_password_twitter(username=""):
+    try:
         if not username: username = CONFIG["username"]
-        return get_user_config(username)["twitter_password"]
+        username = get_user_config(username)["twitter_password"]
+        if username == DEFAULT.TWITTER_PASSWORD: return ""
     except Exception as e: pass
-    return ""
+    return username

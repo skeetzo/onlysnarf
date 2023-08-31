@@ -1,3 +1,8 @@
+import time
+import logging
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
 from .. import CONFIG, debug_delay_check
@@ -23,29 +28,29 @@ def poll(browser, poll_object={}):
     """
 
     if not poll_object or len(poll_object["questions"]) == 0:
-        Settings.dev_print("skipping empty poll")
+        logging.debug("skipping empty poll")
         return True
     try:
-        Settings.print("Poll:")
+        logging.info("Poll:")
         open_poll_model(browser)        
         add_poll_duration(browser, poll_object["duration"])
         add_poll_questions(browser, poll_object["questions"])
         if CONFIG["debug"]:
-            Settings.maybe_print("skipping poll (debug)")
+            logging.debug("skipping poll (debug)")
             find_element_to_click(browser, "b-dropzone__preview__delete", text="Cancel").click()
-        Settings.dev_print("### Poll Successful ###")
+        logging.debug("### Poll Successful ###")
         return True
     except Exception as e:
         Driver.error_checker(e)
-        Settings.err_print("failed to enter poll!")
+        logging.error("failed to enter poll!")
     return False
 
 # open the poll duration
 # can click anywhere near the top label
 # TODO: finish updating any inserted wait times to be more dynamic
 def add_poll_duration(browser, duration, wait=1):
-    Settings.print("- Duration: {}".format(duration))
-    Settings.dev_print("setting duration")
+    logging.info("- Duration: {}".format(duration))
+    logging.debug("setting duration")
     action = ActionChains(browser)
     action.click(on_element=browser.find_element(By.CLASS_NAME, "b-post-piece__value"))
     action.pause(int(wait))
@@ -53,41 +58,41 @@ def add_poll_duration(browser, duration, wait=1):
     action.send_keys(str(duration))
     action.perform()
     # save the duration
-    Settings.dev_print("saving duration")
+    logging.debug("saving duration")
     find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Save").click()
-    Settings.dev_print("successfully saved duration")
+    logging.debug("successfully saved duration")
     debug_delay_check()
 
 def add_poll_questions(browser, questions):
-    Settings.dev_print("configuring question paths...")
+    logging.debug("configuring question paths...")
     questionsElement = browser.find_elements(By.CLASS_NAME, "v-text-field__slot")
     # add extra question space
     OFFSET = 2 # number of preexisting questionsElement
     if OFFSET + len(questions) > len(questionsElement):
         for i in range(OFFSET + len(questions)-len(questionsElement)):
-            Settings.dev_print("adding question...")
+            logging.debug("adding question...")
             find_element_to_click(browser, "g-btn.m-flat.new_vote_add_option").click()
-            Settings.dev_print("added question")
+            logging.debug("added question")
     # find the question inputs again
     questionsElement = browser.find_elements(By.CLASS_NAME, "v-text-field__slot")
-    Settings.dev_print("question paths: {}".format(len(questionsElement)))
+    logging.debug("question paths: {}".format(len(questionsElement)))
     # enter the questions
     i = 0
-    Settings.dev_print("questions: {}".format(questions))
-    Settings.print("- Questions:")
+    logging.debug("questions: {}".format(questions))
+    logging.info("- Questions:")
     for question in list(questions):
-        Settings.print("> {}".format(question))
-        Settings.dev_print("entering question: {}".format(question))
+        logging.info("> {}".format(question))
+        logging.debug("entering question: {}".format(question))
         questionsElement[i].find_elements(By.XPATH, "./child::*")[0].send_keys(str(question))
-        Settings.dev_print("entered question")
+        logging.debug("entered question")
         time.sleep(1)
         i+=1
-    Settings.dev_print("successfully entered questions")
+    logging.debug("successfully entered questions")
     debug_delay_check()
 
 # open the poll model
 def open_poll_model(browser):
-    Settings.dev_print("adding poll")
+    logging.debug("adding poll")
     elements = browser.find_elements(By.TAG_NAME, "use")
     element = [elem for elem in elements if '#icon-poll' in str(elem.get_attribute('href'))][0]
     ActionChains(browser).move_to_element(element).click().perform()

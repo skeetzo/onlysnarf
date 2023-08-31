@@ -1,5 +1,8 @@
+import logging
+from selenium.webdriver.common.by import By
 
 from .element import find_element_to_click
+from ..schedule import Schedule
 from .. import CONFIG, debug_delay_check
 
 ####################
@@ -23,12 +26,12 @@ def schedule(browser, schedule_object={}):
     """
 
     if not schedule_object:
-        Settings.dev_print("skipping empty schedule")
+        logging.debug("skipping empty schedule")
         return True
     try:
-        Settings.print("Schedule:")
-        Settings.print(f"- Date: {Settings.format_date(schedule_object['date'])}")
-        Settings.print(f"- Time: {Settings.format_time(schedule_object['time'])}")
+        logging.info("Schedule:")
+        logging.info(f"- Date: {Schedule.format_date(schedule_object['date'])}")
+        logging.info(f"- Time: {Schedule.format_time(schedule_object['time'])}")
 
         # TODO: fix
         ## BUG: tries twice to solve whatever issue is occurring
@@ -36,9 +39,9 @@ def schedule(browser, schedule_object={}):
         # try:
         #     self.schedule_open()
         # except Exception as e:
-        #     Settings.dev_print(e)
-        #     Settings.dev_print("## SCHEDULE BUG ##")
-        #     Settings.maybe_print("attempting to circumvent scheduling bug...")
+        #     logging.debug(e)
+        #     logging.debug("## SCHEDULE BUG ##")
+        #     logging.debug("attempting to circumvent scheduling bug...")
         #     self.go_to_home()
         #     self.schedule_open()
         ##
@@ -57,9 +60,9 @@ def schedule(browser, schedule_object={}):
             raise Exception("failed to enter minutes!")
         if not self.schedule_suffix(browser, schedule_object['suffix']):
             raise Exception("failed to enter suffix!")
-        Settings.dev_print("saving schedule...")
+        logging.debug("saving schedule...")
         if CONFIG["debug"]:
-            Settings.print("skipping schedule save (debug)")
+            logging.info("skipping schedule save (debug)")
             return self.schedule_cancel(browser)
         return self.schedule_save(browser)
     except Exception as e:
@@ -70,19 +73,19 @@ def schedule(browser, schedule_object={}):
 def schedule_open(browser):
     """Click schedule"""
 
-    Settings.dev_print("opening schedule...")
+    logging.debug("opening schedule...")
     find_element_to_click(browser, "g-btn.m-flat.b-make-post__datepicker-btn").click()
-    Settings.dev_print("opened schedule")
+    logging.debug("opened schedule")
 
 def schedule_date(browser, month, year):
     """Find and click month w/ correct date"""
 
-    Settings.dev_print("setting date...")
+    logging.debug("setting date...")
     while True:
         date = browser.find_element(By.CLASS_NAME, "vdatetime-calendar__current--month").get_attribute("innerHTML")
-        Settings.dev_print(f"date: {date} - {month} {year}")
+        logging.debug(f"date: {date} - {month} {year}")
         if str(month) in str(date) and str(year) in str(date):
-            Settings.dev_print("set month and year")
+            logging.debug("set month and year")
             debug_delay_check()
             return True
         else:
@@ -92,11 +95,11 @@ def schedule_date(browser, month, year):
 def schedule_day(browser, day):
     """Set day in month"""
 
-    Settings.dev_print("setting day...")
+    logging.debug("setting day...")
     for ele in Driver.find_elements_by_name("vdatetime-calendar__month__day"):
         if str(day) in ele.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>",""):
             ele.click()
-            Settings.dev_print("set day")
+            logging.debug("set day")
             debug_delay_check()
             return True
     return False
@@ -105,17 +108,17 @@ def schedule_save_date(browser):
     """Save schedule date and move to next view in frame by hitting next"""
     
     find_element_to_click(browser, "g-btn.m-flat.m-reset-width.m-btn-gaps", text="Next").click()
-    Settings.dev_print("saved date")
+    logging.debug("saved date")
 
 def schedule_hour(browser, hour):
     """Set schedule hour"""
 
-    Settings.dev_print("setting hours...")
+    logging.debug("setting hours...")
     eles = browser.find_element(By.CLASS_NAME, "vdatetime-time-picker__list--hours").find_elements(By.XPATH, "./child::*")
     for ele in eles:
         if str(hour) in ele.get_attribute("innerHTML").strip():
             ele.click()
-            Settings.dev_print("set hour")
+            logging.debug("set hour")
             debug_delay_check()
             return True
     return False
@@ -123,12 +126,12 @@ def schedule_hour(browser, hour):
 def schedule_minutes(browser, minutes):
     """Set schedule minutes"""
 
-    Settings.dev_print("setting minutes...")
+    logging.debug("setting minutes...")
     eles = browser.find_element(By.CLASS_NAME, "vdatetime-time-picker__list--minutes").find_elements(By.XPATH, "./child::*")
     for ele in eles:
         if str(minutes) in ele.get_attribute("innerHTML").strip():
             ele.click()
-            Settings.dev_print("set minutes")
+            logging.debug("set minutes")
             debug_delay_check()
             return True
     return False
@@ -136,12 +139,12 @@ def schedule_minutes(browser, minutes):
 def schedule_suffix(browser, suffix):
     """Set am/pm suffix"""
 
-    Settings.dev_print("setting suffix...")
+    logging.debug("setting suffix...")
     eles = browser.find_element(By.CLASS_NAME, "vdatetime-time-picker__list--suffix").find_elements(By.XPATH, "./child::*")
     for ele in eles:
         if str(suffix).lower() in ele.get_attribute("innerHTML").strip().lower():
             ele.click()
-            Settings.dev_print("set suffix")
+            logging.debug("set suffix")
             debug_delay_check()
             return True
     return False
@@ -149,15 +152,15 @@ def schedule_suffix(browser, suffix):
 def schedule_cancel(browser):
     """Cancel schedule by clicking cancel"""
 
-    Settings.dev_print("canceling schedule...")
+    logging.debug("canceling schedule...")
     browser.find_element(By.CLASS_NAME, "vdatetime-popup__actions__button--cancel").find_elements(By.XPATH, "./child::*")[0].click()
-    Settings.print("Canceled schedule!")
+    logging.info("Canceled schedule!")
     return True
 
 def schedule_save(browser):
     """Save schedule by clicking save"""
 
-    Settings.dev_print("saving schedule...")
+    logging.debug("saving schedule...")
     browser.find_element(By.CLASS_NAME, "vdatetime-popup__actions__button--confirm").find_elements(By.XPATH, "./child::*")[0].click()
-    Settings.print("Saved schedule!")
+    logging.info("Saved schedule!")
     return True

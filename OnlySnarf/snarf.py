@@ -134,7 +134,6 @@ def users(config={'prefer_local':False}):
 
 def main():
     try:
-        print(CONFIG)
         configure_logging(CONFIG["debug"], True if int(CONFIG["verbose"]) > 0 else False)
         logging.info(f"Running - {CONFIG['action']}")
         eval(f"{CONFIG['action']}(CONFIG)")

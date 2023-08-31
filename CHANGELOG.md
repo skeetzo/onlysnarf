@@ -750,52 +750,57 @@
   - updates to webdriver/discount
   **8/19/2023, 8/20/2023, 8/21/2023**
   - more driver cleanup
-**4.6.7 : 8/22/2023**
-- restructure snarf "class" & method of interfacing with general behavior
-- more driver cleanup and updates to rounding out codebase
-- added list of default urls in .utils
-- removal of elements mess (finally)
-- looked into Marshmellow package for class / object cleanup and expanded from User to other classes
-**8/23/2023**
-- more code cleanup
-- finished updates to schedule class parsing schedule vs date & time
-**8/24/2023**
-- more code cleanup
-- added collection urls
-**8/29/2023**
-- user file writes moved to utils/data.py
-- beginnning updates on test scripts
-**8/30/2023**
-- more code reorg & updates
-- beginning code tests 
+  **4.6.7 : 8/22/2023**
+  - restructure snarf "class" & method of interfacing with general behavior
+  - more driver cleanup and updates to rounding out codebase
+  - added list of default urls in .utils
+  - removal of elements mess (finally)
+  - looked into Marshmellow package for class / object cleanup and expanded from User to other classes
+  **8/23/2023**
+  - more code cleanup
+  - finished updates to schedule class parsing schedule vs date & time
+  **8/24/2023**
+  - more code cleanup
+  - added collection urls
+  **8/29/2023**
+  - user file writes moved to utils/data.py
+  - beginnning updates on test scripts
+  **8/30/2023**
+  - more code reorg & updates
+  - beginning code tests 
+**4.6.8 : 8/31/2023**
+- finished removing Settings references in /webdriver
+- finished merging all old code from notes/old/re-add-me
+- ensured that config / arg variables properly affect processes / finish updating their removal references from Settings
+- updated 'snarf config' command to properly interact with main config file and variables
+- cleaned up maybe_ & dev_  & err_ prints and readded logging module
+- finished majority of updates to codebase
+- finished updates to logging process
+- finished and tested marshmallow updates to classes
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- finish removing Settings references in /webdriver
-- finish merging all old code from notes/old/re-add-me
+- fix output location of geckodriver logs
+
+- FINISH UPDATING TESTS THEN RUN ALL TESTS
 
 (update)
-- ensure that config / arg variables properly affect processes / finish updating their removal references from Settings
 - update / check how exiration, poll, schedule interact with post&message
 - update adding uploads to being able to set previews to messages
-- update 'snarf config' command to properly interact with main config file and variables
 
 (cleanup)
 - double check how tags & performers are implemented in config and text config and then re-add to docs
-- cleanup maybe_ & dev_  & err_ prints
 - add better version notes to readme's list of "works on"
 
 (finish)
-- finish updates to codebase
-- finish and test marshmallow updates to classes
 - finish message ability to add_user_to_message
-- finish updates to logging process
 - finish scan.py
 - finish updating image/video downloading
 - finish updating cli menu functionality
 - finish updating profile class & menu
+- finish testing 'snarf config'
 
 ------------------------------------------------------------------------------------
 
@@ -835,6 +840,7 @@
 -- keep track of tweets (somehow)
 
 -> Tests
+- test updates to codebase
 - test updates to webdriver 
 - test scan.py for final touches
 - test dropbox scripts on rpi

@@ -54,9 +54,6 @@ def set_config(args):
   CONFIG = parsed_config
   return parsed_config
 
-# def get_config():
-#   return CONFIG
-
 def get_args_config_file():
   return os.path.join(os.path.abspath(__file__), "../conf", "config-args.conf")
 

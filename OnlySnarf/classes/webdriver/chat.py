@@ -1,5 +1,8 @@
+import re
 import logging
+from selenium.webdriver.common.by import By
 
+from .errors import error_checker
 from .message import message_user_by_username
 
 ############
@@ -43,7 +46,7 @@ def get_recent_chat_users(browser, num=0):
             if not user or not user.get_attribute("href") or str(user.get_attribute("href")) == "None": continue
             users.append(str(user.get_attribute("href")).replace("https://onlyfans.com/my/chats/chat/", ""))
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
         logging.error("Failed to scan messages!")
     return users[:10]
 
@@ -158,6 +161,6 @@ def get_user_chat(browser, username, user_id=None):
         logging.debug("messages all: {}".format(len(messages_all)))
         return [messages_all, messages_and_timestamps, messages_received, messages_sent]
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
         logging.error("failure to read chat - {}".format(username))
         return [[],[],[],[]]

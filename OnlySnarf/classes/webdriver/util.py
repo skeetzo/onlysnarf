@@ -1,11 +1,11 @@
+import os
 import json
 import logging
-import os
 from selenium.webdriver.remote.remote_connection import LOGGER as SeleniumLogger
 
 from .. import CONFIG, DEFAULT
 
-def enable_logging():
+def configure_logging():
     if not CONFIG["debug_selenium"]:
         SeleniumLogger.setLevel(logging.ERROR)
         logging.getLogger("urllib3").setLevel(logging.ERROR)

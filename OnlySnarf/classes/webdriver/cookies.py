@@ -1,5 +1,6 @@
 import os
 import pickle
+import logging
 
 from .. import CONFIG, DEFAULT
 from .goto import go_to_home

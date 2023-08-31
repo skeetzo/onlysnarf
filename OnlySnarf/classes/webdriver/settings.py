@@ -1,4 +1,6 @@
+import logging
 
+from .errors import error_checker
 from .. import CONFIG
 
 # TODO: also last
@@ -15,7 +17,7 @@ from .. import CONFIG
 # goes through the settings and get all the values
 # @staticmethod
 # def settings_get_all():
-#     Settings.print("Getting All Settings")
+#     logging.info("Getting All Settings")
 #     profile = Profile()
 #     try:
 #         pages = Profile.get_pages()
@@ -23,10 +25,10 @@ from .. import CONFIG
 #             data = self.sync_from_settings_page(page)
 #             for key, value in data:
 #                 profile[key] = value
-#         Settings.dev_print("successfully got settings")
-#         Settings.print("Settings Retrieved")
+#         logging.debug("successfully got settings")
+#         logging.info("Settings Retrieved")
 #     except Exception as e:
-#         Driver.error_checker(e)
+#         error_checker(e)
 #     return profile
 
 def sync_from_settings_page(self, profile=None, page=None):
@@ -47,13 +49,13 @@ def sync_from_settings_page(self, profile=None, page=None):
 
     """
 
-    Settings.print("Getting Settings: {}".format(page))
+    logging.info("Getting Settings: {}".format(page))
     from ..classes.profile import Profile
     try:
         variables = Profile.get_variables_for_page(page)
-        Settings.dev_print("going to settings page: {}".format(page))
+        logging.debug("going to settings page: {}".format(page))
         self.go_to_settings(page)
-        Settings.dev_print("reached settings: {}".format(page))
+        logging.debug("reached settings: {}".format(page))
         if profile == None:
             profile = Profile()
         for var in variables:
@@ -61,18 +63,18 @@ def sync_from_settings_page(self, profile=None, page=None):
             page_ = var[1]
             type_ = var[2]
             status = None
-            Settings.dev_print("searching: {} - {}".format(name, type_))
+            logging.debug("searching: {} - {}".format(name, type_))
             try:
                 element = self.find_element_by_name(name)
-                Settings.dev_print("successful ele: {}".format(name))
+                logging.debug("successful ele: {}".format(name))
             except Exception as e:
-                Driver.error_checker(e)
+                error_checker(e)
                 continue
             if str(type_) == "text":
                 # get attr text
                 status = element.get_attribute("innerHTML").strip() or None
                 status2 = element.get_attribute("value").strip() or None
-                Settings.print("{} - {}".format(status, status2))
+                logging.info("{} - {}".format(status, status2))
                 if not status and status2: status = status2
             elif str(type_) == "toggle":
                 # get state true|false
@@ -84,20 +86,20 @@ def sync_from_settings_page(self, profile=None, page=None):
             elif str(type_) == "list":
                 status = element.get_attribute("innerHTML")
             elif str(type_) == "file":
-                Settings.print("NEED TO UPDATE THIS")
+                logging.info("NEED TO UPDATE THIS")
                 # can get file from image above
                 # can set once found
                 # status = element.get_attribute("innerHTML")
                 # pass
             elif str(type_) == "checkbox":
                 status = element.is_selected()
-            if status is not None: Settings.dev_print("successful value: {}".format(status))
-            Settings.maybe_print("{} : {}".format(name, status))
+            if status is not None: logging.debug("successful value: {}".format(status))
+            logging.debug("{} : {}".format(name, status))
             setattr(profile, str(name), status)
-        Settings.dev_print("successfully got settings page: {}".format(page))
-        Settings.print("Settings Page Retrieved: {}".format(page))
+        logging.debug("successfully got settings page: {}".format(page))
+        logging.info("Settings Page Retrieved: {}".format(page))
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
 
 # goes through each page and sets all the values
 def sync_to_settings_page(self, profile=None, page=None):
@@ -118,13 +120,13 @@ def sync_to_settings_page(self, profile=None, page=None):
 
     """
 
-    Settings.print("Updating Page Settings: {}".format(page))
+    logging.info("Updating Page Settings: {}".format(page))
     from ..classes.profile import Profile
     try:
         variables = Profile.get_variables_for_page(page)
-        Settings.dev_print("going to settings page: {}".format(page))
+        logging.debug("going to settings page: {}".format(page))
         self.go_to_settings(page)
-        Settings.dev_print("reached settings: {}".format(page))
+        logging.debug("reached settings: {}".format(page))
         if profile == None:
             profile = Profile()
         for var in variables:
@@ -132,12 +134,12 @@ def sync_to_settings_page(self, profile=None, page=None):
             page_ = var[1]
             type_ = var[2]
             status = None
-            Settings.dev_print("searching: {} - {}".format(name, type_))
+            logging.debug("searching: {} - {}".format(name, type_))
             try:
                 element = self.find_element_by_name(name)
-                Settings.dev_print("successful ele: {}".format(name))
+                logging.debug("successful ele: {}".format(name))
             except Exception as e:
-                Driver.error_checker(e)
+                error_checker(e)
                 continue
             if str(type_) == "text":
 
@@ -158,25 +160,25 @@ def sync_to_settings_page(self, profile=None, page=None):
             elif str(type_) == "checkbox":
                 element.click()
         if str(CONFIG["debug"]) == "True":
-            Settings.dev_print("successfully cancelled settings page: {}".format(page))
+            logging.debug("successfully cancelled settings page: {}".format(page))
         else:
             self.settings_save(page=page)
-            Settings.dev_print("successfully set settings page: {}".format(page))
-        Settings.print("Settings Page Updated: {}".format(page))
+            logging.debug("successfully set settings page: {}".format(page))
+        logging.info("Settings Page Updated: {}".format(page))
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
 
 # @staticmethod
 # def settings_set_all(Profile):
-#     Settings.print("Updating All Settings")
+#     logging.info("Updating All Settings")
 #     try:
 #         pages = Profile.TABS
 #         for page in pages:
 #             self.sync_to_settings_page(Profile, page)
-#         Settings.dev_print("successfully set settings")
-#         Settings.print("Settings Updated")
+#         logging.debug("successfully set settings")
+#         logging.info("Settings Updated")
 #     except Exception as e:
-#         Driver.error_checker(e)
+#         error_checker(e)
 
 # saves the settings page if it is a page that needs to be saved
     # has save:
@@ -200,19 +202,19 @@ def settings_save(self, page=None):
     """
 
     if str(page) not in ["profile", "account", "security"]:
-        Settings.dev_print("not saving: {}".format(page))
+        logging.debug("not saving: {}".format(page))
         return
     try:
-        Settings.dev_print("saving: {}".format(page))
+        logging.debug("saving: {}".format(page))
         element = self.find_element_by_name("profileSave")
-        Settings.dev_print("derp")
+        logging.debug("derp")
         element = self.find_element_to_click("profileSave")
-        Settings.dev_print("found page save")
+        logging.debug("found page save")
         if str(CONFIG["debug"]) == "True":
-            Settings.print("skipping settings save (debug)")
+            logging.info("skipping settings save (debug)")
         else:
-            Settings.dev_print("saving page")
+            logging.debug("saving page")
             element.click()
-            Settings.dev_print("page saved")
+            logging.debug("page saved")
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)

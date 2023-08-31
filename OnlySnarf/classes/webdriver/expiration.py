@@ -1,4 +1,7 @@
+import logging
+
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
@@ -27,25 +30,25 @@ def expiration(browser, expires="0"):
     """
 
     if str(expires) == "0":
-        Settings.dev_print("skipping empty expiration")
+        logging.debug("skipping empty expiration")
         return True
     # if expiration is 'no limit', then there's no expiration and hence no point here
     elif str(expires) == "999":
-        Settings.dev_print("skipping no-limit expiration")
+        logging.debug("skipping no-limit expiration")
         return True
     try:
-        Settings.print(f"Expiration: {expires}")
+        logging.info(f"Expiration: {expires}")
         enter_expiration(browser, expires)
-        Settings.dev_print("### Expiration Successful ###")
+        logging.debug("### Expiration Successful ###")
         return True
     except Exception as e:
         Driver.error_checker(e)
-        Settings.err_print("failed to enter expiration!")
+        logging.error("failed to enter expiration!")
     cancel_expiration(browser)
     return False
 
 def enter_expiration(browser, expires):
-    Settings.dev_print("entering expiration...")
+    logging.debug("entering expiration...")
     action = ActionChains(browser)
     action.click(on_element=find_element_to_click(browser, "b-make-post__expire-period-btn", text="Save"))
     action.pause(int(1))
@@ -56,14 +59,14 @@ def enter_expiration(browser, expires):
     action.pause(int(1))
     action.send_keys(Keys.ENTER)
     action.perform()
-    Settings.dev_print("successfully entered expiration!")
+    logging.debug("successfully entered expiration!")
     debug_delay_check()
 
 # not really necessary with 'Clear' button
 def cancel_expiration(browser):
-    Settings.dev_print("canceling expiration...")
+    logging.debug("canceling expiration...")
     elements = browser.find_elements(By.TAG_NAME, "use")
     element = [elem for elem in elements if '#icon-close' in str(elem.get_attribute('href'))][0]
     ActionChains(browser).move_to_element(element).click().perform()
-    Settings.dev_print("### Expiration Canceled ###")
+    logging.debug("### Expiration Canceled ###")
     debug_delay_check()

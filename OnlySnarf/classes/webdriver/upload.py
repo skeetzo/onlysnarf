@@ -1,6 +1,8 @@
+import time
 import logging
 import threading
 import concurrent.futures
+from selenium.webdriver.common.by import By
 
 from .. import debug_delay_check
 from .. import CONFIG

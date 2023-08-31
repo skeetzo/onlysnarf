@@ -1,6 +1,8 @@
 import time
+import logging
 
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -13,7 +15,7 @@ from .goto import go_to_home, go_to_page
 from .upload import upload_files
 from .. import debug_delay_check
 from .. import CONFIG
-from .. import ONLYFANS_CHAT_URL, ONLYFANS_NEW_MESSAGE_URL
+from .. import ONLYFANS_HOME_URL, ONLYFANS_CHAT_URL, ONLYFANS_NEW_MESSAGE_URL
 
 ####################
 ##### Messages #####
@@ -86,7 +88,7 @@ def message_fans(browser, exclude=False):
         find_element_to_click(browser, "b-tabs__nav__text", text="Fans", fuzzyMatch=True, index=1 if exclude else 0).click()
         return True
     except Exception as e:
-        Setings.dev_print("unable to message all fans!")
+        logging.warning("unable to message all fans!")
     return False
 
 def message_recent(browser, exclude=False):
@@ -99,7 +101,7 @@ def message_recent(browser, exclude=False):
 
         return True
     except Exception as e:
-        Setings.dev_print("unable to message all recent!")
+        logging.warning("unable to message all recent!")
     return False
 
 def message_following(browser, exclude=False):
@@ -109,7 +111,7 @@ def message_following(browser, exclude=False):
         find_element_to_click(browser, "b-tabs__nav__text", text="Following", fuzzyMatch=True, index=1 if exclude else 0).click()
         return True
     except Exception as e:
-        Setings.dev_print("unable to message all following!")
+        logging.warning("unable to message all following!")
     return False
 
 def message_favorites(browser, exclude=False):
@@ -119,7 +121,7 @@ def message_favorites(browser, exclude=False):
         find_element_to_click(browser, "b-tabs__nav__text", text="Favorites", index=1 if exclude else 0).click()
         return True
     except Exception as e:
-        Setings.dev_print("unable to message all favorites!")
+        logging.warning("unable to message all favorites!")
     return False
 
 def message_friends(browser, exclude=False):
@@ -129,7 +131,7 @@ def message_friends(browser, exclude=False):
         find_element_to_click(browser, "b-tabs__nav__text", text="Friends", index=1 if exclude else 0).click()
         return True
     except Exception as e:
-        Setings.dev_print("unable to message all friends!")
+        logging.warning("unable to message all friends!")
     return False
 
 def message_renewers(browser, exclude=False, on=True):
@@ -139,7 +141,7 @@ def message_renewers(browser, exclude=False, on=True):
         find_element_to_click(browser, "b-tabs__nav__text", text="Renew On" if on else "Renew Off", index=1 if exclude else 0).click()
         return True
     except Exception as e:
-        Setings.dev_print("unable to message all renewals!")
+        logging.warning("unable to message all renewals!")
     return False
 
 def message_bookmarks(browser, exclude=False):
@@ -149,7 +151,7 @@ def message_bookmarks(browser, exclude=False):
         find_element_to_click(browser, "b-tabs__nav__text", text="Bookmarks", index=1 if exclude else 0).click()
         return True
     except Exception as e:
-        Setings.dev_print("unable to message all bookmarks!")
+        logging.warning("unable to message all bookmarks!")
     return False
 
 def message_random(browser):
@@ -174,14 +176,14 @@ def close_icons(browser):
             ActionChains(browser).move_to_element(element).click().perform()
     except Exception as e:
         logging.error(e)
-        logging.debug("unable to click: #icon-close")
+        logging.warning("unable to click: #icon-close")
 
 def clear_text(browser):
     try:
         ActionChains(browser).move_to_element(browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).perform()
     except Exception as e:
         logging.error(e)
-        logging.debug("unable to clear text!")
+        logging.warning("unable to clear text!")
 
 ## TODO
 # add check for clearing any text or images already in post field
@@ -271,7 +273,7 @@ def message_price_clear(browser):
         logging.debug("clearing any preexisting price...")
         browser.find_element(By.CLASS_NAME, "m-btn-remove").click()
     except Exception as e:
-        logging.debug(e)
+        logging.error(e)
 
 def message_price_enter(browser, price):
     try:
@@ -328,7 +330,7 @@ def message_text(browser, text=""):
         return True
     except Exception as e:
         error_checker(e)
-        logging.error("failure to enter message")
+        logging.error("failure to enter message!")
     return False
 
 ######################################################################
@@ -398,7 +400,7 @@ def message_user_by_username(browser, username):
         # clicking no longer works? just open href in self.browser
         # logging.debug("clicking send message")
         # ele.click()
-        logging.debug(f"user id found: {ele.replace(ONLYFANS_HOME_URL2, '')}")
+        logging.debug(f"user id found: {ele.replace(ONLYFANS_HOME_URL+'/', '')}")
         go_to_page(browser, ele)
         logging.debug(f"successfully messaging username: {username}")
         return True

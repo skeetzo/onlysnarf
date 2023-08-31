@@ -28,6 +28,7 @@ from webdriver_manager.microsoft import EdgeChromiumDriverManager
 from webdriver_manager.opera import OperaDriverManager
 
 from .. import CONFIG, DEFAULT
+from .util import configure_logging, read_session_data
 
 def create_browser(browserType):
     """
@@ -49,6 +50,8 @@ def create_browser(browserType):
 
     browser = None
     logging.info("spawning web browser...")
+
+    configure_logging()
 
     if "auto" in browserType:
         browser = attempt_reconnect()
@@ -82,6 +85,7 @@ def create_browser(browserType):
 
     browser.implicitly_wait(30) # seconds
     browser.set_page_load_timeout(1200)
+    browser.maximize_window()
     browser.file_detector = LocalFileDetector() # for uploading via remote sessions
     if not CONFIG["show"]:
         logging.info("headless browser spawned successfully!")
@@ -152,6 +156,7 @@ def attempt_chrome():
             browserAttempt = webdriver.Chrome(service=ChromeService('/usr/bin/chromedriver'), options=chrome_options())
         else:
             browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options())
+            # browserAttempt = webdriver.Chrome(options=chrome_options())
         logging.info("browser created - Chrome")        
     except Exception as e:
         browser_error(e, "chrome")
@@ -285,18 +290,21 @@ def attempt_remote():
 def brave_options():
     dC = DesiredCapabilities.BRAVE
     options = webdriver.BraveOptions()
-    return dC, options
+    return options
+    # return dC, options
 
 def chrome_options():
     dC = DesiredCapabilities.CHROME
     options = webdriver.ChromeOptions()
     add_options(options)
-    return dC, options
+    return options
+    # return dC, options
 
 def chromium_options():
     dC = DesiredCapabilities.CHROMIUM
     options = webdriver.ChromeOptions()
-    return dC, options
+    return options
+    # return dC, options
 
 def edge_options():
     dC = DesiredCapabilities.EDGE
@@ -311,8 +319,8 @@ def edge_options():
     # fix any permissions issues
     # os.chmod(options.binary_location, 0o755)
     # shutil.chown(options.binary_location, user=os.getenv('USER'), group=None)
-
-    return dC, options
+    return options
+    # return dC, options
 
 def firefox_options():
     dC = DesiredCapabilities.FIREFOX
@@ -322,16 +330,19 @@ def firefox_options():
         options.log.level = "trace"
     add_options(options)
     # options.add_argument("--enable-file-cookies")
-    return dC, options
+    return options
+    # return dC, options
 
 def ie_options():
     dC = DesiredCapabilities.IE
     options = webdriver.ChromeOptions()
-    return dC, options
+    return options
+    # return dC, options
 
 def opera_options():
     dC = DesiredCapabilities.OPERA
     options = webdriver.OperaOptions()
     # options.add_argument('allow-elevated-browser')
     # options.binary_location = "C:\\Users\\USERNAME\\FOLDERLOCATION\\Opera\\VERSION\\opera.exe"
-    return dC, options
+    return options
+    # return dC, options

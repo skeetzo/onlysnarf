@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="OnlySnarf",
-    version="4.6.7",
+    version="4.6.8",
     author="Skeetzo",
     author_email="WebmasterSkeetzo@gmail.com",
     url = 'https://github.com/skeetzo/onlysnarf',
@@ -22,8 +22,8 @@ setuptools.setup(
         'inquirer',
         'marshmallow',
         'wget',
-        'selenium>=4',
-        'webdriver_manager==3.9.0',
+        'selenium',
+        'webdriver_manager',
         'validators',
         'flask'
     ],

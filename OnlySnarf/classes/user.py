@@ -42,7 +42,7 @@ class UserSchema(Schema):
 
     @post_load
     def make_user(self, data, **kwargs):
-        return User(**data)
+        return User(**kwargs)
 
 class User:
     """OnlyFans users."""
@@ -70,8 +70,7 @@ class User:
     @staticmethod
     def create_user(user_data):
         schema = UserSchema()
-        user = schema.load(**user_data)
-        return user
+        return schema.load(user_data)
 
     def dump(self):
         schema = UserSchema()
@@ -153,7 +152,7 @@ class User:
             users = read_users_local()
         if len(users) == 0:
             for user in get_users(isFan=True, isFollower=True):
-                users.append(User(user))
+                users.append(User.create_user(user))
         logging.debug(f"users: {len(users)}")
         write_users_local(users)
         CONFIG["prefer_local"] = True
@@ -433,7 +432,7 @@ class User:
         logging.debug("getting recent users from messages...")
         users = []
         for user in get_recent_chat_users():
-            users.append(User({"id":user}))
+            users.append(User.create_user({"id":user}))
         return users
 
     @staticmethod
@@ -451,7 +450,7 @@ class User:
         if str(username).lower() == "random":
             return User.get_random_user().message(message)
         else:
-            return User(username, user_id=user_id).message(message)
+            return User.create_user(username, user_id=user_id).message(message)
  
 
     @staticmethod

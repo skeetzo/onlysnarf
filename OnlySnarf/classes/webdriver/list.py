@@ -1,6 +1,10 @@
+import time
+import logging
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
 ## TODO: update lists functionality
 
-from .. import CONFIG, DEFAULT
+from .. import CONFIG, DEFAULT, print_same_line
 
 def search_for_list(self, name=None, number=None):
     """
@@ -22,15 +26,15 @@ def search_for_list(self, name=None, number=None):
 
     """
 
-    Settings.dev_print("lists: {}".format(self.lists))
+    logging.debug("lists: {}".format(self.lists))
     try:
         for list_ in self.lists:
             if list_[0] == name or list_[1] == number:
                 return list_[0], list_[1]
-        Settings.dev_print("failed to locate list: {} - {}".format(name, number))
+        logging.debug("failed to locate list: {} - {}".format(name, number))
     except Exception as e:
         if "Unable to locate window" not in str(e):
-            Settings.dev_print(e)
+            logging.debug(e)
     return name, number
 
 @staticmethod
@@ -56,11 +60,11 @@ def get_list(name=None, number=None):
 
     """
 
-    driver = Driver.get_driver()
+    # driver = Driver.get_driver()
     driver.auth()
     # gets members from list
     users = []
-    Settings.maybe_print("getting list: {} - {}".format(name, number))
+    logging.debug("getting list: {} - {}".format(name, number))
     name, number = driver.search_for_list(name=name, number=number)
     try:
         if not name or not number:
@@ -69,10 +73,10 @@ def get_list(name=None, number=None):
                     number = list_[0]
                 if number and str(list_[0]).lower() == str(number).lower():
                     name = list_[1]
-        users = Driver.users_get(page="/my/lists/{}".format(number))
+        # users = Driver.users_get(page="/my/lists/{}".format(number))
     except Exception as e:
-        Driver.error_checker(e)
-        Settings.err_print("failed to find list members")
+        # Driver.error_checker(e)
+        logging.error("failed to find list members")
     return users, name, number
 
 def get_lists(self):
@@ -88,7 +92,7 @@ def get_lists(self):
 
     lists = []
     try:
-        Settings.maybe_print("getting lists")
+        logging.debug("getting lists")
         self.go_to_page("/my/lists")
 
         elements = self.browser.find_elements(By.CLASS_NAME, "b-users-lists__item")
@@ -109,34 +113,34 @@ def get_lists(self):
 
         for ele in elements:
             if "/my/favorites" in str(ele.get_attribute("href")):
-                # Settings.print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+                # logging.info("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
                 count = ele.find_elements(By.CLASS_NAME, "b-users-lists__item__count").get_attribute("innerHTML").replace("people", "").replace("person", "").strip()
                 if int(count) > 0: lists.append("favorites")
             elif "/my/bookmarks" in str(ele.get_attribute("href")):
-                # Settings.print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+                # logging.info("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
                 count = ele.find_elements(By.CLASS_NAME, "b-users-lists__item__count").get_attribute("innerHTML").replace("people", "").replace("person", "").strip()
                 if int(count) > 0: lists.append("bookmarks")
             elif "/my/friends" in str(ele.get_attribute("href")):
-                # Settings.print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+                # logging.info("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
                 count = ele.find_elements(By.CLASS_NAME, "b-users-lists__item__count").get_attribute("innerHTML").replace("people", "").replace("person", "").strip()
                 if int(count) > 0: lists.append("friends")
             elif "/my/lists" in str(ele.get_attribute("href")):
                 try:
-                    # Settings.print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+                    # logging.info("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
 
                     # ele = ele.find_elements(By.CLASS_NAME, "b-users-lists__item__text")
                     listNumber = ele.get_attribute("href").replace("https://onlyfans.com/my/lists/", "")
                     listName = ele.find_element(By.CLASS_NAME, "b-users-lists__item__name").get_attribute("innerHTML").strip()
                     count = ele.find_element(By.CLASS_NAME, "b-users-lists__item__count").get_attribute("innerHTML").replace("people", "").replace("person", "").strip()
-                    Settings.dev_print("{} - {}: {}".format(listNumber, listName, count))
+                    logging.debug("{} - {}: {}".format(listNumber, listName, count))
                     lists.append([listNumber, listName])
                 except Exception as e:
-                    Settings.dev_print(e)
-        Settings.dev_print("successfully found lists: {}".format(len(lists)))
+                    logging.debug(e)
+        logging.debug("successfully found lists: {}".format(len(lists)))
     except Exception as e:
-        Driver.error_checker(e)
-        Settings.print(e)
-        Settings.err_print("failed to find lists")
+        # Driver.error_checker(e)
+        logging.info(e)
+        logging.error("failed to find lists")
     return lists
 
 def get_list_members(self, list):
@@ -157,10 +161,10 @@ def get_list_members(self, list):
 
     users = []
     try:
-        users = Driver.users_get(page="/my/lists/{}".format(int(list_)))
+        # users = Driver.users_get(page="/my/lists/{}".format(int(list_)))
     except Exception as e:
-        Driver.error_checker(e)
-        Settings.err_print("failed to find list members")
+        # Driver.error_checker(e)
+        logging.error("failed to find list members")
     return users
 
 def add_user_to_list(self, username=None, listNumber=None):
@@ -181,12 +185,12 @@ def add_user_to_list(self, username=None, listNumber=None):
 
     """
 
-    Settings.print("Adding user to list: {} - {}".format(username, listNumber))
+    logging.info("Adding user to list: {} - {}".format(username, listNumber))
     if not username:
-        Settings.err_print("missing username for list")
+        logging.error("missing username for list")
         return False
     if not listNumber:
-        Settings.err_print("missing list number")
+        logging.error("missing list number")
         return False
     users = []
     try:
@@ -204,46 +208,46 @@ def add_user_to_list(self, username=None, listNumber=None):
                     end_ = False
             if not end_: continue
             if len(elements) == int(count): break
-            Settings.print_same_line("({}/{}) scrolling...".format(count, len(elements)))
+            print_same_line("({}/{}) scrolling...".format(count, len(elements)))
             count = len(elements)
             self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
-        Settings.print("")
-        Settings.dev_print("successfully found fans")
+        logging.info("")
+        logging.debug("successfully found fans")
         if not user_:
-            Settings.err_print("unable to find user - {}".format(username))
+            logging.error("unable to find user - {}".format(username))
             return False
-        Settings.maybe_print("found: {}".format(username))
+        logging.debug("found: {}".format(username))
         ActionChains(self.browser).move_to_element(user_).perform()
-        Settings.dev_print("finding list add")
+        logging.debug("finding list add")
         listAdds = user_.find_elements(By.CLASS_NAME, "g-btn.m-add-to-lists")
         listAdd_ = None
         for listAdd in listAdds:
             if str("/my/lists/"+listNumber) in str(listAdd.get_attribute("href")):
-                Settings.print("skipping: User already on list - {}".format(listNumber))
+                logging.info("skipping: User already on list - {}".format(listNumber))
                 return True
             if " lists " in str(listAdd.get_attribute("innerHTML")).lower():
-                Settings.dev_print("found list add")
+                logging.debug("found list add")
                 listAdd_ = listAdd
-        Settings.dev_print("clicking list add")
+        logging.debug("clicking list add")
         listAdd_.click()
         links = self.browser.find_elements(By.CLASS_NAME, "b-users-lists__item")
         for link in links:
-            # Settings.print("{} {}".format(link.get_attribute("href"), link.get_attribute("innerHTML")))
+            # logging.info("{} {}".format(link.get_attribute("href"), link.get_attribute("innerHTML")))
             if str("/my/lists/"+listNumber) in str(link.get_attribute("href")):
-                Settings.dev_print("clicking list")
+                logging.debug("clicking list")
                 self.move_to_then_click_element(link)
                 time.sleep(0.5)
-                Settings.dev_print("successfully clicked list")
-        Settings.dev_print("searching for list save")
+                logging.debug("successfully clicked list")
+        logging.debug("searching for list save")
         close = self.find_element_to_click("listSingleSave")
-        Settings.dev_print("clicking save list")
+        logging.debug("clicking save list")
         close.click()
-        Settings.dev_print("successfully added user to list - {}".format(listNumber))
+        logging.debug("successfully added user to list - {}".format(listNumber))
         return True
     except Exception as e:
-        Driver.error_checker(e)
-        Settings.err_print("failed to add user to list")
+        # Driver.error_checker(e)
+        logging.error("failed to add user to list")
     return False
 
 def add_users_to_list(self, users=[], number=None, name=None):
@@ -275,63 +279,63 @@ def add_users_to_list(self, users=[], number=None, name=None):
                 for key, value in user_.items():
                     if str(key) == "username" and str(user.username) == str(value):
                         users.remove(user)
-        Settings.maybe_print("adding users to list: {} - {} - {}".format(len(users), number, name))
+        logging.debug("adding users to list: {} - {} - {}".format(len(users), number, name))
         try:
-            Settings.dev_print("opening toggle options")
+            logging.debug("opening toggle options")
             toggle = self.browser.find_element(By.CLASS_NAME, "b-users__list__add-btn")
-            Settings.dev_print("clicking toggle options")
+            logging.debug("clicking toggle options")
             toggle.click()
-            Settings.dev_print("toggle options opened")
+            logging.debug("toggle options opened")
         except Exception as e:
-            Settings.dev_print("no options to toggle - users already available")
-            # Settings.print("weird fuckup")
+            logging.debug("no options to toggle - users already available")
+            # logging.info("weird fuckup")
             # return self.add_users_to_list(users=users, number=number, name=name)
         time.sleep(1)
         original_handle = self.browser.current_window_handle
         clicked = False
-        Settings.maybe_print("searching for users")
+        logging.debug("searching for users")
         while len(users) > 0:
             # find user thing
             eles = self.browser.find_elements(By.CLASS_NAME, "b-chats__available-users__item.m-search")
             for ele in eles:
                 for user in users.copy():
-                    # Settings.print("{} - {}".format(i, user.username))
+                    # logging.info("{} - {}".format(i, user.username))
                     if str(user.username) in str(ele.get_attribute("href")):
-                        Settings.maybe_print("found user: {}".format(user.username))
+                        logging.debug("found user: {}".format(user.username))
                         # time.sleep(2)
                         self.move_to_then_click_element(ele)
                         users.remove(user)
                         clicked = True
-            Settings.print_same_line("({}/{}) scrolling...".format(len(eles), len(users)))
+            print_same_line("({}/{}) scrolling...".format(len(eles), len(users)))
             self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             if len(eles) > 100:
-                Settings.maybe_print("adding users to list individually")
+                logging.debug("adding users to list individually")
                 for user in users.copy():
                     successful = self.add_user_to_list(username=user.username, listNumber=number)
                     if successful: users.remove(user)
             # if current window has changed, switch back
             if self.browser.current_window_handle != original_handle:
                 self.browser.switch_to.window(original_handle)
-        Settings.print("")
+        logging.info("")
         if not clicked:
-            Settings.print("skipping list add (none)")
-            Settings.dev_print("skipping list save")
+            logging.info("skipping list add (none)")
+            logging.debug("skipping list save")
             self.browser.refresh()
-            Settings.dev_print("### List Add Successfully Skipped ###")
+            logging.debug("### List Add Successfully Skipped ###")
             return True
         if str(CONFIG["debug"]) == "True":
-            Settings.print("skipping list add (debug)")
-            Settings.dev_print("skipping list save")
+            logging.info("skipping list add (debug)")
+            logging.debug("skipping list save")
             self.browser.refresh()
-            Settings.dev_print("### List Add Successfully Canceled ###")
+            logging.debug("### List Add Successfully Canceled ###")
             return True
-        Settings.dev_print("saving list")
+        logging.debug("saving list")
         save = self.find_element_by_name("listSave")
         self.move_to_then_click_element(save)
-        Settings.dev_print("### successfully added users to list")
+        logging.debug("### successfully added users to list")
     except Exception as e:
-        Settings.print(e)
-        Driver.error_checker(e)
-        Settings.err_print("failed to add users to list")
+        logging.info(e)
+        # Driver.error_checker(e)
+        logging.error("failed to add users to list")
         return False
     return True

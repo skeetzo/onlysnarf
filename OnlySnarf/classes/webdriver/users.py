@@ -1,19 +1,17 @@
+import re
+import time
+import logging
+from selenium.webdriver.common.by import By
 
 from .errors import error_checker
 from .goto import go_to_home, go_to_page
-from .. import CONFIG
-from .. import ONLYFANS_HOME_URL2, ONLYFANS_USERS_ACTIVE_URL, ONLYFANS_USERS_FOLLOWING_URL
+from .. import CONFIG, print_same_line
+from .. import ONLYFANS_HOME_URL, ONLYFANS_FANS_URL, ONLYFANS_FOLLOWING_URL, ONLYFANS_FRIENDS_URL, ONLYFANS_RENEW_ON_URL, ONLYFANS_RENEW_OFF_URL, \
+    ONLYFANS_RECENT_URL, ONLYFANS_TAGGED_URL, ONLYFANS_MUTED_URL, ONLYFANS_RESTRICTED_URL, ONLYFANS_BLOCKED_URL
 
 #################
 ##### Users #####
 #################
-
-
-# TODO: add and weave these through newly added list urls
-# get_active_users()
-# get_active_subscriptions()
-
-
 
 def get_current_username(browser):
     """
@@ -27,21 +25,21 @@ def get_current_username(browser):
     """
 
     try:
-        Settings.dev_print("searching for active username...")
+        logging.debug("searching for active username...")
         go_to_home(browser)
         eles = [ele for ele in browser.find_elements(By.TAG_NAME, "a") if "@" in str(ele.get_attribute("innerHTML")) and "onlyfans" not in str(ele.get_attribute("innerHTML"))]
         if CONFIG["debug"]:
             for ele in eles:
-                Settings.dev_print("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+                logging.debug("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
         if len(eles) == 0:
-            Settings.err_print("unable to find username!")
+            logging.error("unable to find username!")
         else:
-            username = str(eles[0].get_attribute("href")).replace(ONLYFANS_HOME_URL2, "")
-            Settings.dev_print("successfully found active username: {}".format(username))
+            username = str(eles[0].get_attribute("href")).replace(ONLYFANS_HOME_URL+"/", "")
+            logging.debug("successfully found active username: {}".format(username))
             return username
     except Exception as e:
         error_checker(e)
-        Settings.err_print("failed to find active username!")
+        logging.error("failed to find active username!")
     return None
 
 def get_userid_by_username(browser, username):
@@ -66,20 +64,20 @@ def get_userid_by_username(browser, username):
         elements = browser.find_elements(By.TAG_NAME, "a")
         user_id = [ele.get_attribute("href") for ele in elements if "/my/chats/chat/" in str(ele.get_attribute("href"))]
         if len(user_id) == 0: 
-            Settings.warn_print(f"unable to find user id for {username}!")
+            logging.warning(f"unable to find user id for {username}!")
             return None
         user_id = user_id[0]
         user_id = user_id.replace("https://onlyfans.com/my/chats/chat/", "")
-        Settings.dev_print(f"successfully found user id: {user_id}")
+        logging.debug(f"successfully found user id: {user_id}")
     except Exception as e:
         error_checker(e)
-        Settings.err_print(f"failed to find user id for username: {username}")
+        logging.error(f"failed to find user id for username: {username}")
     return user_id
 
 def get_users_at_page(browser, page):
-    if page == ONLYFANS_USERS_FOLLOWING_URL:
+    if page == ONLYFANS_FOLLOWING_URL:
         class_name = "subscriptions"
-    elif page == ONLYFANS_USERS_ACTIVE_URL:
+    elif page == ONLYFANS_FANS_URL:
         class_name = "fans"
     users = []
     try:
@@ -90,15 +88,15 @@ def get_users_at_page(browser, page):
         while True:
             elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
             if len(elements) == int(count) and thirdTime >= 3: break
-            Settings.print_same_line(f"({count}) scrolling...")
+            print_same_line(f"({count}) scrolling...")
             count = len(elements)
             browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
             if thirdTime >= 3 and len(elements) == 0: break
             thirdTime += 1
-        Settings.print("")
+        logging.info("")
         elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
-        Settings.dev_print(f"searching {class_name}...")
+        logging.debug(f"searching {class_name}...")
         for ele in elements:
             username = ele.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()
             name = ele.find_element(By.CLASS_NAME, "g-user-name").get_attribute("innerHTML")
@@ -106,28 +104,29 @@ def get_users_at_page(browser, page):
             name = re.sub("<.*\">", "", name)
             name = re.sub("</.*>", "", name).strip()
             users.append({"name":name, "username":username.replace("@","")})
-            Settings.dev_print(users[-1])
-        Settings.maybe_print(f"found {len(users)} {class_name}")
-        Settings.dev_print(f"successfully found {class_name}!")
+            logging.debug(users[-1])
+        logging.debug(f"found {len(users)} {class_name}")
+        logging.debug(f"successfully found {class_name}!")
     except Exception as e:
-        Settings.print(e)
+        logging.info(e)
         error_checker(e)
-        Settings.err_print(f"failed to find {class_name}!")
+        logging.error(f"failed to find {class_name}!")
     return users
 
+# TODO: update to interact with other fan/follower types ala recent, favorite, etc
 def get_users_by_type(browser, isFan=True, isFollower=False):
     users = []
     if isFan:
-        users.extend(get_users_at_page(browser, ONLYFANS_USERS_ACTIVE_URL))
+        users.extend(get_users_at_page(browser, ONLYFANS_FANS_URL))
     if isFollower:
-        users.extend(get_users_at_page(browser, ONLYFANS_USERS_FOLLOWING_URL))
+        users.extend(get_users_at_page(browser, ONLYFANS_FOLLOWING_URL))
     return users
 
 def get_user_by_username(browser, username, reattempt=False):
     if not username: return None
-    go_to_page(browser, ONLYFANS_USERS_ACTIVE_URL)
+    go_to_page(browser, ONLYFANS_FANS_URL)
     count = 0
-    Settings.maybe_print("searching for user: {} ...".format(username))
+    logging.debug("searching for user: {} ...".format(username))
     # scroll through users on page until user is found
     attempts = 0
     attemptsLimit = 5
@@ -139,19 +138,19 @@ def get_user_by_username(browser, username, reattempt=False):
             found_username = ele.get_attribute("innerHTML").strip()
             if str(username) == str(found_username):
                 browser.execute_script("arguments[0].scrollIntoView();", ele)
-                Settings.print("")
-                Settings.dev_print("successfully found user: {}".format(username))
+                logging.info("")
+                logging.debug("successfully found user: {}".format(username))
                 return ele
         if len(elements) == int(count):
             scrollDelay += initialScrollDelay
             attempts+=1
             if attempts == attemptsLimit:
                 break
-        Settings.print_same_line("({}/{}) scrolling...".format(count, len(elements)))
+        print_same_line("({}/{}) scrolling...".format(count, len(elements)))
         count = len(elements)
         browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(scrollDelay)
-    Settings.warn_print(f"Unable to find user by username: {username}")
-    Settings.print("Are you sure that user really exists? shnarf")
+    logging.warning(f"Unable to find user by username: {username}")
+    logging.info("Are you sure that user really exists? shnarf")
     if reattempt: return get_user_by_username(browser, username)
     return None

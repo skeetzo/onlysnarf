@@ -48,7 +48,7 @@ def apply_args(parser):
   ##
   # -cookies
   # load & save from/to local cookies path
-  parser.add_argument('-cookies', action='store_true', dest='cookies', help=argparse.SUPPRESS)
+  # parser.add_argument('-cookies', action='store_true', dest='cookies', help=argparse.SUPPRESS)
   # -debug
   # debugging - skips uploading and deleting unless otherwise forced
   parser.add_argument('-debug', '-D', action='store_true', dest='debug', help='enable debugging')
