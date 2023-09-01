@@ -4,7 +4,7 @@ from .user import User
 from .driver import discount_user as WEBDRIVER_discount_user
 from ..util.defaults import DISCOUNT_MAX_AMOUNT, DISCOUNT_MIN_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_MONTHS
 
-from marshmallow import Schema, fields, validate, post_load
+from marshmallow import Schema, fields, validate, post_load, EXCLUDE
 
 # https://marshmallow.readthedocs.io/en/stable/
 class DiscountSchema(Schema):
@@ -30,7 +30,7 @@ class Discount:
 
     @staticmethod
     def create_discount(discount_data):
-        schema = DiscountSchema()
+        schema = DiscountSchema(unknown=EXCLUDE)
         return schema.load(discount_data)
 
     def dump(self):

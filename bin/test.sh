@@ -20,13 +20,10 @@ pytest tests/api
 # Unit Test #
 #############
 
-python -m unittest tests/selenium/test_browsers.py
-python -m unittest tests/selenium/browsers/test_firefox.py
-
-python -m unittest tests/snarf/auth/test_twitter.py
-
-
+# WORKING:
 python -m unittest tests/snarf/test_auth.py
+
+# TO TEST:
 python -m unittest tests/snarf/test_discount.py
 python -m unittest tests/snarf/test_expiration.py
 python -m unittest tests/snarf/test_message.py
@@ -34,6 +31,15 @@ python -m unittest tests/snarf/test_poll.py
 python -m unittest tests/snarf/test_post.py
 python -m unittest tests/snarf/test_schedule.py
 python -m unittest tests/snarf/test_users.py
+
+
+
+
+
+# Misc:
+python -m unittest tests/selenium/test_browsers.py
+python -m unittest tests/selenium/browsers/test_firefox.py
+python -m unittest tests/snarf/auth/test_twitter.py
 
 ##########
 # pytest #

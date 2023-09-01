@@ -48,6 +48,8 @@ def create_browser(browserType):
 
     """
 
+
+    print(CONFIG)
     browser = None
     logging.info("spawning web browser...")
 
@@ -139,7 +141,7 @@ def add_options(options):
     # options.add_argument("--remote-debugging-port=9223")
 
 def browser_error(err, browserName):
-    logging.warn("unable to launch {}!".format(browserName))
+    logging.warning("unable to launch {}!".format(browserName))
     logging.debug(err)
 
 def attempt_chrome():
@@ -236,7 +238,7 @@ def attempt_opera():
 def attempt_reconnect():
     session_id, session_url = read_session_data()
     if not session_id and not session_url:
-        logging.warn("unable to read session data!")
+        logging.warning("unable to read session data!")
         return None
     logging.debug("reconnecting to web browser...")
     logging.debug("reconnect id: {}".format(session_id))
@@ -252,7 +254,7 @@ def attempt_reconnect():
         logging.info("browser reconnected!")
         return browserAttempt
     except Exception as e:
-        logging.warn("unable to reconnect!")
+        logging.warning("unable to reconnect!")
         logging.debug(e)
     return None
 
@@ -269,7 +271,7 @@ def attempt_remote():
             logging.info("remote browser created - {}".format(browserType))
             return browserAttempt
         except Exception as e:
-            logging.warn("unable to connect remotely!")
+            logging.warning("unable to connect remotely!")
             logging.debug(e)
         return None
 
@@ -280,7 +282,7 @@ def attempt_remote():
     elif "firefox" in browserType: return attempt(*firefox_options())
     elif "ie" in browserType: return attempt(*ie_options())
     elif "opera" in browserType: return attempt(*opera_options())
-    logging.warn("unable to connect remotely via {}!".format(browserType))
+    logging.warning("unable to connect remotely via {}!".format(browserType))
     return None
 
 ################################################################################################

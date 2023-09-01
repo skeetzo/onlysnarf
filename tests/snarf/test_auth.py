@@ -16,7 +16,7 @@ class TestAuth(unittest.TestCase):
         CONFIG["login"] = "auto"
         
     def tearDown(self):
-        pass
+        self.browser.quit()
 
     def test_login(self):
         CONFIG["cookies"] = False

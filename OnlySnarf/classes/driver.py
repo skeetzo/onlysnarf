@@ -3,7 +3,7 @@ import time
 import logging
 
 from .webdriver import create_browser, get_user_chat, cookies_load, cookies_save, go_to_home, login, \
-    message as WEBDRIVER_message, post as WEBDRIVER_post, \
+    discount_user as WEBDRIVER_discount_user, message as WEBDRIVER_message, post as WEBDRIVER_post, \
     get_userid_by_username as WEBDRIVER_get_userid_by_username, get_users_by_type as WEBDRIVER_get_users_by_type, \
     get_recent_chat_users as WEBDRIVER_get_recent_chat_users
 
@@ -21,6 +21,7 @@ class Webdriver:
     ##### Get #####
     ###############
 
+    @staticmethod
     def get_browser():
         global BROWSER
         if BROWSER: return BROWSER
@@ -28,27 +29,30 @@ class Webdriver:
         cookies_load(BROWSER)
         global TABS
         TABS.append([BROWSER.current_url, BROWSER.current_window_handle, 0])
-        if login(BROWSER):
-            cookies_save(BROWSER)
-            return BROWSER
+        return BROWSER
+        # if login(BROWSER):
+            # cookies_save(BROWSER)
+            # return BROWSER
         raise Exception("Unable to create OnlyFans browser!")
 
     ################
     ##### Exit #####
     ################
 
-    def exit(browser):
+    @staticmethod
+    def exit():
         """Save and exit"""
 
-        if not browser: return
+        global BROWSER
+        if not BROWSER: return 
         if CONFIG["keep"]:
-            write_session_data(browser.session_id, browser.command_executor._url)
-        cookies_save(browser)
+            write_session_data(BROWSER.session_id, BROWSER.command_executor._url)
+        cookies_save(BROWSER)
         if CONFIG["keep"]:
-            go_to_home(browser)
+            go_to_home(BROWSER)
             logging.debug("reset to home page")
         else:
-            browser.quit()
+            BROWSER.quit()
             logging.info("Web browser closed!")
 
     #########
@@ -96,14 +100,4 @@ get_users = Webdriver.get_users
 
 # read_user_messages = Webdriver.read_user_messages
 
-def exit_handler():
-    """Exit cleanly"""
 
-    try:
-        global BROWSER
-        Webdriver.exit(BROWSER)
-    except Exception as e:
-        print(e)
-
-import atexit
-atexit.register(exit_handler)

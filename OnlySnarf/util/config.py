@@ -3,38 +3,41 @@ import configparser
 import getpass
 import os
 
+CONFIG_DEFAULT = os.path.join(os.getcwd(), "OnlySnarf/conf", "config.conf")
+CONFIG_TEST = os.path.join(os.getcwd(), "OnlySnarf/conf", "test-config.conf")
+CONFIG_USER = os.path.expanduser(os.path.join("~/.onlysnarf/conf", "config.conf"))
+
 CONFIG = {}
 
 def get_config_file():
-  configFile = "config.conf"
   if os.environ.get('ENV') == "test":
-    configFile = os.path.join(os.getcwd(), "OnlySnarf/conf", "test-config.conf")
-    print("using test config:")
-  elif os.path.isfile(os.path.expanduser(os.path.join("~/.onlysnarf/conf", "config.conf"))):
-    configFile = os.path.expanduser(os.path.join("~/.onlysnarf/conf", "config.conf"))
-    print("using normal config:")
+    print(f"using test config: {CONFIG_TEST}")
+    return CONFIG_TEST
+  elif os.path.isfile(CONFIG_USER):
+    print(f"using normal config: {CONFIG_USER}")
+    return CONFIG_USER
   else:
-    configFile = os.path.join(os.getcwd(), "OnlySnarf/conf", "config.conf")
-    print("using local config:")
-  print(configFile)
-  return configFile
+    print(f"using local config: {CONFIG_DEFAULT}")
+    return CONFIG_DEFAULT
+
+def parse_config(config_path, parsed_config=None):
+  if not parsed_config: parsed_config = {}
+  config_file = configparser.ConfigParser()
+  config_file.read(config_path)
+  for section in config_file.sections():
+    for key in config_file[section]:
+      if section == "ARGS":
+        parsed_config[key] = config_file[section][key]
+      else:
+        parsed_config[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
+  return parsed_config  
 
 def set_config(args):
-  parsed_config = {}
   try:
-    # overwrite any fetched config path with args path
-    config_path = args.get("path_config", get_config_file())
-    config_file = configparser.ConfigParser()
-    config_file.read(config_path)
-    # relabels config for cleaner usage
-    for section in config_file.sections():
-      for key in config_file[section]:
-        if section == "ARGS":
-          parsed_config[key] = config_file[section][key]
-          # print(key, parsed_config[key])
-        else:
-          parsed_config[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
-          # print(key, parsed_config[section.lower()+"_"+key.lower()])
+    # load default values
+    default_config = parse_config(CONFIG_DEFAULT)
+    # load config from args or use user config, overwrite default values
+    parsed_config = parse_config(args.get("path_config", get_config_file()), parsed_config=default_config)
     # overwrite with provided args
     for key, value in args.items():
       parsed_config[key] = value

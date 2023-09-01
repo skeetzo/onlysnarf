@@ -5,9 +5,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
-from .user import get_user_by_username
-from ..util import debug_delay_check
-from .. import CONFIG
+from .errors import error_checker
+from .users import get_user_by_username
+from .. import CONFIG, debug_delay_check
 
 def discount_user(browser, discount_object):
     """
@@ -34,15 +34,15 @@ def discount_user(browser, discount_object):
         logging.error("missing discount!")
         return False
 
-    logging.info(f"Discounting {discount_object["username"]} {discount_object["amount"]}% for {discount_object["months"]} month(s)")
+    logging.info(f"Discounting {discount_object['username']} {discount_object['amount']}% for {discount_object['months']} month(s)")
 
     try:
-        user = get_user_by_username(browser, username, reattempt=True)
+        user = get_user_by_username(browser, discount_object['username'], reattempt=True)
         click_discount_button(user)
         
         # discount method is repeated until values are correct because somehow it occasionally messes up...
-        discount_amount, discount_months = apply_discount_values(browser, discount_object["amount"], discount_object["months"])
-        while int(discount_amount) != int(discount_object["amount"]) and int(discount_months) != int(discount_object["months"]):
+        discount_amount, discount_months = apply_discount_values(browser, discount_object['amount'], discount_object['months'])
+        while int(discount_amount) != int(discount_object['amount']) and int(discount_months) != int(discount_object['months']):
             logging.debug("repeating discount amount & months...")
             discount_amount, discount_months = apply_discount()
 
@@ -51,7 +51,7 @@ def discount_user(browser, discount_object):
         else:
             return apply_discount(browser)
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
     return cancel_discount(browser, onsuccess=False)
 
 def apply_discount_values(browser, amount, months):
@@ -100,8 +100,8 @@ def click_discount_button(user_element):
         debug_delay_check()
         return True
     except Exception as e:
-        Driver.error_checker(e)
-    logging.warning(f"unable to click discount btn for: {element.get_attribute("innerHTML").strip()}")
+        error_checker(e)
+    logging.warning(f"unable to click discount btn for: {user_element.get_attribute('innerHTML').strip()}")
     return False
 
 def get_discount_amount(browser):
@@ -121,13 +121,13 @@ def apply_discount_amount(browser, amount):
     # amount_element = driver.browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[0]
     # discount_amount = int(amount_element.get_attribute("innerHTML").replace("% discount", ""))
     amount_element, discount_amount = get_discount_amount(browser)
-    logging.debug("amount: {}".format(discount_amount))
+    logging.debug(f"amount: {discount_amount}")
     logging.debug("entering discount amount...")
     if int(discount_amount) != int(amount):
         up_ = int((discount_amount / 5) - 1)
         down_ = int((int(amount) / 5) - 1)
-        logging.debug("up: {}".format(up_))
-        logging.debug("down: {}".format(down_))
+        logging.debug(f"up: {up_}")
+        logging.debug(f"down: {down_}")
         action = ActionChains(browser)
         action.click(on_element=amount_element)
         action.pause(1)
@@ -147,13 +147,13 @@ def apply_discount_months(browser, months):
     # months_element = driver.browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[1]
     # discount_months = int(months_element.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
     months_element, discount_months = get_discount_months(browser)
-    logging.debug("months: {}".format(discount_months))
+    logging.debug(f"months: {discount_months}")
     logging.debug("entering discount months...")
     if int(discount_months) != int(months):
         up_ = int(discount_months - 1)
         down_ = int(int(months) - 1)
-        logging.debug("up: {}".format(up_))
-        logging.debug("down: {}".format(down_))
+        logging.debug(f"up: {up_}")
+        logging.debug(f"down: {down_}")
         action = ActionChains(browser)
         action.click(on_element=months_element)
         action.pause(1)

@@ -2,6 +2,7 @@
 from .browser import create_browser
 from .chat import get_user_chat, get_recent_chat_users
 from .cookies import cookies_load, cookies_save
+from .discount import discount_user
 from .goto import go_to_home
 from .login import login
 from .message import message
