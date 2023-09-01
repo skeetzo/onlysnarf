@@ -13,7 +13,7 @@ from .driver import message as WEBDRIVER_message, post as WEBDRIVER_post
 from ..util.defaults import PRICE_MAXIMUM, PRICE_MINIMUM, SCHEDULE
 from ..util.config import CONFIG
 
-from marshmallow import Schema, fields, validate, post_load
+from marshmallow import Schema, fields, validate, post_load, EXCLUDE
 
 # https://marshmallow.readthedocs.io/en/stable/
 class MessageSchema(Schema):
@@ -54,7 +54,7 @@ class Message():
 
     @staticmethod
     def create_message(message_data):
-        schema = MessageSchema()
+        schema = MessageSchema(unknown=EXCLUDE)
         return schema.load(message_data)
 
     def dump(self):

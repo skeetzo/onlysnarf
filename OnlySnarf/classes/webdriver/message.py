@@ -53,7 +53,7 @@ def message(browser, message_object):
                     if str(label).lower() == "renew on": successful_message_steps.append(message_renewers(browser))
                     if str(label).lower() == "renew off": successful_message_steps.append(message_renewers(browser, on=False))
                     if str(label).lower() == "bookmarks": successful_message_steps.append(message_bookmarks(browser))
-                    if str(label).lower() == "random": successful_message_steps.append(message_random(browser))
+                    # if str(label).lower() == "random": successful_message_steps.append(message_random(browser))
             if message_object["excludes"]:
                 for label in message_object["excluded_recipients"]:
                     if str(label).lower() == "all" or str(label).lower() == "fans": successful_message_steps.append(message_fans(browser, exclude=True))
@@ -62,7 +62,7 @@ def message(browser, message_object):
                     if str(label).lower() == "renew on": successful_message_steps.append(message_renewers(browser, exclude=True))
                     if str(label).lower() == "renew off": successful_message_steps.append(message_renewers(browser, exclude=True, on=False))
                     if str(label).lower() == "bookmarks": successful_message_steps.append(message_bookmarks(browser, exclude=True))
-                    if str(label).lower() == "random": successful_message_steps.append(message_random(browser, exclude=True))
+                    # if str(label).lower() == "random": successful_message_steps.append(message_random(browser, exclude=True))
             # use same page to add additional users to message 
             for username in message_object["recipients"]:
                 successful_message_steps.append(add_user_to_message(browser, username))
@@ -154,9 +154,8 @@ def message_bookmarks(browser, exclude=False):
         logging.warning("unable to message all bookmarks!")
     return False
 
-def message_random(browser):
-    username = get_random_user().username
-    return message_user_by_username(browser, username)
+# def message_random(browser):
+#     return message_user_by_username(browser, get_random_user().username)
 
 # TODO: finish and test this functionality of mass messaging
 # add username to existing mass message being started

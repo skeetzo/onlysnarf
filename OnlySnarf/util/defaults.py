@@ -84,7 +84,6 @@ USER_LIMIT = 10
 
 import getpass
 USER = getpass.getuser()
-# USER = os.getenv('USER')
 if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "None":
     USER = os.getenv('SUDO_USER')
 

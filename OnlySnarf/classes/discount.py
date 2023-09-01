@@ -1,5 +1,5 @@
-
 import logging
+
 from .user import User
 from .driver import discount_user as WEBDRIVER_discount_user
 from ..util.defaults import DISCOUNT_MAX_AMOUNT, DISCOUNT_MIN_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_MONTHS
@@ -31,6 +31,8 @@ class Discount:
     @staticmethod
     def create_discount(discount_data):
         schema = DiscountSchema(unknown=EXCLUDE)
+        if discount_data["username"] == "random":
+            discount_data["username"] = User.get_random_user().username
         return schema.load(discount_data)
 
     def dump(self):

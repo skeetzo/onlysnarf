@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from marshmallow import Schema, fields, validate, post_load
+from marshmallow import Schema, fields, validate, post_load, EXCLUDE
 
 from ..util.defaults import DATE, DATE_FORMAT, SCHEDULE, SCHEDULE_FORMAT, TIME, TIME_FORMAT, TIME_NONE
 
@@ -37,7 +37,7 @@ class Schedule:
 
     @staticmethod
     def create_schedule(schedule_data):
-        schema = ScheduleSchema()
+        schema = ScheduleSchema(unknown=EXCLUDE)
         return schema.load(schedule_data)
 
     def dump(self):

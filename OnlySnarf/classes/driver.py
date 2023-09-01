@@ -29,10 +29,10 @@ class Webdriver:
         cookies_load(BROWSER)
         global TABS
         TABS.append([BROWSER.current_url, BROWSER.current_window_handle, 0])
-        return BROWSER
-        # if login(BROWSER):
-            # cookies_save(BROWSER)
-            # return BROWSER
+        # return BROWSER
+        if login(BROWSER):
+            cookies_save(BROWSER)
+            return BROWSER
         raise Exception("Unable to create OnlyFans browser!")
 
     ################

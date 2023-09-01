@@ -1,5 +1,5 @@
 
-from marshmallow import Schema, fields, validate, ValidationError, post_load
+from marshmallow import Schema, fields, validate, ValidationError, post_load, EXCLUDE
 
 class PollSchema(Schema):
     duration = fields.Int(validate=validate.Range(min=1))
@@ -22,7 +22,7 @@ class Poll:
 
     @staticmethod
     def create_poll(poll_data):
-        schema = PollSchema()
+        schema = PollSchema(unknown=EXCLUDE)
         return schema.load(poll_data)
 
     def dump(self):

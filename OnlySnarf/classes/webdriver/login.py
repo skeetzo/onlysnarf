@@ -217,6 +217,7 @@ def check_captcha(browser):
     try:
         time.sleep(3) # wait extra long to make sure it doesn't verify obnoxiously
         el = browser.find_element(By.NAME, "password")
+        print(el.get_attribute("innerHTML"))
         if not el: return # likely logged in without captcha
         logging.info("waiting for captcha completion by user...")
         action = ActionChains(browser)
@@ -229,10 +230,10 @@ def check_captcha(browser):
             if str(ele.get_attribute("innerHTML")) == "Login" and ele.is_enabled():
                 ele.click()
                 return
+        logging.error("unable to login via form - captcha")
     except Exception as e:
         if "Unable to locate element: [name=\"password\"]" not in str(e):
             logging.debug(e)
-    logging.error("unable to login via form - captcha")
 
 # Twitter second chance verification
 def verify_phone(browser):

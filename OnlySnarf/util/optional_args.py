@@ -196,9 +196,9 @@ def apply_subcommand_args(parser):
   # time in HH:MM
   parser_message.add_argument('-time', type=valid_time, default=DEFAULT.TIME, dest='time', help='time (HH:MM)')
   ##
-  # -tags
-  # @[tag]
-  parser_message.add_argument('-tags', dest='tags', action='append', default=[], help='the tags (@[tag])')
+  # -keywords
+  # #keyword
+  parser_message.add_argument('-keywords', dest='keywords', action='append', default=[], help='the keywords to append')
   ##
   # -text
   # text for message or upload

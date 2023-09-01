@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
-from .util.logger import configure_logging, logging
-# log = logging.getLogger('onlysnarf')
-
 from .util.args import get_args
 from .util.config import set_config
 CONFIG = set_config(get_args())
+
+from .util.logger import configure_logging, logging
+configure_logging(CONFIG["debug"], True if int(CONFIG["verbose"]) > 0 else False)
+# log = logging.getLogger('onlysnarf')
 
 from .classes.discount import Discount
 from .classes.message import Message, Post
@@ -35,7 +36,13 @@ def discount(config={'user':None,'users':[]}):
     """
 
     logging.info("Beginning discount process...")
-    return Discount.create_discount(config).apply()
+    users = list(filter(None, config.get("users", [])))
+    if config.get("user"):
+        users.append(config.get("user"))
+    successful = []
+    for user in users:
+        successful.append(Discount.create_discount({'username':user,'amount':config["amount"],'months':config["months"]}).apply())
+    return all(successful)
 
 def message(config={'user':None,'users':[]}):
 
@@ -147,7 +154,7 @@ atexit.register(exit_handler)
 
 def main():
     try:
-        configure_logging(CONFIG["debug"], True if int(CONFIG["verbose"]) > 0 else False)
+        
         logging.info(f"Running - {CONFIG['action']}")
         eval(f"{CONFIG['action']}(CONFIG)")
     except Exception as e:

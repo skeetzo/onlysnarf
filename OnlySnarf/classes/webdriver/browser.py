@@ -113,7 +113,7 @@ def add_options(options):
     # if os.name == 'nt':
         # options.add_argument(r"--user-data-dir=C:\Users\brain\AppData\Local\Google\Chrome\User Data")
     # else:
-    options.add_argument('--profile-directory=Default')
+    # options.add_argument('--profile-directory=Default')
 
     if str(platform.processor()) == "aarch64": # raspi
         options.add_argument("--user-data-dir=/home/ubuntu/selenium") # do not disable, required for cookies to work 
@@ -137,12 +137,22 @@ def add_options(options):
     # TODO: to be added to list of removed (if not truly needed by then)
     # options.add_argument('--disable-software-rasterizer')
     # options.add_argument('--ignore-certificate-errors')
-    # options.add_argument("--remote-debugging-address=localhost")    
-    # options.add_argument("--remote-debugging-port=9223")
+    options.add_argument("--remote-debugging-address=localhost")    
+    options.add_argument("--remote-debugging-port=9223")
 
 def browser_error(err, browserName):
     logging.warning("unable to launch {}!".format(browserName))
     logging.debug(err)
+
+def attempt_brave():
+    browserAttempt = None
+    try:
+        logging.debug("attempting Brave web browser...")
+        browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()), options=chrome_options())
+        logging.info("browser created - Brave")
+    except Exception as e:
+        browser_error(e, "brave")
+    return browserAttempt
 
 def attempt_chrome():
     browserAttempt = None
@@ -162,16 +172,6 @@ def attempt_chrome():
         logging.info("browser created - Chrome")        
     except Exception as e:
         browser_error(e, "chrome")
-    return browserAttempt
-
-def attempt_brave():
-    browserAttempt = None
-    try:
-        logging.debug("attempting Brave web browser...")
-        browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()), options=chrome_options())
-        logging.info("browser created - Brave")
-    except Exception as e:
-        browser_error(e, "brave")
     return browserAttempt
 
 def attempt_chromium():

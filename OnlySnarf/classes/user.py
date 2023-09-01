@@ -3,11 +3,11 @@ import os
 import random
 import logging
 from datetime import datetime, timedelta
-from marshmallow import Schema, fields, validate, ValidationError, post_load
+from marshmallow import Schema, fields, validate, ValidationError, post_load, EXCLUDE
 
 from ..util.colorize import colorize
 from ..util.data import add_to_randomized_users, get_already_randomized_users, read_users_local, write_users_local
-from .driver import get_recent_chat_users, get_userid_by_username as WEBDRIVER_get_userid_by_username, message, get_users
+from .driver import get_recent_chat_users, get_userid_by_username as WEBDRIVER_get_userid_by_username, message as WEBDRIVER_message, get_users as WEBDRIVER_get_users
  # read_user_messages as WEBDRIVER_read_user_messages
 from ..util.config import CONFIG
 
@@ -28,8 +28,8 @@ class UserSchema(Schema):
     name = fields.Str()
     user_id = fields.Str()
     start_date = fields.DateTime()
-    messages = fields.Nested(MessagesSchema(), dump_only=True)
-    files = fields.Nested(FilesSchema(), dump_only=True)
+    messages = fields.Nested(MessagesSchema(unknown=EXCLUDE), dump_only=True)
+    files = fields.Nested(FilesSchema(unknown=EXCLUDE), dump_only=True)
 
     isRecent = fields.Bool(default=False)
     isFavorite = fields.Bool(default=False)
@@ -42,17 +42,18 @@ class UserSchema(Schema):
 
     @post_load
     def make_user(self, data, **kwargs):
-        return User(**kwargs)
+        return User(**data)
 
 class User:
     """OnlyFans users."""
 
-    def __init__(self, username, user_id, messages, start_date):
+    def __init__(self, username, name, user_id, messages, start_date):
         """User object"""
 
         self.username = str(username).replace("@","")
+        self.name = name
         self.user_id = user_id
-        self.messages = message
+        self.messages = messages
         self.start_date = start_date
 
         self.isFan = True
@@ -69,7 +70,10 @@ class User:
 
     @staticmethod
     def create_user(user_data):
-        schema = UserSchema()
+        print(user_data)
+        schema = UserSchema(unknown=EXCLUDE)
+        if user_data["username"] == "random":
+            user_data["username"] = User.get_random_user().username
         return schema.load(user_data)
 
     def dump(self):
@@ -151,7 +155,7 @@ class User:
         if CONFIG["prefer_local"]:
             users = read_users_local()
         if len(users) == 0:
-            for user in get_users(isFan=True, isFollower=True):
+            for user in WEBDRIVER_get_users(isFan=True, isFollower=True):
                 users.append(User.create_user(user))
         logging.debug(f"users: {len(users)}")
         write_users_local(users)
@@ -448,9 +452,9 @@ class User:
         """
 
         if str(username).lower() == "random":
-            return User.get_random_user().message(message)
+            return User.get_random_user().WEBDRIVER_message(message)
         else:
-            return User.create_user(username, user_id=user_id).message(message)
+            return User.create_user(username, user_id=user_id).WEBDRIVER_message(message)
  
 
     @staticmethod
