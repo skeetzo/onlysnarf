@@ -224,18 +224,15 @@ def check_captcha(browser):
         action.click()
         action.perform()
         time.sleep(10)
-        sub = None
-        submit = browser.find_element(By.CLASS_NAME, "g-btn.m-rounded.m-flex.m-lg")
+        submit = browser.find_elements(By.CLASS_NAME, "g-btn.m-rounded.m-flex.m-lg")
         for ele in submit:
-            if str(ele.get_attribute("innerHTML")) == "Login":
-                sub = ele
-        if sub and sub.is_enabled():
-            submit.click()
-        elif sub and not sub.is_enabled():
-            logging.error("unable to login via form - captcha")
+            if str(ele.get_attribute("innerHTML")) == "Login" and ele.is_enabled():
+                ele.click()
+                return
     except Exception as e:
         if "Unable to locate element: [name=\"password\"]" not in str(e):
             logging.debug(e)
+    logging.error("unable to login via form - captcha")
 
 # Twitter second chance verification
 def verify_phone(browser):

@@ -6,34 +6,24 @@ import os
 CONFIG = {}
 
 def get_config_file():
-
-  USER = getpass.getuser()
-  # USER = os.getenv('USER')
-  if str(os.getenv('SUDO_USER')) != "root" and str(os.getenv('SUDO_USER')) != "None":
-      USER = os.getenv('SUDO_USER')
-
   configFile = "config.conf"
-
   if os.environ.get('ENV') == "test":
     configFile = os.path.join(os.getcwd(), "OnlySnarf/conf", "test-config.conf")
-    print("using test config")
+    print("using test config:")
   elif os.path.isfile(os.path.expanduser(os.path.join("~/.onlysnarf/conf", "config.conf"))):
     configFile = os.path.expanduser(os.path.join("~/.onlysnarf/conf", "config.conf"))
-    print("using normal config")
+    print("using normal config:")
   else:
     configFile = os.path.join(os.getcwd(), "OnlySnarf/conf", "config.conf")
-    print("using local config")
-
-    return configFile
+    print("using local config:")
+  print(configFile)
+  return configFile
 
 def set_config(args):
   parsed_config = {}
   try:
-    # overwrite any fetched config path with args
-    args_path = args["path_config"]
-    config_path = get_config_file()
-    if args_path != config_path:
-      config_path = args_path
+    # overwrite any fetched config path with args path
+    config_path = args.get("path_config", get_config_file())
     config_file = configparser.ConfigParser()
     config_file.read(config_path)
     # relabels config for cleaner usage
@@ -48,19 +38,23 @@ def set_config(args):
     # overwrite with provided args
     for key, value in args.items():
       parsed_config[key] = value
+    # turn strings of booleans into actual booleans
+    for key, value in parsed_config.items():
+      if value == "True" or value == "False":
+        parsed_config[key] = bool(value)
   except Exception as e:
     print(e)
+  ###############
   global CONFIG
   CONFIG = parsed_config
+  ###############
+  ## Debugging ##
+  # import sys
+  # print(parsed_config)
+  # sys.exit(0)
   return parsed_config
 
 def get_args_config_file():
   return os.path.join(os.path.abspath(__file__), "../conf", "config-args.conf")
 
 
-
-  ###############
-  ## Debugging ##
-  # import sys
-  # print(config)
-  # sys.exit(0)
