@@ -25,20 +25,20 @@ class TestSnarf(unittest.TestCase):
         CONFIG["user"] = None
 
     def test_discount(self):
-        # CONFIG["prefer_local"] = False
+        CONFIG["prefer_local"] = False
         assert self.discount.apply(), "unable to apply discount"
 
-    # def test_discount_max(self):
-    #     CONFIG["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT # 55
-    #     CONFIG["months"] = DEFAULT.DISCOUNT_MAX_MONTHS # 12
-    #     assert self.discount.apply(), "unable to apply discount maximum"
+    def test_discount_max(self):
+        CONFIG["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT # 55
+        CONFIG["months"] = DEFAULT.DISCOUNT_MAX_MONTHS # 12
+        assert self.discount.apply(), "unable to apply discount maximum"
 
-    # def test_discount_min(self):
-    #     CONFIG["amount"] = DEFAULT.DISCOUNT_MIN_AMOUNT # 1
-    #     CONFIG["months"] = DEFAULT.DISCOUNT_MIN_MONTHS # 1
-    #     assert self.discount.apply(), "unable to apply discount minimum"
+    def test_discount_min(self):
+        CONFIG["amount"] = DEFAULT.DISCOUNT_MIN_AMOUNT # 1
+        CONFIG["months"] = DEFAULT.DISCOUNT_MIN_MONTHS # 1
+        assert self.discount.apply(), "unable to apply discount minimum"
 
-    # add a test for applying the same discount to an existing discount
+    # TODO: add a test for applying the same discount to an existing discount
         
 ############################################################################################
 

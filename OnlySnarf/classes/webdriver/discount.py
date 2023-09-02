@@ -94,7 +94,7 @@ def cancel_discount(browser, onsuccess=True):
         logging.error(e)
     return False
 
-def click_discount_button(browser, user_element):
+def click_discount_button(browser, user_element, retry=False):
     try:
         logging.debug("clicking discount btn...")
         find_element_to_click(user_element, "b-tabs__nav__text", text="Discount").click()
@@ -104,6 +104,8 @@ def click_discount_button(browser, user_element):
         debug_delay_check()
         return True
     except Exception as e:
+        if "obscures it" in str(e) and not retry:
+            click_discount_button(browser, user_element, retry=True)
         error_checker(e)
     logging.warning(f"unable to click discount btn for: {user_element.get_attribute('innerHTML').strip()}")
     return False
