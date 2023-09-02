@@ -41,7 +41,7 @@ def discount_user(browser, discount_object):
 
         if not user: raise Exception("unable to discount missing user!")
 
-        click_discount_button(user)
+        click_discount_button(browser, user)
         
         # discount method is repeated until values are correct because somehow it occasionally messes up...
         discount_amount, discount_months = apply_discount_values(browser, discount_object['amount'], discount_object['months'])
@@ -94,10 +94,11 @@ def cancel_discount(browser, onsuccess=True):
         logging.error(e)
     return False
 
-def click_discount_button(user_element):
+def click_discount_button(browser, user_element):
     try:
         logging.debug("clicking discount btn...")
         find_element_to_click(user_element, "b-tabs__nav__text", text="Discount").click()
+        # ActionChains(browser).move_to_element(element).click().perform()       
         logging.debug("clicked discount btn")
         time.sleep(0.5)
         debug_delay_check()

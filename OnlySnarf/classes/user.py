@@ -159,7 +159,7 @@ class User:
             for user in WEBDRIVER_get_users(isFan=True, isFollower=True):
                 users.append(User.create_user(user))
         logging.debug(f"users: {len(users)}")
-        write_users_local(users)
+        # write_users_local(users)
         CONFIG["prefer_local"] = True
         return users
 
@@ -191,16 +191,17 @@ class User:
         found = False
         i = 0
         while not found and i < len(users):
-            i+=1
             randomUser = random.choice(users)
             if not isFollower and randomUser.isFollower:
-                randomUser = None
+                # randomUser = None
                 continue
+            i+=1
             # for each user in random users, if the user is equal to the current random user then mark user as found; exit when a user is not found
             for user in randomizedUsers:
                 if randomUser.equal(user):
                     found = True
-            randomUser = None
+            # if not found:
+                # randomUser = None
             # if not found: break
         add_to_randomized_users(randomUser)
         logging.debug(f"random user: {randomUser.username}")

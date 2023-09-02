@@ -49,8 +49,9 @@ def expiration(browser, expires="0"):
 
 def enter_expiration(browser, expires):
     logging.debug("entering expiration...")
+    element = find_element_to_click(browser, "b-make-post__expire-period-btn", text="Save")
     action = ActionChains(browser)
-    action.click(on_element=find_element_to_click(browser, "b-make-post__expire-period-btn", text="Save"))
+    action.click(on_element=element)
     action.pause(int(1))
     action.send_keys(Keys.TAB)
     action.send_keys(str(expires))

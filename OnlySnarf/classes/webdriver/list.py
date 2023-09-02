@@ -239,10 +239,8 @@ def add_user_to_list(self, username=None, listNumber=None):
                 self.move_to_then_click_element(link)
                 time.sleep(0.5)
                 logging.debug("successfully clicked list")
-        logging.debug("searching for list save")
-        close = self.find_element_to_click("listSingleSave")
         logging.debug("clicking save list")
-        close.click()
+        find_element_to_click("listSingleSave").click()
         logging.debug("successfully added user to list - {}".format(listNumber))
         return True
     except Exception as e:

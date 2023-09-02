@@ -1,9 +1,11 @@
 import sys
+import time
 
-from .config import CONFIG
 from . import defaults as DEFAULT
 
 def debug_delay_check():
+	from .config import CONFIG
+
 	if CONFIG["debug"]:
 		if CONFIG["debug_delay"]:
 		    print("*snores deeply*")
@@ -44,11 +46,11 @@ def print_same_line(text):
 
 def get_logs_path(process):
     if process == "firefox":
-        path_ = os.path.join(Settings.get_base_directory(), "log")
+        path_ = os.path.join(DEFAULT.ROOT_PATH, "log")
         Path(path_).mkdir(parents=True, exist_ok=True)
         return os.path.join(path_, "geckodriver.log")
     elif process == "google":
-        path_ = os.path.join(Settings.get_base_directory(), "log")
+        path_ = os.path.join(DEFAULT.ROOT_PATH, "log")
         Path(path_).mkdir(parents=True, exist_ok=True)
         return os.path.join(path_, "chromedriver.log")
     return ""

@@ -270,7 +270,8 @@ def message_price(browser, price):
 def message_price_clear(browser):
     try:
         logging.debug("clearing any preexisting price...")
-        browser.find_element(By.CLASS_NAME, "m-btn-remove").click()
+        # browser.find_element(By.CLASS_NAME, "m-btn-remove").click()
+        find_element_to_click(browser, "m-btn-remove").click()
     except Exception as e:
         logging.error(e)
 
@@ -292,7 +293,7 @@ def message_price_enter(browser, price):
 def message_price_save(browser):
     try:
         logging.debug("saving price...")
-        find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Save").click()    
+        find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Save").click()
         logging.debug("saved price!")
         debug_delay_check()
         return True

@@ -11,7 +11,7 @@ from selenium.webdriver.common.keys import Keys
 # isID: use id instead of class_name
 # fuzzymatch: use "in" instead of "==" when matching text
 # index: the index of the element to search for, used to ignore early matches
-def find_element_to_click(browser, name, text="", isID=False, fuzzyMatch=False, index=-1):
+def find_element_to_click(browser, name, text="", isID=False, fuzzyMatch=False, index=-1, click=True):
     """
     Find element on page by name to click
 
@@ -31,6 +31,7 @@ def find_element_to_click(browser, name, text="", isID=False, fuzzyMatch=False, 
     """
 
     logging.debug(f"finding element: {name} - {text}")
+    foundElement = None
     try:
         elements = browser.find_elements(By.ID if isID else By.CLASS_NAME, name)
         logging.debug(f"elements found: {len(elements)}")
@@ -50,9 +51,12 @@ def find_element_to_click(browser, name, text="", isID=False, fuzzyMatch=False, 
             i += 1
     except Exception as e:
         logging.debug(e)
+        # if "obscures it" in str(e):
+            # logging.debug("element obscured, attempting click...")
+            # browser.execute_script("arguments[0].click();", foundElement)
     raise Exception(f"unable to find element: {name}")
 
-def move_to_then_click_element(element):
+def move_to_then_click_element(browser, element):
     """
     Move to then click element.
     
@@ -77,21 +81,21 @@ def move_to_then_click_element(element):
         passed_in_driver.execute_script(scroll_nav_out_of_way)
     #
     try:
-        ActionChains(Driver.browser).move_to_element(element).click().perform()
+        ActionChains(browser).move_to_element(element).click().perform()
         return True
     except Exception as e:
         # logging.debug(e)
-        # if 'firefox' in Driver.browser.capabilities['browserName']:
+        # if 'firefox' in browser.capabilities['browserName']:
         try:
-            scroll_shim(Driver.browser, element)
-            ActionChains(Driver.browser).move_to_element(element).click().perform()
+            scroll_shim(browser, element)
+            ActionChains(browser).move_to_element(element).click().perform()
         except Exception as e:
             pass
             # logging.debug(e)
-            Driver.browser.execute_script("arguments[0].scrollIntoView();", element)
+            browser.execute_script("arguments[0].scrollIntoView();", element)
             # try:
-            #     Driver.browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.CONTROL + Keys.HOME)
-            #     ActionChains(Driver.browser).move_to_element(element).click().perform()
+            #     browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.CONTROL + Keys.HOME)
+            #     ActionChains(browser).move_to_element(element).click().perform()
             # except Exception as e:
             #     logging.debug(e)
     return False

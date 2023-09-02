@@ -786,6 +786,8 @@
 
 ## TODO
 
+- finish test_discount process
+
 - fix output location of geckodriver logs
 
 - FINISH UPDATING TESTS THEN RUN ALL TESTS
