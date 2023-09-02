@@ -1,29 +1,46 @@
+import os
 import json
 import logging
 
 from .config import CONFIG
 
-USERS_PATH = CONFIG["path_users"]
+# TODO: finish data; currently overwrites weirdly; finish test scripts for reading/writing randomized
+
+
+
+USERS_PATH = os.path.expanduser(CONFIG["path_users"])
+
+def reset_userlist():
+    try:
+        os.remove(USERS_PATH)
+    except Exception as e:
+        print(e)
+    with open(USERS_PATH, 'w') as f:
+        json.dump({"users":[],"randomized_users":[]}, f)
 
 # add random user to json file
 def add_to_randomized_users(newUser):
     if not newUser: return
     logging.debug("saving random user...")
     data = {}
+    data['users'] = []
     data['randomized_users'] = []
     existingUsers = get_already_randomized_users()
     for user in existingUsers:
         if user.equals(newUser):
             user.update(newUser)
-        data['randomized_users'].append(user.dump())
+        data['randomized_users'].append(user.dumps())
+    for user in read_users_local():
+        data["users"].append(user.dump())
     try:
-        with open(str(USERS_PATH), 'w') as outfile:  
-            json.dump(data, outfile, indent=4, sort_keys=True)
-    except FileNotFoundError:
-        logging.error("missing local users!")
+        # with open(USERS_PATH, 'w') as outfile:  
+            # json.dump(data, outfile, indent=4, sort_keys=True)
+        logging.debug("saved random users!")
+    except OSError:
+        reset_userlist()
+        return add_to_randomized_users(newUser)
     except OSError:
         logging.error("missing local path!")
-    logging.debug("saved users!")
 
 # return random user from json file 
 def get_already_randomized_users():
@@ -31,10 +48,12 @@ def get_already_randomized_users():
     users = []
     from ..classes.user import User
     try:
-        with open(str(USERS_PATH)) as json_file:  
+        with open(USERS_PATH) as json_file:  
             for user in json.load(json_file)['randomized_users']:
-                users.append(User.create_user(json.loads(user)))
+                users.append(User.create_user(user))
         logging.debug("loaded randomized users")
+    except OSError:
+        reset_userlist()
     except Exception as e:
         logging.debug(e)
     return users
@@ -53,12 +72,15 @@ def read_users_local():
     users = []
     from ..classes.user import User
     try:
-        with open(str(USERS_PATH)) as json_file:  
+        with open(USERS_PATH) as json_file:  
             for user in json.load(json_file)['users']:
-                users.append(User.create_user(json.loads(user)))
+                users.append(User.create_user(user))
         logging.debug("loaded local users")
+    except OSError:
+        reset_userlist()
     except Exception as e:
         logging.debug(e)
+        print(e)
     return users
 
 def write_users_local(users=[]):
@@ -75,17 +97,22 @@ def write_users_local(users=[]):
     # merge with existing user data
     data = {}
     data['users'] = []
+    data['randomized_users'] = []
     existingUsers = read_users_local()
     for user in users:
         for u in existingUsers:
             if user.equals(u):
                 user.update(u)
         data['users'].append(user.dump())
+    for user in get_already_randomized_users():
+        data["randomized_users"].append(user.dumps())
     try:
-        with open(str(USERS_PATH), 'w') as outfile:  
-            json.dump(data, outfile, indent=4, sort_keys=True)
-    except FileNotFoundError:
+        # with open(USERS_PATH, 'w') as outfile:  
+            # json.dump(data, outfile, indent=4, sort_keys=True)
+        logging.debug("saved users!")
+    except OSError:
         logging.error("missing local users!")
+        reset_userlist()
+        write_users_local(users)
     except OSError:
         logging.error("missing local path!")
-    logging.debug("saved users!")

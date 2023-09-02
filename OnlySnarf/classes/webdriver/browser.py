@@ -137,8 +137,8 @@ def add_options(options):
     # TODO: to be added to list of removed (if not truly needed by then)
     # options.add_argument('--disable-software-rasterizer')
     # options.add_argument('--ignore-certificate-errors')
-    options.add_argument("--remote-debugging-address=localhost")    
-    options.add_argument("--remote-debugging-port=9223")
+    # options.add_argument("--remote-debugging-address=localhost")    
+    # options.add_argument("--remote-debugging-port=9223")
 
 def browser_error(err, browserName):
     logging.warning("unable to launch {}!".format(browserName))
@@ -163,11 +163,17 @@ def attempt_chrome():
         # rpi = aarch64
         processor = platform.processor()
         logging.debug("cpu processor: {}".format(processor))
+
+        options = chrome_options()
+        # chrome specific
+        options.add_argument("--remote-debugging-address=localhost")    
+        options.add_argument("--remote-debugging-port=9223")
+
         if str(processor) == "aarch64":
             # TODO: add file check for chromedriver w/ reminder warning for rpi install requirement
-            browserAttempt = webdriver.Chrome(service=ChromeService('/usr/bin/chromedriver'), options=chrome_options())
+            browserAttempt = webdriver.Chrome(service=ChromeService('/usr/bin/chromedriver'), options=options)
         else:
-            browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options())
+            browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
             # browserAttempt = webdriver.Chrome(options=chrome_options())
         logging.info("browser created - Chrome")        
     except Exception as e:

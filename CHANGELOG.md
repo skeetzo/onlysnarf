@@ -777,6 +777,10 @@
 - finished majority of updates to codebase
 - finished updates to logging process
 - finished and tested marshmallow updates to classes
+**9/1/2023**
+- updates to discount & test_discount
+- updates to saving user data
+- added tests/test_data
 
 ------------------------------------------------------------------------------------
 

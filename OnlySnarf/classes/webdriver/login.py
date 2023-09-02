@@ -214,6 +214,7 @@ def via_twitter(browser):
 ################################################################################################################################################
 
 def check_captcha(browser):
+    return
     try:
         time.sleep(3) # wait extra long to make sure it doesn't verify obnoxiously
         el = browser.find_element(By.NAME, "password")
@@ -232,6 +233,7 @@ def check_captcha(browser):
                 return
         logging.error("unable to login via form - captcha")
     except Exception as e:
+        print(e)
         if "Unable to locate element: [name=\"password\"]" not in str(e):
             logging.debug(e)
 

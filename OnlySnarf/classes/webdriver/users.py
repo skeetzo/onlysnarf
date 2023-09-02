@@ -103,7 +103,7 @@ def get_users_at_page(browser, page):
             name = re.sub("<!-*>", "", name)
             name = re.sub("<.*\">", "", name)
             name = re.sub("</.*>", "", name).strip()
-            users.append({"name":name, "username":username.replace("@","")})
+            users.append({"name":name, "username":username.replace("@",""), "isFan":True if class_name=="fans" else False, "isFollower":True if class_name=="subscriptions" else False})
             logging.debug(users[-1])
         logging.debug(f"found {len(users)} {class_name}")
         logging.debug(f"successfully found {class_name}!")
@@ -136,11 +136,13 @@ def get_user_by_username(browser, username, reattempt=False):
         elements = browser.find_elements(By.CLASS_NAME, "g-user-username")
         for ele in elements:
             found_username = ele.get_attribute("innerHTML").strip()
-            if str(username) == str(found_username):
+            if str(username).strip().replace("@","") == str(found_username).strip().replace("@",""):
                 browser.execute_script("arguments[0].scrollIntoView();", ele)
                 logging.info("")
                 logging.debug("successfully found user: {}".format(username))
-                return ele
+                # TODO: figure out how to combine xpath statements?
+                # return parent element housing user info
+                return ele.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
         if len(elements) == int(count):
             scrollDelay += initialScrollDelay
             attempts+=1

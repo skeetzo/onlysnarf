@@ -218,9 +218,8 @@ def search_for_tab(browser, page):
 def get_page_load(browser):
     """Attempt to generic page load"""
 
-    time.sleep(2)
     try:
-        WebDriverWait(browser, 60*3, poll_frequency=10).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
+        WebDriverWait(browser, 60*2, poll_frequency=1).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
     except Exception as e:
         logging.error(e)
 

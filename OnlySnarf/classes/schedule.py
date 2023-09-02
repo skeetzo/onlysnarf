@@ -8,12 +8,12 @@ class ScheduleSchema(Schema):
     schedule = fields.Str()
     date = fields.Str()
     time = fields.Str()
-    hour = fields.Str(default="00")
-    minute = fields.Str(default="00")
-    year = fields.Str(default="0")
-    month = fields.Str(default="0")
-    day = fields.Str(default="0")
-    suffix = fields.Str(default="am")
+    hour = fields.Str(dump_default="00")
+    minute = fields.Str(dump_default="00")
+    year = fields.Str(dump_default="0")
+    month = fields.Str(dump_default="0")
+    day = fields.Str(dump_default="0")
+    suffix = fields.Str(dump_default="am")
 
     @post_load
     def make_schedule(self, data, **kwargs):

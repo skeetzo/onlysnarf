@@ -38,6 +38,9 @@ def discount_user(browser, discount_object):
 
     try:
         user = get_user_by_username(browser, discount_object['username'], reattempt=True)
+
+        if not user: raise Exception("unable to discount missing user!")
+
         click_discount_button(user)
         
         # discount method is repeated until values are correct because somehow it occasionally messes up...

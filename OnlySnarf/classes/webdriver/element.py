@@ -11,7 +11,7 @@ from selenium.webdriver.common.keys import Keys
 # isID: use id instead of class_name
 # fuzzymatch: use "in" instead of "==" when matching text
 # index: the index of the element to search for, used to ignore early matches
-def find_element_to_click(browser, name, text="", isID=False, fuzzyMatch=False, index=0):
+def find_element_to_click(browser, name, text="", isID=False, fuzzyMatch=False, index=-1):
     """
     Find element on page by name to click
 
@@ -30,21 +30,21 @@ def find_element_to_click(browser, name, text="", isID=False, fuzzyMatch=False, 
 
     """
 
-    logging.debug("finding element: {}".format(name))
+    logging.debug(f"finding element: {name} - {text}")
     try:
-        elements = browser.find_elements(By.ID if isID else By.CLASS_NAME, className)
+        elements = browser.find_elements(By.ID if isID else By.CLASS_NAME, name)
         logging.debug(f"elements found: {len(elements)}")
         i = 0
         for element in elements:
             logging.debug(f"element: {element.get_attribute('innerHTML').strip()}")
-            if element.is_displayed() and element.is_enabled() and i == index:
-                if text and str(text) == element.get_attribute("innerHTML").strip().lower():
+            if element.is_displayed() and element.is_enabled() and ( (index >= 0 and i == index) or (index==-1) ):
+                if text and str(text).lower() == element.get_attribute("innerHTML").strip().lower():
                     logging.debug("found matching element!")
                     return element
-                elif text and fuzzyMatch and str(text) in element.get_attribute("innerHTML").strip().lower():
+                elif text and fuzzyMatch and str(text).lower() in element.get_attribute("innerHTML").strip().lower():
                     logging.debug("found matching fuzzy element!")
                     return element
-                else:
+                elif not text:
                     logging.debug("found matching element!")
                     return element
             i += 1
@@ -95,89 +95,3 @@ def move_to_then_click_element(element):
             # except Exception as e:
             #     logging.debug(e)
     return False
-
-
-
-
-# TODO: check
-# these are probably deprecated in favor of find_element_to_click
-
-def find_element_by_name(name):
-    """
-    Find element on page by name
-
-    Does not auth check or otherwise change the focus
-
-    Parameters
-    ----------
-    name : str
-        The name of the element to reference from its /elements/element name
-
-    Returns
-    -------
-    Selenium.WebDriver.WebElement
-        The located web element if found by id, class name, or css selector
-
-    """
-    element = Element.get_element_by_name(name)
-    if not element:
-        logging.error("unable to find element reference")
-        return None
-    # prioritize id over class name
-    eleID = None
-    try: eleID = Driver.browser.find_element(By.ID, element.getId())
-    except: eleID = None
-    if eleID: return eleID
-    for className in element.getClasses():
-        ele = None
-        eleCSS = None
-        try: ele = Driver.browser.find_element(By.CLASS_NAME, className)
-        except: ele = None
-        # try: eleCSS = Driver.browser.find_element(By.CSS_SELECTOR, className)
-        # except: eleCSS = None
-        logging.debug("class: {} - {}:css".format(ele, eleCSS))
-        if ele: return ele
-        # if eleCSS: return eleCSS
-    raise Exception("unable to locate element")
-
-def find_elements_by_name(name):
-    """
-    Find elements on page by name. Does not change window focus.
-
-    Parameters
-    ----------
-    name : str
-        The name of the element to reference from its /elements/element name
-
-    Returns
-    -------
-    list
-        A list of the located Selenium.WebDriver.WebElements as found by id, class name, or css selector. 
-        Elements must also be displayed
-
-    """
-
-    element = Element.get_element_by_name(name)
-    if not element:
-        logging.error("unable to find element reference")
-        return []
-    eles = []
-    for className in element.getClasses():
-        eles_ = []
-        elesCSS_ = []
-        try: eles_ = Driver.browser.find_elements(By.CLASS_NAME, className)
-        except: eles_ = []
-        # try: elesCSS_ = Driver.browser.find_elements(By.CSS_SELECTOR, className)
-        # except: elesCSS_ = []
-        logging.debug("class: {} - {}:css".format(len(eles_), len(elesCSS_)))
-        eles.extend(eles_)
-        # eles.extend(elesCSS_)
-    eles_ = []
-    for i in range(len(eles)):
-        # logging.debug("ele: {} -> {}".format(eles[i].get_attribute("innerHTML").strip(), element.getText()))
-        if eles[i].is_displayed():
-            logging.debug("found displayed ele: {}".format(eles[i].get_attribute("innerHTML").strip()))
-            eles_.append(eles[i])
-    if len(eles_) == 0:
-        raise Exception("unable to locate elements: {}".format(name))
-    return eles_

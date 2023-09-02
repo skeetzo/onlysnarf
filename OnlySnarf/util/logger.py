@@ -28,7 +28,6 @@ def configure_logging(debug=False, verbose=False):
     # add the handler to the root logger
     logging.getLogger('').addHandler(console)
 
-
 # https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
 class CustomFormatter(logging.Formatter):
     """Logging Formatter to add colors and count warning / errors"""

@@ -14,31 +14,34 @@ from ..util.config import CONFIG
 ALREADY_RANDOMIZED_USERS = []
 
 class MessagesSchema(Schema):
-    parsed = fields.List(fields.Str(), default=[])
-    sent = fields.List(fields.Str(), default=[])
-    received = fields.List(fields.Str(), default=[])
+    parsed = fields.List(fields.Str(), dump_default=[])
+    sent = fields.List(fields.Str(), dump_default=[])
+    received = fields.List(fields.Str(), dump_default=[])
 
 class FilesSchema(Schema):
-    sent = fields.List(fields.Str(), default=[])
-    received = fields.List(fields.Str(), default=[])
+    sent = fields.List(fields.Str(), dump_default=[])
+    received = fields.List(fields.Str(), dump_default=[])
 
 # https://marshmallow.readthedocs.io/en/stable/
 class UserSchema(Schema):
     username = fields.Str(required=True, error_messages={"required": "Username is required."}, validate=validate.Length(min=4))
     name = fields.Str()
     user_id = fields.Str()
-    start_date = fields.DateTime()
-    messages = fields.Nested(MessagesSchema(unknown=EXCLUDE), dump_only=True)
-    files = fields.Nested(FilesSchema(unknown=EXCLUDE), dump_only=True)
+    # start_date = fields.DateTime()
+    messages = fields.Nested(MessagesSchema(unknown=EXCLUDE))
+    files = fields.Nested(FilesSchema(unknown=EXCLUDE))
 
-    isRecent = fields.Bool(default=False)
-    isFavorite = fields.Bool(default=False)
-    isRenew = fields.Bool(default=False)
-    isRecent = fields.Bool(default=False)
-    isTagged = fields.Bool(default=False)
-    isMuted = fields.Bool(default=False)
-    isRestricted = fields.Bool(default=False)
-    isBlocked = fields.Bool(default=False)
+    isFan = fields.Bool(dump_default=False)
+    isFollower = fields.Bool(dump_default=False)
+
+    isRecent = fields.Bool(dump_default=False)
+    isFavorite = fields.Bool(dump_default=False)
+    isRenew = fields.Bool(dump_default=False)
+    isRecent = fields.Bool(dump_default=False)
+    isTagged = fields.Bool(dump_default=False)
+    isMuted = fields.Bool(dump_default=False)
+    isRestricted = fields.Bool(dump_default=False)
+    isBlocked = fields.Bool(dump_default=False)
 
     @post_load
     def make_user(self, data, **kwargs):
@@ -47,30 +50,28 @@ class UserSchema(Schema):
 class User:
     """OnlyFans users."""
 
-    def __init__(self, username, name, user_id, messages, start_date):
+    def __init__(self, username, name="", user_id="", messages=[], isFan=False, isFollower=False, isFavorite=False, isRecent=False, isRenew=False, isTagged=False, isMuted=False, isRestricted=False, isBlocked=False):
         """User object"""
 
         self.username = str(username).replace("@","")
         self.name = name
         self.user_id = user_id
         self.messages = messages
-        self.start_date = start_date
-
-        self.isFan = True
-        self.isFollower = False
-
-        self.isRecent = False
-        self.isFavorite = False
-        self.isRenew = False
-        self.isRecent = False
-        self.isTagged = False
-        self.isMuted = False
-        self.isRestricted = False
-        self.isBlocked = False
+        # self.start_date = start_date
+        #
+        self.isFan = isFan
+        self.isFollower = isFollower
+        #
+        self.isRecent = isRecent
+        self.isFavorite = isFavorite
+        self.isRenew = isRenew
+        self.isTagged = isTagged
+        self.isMuted = isMuted
+        self.isRestricted = isRestricted
+        self.isBlocked = isBlocked
 
     @staticmethod
     def create_user(user_data):
-        print(user_data)
         schema = UserSchema(unknown=EXCLUDE)
         if user_data["username"] == "random":
             user_data["username"] = User.get_random_user().username
@@ -125,7 +126,7 @@ class User:
     #     logging.debug("chat read!")
 
     def update(self, user):
-        for key, value in json.loads(user.dump()).items():
+        for key, value in user.dump().items():
             setattr(self, str(key), value)
 
     # necessary?
@@ -163,7 +164,7 @@ class User:
         return users
 
     @staticmethod
-    def get_random_user():
+    def get_random_user(isFollower=False):
         """
         Get a random user.
 
@@ -174,23 +175,38 @@ class User:
 
         """
 
+
+
+
+        # TODO: fix the users only returning the last in the array for whatever reason
+
+
+
         logging.debug("getting random user...")
         users = User.get_all_users()
         randomizedUsers = get_already_randomized_users()
         # check each user in users
         # if user is not in random users, return user
         randomUser = random.choice(users)
-        while randomUser:
-            found = False
+        found = False
+        i = 0
+        while not found and i < len(users):
+            i+=1
             randomUser = random.choice(users)
+            if not isFollower and randomUser.isFollower:
+                randomUser = None
+                continue
+            # for each user in random users, if the user is equal to the current random user then mark user as found; exit when a user is not found
             for user in randomizedUsers:
                 if randomUser.equal(user):
                     found = True
-            if not found: break
+            randomUser = None
+            # if not found: break
         add_to_randomized_users(randomUser)
         logging.debug(f"random user: {randomUser.username}")
         return randomUser
 
+    # TODO: use this function at all?
     # TODO: change to enum?
     # active users (fans)
     # active subscriptions (followers)
