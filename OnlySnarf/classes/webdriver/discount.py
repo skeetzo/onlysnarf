@@ -33,22 +33,16 @@ def discount_user(browser, discount_object):
     if not discount_object:
         logging.error("missing discount!")
         return False
-
     logging.info(f"Discounting {discount_object['username']} {discount_object['amount']}% for {discount_object['months']} month(s)")
-
     try:
         user = get_user_by_username(browser, discount_object['username'], reattempt=True)
-
         if not user: raise Exception("unable to discount missing user!")
-
         click_discount_button(browser, user)
-        
         # discount method is repeated until values are correct because somehow it occasionally messes up...
         discount_amount, discount_months = apply_discount_values(browser, discount_object['amount'], discount_object['months'])
         while int(discount_amount) != int(discount_object['amount']) and int(discount_months) != int(discount_object['months']):
             logging.debug("repeating discount amount & months...")
             discount_amount, discount_months = apply_discount()
-
         if CONFIG["debug"]:
             return cancel_discount(browser)
         else:
@@ -97,8 +91,10 @@ def cancel_discount(browser, onsuccess=True):
 def click_discount_button(browser, user_element, retry=False):
     try:
         logging.debug("clicking discount btn...")
-        find_element_to_click(user_element, "b-tabs__nav__text", text="Discount").click()
-        # ActionChains(browser).move_to_element(element).click().perform()       
+        button = find_element_to_click(user_element, "b-tabs__nav__text", text="Discount")
+        # scroll into view to prevent element from being obscured by menu at top of page
+        browser.execute_script("return arguments[0].scrollIntoView(true);", button)
+        button.click()
         logging.debug("clicked discount btn")
         time.sleep(0.5)
         debug_delay_check()
@@ -107,8 +103,8 @@ def click_discount_button(browser, user_element, retry=False):
         if "obscures it" in str(e) and not retry:
             click_discount_button(browser, user_element, retry=True)
         error_checker(e)
-    logging.warning(f"unable to click discount btn for: {user_element.get_attribute('innerHTML').strip()}")
-    return False
+    raise Exception(f"unable to click discount btn for: {user_element.get_attribute('innerHTML').strip()}")
+    # return False
 
 def get_discount_amount(browser):
     amount_element = browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[0]

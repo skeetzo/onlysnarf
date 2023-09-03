@@ -15,26 +15,11 @@ from ..util.config import CONFIG
 
 from marshmallow import Schema, fields, validate, post_load, EXCLUDE
 
-# https://marshmallow.readthedocs.io/en/stable/
-class MessageSchema(Schema):
-    text = fields.Str(default="")
-    files = fields.List(fields.Str(), default=[])
-    keywords = fields.List(fields.Str(), default=[])
-    performers = fields.List(fields.Str(), default=[])
-    price = fields.Float(validate=validate.Range(min=PRICE_MINIMUM, max=PRICE_MAXIMUM))
-    schedule = fields.Str(default=SCHEDULE)
-    recipients = fields.List(fields.Str(), default=[])
-    includes = fields.List(fields.Str(), default=[])
-    excludes = fields.List(fields.Str(), default=[])
-
-    @post_load
-    def make_message(self, data, **kwargs):
-        return Message(**data)
 
 class Message():
     """OnlyFans message (and post) class"""
 
-    def __init__(self, files, keywords, performers, price, recipients, schedule, text, includes, excludes):
+    def __init__(self, files=[], keywords=[], performers=[], price=0, recipients=[], schedule={}, text="", includes=[], excludes=[]):
         """
         OnlyFans message and post object
 
@@ -121,8 +106,8 @@ class Message():
         return f"{text}{Message.format_performers(performers)}{Message.format_keywords(keywords)}".strip()
 
     @staticmethod
-    def format_schedule(**scheduleArgs):
-        return Schedule(**scheduleArgs).dump()
+    def format_schedule(scheduleArgs):
+        return Schedule.create_schedule(scheduleArgs).dump()
 
     # TODO: reintegrate upload max
     @staticmethod
@@ -234,7 +219,7 @@ class Message():
 class Post(Message):
     """OnlyFans message (and post) class"""
 
-    def __init__(self, expiration, poll, **kwargs):
+    def __init__(self, expiration=0, poll={},schedule={}, **kwargs):
         """
         OnlyFans post object
 
@@ -243,12 +228,23 @@ class Post(Message):
 
         """
 
-        super().__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self.expiration = expiration
         self.poll = Post.format_poll(poll)
 
     @staticmethod
-    def format_poll(**pollArgs):
+    def create_post(post_data):
+        schema = PostSchema(unknown=EXCLUDE)
+        return schema.load(post_data)
+
+    def dump(self):
+        schema = PostSchema()
+        result = schema.dump(self)
+        # pprint(result, indent=2)
+        return result
+
+    @staticmethod
+    def format_poll(pollArgs):
         return Poll(**pollArgs).dump()
 
     def send(self):
@@ -269,3 +265,33 @@ class Post(Message):
             return False
         return WEBDRIVER_post(self.dump())
             
+
+
+# https://marshmallow.readthedocs.io/en/stable/
+class MessageSchema(Schema):
+    __model__ = Message
+
+    text = fields.Str(default="")
+    files = fields.List(fields.Str(), default=[])
+    keywords = fields.List(fields.Str(), default=[])
+    performers = fields.List(fields.Str(), default=[])
+    price = fields.Float(validate=validate.Range(min=0, max=PRICE_MAXIMUM))
+    schedule = fields.Dict()
+    recipients = fields.List(fields.Str(), default=[])
+    includes = fields.List(fields.Str(), default=[])
+    excludes = fields.List(fields.Str(), default=[])
+
+    @post_load
+    def make_message(self, data, **kwargs):
+        return type(self).__model__(**data)
+
+
+class PostSchema(MessageSchema):
+    __model__ = Post
+
+    expiration = fields.Int(default=0)
+    poll = fields.Dict()
+
+    @post_load
+    def make_post(self, data, **kwargs):
+        return type(self).__model__(**data.dump())

@@ -768,25 +768,29 @@
   **8/30/2023**
   - more code reorg & updates
   - beginning code tests 
-**4.6.8 : 8/31/2023**
-- finished removing Settings references in /webdriver
-- finished merging all old code from notes/old/re-add-me
-- ensured that config / arg variables properly affect processes / finish updating their removal references from Settings
-- updated 'snarf config' command to properly interact with main config file and variables
-- cleaned up maybe_ & dev_  & err_ prints and readded logging module
-- finished majority of updates to codebase
-- finished updates to logging process
-- finished and tested marshmallow updates to classes
-**9/1/2023**
-- updates to discount & test_discount
-- updates to saving user data
-- added tests/test_data
+  **4.6.8 : 8/31/2023**
+  - finished removing Settings references in /webdriver
+  - finished merging all old code from notes/old/re-add-me
+  - ensured that config / arg variables properly affect processes / finish updating their removal references from Settings
+  - updated 'snarf config' command to properly interact with main config file and variables
+  - cleaned up maybe_ & dev_  & err_ prints and readded logging module
+  - finished majority of updates to codebase
+  - finished updates to logging process
+  - finished and tested marshmallow updates to classes
+  **9/1/2023**
+  - updates to discount & test_discount
+  - updates to saving user data
+  - added tests/test_data
+**4.6.9 : 9/3/2023**
+- finished test_discount process
+- beginnig test_expiration
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- finish test_discount process
+- finish ensuring Message & Post marshmallow schemas properly instantiate w/ Poll & Schedule 
+- finish test_expiration
 
 - fix output location of geckodriver logs
 

@@ -2,26 +2,28 @@ import os
 os.environ['ENV'] = "test"
 import unittest
 
-from OnlySnarf.util.config import get_config
-from OnlySnarf.util import defaults as DEFAULT
-from OnlySnarf.util.settings import Settings
-from OnlySnarf.snarf import Snarf
+from OnlySnarf.util.config import set_config
+CONFIG = set_config({"debug_selenium":False})
+from OnlySnarf.util.logger import configure_logging
+configure_logging(True, True)
 
-config = {}
+from OnlySnarf.util import defaults as DEFAULT
+from OnlySnarf.classes.message import Post
 
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
-        config = get_config()
-        config["expiration"] = DEFAULT.EXPIRATION_MAX
-        config["text"] = "test balls"
-        Settings.set_debug("tests")
+        CONFIG["poll"] = {}
+        CONFIG["schedule"] = {'date':None,'time':None}
+        CONFIG["expiration"] = DEFAULT.EXPIRATION_MAX
+        CONFIG["text"] = "test balls"
+        self.post = Post.create_post({**CONFIG, 'keywords':[]})
 
     def tearDown(self):
         pass
 
     def test_poll(self):
-        assert Snarf.post(config), "unable to post with expiration"
+        assert self.post.send(), "unable to post with expiration"
 
 ############################################################################################
 

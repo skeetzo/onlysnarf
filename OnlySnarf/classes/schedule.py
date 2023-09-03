@@ -21,15 +21,15 @@ class ScheduleSchema(Schema):
 
 class Schedule:
 
-    def __init__(self, date, time):
+    def __init__(self, date=None, time=None):
         self.date = Schedule.format_date(date)
         self.time = Schedule.format_time(time)
         self.schedule = datetime.strptime(Schedule.format_schedule(date, time), SCHEDULE_FORMAT) # saved as a datetime
-        self.year = schedule.year
-        self.month = schedule.strftime("%B")
-        self.day = schedule.day
-        self.hour = schedule.hour
-        self.minute = schedule.minute
+        self.year = self.schedule.year
+        self.month = self.schedule.strftime("%B")
+        self.day = self.schedule.day
+        self.hour = self.schedule.hour
+        self.minute = self.schedule.minute
         self.suffix = "am"
         if int(self.hour) > 12:
             self.suffix = "pm"
