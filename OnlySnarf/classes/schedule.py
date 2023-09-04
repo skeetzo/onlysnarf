@@ -5,7 +5,7 @@ from marshmallow import Schema, fields, validate, post_load, EXCLUDE
 from ..util.defaults import DATE, DATE_FORMAT, SCHEDULE, SCHEDULE_FORMAT, TIME, TIME_FORMAT, TIME_NONE
 
 class ScheduleSchema(Schema):
-    schedule = fields.Str()
+    # schedule = fields.Str()
     date = fields.Str(dump_default=DATE)
     time = fields.Str(dump_default=TIME)
     hour = fields.Str(dump_default="00")
@@ -21,7 +21,7 @@ class ScheduleSchema(Schema):
 
 class Schedule:
 
-    def __init__(self, date=None, time=None):
+    def __init__(self, date=DATE, time=TIME, hour="", day="", month="", minute="", suffix="am", year=""):
         self.date = Schedule.format_date(date)
         self.time = Schedule.format_time(time)
         self.schedule = datetime.strptime(Schedule.format_schedule(date, time), SCHEDULE_FORMAT) # saved as a datetime

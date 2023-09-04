@@ -3,47 +3,37 @@ os.environ['ENV'] = "test"
 import unittest
 import datetime
 
-from OnlySnarf.util.config import get_config
+from OnlySnarf.util.config import set_config
+CONFIG = set_config({"debug_selenium":False,"debug_delay":False,"keep":False})
+from OnlySnarf.util.logger import configure_logging
+configure_logging(True, True)
+
 from OnlySnarf.util import defaults as DEFAULT
-from OnlySnarf.util.settings import Settings
-from OnlySnarf.snarf import Snarf
+from OnlySnarf.classes.message import Post
 
 today = datetime.datetime.now()
 tomorrow = today + datetime.timedelta(days=1, hours=13, minutes=10)
 
-config = {}
-
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
-        config = get_config()
-        config["keep"] = True
-        config["text"] = "test balls"
-        config["schedule"] = DEFAULT.SCHEDULE
-        config["date"] = DEFAULT.DATE
-        config["time"] = DEFAULT.TIME
-        Settings.set_debug("tests")
+        CONFIG["text"] = "test balls"
+        CONFIG["schedule"] = {
+            "date" : DEFAULT.DATE,
+            "time" : DEFAULT.TIME
+        }
+        self.post = Post.create_post({**CONFIG})
 
     def tearDown(self):
         pass
 
     def test_schedule(self):
-        config["schedule"] = tomorrow.strftime(DEFAULT.SCHEDULE_FORMAT)
-        assert Snarf.post(config), "unable to post schedule"
-        
-    def test_schedule_date(self):
-        config["date"] = tomorrow.strftime(DEFAULT.DATE_FORMAT)
-        assert Snarf.post(config), "unable to post schedule via date"
-
-    def test_schedule_time(self):
-        config["time"] = (today + datetime.timedelta(hours=1, minutes=30)).strftime(DEFAULT.TIME_FORMAT)
-        assert Snarf.post(config), "unable to post schedule via time"
-
-    ## TODO:
-    # verify correct values by getting values of selected components:
-        # vdatetime-calendar__current--month
-    #     day, month, year: class="vdatetime-calendar__month__day vdatetime-calendar__month__day--selected"
-    #     vdatetime-time-picker__item vdatetime-time-picker__item--selected
+        CONFIG["schedule"] = {
+            "date" : tomorrow.strftime(DEFAULT.DATE_FORMAT),
+            "time" : (today + datetime.timedelta(hours=1, minutes=30)).strftime(DEFAULT.TIME_FORMAT)
+        }
+        self.post = Post.create_post({**CONFIG})
+        assert self.post.send(), "unable to post schedule"
 
     @unittest.skip("todo")
     def test_schedule_calendar_day(self):

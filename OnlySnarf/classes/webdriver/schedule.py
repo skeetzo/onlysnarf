@@ -2,6 +2,7 @@ import logging
 from selenium.webdriver.common.by import By
 
 from .element import find_element_to_click
+from .errors import error_checker
 from ..schedule import Schedule
 from .. import CONFIG, debug_delay_check
 
@@ -37,38 +38,38 @@ def schedule(browser, schedule_object={}):
         ## BUG: tries twice to solve whatever issue is occurring
         ## disabled since no access to "self" aka driver object, add import workaround?
         # try:
-        #     self.schedule_open()
+        #     schedule_open()
         # except Exception as e:
         #     logging.debug(e)
         #     logging.debug("## SCHEDULE BUG ##")
         #     logging.debug("attempting to circumvent scheduling bug...")
-        #     self.go_to_home()
-        #     self.schedule_open()
+        #     go_to_home()
+        #     schedule_open()
         ##
 
         schedule_open(browser)
         # individually set month, year, and day
-        if not self.schedule_date(browser, schedule_object['month'], schedule_object['year']):
+        if not schedule_date(browser, schedule_object['month'], schedule_object['year']):
             raise Exception("failed to enter date!")
-        if not self.schedule_day(schedule_object['day']):
+        if not schedule_day(browser, schedule_object['day']):
             raise Exception("failed to enter day!")
-        self.schedule_save_date(browser)
+        schedule_save_date(browser)
         # individually set hour, minutes, and suffix
-        if not self.schedule_hour(browser, schedule_object['hour']):
+        if not schedule_hour(browser, schedule_object['hour']):
             raise Exception("failed to enter hour!")
-        if not self.schedule_minutes(browser, schedule_object['minute']):
+        if not schedule_minutes(browser, schedule_object['minute']):
             raise Exception("failed to enter minutes!")
-        if not self.schedule_suffix(browser, schedule_object['suffix']):
+        if not schedule_suffix(browser, schedule_object['suffix']):
             raise Exception("failed to enter suffix!")
         logging.debug("saving schedule...")
         if CONFIG["debug"]:
             logging.info("skipping schedule save (debug)")
-            return self.schedule_cancel(browser)
-        return self.schedule_save(browser)
+            return schedule_cancel(browser)
+        return schedule_save(browser)
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
     # attempt to cancel window if reached this far
-    return self.schedule_cancel(browser)
+    return schedule_cancel(browser)
 
 def schedule_open(browser):
     """Click schedule"""
@@ -96,8 +97,10 @@ def schedule_day(browser, day):
     """Set day in month"""
 
     logging.debug("setting day...")
-    for ele in Driver.find_elements_by_name("vdatetime-calendar__month__day"):
-        if str(day) in ele.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>",""):
+    # for ele in Driver.find_elements_by_name("vdatetime-calendar__month__day"):
+    for ele in browser.find_elements(By.CLASS_NAME, "vdatetime-calendar__month__day"):
+        # if str(day) in ele.get_attribute("innerHTML").replace("<span><span>","").replace("</span></span>",""):
+        if str(day) in ele.get_attribute("innerHTML"):
             ele.click()
             logging.debug("set day")
             debug_delay_check()

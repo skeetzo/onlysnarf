@@ -1,29 +1,30 @@
 import os
 os.environ['ENV'] = "test"
 import unittest
+import datetime
 
-from OnlySnarf.util.config import get_config
+from OnlySnarf.util.config import set_config
+CONFIG = set_config({"debug_selenium":False,"debug_delay":False,"keep":False})
+from OnlySnarf.util.logger import configure_logging
+configure_logging(True, True)
+
 from OnlySnarf.util import defaults as DEFAULT
-from OnlySnarf.util.settings import Settings
-from OnlySnarf.snarf import Snarf
-
-config = {}
+from OnlySnarf.classes.message import Post
 
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
-        config = get_config()
-        config["duration"] = DEFAULT.DURATION_ALLOWED[0]
-        config["questions"] = ["suck","my","dick","please?"]
-        config["text"] = "test balls"
-        Settings.set_debug("tests")
+        CONFIG["schedule"] = {}
+        CONFIG["expiration"] = DEFAULT.DURATION_ALLOWED[0]
+        CONFIG["questions"] = ["suck","my","dick","please?"]
+        CONFIG["text"] = "test balls"
+        self.post = Post.create_post({**CONFIG})
 
     def tearDown(self):
-        config["duration"] = None
-        config["questions"] = []
+        pass
 
     def test_poll(self):
-        assert Snarf.post(config), "unable to post poll"
+        assert self.post.send(), "unable to post poll"
 
 ############################################################################################
 

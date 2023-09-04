@@ -2,23 +2,20 @@ import os
 os.environ['ENV'] = "test"
 import unittest
 
-from OnlySnarf.util.config import get_config
-# from OnlySnarf.util import defaults as DEFAULT
-from OnlySnarf.util.settings import Settings
-from OnlySnarf.snarf import Snarf
+from OnlySnarf.util.config import set_config
+CONFIG = set_config({"debug_selenium":False,"debug_delay":False,"keep":False})
+from OnlySnarf.util.logger import configure_logging
+configure_logging(True, True)
 from OnlySnarf.classes.user import User
-
-config = {}
 
 class TestUsers(unittest.TestCase):
 
     def setUp(self):
-        config = get_config()
-        config["prefer_local"] = False
-        Settings.set_debug("tests")
+        CONFIG["prefer_local"] = False
+
         
     def tearDown(self):
-        config["prefer_local"] = True
+        CONFIG["prefer_local"] = True
 
     def test_get_users(self):
         assert User.get_all_users(), "unable to read users"

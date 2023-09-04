@@ -28,14 +28,14 @@ class Message():
         """
 
         self.files = Message.format_files(files)
-        self.keywords = [k.strip() for k in keywords]
-        self.performers = [p.strip() for p in performers]
+        self.keywords = list(set([k.strip() for k in keywords]))
+        self.performers = list(set([p.strip() for p in performers]))
         self.price = Message.format_price(price)
         self.recipients = list(set([username.replace("@","") for username in recipients])) # usernames
         self.includes = list(set([username.replace("@","") for username in includes]))
         self.excludes = list(set([username.replace("@","") for username in excludes]))
         self.schedule = Message.format_schedule(schedule)        
-        self.text = Message.format_text(text, self.keywords, self.performers, files)
+        self.text = Message.format_text(text, self.keywords, self.performers, self.files)
 
     @staticmethod
     def create_message(message_data):
@@ -44,8 +44,7 @@ class Message():
 
     def dump(self):
         schema = MessageSchema()
-        result = schema.dump(self)
-        return result
+        return schema.dump(self)
 
     @staticmethod
     def format_keywords(keywords):
@@ -63,7 +62,7 @@ class Message():
             The generated keywords into a string
         """
 
-        return "#{}".format(" #".join(keywords)) if len(keywords) > 0 else ""
+        return f"#{' #'.join(keywords)}" if len(keywords) > 0 else ""
 
     @staticmethod
     def format_performers(performers):
@@ -82,10 +81,10 @@ class Message():
             The generated performers into a string
         """
 
-        return " @{} ".format(" @".join(performers)) if len(performers) > 0 else ""
+        return f"@{' @'.join(performers)} " if len(performers) > 0 else ""
 
     @staticmethod
-    def format_text(text, keywords=[], performers=[], files=[]):
+    def format_text(text, keywords, performers, files):
         """Formats self.text with the provided keywords and performers
 
         
@@ -101,13 +100,11 @@ class Message():
             logging.warning("formatting empty message!")
             return ""
         if not text and len(files) > 0:
-            text = self.get_text_from_filename(files[0])
-        return f"{text}{Message.format_performers(performers)}{Message.format_keywords(keywords)}".strip()
+            text = Message.get_text_from_filename(files[0])
+        return f"{text} {Message.format_performers(performers)} {Message.format_keywords(keywords)}".strip()
 
     @staticmethod
     def format_schedule(scheduleArgs):
-        print("schedule")
-        print(scheduleArgs)
         return Schedule.create_schedule(scheduleArgs).dump()
 
     # TODO: reintegrate upload max
@@ -140,10 +137,11 @@ class Message():
         return Decimal(price)
 
     # TODO: format filename better, possibly grab text from parent folder instead
-    def get_text_from_filename(self, file_object):
+    @staticmethod
+    def get_text_from_filename(file_object):
         """Gets text from this object's file's title"""
 
-        if not self.get_files(): return ""
+        # if not self.get_files(): return ""
         text = file_object.get_title()
 
         return text.replace("_", " ")
@@ -215,12 +213,14 @@ class Message():
             return True, int(amount)
         return False, 0
 
-
+########################################################################################################################            
+########################################################################################################################
+########################################################################################################################
 
 class Post(Message):
     """OnlyFans message (and post) class"""
 
-    def __init__(self, expiration=0, poll={},schedule={}, **kwargs):
+    def __init__(self, expiration=0, poll={}, **kwargs):
         """
         OnlyFans post object
 
