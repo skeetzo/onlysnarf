@@ -96,6 +96,7 @@ class Message():
 
         """
 
+        if "@" in text: return text
         if not text and len(keywords) == 0 and len(performers) == 0 and len(files) == 0:
             logging.warning("formatting empty message!")
             return ""
