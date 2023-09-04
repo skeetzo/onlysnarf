@@ -38,7 +38,7 @@ def message(browser, message_object):
     """
 
     try:
-        logging.info(f"Entering message to {message_object['recipients']}: (${message_object['price']}) {message_object['text']}")
+        logging.info(f"Entering message to {','.join(message_object['recipients'])}: (${message_object['price']}) {message_object['text']}")
         successful_message_steps = []
 
         if len(message_object["recipients"]) > 1 or message_object["includes"] or message_object["excludes"]:
@@ -68,12 +68,15 @@ def message(browser, message_object):
                 successful_message_steps.append(add_user_to_message(browser, username))
         else:
             # if none of above or solo messaging, switch to normal user messaging (locates user_id on profile page and opens url link)
-            successful_message_steps.append(message_user_by_username(browser, username))
-
+            successful_message_steps.append(message_user_by_username(browser, message_object["recipients"][0]))
         if not all(successful_message_steps): raise Exception(f"Failed to begin message for {message_object['recipients']}!")
 
+        # TODO: fix this circular import issue, probably move enter_text somewhere else
+        from .post import enter_text
+        time.sleep(1)
+
         # actually send the message
-        return all([message_text(browser, message_object['text']), message_price(browser, message_object['price']), upload_files(browser, message_object['files']), message_confirm(browser)])
+        return all([enter_text(browser, message_object['text']), message_price(browser, message_object['price']), upload_files(browser, message_object['files']), message_confirm(browser)])
     except Exception as e:
         logging.error(e)
     message_clear(browser)
@@ -278,8 +281,8 @@ def message_price(browser, price):
 
     try:
         if not price or str(price) == "None":
-            logging.error("missing price!")
-            return False
+            logging.debug("skipping empty price")
+            return True
         message_price_clear(browser)
         if message_price_enter(browser, price) and message_price_save(browser):
             logging.debug("successfully entered message price!")

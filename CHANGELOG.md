@@ -785,13 +785,14 @@
 - finished test_discount process
 - beginning & finished test_expiration
 - updates to clearing post / message text
-- finished test_schedule, test_users, test_poll
+- finished test_schedule, test_users, test_poll, test_post
 - finished ensuring Message & Post marshmallow schemas properly instantiate w/ Poll & Schedule 
-
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- finish test_message
 
 - figure out where to put atexit --> Webdriver.exit
 

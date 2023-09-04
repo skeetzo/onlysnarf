@@ -13,8 +13,9 @@ from OnlySnarf.classes.message import Message
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
+        CONFIG["schedule"] = {}
         CONFIG["text"] = "test balls"
-        CONFIG["user"] = "random"
+        CONFIG["recipients"] = ["random"]
         self.message = Message.create_message({**CONFIG})
 
     def tearDown(self):

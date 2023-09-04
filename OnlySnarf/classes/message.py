@@ -39,6 +39,13 @@ class Message():
 
     @staticmethod
     def create_message(message_data):
+        new_recipients = []
+        for recipient in message_data["recipients"]:
+            if recipient.strip() == "random":
+                new_recipients.append(User.get_random_user().username)
+            else:
+                new_recipients.append(recipient)
+        message_data["recipients"] = new_recipients
         schema = MessageSchema(unknown=EXCLUDE)
         return schema.load(message_data)
 
@@ -96,7 +103,7 @@ class Message():
 
         """
 
-        if "@" in text: return text
+        if "@" in text  or "#" in text: return text # BUG: return if text has already been formatted
         if not text and len(keywords) == 0 and len(performers) == 0 and len(files) == 0:
             logging.warning("formatting empty message!")
             return ""
