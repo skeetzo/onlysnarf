@@ -783,14 +783,14 @@
   - added tests/test_data
 **4.6.9 : 9/3/2023**
 - finished test_discount process
-- beginnig test_expiration
+- beginning & finished test_expiration
+- updates to clearing post / message text
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
 - finish ensuring Message & Post marshmallow schemas properly instantiate w/ Poll & Schedule 
-- finish test_expiration
 
 - fix output location of geckodriver logs
 

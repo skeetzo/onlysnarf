@@ -42,8 +42,9 @@ def expiration(browser, expires="0"):
         logging.info(f"Expiration: {expires}")
         enter_expiration(browser, expires)
         logging.debug("### Expiration Successful ###")
-        if CONFIG["debug"]:
-            close_icons(browser)
+        # unnecessary due to clear_message
+        # if CONFIG["debug"]:
+            # close_icons(browser)
         return True
     except Exception as e:
         error_checker(e)

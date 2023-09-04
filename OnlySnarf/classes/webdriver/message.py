@@ -167,22 +167,23 @@ def add_user_to_message(browser, username):
 ######################################################################
 ######################################################################
 
-def clear_button(browser, retry=False):
-    try:
-        find_element_to_click(browser, "button", by=By.TAG_NAME, text="Clear").click()
-        logging.debug("successfully clicked clear button!")
-        return True
-    except Exception as e:
-        if not retry:
-            go_to_home(browser, force=True)
-            action = ActionChains(browser)
-            action.move_to_element(browser.find_element(By.ID, "new_post_text_input"))
-            action.click(on_element=browser.find_element(By.ID, "new_post_text_input"))
-            action.perform()
-            time.sleep(0.5) # needs to load: TODO: possibly add wait
-            return clear_button(browser, retry=True)
-        logging.debug("unable to click clear button!")
-    return False
+# message_clear
+# def clear_button(browser, retry=False):
+#     try:
+#         find_element_to_click(browser, "button", by=By.TAG_NAME, text="Clear").click()
+#         logging.debug("successfully clicked clear button!")
+#         return True
+#     except Exception as e:
+#         if not retry:
+#             go_to_home(browser, force=True)
+#             action = ActionChains(browser)
+#             action.move_to_element(browser.find_element(By.ID, "new_post_text_input"))
+#             action.click(on_element=browser.find_element(By.ID, "new_post_text_input"))
+#             action.perform()
+#             time.sleep(0.5) # needs to load: TODO: possibly add wait
+#             return clear_button(browser, retry=True)
+#         logging.debug("unable to click clear button!")
+#     return False
 
 def close_icons(browser):
     try:
@@ -195,9 +196,10 @@ def close_icons(browser):
 
 def clear_text(browser):
     try:
+        element = browser.find_element(By.ID, "new_post_text_input")
         action = ActionChains(browser)
-        action.move_to_element(browser.find_element(By.ID, "new_post_text_input"))
-        action.click(on_element=browser.find_element(By.ID, "new_post_text_input"))
+        action.move_to_element(element)
+        action.click(on_element=element)
         action.double_click()
         action.click_and_hold()
         action.send_keys(Keys.CLEAR)
@@ -207,15 +209,22 @@ def clear_text(browser):
         logging.error(e)
         logging.warning("unable to clear text!")
 
-## TODO: add check for clearing any text or images already in post field
-def message_clear(browser):
-    logging.debug("clearing message...")
-    successful = clear_button(browser)
-    if not successful:
-        close_icons(browser)
-        clear_text(browser)
-    if successful: return True
-    logging.warning("failed to clear message!")
+## TODO: add check for clearing any text or images already in post field?
+def message_clear(browser, retry=False):
+    try:
+        find_element_to_click(browser, "button", by=By.TAG_NAME, text="Clear").click()
+        logging.debug("successfully clicked clear button!")
+        return True
+    except Exception as e:
+        if not retry:
+            go_to_home(browser, force=True)
+            action = ActionChains(browser)
+            action.move_to_element(browser.find_element(By.ID, "new_post_text_input"))
+            action.click(on_element=browser.find_element(By.ID, "new_post_text_input"))
+            action.perform()
+            time.sleep(0.5) # needs to load: TODO: possibly add wait
+            return message_clear(browser, retry=True)
+        logging.debug("unable to click clear button!")
     return False
 
 def message_confirm(browser):
