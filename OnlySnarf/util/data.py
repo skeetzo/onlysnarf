@@ -4,10 +4,6 @@ import logging
 
 from .config import CONFIG
 
-# TODO: finish data; currently overwrites weirdly; finish test scripts for reading/writing randomized
-
-
-
 USERS_PATH = os.path.expanduser(CONFIG["path_users"])
 
 def reset_userlist():

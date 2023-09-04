@@ -787,12 +787,14 @@
 - updates to clearing post / message text
 - finished test_schedule, test_users, test_poll, test_post
 - finished ensuring Message & Post marshmallow schemas properly instantiate w/ Poll & Schedule 
+**9/4/2023**
+- finished test_message
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- finish test_message
+- finish fixing clear_text
 
 - figure out where to put atexit --> Webdriver.exit
 

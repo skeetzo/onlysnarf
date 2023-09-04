@@ -13,6 +13,7 @@ from .element import find_element_to_click
 from .errors import error_checker
 from .goto import go_to_home, go_to_page
 from .upload import upload_files
+from .users import get_user_by_username
 from .. import debug_delay_check
 from .. import CONFIG
 from .. import ONLYFANS_HOME_URL, ONLYFANS_CHAT_URL, ONLYFANS_NEW_MESSAGE_URL
@@ -170,24 +171,6 @@ def add_user_to_message(browser, username):
 ######################################################################
 ######################################################################
 
-# message_clear
-# def clear_button(browser, retry=False):
-#     try:
-#         find_element_to_click(browser, "button", by=By.TAG_NAME, text="Clear").click()
-#         logging.debug("successfully clicked clear button!")
-#         return True
-#     except Exception as e:
-#         if not retry:
-#             go_to_home(browser, force=True)
-#             action = ActionChains(browser)
-#             action.move_to_element(browser.find_element(By.ID, "new_post_text_input"))
-#             action.click(on_element=browser.find_element(By.ID, "new_post_text_input"))
-#             action.perform()
-#             time.sleep(0.5) # needs to load: TODO: possibly add wait
-#             return clear_button(browser, retry=True)
-#         logging.debug("unable to click clear button!")
-#     return False
-
 def close_icons(browser):
     try:
         elements = browser.find_elements(By.CLASS_NAME, "b-dropzone__preview__delete")
@@ -198,36 +181,45 @@ def close_icons(browser):
         logging.debug("unable to click close icons!")
 
 def clear_text(browser):
-    try:
+    try:        
+
         element = browser.find_element(By.ID, "new_post_text_input")
-        action = ActionChains(browser)
-        action.move_to_element(element)
-        action.click(on_element=element)
-        action.double_click()
-        action.click_and_hold()
-        action.send_keys(Keys.CLEAR)
-        action.perform()
+        print(element.get_attribute("innerHTML"))
+        element.click()
+        element.clear()
+        # element = browser.find_element(By.CLASS_NAME, "v-text-field__slot")
+        # element.click()
+        # element.clear()
+        # print(element.text)
+        # print(element.get_attribute("innerHTML"))
+        # print(element.get_attribute("textContent"))
+        # while True:
+        #     break
+            # if not text: break
+
+            # action = ActionChains(browser)
+            # action.move_to_element(element)
+            # action.click(on_element=element)
+            # action.double_click()
+            # action.click_and_hold()
+            # action.send_keys(Keys.DELETE)
+            # action.perform()
+
+        # # action.send_keys(Keys.CONTROL + "a")
+        # action.send_keys(Keys.DELETE)
         logging.debug("successfully cleared text!")
     except Exception as e:
         logging.error(e)
         logging.warning("unable to clear text!")
 
 ## TODO: add check for clearing any text or images already in post field?
-def message_clear(browser, retry=False):
+def message_clear(browser):
     try:
-        find_element_to_click(browser, "button", by=By.TAG_NAME, text="Clear").click()
-        logging.debug("successfully clicked clear button!")
+        clear_text(browser)
+        close_icons(browser)
         return True
     except Exception as e:
-        if not retry:
-            go_to_home(browser, force=True)
-            action = ActionChains(browser)
-            action.move_to_element(browser.find_element(By.ID, "new_post_text_input"))
-            action.click(on_element=browser.find_element(By.ID, "new_post_text_input"))
-            action.perform()
-            time.sleep(0.5) # needs to load: TODO: possibly add wait
-            return message_clear(browser, retry=True)
-        logging.debug("unable to click clear button!")
+        logging.error(e)
     return False
 
 def message_confirm(browser):
@@ -345,6 +337,7 @@ def message_text(browser, text=""):
     """
 
     try:
+        clear_text(browser)
         if not text:
             logging.error("missing text for message!")
             return False
@@ -413,24 +406,53 @@ def message_user_by_username(browser, username):
         logging.error("missing username to message!")
         return False
     try:
-        go_to_page(browser, username)
-        # time.sleep(5) # for whatever reason this constantly errors out from load times
-        WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.TAG_NAME, "a")))
-        elements = browser.find_elements(By.TAG_NAME, "a")
-        ele = [ele for ele in elements if ONLYFANS_CHAT_URL in str(ele.get_attribute("href"))]
-        if len(ele) == 0:
-            logging.warning("user cannot be messaged - unable to locate id!")
-            return False
-        ele = ele[0]
-        ele = ele.get_attribute("href").replace("https://onlyfans.com", "")
-        # clicking no longer works? just open href in self.browser
-        # logging.debug("clicking send message")
-        # ele.click()
-        logging.debug(f"user id found: {ele.replace(ONLYFANS_HOME_URL+'/', '')}")
-        go_to_page(browser, ele)
+        click_message_button(browser, get_user_by_username(browser, username))
         logging.debug(f"successfully messaging username: {username}")
         return True
+
+        # changed in favor of similar discount method 
+        # open user page and click on message button there
+            # go_to_page(browser, username)
+            # time.sleep(5) # for whatever reason this constantly errors out from load times
+            # WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.TAG_NAME, "a")))
+            # elements = browser.find_elements(By.TAG_NAME, "a")
+            # ele = [ele for ele in elements if ONLYFANS_CHAT_URL in str(ele.get_attribute("href"))]
+            # if len(ele) == 0:
+            #     logging.warning("user cannot be messaged - unable to locate id!")
+            #     return False
+            # ele = ele[0]
+            # ele = ele.get_attribute("href").replace("https://onlyfans.com", "")
+            # # clicking no longer works? just open href in self.browser
+            # # logging.debug("clicking send message")
+            # # ele.click()
+            # logging.debug(f"user id found: {ele.replace(ONLYFANS_HOME_URL+'/', '')}")
+            # go_to_page(browser, ele)
     except Exception as e:
         error_checker(e)
         logging.error("failed to message user")
     return False
+
+# TODO: combine click_message_button with click_discount_button
+def click_message_button(browser, user_element, retry=False):
+    button = None
+    try:
+        logging.debug("clicking message btn...")
+        button = find_element_to_click(user_element, "b-tabs__nav__text", text="Message")
+
+        browser.execute_script("return arguments[0].scrollIntoView(0, document.documentElement.scrollHeight-10);", button)
+
+        # scroll into view to prevent element from being obscured by menu at top of page
+        # browser.execute_script("return arguments[0].scrollIntoView(true);", button)
+        button.click()
+        logging.debug("clicked message btn")
+        time.sleep(0.5)
+        debug_delay_check()
+        return True
+    except Exception as e:
+        if "obscures it" in str(e) and not retry:
+            x = button.location_once_scrolled_into_view["x"]
+            y = button.location_once_scrolled_into_view["y"]
+            browser.execute_script(f"window.scrollTo({x}, {y-50})")
+            return click_message_button(browser, user_element, retry=True)
+        error_checker(e)
+    raise Exception(f"unable to click message btn for: {user_element.get_attribute('innerHTML').strip()}")

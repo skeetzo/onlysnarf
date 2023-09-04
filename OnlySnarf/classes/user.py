@@ -50,13 +50,14 @@ class UserSchema(Schema):
 class User:
     """OnlyFans users."""
 
-    def __init__(self, username, name="", user_id="", messages=[], isFan=False, isFollower=False, isFavorite=False, isRecent=False, isRenew=False, isTagged=False, isMuted=False, isRestricted=False, isBlocked=False):
+    def __init__(self, username, name="", user_id="", files=[], messages=[], isFan=False, isFollower=False, isFavorite=False, isRecent=False, isRenew=False, isTagged=False, isMuted=False, isRestricted=False, isBlocked=False):
         """User object"""
 
         self.username = str(username).replace("@","")
         self.name = name
         self.user_id = user_id
         self.messages = messages
+        self.files = files
         # self.start_date = start_date
         #
         self.isFan = isFan
@@ -138,6 +139,15 @@ class User:
     #############
     ## Statics ##
     #############
+
+    @staticmethod
+    def save_users(users):
+        user_objects = []
+        for user in users:
+            if not isinstance(user, User):
+                user = User.create_user(user)
+            user_objects.append(user)
+        write_users_local(user_objects)
 
     @staticmethod
     def get_all_users():

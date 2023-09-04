@@ -143,17 +143,9 @@ def open_tab(browser, url):
     logging.debug(f"current window handle is : {windows_before}")
     windows = browser.window_handles
     browser.execute_script('''window.open("{}","_blank");'''.format(url))
-    handle_alert(browser)
-    get_page_load(browser)
-    try:
-        WebDriverWait(browser, 10, poll_frequency=1).until(EC.number_of_windows_to_be(len(windows)+1))
-    except TimeoutException as te:
-        logging.debug("timed out waiting for new tab!")
-        logging.error(str(te))
-        return
-    except Exception as e:
-        logging.error(e)
-        return
+    # handle_alert(browser)
+    # get_page_load(browser)
+    WebDriverWait(browser, 10, poll_frequency=1).until(EC.number_of_windows_to_be(len(windows)+1))
     windows_after = browser.window_handles
     new_window = [x for x in windows_after if x not in windows][0]
     browser.switch_to.window(new_window)

@@ -90,9 +90,9 @@ def create_browser(browserType):
     browser.maximize_window()
     browser.file_detector = LocalFileDetector() # for uploading via remote sessions
     if not CONFIG["show"]:
-        logging.info("headless browser spawned successfully!")
+        logging.debug("headless browser spawned successfully!")
     else:
-        logging.info("browser spawned successfully!")
+        logging.debug("browser spawned successfully!")
     return browser
 
 ################################################################################################

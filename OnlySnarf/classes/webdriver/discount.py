@@ -101,7 +101,10 @@ def click_discount_button(browser, user_element, retry=False):
         return True
     except Exception as e:
         if "obscures it" in str(e) and not retry:
-            click_discount_button(browser, user_element, retry=True)
+            x = button.location_once_scrolled_into_view["x"]
+            y = button.location_once_scrolled_into_view["y"]
+            browser.execute_script(f"window.scrollTo({x}, {y})")
+            return click_discount_button(browser, user_element, retry=True)
         error_checker(e)
     raise Exception(f"unable to click discount btn for: {user_element.get_attribute('innerHTML').strip()}")
     # return False

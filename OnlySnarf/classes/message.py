@@ -163,10 +163,11 @@ class Message():
         # add message text to list of messages (cause why not, though it gets scraped anyways eventually)
         users = []
         for username in self.recipients:
-            user = User.get_user_by_username(username)
-            user.messages.sent.append(self.text)
-            user.files.sent.extend(self.files)
-            user.files.sent = list(set(user.files.sent))
+            user = User.get_user_by_username(username).dump()
+            print(user)
+            user["messages"]["sent"].append(self.text)
+            user["files"]["sent"].extend(self.files)
+            user["files"]["sent"] = list(set(user["files"]["sent"]))
             users.append(user)
         User.save_users(users)
 
