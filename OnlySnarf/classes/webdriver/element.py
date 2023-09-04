@@ -11,7 +11,7 @@ from selenium.webdriver.common.keys import Keys
 # isID: use id instead of class_name
 # fuzzymatch: use "in" instead of "==" when matching text
 # index: the index of the element to search for, used to ignore early matches
-def find_element_to_click(browser, name, text="", isID=False, fuzzyMatch=False, index=-1, click=True):
+def find_element_to_click(browser, name, text="", by=By.CLASS_NAME, fuzzyMatch=False, index=-1, click=True):
     """
     Find element on page by name to click
 
@@ -33,11 +33,11 @@ def find_element_to_click(browser, name, text="", isID=False, fuzzyMatch=False, 
     logging.debug(f"finding element: {name} - {text}")
     foundElement = None
     try:
-        elements = browser.find_elements(By.ID if isID else By.CLASS_NAME, name)
+        elements = browser.find_elements(by, name)
         logging.debug(f"elements found: {len(elements)}")
         i = 0
         for element in elements:
-            logging.debug(f"element: {element.get_attribute('innerHTML').strip()}")
+            # logging.debug(f"element: {element.get_attribute('innerHTML').strip()}")
             if element.is_displayed() and element.is_enabled() and ( (index >= 0 and i == index) or (index==-1) ):
                 if text and str(text).lower() == element.get_attribute("innerHTML").strip().lower():
                     logging.debug("found matching element!")

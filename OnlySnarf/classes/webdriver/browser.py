@@ -138,7 +138,7 @@ def add_options(options):
     # options.add_argument('--disable-software-rasterizer')
     # options.add_argument('--ignore-certificate-errors')
     # options.add_argument("--remote-debugging-address=localhost")    
-    # options.add_argument("--remote-debugging-port=9223")
+    # options.add_argument("--remote-debugging-port=9223") # required
 
 def browser_error(err, browserName):
     logging.warning("unable to launch {}!".format(browserName))
@@ -298,6 +298,8 @@ def attempt_remote():
 def brave_options():
     dC = DesiredCapabilities.BRAVE
     options = webdriver.BraveOptions()
+    add_options(options)
+    options.add_argument("--remote-debugging-port=9223") # required
     return options
     # return dC, options
 
@@ -305,12 +307,15 @@ def chrome_options():
     dC = DesiredCapabilities.CHROME
     options = webdriver.ChromeOptions()
     add_options(options)
+    options.add_argument("--remote-debugging-port=9223") # required
     return options
     # return dC, options
 
 def chromium_options():
     dC = DesiredCapabilities.CHROMIUM
     options = webdriver.ChromeOptions()
+    add_options(options)
+    options.add_argument("--remote-debugging-port=9223") # required
     return options
     # return dC, options
 
@@ -319,6 +324,8 @@ def edge_options():
     # options = EdgeOptions()
     options = webdriver.EdgeOptions()
     options.use_chromium = True
+    add_options(options)
+    options.add_argument("--remote-debugging-port=9223") # required
     # options.binary_location="/home/{user}/.wdm/drivers/edgedriver/linux64/111.0.1661/msedgedriver".format(user=os.getenv('USER'))
     # os.chmod(options.binary_location, 0o755)
     # shutil.chown(options.binary_location, user=os.getenv('USER'), group=None)
@@ -337,19 +344,26 @@ def firefox_options():
     if CONFIG["debug_firefox"]:
         options.log.level = "trace"
     add_options(options)
-    # options.add_argument("--enable-file-cookies")
+    # BUG: required for cookies when using firefox
+    options.add_argument("-profile")
+    options.add_argument(os.path.expanduser("~/.mozilla/firefox/whatever.selenium"))
+    options.add_argument("--enable-file-cookies") # probably not needed
     return options
     # return dC, options
 
 def ie_options():
     dC = DesiredCapabilities.IE
     options = webdriver.ChromeOptions()
+    add_options(options)
+    options.add_argument("--remote-debugging-port=9223") # required
     return options
     # return dC, options
 
 def opera_options():
     dC = DesiredCapabilities.OPERA
     options = webdriver.OperaOptions()
+    add_options(options)
+    options.add_argument("--remote-debugging-port=9223") # required
     # options.add_argument('allow-elevated-browser')
     # options.binary_location = "C:\\Users\\USERNAME\\FOLDERLOCATION\\Opera\\VERSION\\opera.exe"
     return options

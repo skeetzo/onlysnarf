@@ -45,7 +45,6 @@ class Message():
     def dump(self):
         schema = MessageSchema()
         result = schema.dump(self)
-        # pprint(result, indent=2)
         return result
 
     @staticmethod
@@ -107,6 +106,8 @@ class Message():
 
     @staticmethod
     def format_schedule(scheduleArgs):
+        print("schedule")
+        print(scheduleArgs)
         return Schedule.create_schedule(scheduleArgs).dump()
 
     # TODO: reintegrate upload max
@@ -240,11 +241,12 @@ class Post(Message):
     def dump(self):
         schema = PostSchema()
         result = schema.dump(self)
-        # pprint(result, indent=2)
         return result
 
     @staticmethod
     def format_poll(pollArgs):
+        print("poll")
+        print(pollArgs)
         return Poll(**pollArgs).dump()
 
     def send(self):

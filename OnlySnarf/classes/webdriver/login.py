@@ -31,7 +31,7 @@ def login(browser):
     """
 
     if check_if_already_logged_in(browser): return True
-    logging.info(f"Logging into OnlyFans for {CONFIG['username']}...")
+    logging.info(f"logging into OnlyFans for {CONFIG['username']}...")
     try:
         if CONFIG["login"] == "auto":
             successful = via_form(browser)

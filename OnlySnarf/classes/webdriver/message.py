@@ -167,42 +167,55 @@ def add_user_to_message(browser, username):
 ######################################################################
 ######################################################################
 
+def clear_button(browser, retry=False):
+    try:
+        find_element_to_click(browser, "button", by=By.TAG_NAME, text="Clear").click()
+        logging.debug("successfully clicked clear button!")
+        return True
+    except Exception as e:
+        if not retry:
+            go_to_home(browser, force=True)
+            action = ActionChains(browser)
+            action.move_to_element(browser.find_element(By.ID, "new_post_text_input"))
+            action.click(on_element=browser.find_element(By.ID, "new_post_text_input"))
+            action.perform()
+            time.sleep(0.5) # needs to load: TODO: possibly add wait
+            return clear_button(browser, retry=True)
+        logging.debug("unable to click clear button!")
+    return False
+
 def close_icons(browser):
     try:
-        #icon-close
-        elements = browser.find_elements(By.TAG_NAME, "use")
-        for element in [elem for elem in elements if '#icon-close' in str(elem.get_attribute('href'))]:
+        elements = browser.find_elements(By.CLASS_NAME, "b-dropzone__preview__delete")
+        for element in elements:
             ActionChains(browser).move_to_element(element).click().perform()
+            logging.debug("successfully clicked close button!")
     except Exception as e:
-        logging.error(e)
-        logging.warning("unable to click: #icon-close")
+        logging.debug("unable to click close icons!")
 
 def clear_text(browser):
     try:
-        ActionChains(browser).move_to_element(browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).perform()
+        action = ActionChains(browser)
+        action.move_to_element(browser.find_element(By.ID, "new_post_text_input"))
+        action.click(on_element=browser.find_element(By.ID, "new_post_text_input"))
+        action.double_click()
+        action.click_and_hold()
+        action.send_keys(Keys.CLEAR)
+        action.perform()
+        logging.debug("successfully cleared text!")
     except Exception as e:
         logging.error(e)
         logging.warning("unable to clear text!")
 
-## TODO
-# add check for clearing any text or images already in post field
+## TODO: add check for clearing any text or images already in post field
 def message_clear(browser):
-    try:
-        logging.debug("clearing message...")
-        clearButton = [ele for ele in browser.find_elements(By.TAG_NAME, "button") if "Clear" in ele.get_attribute("innerHTML") and ele.is_enabled()]
-        if len(clearButton) > 0:
-            logging.debug("clicking clear button...")
-            clearButton[0].click()
-        else:
-            logging.debug("refreshing page and clearing text...")
-            go_to_home(browser, force=True)
-            clear_text(browser)
-            close_icons(browser)
-        logging.debug("successfully cleared message!")
-        return True
-    except Exception as e:
-        error_checker(e)
-        logging.warning("failed to clear message!")
+    logging.debug("clearing message...")
+    successful = clear_button(browser)
+    if not successful:
+        close_icons(browser)
+        clear_text(browser)
+    if successful: return True
+    logging.warning("failed to clear message!")
     return False
 
 def message_confirm(browser):
@@ -222,12 +235,13 @@ def message_confirm(browser):
         logging.debug("message confirm is clickable")
         debug_delay_check()
         # TODO: switch to regular type after extra debugging
-        if str(CONFIG["debug"]) == "True":
+        if CONFIG["debug"] and str(CONFIG["debug"]) == "True":
             logging.info('skipping message (debug)')
-            return message_clear(browser)
-        logging.debug("clicking confirm...")
-        confirm.click()
-        logging.info('OnlyFans message sent!')
+            message_clear(browser)
+        else:
+            logging.debug("clicking confirm...")
+            confirm.click()
+            logging.info('OnlyFans message sent!')
         return True
     except TimeoutException:
         logging.error("Timed out waiting for message confirm!")

@@ -23,12 +23,12 @@ def cookies_load(browser):
             file = open(get_cookies_path(), "rb")
             cookies = pickle.load(file)
             file.close()
-            logging.debug("cookies: ")
+            # logging.debug("cookies: ")
             for cookie in cookies:
-                logging.debug(cookie)
+                # logging.debug(cookie)
                 browser.add_cookie(cookie)
-            logging.debug("successfully loaded cookies")
             browser.refresh()
+            logging.debug("successfully loaded cookies")
         else: 
             logging.warning("missing cookies file")
     except Exception as e:
@@ -45,7 +45,7 @@ def cookies_save(browser):
     try:
         # must be at onlyfans.com to save cookies of onlyfans.com
         go_to_home(browser)
-        logging.debug(browser.get_cookies())
+        # logging.debug(browser.get_cookies())
         file = open(get_cookies_path(), "wb")
         pickle.dump(browser.get_cookies(), file) # "cookies.pkl"
         file.close()

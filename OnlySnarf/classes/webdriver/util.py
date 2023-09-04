@@ -1,21 +1,28 @@
 import os
 import json
 import logging
-from selenium.webdriver.remote.remote_connection import LOGGER as SeleniumLogger
+# from selenium.webdriver.remote.remote_connection import LOGGER as SeleniumLogger
 
 from .. import CONFIG, DEFAULT
 
 def configure_logging():
+
+    
+    # logging.getLogger("urllib3.connectionpool").setLevel(logging.ERROR)
+
+    if int(CONFIG["verbose"]) >= 2:
+        # SeleniumLogger.setLevel(logging.WARNING)
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        logging.getLogger("requests").setLevel(logging.WARNING)
+        logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.WARNING)
+
     if not CONFIG["debug_selenium"]:
-        SeleniumLogger.setLevel(logging.ERROR)
+        # SeleniumLogger.setLevel(logging.ERROR)
+        logging.getLogger("selenium.webdriver.common.service").setLevel(logging.ERROR)
+        logging.getLogger("WDM").setLevel(logging.ERROR)
         logging.getLogger("urllib3").setLevel(logging.ERROR)
         logging.getLogger("requests").setLevel(logging.ERROR)
         logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.ERROR)
-        if int(CONFIG["verbose"]) >= 2:
-            SeleniumLogger.setLevel(logging.WARNING)
-            logging.getLogger("urllib3").setLevel(logging.WARNING)
-            logging.getLogger("requests").setLevel(logging.WARNING)
-            logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.WARNING)
 
 def read_session_data():
     logging.debug("reading local session...")

@@ -6,8 +6,8 @@ from ..util.defaults import DATE, DATE_FORMAT, SCHEDULE, SCHEDULE_FORMAT, TIME, 
 
 class ScheduleSchema(Schema):
     schedule = fields.Str()
-    date = fields.Str()
-    time = fields.Str()
+    date = fields.Str(dump_default=DATE)
+    time = fields.Str(dump_default=TIME)
     hour = fields.Str(dump_default="00")
     minute = fields.Str(dump_default="00")
     year = fields.Str(dump_default="0")
@@ -43,12 +43,11 @@ class Schedule:
     def dump(self):
         if not self.validate(): return {}
         schema = ScheduleSchema()
-        result = schema.dump(self)
-        # pprint(result, indent=2)
-        return result
+        return schema.dump(self)
 
     @staticmethod
     def format_date(date_string):
+        if not date_string: return ""
         date = ""
         try:
             date = datetime.strptime(str(date_string), DATE_FORMAT)    

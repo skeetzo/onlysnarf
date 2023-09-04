@@ -5,6 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
+from .errors import error_checker
+from .message import close_icons
 from .. import CONFIG, debug_delay_check
 
 ######################
@@ -40,16 +42,18 @@ def expiration(browser, expires="0"):
         logging.info(f"Expiration: {expires}")
         enter_expiration(browser, expires)
         logging.debug("### Expiration Successful ###")
+        if CONFIG["debug"]:
+            close_icons(browser)
         return True
     except Exception as e:
-        Driver.error_checker(e)
+        error_checker(e)
         logging.error("failed to enter expiration!")
-    cancel_expiration(browser)
+    close_icons(browser)
     return False
 
 def enter_expiration(browser, expires):
     logging.debug("entering expiration...")
-    element = find_element_to_click(browser, "b-make-post__expire-period-btn", text="Save")
+    element = find_element_to_click(browser, "b-make-post__expire-period-btn")
     action = ActionChains(browser)
     action.click(on_element=element)
     action.pause(int(1))
@@ -61,13 +65,4 @@ def enter_expiration(browser, expires):
     action.send_keys(Keys.ENTER)
     action.perform()
     logging.debug("successfully entered expiration!")
-    debug_delay_check()
-
-# not really necessary with 'Clear' button
-def cancel_expiration(browser):
-    logging.debug("canceling expiration...")
-    elements = browser.find_elements(By.TAG_NAME, "use")
-    element = [elem for elem in elements if '#icon-close' in str(elem.get_attribute('href'))][0]
-    ActionChains(browser).move_to_element(element).click().perform()
-    logging.debug("### Expiration Canceled ###")
     debug_delay_check()

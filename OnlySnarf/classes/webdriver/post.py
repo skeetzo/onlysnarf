@@ -78,7 +78,7 @@ def post(browser, post_object):
         logging.debug(e)
         logging.error("failed to send post!")
     message_clear(browser)
-    return False
+    return True
 
 def enter_text(browser, text):
         """
@@ -117,21 +117,23 @@ def enter_text(browser, text):
         return False
 
 # TODO: test this
-def enable_tweeting(brower):
+def enable_tweeting(browser):
     logging.debug("enabling tweeting...")
     ActionChains(browser).move_to_element(browser.find_element(By.CLASS_NAME, "b-btns-group").find_elements(By.XPATH, "./child::*")[0]).click().perform()
     logging.debug("enabled tweeting")
 
 def send_post(browser):
-    ## TODO: switch to boolean check last / never
-    if str(CONFIG["debug"]) == "True":
-        message_clear(browser)
+    if CONFIG["debug"] and str(CONFIG["debug"]) == "True":
         logging.info('skipped post (debug)')
         debug_delay_check()
         return True
     logging.debug("sending post...")
-    button = [ele for ele in browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
-    ActionChains(browser).move_to_element(button).click().perform()
+
+    # button = [ele for ele in browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
+    # ActionChains(browser).move_to_element(button).click().perform()
+
+    find_element_to_click("button", by=By.TAG_NAME, text="Post").click()
+
     logging.info('Posted to OnlyFans!')
     return True
 
@@ -161,7 +163,7 @@ def open_more_options(browser):
         """Click in empty space"""
 
         logging.debug("opening options (2)")
-        moreOptions = find_element_to_click(browser, "new_post_text_input", isID=True)
+        moreOptions = find_element_to_click(browser, "new_post_text_input", by=By.ID)
         if not moreOptions: return False    
         moreOptions.click()
         logging.debug("successfully opened more options (2)")

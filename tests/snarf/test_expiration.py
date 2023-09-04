@@ -3,7 +3,7 @@ os.environ['ENV'] = "test"
 import unittest
 
 from OnlySnarf.util.config import set_config
-CONFIG = set_config({"debug_selenium":False})
+CONFIG = set_config({"debug_selenium":False,"debug_delay":False,"keep":False})
 from OnlySnarf.util.logger import configure_logging
 configure_logging(True, True)
 

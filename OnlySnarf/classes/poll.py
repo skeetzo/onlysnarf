@@ -28,9 +28,7 @@ class Poll:
     def dump(self):
         if not self.validate(): return {}
         schema = PollSchema()
-        result = schema.dump(self)
-        # pprint(result, indent=2)
-        return result
+        return schema.dump(self)
 
     @staticmethod
     def format_duration(duration):
