@@ -1,3 +1,4 @@
+import time
 import logging
 
 from selenium.webdriver.common.action_chains import ActionChains
@@ -7,8 +8,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
+from .element import find_element_to_click
 from .expiration import expiration as EXPIRES
 from .errors import error_checker
+from .goto import go_to_home
 from .poll import poll as POLL
 from .schedule import schedule as SCHEDULE
 from .upload import upload_files
@@ -45,7 +48,7 @@ def post(browser, post_object):
     if not post_object:
         logging.debug("skipping empty post")
         return True
-    clear_button(browser)
+    click_clear_button(browser)
     #################### Formatted Text ####################
     logging.info("====================")
     logging.info("Posting:")
@@ -76,7 +79,7 @@ def post(browser, post_object):
     except Exception as e:
         logging.debug(e)
         logging.error("failed to send post!")
-    clear_button(browser)
+    click_clear_button(browser)
     return True
 
 def enter_text(browser, text):
@@ -108,7 +111,7 @@ def enter_text(browser, text):
             action.click(on_element=element)
             action.double_click()
             action.click_and_hold()
-            # action.send_keys(Keys.CLEAR)
+            action.send_keys(Keys.CLEAR)
             action.send_keys(str(text))
             action.perform()
             logging.debug("successfully entered text!")
@@ -182,7 +185,7 @@ def open_more_options(browser):
     
     raise Exception("unable to locate 'More Options' element")
 
-def clear_button(browser, retry=False):
+def click_clear_button(browser, retry=False):
     try:
         find_element_to_click(browser, "button", by=By.TAG_NAME, text="Clear").click()
         logging.debug("successfully clicked clear button!")
@@ -195,6 +198,6 @@ def clear_button(browser, retry=False):
             action.click(on_element=browser.find_element(By.ID, "new_post_text_input"))
             action.perform()
             time.sleep(0.5) # needs to load: TODO: possibly add wait
-            return clear_button(browser, retry=True)
+            return click_clear_button(browser, retry=True)
         logging.debug("unable to click clear button!")
     return False

@@ -2,7 +2,7 @@ import os
 import time
 import logging
 
-from .webdriver import create_browser, get_user_chat, cookies_load, cookies_save, go_to_home, login, \
+from .webdriver import create_browser, get_user_chat, cookies_load, cookies_save, go_to_home, login as WEBDRIVER_login, \
     discount_user as WEBDRIVER_discount_user, message as WEBDRIVER_message, post as WEBDRIVER_post, \
     get_userid_by_username as WEBDRIVER_get_userid_by_username, get_users_by_type as WEBDRIVER_get_users_by_type, \
     get_recent_chat_users as WEBDRIVER_get_recent_chat_users
@@ -30,7 +30,7 @@ class Webdriver:
         global TABS
         TABS.append([BROWSER.current_url, BROWSER.current_window_handle, 0])
         # return BROWSER
-        if login(BROWSER):
+        if WEBDRIVER_login(BROWSER):
             cookies_save(BROWSER)
             return BROWSER
         raise Exception("Unable to create OnlyFans browser!")

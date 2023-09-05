@@ -4,6 +4,9 @@ import threading
 import concurrent.futures
 from selenium.webdriver.common.by import By
 
+from .element import find_element_to_click
+from .errors import error_checker
+from ..file import File
 from .. import debug_delay_check
 from .. import CONFIG
 
@@ -112,19 +115,25 @@ def upload_files(browser, files):
 
     prepared_files = []
 
+    print(files)
+
     def prepare_file(file):
-        # add a better check for this w/ the new API
+        print(file)
         if not isinstance(file, File):
-            _file = File()
-            setattr(_file, "path", file)
-            file = _file
+            print("creating file object")
+            file = File(file)
+        print("preparing: "+file.get_title())
         if not file.prepare():
             logging.error("unable to upload - {}".format(file.get_title()))
         else:
-            prepared_files.append(file)    
+            prepared_files.append(file)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-        executor.map(prepare_file, files)
+        for result in executor.map(prepare_file, files):
+            print(result)
+
+
+
         
     logging.debug("files prepared: {}".format(len(prepared_files)))
     if len(prepared_files) == 0:
@@ -136,7 +145,7 @@ def upload_files(browser, files):
     for file in prepared_files:
         logging.info('> {} - {}/{}'.format(file.get_title(), i, len(files)))
         i += 1
-        successful.append(drag_and_drop_file(enter_file , file.get_path()))
+        successful.append(drag_and_drop_file(enter_file , file.path))
         time.sleep(1)
     if all(successful):
         if error_window_upload(browser): logging.debug("files uploaded successfully!")
@@ -150,19 +159,24 @@ def error_window_upload(browser):
     """Closes error window that appears during uploads for 'duplicate' files"""
 
     try:
-        buttons = browser.find_elements(By.CLASS_NAME, "g-btn.m-flat.m-btn-gaps.m-reset-width")
-        logging.debug("errors btns: {}".format(len(buttons)))
-        if len(buttons) == 0: return True
-        for button in buttons:
-            if button.get_attribute("innerHTML").strip() == "Close" and button.is_enabled():
-                logging.debug("upload error message, closing")
-                button.click()
-                logging.debug("success: upload error message closed")
-                time.sleep(0.5)
-                return True
-        return False
+        find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Close").click()
+        logging.debug("upload error message successfully closed!")
+        return True
+        ## other method
+        # buttons = browser.find_elements(By.CLASS_NAME, "g-btn.m-flat.m-btn-gaps.m-reset-width")
+        # logging.debug("errors btns: {}".format(len(buttons)))
+        # if len(buttons) == 0: return True
+        # # if not button: return True
+        # for button in buttons:
+        #     if button.get_attribute("innerHTML").strip() == "Close" and button.is_enabled():
+        #         logging.debug("upload error message, closing")
+        #         button.click()
+        #         break
+        # logging.debug("success: upload error message closed")
+        # time.sleep(1)
+        # return True
     except Exception as e:
-        Driver.error_checker(e)
+        pass
     return False
 
 # TODO: used at all?

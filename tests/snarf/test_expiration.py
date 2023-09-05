@@ -14,7 +14,10 @@ class TestSnarf(unittest.TestCase):
 
     def setUp(self):
         CONFIG["poll"] = {}
-        CONFIG["schedule"] = {'date':None,'time':None}
+        CONFIG["schedule"] = {
+            "date" : DEFAULT.DATE,
+            "time" : DEFAULT.TIME
+        }
         CONFIG["expiration"] = DEFAULT.EXPIRATION_MAX
         CONFIG["text"] = "test balls"
         self.post = Post.create_post({**CONFIG, 'keywords':[]})

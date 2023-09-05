@@ -13,7 +13,8 @@ from .element import find_element_to_click
 from .errors import error_checker
 from .goto import go_to_home, go_to_page
 from .upload import upload_files
-from .users import get_user_by_username
+from .upload import error_window_upload
+from .users import click_user_button, get_user_by_username
 from .. import debug_delay_check
 from .. import CONFIG
 from .. import ONLYFANS_HOME_URL, ONLYFANS_CHAT_URL, ONLYFANS_NEW_MESSAGE_URL
@@ -173,41 +174,36 @@ def add_user_to_message(browser, username):
 
 def close_icons(browser):
     try:
-        elements = browser.find_elements(By.CLASS_NAME, "b-dropzone__preview__delete")
-        for element in elements:
-            ActionChains(browser).move_to_element(element).click().perform()
-            logging.debug("successfully clicked close button!")
+        while len(browser.find_elements(By.CLASS_NAME, "b-dropzone__preview__delete")) > 0:
+            for element in browser.find_elements(By.CLASS_NAME, "b-dropzone__preview__delete"):
+                ActionChains(browser).move_to_element(element).click().perform()
+                logging.debug("successfully clicked close button!")
     except Exception as e:
         logging.debug("unable to click close icons!")
 
 def clear_text(browser):
     try:        
-
-        element = browser.find_element(By.ID, "new_post_text_input")
-        print(element.get_attribute("innerHTML"))
-        element.click()
-        element.clear()
-        # element = browser.find_element(By.CLASS_NAME, "v-text-field__slot")
+        # BUGS: only backspace is working
+        element = WebDriverWait(browser, 60).until(EC.visibility_of_element_located((By.ID, 'new_post_text_input')))
+        # TODO: fix this horribly inefficient loop
+        for i in range(300):
+            element.send_keys(Keys.BACK_SPACE)
+        logging.debug("successfully cleared text!")
+    # broken method one:
+        # print(element.get_attribute("innerHTML"))
         # element.click()
         # element.clear()
-        # print(element.text)
-        # print(element.get_attribute("innerHTML"))
-        # print(element.get_attribute("textContent"))
-        # while True:
-        #     break
-            # if not text: break
-
-            # action = ActionChains(browser)
-            # action.move_to_element(element)
-            # action.click(on_element=element)
-            # action.double_click()
-            # action.click_and_hold()
-            # action.send_keys(Keys.DELETE)
-            # action.perform()
-
+    # broken method two:
+        # action = ActionChains(browser)
+        # action.move_to_element(element)
+        # action.click(on_element=element)
+        # action.double_click()
+        # action.click_and_hold()
+        # action.send_keys(Keys.CLEAR)
+        # action.perform()
+    # broken method 3:
         # # action.send_keys(Keys.CONTROL + "a")
         # action.send_keys(Keys.DELETE)
-        logging.debug("successfully cleared text!")
     except Exception as e:
         logging.error(e)
         logging.warning("unable to clear text!")
@@ -238,7 +234,6 @@ def message_confirm(browser):
         confirm = WebDriverWait(browser, int(CONFIG["upload_max_duration"]), poll_frequency=3).until(EC.element_to_be_clickable((By.CLASS_NAME, "g-btn.m-rounded.b-chat__btn-submit")))
         logging.debug("message confirm is clickable")
         debug_delay_check()
-        # TODO: switch to regular type after extra debugging
         if CONFIG["debug"] and str(CONFIG["debug"]) == "True":
             logging.info('skipping message (debug)')
             message_clear(browser)
@@ -276,9 +271,11 @@ def message_price(browser, price):
             logging.debug("skipping empty price")
             return True
         message_price_clear(browser)
-        if message_price_enter(browser, price) and message_price_save(browser):
-            logging.debug("successfully entered message price!")
-            return True
+        message_price_open(browser)
+        message_price_enter(browser, price)
+        message_price_save(browser)
+        logging.debug("successfully entered message price!")
+        return True
     except Exception as e:
         error_checker(e)
         logging.error("failed to enter message price!")
@@ -291,22 +288,44 @@ def message_price_clear(browser):
         # browser.find_element(By.CLASS_NAME, "m-btn-remove").click()
         find_element_to_click(browser, "m-btn-remove").click()
     except Exception as e:
+        # logging.error(e)
+        pass
+
+def message_price_open(browser, retry=False):
+    try:
+        logging.debug("opening price...")
+        for element in browser.find_element(By.CLASS_NAME, "b-make-post__actions__btns").find_elements(By.XPATH, "./child::*"):
+            if "icon-price" in str(element.get_attribute("innerHTML")):
+                logging.debug("clicking price button...")
+                browser.execute_script("arguments[0].click()", element)
+                return
+                # BUG: normal methods not working :/
+                # ActionChains(browser).move_to_element(element).click().perform()
+                # element.click()
+                # element.send_keys("\n")
+    except Exception as e:
+        logging.debug("failed to open price model!")
+        if not retry:
+            error_window_upload(browser)
+            return message_price_open(browser, retry=True)
         logging.error(e)
+    raise Exception("unable to open price model!")
+    # return False
 
 def message_price_enter(browser, price):
     try:
         logging.debug("entering price...")
-        browser.find_element(By.CLASS_NAME, "b-make-post__actions__btns").find_elements(By.XPATH, "./child::*")[7].click()
         element = WebDriverWait(browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(browser.find_element(By.ID, "priceInput_1")))
         element.click()
         element.send_keys(str(price))
         logging.debug("entered price!")
         debug_delay_check()
-        return True
+        return
     except Exception as e:
         logging.debug("failed to enter price!")
         logging.error(e)
-    return False
+    raise Exception("unable to enter price amount!")
+    # return False
 
 def message_price_save(browser):
     try:
@@ -401,12 +420,16 @@ def message_user_by_username(browser, username):
 
     """
 
-    logging.debug(f"username: {username}")
+    logging.debug(f"messaging username: {username}")
     if not username:
         logging.error("missing username to message!")
         return False
     try:
-        click_message_button(browser, get_user_by_username(browser, username))
+        user = get_user_by_username(browser, username)
+        if not user: 
+            if message_user_by_user_page(browser, username): return True
+            raise Exception("unable to message missing user!")
+        click_user_button(browser, user, text="Message")
         logging.debug(f"successfully messaging username: {username}")
         return True
 
@@ -429,30 +452,34 @@ def message_user_by_username(browser, username):
             # go_to_page(browser, ele)
     except Exception as e:
         error_checker(e)
-        logging.error("failed to message user")
+        logging.error(f"failed to message user: {username}")
     return False
 
-# TODO: combine click_message_button with click_discount_button
-def click_message_button(browser, user_element, retry=False):
-    button = None
+def message_user_by_user_page(browser, username):
+    logging.debug(f"messaging username via page: {username}")
+    if not username:
+        logging.error("missing username to message!")
+        return False
     try:
-        logging.debug("clicking message btn...")
-        button = find_element_to_click(user_element, "b-tabs__nav__text", text="Message")
-
-        browser.execute_script("return arguments[0].scrollIntoView(0, document.documentElement.scrollHeight-10);", button)
-
-        # scroll into view to prevent element from being obscured by menu at top of page
-        # browser.execute_script("return arguments[0].scrollIntoView(true);", button)
-        button.click()
-        logging.debug("clicked message btn")
-        time.sleep(0.5)
-        debug_delay_check()
+        # changed in favor of similar discount method 
+        # open user page and click on message button there
+        go_to_page(browser, username)
+        time.sleep(3) # for whatever reason this constantly errors out from load times
+        WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.TAG_NAME, "a")))
+        elements = browser.find_elements(By.TAG_NAME, "a")
+        ele = [ele for ele in elements if ONLYFANS_CHAT_URL in str(ele.get_attribute("href"))]
+        if len(ele) == 0:
+            logging.warning("user cannot be messaged - unable to locate id!")
+            return False
+        ele = ele[0]
+        ele = ele.get_attribute("href").replace("https://onlyfans.com", "")
+        # clicking no longer works? just open href in self.browser
+        # logging.debug("clicking send message")
+        # ele.click()
+        logging.debug(f"user id found: {ele.replace(ONLYFANS_HOME_URL+'/', '')}")
+        go_to_page(browser, ele)
         return True
     except Exception as e:
-        if "obscures it" in str(e) and not retry:
-            x = button.location_once_scrolled_into_view["x"]
-            y = button.location_once_scrolled_into_view["y"]
-            browser.execute_script(f"window.scrollTo({x}, {y-50})")
-            return click_message_button(browser, user_element, retry=True)
         error_checker(e)
-    raise Exception(f"unable to click message btn for: {user_element.get_attribute('innerHTML').strip()}")
+        logging.error(f"failed to message user: {username}")
+    return False

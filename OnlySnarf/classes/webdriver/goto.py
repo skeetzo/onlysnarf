@@ -10,7 +10,7 @@ from selenium.common.exceptions import WebDriverException
 from .. import ONLYFANS_HOME_URL, ONLYFANS_SETTINGS_URL
 from .. import CONFIG, DEFAULT
 
-TABS = []
+# TABS = []
 
 ##############
 ### Go Tos ###
@@ -151,14 +151,14 @@ def open_tab(browser, url):
     browser.switch_to.window(new_window)
     logging.debug(f"page title after tab switching is : {browser.title}")
     logging.debug(f"new window handle is : {new_window}")
-    global TABS
-    if len(TABS) >= DEFAULT.MAX_TABS:
-        least = TABS[0]
-        for i, tab in enumerate(TABS):
-            if int(tab[2]) < int(least[2]):
-                least = tab
-        TABS.remove(least)
-    TABS.append([url, new_window, 0]) # url, window_handle, use count
+    # global TABS
+    # if len(TABS) >= DEFAULT.MAX_TABS:
+    #     least = TABS[0]
+    #     for i, tab in enumerate(TABS):
+    #         if int(tab[2]) < int(least[2]):
+    #             least = tab
+    #     TABS.remove(least)
+    # TABS.append([url, new_window, 0]) # url, window_handle, use count
 
 def search_for_tab(browser, page):
     """
@@ -177,20 +177,20 @@ def search_for_tab(browser, page):
 
     """
 
-    global TABS
+    # global TABS
     original_handle = browser.current_window_handle
     logging.debug(f"searching for page: {page}")
-    logging.debug(f"tabs: {TABS}")
+    # logging.debug(f"tabs: {TABS}")
     logging.debug(f"handles: {browser.window_handles}")
     try:
-        logging.debug("checking tabs...")
-        for page_, handle, value in TABS:
-            logging.debug(f"{page_} = {page}")
-            if str(page_) in str(page):
-                browser.switch_to.window(handle)
-                value += 1
-                logging.debug(f"successfully located tab in cache: {page}")
-                return True
+        # logging.debug("checking tabs...")
+        # for page_, handle, value in TABS:
+        #     logging.debug(f"{page_} = {page}")
+        #     if str(page_) in str(page):
+        #         browser.switch_to.window(handle)
+        #         value += 1
+        #         logging.debug(f"successfully located tab in cache: {page}")
+        #         return True
         logging.debug("checking handles...")
         for handle in browser.window_handles:
             logging.debug(handle)

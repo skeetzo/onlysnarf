@@ -6,7 +6,7 @@ from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
 from .errors import error_checker
-from .users import get_user_by_username
+from .users import click_user_button, get_user_by_username
 from .. import CONFIG, debug_delay_check
 
 def discount_user(browser, discount_object):
@@ -37,7 +37,7 @@ def discount_user(browser, discount_object):
     try:
         user = get_user_by_username(browser, discount_object['username'], reattempt=True)
         if not user: raise Exception("unable to discount missing user!")
-        click_discount_button(browser, user)
+        click_user_button(browser, user, text="Discount")
         # discount method is repeated until values are correct because somehow it occasionally messes up...
         discount_amount, discount_months = apply_discount_values(browser, discount_object['amount'], discount_object['months'])
         while int(discount_amount) != int(discount_object['amount']) and int(discount_months) != int(discount_object['months']):
@@ -67,8 +67,8 @@ def apply_discount(browser):
         debug_delay_check()
         return True
     except Exception as e:
-        logging.debug("### Discount Failure - Missing Apply Button ###")
-        logging.error(e)
+        logging.debug(e)
+        logging.error("### Discount Failure - Missing Apply Button ###")
     return False
 
 def cancel_discount(browser, onsuccess=True):
@@ -84,30 +84,9 @@ def cancel_discount(browser, onsuccess=True):
             logging.info("Discount failed!")
             logging.debug("### Discount Failure ###")
     except Exception as e:
-        logging.debug("### Discount Failure - Missing Cancel Button ###")
-        logging.error(e)
+        logging.debug(e)
+        logging.error("### Discount Failure - Missing Cancel Button ###")
     return False
-
-def click_discount_button(browser, user_element, retry=False):
-    try:
-        logging.debug("clicking discount btn...")
-        button = find_element_to_click(user_element, "b-tabs__nav__text", text="Discount")
-        # scroll into view to prevent element from being obscured by menu at top of page
-        browser.execute_script("return arguments[0].scrollIntoView(true);", button)
-        button.click()
-        logging.debug("clicked discount btn")
-        time.sleep(0.5)
-        debug_delay_check()
-        return True
-    except Exception as e:
-        if "obscures it" in str(e) and not retry:
-            x = button.location_once_scrolled_into_view["x"]
-            y = button.location_once_scrolled_into_view["y"]
-            browser.execute_script(f"window.scrollTo({x}, {y})")
-            return click_discount_button(browser, user_element, retry=True)
-        error_checker(e)
-    raise Exception(f"unable to click discount btn for: {user_element.get_attribute('innerHTML').strip()}")
-    # return False
 
 def get_discount_amount(browser):
     amount_element = browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[0]

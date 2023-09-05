@@ -27,7 +27,9 @@ class Message():
 
         """
 
-        self.files = Message.format_files(files)
+        # BUG: for whatever reason, prior formatting fucks over the isinstance reconizing the File object; maybe fix import in uploads?
+        self.files = files
+        # self.files = Message.format_files(files)
         self.keywords = list(set([k.strip() for k in keywords]))
         self.performers = list(set([p.strip() for p in performers]))
         self.price = Message.format_price(price)
@@ -39,6 +41,7 @@ class Message():
 
     @staticmethod
     def create_message(message_data):
+        # TODO: possibly update these formatting / validation steps?
         new_recipients = []
         for recipient in message_data["recipients"]:
             if recipient.strip() == "random":
@@ -46,6 +49,8 @@ class Message():
             else:
                 new_recipients.append(recipient)
         message_data["recipients"] = new_recipients
+        if message_data["input"]:
+            message_data["files"] = message_data["input"]
         schema = MessageSchema(unknown=EXCLUDE)
         return schema.load(message_data)
 
@@ -161,13 +166,14 @@ class Message():
 
         # add files to list of files sent to help prevent duplicates
         # add message text to list of messages (cause why not, though it gets scraped anyways eventually)
+
         users = []
         for username in self.recipients:
             user = User.get_user_by_username(username).dump()
-            print(user)
             user["messages"]["sent"].append(self.text)
+            # user["files"]["sent"].extend([file.get_title() for file in self.files])
             user["files"]["sent"].extend(self.files)
-            user["files"]["sent"] = list(set(user["files"]["sent"]))
+            user["files"]["sent"] = list(set(user["files"]["sent"])) # prevent duplicates
             users.append(user)
         User.save_users(users)
 

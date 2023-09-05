@@ -56,6 +56,7 @@ def login(browser):
 def check_if_already_logged_in(browser):
     """Check if already logged in before attempting to login again"""
 
+    # go_to_home(browser)
     go_to_home(browser, force=True)
     try:
         WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-make-post__streaming-link")))

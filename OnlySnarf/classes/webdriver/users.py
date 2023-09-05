@@ -3,9 +3,10 @@ import time
 import logging
 from selenium.webdriver.common.by import By
 
+from .element import find_element_to_click
 from .errors import error_checker
 from .goto import go_to_home, go_to_page
-from .. import CONFIG, print_same_line
+from .. import CONFIG, debug_delay_check, print_same_line
 from .. import ONLYFANS_HOME_URL, ONLYFANS_FANS_URL, ONLYFANS_FOLLOWING_URL, ONLYFANS_FRIENDS_URL, ONLYFANS_RENEW_ON_URL, ONLYFANS_RENEW_OFF_URL, \
     ONLYFANS_RECENT_URL, ONLYFANS_TAGGED_URL, ONLYFANS_MUTED_URL, ONLYFANS_RESTRICTED_URL, ONLYFANS_BLOCKED_URL
 
@@ -133,8 +134,12 @@ def get_user_by_username(browser, username, reattempt=False):
     initialScrollDelay = 0.5
     scrollDelay = 0.5
     while True:
+        # BUG: occasionally unable to find user due to "stale element" bug occurring somewhere near here
+        logging.debug("stale 1")
         elements = browser.find_elements(By.CLASS_NAME, "g-user-username")
+        logging.debug("stale 2")        
         for ele in elements:
+            logging.debug("stale 3")
             found_username = ele.get_attribute("innerHTML").strip()
             if str(username).strip().replace("@","") == str(found_username).strip().replace("@",""):
                 browser.execute_script("arguments[0].scrollIntoView();", ele)
@@ -142,6 +147,7 @@ def get_user_by_username(browser, username, reattempt=False):
                 logging.debug("successfully found user: {}".format(username))
                 # TODO: figure out how to combine xpath statements?
                 # return parent element housing user info
+                logging.debug("stale 4")
                 return ele.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
         if len(elements) == int(count):
             scrollDelay += initialScrollDelay
@@ -152,7 +158,30 @@ def get_user_by_username(browser, username, reattempt=False):
         count = len(elements)
         browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(scrollDelay)
-    logging.warning(f"Unable to find user by username: {username}")
-    logging.info("Are you sure that user really exists? shnarf")
-    if reattempt: return get_user_by_username(browser, username)
+    logging.warning(f"unable to find user by username: {username}")
+    if not reattempt: return get_user_by_username(browser, username, reattempt=True)
+    logging.info(f"Snarf isn't sure that '{username}' really exists...")
     return None
+
+def click_user_button(browser, user_element, text="Message", retry=False):
+    if not user_element: raise Exception("missing user element!")
+    button = None
+    try:
+        logging.debug(f"clicking {text} btn...")
+        button = find_element_to_click(user_element, "b-tabs__nav__text", text=text)
+        browser.execute_script("return arguments[0].scrollIntoView(0, document.documentElement.scrollHeight-10);", button)
+        # scroll into view to prevent element from being obscured by menu at top of page
+        # browser.execute_script("return arguments[0].scrollIntoView(true);", button)
+        button.click()
+        logging.debug(f"clicked {text} btn")
+        time.sleep(0.5)
+        debug_delay_check()
+        return True
+    except Exception as e:
+        if "obscures it" in str(e) and not retry:
+            x = button.location_once_scrolled_into_view["x"]
+            y = button.location_once_scrolled_into_view["y"]
+            browser.execute_script(f"window.scrollTo({x}, {y-50})")
+            return click_user_button(browser, user_element, text=text, retry=True)
+        error_checker(e)
+    raise Exception(f"unable to click {text} btn for user!")

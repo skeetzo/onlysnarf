@@ -788,13 +788,26 @@
 - finished test_schedule, test_users, test_poll, test_post
 - finished ensuring Message & Post marshmallow schemas properly instantiate w/ Poll & Schedule 
 **9/4/2023**
+- finished* fixing clear_text
+- mostly finished test_messages; fixed uploading
+**4.6.10 : 9/5/2022**
 - finished test_message
+- fixed messages w/ uploads not clearing text and uploads after debugging test
+- polished uploading bugs
+- finished snarf tests
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- finish fixing clear_text
+- possibly convert all return statements into raising exceptions? figure out how to integrate easiest with test scripts and for app flow
+
+
+
+- figure out user search bug that returns node not connected to dom
+
+- check that config settings are loading proper variables: aka, why do i have to keep setting the variables directly to CONFIG in test scripts?
+
 
 - figure out where to put atexit --> Webdriver.exit
 
@@ -892,6 +905,8 @@ https://stackoverflow.com/questions/55870489/how-to-handle-google-authenticator-
 https://stackoverflow.com/questions/8529265/google-authenticator-implementation-in-python
 
 ## Fix / Debug
+
+- fix clear_text bug
 
 - fix how tabs open and scroll and then the process opens another tab to find the same elements and scroll again ala: find users then discount user
 

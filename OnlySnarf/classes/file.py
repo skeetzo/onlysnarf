@@ -1,9 +1,11 @@
+import logging
 import os, shutil, random, sys
 from os import walk
 import wget
 
 from ..util.config import CONFIG
 from ..lib.ffmpeg import ffmpeg
+from ..util.defaults import DOWNLOAD_PATH
 
 ###############################################################
 
@@ -53,10 +55,10 @@ class File():
         """
 
         size = self.size
-        if not size and not os.path.exists(self.get_path()):
+        if not size and not os.path.exists(self.path):
             return False
         if size: return True
-        size = os.path.getsize(self.get_path())
+        size = os.path.getsize(self.path)
         logging.debug("file size: {}kb - {}mb".format(size/1000, size/1000000))
         if size <= File.ONE_HUNDRED_KILOBYTES:
             logging.warning("tiny file size")
@@ -76,7 +78,7 @@ class File():
         """Download a url. An input can only be a valid path or a valid url."""
 
         logging.debug("downloading file...")
-        filename = wget.download(self.path, out=self.get_tmp())
+        filename = wget.download(self.path, out=File.get_tmp())
         logging.info("") # resume same line after wget download
         logging.debug("downloaded: "+filename)
         self.path = filename
@@ -87,22 +89,6 @@ class File():
         if self.ext != "": return self.ext
         self.get_title()
         return self.ext
-
-    def get_path(self):
-        """
-        Get the file's path
-        
-        Returns
-        -------
-        str
-            The file path
-
-        """
-
-        if self.path == "":
-            logging.error("missing file path")
-            return  ""
-        return str(self.path)
 
     def get_title(self):
         """
@@ -115,24 +101,21 @@ class File():
 
         """
 
-        if self.title != "": return self.title
-        path = self.get_path()
-        if str(path) == "": 
-            logging.error("missing file title!")
-            return ""
-        title, ext = os.path.splitext(path)
+        if self.title: return self.title
+        title, ext = os.path.splitext(self.path)
         self.ext = ext.replace(".","")
         self.title = "{}{}".format(os.path.basename(title), ext)
+        if self.title.find("?") >= 0:
+            self.title = self.title[:self.title.find("?")]
         return self.title
 
     @staticmethod
     def get_tmp():
         """Creates / gets the default temporary download directory"""
 
-        download_path = CONFIG["download_path"]
-        if not os.path.exists(download_path):
-            os.mkdir(download_path)
-        return download_path
+        if not os.path.exists(DOWNLOAD_PATH):
+            os.mkdir(DOWNLOAD_PATH)
+        return DOWNLOAD_PATH
 
     def get_type(self):
         """
@@ -166,6 +149,7 @@ class File():
 
         """
 
+        print("preparing file")
         logging.debug("preparing file: {}".format(self.get_title()))
         # self.get_type().prepare()
         if not self.check_size():
@@ -387,10 +371,10 @@ class Folder(File):
 
         if not self.files and self.path:
             self.files = []
-            files = File.get_files_by_folder(self.get_path())
+            files = File.get_files_by_folder(self.path)
             for file in files:
                 file_ = File()
-                setattr(file_, "path", os.path.join(self.get_path(), file))
+                setattr(file_, "path", os.path.join(self.path, file))
                 self.files.append(file_)
                 logging.debug("local file found: {}".format(file_.get_title()))
         # if Settings.get_title():
@@ -412,7 +396,7 @@ class Folder(File):
         """
 
         if self.title: return self.title
-        path = self.get_path()
+        path = self.path
         if str(path) == "": 
             logging.error("missing file title")
             return ""
@@ -474,14 +458,14 @@ class Video(File):
     def trim(self):
         """Trim the video file."""
 
-        path = self.get_path()
+        path = self.path
         self.trimmed = ffmpeg.trim(path) 
 
     # into segments (60 sec, 5 min, 10 min)
     def split(self):
         """Split the video file."""
 
-        path = self.get_path()
+        path = self.path
         self.split = ffmpeg.split(path)
 
     # unnecessary, handled by onlyfans
@@ -497,7 +481,7 @@ class Video(File):
     def get_frames(self):
         """Get frames from the video as screenshots."""
 
-        path = self.get_path()
+        path = self.path
         self.screenshots = ffmpeg.frames(path)
 
     def prepare(self):
@@ -523,7 +507,7 @@ class Video(File):
         if not CONFIG["reduce"]: 
             logging.debug("skipping: video reduction")
             return
-        path = self.get_path()
+        path = self.path
         if (int(os.stat(str(path)).st_size) < File.FIFTY_MEGABYTES or str(CONFIG["reduce"]) == "False"):
             return
         logging.debug("reduce: {}".format(self.get_title()))
@@ -536,7 +520,7 @@ class Video(File):
     #     if not Settings.is_repair():
     #         logging.debug("skipping: video repair")
     #         return
-    #     path = self.get_path()
+    #     path = self.path
     #     if Settings.is_repair():
     #         return
     #     logging.debug("repair: {}".format(self.get_title()))
