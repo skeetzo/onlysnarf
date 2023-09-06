@@ -149,7 +149,6 @@ class File():
 
         """
 
-        print("preparing file")
         logging.debug("preparing file: {}".format(self.get_title()))
         # self.get_type().prepare()
         if not self.check_size():

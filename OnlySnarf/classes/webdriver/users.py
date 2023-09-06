@@ -134,30 +134,29 @@ def get_user_by_username(browser, username, reattempt=False):
     initialScrollDelay = 0.5
     scrollDelay = 0.5
     while True:
-        # BUG: occasionally unable to find user due to "stale element" bug occurring somewhere near here
-        logging.debug("stale 1")
-        elements = browser.find_elements(By.CLASS_NAME, "g-user-username")
-        logging.debug("stale 2")        
-        for ele in elements:
-            logging.debug("stale 3")
-            found_username = ele.get_attribute("innerHTML").strip()
-            if str(username).strip().replace("@","") == str(found_username).strip().replace("@",""):
-                browser.execute_script("arguments[0].scrollIntoView();", ele)
-                logging.info("")
-                logging.debug("successfully found user: {}".format(username))
-                # TODO: figure out how to combine xpath statements?
-                # return parent element housing user info
-                logging.debug("stale 4")
-                return ele.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
-        if len(elements) == int(count):
-            scrollDelay += initialScrollDelay
-            attempts+=1
-            if attempts == attemptsLimit:
-                break
-        print_same_line("({}/{}) scrolling...".format(count, len(elements)))
-        count = len(elements)
-        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(scrollDelay)
+        try:
+            elements = browser.find_elements(By.CLASS_NAME, "g-user-username")
+            for ele in elements:
+                found_username = ele.get_attribute("innerHTML").strip()
+                if str(username).strip().replace("@","") == str(found_username).strip().replace("@",""):
+                    browser.execute_script("arguments[0].scrollIntoView();", ele)
+                    logging.info("")
+                    logging.debug("successfully found user: {}".format(username))
+                    # TODO: figure out how to combine xpath statements?
+                    # return parent element housing user info
+                    return ele.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
+            if len(elements) == int(count):
+                scrollDelay += initialScrollDelay
+                attempts+=1
+                if attempts == attemptsLimit:
+                    break
+            print_same_line("({}/{}) scrolling...".format(count, len(elements)))
+            count = len(elements)
+            browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(scrollDelay)
+        except Exception as e:
+            if "is stale" in str(e):
+                logging.debug("stale element found, resetting search!")
     logging.warning(f"unable to find user by username: {username}")
     if not reattempt: return get_user_by_username(browser, username, reattempt=True)
     logging.info(f"Snarf isn't sure that '{username}' really exists...")

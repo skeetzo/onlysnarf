@@ -28,7 +28,7 @@ from webdriver_manager.microsoft import EdgeChromiumDriverManager
 from webdriver_manager.opera import OperaDriverManager
 
 from .. import CONFIG, DEFAULT
-from .util import configure_logging, read_session_data
+from .util import configure_logging, read_session_data, write_session_data
 
 def create_browser(browserType):
     """
@@ -93,6 +93,7 @@ def create_browser(browserType):
         logging.debug("headless browser spawned successfully!")
     else:
         logging.debug("browser spawned successfully!")
+    write_session_data(browser.session_id, browser.command_executor._url)
     return browser
 
 ################################################################################################

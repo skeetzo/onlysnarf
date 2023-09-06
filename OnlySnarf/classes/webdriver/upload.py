@@ -115,25 +115,19 @@ def upload_files(browser, files):
 
     prepared_files = []
 
-    print(files)
-
     def prepare_file(file):
-        print(file)
         if not isinstance(file, File):
-            print("creating file object")
+            logger.debug("preparing new file object...")
             file = File(file)
-        print("preparing: "+file.get_title())
         if not file.prepare():
             logging.error("unable to upload - {}".format(file.get_title()))
         else:
             prepared_files.append(file)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        # executor.map(prepare_file, files)
         for result in executor.map(prepare_file, files):
-            print(result)
-
-
-
+            pass
         
     logging.debug("files prepared: {}".format(len(prepared_files)))
     if len(prepared_files) == 0:

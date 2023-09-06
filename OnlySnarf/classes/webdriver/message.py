@@ -71,7 +71,7 @@ def message(browser, message_object):
         else:
             # if none of above or solo messaging, switch to normal user messaging (locates user_id on profile page and opens url link)
             successful_message_steps.append(message_user_by_username(browser, message_object["recipients"][0]))
-        if not all(successful_message_steps): raise Exception(f"Failed to begin message for {message_object['recipients']}!")
+        if not all(successful_message_steps): raise Exception(f"failed to begin message for {message_object['recipients']}!")
 
         # TODO: fix this circular import issue, probably move enter_text somewhere else
         from .post import enter_text
@@ -461,8 +461,7 @@ def message_user_by_user_page(browser, username):
         logging.error("missing username to message!")
         return False
     try:
-        # changed in favor of similar discount method 
-        # open user page and click on message button there
+        go_to_home(browser, force=True)
         go_to_page(browser, username)
         time.sleep(3) # for whatever reason this constantly errors out from load times
         WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.TAG_NAME, "a")))
@@ -481,5 +480,5 @@ def message_user_by_user_page(browser, username):
         return True
     except Exception as e:
         error_checker(e)
-        logging.error(f"failed to message user: {username}")
+        logging.error(f"failed to message user by page: {username}")
     return False

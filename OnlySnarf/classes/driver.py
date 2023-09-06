@@ -10,7 +10,6 @@ from .webdriver import create_browser, get_user_chat, cookies_load, cookies_save
 from ..util.config import CONFIG
 
 BROWSER = None
-TABS = []
 
 class Webdriver:
 
@@ -27,8 +26,6 @@ class Webdriver:
         if BROWSER: return BROWSER
         BROWSER = create_browser(CONFIG["browser"])
         cookies_load(BROWSER)
-        global TABS
-        TABS.append([BROWSER.current_url, BROWSER.current_window_handle, 0])
         # return BROWSER
         if WEBDRIVER_login(BROWSER):
             cookies_save(BROWSER)
@@ -45,11 +42,9 @@ class Webdriver:
 
         global BROWSER
         if not BROWSER: return 
-        if CONFIG["keep"]:
-            write_session_data(BROWSER.session_id, BROWSER.command_executor._url)
         cookies_save(BROWSER)
         if CONFIG["keep"]:
-            go_to_home(BROWSER)
+            go_to_home(BROWSER, force=True)
             logging.debug("reset to home page")
         else:
             BROWSER.quit()
