@@ -2,6 +2,8 @@ import re
 import time
 import logging
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
 from .errors import error_checker
@@ -123,7 +125,7 @@ def get_users_by_type(browser, isFan=True, isFollower=False):
         users.extend(get_users_at_page(browser, ONLYFANS_FOLLOWING_URL))
     return users
 
-def get_user_by_username(browser, username, reattempt=False):
+def get_user_by_username_old(browser, username, reattempt=False):
     if not username: return None
     go_to_page(browser, ONLYFANS_FANS_URL)
     count = 0
@@ -158,9 +160,133 @@ def get_user_by_username(browser, username, reattempt=False):
             if "is stale" in str(e):
                 logging.debug("stale element found, resetting search!")
     logging.warning(f"unable to find user by username: {username}")
-    if not reattempt: return get_user_by_username(browser, username, reattempt=True)
+    if not reattempt:
+        browser.refresh()
+        return get_user_by_username(browser, username, reattempt=True)
     logging.info(f"Snarf isn't sure that '{username}' really exists...")
     return None
+
+
+def get_user_by_username(browser, username, reattempt=False):
+    logging.debug(f"searching for user: {username}")
+    if not username: return None
+    go_to_page(browser, ONLYFANS_FANS_URL)
+    time.sleep(1)
+    # elements = browser.find_elements(By.TAG_NAME, "use")
+    # for element in elements:
+        # print(element.get_attribute("innerHTML"))
+    # elements = [elem for elem in browser.find_elements(By.TAG_NAME, "use") if '#icon-search' in str(elem.get_attribute('href'))]
+
+
+    # class = b-search-form__input form-control
+
+
+    # search_elements = browser.find_elements(By.CLASS_NAME, "m-search-btn")
+    search_elements = browser.find_elements(By.TAG_NAME, "use")
+
+# b-search-form__input form-control
+
+# g-page__header__btn m-search-btn m-with-round-hover g-btn m-icon m-icon-only m-sm-size ml-0 m-gray has-tooltip
+
+    
+
+    print(len(search_elements))
+    new_search_elements = []
+    for element in search_elements:
+        if '#icon-search' in str(element.get_attribute('href')):
+            print("found search element")
+            new_search_elements.append(element)
+
+
+
+    search_element = None
+    if len(new_search_elements) > 1:
+        search_element = new_search_elements[1]
+    elif len(new_search_elements) == 1:
+        search_element = new_search_elements[0]
+
+    # while True:
+    #     try:
+    #         elements = [elem for elem in browser.find_elements(By.TAG_NAME, "use") if elem.is_enabled() and elem.is_displayed() and '#icon-search' in str(elem.get_attribute('href'))]
+    #     except Exception as e:
+    #         print(e)
+
+
+    if not search_element:
+        raise Exception("unable to find search element!")
+
+    ActionChains(browser).move_to_element(search_element).click(on_element=search_element).send_keys(str(username)).send_keys(Keys.ENTER).perform()
+
+
+    # for i in range(10):
+    #     try:
+    #         elements_length = len([elem for elem in browser.find_elements(By.TAG_NAME, "use") if elem.is_enabled() and elem.is_displayed() and '#icon-search' in str(elem.get_attribute('href'))])
+    #         try:
+    #             for element in range(elements_length):
+    #                 try:
+    #                     elements = [elem for elem in browser.find_elements(By.TAG_NAME, "use") if elem.is_enabled() and elem.is_displayed() and '#icon-search' in str(elem.get_attribute('href'))]
+    #                     for element in elements:
+    #                         try:
+    #                             ActionChains(browser).move_to_element(element).click(on_element=element).send_keys(str(username)).send_keys(Keys.ENTER).perform()
+    #                         except Exception as e:
+    #                             print(2)
+    #                             print(e)
+    #                 except Exception as e:
+    #                     print(1)
+    #                     print(e)
+    #                     print(element.get_attribute("innerHTML"))
+    #         except Exception as e:
+    #             print(0)
+    #             print(e)
+    #     except Exception as e:
+    #         print(-1)
+    #         print(e)
+
+
+    # it is the last element for whatever reason
+    time.sleep(5)
+    debug_delay_check()
+
+
+    
+    try:
+        user = get_user_from_elements(browser, username)
+
+        if not user:
+            find_element_to_click(browser, "b-tabs__nav__text", text="All", fuzzyMatch=True).click()
+            time.sleep(5)
+            # user should already be there cause username is already in search field
+            return get_user_from_elements(browser, username)
+    except Exception as e:
+        print(e)
+
+    return None
+    
+
+
+def get_user_from_elements(browser, username):
+    elements = browser.find_elements(By.CLASS_NAME, "g-user-username")
+    for ele in elements:
+        if str(username).strip().replace("@","") == str(ele.get_attribute("innerHTML")).strip().replace("@",""):
+            browser.execute_script("arguments[0].scrollIntoView();", ele)
+            logging.debug("successfully found user: {}".format(username))
+            # TODO: figure out how to combine xpath statements?
+            # return parent element housing user info
+            return ele.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
+    return None
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def click_user_button(browser, user_element, text="Message", retry=False):
     if not user_element: raise Exception("missing user element!")

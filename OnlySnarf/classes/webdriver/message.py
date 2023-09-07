@@ -455,18 +455,45 @@ def message_user_by_username(browser, username):
         logging.error(f"failed to message user: {username}")
     return False
 
+
+# 3 total ways:
+# 1) scroll down
+# 2) search
+# 3) go to user page, click message button or find message button url and extract user_id
+
+# how to properly fail:
+# 1) cannot find user in 'all': shouldn't this never happen?
+
+# 'active', 'expired', 'restricted', 'blocked', 'promotions', 'fan stats':
+
+# so discount can ignore the requirement that the user is 'active' and can legitimately search in 'all'
+
+
+
+
+
 def message_user_by_user_page(browser, username):
     logging.debug(f"messaging username via page: {username}")
     if not username:
         logging.error("missing username to message!")
         return False
     try:
+        logging.debug("BACKUP USER SEARCH")
+        logging.debug("BACKUP USER SEARCH")
+        logging.debug("BACKUP USER SEARCH")
+
         go_to_home(browser, force=True)
         go_to_page(browser, username)
         time.sleep(3) # for whatever reason this constantly errors out from load times
         WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.TAG_NAME, "a")))
         elements = browser.find_elements(By.TAG_NAME, "a")
         ele = [ele for ele in elements if ONLYFANS_CHAT_URL in str(ele.get_attribute("href"))]
+
+
+        logging.debug()
+
+
+
         if len(ele) == 0:
             logging.warning("user cannot be messaged - unable to locate id!")
             return False

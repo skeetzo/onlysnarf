@@ -795,7 +795,8 @@
 - fixed messages w/ uploads not clearing text and uploads after debugging test
 - polished uploading bugs
 - finished snarf tests
-
+**9/6/2023**
+- fixed user search method *crosses fingers* by noticing super dumb easy method -_-
 ------------------------------------------------------------------------------------
 
 ## TODO

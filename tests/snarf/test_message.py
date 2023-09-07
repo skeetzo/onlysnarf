@@ -45,6 +45,10 @@ class TestSnarf(unittest.TestCase):
         self.message = Message.create_message({**CONFIG})
         assert not self.message.send(), "unable to fail message properly"
 
+    def test_message_inactive_user(self):
+        CONFIG["recipients"] = ["yeahzers"]
+        assert not self.message.send(), "unable to properly fail messaging an inactive user"
+
 ############################################################################################
 
 if __name__ == '__main__':

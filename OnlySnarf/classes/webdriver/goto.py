@@ -16,6 +16,7 @@ from .. import CONFIG, DEFAULT
 ### Go Tos ###
 ##############
 
+# TODO: finally combine with go_to_page?
 def go_to_home(browser, force=False):
     """
     Go to home page
