@@ -2,26 +2,24 @@ import os
 os.environ['ENV'] = "test"
 import unittest
 
-from OnlySnarf.util.config import config
-from OnlySnarf.util.settings import Settings
-from OnlySnarf.util.webdriver import Driver
+from OnlySnarf.util.config import set_config
+CONFIG = set_config({})
 
-class TestSeleniumChrome(unittest.TestCase):
+from OnlySnarf.classes.driver import create_browser
+
+class TestSeleniumBrave(unittest.TestCase):
 
     def setUp(self):
-        config["debug_selenium"] = True
-        config["keep"] = False
-        # config["show"] = True
-        Settings.set_debug("tests")
+        CONFIG["browser"] = "chrome"
+        CONFIG["debug_selenium"] = True
+        CONFIG["keep"] = False
+        self.browser = create_browser(CONFIG["browser"])
 
     def tearDown(self):
-        config["debug_chrome"] = False
-        config["show"] = False
+        self.browser.quit()
 
-    def test_chrome(self):
-        config["browser"] = "chrome"
-        config["debug_chrome"] = True
-        assert Driver.get_browser(), "unable to launch chrome"
+    def test_brave(self):
+        assert self.browser, "unable to launch chrome"
 
 ############################################################################################
 

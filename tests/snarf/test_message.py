@@ -3,7 +3,7 @@ os.environ['ENV'] = "test"
 import unittest
 
 from OnlySnarf.util.config import set_config
-CONFIG = set_config({"skip_upload":False,"skip_download":False,"debug_selenium":False,"debug_delay":False,"keep":False})
+CONFIG = set_config({"skip_upload":False,"skip_download":False,"debug_selenium":False,"debug_delay":False,"keep":False,"show":False})
 from OnlySnarf.util.logger import configure_logging
 configure_logging(True, True)
 
@@ -40,13 +40,15 @@ class TestSnarf(unittest.TestCase):
         self.message = Message.create_message({**CONFIG})
         assert self.message.send(), "unable to set message price"
 
-    # def test_message_failure(self):
-    #     CONFIG["recipients"] = ["onlyfans"]
-    #     self.message = Message.create_message({**CONFIG})
-    #     assert not self.message.send(), "unable to fail message properly"
+    def test_message_failure(self):
+        CONFIG["recipients"] = ["onlyfans"]
+        self.message = Message.create_message({**CONFIG})
+        assert not self.message.send(), "unable to fail message properly"
 
     def test_message_inactive_user(self):
-        CONFIG["recipients"] = ["yeahzers"]
+        import string
+        import random
+        CONFIG["recipients"] = [''.join(random.choices(string.ascii_uppercase + string.digits, k=8))]
         self.message = Message.create_message({**CONFIG})
         assert not self.message.send(), "unable to properly fail messaging an inactive user"
 

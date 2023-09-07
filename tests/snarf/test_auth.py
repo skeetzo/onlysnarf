@@ -8,7 +8,6 @@ CONFIG = set_config({})
 from OnlySnarf.classes.driver import create_browser
 from OnlySnarf.classes.webdriver.login import login as WEBDRIVER_login
 
-
 class TestAuth(unittest.TestCase):
 
     def setUp(self):

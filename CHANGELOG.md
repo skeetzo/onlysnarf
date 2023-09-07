@@ -796,25 +796,20 @@
 - polished uploading bugs
 - finished snarf tests
 **9/6/2023**
-- fixed user search method *crosses fingers* by noticing super dumb easy method -_- 
+- fixed user search method *crosses fingers* by noticing super dumb easy method
+- figured out user search bug that returns node not connected to dom
+**4.6.11 : 9/7/2023**
+- finished fixing search bugs in webdriver/user
+- more updates to user search process: ?search={username}
+- updated browser tests
+
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- finish fixing search bugs in webdriver/user
-
 - possibly convert all return statements into raising exceptions? figure out how to integrate easiest with test scripts and for app flow
-
-
-
-- figure out user search bug that returns node not connected to dom
-
 - check that config settings are loading proper variables: aka, why do i have to keep setting the variables directly to CONFIG in test scripts?
-
-
 - figure out where to put atexit --> Webdriver.exit
-
-
 - fix output location of geckodriver logs
 
 - FINISH UPDATING TESTS THEN RUN ALL TESTS

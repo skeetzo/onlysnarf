@@ -2,29 +2,26 @@ import os
 os.environ['ENV'] = "test"
 import unittest
 
-from OnlySnarf.util.config import config
-from OnlySnarf.util.settings import Settings
-from OnlySnarf.util.webdriver import Driver
+from OnlySnarf.util.config import set_config
+CONFIG = set_config({})
 
-class TestSeleniumReconnect(unittest.TestCase):
+from OnlySnarf.classes.driver import create_browser
+
+class TestSeleniumBrave(unittest.TestCase):
 
     def setUp(self):
-        config["debug_selenium"] = True
-        config["keep"] = True
-        # config["show"] = True
-        Settings.set_debug("tests")
+        CONFIG["browser"] = "auto"
+        CONFIG["debug_selenium"] = True
+        CONFIG["keep"] = False
+        self.browser = create_browser(CONFIG["browser"])
 
     def tearDown(self):
-        config["debug_selenium"] = False
-        config["keep"] = False
-        config["show"] = False
-    
-    def test_reconnect(self):
-        config["browser"] = "auto"
-        Driver.get_browser()
-        Driver.exit()
-        config["browser"] = "auto"
-        assert Driver.get_browser(), "unable to launch via reconnect auto"
+        self.browser.quit()
+
+    def test_brave(self):
+        self.browser.quit()
+        self.browser = create_browser(CONFIG["browser"])
+        assert self.browser, "unable to reconnect to browser"
 
 ############################################################################################
 

@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 
+# from . import scroll_to_bottom
 from .element import find_element_to_click
 from .errors import error_checker
 from .goto import go_to_home, go_to_page
@@ -79,15 +80,13 @@ def get_userid_by_username(browser, username):
         logging.error(f"failed to find user id for username: {username}")
     return user_id
 
-def get_user_at_page(browser, username, page, collection="Active"):
+def get_user_element_at_page(browser, username, page, collection="All"):
     if page == ONLYFANS_FOLLOWING_URL:
         class_name = "subscriptions"
     elif page == ONLYFANS_FANS_URL:
         class_name = "fans"
     users = []
     try:
-        go_to_page(browser, page, force=True)
-        find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True).click()
         # scroll until elements stop spawning
         thirdTime = 0
         count = 0
@@ -101,7 +100,6 @@ def get_user_at_page(browser, username, page, collection="Active"):
                     # TODO: figure out how to combine xpath statements?
                     # return parent element housing user info
                     return ele.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
-
             elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
             if len(elements) == int(count) and thirdTime >= 3: break
             print_same_line(f"({count}) scrolling...")
@@ -110,7 +108,6 @@ def get_user_at_page(browser, username, page, collection="Active"):
             time.sleep(2)
             if thirdTime >= 3 and len(elements) == 0: break
             thirdTime += 1
-        
     except Exception as e:
         logging.info(e)
         error_checker(e)
@@ -167,42 +164,31 @@ def get_users_by_type(browser, isFan=True, isFollower=False):
     return users
 
 # TODO: change collection into enum stuff
-def get_user_by_username(browser, username, reattempt=False, collection="Active"):
+def get_user_by_username(browser, username, reattempt=False, collection="All"):
     logging.debug(f"searching for user by username: {username}")
     if not username: return None
     try:
-        go_to_page(browser, ONLYFANS_FANS_URL, force=True)
-        find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True).click()
-        search_element = get_user_search_field(browser)
-        search_username_in_search_element(browser, search_element, username)
-        # user = get_user_from_elements(browser, username)
-        user = get_user_at_page(browser, username, ONLYFANS_FANS_URL)
+        search_for_username(browser, username)
+        user = get_user_element_at_page(browser, username, ONLYFANS_FANS_URL)
         if user: return user
     except Exception as e:
         error_checker(e)
-    if not reattempt: return get_user_by_username(browser, username, reattempt=True, collection="All")
+    if not reattempt: return get_user_by_username(browser, username, reattempt=True)
     raise Exception("unable to get user by username!")
 
-def get_user_search_field(browser):
-    try:
-        logging.debug(f"getting user search field...")
-        WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-content-filter__group-btns")))
-        search_elements = browser.find_elements(By.CLASS_NAME, "b-content-filter__group-btns")
-        search_element = search_elements[1].find_element(By.CLASS_NAME, "b-content-filter__btn")
-        return search_element
-    except Exception as e:
-        error_checker(e)
-    raise Exception("unable to find search element!")
 
-def search_username_in_search_element(browser, search_element, username):
+
+def search_for_username(browser, username):
     try:
-        logging.debug(f"entering username '{username}' into search field...")
-        ActionChains(browser).move_to_element(search_element).click(on_element=search_element).send_keys(str(username)).send_keys(Keys.ENTER).perform()
-        time.sleep(1) # required wait
+        logging.debug(f"searching for username by opening url...")
+        import os
+        go_to_page(browser, os.path.join(ONLYFANS_FANS_URL, f"?search={username}"))
+        # time.sleep(5)
         return True
     except Exception as e:
         error_checker(e)
-    raise Exception("failed to enter username into search field!")
+    raise Exception("unable to search for username")
+
 
 def get_user_from_elements(browser, username, reattempt=False):
     try:
@@ -246,6 +232,24 @@ def click_user_button(browser, user_element, text="Message", reattempt=False):
         error_checker(e)
     raise Exception(f"unable to click {text} btn for user!")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# TODO: move these somewhere else?
 def scroll_to_bottom(browser):
     logging.debug("scrolling to bottom...")
     SCROLL_PAUSE_TIME = 1
@@ -267,13 +271,29 @@ def scroll_to_bottom(browser):
             break
         last_height = new_height
 
-
+# TODO: probably delete, or leave for reference
 def scroll_to_bottom_once(browser):
     logging.debug("scrolling to bottom once...")
     # Scroll down to bottom
     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     # Wait to load page
     time.sleep(1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -318,3 +338,28 @@ def scroll_to_bottom_once(browser):
 #         return get_user_by_username(browser, username, reattempt=True)
 #     logging.info(f"Snarf isn't sure that '{username}' really exists...")
 #     return None
+
+
+
+# not needed, unnecessary once realizing that its simpler to just go to the url with the username in the search?= format
+def get_user_search_field(browser):
+    try:
+        logging.debug(f"getting user search field...")
+        WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-content-filter__group-btns")))
+        search_elements = browser.find_elements(By.CLASS_NAME, "b-content-filter__group-btns")
+        search_element = search_elements[1].find_element(By.CLASS_NAME, "b-content-filter__btn")
+        return search_element
+    except Exception as e:
+        error_checker(e)
+    raise Exception("unable to find search element!")
+
+
+def search_username_in_search_element(browser, search_element, username):
+    try:
+        logging.debug(f"entering username '{username}' into search field...")
+        ActionChains(browser).move_to_element(search_element).click(on_element=search_element).send_keys(str(username)).send_keys(Keys.ENTER).perform()
+        time.sleep(1) # required wait
+        return True
+    except Exception as e:
+        error_checker(e)
+    raise Exception("failed to enter username into search field!")

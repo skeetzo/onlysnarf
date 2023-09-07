@@ -1,34 +1,33 @@
+# TODO: requires internal updates
+
 # import os
 # os.environ['ENV'] = "test"
 # import unittest
 
-# from OnlySnarf.util.config import get_config
-# from OnlySnarf.webdriver.login import login as WEBDRIVER_login
-# from OnlySnarf.util.settings import Settings
+# from OnlySnarf.util.config import set_config
+# CONFIG = set_config({})
 
-# config = {}
+# from OnlySnarf.classes.driver import create_browser
+# from OnlySnarf.classes.webdriver.login import login as WEBDRIVER_login
 
 # class TestAuth(unittest.TestCase):
 
 #     def setUp(self):
-#         config = get_config()
-#         config["login"] = "google"
-#         Settings.set_debug("tests")
-
+#         self.browser = create_browser(CONFIG["browser"])
+#         CONFIG["login"] = "google"
+        
 #     def tearDown(self):
-#         pass
+#         self.browser.quit()
 
-#     @unittest.skip("todo")
 #     def test_login(self):
-#         config["cookies"] = False
-#         assert WEBDRIVER_login(), "unable to login"
-#         config["cookies"] = True # saves cookies for next test
+#         CONFIG["cookies"] = False
+#         assert WEBDRIVER_login(self.browser), "unable to login"
+#         CONFIG["cookies"] = True # saves cookies for next test
 
-#     @unittest.skip("todo")
 #     def test_login_via_cookies(self):
-#         config["cookies"] = True
-#         config["debug_cookies"] = True
-#         assert WEBDRIVER_login(), "unable to login from cookies"
+#         CONFIG["cookies"] = True
+#         CONFIG["debug_cookies"] = True
+#         assert WEBDRIVER_login(self.browser), "unable to login from cookies"
 
 # ############################################################################################
 

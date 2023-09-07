@@ -425,7 +425,7 @@ def message_user_by_username(browser, username):
         logging.error("missing username to message!")
         return False
     try:
-        user = get_user_by_username(browser, username)
+        user = get_user_by_username(browser, username, collection="Active")
         if not user: 
             if message_user_by_user_page(browser, username): return True
             raise Exception("unable to message missing user!")
@@ -454,23 +454,6 @@ def message_user_by_username(browser, username):
         error_checker(e)
         logging.error(f"failed to message user: {username}")
     return False
-
-
-# 3 total ways:
-# 1) scroll down
-# 2) search
-# 3) go to user page, click message button or find message button url and extract user_id
-
-# how to properly fail:
-# 1) cannot find user in 'all': shouldn't this never happen?
-
-# 'active', 'expired', 'restricted', 'blocked', 'promotions', 'fan stats':
-
-# so discount can ignore the requirement that the user is 'active' and can legitimately search in 'all'
-
-
-
-
 
 def message_user_by_user_page(browser, username):
     logging.debug(f"messaging username via page: {username}")
