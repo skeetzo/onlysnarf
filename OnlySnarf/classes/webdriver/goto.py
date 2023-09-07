@@ -43,7 +43,7 @@ def go_to_home(browser, force=False):
         handle_alert(browser)
         get_page_load(browser)
     if force: return goto()
-    if search_for_tab(browser, ONLYFANS_HOME_URL):
+    if search_for_tab(browser, ONLYFANS_HOME_URL, force=force):
         logging.debug("found -> /")
         return
     logging.debug(f"current url: {browser.current_url}")
@@ -52,7 +52,7 @@ def go_to_home(browser, force=False):
         browser.execute_script("window.scrollTo(0, 0);")
     else: goto()        
     
-def go_to_page(browser, page):
+def go_to_page(browser, page, force=False):
     """
     Go to page
 
@@ -65,10 +65,10 @@ def go_to_page(browser, page):
 
     """
 
-    if search_for_tab(browser, page):
+    if search_for_tab(browser, page, force=force):
         logging.debug(f"found -> {page}")
         return
-    if str(browser.current_url) == str(page) or str(page) in str(browser.current_url):
+    if str(browser.current_url) == str(page) or (str(page) in str(browser.current_url) and not force):
         logging.debug(f"already at -> {page}")
         browser.execute_script("window.scrollTo(0, 0);")
     else:
@@ -161,7 +161,7 @@ def open_tab(browser, url):
     #     TABS.remove(least)
     # TABS.append([url, new_window, 0]) # url, window_handle, use count
 
-def search_for_tab(browser, page):
+def search_for_tab(browser, page, force=False):
     """
     Search for (and goto if exists) tab in tabs cache
 
@@ -178,31 +178,26 @@ def search_for_tab(browser, page):
 
     """
 
-    # global TABS
     original_handle = browser.current_window_handle
     logging.debug(f"searching for page: {page}")
-    # logging.debug(f"tabs: {TABS}")
     logging.debug(f"handles: {browser.window_handles}")
     try:
-        # logging.debug("checking tabs...")
-        # for page_, handle, value in TABS:
-        #     logging.debug(f"{page_} = {page}")
-        #     if str(page_) in str(page):
-        #         browser.switch_to.window(handle)
-        #         value += 1
-        #         logging.debug(f"successfully located tab in cache: {page}")
-        #         return True
         logging.debug("checking handles...")
         for handle in browser.window_handles:
             logging.debug(handle)
             browser.switch_to.window(handle)
-            if str(page) in str(browser.current_url):
-                logging.debug(f"successfully located tab in handles: {page}")
-                return True
+            if force:
+                print(f"{page} == {browser.current_url}")
+                if str(page) == str(browser.current_url).replace(ONLYFANS_HOME_URL, ""):
+                    logging.debug(f"successfully located exact tab in handles: {page}")
+                    return True
+            else:
+                if str(page) in str(browser.current_url):
+                    logging.debug(f"successfully located tab in handles: {page}")
+                    return True
         logging.debug(f"failed to locate tab: {page}")
         browser.switch_to.window(original_handle)
     except Exception as e:
-        # print(e)
         # if "Unable to locate window" not in str(e):
         logging.debug(e)
     return False

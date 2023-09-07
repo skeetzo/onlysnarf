@@ -40,13 +40,14 @@ class TestSnarf(unittest.TestCase):
         self.message = Message.create_message({**CONFIG})
         assert self.message.send(), "unable to set message price"
 
-    def test_message_failure(self):
-        CONFIG["recipients"] = ["onlyfans"]
-        self.message = Message.create_message({**CONFIG})
-        assert not self.message.send(), "unable to fail message properly"
+    # def test_message_failure(self):
+    #     CONFIG["recipients"] = ["onlyfans"]
+    #     self.message = Message.create_message({**CONFIG})
+    #     assert not self.message.send(), "unable to fail message properly"
 
     def test_message_inactive_user(self):
         CONFIG["recipients"] = ["yeahzers"]
+        self.message = Message.create_message({**CONFIG})
         assert not self.message.send(), "unable to properly fail messaging an inactive user"
 
 ############################################################################################

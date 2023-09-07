@@ -3,7 +3,7 @@ os.environ['ENV'] = "test"
 import unittest
 
 from OnlySnarf.util.config import set_config
-CONFIG = set_config({"debug_selenium":False})
+CONFIG = set_config({"debug_selenium":False,"debug_delay":False})
 from OnlySnarf.util.logger import configure_logging
 configure_logging(True, True)
 
@@ -15,7 +15,7 @@ class TestSnarf(unittest.TestCase):
     def setUp(self):
         CONFIG["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT/2 # 55 / 2 = 27 or 28 -> 25
         CONFIG["months"] = DEFAULT.DISCOUNT_MAX_MONTHS/2 # 12 / 2 = 6
-        CONFIG["user"] = "random"
+        CONFIG["user"] = "quatro78654488"
         CONFIG["prefer_local"] = True
         self.discount = Discount.create_discount({**CONFIG, 'username':CONFIG["user"]})
 

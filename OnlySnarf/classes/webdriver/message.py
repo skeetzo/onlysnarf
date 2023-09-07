@@ -291,28 +291,27 @@ def message_price_clear(browser):
         # logging.error(e)
         pass
 
-def message_price_open(browser, retry=False):
+def message_price_open(browser, reattempt=False):
     try:
         logging.debug("opening price...")
         for element in browser.find_element(By.CLASS_NAME, "b-make-post__actions__btns").find_elements(By.XPATH, "./child::*"):
             if "icon-price" in str(element.get_attribute("innerHTML")):
                 logging.debug("clicking price button...")
                 browser.execute_script("arguments[0].click()", element)
-                return
+                return True
                 # BUG: normal methods not working :/
                 # ActionChains(browser).move_to_element(element).click().perform()
                 # element.click()
                 # element.send_keys("\n")
     except Exception as e:
         logging.debug("failed to open price model!")
-        if not retry:
+        if "obscures it" in str(e) and not reattempt:
             error_window_upload(browser)
-            return message_price_open(browser, retry=True)
+            return message_price_open(browser, reattempt=True)
         logging.error(e)
     raise Exception("unable to open price model!")
-    # return False
 
-def message_price_enter(browser, price):
+def message_price_enter(browser, price, reattempt=False):
     try:
         logging.debug("entering price...")
         element = WebDriverWait(browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(browser.find_element(By.ID, "priceInput_1")))
@@ -320,12 +319,14 @@ def message_price_enter(browser, price):
         element.send_keys(str(price))
         logging.debug("entered price!")
         debug_delay_check()
-        return
+        return True
     except Exception as e:
+        if "obscures it" in str(e) and not reattempt:
+            error_window_upload(browser)
+            return message_price_enter(browser, price, reattempt=True)
         logging.debug("failed to enter price!")
         logging.error(e)
     raise Exception("unable to enter price amount!")
-    # return False
 
 def message_price_save(browser):
     try:
@@ -335,9 +336,8 @@ def message_price_save(browser):
         debug_delay_check()
         return True
     except Exception as e:
-        logging.debug("failed to save price!")
         logging.error(e)
-    return False
+    raise Exception("failed to save price!")
 
 def message_text(browser, text=""):
     """

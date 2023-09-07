@@ -117,7 +117,7 @@ def upload_files(browser, files):
 
     def prepare_file(file):
         if not isinstance(file, File):
-            logger.debug("preparing new file object...")
+            logging.debug("preparing new file object...")
             file = File(file)
         if not file.prepare():
             logging.error("unable to upload - {}".format(file.get_title()))
@@ -153,8 +153,11 @@ def error_window_upload(browser):
     """Closes error window that appears during uploads for 'duplicate' files"""
 
     try:
-        find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Close").click()
-        logging.debug("upload error message successfully closed!")
+        while True:
+            element = find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Close")
+            if not element: break
+            element.click()
+            logging.debug("upload error message successfully closed!")
         return True
         ## other method
         # buttons = browser.find_elements(By.CLASS_NAME, "g-btn.m-flat.m-btn-gaps.m-reset-width")
