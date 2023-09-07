@@ -20,25 +20,25 @@ class TestUsers(unittest.TestCase):
     def test_get_users(self):
         assert User.get_all_users(), "unable to read users"
 
-    # @unittest.skip("todo")
-    # def test_read_users_locally(self):
-    #     assert User.read_users_local(), "unable to read in users locally"
+    @unittest.skip("todo")
+    def test_read_users_locally(self):
+        assert User.read_users_local(), "unable to read in users locally"
 
-    # @unittest.skip("todo")
-    # def test_write_users_locally(self):
-    #     assert User.write_users_local(), "unable to write out users locally"
+    @unittest.skip("todo")
+    def test_write_users_locally(self):
+        assert User.write_users_local(), "unable to write out users locally"
 
-    # @unittest.skip("todo")
-    # def test_get_following(self):
-    #     assert User.get_following(), "unable to read followers"
+    @unittest.skip("todo")
+    def test_get_following(self):
+        assert User.get_following(), "unable to read followers"
 
-    # @unittest.skip("todo")
-    # def test_read_following_local(self):
-    #     assert User.read_following_local(), "unable to read in followers locally"
+    @unittest.skip("todo")
+    def test_read_following_local(self):
+        assert User.read_following_local(), "unable to read in followers locally"
 
-    # @unittest.skip("todo")
-    # def test_write_following_local(self):
-    #     assert User.write_following_local(), "unable to write out followers locally"
+    @unittest.skip("todo")
+    def test_write_following_local(self):
+        assert User.write_following_local(), "unable to write out followers locally"
 
 ############################################################################################
 

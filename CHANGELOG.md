@@ -807,12 +807,13 @@
 
 ## TODO
 
+- FINISH UPDATING TESTS THEN RUN ALL TESTS
+
 - possibly convert all return statements into raising exceptions? figure out how to integrate easiest with test scripts and for app flow
 - check that config settings are loading proper variables: aka, why do i have to keep setting the variables directly to CONFIG in test scripts?
 - figure out where to put atexit --> Webdriver.exit
 - fix output location of geckodriver logs
 
-- FINISH UPDATING TESTS THEN RUN ALL TESTS
 
 (update)
 - update / check how exiration, poll, schedule interact with post&message
