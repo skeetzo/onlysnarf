@@ -74,7 +74,7 @@ class User:
     @staticmethod
     def create_user(user_data):
         schema = UserSchema(unknown=EXCLUDE)
-        if user_data["username"] == "random":
+        if user_data["username"].lower().strip() == "random":
             user_data["username"] = User.get_random_user().username
         return schema.load(user_data)
 

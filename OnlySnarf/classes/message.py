@@ -44,7 +44,7 @@ class Message():
         # TODO: possibly update these formatting / validation steps?
         new_recipients = []
         for recipient in message_data["recipients"]:
-            if recipient.strip() == "random":
+            if recipient.lower().strip() == "random":
                 new_recipients.append(User.get_random_user().username)
             else:
                 new_recipients.append(recipient)

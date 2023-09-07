@@ -796,10 +796,12 @@
 - polished uploading bugs
 - finished snarf tests
 **9/6/2023**
-- fixed user search method *crosses fingers* by noticing super dumb easy method -_-
+- fixed user search method *crosses fingers* by noticing super dumb easy method -_- 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- finish fixing search bugs in webdriver/user
 
 - possibly convert all return statements into raising exceptions? figure out how to integrate easiest with test scripts and for app flow
 

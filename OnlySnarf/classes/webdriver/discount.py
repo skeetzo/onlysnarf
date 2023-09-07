@@ -35,7 +35,7 @@ def discount_user(browser, discount_object):
         return False
     logging.info(f"Discounting {discount_object['username']} {discount_object['amount']}% for {discount_object['months']} month(s)")
     try:
-        user = get_user_by_username(browser, discount_object['username'], reattempt=True)
+        user = get_user_by_username(browser, discount_object['username'])
         if not user: raise Exception("unable to discount missing user!")
         click_user_button(browser, user, text="Discount")
         # discount method is repeated until values are correct because somehow it occasionally messes up...
