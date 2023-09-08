@@ -5,7 +5,7 @@ import unittest
 from OnlySnarf.util.config import set_config
 CONFIG = set_config({})
 
-from OnlySnarf.classes.driver import create_browser
+from OnlySnarf.lib.driver import create_browser
 
 class TestSeleniumBrave(unittest.TestCase):
 
@@ -18,8 +18,15 @@ class TestSeleniumBrave(unittest.TestCase):
     def tearDown(self):
         self.browser.quit()
 
-    def test_brave(self):
+    def test_chrome(self):
         assert self.browser, "unable to launch chrome"
+
+    def test_chrome_reconnect(self):
+        CONFIG["keep"] = True
+        self.browser = create_browser(CONFIG["browser"])
+        self.browser.quit()
+        self.browser = create_browser(CONFIG["browser"])        
+        assert self.browser, "unable to reconnect to chrome"
 
 ############################################################################################
 

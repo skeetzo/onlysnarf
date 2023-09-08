@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 
 from .element import find_element_to_click
 from .errors import error_checker
-from ..schedule import Schedule
+from ...classes.schedule import Schedule
 from .. import CONFIG, debug_delay_check
 
 ####################

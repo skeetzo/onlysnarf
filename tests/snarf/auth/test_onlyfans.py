@@ -5,8 +5,8 @@ import unittest
 from OnlySnarf.util.config import set_config
 CONFIG = set_config({})
 
-from OnlySnarf.classes.driver import create_browser
-from OnlySnarf.classes.webdriver.login import login as WEBDRIVER_login
+from OnlySnarf.lib.driver import create_browser
+from OnlySnarf.lib.webdriver.login import login as WEBDRIVER_login
 
 class TestAuth(unittest.TestCase):
 

@@ -22,7 +22,6 @@ class TestSnarf(unittest.TestCase):
             "date" : DEFAULT.DATE,
             "time" : DEFAULT.TIME
         }
-        self.post = Post.create_post({**CONFIG})
 
     def tearDown(self):
         pass
@@ -35,6 +34,7 @@ class TestSnarf(unittest.TestCase):
         self.post = Post.create_post({**CONFIG})
         assert self.post.send(), "unable to post schedule"
 
+    # TODO: are these even necessary?
     @unittest.skip("todo")
     def test_schedule_calendar_day(self):
         pass
@@ -46,6 +46,7 @@ class TestSnarf(unittest.TestCase):
     @unittest.skip("todo")
     def test_schedule_calendar_minute(self):
         pass
+
     @unittest.skip("todo")
     def test_schedule_calendar_suffix(self):
         pass

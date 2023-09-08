@@ -425,7 +425,7 @@ def message_user_by_username(browser, username):
         logging.error("missing username to message!")
         return False
     try:
-        user = get_user_by_username(browser, username, collection="Active")
+        user = get_user_by_username(browser, username, collection="Active", reattempt=True) # a True value for reattempt has the function skip "All" as a search option
         if not user: 
             if message_user_by_user_page(browser, username): return True
             raise Exception("unable to message missing user!")

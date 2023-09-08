@@ -18,13 +18,12 @@ class TestSnarf(unittest.TestCase):
         CONFIG["expiration"] = DEFAULT.DURATION_ALLOWED[0]
         CONFIG["questions"] = ["suck","my","dick","please?"]
         CONFIG["text"] = "test balls"
-        self.post = Post.create_post({**CONFIG})
 
     def tearDown(self):
         pass
 
     def test_poll(self):
-        assert self.post.send(), "unable to post poll"
+        assert Post.create_post({**CONFIG}).send(), "unable to post poll"
 
 ############################################################################################
 

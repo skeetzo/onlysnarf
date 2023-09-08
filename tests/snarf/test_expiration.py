@@ -20,12 +20,12 @@ class TestSnarf(unittest.TestCase):
         }
         CONFIG["expiration"] = DEFAULT.EXPIRATION_MAX
         CONFIG["text"] = "test balls"
-        self.post = Post.create_post({**CONFIG, 'keywords':[]})
 
     def tearDown(self):
         pass
 
     def test_poll(self):
+        self.post = Post.create_post({**CONFIG, 'keywords':[]})
         assert self.post.send(), "unable to post with expiration"
 
 ############################################################################################

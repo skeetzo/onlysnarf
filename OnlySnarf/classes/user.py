@@ -5,9 +5,9 @@ import logging
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError, post_load, EXCLUDE
 
+from ..lib.driver import get_recent_chat_users, get_userid_by_username as WEBDRIVER_get_userid_by_username, message as WEBDRIVER_message, get_users as WEBDRIVER_get_users
 from ..util.colorize import colorize
 from ..util.data import add_to_randomized_users, get_already_randomized_users, read_users_local, write_users_local
-from .driver import get_recent_chat_users, get_userid_by_username as WEBDRIVER_get_userid_by_username, message as WEBDRIVER_message, get_users as WEBDRIVER_get_users
  # read_user_messages as WEBDRIVER_read_user_messages
 from ..util.config import CONFIG
 

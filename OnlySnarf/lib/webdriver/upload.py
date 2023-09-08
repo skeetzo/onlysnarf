@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 
 from .element import find_element_to_click
 from .errors import error_checker
-from ..file import File
+from ...classes.file import File
 from .. import debug_delay_check
 from .. import CONFIG
 

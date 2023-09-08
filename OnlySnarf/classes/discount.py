@@ -1,7 +1,7 @@
 import logging
 
 from .user import User
-from .driver import discount_user as WEBDRIVER_discount_user
+from ..lib.driver import discount_user as WEBDRIVER_discount_user
 from ..util.defaults import DISCOUNT_MAX_AMOUNT, DISCOUNT_MIN_AMOUNT, DISCOUNT_MAX_MONTHS, DISCOUNT_MIN_MONTHS
 
 from marshmallow import Schema, fields, validate, post_load, EXCLUDE

@@ -781,39 +781,44 @@
   - updates to discount & test_discount
   - updates to saving user data
   - added tests/test_data
-**4.6.9 : 9/3/2023**
-- finished test_discount process
-- beginning & finished test_expiration
-- updates to clearing post / message text
-- finished test_schedule, test_users, test_poll, test_post
-- finished ensuring Message & Post marshmallow schemas properly instantiate w/ Poll & Schedule 
-**9/4/2023**
-- finished* fixing clear_text
-- mostly finished test_messages; fixed uploading
-**4.6.10 : 9/5/2022**
-- finished test_message
-- fixed messages w/ uploads not clearing text and uploads after debugging test
-- polished uploading bugs
-- finished snarf tests
-**9/6/2023**
-- fixed user search method *crosses fingers* by noticing super dumb easy method
-- figured out user search bug that returns node not connected to dom
+  **4.6.9 : 9/3/2023**
+  - finished test_discount process
+  - beginning & finished test_expiration
+  - updates to clearing post / message text
+  - finished test_schedule, test_users, test_poll, test_post
+  - finished ensuring Message & Post marshmallow schemas properly instantiate w/ Poll & Schedule 
+  **9/4/2023**
+  - finished* fixing clear_text
+  - mostly finished test_messages; fixed uploading
+  **4.6.10 : 9/5/2022**
+  - finished test_message
+  - fixed messages w/ uploads not clearing text and uploads after debugging test
+  - polished uploading bugs
+  - finished snarf tests
+  **9/6/2023**
+  - fixed user search method *crosses fingers* by noticing super dumb easy method
+  - figured out user search bug that returns node not connected to dom
 **4.6.11 : 9/7/2023**
 - finished fixing search bugs in webdriver/user
 - more updates to user search process: ?search={username}
 - updated browser tests
+- all tests working successfully
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- FINISH UPDATING TESTS THEN RUN ALL TESTS
+NOTE: geckodriver must be installed locally and not in the user's selenium cache for cookies to work
+
+
+- fix output location of geckodriver logs
+
 
 - possibly convert all return statements into raising exceptions? figure out how to integrate easiest with test scripts and for app flow
 - check that config settings are loading proper variables: aka, why do i have to keep setting the variables directly to CONFIG in test scripts?
 - figure out where to put atexit --> Webdriver.exit
-- fix output location of geckodriver logs
 
+- LIVE TESTING
 
 (update)
 - update / check how exiration, poll, schedule interact with post&message

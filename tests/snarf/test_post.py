@@ -19,13 +19,12 @@ class TestSnarf(unittest.TestCase):
         CONFIG["keywords"] = ["test","ticles"]
         CONFIG["performers"] = ["yourmom","yourdad"]
         CONFIG["schedule"] = {}
-        self.post = Post.create_post({**CONFIG})
 
     def tearDown(self):
         pass
 
     def test_post(self):
-        assert self.post.send(), "unable to post"
+        assert Post.create_post({**CONFIG}).send(), "unable to post"
 
     # @unittest.skip("todo")
     # def test_post_files(self):

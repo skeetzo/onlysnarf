@@ -9,12 +9,11 @@ from .file import File, Folder
 from .poll import Poll
 from .schedule import Schedule
 from .user import User
-from .driver import message as WEBDRIVER_message, post as WEBDRIVER_post
+from ..lib.driver import message as WEBDRIVER_message, post as WEBDRIVER_post
 from ..util.defaults import PRICE_MAXIMUM, PRICE_MINIMUM, SCHEDULE
 from ..util.config import CONFIG
 
 from marshmallow import Schema, fields, validate, post_load, EXCLUDE
-
 
 class Message():
     """OnlyFans message (and post) class"""

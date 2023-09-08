@@ -93,35 +93,45 @@ HOME_DIR = "/home"
 if os.name == 'nt':
     HOME_DIR = "C:\\Users"
 ROOT_PATH = os.path.join(HOME_DIR, USER, ".onlysnarf")
+
+LOG_PATH = os.path.join(ROOT_PATH, "log")
     
 DOWNLOAD_PATH = os.path.join(ROOT_PATH, "downloads")
 UPLOAD_PATH = os.path.join(ROOT_PATH, "uploads")
-LOG_PATH = os.path.join(ROOT_PATH, "snarf.log")
-REMOTE_PATH = ROOT_PATH
+
 CONFIGS_PATH = os.path.join(ROOT_PATH, "conf")
+CONFIG_PATH = os.path.join(CONFIGS_PATH, "config.conf")
 USERS_PATH = os.path.join(CONFIGS_PATH, "users.json")
 PROFILE_PATH = os.path.join(CONFIGS_PATH, "profile.json")
-CONFIG_PATH = os.path.join(CONFIGS_PATH, "config.conf")
-if os.environ.get('ENV') == "test":
-    # CONFIG_PATH = os.path.join(CONFIGS_PATH, "test-config.conf")
-    CONFIG_PATH = os.path.join(os.getcwd(), "OnlySnarf", "conf", "test-config.conf")
-PROFILES_PATH = os.path.join(CONFIGS_PATH, "users")
+USERS_PATH = os.path.join(CONFIGS_PATH, "users")
 
-if os.environ.get('ENV') == "test":
-    print("Paths:")
-    print("root: "+ROOT_PATH)
-    print("configs: "+CONFIGS_PATH)
-    print("config: "+CONFIG_PATH)
-    print("download: "+DOWNLOAD_PATH)
-    print("log: "+LOG_PATH)
-    print("profiles: "+PROFILES_PATH)
-    print("profile: "+PROFILE_PATH)
-    print("remote: "+REMOTE_PATH)
-    print("upload: "+UPLOAD_PATH)
-    print("users: "+USERS_PATH)
+if str(os.environ.get('ENV')).lower() == "test":
+    CONFIG_PATH = os.path.join(os.getcwd(), "OnlySnarf", "conf", "test-config.conf")
+    # LOG_PATH = os.path.join(os.getcwd(), "log")
+
+LOG_PATH_SNARF = os.path.join(LOG_PATH, "snarf.log")
+LOG_PATH_CHROMEDRIVER = os.path.join(LOG_PATH, "chromedriver.log")
+LOG_PATH_GECKODRIVER = os.path.join(LOG_PATH, "geckodriver.log")
 
 Path(ROOT_PATH).mkdir(parents=True, exist_ok=True)
 Path(DOWNLOAD_PATH).mkdir(parents=True, exist_ok=True)
 Path(UPLOAD_PATH).mkdir(parents=True, exist_ok=True)
 Path(CONFIGS_PATH).mkdir(parents=True, exist_ok=True)
-Path(PROFILES_PATH).mkdir(parents=True, exist_ok=True)
+Path(USERS_PATH).mkdir(parents=True, exist_ok=True)
+
+if os.environ.get('ENV') == "test":
+    print("##############")
+    print("## DEFAULTS ##")
+    print("##############")
+    print("Paths:")
+    print("root: "+ROOT_PATH)
+    print("configs: "+CONFIGS_PATH)
+    print("config: "+CONFIG_PATH)
+    print("users: "+USERS_PATH)
+    print("profiles: "+USERS_PATH)
+    print("profile: "+PROFILE_PATH)
+    print("download: "+DOWNLOAD_PATH)
+    print("upload: "+UPLOAD_PATH)
+    print("log: "+LOG_PATH)
+
+    # TODO: maybe print out more default settings?

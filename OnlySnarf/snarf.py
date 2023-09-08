@@ -137,13 +137,13 @@ def users(config={'prefer_local':False}):
 
 ################################################################################################################################################
 
-from .classes.driver import Webdriver
+from .lib.driver import close_browser
 
 def exit_handler():
     """Exit cleanly"""
 
     try:
-        Webdriver.exit()
+        close_browser()
     except Exception as e:
         print(e)
 

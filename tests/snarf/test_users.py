@@ -6,7 +6,7 @@ from OnlySnarf.util.config import set_config
 CONFIG = set_config({"debug_selenium":False,"debug_delay":False,"keep":False})
 from OnlySnarf.util.logger import configure_logging
 configure_logging(True, True)
-from OnlySnarf.classes.user import User
+from OnlySnarf.classes.user import User # TODO: i don't think this is in the correct import order with config variable
 
 class TestUsers(unittest.TestCase):
 

@@ -1,3 +1,4 @@
+import os
 import re
 import time
 import logging
@@ -80,7 +81,7 @@ def get_userid_by_username(browser, username):
         logging.error(f"failed to find user id for username: {username}")
     return user_id
 
-def get_user_element_at_page(browser, username, page, collection="All"):
+def get_user_element_at_page(browser, username, page):
     if page == ONLYFANS_FOLLOWING_URL:
         class_name = "subscriptions"
     elif page == ONLYFANS_FANS_URL:
@@ -168,7 +169,7 @@ def get_user_by_username(browser, username, reattempt=False, collection="All"):
     logging.debug(f"searching for user by username: {username}")
     if not username: return None
     try:
-        search_for_username(browser, username)
+        search_for_username(browser, username, collection=collection)
         user = get_user_element_at_page(browser, username, ONLYFANS_FANS_URL)
         if user: return user
     except Exception as e:
@@ -176,19 +177,14 @@ def get_user_by_username(browser, username, reattempt=False, collection="All"):
     if not reattempt: return get_user_by_username(browser, username, reattempt=True)
     raise Exception("unable to get user by username!")
 
-
-
-def search_for_username(browser, username):
+def search_for_username(browser, username, collection="All"):
     try:
         logging.debug(f"searching for username by opening url...")
-        import os
-        go_to_page(browser, os.path.join(ONLYFANS_FANS_URL, f"?search={username}"))
-        # time.sleep(5)
+        go_to_page(browser, os.path.join(ONLYFANS_FANS_URL, "" if collection == "All" else collection.lower(), f"?search={username}"))
         return True
     except Exception as e:
         error_checker(e)
     raise Exception("unable to search for username")
-
 
 def get_user_from_elements(browser, username, reattempt=False):
     try:

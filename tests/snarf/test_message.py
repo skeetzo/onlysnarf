@@ -16,41 +16,36 @@ class TestSnarf(unittest.TestCase):
         CONFIG["schedule"] = {}
         CONFIG["text"] = "test balls"
         CONFIG["recipients"] = ["random"]
-        self.message = Message.create_message({**CONFIG})
+        CONFIG["input"] = []
 
     def tearDown(self):
         pass
 
     def test_message(self):
-        assert self.message.send(), "unable to send basic message"
+        assert Message.create_message({**CONFIG}).send(), "unable to send basic message"
 
     def test_message_files_local(self):
         CONFIG["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]
-        self.message = Message.create_message({**CONFIG})
-        assert self.message.send(), "unable to upload message files - local"
+        assert Message.create_message({**CONFIG}).send(), "unable to upload message files - local"
 
     def test_message_files_remote(self):
         CONFIG["input"] = ["https://github.com/skeetzo/onlysnarf/blob/master/public/images/shnarf.jpg?raw=true", "https://github.com/skeetzo/onlysnarf/blob/master/public/images/snarf.jpg?raw=true"]
-        self.message = Message.create_message({**CONFIG})
-        assert self.message.send(), "unable to upload message files - remote"
+        assert Message.create_message({**CONFIG}).send(), "unable to upload message files - remote"
 
     def test_message_price(self):
         CONFIG["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"]
         CONFIG["price"] = DEFAULT.PRICE_MINIMUM
-        self.message = Message.create_message({**CONFIG})
-        assert self.message.send(), "unable to set message price"
+        assert Message.create_message({**CONFIG}).send(), "unable to set message price"
 
     def test_message_failure(self):
         CONFIG["recipients"] = ["onlyfans"]
-        self.message = Message.create_message({**CONFIG})
-        assert not self.message.send(), "unable to fail message properly"
+        assert not Message.create_message({**CONFIG}).send(), "unable to fail message properly"
 
     def test_message_inactive_user(self):
         import string
         import random
         CONFIG["recipients"] = [''.join(random.choices(string.ascii_uppercase + string.digits, k=8))]
-        self.message = Message.create_message({**CONFIG})
-        assert not self.message.send(), "unable to properly fail messaging an inactive user"
+        assert not Message.create_message({**CONFIG}).send(), "unable to properly fail messaging an inactive user"
 
 ############################################################################################
 
