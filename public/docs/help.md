@@ -59,7 +59,7 @@ options:
 
 # Message
 
-`snarf message [-h] [-date DATE] [-performers PERFORMERS] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-tags TAGS] [-text TEXT] [-user USER | -users USERS] ... `  
+`snarf message [-h] [-date DATE] [-performers PERFORMERS] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-text TEXT] [-user USER | -users USERS] ... `  
 
 positional arguments:  
 > input                 one or more paths to files (or folder) to include in the message  
@@ -71,14 +71,13 @@ options:
 > -price PRICE          price to charge ($)  
 > -schedule SCHEDULE    schedule (MM-DD-YYYY:HH:MM:SS)  
 > -time TIME            time (HH:MM)  
-> -tags TAGS            the tags (@[tag])  
 > -text TEXT            text to send  
 > -user USER            user to message  
 > -users USERS          users to message  
 
 # Post
 
-`snarf post [-h] [-date DATE] [-duration {1,3,7,30,99} | -expiration EXPIRATION] [-performers PERFORMERS] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-tags TAGS] [-text TEXT] [-question QUESTIONS] ... `  
+`snarf post [-h] [-date DATE] [-duration {1,3,7,30,99} | -expiration EXPIRATION] [-performers PERFORMERS] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-text TEXT] [-question QUESTIONS] ... `  
 
 positional arguments:  
 > input                 one or more paths to files (or folders) to include in the post  
@@ -92,7 +91,6 @@ options:
 > -price PRICE          price to charge ($)  
 > -schedule SCHEDULE    schedule (MM-DD-YYYY:HH:MM:SS)  
 > -time TIME            time (HH:MM)  
-> -tags TAGS            tags (@[tag])  
 > -text TEXT            text to send  
 > -question QUESTIONS, -Q QUESTIONS   questions to ask  
 

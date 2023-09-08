@@ -2,27 +2,26 @@ import logging
 import os
 # import shutil
 import platform
-## selenium
+
+from .. import CONFIG, DEFAULT
+from .util import configure_logging, read_session_data, write_session_data
+
+##############
+## Selenium ##
+##############
+
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.remote.file_detector import LocalFileDetector
 
+###########################
+# Chrome, Brave, Chromium #
+###########################
 
-from selenium import webdriver
-
-## webdriver_manager
-# brave
-
-# chrome
 from selenium.webdriver import Chrome as ChromeWebDriver
-
-
-
-
-# chromium
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service as ChromeService
-# from webdriver_manager.core.utils import ChromeType
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
 
 ########################
 # Firefox: Geckodriver #
@@ -31,18 +30,22 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxWebDriver
 
-# ie
+######
+# IE #
+######
 from selenium.webdriver.ie.service import Service as IEService
 from webdriver_manager.microsoft import IEDriverManager
-# edge
+
+########
+# Edge #
+########
 from selenium.webdriver.edge.service import Service as EdgeService
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
-# from msedge.selenium_tools import Edge, EdgeOptions
-# opera
-from webdriver_manager.opera import OperaDriverManager
 
-from .. import CONFIG, DEFAULT
-from .util import configure_logging, read_session_data, write_session_data
+#########
+# Opera #
+#########
+from webdriver_manager.opera import OperaDriverManager
 
 def create_browser(browserType):
     """
@@ -69,8 +72,11 @@ def create_browser(browserType):
 
     configure_logging()
 
-    if "auto" in browserType:
-        browser = attempt_reconnect()
+    if "reconnect" in browserType:
+        browser = attempt_reconnect(browserType.replace("reconnect:",""))
+
+    elif "auto" in browserType:
+        browser = attempt_reconnect(browserType)
         if not browser: browser = attempt_brave()
         if not browser: browser = attempt_chrome()
         if not browser: browser = attempt_chromium()
@@ -107,7 +113,7 @@ def create_browser(browserType):
         logging.debug("headless browser spawned successfully!")
     else:
         logging.debug("browser spawned successfully!")
-    write_session_data(browser.session_id, browser.command_executor._url)
+    write_session_data(browserType, browser.session_id, browser.command_executor._url)
     return browser
 
 ################################################################################################
@@ -156,19 +162,16 @@ def add_options(options):
     # options.add_argument("--remote-debugging-port=9223") # required
 
 def browser_error(err, browserName):
-    logging.warning("unable to launch {}!".format(browserName))
+    print(err)
     logging.debug(err)
+    logging.warning("unable to launch {}!".format(browserName))
 
+# TODO: debug
 def attempt_brave():
     browserAttempt = None
     try:
         logging.debug("attempting Brave web browser...")
-
-    #     service = ChromeService()
-    # driver = webdriver.Chrome(service=service)
-
-
-        # browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()), options=chrome_options())
+        browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=ChromeDriverManager(chrome_type=ChromeType.BRAVE).install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_BRAVE, service_args=configure_service_args()), options=configure_brave_options())
         logging.info("browser created - Brave")
     except Exception as e:
         browser_error(e, "brave")
@@ -178,50 +181,34 @@ def attempt_chrome():
     browserAttempt = None
     try:
         logging.debug("attempting Chrome web browser...")
+
+        # TODO: is this still necessary?
         # raspberrypi arm processors don't work with webdriver manager
         # linux = x86_64
         # rpi = aarch64
+        logging.debug("checking processor for use with RPi4s...")
         processor = platform.processor()
         logging.debug("cpu processor: {}".format(processor))
 
-        options = chrome_options()
-
-        print(ChromeDriverManager().install())
-        # print(ChromeDriverManager().install())
-        # print(ChromeDriverManager().install())
-
 
         if str(processor) == "aarch64":
+            logging.debug("cpu process: RPi4")
             # TODO: add file check for chromedriver w/ reminder warning for rpi install requirement
-            browserAttempt = ChromeWebDriver(service=ChromeService('/usr/bin/chromedriver'), options=options)
+            browserAttempt = ChromeWebDriver(service=ChromeService('/usr/bin/chromedriver', log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
         else:
-            browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=str(ChromeDriverManager().install())), options=options)
-            # browserAttempt = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options())
+            logging.debug("cpu process: standard")
+            browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=ChromeDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
         logging.info("browser created - Chrome")        
-
-
-
-            # service = webdriver.chrome.service.Service(log_path=log_path)
-
-
-            #     service = webdriver.chrome.service.Service(service_args=['--log-level=DEBUG'], log_path=log_path)
-            #         service = webdriver.chrome.service.Service(service_args=['--append-log', '--readable-timestamp'], log_path=log_path)
-
-                        
-            #             # Chromedriver and Chrome browser versions should match, and if they don’t the driver will error. If you disable the build check, you can force the driver to be used with any version of Chrome. Note that this is an unsupported feature, and bugs will not be investigated.
-            #             service = webdriver.chrome.service.Service(service_args=['--disable-build-check'], log_path=log_path)
-
-
     except Exception as e:
-        print(e)
         browser_error(e, "chrome")
     return browserAttempt
 
+# TODO: debug
 def attempt_chromium():
     browserAttempt = None
     try:
         logging.debug("attempting Chromium web browser...")
-        # browserAttempt = webdriver.Chrome(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install(), options=chrome_options())
+        browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_CHROMIUM, service_args=configure_service_args()), options=configure_chromium_options())
         logging.info("browser created - Chromium")        
     except Exception as e:
         browser_error(e, "chromium")
@@ -232,8 +219,7 @@ def attempt_edge():
     browserAttempt = None
     try:
         logging.debug("attempting Edge web browser...")
-        # browserAttempt = Edge(executable_path=options.binary_location, options=edge_options())
-        browserAttempt = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
+        browserAttempt = webdriver.Edge(service=EdgeService(executable_path=EdgeChromiumDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_EDGE, service_args=configure_service_args()), options=configure_edge_options())
         logging.info("browser created - Edge")
     except Exception as e:
         browser_error(e, "edge")
@@ -244,15 +230,10 @@ def attempt_firefox():
     # firefox needs non root
     if os.geteuid() == 0:
         logging.info("You must run `onlysnarf` as non-root for Firefox to work correctly!")
-        return False
+        return None
     try:
         logging.debug("attempting Firefox web browser...")
-
-
-        
-
-        browserAttempt = FirefoxWebDriver(service=FirefoxService(log_path=DEFAULT.LOG_PATH_GECKODRIVER), options=firefox_options())
-
+        browserAttempt = FirefoxWebDriver(service=FirefoxService(log_path=DEFAULT.LOG_PATH_GECKODRIVER), options=configure_firefox_options())
         logging.info("browser created - Firefox")
     except Exception as e:
         browser_error(e, "firefox")
@@ -266,7 +247,7 @@ def attempt_ie():
         # driver_path = IEDriverManager().install()
         # os.chmod(driver_path, 0o755)
         # browserAttempt = webdriver.Ie(executable_path=IEService(driver_path))
-        browserAttempt = webdriver.Ie(service=IEService(IEDriverManager().install()))
+        browserAttempt = webdriver.Ie(service=IEService(executable_path=IEDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_IE, service_args=configure_service_args()), options=configure_ie_options())
         logging.info("browser created - IE")
     except Exception as e:
         browser_error(e, "ie")
@@ -277,23 +258,33 @@ def attempt_opera():
     browserAttempt = None
     try:
         logging.debug("attempting Opera web browser...")
-        browserAttempt = webdriver.Opera(executable_path=OperaDriverManager().install())
+
+        from selenium.webdriver.chrome import service
+        webdriver_service = service.Service(executable_path=OperaDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_OPERA, service_args=configure_service_args())
+        webdriver_service.start()
+
+        options = webdriver.ChromeOptions()
+        options.add_experimental_option('w3c', True)
+
+        browserAttempt = webdriver.Remote(webdriver_service.service_url, options=options)
+
+        # browserAttempt = webdriver.Opera(executable_path=OperaDriverManager().install())
         logging.info("browser created - Opera")
     except Exception as e:
         browser_error(e, "opera")
     return browserAttempt
 
-def attempt_reconnect():
-    session_id, session_url = read_session_data()
+def attempt_reconnect(browserType):
+    session_id, session_url = read_session_data(browserType)
     if not session_id and not session_url:
-        logging.warning("unable to read session data!")
+        logging.debug("unable to read session data!")
         return None
     logging.debug("reconnecting to web browser...")
     logging.debug("reconnect id: {}".format(session_id))
     logging.debug("reconnect url: {}".format(session_url))
     try:
-        options = webdriver.ChromeOptions()
-        add_options(options)
+        options = configure_options(browserType)
+        # TODO: finish debugging / wait for better documentation on 4.0 @ https://www.selenium.dev/documentation/webdriver/drivers/remote_webdriver/
         browserAttempt = webdriver.Remote(command_executor=session_url, options=options)
         browserAttempt.close()   # this closes the session's window - it is currently the only one, thus the session itself will be auto-killed, yet:
         # take the session that's already running
@@ -302,62 +293,76 @@ def attempt_reconnect():
         logging.info("browser reconnected!")
         return browserAttempt
     except Exception as e:
-        logging.warning("unable to reconnect!")
-        logging.debug(e)
+        browser_error(e, f"reconnect:{browserType}")
+        print(e)
     return None
 
-# TODO: update and debug
-def attempt_remote():
-    link = 'http://{}:{}/wd/hub'.format(CONFIG["remote_browser_host"], CONFIG["remote_browser_port"])
-    logging.debug("remote url: {}".format(link))
-    def attempt(dc, opts):
-        try:
-            if not CONFIG["show"]:
-                opts.add_argument('--headless')
-            logging.debug("attempting remote: {}".format(browserType))
-            browserAttempt = webdriver.Remote(command_executor=link, desired_capabilities=dc, options=opts)
-            logging.info("remote browser created - {}".format(browserType))
-            return browserAttempt
-        except Exception as e:
-            logging.warning("unable to connect remotely!")
-            logging.debug(e)
-        return None
-
-    if "brave" in browserType: return attempt(*brave_options())
-    elif "chrome" in browserType: return attempt(*chrome_options())
-    elif "chromium" in browserType: return attempt(*chromium_options())
-    elif "edge" in browserType: return attempt(*edge_options())
-    elif "firefox" in browserType: return attempt(*firefox_options())
-    elif "ie" in browserType: return attempt(*ie_options())
-    elif "opera" in browserType: return attempt(*opera_options())
-    logging.warning("unable to connect remotely via {}!".format(browserType))
+# TODO: debug
+def attempt_remote(browserType, host, port):
+    link = f"http://{host}:{port}/wd/hub"
+    logging.debug(f"remote webserver: {link}")
+    try:        
+        options = configure_options(browserType)
+        logging.debug(f"attempting remote browser: {browserType}")
+        browserAttempt = webdriver.Remote(command_executor=link, options=options)
+        logging.info(f"remote browser created - {browserType}")
+        return browserAttempt
+    except Exception as e:
+        browser_error(e, f"reconnect:{browserType}")
     return None
 
 ################################################################################################
 ################################################################################################
 ################################################################################################
 
-def brave_options():
+def configure_service_args():
+    # Chromedriver and Chrome browser versions should match, and if they don’t the driver will error. If you disable the build check, you can force the driver to be used with any version of Chrome. Note that this is an unsupported feature, and bugs will not be investigated.
+    # service = webdriver.chrome.service.Service(service_args=['--disable-build-check'], log_path=log_path)
+    return [
+        '--log-level=DEBUG',
+        '--append-log', '--readable-timestamp',
+    ]
+
+# from below
+def configure_options(browserType):
+    if browserType == "brave":
+        return configure_brave_options()
+    elif browserType == "chrome":
+        return configure_chrome_options()
+    elif browserType == "chromium":
+        return configure_chromium_options()
+    elif browserType == "edge":
+        return configure_edge_options()
+    elif browserType == "firefox":
+        return configure_firefox_options()
+    elif browserType == "ie":
+        return configure_ie_options()
+    elif browserType == "opera":
+        return configure_opera_options()
+
+################################################################################################
+################################################################################################
+################################################################################################
+
+def configure_brave_options():
     options = webdriver.BraveOptions()
     add_options(options)
     options.add_argument("--remote-debugging-port=9223") # required
     return options
 
-def chrome_options():
+def configure_chrome_options():
     options = webdriver.ChromeOptions()
     add_options(options)
     options.add_argument("--remote-debugging-port=9223") # required
     return options
 
-def chromium_options():
-    dC = DesiredCapabilities.CHROMIUM
+def configure_chromium_options():
     options = webdriver.ChromeOptions()
     add_options(options)
     options.add_argument("--remote-debugging-port=9223") # required
     return options
 
-def edge_options():
-    dC = DesiredCapabilities.EDGE
+def configure_edge_options():
     # options = EdgeOptions()
     options = webdriver.EdgeOptions()
     options.use_chromium = True
@@ -373,7 +378,7 @@ def edge_options():
     # shutil.chown(options.binary_location, user=os.getenv('USER'), group=None)
     return options
 
-def firefox_options():
+def configure_firefox_options():
     options = FirefoxOptions()
     add_options(options)
     # BUG: required for cookies when using firefox
@@ -382,13 +387,13 @@ def firefox_options():
     options.add_argument("--enable-file-cookies") # probably not needed
     return options
 
-def ie_options():
+def configure_ie_options():
     options = webdriver.ChromeOptions()
     add_options(options)
     options.add_argument("--remote-debugging-port=9223") # required
     return options
 
-def opera_options():
+def configure_opera_options():
     options = webdriver.OperaOptions()
     add_options(options)
     options.add_argument("--remote-debugging-port=9223") # required

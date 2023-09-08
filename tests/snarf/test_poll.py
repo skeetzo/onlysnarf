@@ -9,21 +9,22 @@ from OnlySnarf.util.logger import configure_logging
 configure_logging(True, True)
 
 from OnlySnarf.util import defaults as DEFAULT
-from OnlySnarf.classes.message import Post
+from OnlySnarf.lib.driver import poll
 
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
-        CONFIG["schedule"] = {}
-        CONFIG["expiration"] = DEFAULT.DURATION_ALLOWED[0]
-        CONFIG["questions"] = ["suck","my","dick","please?"]
-        CONFIG["text"] = "test balls"
+        pass
 
     def tearDown(self):
         pass
 
     def test_poll(self):
-        assert Post.create_post({**CONFIG}).send(), "unable to post poll"
+        poll_object = {
+            "duration": DEFAULT.DURATION_ALLOWED[0],
+            "questions": ["suck","my","dick","please?"]
+        }
+        assert poll(poll_object), "unable to post poll"
 
 ############################################################################################
 

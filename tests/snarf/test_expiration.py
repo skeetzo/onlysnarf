@@ -8,25 +8,27 @@ from OnlySnarf.util.logger import configure_logging
 configure_logging(True, True)
 
 from OnlySnarf.util import defaults as DEFAULT
-from OnlySnarf.classes.message import Post
+from OnlySnarf.lib.driver import expiration
 
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
-        CONFIG["poll"] = {}
-        CONFIG["schedule"] = {
-            "date" : DEFAULT.DATE,
-            "time" : DEFAULT.TIME
-        }
-        CONFIG["expiration"] = DEFAULT.EXPIRATION_MAX
-        CONFIG["text"] = "test balls"
+        pass
 
     def tearDown(self):
         pass
 
-    def test_poll(self):
-        self.post = Post.create_post({**CONFIG, 'keywords':[]})
-        assert self.post.send(), "unable to post with expiration"
+    def test_expiration(self):
+        assert expiration(DEFAULT.EXPIRATION_MAX / 2), "unable to post with expiration"
+
+    def test_expiration_min(self):
+        assert expiration(DEFAULT.EXPIRATION_MIN), "unable to post with expiration: min"
+
+    def test_expiration_max(self):
+        assert expiration(DEFAULT.EXPIRATION_MAX), "unable to post with expiration: max"
+
+    def test_expiration_none(self):
+        assert expiration(DEFAULT.EXPIRATION_NONE), "unable to skip missing expiration"
 
 ############################################################################################
 

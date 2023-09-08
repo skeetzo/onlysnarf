@@ -33,7 +33,7 @@ input: "/path/to/fileoOrFolder"
 
 (when input is specified)  
 price ($): "0.00" | "min" | "max"  
-tags: key, words -> #key #words  
+keywords: key, words -> #key #words  
 performers: performerName1, performerName2 -> @performerName1 @performerName2  
 
 Schedule: ("date" & "time" or only "schedule")  
@@ -50,7 +50,7 @@ text: ""
 
 (optional)  
 input: "/path/to/fileoOrFolder"  
-tags: key, words -> #key #words  
+keywords: key, words -> #key #words  
 performers: performerName1, performerName2 -> @performerName1 @performerName2  
 
 **Schedule**: (when specificying "date" & "time" or only "schedule")  
@@ -125,8 +125,8 @@ The price to specify for file uploads.
 -schedule "mm/dd/YYYY:HH:MM"  
 Schedule message for upload via $date and $time.  
 
--tags "tag1" -tags "tag2" ...  
-Tags to become #tags when creating text.  
+-keywords "key1" -keywords "key2" ...  
+Keywords to become # tagged when creating text.  
 
 -text ""  
 Text to be entered.  
@@ -156,8 +156,8 @@ Performer usernames to reference. Adds to text with "@" symbols.
 -schedule "mm/dd/YYYY:HH:MM"  
 Schedule post for upload via $date and $time.  
 
--tags "tag1" -tags "tag2" ...  
-Tags to become #tags when creating text.  
+-keywords "key1" -keywords "key2" ...  
+Keywords to become # tagged when creating text.  
 
 -text ""  
 Text to be entered.  

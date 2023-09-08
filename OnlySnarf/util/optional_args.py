@@ -235,7 +235,7 @@ def apply_subcommand_args(parser):
   ##
   # -expiration
   # date of post or poll expiration
-  durationAndExpiration.add_argument('-expiration', type=valid_expiration, dest='expiration', help='expiration in days (999 for \'No Limit\')', default=DEFAULT.EXPIRATION_NONE)
+  durationAndExpiration.add_argument('-expiration', type=valid_expiration, dest='expiration', help=f"expiration in days with a minimum of {DEFAULT.EXPIRATION_MIN} and a maximum of {DEFAULT.EXPIRATION_MAX}", default=DEFAULT.EXPIRATION_NONE)
   ##
   # -performers
   # list of performers to tag
@@ -252,10 +252,6 @@ def apply_subcommand_args(parser):
   # -time
   # time in HH:MM
   parser_post.add_argument('-time', type=valid_time, default=DEFAULT.TIME, dest='time', help='time (HH:MM)')
-  ##
-  # -tags
-  # @[tag]
-  parser_post.add_argument('-tags', dest='tags', action='append', default=[], help='tags (@[tag])')
   ##
   # -text
   # text for message or upload
@@ -283,7 +279,7 @@ def apply_shim_args(parser):
   parser.add_argument('-price', type=valid_price, help='price to charge ($)', default=0, dest='price')
   parser.add_argument('-schedule', type=valid_schedule, default=DEFAULT.SCHEDULE, dest='schedule', help='schedule (MM-DD-YYYY:HH:MM:SS)')
   parser.add_argument('-time', type=valid_time, default=DEFAULT.TIME, dest='time', help='time (HH:MM)')
-  parser.add_argument('-tags', dest='tags', action='append', default=[], help='the tags (@[tag])')
+  parser.add_argument('-performers', dest='performers', action='append',  default=[], help='performers to reference. adds \"@[...performers]\"')
   parser.add_argument('-text', default=None, dest='text', help='text to send')
   parser.add_argument('-duration', type=valid_duration, dest='duration', help='duration in days (99 for \'No Limit\') for a poll', choices=DEFAULT.DURATION_ALLOWED, default=DEFAULT.DURATION_NONE)
   parser.add_argument('-expiration', type=valid_expiration, dest='expiration', help='expiration in days (999 for \'No Limit\')', default=DEFAULT.EXPIRATION_NONE)

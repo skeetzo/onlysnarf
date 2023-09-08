@@ -803,30 +803,27 @@
 - more updates to user search process: ?search={username}
 - updated browser tests
 - all tests working successfully
+- fixed output location of geckodriver logs by updating to service object
+- figure out where to put atexit --> Webdriver.exit
+- updated remaining webdriver:browser to all service objects
+- new exiration, poll, and schedule interactions pass all tests
+- double check how tags & performers are implemented in config and text config and then updated in docs
+- updated snarf tests for better webdriver simplicity
+- converted all return statements into raising exceptions
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-NOTE: geckodriver must be installed locally and not in the user's selenium cache for cookies to work
-
-
-- fix output location of geckodriver logs
-
-
-- possibly convert all return statements into raising exceptions? figure out how to integrate easiest with test scripts and for app flow
-- check that config settings are loading proper variables: aka, why do i have to keep setting the variables directly to CONFIG in test scripts?
-- figure out where to put atexit --> Webdriver.exit
+- finish updates to test_schedule data
 
 - LIVE TESTING
+- check that config settings are loading proper variables: aka, why do i have to keep setting the variables directly to CONFIG in test scripts?
 
 (update)
-- update / check how exiration, poll, schedule interact with post&message
-- update adding uploads to being able to set previews to messages
 
 (cleanup)
-- double check how tags & performers are implemented in config and text config and then re-add to docs
-- add better version notes to readme's list of "works on"
+- add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64
 
 (finish)
 - finish message ability to add_user_to_message
@@ -839,6 +836,7 @@ NOTE: geckodriver must be installed locally and not in the user's selenium cache
 ------------------------------------------------------------------------------------
 
 -> OnlyFans
+- update adding uploads to being able to set previews to messages
 - add process to clear upload/download space
 - add cli args for config to autoconfigure more easily
 - add smart idea for getting statement information

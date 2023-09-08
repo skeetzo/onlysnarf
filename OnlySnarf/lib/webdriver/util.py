@@ -2,11 +2,13 @@ import os
 import json
 import logging
 # from selenium.webdriver.remote.remote_connection import LOGGER as SeleniumLogger
+# from webdriver_manager.core.logger import set_logger
 
 from .. import CONFIG, DEFAULT
 
 def configure_logging():
 
+    # set_logger(logging.getLogger("root"))
     
     # logging.getLogger("urllib3.connectionpool").setLevel(logging.ERROR)
 
@@ -24,9 +26,9 @@ def configure_logging():
         logging.getLogger("requests").setLevel(logging.ERROR)
         logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.ERROR)
 
-def read_session_data():
+def read_session_data(browserType):
     logging.debug("reading local session...")
-    path = os.path.join(DEFAULT.ROOT_PATH, "session.json")
+    path = os.path.join(DEFAULT.ROOT_PATH, f"session-{browserType}.json")
     logging.debug("local session path: "+str(path))
     try:
         with open(str(path)) as json_file:  
@@ -37,11 +39,11 @@ def read_session_data():
         logging.debug(e)
     return None, None
 
-def write_session_data(session_id, session_url):
+def write_session_data(browserType, session_id, session_url):
     logging.debug("writing local session...")
     logging.debug("saving session id: {}".format(session_id))        
     logging.debug("saving session url: {}".format(session_url))
-    path = os.path.join(DEFAULT.ROOT_PATH, "session.json")
+    path = os.path.join(DEFAULT.ROOT_PATH, f"session-{browserType}.json")
     logging.debug("local session path: "+str(path))
     data = {}
     data['id'] = session_id

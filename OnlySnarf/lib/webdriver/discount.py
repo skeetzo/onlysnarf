@@ -42,51 +42,41 @@ def discount_user(browser, discount_object):
         discount_amount, discount_months = apply_discount_values(browser, discount_object['amount'], discount_object['months'])
         while int(discount_amount) != int(discount_object['amount']) and int(discount_months) != int(discount_object['months']):
             logging.debug("repeating discount amount & months...")
-            discount_amount, discount_months = apply_discount()
+            discount_amount, discount_months = apply_discount_values(browser, discount_object['amount'], discount_object['months'])
         if CONFIG["debug"]:
             return cancel_discount(browser)
         else:
             return apply_discount(browser)
     except Exception as e:
         error_checker(e)
-    return cancel_discount(browser, onsuccess=False)
-
-def apply_discount_values(browser, amount, months):
-    apply_discount_amount(browser, int(amount))
-    apply_discount_months(browser, int(months))
-    amount_element, discount_amount = get_discount_amount(browser)
-    months_element, discount_months = get_discount_months(browser)
-    return discount_amount, discount_months
+    logging.warning("discount failure!")
+    return cancel_discount(browser)
 
 def apply_discount(browser):
     try:
         logging.debug("applying discount...")
         find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Apply").click()
-        logging.debug("### Discount Successful ###")
-        logging.info("Discount successful!")
+        logging.info("discount successfully applied!")
         debug_delay_check()
         return True
     except Exception as e:
-        logging.debug(e)
-        logging.error("### Discount Failure - Missing Apply Button ###")
-    return False
+        error_checker(e)
+    raise Exception("unable to apply discount!")
 
-def cancel_discount(browser, onsuccess=True):
+def cancel_discount(browser):
     try:
-        logging.debug("canceling discount...")
-        find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Cancel").click()
-        if onsuccess:
-            logging.debug("### Discount Successfully Canceled ###")
-            logging.info("Discount canceled!")
-            debug_delay_check()
-            return True
-        else:
-            logging.info("Discount failed!")
-            logging.debug("### Discount Failure ###")
+        logging.debug("canceling discount entry...")
+        element = find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Cancel")
+        if not element:
+            logging.debug("skipping cancel click, missing button")
+            return        
+        element.click()
+        logging.debug("discount successfully canceled!")
+        debug_delay_check()
+        return True
     except Exception as e:
-        logging.debug(e)
-        logging.error("### Discount Failure - Missing Cancel Button ###")
-    return False
+        error_checker(e)
+    raise Exception("unable to cancel discount!")
 
 def get_discount_amount(browser):
     amount_element = browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[0]
@@ -101,53 +91,70 @@ def get_discount_months(browser):
     return months_element, months
     
 def apply_discount_amount(browser, amount):
-    logging.debug("attempting discount amount entry")
-    # amount_element = driver.browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[0]
-    # discount_amount = int(amount_element.get_attribute("innerHTML").replace("% discount", ""))
-    amount_element, discount_amount = get_discount_amount(browser)
-    logging.debug(f"amount: {discount_amount}")
-    logging.debug("entering discount amount...")
-    if int(discount_amount) != int(amount):
-        up_ = int((discount_amount / 5) - 1)
-        down_ = int((int(amount) / 5) - 1)
-        logging.debug(f"up: {up_}")
-        logging.debug(f"down: {down_}")
-        action = ActionChains(browser)
-        action.click(on_element=amount_element)
-        action.pause(1)
-        for n in range(up_):
-            action.send_keys(Keys.UP)
-            action.pause(0.5)
-        for n in range(down_):
-            action.send_keys(Keys.DOWN)
-            action.pause(0.5)                
-        action.send_keys(Keys.TAB)
-        action.perform()
-    logging.debug("successfully entered discount amount!")
-    debug_delay_check()
+    try:
+        logging.debug("attempting discount amount entry...")
+        # amount_element = driver.browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[0]
+        # discount_amount = int(amount_element.get_attribute("innerHTML").replace("% discount", ""))
+        amount_element, discount_amount = get_discount_amount(browser)
+        logging.debug(f"amount: {discount_amount}")
+        logging.debug("entering discount amount...")
+        if int(discount_amount) != int(amount):
+            up_ = int((discount_amount / 5) - 1)
+            down_ = int((int(amount) / 5) - 1)
+            logging.debug(f"up: {up_}")
+            logging.debug(f"down: {down_}")
+            action = ActionChains(browser)
+            action.click(on_element=amount_element)
+            action.pause(1)
+            for n in range(up_):
+                action.send_keys(Keys.UP)
+                action.pause(0.5)
+            for n in range(down_):
+                action.send_keys(Keys.DOWN)
+                action.pause(0.5)                
+            action.send_keys(Keys.TAB)
+            action.perform()
+        logging.debug("successfully entered discount amount!")
+        debug_delay_check()
+        return True
+    except Exception as e:
+        error_checker(e)
+    raise Exception("unable to apply discount amount!")
 
 def apply_discount_months(browser, months):
-    logging.debug("attempting discount months entry")
-    # months_element = driver.browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[1]
-    # discount_months = int(months_element.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
+    try:
+        logging.debug("attempting discount months entry...")
+        # months_element = driver.browser.find_elements(By.CLASS_NAME, "v-select__selection.v-select__selection--comma")[1]
+        # discount_months = int(months_element.get_attribute("innerHTML").replace(" months", "").replace(" month", ""))
+        months_element, discount_months = get_discount_months(browser)
+        logging.debug(f"months: {discount_months}")
+        logging.debug("entering discount months...")
+        if int(discount_months) != int(months):
+            up_ = int(discount_months - 1)
+            down_ = int(int(months) - 1)
+            logging.debug(f"up: {up_}")
+            logging.debug(f"down: {down_}")
+            action = ActionChains(browser)
+            action.click(on_element=months_element)
+            action.pause(1)
+            for n in range(up_):
+                action.send_keys(Keys.UP)
+                action.pause(0.5)
+            for n in range(down_):
+                action.send_keys(Keys.DOWN)
+                action.pause(0.5)
+            action.send_keys(Keys.TAB)
+            action.perform()
+        logging.debug("successfully entered discount months!")
+        debug_delay_check()
+        return True
+    except Exception as e:
+        error_checker(e)
+    raise Exception("unable to apply discount months!")
+
+def apply_discount_values(browser, amount, months):
+    apply_discount_amount(browser, int(amount))
+    apply_discount_months(browser, int(months))
+    amount_element, discount_amount = get_discount_amount(browser)
     months_element, discount_months = get_discount_months(browser)
-    logging.debug(f"months: {discount_months}")
-    logging.debug("entering discount months...")
-    if int(discount_months) != int(months):
-        up_ = int(discount_months - 1)
-        down_ = int(int(months) - 1)
-        logging.debug(f"up: {up_}")
-        logging.debug(f"down: {down_}")
-        action = ActionChains(browser)
-        action.click(on_element=months_element)
-        action.pause(1)
-        for n in range(up_):
-            action.send_keys(Keys.UP)
-            action.pause(0.5)
-        for n in range(down_):
-            action.send_keys(Keys.DOWN)
-            action.pause(0.5)
-        action.send_keys(Keys.TAB)
-        action.perform()
-    logging.debug("successfully entered discount months!")
-    debug_delay_check()
+    return discount_amount, discount_months

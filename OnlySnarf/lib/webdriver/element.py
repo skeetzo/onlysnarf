@@ -3,6 +3,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
+from .errors import error_checker
+
 ################
 ### Elements ###
 ################
@@ -50,7 +52,7 @@ def find_element_to_click(browser, name, text="", by=By.CLASS_NAME, fuzzyMatch=F
                     return element
             i += 1
     except Exception as e:
-        logging.debug(e)
+        error_checker(e)
         # if "obscures it" in str(e):
             # logging.debug("element obscured, attempting click...")
             # browser.execute_script("arguments[0].click();", foundElement)

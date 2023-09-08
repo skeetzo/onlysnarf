@@ -5,12 +5,12 @@ import unittest
 from OnlySnarf.util.config import set_config
 CONFIG = set_config({})
 
-from OnlySnarf.classes.driver import create_browser
+from OnlySnarf.lib.webdriver.browser import create_browser
 
 class TestSeleniumBrave(unittest.TestCase):
 
     def setUp(self):
-        CONFIG["browser"] = "edge"
+        CONFIG["browser"] = "opera"
         CONFIG["debug_selenium"] = True
         CONFIG["keep"] = False
         self.browser = create_browser(CONFIG["browser"])
@@ -18,8 +18,15 @@ class TestSeleniumBrave(unittest.TestCase):
     def tearDown(self):
         self.browser.quit()
 
-    def test_brave(self):
-        assert self.browser, "unable to launch edge"
+    def test_opera(self):
+        assert self.browser, "unable to launch opera"
+
+    # def test_opera_reconnect(self):
+    #     CONFIG["keep"] = True
+    #     self.browser = create_browser(CONFIG["browser"])
+    #     self.browser.quit()
+    #     self.browser = create_browser(CONFIG["browser"])        
+    #     assert self.browser, "unable to reconnect to opera"
 
 ############################################################################################
 

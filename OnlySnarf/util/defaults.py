@@ -111,6 +111,11 @@ if str(os.environ.get('ENV')).lower() == "test":
 
 LOG_PATH_SNARF = os.path.join(LOG_PATH, "snarf.log")
 LOG_PATH_CHROMEDRIVER = os.path.join(LOG_PATH, "chromedriver.log")
+LOG_PATH_CHROMEDRIVER_BRAVE = os.path.join(LOG_PATH, "chromedriver-brave.log")
+LOG_PATH_CHROMEDRIVER_CHROMIUM = os.path.join(LOG_PATH, "chromedriver-chromium.log")
+LOG_PATH_CHROMEDRIVER_EDGE = os.path.join(LOG_PATH, "chromedriver-edge.log")
+LOG_PATH_CHROMEDRIVER_IE = os.path.join(LOG_PATH, "chromedriver-ie.log")
+LOG_PATH_CHROMEDRIVER_OPERA = os.path.join(LOG_PATH, "chromedriver-opera.log")
 LOG_PATH_GECKODRIVER = os.path.join(LOG_PATH, "geckodriver.log")
 
 Path(ROOT_PATH).mkdir(parents=True, exist_ok=True)

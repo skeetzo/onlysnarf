@@ -46,8 +46,7 @@ def get_current_username(browser):
             return username
     except Exception as e:
         error_checker(e)
-        logging.error("failed to find active username!")
-    return None
+    raise Exception("failed to find active username!")
 
 def get_userid_by_username(browser, username):
     """
@@ -65,7 +64,6 @@ def get_userid_by_username(browser, username):
 
     """
 
-    user_id = None
     try:
         go_to_page(browser, username, force=True)
         elements = browser.find_elements(By.TAG_NAME, "a")
@@ -76,18 +74,18 @@ def get_userid_by_username(browser, username):
         user_id = user_id[0]
         user_id = user_id.replace("https://onlyfans.com/my/chats/chat/", "")
         logging.debug(f"successfully found user id: {user_id}")
+        return user_id
     except Exception as e:
         error_checker(e)
-        logging.error(f"failed to find user id for username: {username}")
-    return user_id
+    raise Exception(f"failed to find user id for username: {username}")
 
 def get_user_element_at_page(browser, username, page):
     if page == ONLYFANS_FOLLOWING_URL:
         class_name = "subscriptions"
     elif page == ONLYFANS_FANS_URL:
         class_name = "fans"
-    users = []
     try:
+        users = []
         # scroll until elements stop spawning
         thirdTime = 0
         count = 0
@@ -110,18 +108,16 @@ def get_user_element_at_page(browser, username, page):
             if thirdTime >= 3 and len(elements) == 0: break
             thirdTime += 1
     except Exception as e:
-        logging.info(e)
         error_checker(e)
-        logging.error(f"failed to find {username} at {page}!")
-    return users
+    raise Exception(f"failed to find {username} at {page}!")
 
 def get_users_at_page(browser, page, collection="Active"):
     if page == ONLYFANS_FOLLOWING_URL:
         class_name = "subscriptions"
     elif page == ONLYFANS_FANS_URL:
         class_name = "fans"
-    users = []
     try:
+        users = []
         go_to_page(browser, page, force=True)
         find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True).click()
         # scroll until elements stop spawning
@@ -149,11 +145,10 @@ def get_users_at_page(browser, page, collection="Active"):
             logging.debug(users[-1])
         logging.debug(f"found {len(users)} {class_name}")
         logging.debug(f"successfully found {class_name}!")
+        return users
     except Exception as e:
-        logging.info(e)
         error_checker(e)
-        logging.error(f"failed to find {class_name}!")
-    return users
+    raise Exception(f"failed to find {class_name}!")
 
 # TODO: update to interact with other fan/follower types ala recent, favorite, etc
 def get_users_by_type(browser, isFan=True, isFollower=False):

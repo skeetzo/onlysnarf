@@ -8,7 +8,7 @@ python -m pip install -e .[dev]
 snarf -debug -vvv post -text "balls"
 
 pytest tests/selenium
-pytest tests/selenium/browsers
+pytest tests/selenium
 pytest tests/selenium/reconnect
 
 pytest tests/snarf
@@ -37,8 +37,7 @@ python -m unittest tests/snarf/test_users.py
 
 
 # Misc:
-python -m unittest tests/selenium/test_browsers.py
-python -m unittest tests/selenium/browsers/test_firefox.py
+python -m unittest tests/selenium/test_firefox.py
 python -m unittest tests/snarf/auth/test_twitter.py
 
 ##########
@@ -54,13 +53,13 @@ pytest tests/selenium/test_browsers.py
 pytest tests/selenium/test_reconnect.py
 pytest tests/selenium/test_remote.py
 
-pytest tests/selenium/browsers/test_brave.py
-pytest tests/selenium/browsers/test_chrome.py
-pytest tests/selenium/browsers/test_chromium.py
-pytest tests/selenium/browsers/test_edge.py
-pytest tests/selenium/browsers/test_firefox.py
-pytest tests/selenium/browsers/test_ie.py
-pytest tests/selenium/browsers/test_opera.py
+pytest tests/selenium/test_brave.py
+pytest tests/selenium/test_chrome.py
+pytest tests/selenium/test_chromium.py
+pytest tests/selenium/test_edge.py
+pytest tests/selenium/test_firefox.py
+pytest tests/selenium/test_ie.py
+pytest tests/selenium/test_opera.py
 
 pytest tests/selenium/reconnect
 pytest tests/selenium/reconnect/...
