@@ -43,7 +43,7 @@ def set_config(args):
       parsed_config[key] = value
     # turn strings of booleans into actual booleans, fix lists
     for key, value in parsed_config.items():
-      if value == "True" or value == "False":
+      if value == "'True'" or value == "'False'":
         parsed_config[key] = bool(value)
       elif value == '[]':
         parsed_config[key] = []

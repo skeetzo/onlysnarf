@@ -798,32 +798,33 @@
   **9/6/2023**
   - fixed user search method *crosses fingers* by noticing super dumb easy method
   - figured out user search bug that returns node not connected to dom
-**4.6.11 : 9/7/2023**
-- finished fixing search bugs in webdriver/user
-- more updates to user search process: ?search={username}
-- updated browser tests
-- all tests working successfully
-- fixed output location of geckodriver logs by updating to service object
-- figure out where to put atexit --> Webdriver.exit
-- updated remaining webdriver:browser to all service objects
-- new exiration, poll, and schedule interactions pass all tests
-- double check how tags & performers are implemented in config and text config and then updated in docs
-- updated snarf tests for better webdriver simplicity
-- converted all return statements into raising exceptions
-- finished updates to test_schedule and test_poll data
-- fully tested updates to codebase
-- fully tested updates to webdriver 
-- fully tested updates to schedule, date, and time
-- separated driver functions into individual components ala schedule --> individual steps; for easier testing (and to clean up the giant ass driver file)
+  **4.6.11 : 9/7/2023**
+  - finished fixing search bugs in webdriver/user
+  - more updates to user search process: ?search={username}
+  - updated browser tests
+  - all tests working successfully
+  - fixed output location of geckodriver logs by updating to service object
+  - figure out where to put atexit --> Webdriver.exit
+  - updated remaining webdriver:browser to all service objects
+  - new exiration, poll, and schedule interactions pass all tests
+  - double check how tags & performers are implemented in config and text config and then updated in docs
+  - updated snarf tests for better webdriver simplicity
+  - converted all return statements into raising exceptions
+  - finished updates to test_schedule and test_poll data
+  - fully tested updates to codebase
+  - fully tested updates to webdriver 
+  - fully tested updates to schedule, date, and time
+  - separated driver functions into individual components ala schedule --> individual steps; for easier testing (and to clean up the giant ass driver file)
+**4.6.12 : 9/9/2023**
+- figured out why config settings arent loading proper variables
+- removed extra and unnecessary args from optional_args; cleaned up menu & help docs
+- finished message ability to add_user_to_message
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-(update)
-- finish message ability to add_user_to_message
 - finish adding new messaging capacities: all, recent, etc
-- check that config settings are loading proper variables: aka, why do i have to keep setting the variables directly to CONFIG in test scripts?
 
 (cleanup)
 - add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64
@@ -839,12 +840,13 @@
 ------------------------------------------------------------------------------------
 
 -> OnlyFans
+- add quiz & price target interactions (missing onlyfans buttons)
 - update adding uploads to being able to set previews to messages
 - add process to clear upload/download space
 - add cli args for config to autoconfigure more easily
 - add smart idea for getting statement information
-- add quiz & price target interactions (missing onlyfans buttons)
 - add functionality that follows profiles that are free for a month
+(quality of life)
 - update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
 - add min/max to missing args & validators
 - update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time

@@ -13,7 +13,7 @@ from .errors import error_checker
 # isID: use id instead of class_name
 # fuzzymatch: use "in" instead of "==" when matching text
 # index: the index of the element to search for, used to ignore early matches
-def find_element_to_click(browser, name, text="", by=By.CLASS_NAME, fuzzyMatch=False, index=-1, click=True):
+def find_element_to_click(browser, name, text="", by=By.CLASS_NAME, fuzzyMatch=False, index=-1):
     """
     Find element on page by name to click
 
@@ -41,10 +41,10 @@ def find_element_to_click(browser, name, text="", by=By.CLASS_NAME, fuzzyMatch=F
         for element in elements:
             # logging.debug(f"element: {element.get_attribute('innerHTML').strip()}")
             if element.is_displayed() and element.is_enabled() and ( (index >= 0 and i == index) or (index==-1) ):
-                if text and str(text).lower() == element.get_attribute("innerHTML").strip().lower():
+                if text and str(text).lower().strip() == element.get_attribute("innerHTML").lower().strip():
                     logging.debug("found matching element!")
                     return element
-                elif text and fuzzyMatch and str(text).lower() in element.get_attribute("innerHTML").strip().lower():
+                elif text and fuzzyMatch and str(text).lower().strip() in element.get_attribute("innerHTML").lower().strip():
                     logging.debug("found matching fuzzy element!")
                     return element
                 elif not text:
@@ -53,9 +53,6 @@ def find_element_to_click(browser, name, text="", by=By.CLASS_NAME, fuzzyMatch=F
             i += 1
     except Exception as e:
         error_checker(e)
-        # if "obscures it" in str(e):
-            # logging.debug("element obscured, attempting click...")
-            # browser.execute_script("arguments[0].click();", foundElement)
     raise Exception(f"unable to find element: {name}")
 
 def move_to_then_click_element(browser, element):

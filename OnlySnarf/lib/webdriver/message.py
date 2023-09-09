@@ -57,7 +57,7 @@ def message(browser, message_object):
                     if str(label).lower() == "bookmarks": successful_message_steps.append(message_bookmarks(browser))
                     # if str(label).lower() == "random": successful_message_steps.append(message_random(browser))
             if message_object["excludes"]:
-                for label in message_object["excluded_recipients"]:
+                for label in message_object["excludes"]:
                     if str(label).lower() == "all" or str(label).lower() == "fans": successful_message_steps.append(message_fans(browser, exclude=True))
                     if str(label).lower() == "recent": successful_message_steps.append(message_recent(browser, exclude=True))
                     if str(label).lower() == "favorite": successful_message_steps.append(message_favorites(browser, exclude=True))
@@ -85,88 +85,102 @@ def message(browser, message_object):
     logging.error("Message failed to send!")
     return False
 
+
+# TODO: update the message process to match the following backup process of opening the lists up and scrolling for it or typing into the list's search function and then clicking it there
+# if one of the below fails, click and open the list of "lists to send to" via the "view all" button
+# same for exlude process
+# scroll through lists until matching name of list is found and click on it there
+
+
 # TODO: test all these added behaviors
 def message_fans(browser, exclude=False):
     try:
-        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
         logging.debug("clicking message recipients: fans")
-        find_element_to_click(browser, "b-tabs__nav__text", text="Fans", fuzzyMatch=True, index=1 if exclude else 0).click()
+        find_element_to_click(browser, "b-tabs__nav__text", text="Fans", fuzzyMatch=True).click()
         return True
     except Exception as e:
-        logging.warning("unable to message all fans!")
-    return False
+        error_checker(e)
+    raise Exception("unable to message all fans!")
 
 def message_recent(browser, exclude=False):
     try:
-        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
         logging.debug("clicking message recipients: recent")
-        find_element_to_click(browser, "b-tabs__nav__text", text="Recent", fuzzyMatch=True, index=1 if exclude else 0).click()
+        find_element_to_click(browser, "b-tabs__nav__text", text="Recent", fuzzyMatch=True).click()
 
         # TODO: add method for interacting with popup calendar for selecting date for recent subscribers
+        logging.error("TODO: FINISH ME")
 
         return True
     except Exception as e:
-        logging.warning("unable to message all recent!")
-    return False
+        error_checker(e)
+    raise Exception("unable to message all recent!")
 
 def message_following(browser, exclude=False):
     try:
-        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
         logging.debug("clicking message recipients: following")
-        find_element_to_click(browser, "b-tabs__nav__text", text="Following", fuzzyMatch=True, index=1 if exclude else 0).click()
+        find_element_to_click(browser, "b-tabs__nav__text", text="Following", fuzzyMatch=True).click()
         return True
     except Exception as e:
-        logging.warning("unable to message all following!")
-    return False
+        error_checker(e)
+    raise Exception("unable to message all following!")
 
 def message_favorites(browser, exclude=False):
     try:
-        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
         logging.debug("clicking message recipients: favorites")
-        find_element_to_click(browser, "b-tabs__nav__text", text="Favorites", index=1 if exclude else 0).click()
+        find_element_to_click(browser, "b-tabs__nav__text", text="Favorites").click()
         return True
     except Exception as e:
-        logging.warning("unable to message all favorites!")
-    return False
+        error_checker(e)
+    raise Exception("unable to message all favorites!")
 
 def message_friends(browser, exclude=False):
     try:
-        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
         logging.debug("clicking message recipients: friends")
-        find_element_to_click(browser, "b-tabs__nav__text", text="Friends", index=1 if exclude else 0).click()
+        find_element_to_click(browser, "b-tabs__nav__text", text="Friends").click()
         return True
     except Exception as e:
-        logging.warning("unable to message all friends!")
-    return False
+        error_checker(e)
+    raise Exception("unable to message all friends!")
 
 def message_renewers(browser, exclude=False, on=True):
     try:
-        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
         logging.debug(f"clicking message recipients: renew ({on})")
-        find_element_to_click(browser, "b-tabs__nav__text", text="Renew On" if on else "Renew Off", index=1 if exclude else 0).click()
+        find_element_to_click(browser, "b-tabs__nav__text", text="Renew On" if on else "Renew Off").click()
         return True
     except Exception as e:
-        logging.warning("unable to message all renewals!")
-    return False
+        error_checker(e)
+    raise Exception("unable to message all renewals!")
 
 def message_bookmarks(browser, exclude=False):
     try:
-        go_to_page(ONLYFANS_NEW_MESSAGE_URL)
+        go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
         logging.debug(f"clicking message recipients: bookmarks")
-        find_element_to_click(browser, "b-tabs__nav__text", text="Bookmarks", index=1 if exclude else 0).click()
+        find_element_to_click(browser, "b-tabs__nav__text", text="Bookmarks").click()
         return True
     except Exception as e:
-        logging.warning("unable to message all bookmarks!")
-    return False
+        error_checker(e)
+    raise Exception("unable to message all bookmarks!")
 
-# def message_random(browser):
-#     return message_user_by_username(browser, get_random_user().username)
-
-# TODO: finish and test this functionality of mass messaging
 # add username to existing mass message being started
 def add_user_to_message(browser, username):
-    logging.error("TODO: finish me!")
-    pass
+    try:
+        logging.debug(f"adding user to message: {username}")
+        element = browser.find_element(By.CLASS_NAME, "b-search-users-form__input")
+        ActionChains(browser).move_to_element(element).click(on_element=element).send_keys(Keys.CLEAR).send_keys(str(username)).perform()
+        WebDriverWait(browser, 60).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-search-users-form__input")))
+        # elements = browser.find_elements(By.CLASS_NAME, "b-available-users__item")
+        for element in browser.find_elements(By.CLASS_NAME, "b-available-users__item"):
+            element.click()
+        return True
+    except Exception as e:
+        error_checker(e)
+    raise Exception("unable to add user to message!")
 
 ######################################################################
 ######################################################################

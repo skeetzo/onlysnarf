@@ -90,9 +90,6 @@ The path to the config file.
 -login, -L [onlyfans|twitter]  
 The method to use to log in.  
 
--reduce  
-Reduce the file size before uploading.  
-
 --username, --u ""  
 The OnlyFans username to login as.  
 
@@ -198,9 +195,6 @@ The number of 10 minute intervals to wait while uploading a file.
 -debug, -D  
 Tests configuration. Does not upload or remove from Google Drive.  
 
--force-upload  
-Enable forcing upload despite long upload time.  
-
 -show, -SW  
 Show web browser.  
 
@@ -219,12 +213,6 @@ Basic debugging preface:
 
 -debug-delay  
 Delays certain portions for visual monitoring.  
-
--debug-firefox  
-Enable debugging of Firefox.  
-
--debug-google  
-Enable debugging of google chrome.  
 
 -download-path ""  
 The download path for files.  

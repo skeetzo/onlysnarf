@@ -2,7 +2,7 @@ import argparse
 from .validators import valid_amount, valid_price, valid_path
 from .validators import valid_date, valid_month, valid_schedule, valid_time
 from .validators import valid_duration, valid_expiration, valid_limit
-from .validators import valid_promo_duration, valid_promo_expiration
+# from .validators import valid_promo_duration, valid_promo_expiration
 from . import defaults as DEFAULT
 
 def apply_args(parser):
@@ -21,10 +21,6 @@ def apply_args(parser):
   # note: "google" is disabled due to updates&testing requirements
   parser.add_argument('-login', '-L', dest='login', default="auto", choices=["auto","onlyfans","twitter"], help='method of user login to prefer')
   ##
-  # -reduce
-  # enables file reduction
-  parser.add_argument('-reduce', action='store_true', dest='reduce', help='enable reducing files over 50 MB')
-  ##
   # -tweet
   # enabled tweeting
   parser.add_argument('-tweet', action='store_true', dest='tweeting', help='enable tweeting when posting')
@@ -34,8 +30,8 @@ def apply_args(parser):
   parser.add_argument('--username', '--u', type=str, default="default", dest='username', help='OnlyFans username to use')
   ##
   # -phone
-  # OnlyFans phone number to use for additional login steps
-  parser.add_argument('-phone', type=str, default="", dest='phone', help='OnlyFans phone number to use')
+  # OnlyFans phone number to use for additional login steps; never really required
+  # parser.add_argument('-phone', type=str, default="", dest='phone', help='OnlyFans phone number to use')
 
   ###############
   ## DEBUGGING ##
@@ -57,37 +53,13 @@ def apply_args(parser):
   # user message delay
   parser.add_argument('-debug-delay', action='store_true', dest='debug_delay', help=argparse.SUPPRESS)
   ##
-  # -debug-firefox
-  # enables trace logging for firefox
-  parser.add_argument('-debug-firefox', action='store_true', dest='debug_firefox', help=argparse.SUPPRESS)
-  ##
-  # -debug-google
-  # enables trace logging for google chrome
-  parser.add_argument('-debug-chrome', action='store_true', dest='debug_chrome', help=argparse.SUPPRESS)
-  ##
-  # -debug-selenium
-  # enables selenium logging
-  parser.add_argument('-debug-selenium', action='store_true', dest='debug_selenium', help=argparse.SUPPRESS)
-  ##
-  # -download-max
-  # maximum number of images to download
-  parser.add_argument('-download-max', type=int, default=DEFAULT.IMAGE_LIMIT, dest="download_limit", help=argparse.SUPPRESS)
-  ##
   # -download-path
-  # the path to the downloaded files
+  # the path to download files to
   parser.add_argument('-download-path', type=str, dest='path_download', default=DEFAULT.DOWNLOAD_PATH, help=argparse.SUPPRESS)
-  ##
-  # -force-upload
-  # ignore upload max wait
-  parser.add_argument('-force-upload', action='store_true', dest='force_upload', help=argparse.SUPPRESS)
   ##
   # -keep
   # keep the browser window open
   parser.add_argument('-keep', '-K', action='store_true', dest='keep', help='keep browser window open after scripting ends')
-  ##
-  # -prefer-local
-  # prefers local user cache over refreshing first call
-  parser.add_argument('-prefer-local', default=True, action='store_false', dest='prefer_local', help='prefer recently cached data')
   ##
   # -show
   # shows window
@@ -99,10 +71,6 @@ def apply_args(parser):
   # -skip-upload
   # skips file upload
   parser.add_argument('-skip-upload', action='store_true', dest='skip_upload', help=argparse.SUPPRESS)
-  ##
-  # -skip-users
-  # list of users to skip
-  parser.add_argument('-skip-users', dest='skipped_users', action='append', help=argparse.SUPPRESS)
   ##
   # -upload-max
   # maximum number of images that can be uploaded

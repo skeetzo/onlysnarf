@@ -3,7 +3,7 @@
 
 # -h
 
-`snarf [-h] [-browser {auto,brave,chrome,chromium,firefox,remote}] [-login {auto,onlyfans,twitter}] [-reduce] [-save] [-tweet] [--username USERNAME] [-config PATH_CONFIG] [-debug] [-keep] [-prefer-local] [-show] [-v] [-version] {api,config,discount,message,post,users} ... ` 
+`snarf [-h] [-browser {auto,brave,chrome,chromium,firefox,remote}] [-login {auto,onlyfans,twitter}] [-save] [-tweet] [--username USERNAME] [-config PATH_CONFIG] [-debug] [-keep] [-show] [-v] [-version] {api,config,discount,message,post,users} ... ` 
 
 No mention of old Shnarf, I notice. Go ahead, just take all the glory, and leave it to Snarf to clean up after you. I don't mind!  
 
@@ -19,15 +19,12 @@ options:
 > -h, --help            show this help message and exit  
 > -browser {auto,brave,chrome,chromium,firefox,remote}, -B {auto,brave,chrome,chromium,firefox,remote}  web browser to use  
 > -login {auto,onlyfans,twitter}, -L {auto,onlyfans,twitter}  method of user login to prefer  
-> -reduce               enable reducing files over 50 MB  
 > -save, -S             enable saving users locally on exit  
 > -tweet                enable tweeting when posting  
 > --username USERNAME, --u USERNAME OnlyFans username to use  
-> -phone PHONE          OnlyFans phone number to use
 > -config PATH_CONFIG, -C PATH_CONFIG path to config.conf  
 > -debug, -D            enable debugging  
 > -keep, -K             keep browser window open after scripting ends  
-> -prefer-local         prefer recently cached data  
 > -show, -SW            enable displaying browser window  
 > -v, -verbose          verbosity level (max 3)  
 > -version              show program's version number and exit  
