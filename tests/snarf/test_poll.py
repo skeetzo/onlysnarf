@@ -10,6 +10,7 @@ configure_logging(True, True)
 
 from OnlySnarf.util import defaults as DEFAULT
 from OnlySnarf.lib.driver import poll
+from OnlySnarf.classes.poll import Poll
 
 class TestSnarf(unittest.TestCase):
 
@@ -24,6 +25,7 @@ class TestSnarf(unittest.TestCase):
             "duration": DEFAULT.DURATION_ALLOWED[0],
             "questions": ["suck","my","dick","please?"]
         }
+        poll_object = Poll.create_poll(poll_object).dump()
         assert poll(poll_object), "unable to post poll"
 
 ############################################################################################

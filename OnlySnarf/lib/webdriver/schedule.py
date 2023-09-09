@@ -166,6 +166,7 @@ def schedule_cancel(browser):
         logging.debug("canceling schedule...")
         browser.find_element(By.CLASS_NAME, "vdatetime-popup__actions__button--cancel").find_elements(By.XPATH, "./child::*")[0].click()
         logging.debug("sucessfully canceled schedule!")
+        return True
     except Exception as e:
         error_checker(e)
     raise Exception("failed to cancel schedule menu!")
@@ -177,6 +178,7 @@ def schedule_save(browser):
         logging.debug("saving schedule...")
         browser.find_element(By.CLASS_NAME, "vdatetime-popup__actions__button--confirm").find_elements(By.XPATH, "./child::*")[0].click()
         logging.debug("sucessfully saved schedule!")
+        return True
     except Exception as e:
         error_checker(e)
     raise Exception("failed to save schedule menu!")

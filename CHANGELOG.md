@@ -810,29 +810,31 @@
 - double check how tags & performers are implemented in config and text config and then updated in docs
 - updated snarf tests for better webdriver simplicity
 - converted all return statements into raising exceptions
+- finished updates to test_schedule and test_poll data
+- fully tested updates to codebase
+- fully tested updates to webdriver 
+- fully tested updates to schedule, date, and time
+- separated driver functions into individual components ala schedule --> individual steps; for easier testing (and to clean up the giant ass driver file)
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- finish updates to test_schedule data
-
-
-- LIVE TESTING
-- check that config settings are loading proper variables: aka, why do i have to keep setting the variables directly to CONFIG in test scripts?
-
 (update)
+- finish message ability to add_user_to_message
+- finish adding new messaging capacities: all, recent, etc
+- check that config settings are loading proper variables: aka, why do i have to keep setting the variables directly to CONFIG in test scripts?
 
 (cleanup)
 - add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64
 
 (finish)
-- finish message ability to add_user_to_message
 - finish scan.py
 - finish updating image/video downloading
 - finish updating cli menu functionality
-- finish updating profile class & menu
 - finish testing 'snarf config'
+
+- LIVE TESTING --> release new version on pypi
 
 ------------------------------------------------------------------------------------
 
@@ -841,18 +843,18 @@
 - add process to clear upload/download space
 - add cli args for config to autoconfigure more easily
 - add smart idea for getting statement information
---
 - add quiz & price target interactions (missing onlyfans buttons)
 - add functionality that follows profiles that are free for a month
 - update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
+- add min/max to missing args & validators
 - update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
 
 -> OnlyFans: Promos (review usability and code first)
 - clean up / fix & test
-- add min/max to args & validators
 - re-enable / add promo subcommands and config variables
 
 -> OnlyFans: Profile (review usability and code first)
+- finish updating profile class & menu
 - new - setup - Twitter -> profile, banner; Price and Settings
 - new - advertise
 - new - posts - tweet to advertise new account, tweet to ask about what you should post, etc; recommend what to post
@@ -864,48 +866,27 @@
 (once everything else in app works again)
 - run new auth tests w/ appropriately connected accounts
 -> Twitter
-- actually test if tweeting behavior works in driver
-- needs a dummy account to test actual tweeting w/
-- tweet reminders from inlaid config behavior
-- can enter and edit the final text that is tweeted
-- can include media attachments
+- check auth via Twitter
+- actually test if tweeting behavior works after being enabled
 -- add checks for previously existing tweets
 -- keep track of tweets (somehow)
 
 -> Tests
-- test updates to codebase
-- test updates to webdriver 
 - test scan.py for final touches
 - test dropbox scripts on rpi
 - test upload script on android
 - test user messaging processes: all fans, recent, favorite, renew, bookmarks, random
-- test updates to schedule, date, and time
 - re-add stuff for testing on multiple platforms ala mac ;) 
 --
-- separate driver functions into individual components ala schedule --> individual steps; for easier testing (and to clean up the giant ass driver file)
 - add tests for newly separated driver files / functions
-- add tests for additional config variables such as browser and image/video options, limits
-- finish adding tests for individual messaging circumstances: all, recent, favorite, renew on
+- add tests for additional config variables such as browser and image/video options, default limits
 - finish adding tests for individual message entry parts, individual post entry parts
 - add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi; readd references to remote in config files and such
 
-(webdriver)
-- (if necessary) finish integrating edge, ie, and opera
-- figure out how to request specific webdriver versions installs to test v102 for edge
-
 -> CLI Menu
 (probably never)
-- re-add menu system
+- re-add menu system & re-enable menu command
 - fix any new cli menu errors made while updating major processes
-- re-enable prompting for discount amount&months in Settings or somewhere else (at some point)
-- re-add removed user select code in notes/selectstuff.py (for menu prompts)
-- re-enable menu command
-
-(probably never)
-- add bypass for 2fa
-https://www.geeksforgeeks.org/two-factor-authentication-using-google-authenticator-in-python/
-https://stackoverflow.com/questions/55870489/how-to-handle-google-authenticator-with-selenium
-https://stackoverflow.com/questions/8529265/google-authenticator-implementation-in-python
 
 ## Fix / Debug
 

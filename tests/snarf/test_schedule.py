@@ -10,6 +10,7 @@ configure_logging(True, True)
 
 from OnlySnarf.util import defaults as DEFAULT
 from OnlySnarf.lib.driver import schedule
+from OnlySnarf.classes.schedule import Schedule
 
 today = datetime.datetime.now()
 tomorrow = today + datetime.timedelta(days=1, hours=13, minutes=10)
@@ -27,11 +28,7 @@ class TestSnarf(unittest.TestCase):
             "date" : tomorrow.strftime(DEFAULT.DATE_FORMAT),
             "time" : (today + datetime.timedelta(hours=1, minutes=30)).strftime(DEFAULT.TIME_FORMAT)
         }
-
-        # TODO: update this to combine with Schedule class for proper formatting
-        # should probably update poll to match
-
-
+        schedule_object = Schedule.create_schedule(schedule_object).dump()
         assert schedule(schedule_object), "unable to post schedule"
 
     # TODO: are these even necessary?
