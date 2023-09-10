@@ -24,44 +24,11 @@ class TestSnarf(unittest.TestCase):
     # def test_message(self):
         # assert Message.create_message({**CONFIG}).send(), "unable to send basic message"
 
-    def test_message_all(self):
-        assert Message.create_message({**CONFIG,"includes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to: all"
+    # def test_message_all_include(self):
+    #     assert Message.create_message({**CONFIG,"includes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to included lists"
 
-    # def test_message_recent(self):
-    #     assert Message.create_message({**CONFIG,"includes":["recent"]}).send(), "unable to send message to: recent"
-
-    # def test_message_favorite(self):
-    #     assert Message.create_message({**CONFIG,"includes":["favorite"]}).send(), "unable to send message to: favorite"
-
-    # def test_message_renew_on(self):
-    #     assert Message.create_message({**CONFIG,"includes":["renew on"]}).send(), "unable to send message to: renew on"
-
-    # def test_message_renew_off(self):
-    #     assert Message.create_message({**CONFIG,"includes":["renew off"]}).send(), "unable to send message to: renew off"
-
-    # def test_message_bookmarks(self):
-    #     assert Message.create_message({**CONFIG,"includes":["bookmarks"]}).send(), "unable to send message to: bookmarks"
-
-    # def test_message_exclude_recent(self):
-    #     assert Message.create_message({**CONFIG,"includes":["all"],"excludes":["recent"]}).send(), "unable to exclude message from: recent"
-
-    # def test_message_exclude_favorite(self):
-    #     assert Message.create_message({**CONFIG,"includes":["all"],"excludes":["favorite"]}).send(), "unable to exclude message from: favorite"
-
-    # def test_message_exclude_renew_on(self):
-    #     assert Message.create_message({**CONFIG,"includes":["all"],"excludes":["renew on"]}).send(), "unable to exclude message from: renew on"
-
-    # def test_message_exclude_renew_off(self):
-    #     assert Message.create_message({**CONFIG,"includes":["all"],"excludes":["renew off"]}).send(), "unable to exclude message from: renew off"
-
-    # def test_message_exclude_bookmarks(self):
-    #     assert Message.create_message({**CONFIG,"includes":["all"],"excludes":["bookmarks"]}).send(), "unable to exclude message from: bookmarks"
-
-
-
-
-
-
+    def test_message_all_exclude(self):
+        assert Message.create_message({**CONFIG,"excludes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to excluded lists"
 
     # def test_message_files_local(self):
     #     CONFIG["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]

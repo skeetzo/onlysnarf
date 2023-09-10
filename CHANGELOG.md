@@ -824,7 +824,7 @@
 
 ## TODO
 
-- finish adding new messaging capacities: all, recent, etc
+- finish adding and testing new messaging capacities: all, recent, etc
 
 (cleanup)
 - add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64
