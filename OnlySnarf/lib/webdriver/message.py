@@ -80,14 +80,15 @@ def message(browser, message_object):
 
 # this is all working except for sometimes including when it is meant to exclude?
 
-
+# add step to unclick any already clicked boxes aka add a reset / clear step
+# note: refreshing page only removes the lists of selected users added to be included
 
 # click existing button
-def method_one(browser, collection):
+def method_one(browser, collection, include):
     logging.debug("METHOD ONE")
     try:
         logging.debug(f"clicking message recipients: {collection}")
-        element = find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True)
+        element = find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True, index=0 if include else 1)
         ActionChains(browser).move_to_element(element).click().perform()
         return True
     except Exception as e:
@@ -155,10 +156,9 @@ def message_list(browser, collection="Fans", include=True):
     # try method one, if fails open list
     # try method two, if fails type in list
     # try method three, if fails there is no list
-    successful = False
+    # successful = False
 
-    if not include:
-        successful = method_one(browser, collection)
+    successful = method_one(browser, collection, include)
 
     if not successful:
 

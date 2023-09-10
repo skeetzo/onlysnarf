@@ -824,6 +824,8 @@
 
 ## TODO
 
+- add message filters? maybe by request?
+
 - finish adding and testing new messaging capacities: all, recent, etc
 
 (cleanup)
