@@ -24,11 +24,18 @@ class TestSnarf(unittest.TestCase):
     # def test_message(self):
         # assert Message.create_message({**CONFIG}).send(), "unable to send basic message"
 
-    # def test_message_all_include(self):
+    def test_message_all_include(self):
         assert Message.create_message({**CONFIG,"includes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to included lists"
 
     def test_message_all_exclude(self):
         assert Message.create_message({**CONFIG,"excludes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to excluded lists"
+
+
+
+    # TODO: add test with multiple usernames
+
+
+
 
     # def test_message_files_local(self):
     #     CONFIG["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]

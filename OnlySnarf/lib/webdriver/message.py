@@ -40,7 +40,9 @@ def message(browser, message_object):
     """
 
     try:
-        logging.info(f"Entering message to {','.join(message_object['recipients'])}: (${message_object['price']}) {message_object['text']}")
+        logging.info(f"Entering message to {','.join(message_object['recipients'])}: (${message_object['price']}) {message_object['text']}\nIncludes: {','.join(message_object['includes'])}\nExcludes: {','.join(message_object['excludes'])}")
+
+        clear_lists(browser)
 
         # prepare the message
         if len(message_object["recipients"]) > 1 or message_object["includes"] or message_object["excludes"]:
@@ -66,12 +68,40 @@ def message(browser, message_object):
         message_price(browser, message_object['price'])
         upload_files(browser, message_object['files'])
         message_confirm(browser)
+
+        if CONFIG["debug"]:
+            clear_lists(browser)
+
         return True
     except Exception as e:
         error_checker(e)
     message_clear(browser)
+    check_clear_lists(browser)
     raise Exception("failed to send message!")
 
+
+
+# TODO: update this to get the label that is associated with the "icon-done" so that it can unclick that specific label?
+
+def check_clear_lists(browser, reattempt=False):
+    try:
+        for element in browser.find_elements(By.TAG_NAME, "use"):
+
+            # TODO: this goes into an infinite loop that finds the entered username's checkbox
+            if '#icon-done' in str(element.get_attribute('href')) and element.is_displayed():
+                print(element.get_attribute("innerHTML"))
+                print(element.get_attribute("href"))
+                print(element.is_enabled())
+                print(element.is_displayed())
+                clear_lists(browser)
+                return True
+                # break
+    except Exception as e:
+        if "stale element" in str(e) and not reattempt:
+            logging.debug('reattempting message_list...')
+            return check_clear_lists(browser, reattempt=True)
+    logging.debug("no icon-dones found!")
+    return False
 
 def clear_lists(browser):
     logging.debug("clearing lists...")
@@ -79,10 +109,10 @@ def clear_lists(browser):
         # all_lists = ["fans","following","recent","favorites"]
         all_lists = ["fans","following"]
         for label in all_lists:
-            
-            message_list(browser, collection=label, include=True, unclick=True)
-            message_list(browser, collection=label, include=False, unclick=True)
-
+            if check_clear_lists(browser):
+                message_list(browser, collection=label, include=True, unclick=True)
+            if check_clear_lists(browser):
+                message_list(browser, collection=label, include=False, unclick=True)
         logging.debug("successfully cleared lists!")
         return True
     except Exception as e:
@@ -90,7 +120,7 @@ def clear_lists(browser):
     raise Exception("unable to clear user lists!")
 
 # click existing button
-def method_one(browser, collection, include, unclick=False):
+def method_one(browser, collection, include=True, unclick=False):
     logging.debug("METHOD ONE")
     try:
         element = find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True, index=0 if include else 1)
@@ -107,7 +137,7 @@ def method_one(browser, collection, include, unclick=False):
     return False
 
 # click 1st or 2nd 'View All'
-def click_view_all_lists(browser, include):
+def click_view_all_lists(browser, include=True):
     try:
         elements = browser.find_elements(By.CLASS_NAME, "b-content-filter__group-btns")
         element = None
@@ -171,27 +201,8 @@ def method_three(browser, collection, unclick=False):
 # scroll through lists until matching name of list is found and click on it there
 
 # Fans is synonymous with All
-def message_list(browser, collection="Fans", include=True, unclick=False, reattempt=False):
+def message_list(browser, collection="Fans", include=True, unclick=False):
     go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
-
-
-    # TODO: move this snipped somewhere else so that it isn't ran after clicking things on and then immediately clicking those things back off
-
-    if not unclick:
-        try:
-            for element in browser.find_elements(By.TAG_NAME, "use"):
-                if '#icon-done' in str(element.get_attribute('href')) and element.is_displayed():
-                    print(element.get_attribute("innerHTML"))
-                    print(element.get_attribute("href"))
-                    print(element.is_enabled())
-                    print(element.is_displayed())
-                    clear_lists(browser)
-                    break
-        except Exception as e:
-            if "stale element" in str(e) and not reattempt:
-                logging.debug('reattempting message_list...')
-                return message_list(browser, collection, include, unclick, reattempt=True)
-        logging.debug("no icon-dones found!")
 
     if collection.lower() == "all":
         collection = "Fans"
@@ -203,11 +214,11 @@ def message_list(browser, collection="Fans", include=True, unclick=False, reatte
     # try method three, if fails there is no list
     # successful = False
 
-    successful = method_one(browser, collection, include, unclick=unclick)
+    successful = method_one(browser, collection, include=include, unclick=unclick)
 
     if not successful:
 
-        click_view_all_lists(browser, include)
+        click_view_all_lists(browser, include=include)
 
         successful = method_two(browser, collection, unclick=unclick)
 
