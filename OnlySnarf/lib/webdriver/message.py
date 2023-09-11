@@ -76,8 +76,8 @@ def message(browser, message_object):
 def clear_lists(browser):
     logging.debug("clearing lists...")
     try:
-
-        all_lists = ["fans","following","recent","favorites"]
+        # all_lists = ["fans","following","recent","favorites"]
+        all_lists = ["fans","following"]
         for label in all_lists:
             
             message_list(browser, collection=label, include=True, unclick=True)
@@ -126,27 +126,33 @@ def click_view_all_lists(browser, include):
     raise Exception("unable to click view all lists!")
 
 # click existing list available
-def method_two(browser, collection, unclick=False):
+def method_two(browser, collection, unclick=False, reattempt=False):
     logging.debug("METHOD TWO")
     # elements = browser.find_elements(By.CLASS_NAME, "b-rows-lists__item__name")
-    for element in browser.find_elements(By.CLASS_NAME, "b-rows-lists__item__name"):
-        if str(collection).lower().strip() in str(element.get_attribute("innerHTML")).lower().strip():
-            if unclick:
-                try:
-                    icon_done = element.find_element(By.TAG_NAME, "use")
-                    if not icon_done: continue
-                except Exception as e:
-                    print(e)
-                    continue
-                logging.debug("unclicking on list element...")
-                ActionChains(browser).move_to_element(element).click(on_element=element).perform()
-                find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
+    try:
+        for element in browser.find_elements(By.CLASS_NAME, "b-rows-lists__item__name"):
+            if str(collection).lower().strip() in str(element.get_attribute("innerHTML")).lower().strip():
+                if unclick:
+                    try:
+                        icon_done = element.find_element(By.TAG_NAME, "use")
+                        if not icon_done: continue
+                    except Exception as e:
+                        print(e)
+                        continue
+                    logging.debug("unclicking on list element...")
+                    ActionChains(browser).move_to_element(element).click(on_element=element).perform()
+                    find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
+                else:
+                    logging.debug("clicking on list element...")
+                    ActionChains(browser).move_to_element(element).click(on_element=element).perform()
+                    find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
                 return True
-            else:
-                logging.debug("clicking on list element...")
-                ActionChains(browser).move_to_element(element).click(on_element=element).perform()
-                find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
-                return True
+    except Exception as e:
+        if "stale element" in str(e) and not reattempt:
+            logging.debug("reattempting method two (stale element)...")
+            return method_two(browser, collection, unclick=unclick, reattempt=True)
+        else:
+            error_checker(e)
     return False
 
 # search for list
@@ -165,16 +171,32 @@ def method_three(browser, collection, unclick=False):
 # scroll through lists until matching name of list is found and click on it there
 
 # Fans is synonymous with All
-def message_list(browser, collection="Fans", include=True, unclick=False):
+def message_list(browser, collection="Fans", include=True, unclick=False, reattempt=False):
     go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
 
+
+    # TODO: move this snipped somewhere else so that it isn't ran after clicking things on and then immediately clicking those things back off
+
     if not unclick:
-        clear_lists(browser)
+        try:
+            for element in browser.find_elements(By.TAG_NAME, "use"):
+                if '#icon-done' in str(element.get_attribute('href')) and element.is_displayed():
+                    print(element.get_attribute("innerHTML"))
+                    print(element.get_attribute("href"))
+                    print(element.is_enabled())
+                    print(element.is_displayed())
+                    clear_lists(browser)
+                    break
+        except Exception as e:
+            if "stale element" in str(e) and not reattempt:
+                logging.debug('reattempting message_list...')
+                return message_list(browser, collection, include, unclick, reattempt=True)
+        logging.debug("no icon-dones found!")
 
     if collection.lower() == "all":
         collection = "Fans"
     elif collection.lower() == "recent":
-        return message_recent(browser, exlude=include)
+        return message_recent(browser, exclude=include, unclick=unclick)
 
     # try method one, if fails open list
     # try method two, if fails type in list
@@ -197,8 +219,7 @@ def message_list(browser, collection="Fans", include=True, unclick=False):
 
         return successful
 
-    if not unclick:
-        clear_lists(browser)
+    elif unclick:
         return True
     else:
         raise Exception(f"unable to find list: {collection}")
@@ -206,16 +227,32 @@ def message_list(browser, collection="Fans", include=True, unclick=False):
 
 
 # TODO: ADD SCHEDULE BEHAVIOR HERE
-def message_recent(browser, exclude=False):
+def message_recent(browser, exclude=False, unclick=False):
     try:
         go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
         logging.debug("clicking message recipients: recent")
         element = find_element_to_click(browser, "b-tabs__nav__text", text="Recent", fuzzyMatch=True)
 
-        # TODO: add method for interacting with popup calendar for selecting date for recent subscribers
-        logging.error("TODO: FINISH ME")
+        if unclick:
+            try:
+                icon_done = element.find_element(By.TAG_NAME, "use")
+                if not icon_done: return True
+            except Exception as e:
+                print(e)
+                return False
+            logging.debug("unclicking on list element...")
+            ActionChains(browser).move_to_element(element).click(on_element=element).perform()
+
+            # find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
+        else:
+            # TODO: add method for interacting with popup calendar for selecting date for recent subscribers
+            logging.error("TODO: FINISH ME")
+
+
+
 
         return True
+
     except Exception as e:
         error_checker(e)
     raise Exception("unable to message all recent!")

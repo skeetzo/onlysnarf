@@ -25,7 +25,7 @@ class TestSnarf(unittest.TestCase):
         # assert Message.create_message({**CONFIG}).send(), "unable to send basic message"
 
     # def test_message_all_include(self):
-    #     assert Message.create_message({**CONFIG,"includes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to included lists"
+        assert Message.create_message({**CONFIG,"includes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to included lists"
 
     def test_message_all_exclude(self):
         assert Message.create_message({**CONFIG,"excludes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to excluded lists"
