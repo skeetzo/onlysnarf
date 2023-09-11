@@ -72,23 +72,34 @@ def message(browser, message_object):
     message_clear(browser)
     raise Exception("failed to send message!")
 
-# TODO: update the message process to match the following backup process of opening the lists up and scrolling for it or typing into the list's search function and then clicking it there
-# if one of the below fails, click and open the list of "lists to send to" via the "view all" button
-# same for exlude process
-# scroll through lists until matching name of list is found and click on it there
 
+def clear_lists(browser):
+    logging.debug("clearing lists...")
+    try:
 
-# this is all working except for sometimes including when it is meant to exclude?
+        all_lists = ["fans","following","recent","favorites"]
+        for label in all_lists:
+            
+            message_list(browser, collection=label, include=True, unclick=True)
+            message_list(browser, collection=label, include=False, unclick=True)
 
-# add step to unclick any already clicked boxes aka add a reset / clear step
-# note: refreshing page only removes the lists of selected users added to be included
+        logging.debug("successfully cleared lists!")
+        return True
+    except Exception as e:
+        error_checker(e)
+    raise Exception("unable to clear user lists!")
 
 # click existing button
-def method_one(browser, collection, include):
+def method_one(browser, collection, include, unclick=False):
     logging.debug("METHOD ONE")
     try:
-        logging.debug(f"clicking message recipients: {collection}")
         element = find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True, index=0 if include else 1)
+        if unclick:
+            icon_done = element.find_element(By.TAG_NAME, "use")
+            if not icon_done: return True
+            logging.debug(f"unclicking message recipients: {collection}")
+        else:
+            logging.debug(f"clicking message recipients: {collection}")
         ActionChains(browser).move_to_element(element).click().perform()
         return True
     except Exception as e:
@@ -98,17 +109,7 @@ def method_one(browser, collection, include):
 # click 1st or 2nd 'View All'
 def click_view_all_lists(browser, include):
     try:
-        logging.debug(f"clicking view all: {include}")
         elements = browser.find_elements(By.CLASS_NAME, "b-content-filter__group-btns")
-        # view_alls = []
-        # for element in elements:
-        #     if str(element.get_attribute("innerHTML")).lower().strip() == "view all":
-        #         view_alls.append(element)
-
-        # if len(view_alls) == 0:
-        #     logging.warning("unable to find any view all buttons!")
-        #     return False
-
         element = None
         if include:
             logging.debug("clicking view all 1...")
@@ -116,37 +117,59 @@ def click_view_all_lists(browser, include):
         elif not include and len(elements) > 1:
             logging.debug("clicking view all 2...")
             element = elements[1] 
-
         ActionChains(browser).move_to_element(element).click().perform()
         time.sleep(1)
+        logging.debug("clicked view all button")
         return True
     except Exception as e:
         error_checker(e)
-    return False    
+    raise Exception("unable to click view all lists!")
 
 # click existing list available
-def method_two(browser, collection):
+def method_two(browser, collection, unclick=False):
     logging.debug("METHOD TWO")
-    elements = browser.find_elements(By.CLASS_NAME, "b-rows-lists__item__name")
-    for element in elements:
+    # elements = browser.find_elements(By.CLASS_NAME, "b-rows-lists__item__name")
+    for element in browser.find_elements(By.CLASS_NAME, "b-rows-lists__item__name"):
         if str(collection).lower().strip() in str(element.get_attribute("innerHTML")).lower().strip():
-            logging.debug("clicking on list element...")
-            ActionChains(browser).move_to_element(element).click(on_element=element).perform()
-            find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
-            return True
+            if unclick:
+                try:
+                    icon_done = element.find_element(By.TAG_NAME, "use")
+                    if not icon_done: continue
+                except Exception as e:
+                    print(e)
+                    continue
+                logging.debug("unclicking on list element...")
+                ActionChains(browser).move_to_element(element).click(on_element=element).perform()
+                find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
+                return True
+            else:
+                logging.debug("clicking on list element...")
+                ActionChains(browser).move_to_element(element).click(on_element=element).perform()
+                find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
+                return True
     return False
 
 # search for list
-def method_three(browser, collection):
+def method_three(browser, collection, unclick=False):
     logging.debug("METHOD THREE")
     elements = browser.find_elements(By.TAG_NAME, "use")
     element = [elem for elem in elements if '#icon-search' in str(elem.get_attribute('href'))][0]
     ActionChains(browser).move_to_element(element).click(on_element=element).click().send_keys(collection).perform()
-    return method_two(browser, collection)
+    return method_two(browser, collection, unclick=unclick)
+
+
+
+# TODO: update the message process to match the following backup process of opening the lists up and scrolling for it or typing into the list's search function and then clicking it there
+# if one of the below fails, click and open the list of "lists to send to" via the "view all" button
+# same for exlude process
+# scroll through lists until matching name of list is found and click on it there
 
 # Fans is synonymous with All
-def message_list(browser, collection="Fans", include=True):
+def message_list(browser, collection="Fans", include=True, unclick=False):
     go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
+
+    if not unclick:
+        clear_lists(browser)
 
     if collection.lower() == "all":
         collection = "Fans"
@@ -158,24 +181,27 @@ def message_list(browser, collection="Fans", include=True):
     # try method three, if fails there is no list
     # successful = False
 
-    successful = method_one(browser, collection, include)
+    successful = method_one(browser, collection, include, unclick=unclick)
 
     if not successful:
 
-        successful = click_view_all_lists(browser, include)
-        if not successful:
-            raise Exception("unable to continue to method two!")
+        click_view_all_lists(browser, include)
 
-        successful = method_two(browser, collection)
+        successful = method_two(browser, collection, unclick=unclick)
 
     if not successful:
 
-        successful = method_three(browser, collection)
+        successful = method_three(browser, collection, unclick=unclick)
 
     if successful:
 
         return successful
-    raise Exception(f"unable to find list: {collection}")
+
+    if not unclick:
+        clear_lists(browser)
+        return True
+    else:
+        raise Exception(f"unable to find list: {collection}")
 
 
 
