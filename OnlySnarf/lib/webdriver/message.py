@@ -42,17 +42,12 @@ def message(browser, message_object):
     try:
         logging.info(f"Entering message to {','.join(message_object['recipients'])}: (${message_object['price']}) {message_object['text']}\nIncludes: {','.join(message_object['includes'])}\nExcludes: {','.join(message_object['excludes'])}")
 
-        clear_lists(browser)
+        clear_lists(browser, includes=message_object["includes"], excludes=message_object["excludes"])
 
         # prepare the message
         if len(message_object["recipients"]) > 1 or message_object["includes"] or message_object["excludes"]:
             # if not messaging a user directly, all these can be stacked in a single message
-            if message_object["includes"]:
-                for label in message_object['includes']:
-                    message_list(browser, collection=label, include=True)
-            if message_object["excludes"]:
-                for label in message_object["excludes"]:
-                    message_list(browser, collection=label, include=False)
+            message_list(browser, includes=message_object["includes"], excludes=message_object["excludes"])
             # use same page to add additional users to message 
             for username in message_object["recipients"]:
                 add_user_to_message(browser, username)
@@ -70,18 +65,19 @@ def message(browser, message_object):
         message_confirm(browser)
 
         if CONFIG["debug"]:
-            clear_lists(browser)
-
+            clear_lists(browser, includes=message_object["includes"], excludes=message_object["excludes"])
+            message_clear(browser)
+            browser.refresh()
         return True
     except Exception as e:
         error_checker(e)
     message_clear(browser)
-    check_clear_lists(browser)
+    clear_lists(browser, includes=message_object["includes"], excludes=message_object["excludes"])
+    browser.refresh() # clears entered usernames
     raise Exception("failed to send message!")
 
-
-
-# TODO: update this to get the label that is associated with the "icon-done" so that it can unclick that specific label?
+# TODO: when clearing lists, just open the list menu for both and deselect every option available
+# TODO: when clicking lists, do multiple labels at the same time while having the list selection open
 
 def check_clear_lists(browser, reattempt=False):
     try:
@@ -93,26 +89,34 @@ def check_clear_lists(browser, reattempt=False):
                 print(element.get_attribute("href"))
                 print(element.is_enabled())
                 print(element.is_displayed())
-                clear_lists(browser)
                 return True
                 # break
     except Exception as e:
         if "stale element" in str(e) and not reattempt:
             logging.debug('reattempting message_list...')
-            return check_clear_lists(browser, reattempt=True)
+            if not reattempt: return check_clear_lists(browser, reattempt=True)
     logging.debug("no icon-dones found!")
     return False
 
-def clear_lists(browser):
+def clear_lists(browser, includes=[], excludes=[]):
+    if not check_clear_lists(browser): return
     logging.debug("clearing lists...")
     try:
-        # all_lists = ["fans","following","recent","favorites"]
-        all_lists = ["fans","following"]
-        for label in all_lists:
-            if check_clear_lists(browser):
-                message_list(browser, collection=label, include=True, unclick=True)
-            if check_clear_lists(browser):
-                message_list(browser, collection=label, include=False, unclick=True)
+        message_list(browser, includes=includes, excludes=excludes, unclick=True)
+        # # all_lists = ["fans","following","recent","favorites"]
+        # all_lists = ["fans","following","favorites"]
+        # for collection in all_lists:
+        #     click_view_all_lists(browser, include=True)
+        #     method_two(browser, collection, unclick=True)
+        # find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
+        # for collection in all_lists:
+        #     click_view_all_lists(browser, include=False)
+        #     method_two(browser, collection, unclick=True)
+        # find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
+        #     # if check_clear_lists(browser):
+        #         # message_list(browser, collection=collection, include=True, unclick=True)
+        #     # if check_clear_lists(browser):
+        #         # message_list(browser, collection=collection, include=False, unclick=True)
         logging.debug("successfully cleared lists!")
         return True
     except Exception as e:
@@ -120,13 +124,19 @@ def clear_lists(browser):
     raise Exception("unable to clear user lists!")
 
 # click existing button
-def method_one(browser, collection, include=True, unclick=False):
+def method_one(browser, collection, include=True, unclick=False, reattempt=False):
     logging.debug("METHOD ONE")
     try:
         element = find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True, index=0 if include else 1)
         if unclick:
-            icon_done = element.find_element(By.TAG_NAME, "use")
-            if not icon_done: return True
+            try:
+                parent_element = element.find_element(By.XPATH, '..')
+                icon_done = parent_element.find_element(By.TAG_NAME, "use")
+                if not icon_done: return True
+            except Exception as e:
+                print(e)
+                if not reattempt: return method_one(browser, collection, include=include, unclick=unclick, reattempt=True)
+                return True
             logging.debug(f"unclicking message recipients: {collection}")
         else:
             logging.debug(f"clicking message recipients: {collection}")
@@ -160,22 +170,31 @@ def method_two(browser, collection, unclick=False, reattempt=False):
     logging.debug("METHOD TWO")
     # elements = browser.find_elements(By.CLASS_NAME, "b-rows-lists__item__name")
     try:
-        for element in browser.find_elements(By.CLASS_NAME, "b-rows-lists__item__name"):
+
+        # b-rows-lists__item__label m-collection-item b-input-radio__container
+        for element in browser.find_elements(By.CLASS_NAME, "b-rows-lists__item__label"):
             if str(collection).lower().strip() in str(element.get_attribute("innerHTML")).lower().strip():
                 if unclick:
                     try:
-                        icon_done = element.find_element(By.TAG_NAME, "use")
-                        if not icon_done: continue
+
+                        checkbox = element.find_element(By.CLASS_NAME, "b-input-radio")
+                        if not checkbox.is_selected():
+                            logging.debug(f"not unclicking not clicked element: {collection}")
+                            return True
+
+                        # parent_element = element.find_element(By.XPATH, '..')
+                        # icon_done = element.find_element(By.TAG_NAME, "use")
+                        # if not icon_done: continue
                     except Exception as e:
                         print(e)
                         continue
                     logging.debug("unclicking on list element...")
                     ActionChains(browser).move_to_element(element).click(on_element=element).perform()
-                    find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
+                    # find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
                 else:
                     logging.debug("clicking on list element...")
                     ActionChains(browser).move_to_element(element).click(on_element=element).perform()
-                    find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
+                    # find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
                 return True
     except Exception as e:
         if "stale element" in str(e) and not reattempt:
@@ -201,41 +220,39 @@ def method_three(browser, collection, unclick=False):
 # scroll through lists until matching name of list is found and click on it there
 
 # Fans is synonymous with All
-def message_list(browser, collection="Fans", include=True, unclick=False):
+# def message_list(browser, collection="Fans", include=True, unclick=False):
+def message_list(browser, includes=[], excludes=[], unclick=False):
     go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
 
-    if collection.lower() == "all":
-        collection = "Fans"
-    elif collection.lower() == "recent":
-        return message_recent(browser, exclude=include, unclick=unclick)
+    if len(includes) > 0:
+        click_view_all_lists(browser, include=True)
+        for collection in includes:
+            if collection.lower() == "all":
+                collection = "Fans"
+            elif collection.lower() == "recent":
+                return message_recent(browser, exclude=False)
 
-    # try method one, if fails open list
-    # try method two, if fails type in list
-    # try method three, if fails there is no list
-    # successful = False
+            successful = method_two(browser, collection, unclick=unclick)
+            if not successful:
+                successful = method_three(browser, collection, unclick=unclick)
+            if successful: continue
+            raise Exception(f"unable to click list: {collection}")
 
-    successful = method_one(browser, collection, include=include, unclick=unclick)
+        find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
 
-    if not successful:
+    if len(excludes) > 0:
+        click_view_all_lists(browser, include=False)
+        for collection in excludes:
+            if collection.lower() == "all":
+                collection = "Fans"
 
-        click_view_all_lists(browser, include=include)
+            successful = method_two(browser, collection, unclick=unclick)
+            if not successful:
+                successful = method_three(browser, collection, unclick=unclick)
+            if successful: continue
+            raise Exception(f"unable to click list: {collection}")
 
-        successful = method_two(browser, collection, unclick=unclick)
-
-    if not successful:
-
-        successful = method_three(browser, collection, unclick=unclick)
-
-    if successful:
-
-        return successful
-
-    elif unclick:
-        return True
-    else:
-        raise Exception(f"unable to find list: {collection}")
-
-
+        find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
 
 # TODO: ADD SCHEDULE BEHAVIOR HERE
 def message_recent(browser, exclude=False, unclick=False):
@@ -273,7 +290,8 @@ def add_user_to_message(browser, username):
     try:
         logging.debug(f"adding user to message: {username}")
         element = browser.find_element(By.CLASS_NAME, "b-search-users-form__input")
-        ActionChains(browser).move_to_element(element).click(on_element=element).send_keys(Keys.CLEAR).send_keys(str(username)).perform()
+        ActionChains(browser).move_to_element(element).click(on_element=element).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(username)).perform()
+        # time.sleep(1)
         WebDriverWait(browser, 60).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-search-users-form__input")))
         # elements = browser.find_elements(By.CLASS_NAME, "b-available-users__item")
         for element in browser.find_elements(By.CLASS_NAME, "b-available-users__item"):
@@ -282,6 +300,114 @@ def add_user_to_message(browser, username):
     except Exception as e:
         error_checker(e)
     raise Exception("unable to add user to message!")
+
+# TODO: this needs to fail when it does not find a username
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ######################################################################
 ######################################################################

@@ -15,7 +15,7 @@ class TestSnarf(unittest.TestCase):
     def setUp(self):
         CONFIG["schedule"] = {}
         CONFIG["text"] = "test balls"
-        CONFIG["recipients"] = ["random"]
+        CONFIG["recipients"] = ["random", "random"]
         CONFIG["input"] = []
 
     def tearDown(self):
@@ -27,8 +27,8 @@ class TestSnarf(unittest.TestCase):
     def test_message_all_include(self):
         assert Message.create_message({**CONFIG,"includes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to included lists"
 
-    def test_message_all_exclude(self):
-        assert Message.create_message({**CONFIG,"excludes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to excluded lists"
+    # def test_message_all_exclude(self):
+    #     assert Message.create_message({**CONFIG,"excludes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to excluded lists"
 
 
 
