@@ -95,6 +95,16 @@ def write_users_local(added_users=[]):
         if not found:
             new_users.append(user.dump())
 
+    # TODO: fix this and the above loop to maintain the correct variables in the list
+    for existingUser in existing_users:
+        found = False
+        for user in new_users:
+            if user.equals(existingUser):
+                found = True
+                break
+        if not found:
+            new_users.append(existingUser)
+
     data = {}
     data['users'] = new_users
     data['randomized_users'] = randomized_users
