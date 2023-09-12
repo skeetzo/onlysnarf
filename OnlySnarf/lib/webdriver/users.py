@@ -122,7 +122,7 @@ def get_users_at_page(browser, page, collection="Active"):
         class_name = "fans"
     try:
         users = []
-        go_to_page(browser, page, force=True)
+        go_to_page(browser, os.path.join(page, collection.lower()), force=True)
         find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True).click()
         # scroll until elements stop spawning
         thirdTime = 0

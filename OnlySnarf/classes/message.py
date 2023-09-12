@@ -168,11 +168,12 @@ class Message():
 
         users = []
         for username in self.recipients:
-            user = User.get_user_by_username(username).dump()
-            user["messages"]["sent"].append(self.text)
-            # user["files"]["sent"].extend([file.get_title() for file in self.files])
-            user["files"]["sent"].extend(self.files)
-            user["files"]["sent"] = list(set(user["files"]["sent"])) # prevent duplicates
+            user = User.get_user_by_username(username)
+            user.messages["sent"].append(self.text)
+            user.messages["sent"].append(self.text)
+            user.files["sent"].extend([file.get_title() for file in self.files])
+            user.files["sent"].extend(self.files)
+            user.files["sent"] = list(set(user.files["sent"])) # prevent duplicates
             users.append(user)
         User.save_users(users)
 

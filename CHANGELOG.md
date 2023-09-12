@@ -823,17 +823,27 @@
 - more updates to messaging
 - finished updates to messaging includes & excludes
 - added webdriver/collections & /clear
+- finished adding and testing new messaging capacities: all, recent, etc
+**9/12/2023**
+- updated local user data structures
+- finished debugging message on_success
 
 ------------------------------------------------------------------------------------
 
 ## TODO
+
+- figure out why messaging a random user is replacing the users file with that random user
+
+
+- RUN ALL TESTS AGAIN
+
+- update loading local users to save better internally
 
 - possibly remove all return True statements in favor of returning nothing? raise exception moved to except clause?
 - refactor specific class names into shared variables like: new_post_text_input --> message_or_post_textarea
 
 - add message filters? maybe by request?
 
-- finish adding and testing new messaging capacities: all, recent, etc
 
 (cleanup)
 - add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64

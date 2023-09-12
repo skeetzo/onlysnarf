@@ -7,7 +7,7 @@ from marshmallow import Schema, fields, validate, ValidationError, post_load, EX
 
 from ..lib.driver import get_recent_chat_users, get_userid_by_username as WEBDRIVER_get_userid_by_username, message as WEBDRIVER_message, get_users as WEBDRIVER_get_users
 from ..util.colorize import colorize
-from ..util.data import add_to_randomized_users, get_already_randomized_users, read_users_local, write_users_local
+from ..util.data import add_to_randomized_users, read_users_local, write_users_local
  # read_user_messages as WEBDRIVER_read_user_messages
 from ..util.config import CONFIG
 
@@ -94,7 +94,7 @@ class User:
             The user to compare another user object against
         """
 
-        if (str(user.username) != "None" and str(user.username) == str(self.username)) or (str(user.user_id) != "None" and str(user.user_id) == str(self.user_id)): return True
+        if str(self.username) == str(user["username"]): return True
         return False
 
     def get_id(self):
@@ -127,8 +127,12 @@ class User:
     #     logging.debug("chat read!")
 
     def update(self, user):
-        for key, value in user.dump().items():
-            setattr(self, str(key), value)
+        try:
+            # for key, value in user.dumps().items():
+            for key, value in user.items():
+                setattr(self, str(key), value)
+        except Exception as e:
+            logging.error(e)
 
     # necessary?
     # def delete(self):
@@ -164,12 +168,14 @@ class User:
         logging.debug("getting all users...")
         users = []
         if CONFIG["prefer_local"]:
-            users = read_users_local()
+            user_objects, randomized_users = read_users_local()
+            for user in user_objects:
+                users.append(User.create_user(user))
         if len(users) == 0:
             for user in WEBDRIVER_get_users(isFan=True, isFollower=True):
                 users.append(User.create_user(user))
+            User.save_users(users)
         logging.debug(f"users: {len(users)}")
-        # write_users_local(users)
         CONFIG["prefer_local"] = True
         return users
 
@@ -194,25 +200,24 @@ class User:
 
         logging.debug("getting random user...")
         users = User.get_all_users()
-        randomizedUsers = get_already_randomized_users()
+        local_users, random_users = read_users_local()
         # check each user in users
         # if user is not in random users, return user
-        randomUser = random.choice(users)
-        found = False
+        # randomUser = random.choice(users)
+        randomUser = None
         i = 0
-        while not found and i < len(users):
+        while not randomUser and i < len(users):
+            i+=1
             randomUser = random.choice(users)
+            # print(randomUser.dump())
             if not isFollower and randomUser.isFollower:
                 # randomUser = None
                 continue
-            i+=1
-            # for each user in random users, if the user is equal to the current random user then mark user as found; exit when a user is not found
-            for user in randomizedUsers:
-                if randomUser.equal(user):
-                    found = True
-            # if not found:
-                # randomUser = None
-            # if not found: break
+            for user in random_users:
+                if randomUser.equals(user):
+                    randomUser = None
+        if not randomUser:
+            raise Exception("failed to find random user!")
         add_to_randomized_users(randomUser)
         logging.debug(f"random user: {randomUser.username}")
         return randomUser
@@ -499,7 +504,6 @@ class User:
         if len(users) == 0: users = User.get_all_users()
         logging.info("updating chat logs: {}".format(len(users)))
         for user in users: user.messages_read()
-        # User.write_users_local(users=users)
         return users
 
 

@@ -67,8 +67,8 @@ def go_to_page(browser, page, force=False):
 
     if search_for_tab(browser, page, force=force):
         logging.debug(f"found -> {page}")
-        return
-    if str(browser.current_url) == str(page) or (str(page) in str(browser.current_url) and not force):
+        browser.execute_script("window.scrollTo(0, 0);")
+    elif str(browser.current_url) == str(page) or (str(page) in str(browser.current_url) and not force):
         logging.debug(f"already at -> {page}")
         browser.execute_script("window.scrollTo(0, 0);")
     else:
