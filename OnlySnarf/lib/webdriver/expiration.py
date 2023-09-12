@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
 from .errors import error_checker
-from .message import close_icons
+from .message import click_close_icons
 from .. import CONFIG, DEFAULT, debug_delay_check
 
 ######################
@@ -41,11 +41,11 @@ def expiration(browser, expires):
         # unnecessary due to clear_message
         if CONFIG["debug"]:
             logging.debug("skipping expiration save (debug)")
-            close_icons(browser)
+            click_close_icons(browser)
         return True
     except Exception as e:
         error_checker(e)
-    close_icons(browser)
+    click_close_icons(browser)
     return False
 
 def enter_expiration(browser, expires):

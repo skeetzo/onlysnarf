@@ -3,7 +3,8 @@ os.environ['ENV'] = "test"
 import unittest
 
 from OnlySnarf.util.config import set_config
-CONFIG = set_config({"show":True})
+# TODO: this shouldn't require manual configuration of skipping
+CONFIG = set_config({"show":True,"skip_download":False,"skip_upload":False})
 from OnlySnarf.util.logger import configure_logging
 configure_logging(True, True)
 
@@ -25,6 +26,8 @@ class TestSnarf(unittest.TestCase):
         assert Message.create_message({**CONFIG}).send(), "unable to send basic message"
 
     def test_message_all_include(self):
+        CONFIG["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"]
+        CONFIG["price"] = DEFAULT.PRICE_MINIMUM
         CONFIG["recipients"] = ["random", "random"]
         assert Message.create_message({**CONFIG,"includes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to included lists"
 
@@ -48,9 +51,6 @@ class TestSnarf(unittest.TestCase):
     def test_message_failure(self):
         CONFIG["recipients"] = ["onlyfans"]
         assert not Message.create_message({**CONFIG}).send(), "unable to fail message properly"
-
-
-    # TODO: inactive users should also search in "All" before completely failing
 
     def test_message_inactive_user(self):
         import string

@@ -6,7 +6,7 @@ from selenium.webdriver.common.keys import Keys
 
 from .element import find_element_to_click
 from .errors import error_checker
-from .message import close_icons
+from .message import click_close_icons
 from .. import CONFIG, debug_delay_check
 
 ################
@@ -39,7 +39,7 @@ def poll(browser, poll_object):
         add_poll_questions(browser, poll_object["questions"])
         if CONFIG["debug"]:
             logging.debug("skipping poll save (debug)")
-            close_icons(browser)
+            click_close_icons(browser)
         logging.debug("poll successful!")
         return True
     except Exception as e:

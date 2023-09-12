@@ -39,7 +39,7 @@ def get_current_username(browser):
             for ele in eles:
                 logging.debug("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
         if len(eles) == 0:
-            logging.error("unable to find username!")
+            logging.error("failed to find username!")
         else:
             username = str(eles[0].get_attribute("href")).replace(ONLYFANS_HOME_URL+"/", "")
             logging.debug("successfully found active username: {}".format(username))
@@ -69,7 +69,7 @@ def get_userid_by_username(browser, username):
         elements = browser.find_elements(By.TAG_NAME, "a")
         user_id = [ele.get_attribute("href") for ele in elements if "/my/chats/chat/" in str(ele.get_attribute("href"))]
         if len(user_id) == 0: 
-            logging.warning(f"unable to find user id for {username}!")
+            logging.warning(f"failed to find user id for {username}!")
             return None
         user_id = user_id[0]
         user_id = user_id.replace("https://onlyfans.com/my/chats/chat/", "")
@@ -100,12 +100,16 @@ def get_user_element_at_page(browser, username, page):
                     # return parent element housing user info
                     return ele.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
             elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
-            if len(elements) == int(count) and thirdTime >= 3: break
+            if len(elements) == int(count) and thirdTime >= 3:
+                logging.info("")
+                break
             print_same_line(f"({count}) scrolling...")
             count = len(elements)
             browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
-            if thirdTime >= 3 and len(elements) == 0: break
+            if thirdTime >= 3 and len(elements) == 0:
+                logging.info("")
+                break
             thirdTime += 1
     except Exception as e:
         error_checker(e)
@@ -170,16 +174,16 @@ def get_user_by_username(browser, username, reattempt=False, collection="All"):
     except Exception as e:
         error_checker(e)
     if not reattempt: return get_user_by_username(browser, username, reattempt=True)
-    raise Exception("unable to get user by username!")
+    raise Exception("failed to get user by username!")
 
 def search_for_username(browser, username, collection="All"):
     try:
-        logging.debug(f"searching for username by opening url...")
+        logging.debug(f"searching for {username} by opening url...")
         go_to_page(browser, os.path.join(ONLYFANS_FANS_URL, "" if collection == "All" else collection.lower(), f"?search={username}"))
         return True
     except Exception as e:
         error_checker(e)
-    raise Exception("unable to search for username")
+    raise Exception("failed to search for username!")
 
 def get_user_from_elements(browser, username, reattempt=False):
     try:
@@ -198,7 +202,7 @@ def get_user_from_elements(browser, username, reattempt=False):
     if not reattempt:
         scroll_to_bottom(browser)
         return get_user_from_elements(browser, username, reattempt=True)
-    raise Exception(f"unable to get user from elements: '{username}'")
+    raise Exception(f"failed to get user from elements: '{username}'")
 
 def click_user_button(browser, user_element, text="Message", reattempt=False):
     if not user_element: raise Exception("missing user element!")
@@ -221,7 +225,7 @@ def click_user_button(browser, user_element, text="Message", reattempt=False):
             browser.execute_script(f"window.scrollTo({x}, {y-50})")
             return click_user_button(browser, user_element, text=text, reattempt=True)
         error_checker(e)
-    raise Exception(f"unable to click {text} btn for user!")
+    raise Exception(f"failed to click {text} btn for user!")
 
 
 
@@ -323,7 +327,7 @@ def scroll_to_bottom_once(browser):
 #         except Exception as e:
 #             if "is stale" in str(e):
 #                 logging.debug("stale element found, resetting search!")
-#     logging.warning(f"unable to find user by username: {username}")
+#     logging.warning(f"failed to find user by username: {username}")
 #     if not reattempt:
 #         browser.refresh()
 #         return get_user_by_username(browser, username, reattempt=True)
@@ -342,7 +346,7 @@ def get_user_search_field(browser):
         return search_element
     except Exception as e:
         error_checker(e)
-    raise Exception("unable to find search element!")
+    raise Exception("failed to find search element!")
 
 
 def search_username_in_search_element(browser, search_element, username):

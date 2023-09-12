@@ -815,18 +815,21 @@
   - fully tested updates to webdriver 
   - fully tested updates to schedule, date, and time
   - separated driver functions into individual components ala schedule --> individual steps; for easier testing (and to clean up the giant ass driver file)
-**4.6.12 : 9/9/2023**
-- figured out why config settings arent loading proper variables
-- removed extra and unnecessary args from optional_args; cleaned up menu & help docs
-- finished message ability to add_user_to_message
-**9/11/2023**
+  **4.6.12 : 9/9/2023**
+  - figured out why config settings arent loading proper variables
+  - removed extra and unnecessary args from optional_args; cleaned up menu & help docs
+  - finished message ability to add_user_to_message
+**4.6.13 : 9/11/2023**
 - more updates to messaging
+- finished updates to messaging includes & excludes
+- added webdriver/collections & /clear
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- finish updates to messaging includes & excludes
+- possibly remove all return True statements in favor of returning nothing? raise exception moved to except clause?
+- refactor specific class names into shared variables like: new_post_text_input --> message_or_post_textarea
 
 - add message filters? maybe by request?
 
