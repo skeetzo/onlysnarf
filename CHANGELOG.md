@@ -819,6 +819,8 @@
 - figured out why config settings arent loading proper variables
 - removed extra and unnecessary args from optional_args; cleaned up menu & help docs
 - finished message ability to add_user_to_message
+**9/11/2023**
+- more updates to messaging
 
 ------------------------------------------------------------------------------------
 

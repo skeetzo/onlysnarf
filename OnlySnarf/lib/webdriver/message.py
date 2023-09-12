@@ -42,10 +42,11 @@ def message(browser, message_object):
     try:
         logging.info(f"Entering message to {','.join(message_object['recipients'])}: (${message_object['price']}) {message_object['text']}\nIncludes: {','.join(message_object['includes'])}\nExcludes: {','.join(message_object['excludes'])}")
 
-        clear_lists(browser, includes=message_object["includes"], excludes=message_object["excludes"])
 
         # prepare the message
         if len(message_object["recipients"]) > 1 or message_object["includes"] or message_object["excludes"]:
+            clear_lists(browser, includes=message_object["includes"], excludes=message_object["excludes"])
+
             # if not messaging a user directly, all these can be stacked in a single message
             message_list(browser, includes=message_object["includes"], excludes=message_object["excludes"])
             # use same page to add additional users to message 
@@ -53,6 +54,7 @@ def message(browser, message_object):
                 add_user_to_message(browser, username)
         else:
             # if none of above or solo messaging, switch to normal user messaging (locates user_id on profile page and opens url link)
+            # doesn't need to clear lists when opening a new tab to search for the username then send them a message
             message_user_by_username(browser, message_object["recipients"][0])
 
         # TODO: fix this circular import issue, probably move enter_text somewhere else
@@ -79,23 +81,17 @@ def message(browser, message_object):
 # TODO: when clearing lists, just open the list menu for both and deselect every option available
 # TODO: when clicking lists, do multiple labels at the same time while having the list selection open
 
+# searches for a single '#icon-done'
 def check_clear_lists(browser, reattempt=False):
     try:
         for element in browser.find_elements(By.TAG_NAME, "use"):
-
-            # TODO: this goes into an infinite loop that finds the entered username's checkbox
             if '#icon-done' in str(element.get_attribute('href')) and element.is_displayed():
-                print(element.get_attribute("innerHTML"))
-                print(element.get_attribute("href"))
-                print(element.is_enabled())
-                print(element.is_displayed())
                 return True
-                # break
     except Exception as e:
         if "stale element" in str(e) and not reattempt:
             logging.debug('reattempting message_list...')
             if not reattempt: return check_clear_lists(browser, reattempt=True)
-    logging.debug("no icon-dones found!")
+    logging.debug("no lists to clear!")
     return False
 
 def clear_lists(browser, includes=[], excludes=[]):
@@ -103,20 +99,6 @@ def clear_lists(browser, includes=[], excludes=[]):
     logging.debug("clearing lists...")
     try:
         message_list(browser, includes=includes, excludes=excludes, unclick=True)
-        # # all_lists = ["fans","following","recent","favorites"]
-        # all_lists = ["fans","following","favorites"]
-        # for collection in all_lists:
-        #     click_view_all_lists(browser, include=True)
-        #     method_two(browser, collection, unclick=True)
-        # find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
-        # for collection in all_lists:
-        #     click_view_all_lists(browser, include=False)
-        #     method_two(browser, collection, unclick=True)
-        # find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
-        #     # if check_clear_lists(browser):
-        #         # message_list(browser, collection=collection, include=True, unclick=True)
-        #     # if check_clear_lists(browser):
-        #         # message_list(browser, collection=collection, include=False, unclick=True)
         logging.debug("successfully cleared lists!")
         return True
     except Exception as e:
@@ -124,27 +106,27 @@ def clear_lists(browser, includes=[], excludes=[]):
     raise Exception("unable to clear user lists!")
 
 # click existing button
-def method_one(browser, collection, include=True, unclick=False, reattempt=False):
-    logging.debug("METHOD ONE")
-    try:
-        element = find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True, index=0 if include else 1)
-        if unclick:
-            try:
-                parent_element = element.find_element(By.XPATH, '..')
-                icon_done = parent_element.find_element(By.TAG_NAME, "use")
-                if not icon_done: return True
-            except Exception as e:
-                print(e)
-                if not reattempt: return method_one(browser, collection, include=include, unclick=unclick, reattempt=True)
-                return True
-            logging.debug(f"unclicking message recipients: {collection}")
-        else:
-            logging.debug(f"clicking message recipients: {collection}")
-        ActionChains(browser).move_to_element(element).click().perform()
-        return True
-    except Exception as e:
-        error_checker(e)
-    return False
+# def method_one(browser, collection, include=True, unclick=False, reattempt=False):
+#     logging.debug("METHOD ONE")
+#     try:
+#         element = find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True, index=0 if include else 1)
+#         if unclick:
+#             try:
+#                 parent_element = element.find_element(By.XPATH, '..')
+#                 icon_done = parent_element.find_element(By.TAG_NAME, "use")
+#                 if not icon_done: return True
+#             except Exception as e:
+#                 print(e)
+#                 if not reattempt: return method_one(browser, collection, include=include, unclick=unclick, reattempt=True)
+#                 return True
+#             logging.debug(f"unclicking message recipients: {collection}")
+#         else:
+#             logging.debug(f"clicking message recipients: {collection}")
+#         ActionChains(browser).move_to_element(element).click().perform()
+#         return True
+#     except Exception as e:
+#         error_checker(e)
+#     return False
 
 # click 1st or 2nd 'View All'
 def click_view_all_lists(browser, include=True):
@@ -166,7 +148,7 @@ def click_view_all_lists(browser, include=True):
     raise Exception("unable to click view all lists!")
 
 # click existing list available
-def method_two(browser, collection, unclick=False, reattempt=False):
+def click_collection_button(browser, collection, unclick=False, reattempt=False):
     logging.debug("METHOD TWO")
     # elements = browser.find_elements(By.CLASS_NAME, "b-rows-lists__item__name")
     try:
@@ -199,18 +181,18 @@ def method_two(browser, collection, unclick=False, reattempt=False):
     except Exception as e:
         if "stale element" in str(e) and not reattempt:
             logging.debug("reattempting method two (stale element)...")
-            return method_two(browser, collection, unclick=unclick, reattempt=True)
+            return click_collection_button(browser, collection, unclick=unclick, reattempt=True)
         else:
             error_checker(e)
     return False
 
 # search for list
-def method_three(browser, collection, unclick=False):
+def search_for_collection(browser, collection, unclick=False):
     logging.debug("METHOD THREE")
     elements = browser.find_elements(By.TAG_NAME, "use")
     element = [elem for elem in elements if '#icon-search' in str(elem.get_attribute('href'))][0]
     ActionChains(browser).move_to_element(element).click(on_element=element).click().send_keys(collection).perform()
-    return method_two(browser, collection, unclick=unclick)
+    return click_collection_button(browser, collection, unclick=unclick)
 
 
 
@@ -224,35 +206,27 @@ def method_three(browser, collection, unclick=False):
 def message_list(browser, includes=[], excludes=[], unclick=False):
     go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
 
-    if len(includes) > 0:
-        click_view_all_lists(browser, include=True)
-        for collection in includes:
+    def attempt_list(collections, include=True):
+        click_view_all_lists(browser, include=include)
+        for collection in collections:
             if collection.lower() == "all":
                 collection = "Fans"
-            elif collection.lower() == "recent":
+            elif collection.lower() == "recent" and include:
                 return message_recent(browser, exclude=False)
 
-            successful = method_two(browser, collection, unclick=unclick)
+            successful = click_collection_button(browser, collection, unclick=unclick)
             if not successful:
-                successful = method_three(browser, collection, unclick=unclick)
+                successful = search_for_collection(browser, collection, unclick=unclick)
             if successful: continue
             raise Exception(f"unable to click list: {collection}")
 
         find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
+
+    if len(includes) > 0:
+        attempt_list(includes, include=True)
 
     if len(excludes) > 0:
-        click_view_all_lists(browser, include=False)
-        for collection in excludes:
-            if collection.lower() == "all":
-                collection = "Fans"
-
-            successful = method_two(browser, collection, unclick=unclick)
-            if not successful:
-                successful = method_three(browser, collection, unclick=unclick)
-            if successful: continue
-            raise Exception(f"unable to click list: {collection}")
-
-        find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
+        attempt_list(excludes, include=False)
 
 # TODO: ADD SCHEDULE BEHAVIOR HERE
 def message_recent(browser, exclude=False, unclick=False):
@@ -292,25 +266,17 @@ def add_user_to_message(browser, username):
         element = browser.find_element(By.CLASS_NAME, "b-search-users-form__input")
         ActionChains(browser).move_to_element(element).click(on_element=element).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(username)).perform()
         # time.sleep(1)
-        WebDriverWait(browser, 60).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-search-users-form__input")))
+        WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-search-users-form__input")))
         # elements = browser.find_elements(By.CLASS_NAME, "b-available-users__item")
-        for element in browser.find_elements(By.CLASS_NAME, "b-available-users__item"):
+        elements = browser.find_elements(By.CLASS_NAME, "b-available-users__item")
+        if len(elements) == 0:
+            raise Exception(f"unable to add {username} to message!")
+        for element in elements:
             element.click()
         return True
     except Exception as e:
         error_checker(e)
-    raise Exception("unable to add user to message!")
-
-# TODO: this needs to fail when it does not find a username
-
-
-
-
-
-
-
-
-
+    raise Exception(f"unable to add {username} to message!")
 
 
 
@@ -425,7 +391,7 @@ def close_icons(browser):
 def clear_text(browser):
     try:        
         # BUGS: only backspace is working
-        element = WebDriverWait(browser, 60).until(EC.visibility_of_element_located((By.ID, 'new_post_text_input')))
+        element = WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.ID, 'new_post_text_input')))
         # TODO: fix this horribly inefficient loop
         for i in range(300):
             element.send_keys(Keys.BACK_SPACE)
