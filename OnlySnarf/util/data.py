@@ -102,39 +102,38 @@ def write_users_local(added_users):
     # merge with existing user data
     existing_users, randomized_users = read_users_local()
 
-    new_users = []
-    usernames = []
-    for each_added_user in added_users:
-        found = False
-        for existing_user in existing_users:
-            updated = False
-            for added_user in added_users:
-                # if added_user.equals(existing_user):
-                if added_user.equals(existing_user) and added_user.username not in usernames:
-                    existing_user.update(added_user.dump())
-                    logging.debug(f"updated: {added_user.username}")
+    try:
+        new_users = []
+        usernames = []
+        for each_added_user in added_users:
+            found = False
+            for existing_user in existing_users:
+                updated = False
+                for added_user in added_users:
+                    # if added_user.equals(existing_user):
+                    if added_user.equals(existing_user) and added_user.username not in usernames:
+                        existing_user.update(added_user.dump())
+                        # logging.debug(f"updated: {added_user.username}")
+                        new_users.append(existing_user)
+                        usernames.append(added_user.username)
+                        updated = True
+                        if added_user.equals(each_added_user):
+                            found = True
+                        break
+                # if found: continue
+                if not updated and existing_user["username"] not in usernames:
+                    # logging.debug(f"existing: {existing_user['username']}")
                     new_users.append(existing_user)
-                    usernames.append(added_user.username)
-                    updated = True
-                    if added_user.equals(each_added_user):
-                        found = True
-                    break
-            if found:
-                break
-            if not updated and existing_user["username"] not in usernames:
-                logging.debug(f"existing: {existing_user['username']}")
-                new_users.append(existing_user)
-                usernames.append(existing_user["username"])
-                break
-        if not found and each_added_user.username not in usernames:
-            logging.debug(f"adding: {each_added_user.username}")
-            new_users.append(each_added_user.dump())
-            usernames.append(each_added_user.username)
+                    usernames.append(existing_user["username"])
+            if not found and each_added_user.username not in usernames:
+                # logging.debug(f"adding: {each_added_user.username}")
+                new_users.append(each_added_user.dump())
+                usernames.append(each_added_user.username)
+    except Exception as e:
+        print(e)
 
-    # for user in new_users:
-    #     list(filter(lambda d: d['type'] in keyValList, exampleSet))
-    # expectedResult = [d for d in exampleSet if d['type'] in keyValList]
-
+    # logging.debug("usernames:")
+    # logging.debug(usernames)
 
     # logging.debug("new users:")
     # logging.debug(new_users)

@@ -178,14 +178,14 @@ class User:
         logging.debug("getting all users...")
         global USER_CACHE
         if len(USER_CACHE) > 0 and not refresh:
-            logging.debug(f"users: {len(USER_CACHE)}")
+            logging.debug(f"cached users: {len(USER_CACHE)}")
             return USER_CACHE
         USER_CACHE = []
         if CONFIG["prefer_local"] and not refresh:
             user_objects, randomized_users = read_users_local()
             for user_object in user_objects:
                 USER_CACHE.append(User.create_user(user_object))
-            logging.debug(f"users: {len(USER_CACHE)}")
+            logging.debug(f"local users: {len(USER_CACHE)}")
             return USER_CACHE
         for user in WEBDRIVER_get_users(isFan=True, isFollower=True):
             USER_CACHE.append(User.create_user(user))

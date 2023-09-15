@@ -15,35 +15,6 @@ from ..util.config import CONFIG
 
 from marshmallow import Schema, fields, validate, post_load, EXCLUDE
 
-# https://marshmallow.readthedocs.io/en/stable/
-class MessageSchema(Schema):
-    __model__ = Message
-
-    text = fields.Str(default="")
-    files = fields.List(fields.Str(), default=[])
-    keywords = fields.List(fields.Str(), default=[])
-    performers = fields.List(fields.Str(), default=[])
-    price = fields.Float(validate=validate.Range(min=0, max=PRICE_MAXIMUM))
-    schedule = fields.Dict()
-    recipients = fields.List(fields.Str(), default=[])
-    includes = fields.List(fields.Str(), default=[])
-    excludes = fields.List(fields.Str(), default=[])
-
-    @post_load
-    def make_message(self, data, **kwargs):
-        return type(self).__model__(**data)
-
-
-class PostSchema(MessageSchema):
-    __model__ = Post
-
-    expiration = fields.Int(default=0)
-    poll = fields.Dict()
-
-    @post_load
-    def make_post(self, data, **kwargs):
-        return type(self).__model__(**data.dump())
-
 class Message():
     """OnlyFans message (and post) class"""
 
@@ -310,3 +281,32 @@ class Post(Message):
             return False
         return WEBDRIVER_post(self.dump())
             
+
+# https://marshmallow.readthedocs.io/en/stable/
+class MessageSchema(Schema):
+    __model__ = Message
+
+    text = fields.Str(default="")
+    files = fields.List(fields.Str(), default=[])
+    keywords = fields.List(fields.Str(), default=[])
+    performers = fields.List(fields.Str(), default=[])
+    price = fields.Float(validate=validate.Range(min=0, max=PRICE_MAXIMUM))
+    schedule = fields.Dict()
+    recipients = fields.List(fields.Str(), default=[])
+    includes = fields.List(fields.Str(), default=[])
+    excludes = fields.List(fields.Str(), default=[])
+
+    @post_load
+    def make_message(self, data, **kwargs):
+        return type(self).__model__(**data)
+
+
+class PostSchema(MessageSchema):
+    __model__ = Post
+
+    expiration = fields.Int(default=0)
+    poll = fields.Dict()
+
+    @post_load
+    def make_post(self, data, **kwargs):
+        return type(self).__model__(**data.dump())

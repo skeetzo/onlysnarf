@@ -15,7 +15,7 @@ class TestSnarf(unittest.TestCase):
     def setUp(self):
         CONFIG["schedule"] = {}
         CONFIG["text"] = "test balls"
-        CONFIG["recipients"] = ["random"]
+        CONFIG["recipients"] = ["nhkmn"]
         CONFIG["input"] = []
 
     def tearDown(self):
