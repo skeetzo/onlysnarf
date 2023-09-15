@@ -124,10 +124,10 @@ def add_options(options):
     options.add_argument("--no-sandbox") # Bypass OS security model
     if not CONFIG["show"]:
         options.add_argument('--headless')
+        options.add_argument("--window-size=1920,1080") # required for headless
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-extensions")
     options.add_argument("--disable-dev-shm-usage")
-
     options.add_argument("enable-automation")
     # options.add_argument("--disable-infobars")
 
@@ -147,8 +147,7 @@ def add_options(options):
     # possibly linux only
     # options.add_argument('disable-notifications')
     # https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
-    # options.add_arguments("start-maximized"); // open Browser in maximized mode
-    # options.add_argument("--window-size=1920,1080")
+    # options.add_argument("start-maximized")
     # options.add_argument("--disable-crash-reporter")
     # options.add_argument("--disable-infobars")
     # options.add_argument("--disable-in-process-stack-traces")
@@ -160,6 +159,8 @@ def add_options(options):
     # options.add_argument('--ignore-certificate-errors')
     # options.add_argument("--remote-debugging-address=localhost")    
     # options.add_argument("--remote-debugging-port=9223") # required
+
+
 
 def browser_error(err, browserName):
     print(err)

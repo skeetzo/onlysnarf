@@ -117,8 +117,8 @@ def enter_text(browser, text):
             logging.debug("successfully entered text!")
             return True
         except Exception as e:
-            logging.debug(e)
-        return False
+            error_checker(e)
+        raise Exception("failed to enter text!")
 
 # TODO: test this
 def enable_tweeting(browser):

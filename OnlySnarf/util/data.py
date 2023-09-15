@@ -40,6 +40,19 @@ def add_to_randomized_users(newUser):
         reset_userlist()
         logging.debug(e)
 
+def reset_random_users():
+    logging.debug("resetting random users...")
+    existing_users, randomized_users = read_users_local()
+    try:
+        data = {}
+        data['users'] = existing_users
+        data['randomized_users'] = []
+        with open(USERS_PATH, 'w') as outfile:  
+            json.dump(data, outfile, indent=4, sort_keys=True)
+        logging.debug("successfully reset random users!")
+    except Exception as e:
+        logging.error(e)
+
 def read_users_local():
     """
     Read the locally saved users file.
@@ -61,6 +74,8 @@ def read_users_local():
                 users.append(User.create_user(user).dump())
             for user in loaded['randomized_users']:
                 randomized_users.append(User.create_user(user).dump())
+        # logging.debug(users)
+        # logging.debug(randomized_users)
         logging.debug("successfully loaded local users!")
     except OSError:
         reset_userlist()
@@ -69,13 +84,13 @@ def read_users_local():
         # reset_userlist()
     return users, randomized_users
 
-def write_users_local(added_users=[]):
+def write_users_local(added_users):
     """
     Write to local users file.
 
     """
 
-    if len(added_users) == 0:
+    if not isinstance(added_users, list) and len(added_users) == 0:
         logging.debug("skipping local users save - empty")
         return
     logging.debug("saving users...")
@@ -84,26 +99,39 @@ def write_users_local(added_users=[]):
     existing_users, randomized_users = read_users_local()
 
     new_users = []
-    for user in added_users:
+    usernames = []
+    for each_added_user in added_users:
         found = False
-        for existingUser in existing_users:
-            if user.equals(existingUser):
-                user.update(existingUser)
-                new_users.append(user.dump())
-                found = True
+        for existing_user in existing_users:
+            updated = False
+            for added_user in added_users:
+                # if added_user.equals(existing_user):
+                if added_user.equals(existing_user) and added_user.username not in usernames:
+                    existing_user.update(added_user.dump())
+                    logging.debug(f"updated: {added_user.username}")
+                    new_users.append(existing_user)
+                    usernames.append(added_user.username)
+                    updated = True
+                    if added_user.equals(each_added_user):
+                        found = True
+                    break
+            if found:
                 break
-        if not found:
-            new_users.append(user.dump())
+            if not updated and existing_user["username"] not in usernames:
+                logging.debug(f"existing: {existing_user['username']}")
+                new_users.append(existing_user)
+                break
+        if not found and each_added_user.username not in usernames:
+            logging.debug(f"adding: {each_added_user.username}")
+            new_users.append(each_added_user.dump())
 
-    # TODO: fix this and the above loop to maintain the correct variables in the list
-    for existingUser in existing_users:
-        found = False
-        for user in new_users:
-            if user.equals(existingUser):
-                found = True
-                break
-        if not found:
-            new_users.append(existingUser)
+    # for user in new_users:
+    #     list(filter(lambda d: d['type'] in keyValList, exampleSet))
+    # expectedResult = [d for d in exampleSet if d['type'] in keyValList]
+
+
+    # logging.debug("new users:")
+    # logging.debug(new_users)
 
     data = {}
     data['users'] = new_users

@@ -3,8 +3,7 @@ os.environ['ENV'] = "test"
 import unittest
 
 from OnlySnarf.util.config import set_config
-# TODO: this shouldn't require manual configuration of skipping
-CONFIG = set_config({"show":True,"skip_download":False,"skip_upload":False})
+CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging
 configure_logging(True, True)
 
@@ -35,9 +34,9 @@ class TestSnarf(unittest.TestCase):
     #     CONFIG["recipients"] = ["random", "random"]
     #     assert Message.create_message({**CONFIG,"excludes":["all","following","favorites","friends","renew on","renew off"]}).send(), "unable to send message to excluded lists"
 
-    # def test_message_files_local(self):
-    #     CONFIG["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]
-    #     assert Message.create_message({**CONFIG}).send(), "unable to upload message files - local"
+    def test_message_files_local(self):
+        CONFIG["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]
+        assert Message.create_message({**CONFIG}).send(), "unable to upload message files - local"
 
     # def test_message_files_remote(self):
     #     CONFIG["input"] = ["https://github.com/skeetzo/onlysnarf/blob/master/public/images/shnarf.jpg?raw=true", "https://github.com/skeetzo/onlysnarf/blob/master/public/images/snarf.jpg?raw=true"]
@@ -57,12 +56,6 @@ class TestSnarf(unittest.TestCase):
     #     import random
     #     CONFIG["recipients"] = [''.join(random.choices(string.ascii_uppercase + string.digits, k=8))]
     #     assert not Message.create_message({**CONFIG}).send(), "unable to properly fail messaging an inactive user"
-
-    # def test_message_inactive_users(self):
-    #     import string
-    #     import random
-    #     CONFIG["recipients"] = [''.join(random.choices(string.ascii_uppercase + string.digits, k=8)), ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))]
-    #     assert not Message.create_message({**CONFIG}).send(), "unable to properly fail messaging inactive users"
 
 ############################################################################################
 

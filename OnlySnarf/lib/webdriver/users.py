@@ -125,21 +125,34 @@ def get_users_at_page(browser, page, collection="Active"):
         go_to_page(browser, os.path.join(page, collection.lower()), force=True)
         find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True).click()
         # scroll until elements stop spawning
-        thirdTime = 0
+        SLEEP_WAIT = 1
+        BREAK_COUNT = 0
         count = 0
+
+        # logging.StreamHandler.terminator = ""
+
         while True:
             elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
-            if len(elements) == int(count) and thirdTime >= 3: break
-            print_same_line(f"({count}) scrolling...")
+            if len(elements) == int(count) and BREAK_COUNT > 3:
+                break
+            elif len(elements) == int(count):
+                SLEEP_WAIT += 0.5
+                BREAK_COUNT += 1
+            # else:
+                # BREAK_COUNT -= 1
+                # if BREAK_COUNT < 0:
+                    # BREAK_COUNT = 0
             count = len(elements)
+            print_same_line(f"({count}) scrolling...")
+            # logging.info(f"({count}) scrolling...")
             browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(2)
-            if thirdTime >= 3 and len(elements) == 0: break
-            thirdTime += 1
+            time.sleep(SLEEP_WAIT)
         logging.info("")
-        elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
+
+        # logging.StreamHandler.terminator = "\n"
+
         logging.debug(f"searching {class_name}...")
-        for ele in elements:
+        for ele in browser.find_elements(By.CLASS_NAME, f"m-{class_name}"):
             username = ele.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()
             name = ele.find_element(By.CLASS_NAME, "g-user-name").get_attribute("innerHTML")
             name = re.sub("<!-*>", "", name)

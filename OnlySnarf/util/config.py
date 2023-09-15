@@ -43,10 +43,18 @@ def set_config(args):
       parsed_config[key] = value
     # turn strings of booleans into actual booleans, fix lists
     for key, value in parsed_config.items():
-      if value == "'True'" or value == "'False'":
-        parsed_config[key] = bool(value)
+      if "true" in str(value).lower():
+        # print("FIXING TRUE")
+        parsed_config[key] = True
+      elif "false" in str(value).lower():
+        # print("FIXING FALSE")
+        parsed_config[key] = False
       elif value == '[]':
+        # print("FIXING EMPTY LIST")
         parsed_config[key] = []
+      elif value == 'None':
+        # print("FIXING NONE")
+        parsed_config[key] = None
   except Exception as e:
     print(e)
   ###############

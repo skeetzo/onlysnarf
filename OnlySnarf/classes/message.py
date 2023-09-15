@@ -169,9 +169,10 @@ class Message():
         users = []
         for username in self.recipients:
             user = User.get_user_by_username(username)
+            print(user)
+            print(user.dumps())
             user.messages["sent"].append(self.text)
-            user.messages["sent"].append(self.text)
-            user.files["sent"].extend([file.get_title() for file in self.files])
+            user.files["sent"].extend([file.get_title() if isinstance(file, File) else file for file in self.files])
             user.files["sent"].extend(self.files)
             user.files["sent"] = list(set(user.files["sent"])) # prevent duplicates
             users.append(user)

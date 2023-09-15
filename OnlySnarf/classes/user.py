@@ -7,7 +7,7 @@ from marshmallow import Schema, fields, validate, ValidationError, post_load, EX
 
 from ..lib.driver import get_recent_chat_users, get_userid_by_username as WEBDRIVER_get_userid_by_username, message as WEBDRIVER_message, get_users as WEBDRIVER_get_users
 from ..util.colorize import colorize
-from ..util.data import add_to_randomized_users, read_users_local, write_users_local
+from ..util.data import add_to_randomized_users, reset_random_users, read_users_local, write_users_local
  # read_user_messages as WEBDRIVER_read_user_messages
 from ..util.config import CONFIG
 
@@ -46,6 +46,8 @@ class UserSchema(Schema):
     @post_load
     def make_user(self, data, **kwargs):
         return User(**data)
+
+USER_CACHE = []
 
 class User:
     """OnlyFans users."""
@@ -94,7 +96,10 @@ class User:
             The user to compare another user object against
         """
 
-        if str(self.username) == str(user["username"]): return True
+        if isinstance(user, User) and str(self.username) == str(user.username):
+            return True
+        elif isinstance(user, dict) and str(self.username) == str(user["username"]):
+            return True
         return False
 
     def get_id(self):
@@ -128,9 +133,12 @@ class User:
 
     def update(self, user):
         try:
-            # for key, value in user.dumps().items():
-            for key, value in user.items():
-                setattr(self, str(key), value)
+            if isinstance(user, User):
+                for key, value in user.dumps().items():
+                    setattr(self, str(key), value)
+            elif isinstance(user, dict):
+                for key, value in user.items():
+                    setattr(self, str(key), value)
         except Exception as e:
             logging.error(e)
 
@@ -154,7 +162,7 @@ class User:
         write_users_local(user_objects)
 
     @staticmethod
-    def get_all_users():
+    def get_all_users(refresh=False):
         """
         Get all users.
 
@@ -166,21 +174,32 @@ class User:
         """
 
         logging.debug("getting all users...")
-        users = []
-        if CONFIG["prefer_local"]:
-            user_objects, randomized_users = read_users_local()
-            for user in user_objects:
-                users.append(User.create_user(user))
-        if len(users) == 0:
-            for user in WEBDRIVER_get_users(isFan=True, isFollower=True):
-                users.append(User.create_user(user))
-            User.save_users(users)
-        logging.debug(f"users: {len(users)}")
-        CONFIG["prefer_local"] = True
-        return users
 
+        global USER_CACHE
+        if len(USER_CACHE) > 0 and not refresh: return USER_CACHE
+
+        USER_CACHE = []
+
+        if CONFIG["prefer_local"] and not refresh:
+            user_objects, randomized_users = read_users_local()
+            for user_object in user_objects:
+                USER_CACHE.append(User.create_user(user_object))
+            return USER_CACHE
+
+        # if len(users) == 0:
+        for user in WEBDRIVER_get_users(isFan=True, isFollower=True):
+            USER_CACHE.append(User.create_user(user))
+
+        User.save_users(USER_CACHE)
+
+        logging.debug(f"users: {len(USER_CACHE)}")
+        # CONFIG["prefer_local"] = True
+        return USER_CACHE
+
+    # check each user in users
+    # if user is not in random users, return user
     @staticmethod
-    def get_random_user(isFollower=False):
+    def get_random_user(isFollower=False, reattempt=False):
         """
         Get a random user.
 
@@ -191,33 +210,32 @@ class User:
 
         """
 
-
-
-
-        # TODO: fix the users only returning the last in the array for whatever reason
-
-
-
         logging.debug("getting random user...")
         users = User.get_all_users()
         local_users, random_users = read_users_local()
-        # check each user in users
-        # if user is not in random users, return user
-        # randomUser = random.choice(users)
         randomUser = None
         i = 0
         while not randomUser and i < len(users):
             i+=1
             randomUser = random.choice(users)
+            # print(f"random user: {randomUser.username}")
             # print(randomUser.dump())
-            if not isFollower and randomUser.isFollower:
+            if randomUser.isFollower and isFollower:
+                # print("IS FOLLOWER")
                 # randomUser = None
                 continue
+            if not randomUser: continue
+            # print("IS FAN")
             for user in random_users:
-                if randomUser.equals(user):
+                if randomUser and randomUser.equals(user):
                     randomUser = None
         if not randomUser:
-            raise Exception("failed to find random user!")
+            if not reattempt:
+                logging.warning("partially failed to find random user!")
+                reset_random_users()
+                return User.get_random_user(isFollower=isFollower, reattempt=reattempt)
+            else:
+                raise Exception("completely failed to find random user!")                
         add_to_randomized_users(randomUser)
         logging.debug(f"random user: {randomUser.username}")
         return randomUser

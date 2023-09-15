@@ -14,7 +14,7 @@ from .collections import clear_collections, click_collections
 from .element import find_element_to_click
 from .errors import error_checker
 from .goto import go_to_home, go_to_page
-from .post import enter_text
+# from .post import enter_text
 from .upload import upload_files
 from .upload import error_window_upload
 from .users import click_user_button, get_user_by_username
@@ -43,7 +43,7 @@ def message(browser, message_object):
     """
 
     try:
-        logging.info(f"Entering message to {','.join(message_object['recipients'])}: (${message_object['price']}) {message_object['text']}\nIncludes: {','.join(message_object['includes'])}\nExcludes: {','.join(message_object['excludes'])}")
+        logging.info(f"Entering message to {', '.join(message_object['recipients'])}: (${message_object['price']}) {message_object['text']}\nIncludes: {','.join(message_object['includes'])}\nExcludes: {','.join(message_object['excludes'])}")
 
         # prepare the message
         if len(message_object["recipients"]) > 1 or message_object["includes"] or message_object["excludes"]:
@@ -59,9 +59,9 @@ def message(browser, message_object):
             # doesn't need to clear lists when opening a new tab to search for the username then send them a message
             message_user_by_username(browser, message_object["recipients"][0])
 
-        # time.sleep(1)
+        # time.sleep(0.5)
 
-        enter_text(browser, message_object['text'])
+        message_text(browser, message_object['text'])
         message_price(browser, message_object['price'])
         upload_files(browser, message_object['files'])
         message_confirm(browser)
@@ -81,7 +81,8 @@ def message(browser, message_object):
     except Exception as e:
         error_checker(e)
 
-    raise Exception("failed to send message!")
+    logging.error("failed to send message!")
+    return False
 
 ########################################################################
 ########################################################################
@@ -183,10 +184,11 @@ def message_price_clear(browser):
         if element:
             element.click()
             logging.debug("sucessfully cleared preexisting price!")
-        return True
     except Exception as e:
-        error_checker(e)
-    raise Exception("failed to clear message price!")
+        if "unable to locate element" not in str(e).lower():
+            error_checker(e)
+            raise Exception("failed to clear message price!")
+    return True
 
 def message_price_open(browser, reattempt=False):
     try:
@@ -201,6 +203,7 @@ def message_price_open(browser, reattempt=False):
                 # element.click()
                 # element.send_keys("\n")
     except Exception as e:
+        print(e)
         if "obscures it" in str(e) and not reattempt:
             error_window_upload(browser)
             return message_price_open(browser, reattempt=True)
@@ -254,7 +257,8 @@ def message_text(browser, text):
         clear_text(browser)
         logging.debug("entering text...")
         # clear any preexisting text first
-        ActionChains(browser).move_to_element(browser.find_element(By.ID, "new_post_text_input")).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(text)).perform()
+        element = WebDriverWait(browser, 3).until(EC.visibility_of_element_located((By.ID, 'new_post_text_input')))
+        ActionChains(browser).move_to_element(element).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(text)).perform()
         logging.debug("successfully entered text!")
         time.sleep(0.5)
         return True
@@ -314,6 +318,7 @@ def message_user_by_username(browser, username):
         # backup method aka original method that needs updates / debugging
         if not user: return message_user_by_user_page(browser, username)
         click_user_button(browser, user, text="Message")
+        time.sleep(0.5)
         logging.debug(f"successfully messaging username: {username}")
         return True
     except Exception as e:

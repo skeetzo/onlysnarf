@@ -8,16 +8,17 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 # from selenium.common.exceptions import TimeoutException
 # from selenium.common.exceptions import WebDriverException
+# from selenium.common.exceptions import NoSuchElementException
 
 from .element import find_element_to_click
 from .errors import error_checker
 
 def clear_text(browser):
     try:
-        # TODO: reimplement methods in a way that allows for continuous debugging
-        # BUGS: only backspace is working
-        element = WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.ID, 'new_post_text_input')))
+        # BUGS: only backspace method is working
         # TODO: fix this horribly inefficient loop; maybe add a way that checks for text in field and deltes until gone?
+        #       reimplement methods in a way that allows for continuous debugging
+        element = WebDriverWait(browser, 3).until(EC.visibility_of_element_located((By.ID, 'new_post_text_input')))
         for i in range(300):
             element.send_keys(Keys.BACK_SPACE)
         logging.debug("successfully cleared text!")
