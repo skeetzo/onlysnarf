@@ -2,7 +2,7 @@ import os
 import time
 import logging
 
-from .webdriver import create_browser, get_user_chat, cookies_load, cookies_save, go_to_home, login as WEBDRIVER_login, \
+from .webdriver import create_browser, get_user_chat, cookies_save, go_to_home, login as WEBDRIVER_login, \
     discount_user as WEBDRIVER_discount_user, message as WEBDRIVER_message, post as WEBDRIVER_post, \
     get_userid_by_username as WEBDRIVER_get_userid_by_username, get_users_by_type as WEBDRIVER_get_users_by_type, \
     get_recent_chat_users as WEBDRIVER_get_recent_chat_users
@@ -12,6 +12,27 @@ from .webdriver import expiration as WEBDRIVER_expiration, poll as WEBDRIVER_pol
 from ..util.config import CONFIG
 
 BROWSER = None
+LOGGED_IN = False
+
+#################
+##### Close #####
+#################
+
+def close_browser():
+    """Save and exit"""
+
+    global BROWSER
+    logging.debug("closing web browser...")
+    if not BROWSER:
+        logging.debug("no browser to close!")
+        return
+    cookies_save(BROWSER)
+    if CONFIG["keep"]:
+        go_to_home(BROWSER, force=True)
+        logging.debug("reset to home page")
+    else:
+        BROWSER.quit()
+        logging.info("web browser closed!")
 
 ###############
 ##### Get #####
@@ -20,34 +41,28 @@ BROWSER = None
 def get_browser():
     global BROWSER
     if BROWSER: return BROWSER
-    BROWSER = create_browser(CONFIG["browser"])
-    cookies_load(BROWSER)
-    # return BROWSER
-    if WEBDRIVER_login(BROWSER):
-        cookies_save(BROWSER)
-        return BROWSER
-    raise Exception("Unable to create OnlyFans browser!")
+    try:
+        BROWSER = create_browser(CONFIG["browser"])
+    except Exception as e:
+        logging.error(e)
+        os._exit(1)
+    return BROWSER
 
-################
-##### Exit #####
-################
+#################
+##### Login #####
+#################
 
-def close_browser(browser=None):
-    """Save and exit"""
-
-    global BROWSER
-    if not browser: browser = BROWSER
-    logging.debug("closing web browser...")
-    if not browser:
-        logging.debug("no browser to close!")
-        return
-    cookies_save(browser)
-    if CONFIG["keep"]:
-        go_to_home(browser, force=True)
-        logging.debug("reset to home page")
-    else:
-        browser.quit()
-        logging.info("web browser closed!")
+def login():
+    global LOGGED_IN
+    if LOGGED_IN: return True
+    browser = get_browser()
+    try:
+        WEBDRIVER_login(browser, CONFIG["login"])
+    except Exception as e:
+        logging.error(e)
+        os._exit(1)
+    LOGGED_IN = True
+    return True
 
 #####################################
 ### Basic Functionality Shortcuts ###
@@ -88,6 +103,9 @@ def get_user_chat():
 # lists (todo)
 #     get_list
 
+####################
+### Exit Handler ###
+####################
 
 def exit_handler():
     """Exit cleanly"""

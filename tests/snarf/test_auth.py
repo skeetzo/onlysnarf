@@ -12,7 +12,7 @@ class TestAuth(unittest.TestCase):
 
     def setUp(self):
         self.browser = create_browser(CONFIG["browser"])
-        CONFIG["login"] = "auto"
+        # CONFIG["login"] = "auto"
         
     def tearDown(self):
         self.browser.quit()

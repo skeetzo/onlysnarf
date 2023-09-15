@@ -85,32 +85,29 @@ def get_user_element_at_page(browser, username, page):
     elif page == ONLYFANS_FANS_URL:
         class_name = "fans"
     try:
-        users = []
-        # scroll until elements stop spawning
-        thirdTime = 0
+        SLEEP_WAIT = 1
+        BREAK_COUNT = 0
         count = 0
         while True:
-            user_elements = browser.find_elements(By.CLASS_NAME, "g-user-username")            
-            for ele in user_elements:
+            elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
+            if len(elements) == int(count) and BREAK_COUNT > 3:
+                break
+            elif len(elements) == int(count):
+                SLEEP_WAIT += 1
+                BREAK_COUNT += 1
+            for ele in browser.find_elements(By.CLASS_NAME, "g-user-username"):
                 # logging.debug(f"{str(username).strip().replace('@','')} == {str(ele.get_attribute('innerHTML')).strip().replace('@','')}")
                 if str(username).strip().replace("@","") == str(ele.get_attribute("innerHTML")).strip().replace("@",""):
                     browser.execute_script("arguments[0].scrollIntoView();", ele)
+                    logging.info("")
                     logging.debug("successfully found user: {}".format(username))
                     # TODO: figure out how to combine xpath statements?
                     # return parent element housing user info
                     return ele.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
-            elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
-            if len(elements) == int(count) and thirdTime >= 3:
-                logging.info("")
-                break
-            print_same_line(f"({count}) scrolling...")
             count = len(elements)
+            print_same_line(f"({count}) scrolling...")
             browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(2)
-            if thirdTime >= 3 and len(elements) == 0:
-                logging.info("")
-                break
-            thirdTime += 1
+            time.sleep(SLEEP_WAIT)
     except Exception as e:
         error_checker(e)
     raise Exception(f"failed to find {username} at {page}!")
@@ -121,7 +118,6 @@ def get_users_at_page(browser, page, collection="Active"):
     elif page == ONLYFANS_FANS_URL:
         class_name = "fans"
     try:
-        users = []
         go_to_page(browser, os.path.join(page, collection.lower()), force=True)
         find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True).click()
         # scroll until elements stop spawning
@@ -136,12 +132,8 @@ def get_users_at_page(browser, page, collection="Active"):
             if len(elements) == int(count) and BREAK_COUNT > 3:
                 break
             elif len(elements) == int(count):
-                SLEEP_WAIT += 0.5
+                SLEEP_WAIT += 1
                 BREAK_COUNT += 1
-            # else:
-                # BREAK_COUNT -= 1
-                # if BREAK_COUNT < 0:
-                    # BREAK_COUNT = 0
             count = len(elements)
             print_same_line(f"({count}) scrolling...")
             # logging.info(f"({count}) scrolling...")
@@ -151,6 +143,7 @@ def get_users_at_page(browser, page, collection="Active"):
 
         # logging.StreamHandler.terminator = "\n"
 
+        users = []
         logging.debug(f"searching {class_name}...")
         for ele in browser.find_elements(By.CLASS_NAME, f"m-{class_name}"):
             username = ele.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()

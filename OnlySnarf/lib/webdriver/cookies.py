@@ -3,6 +3,7 @@ import pickle
 import logging
 
 from .. import CONFIG, DEFAULT
+from .errors import error_checker
 from .goto import go_to_home
 
 ###################
@@ -13,7 +14,7 @@ def cookies_load(browser):
     """Loads existing web browser cookies from local source"""
 
     if not CONFIG["cookies"]:
-        logging.debug("skipping cookies load")
+        logging.debug("skipping cookies (load)")
         return
     logging.debug("loading cookies...")
     try:
@@ -28,18 +29,18 @@ def cookies_load(browser):
                 # logging.debug(cookie)
                 browser.add_cookie(cookie)
             browser.refresh()
-            logging.debug("successfully loaded cookies")
+            logging.debug("successfully loaded cookies!")
         else: 
-            logging.warning("missing cookies file")
+            logging.warning("missing cookies file!")
     except Exception as e:
-        logging.debug("error loading cookies!")
-        logging.error(e)
+        error_checker(e)
+        logging.warning("failed to load cookies!")
 
 def cookies_save(browser):
     """Saves existing web browser cookies to local source"""
 
     if not CONFIG["cookies"]:
-        logging.debug("skipping cookies save")
+        logging.debug("skipping cookies (save)")
         return
     logging.debug("saving cookies...")
     try:
@@ -51,8 +52,8 @@ def cookies_save(browser):
         file.close()
         logging.debug("successfully saved cookies!")
     except Exception as e:
-        logging.debug("failed to save cookies!")
-        logging.error(e)
+        error_checker(e)
+        logging.warning("failed to save cookies!")
 
 def get_cookies_path():
     return os.path.join(DEFAULT.ROOT_PATH, "cookies.pkl")

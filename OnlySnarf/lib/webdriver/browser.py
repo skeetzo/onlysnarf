@@ -65,8 +65,6 @@ def create_browser(browserType):
 
     """
 
-
-    print(CONFIG)
     browser = None
     logging.info("spawning web browser...")
 
@@ -101,19 +99,15 @@ def create_browser(browserType):
     elif "remote" in browserType:
         browser = attempt_remote()
 
-    if not browser:
-        logging.error("unable to spawn a web browser!")
-        os._exit(1)
+    if not browser: raise Exception("failed to spawn a web browser!")
 
     browser.implicitly_wait(30) # seconds
     browser.set_page_load_timeout(1200)
     browser.maximize_window()
     browser.file_detector = LocalFileDetector() # for uploading via remote sessions
-    if not CONFIG["show"]:
-        logging.debug("headless browser spawned successfully!")
-    else:
-        logging.debug("browser spawned successfully!")
+    
     write_session_data(browserType, browser.session_id, browser.command_executor._url)
+    logging.debug(f"browser created successfully!{'' if CONFIG['show'] else ' (headless)'}")
     return browser
 
 ################################################################################################
@@ -160,10 +154,8 @@ def add_options(options):
     # options.add_argument("--remote-debugging-address=localhost")    
     # options.add_argument("--remote-debugging-port=9223") # required
 
-
-
 def browser_error(err, browserName):
-    print(err)
+    if os.environ.get('ENV') == "True": print(err)
     logging.debug(err)
     logging.warning("unable to launch {}!".format(browserName))
 
@@ -182,7 +174,6 @@ def attempt_chrome():
     browserAttempt = None
     try:
         logging.debug("attempting Chrome web browser...")
-
         # TODO: is this still necessary?
         # raspberrypi arm processors don't work with webdriver manager
         # linux = x86_64
@@ -190,8 +181,6 @@ def attempt_chrome():
         logging.debug("checking processor for use with RPi4s...")
         processor = platform.processor()
         logging.debug("cpu processor: {}".format(processor))
-
-
         if str(processor) == "aarch64":
             logging.debug("cpu process: RPi4")
             # TODO: add file check for chromedriver w/ reminder warning for rpi install requirement
@@ -295,7 +284,6 @@ def attempt_reconnect(browserType):
         return browserAttempt
     except Exception as e:
         browser_error(e, f"reconnect:{browserType}")
-        print(e)
     return None
 
 # TODO: debug

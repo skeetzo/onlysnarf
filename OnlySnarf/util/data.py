@@ -17,6 +17,7 @@ def reset_userlist():
 # TODO: this could be combined into write_users_local but for now i'm keeping it separate
 # add random user to json file
 def add_to_randomized_users(newUser):
+    if CONFIG["debug"]: return
     if not newUser: return
     logging.debug("saving random user...")
     users, randomized_users = read_users_local()
@@ -39,6 +40,9 @@ def add_to_randomized_users(newUser):
     except Exception as e:
         reset_userlist()
         logging.debug(e)
+
+def remove_from_randomized_users(removedUser):
+    pass
 
 def reset_random_users():
     logging.debug("resetting random users...")
@@ -76,7 +80,7 @@ def read_users_local():
                 randomized_users.append(User.create_user(user).dump())
         # logging.debug(users)
         # logging.debug(randomized_users)
-        logging.debug("successfully loaded local users!")
+        logging.debug(f"successfully loaded local users: {len(users)}")
     except OSError:
         reset_userlist()
     except Exception as e:
@@ -120,10 +124,12 @@ def write_users_local(added_users):
             if not updated and existing_user["username"] not in usernames:
                 logging.debug(f"existing: {existing_user['username']}")
                 new_users.append(existing_user)
+                usernames.append(existing_user["username"])
                 break
         if not found and each_added_user.username not in usernames:
             logging.debug(f"adding: {each_added_user.username}")
             new_users.append(each_added_user.dump())
+            usernames.append(each_added_user.username)
 
     # for user in new_users:
     #     list(filter(lambda d: d['type'] in keyValList, exampleSet))

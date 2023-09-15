@@ -12,6 +12,7 @@ from ..util.data import add_to_randomized_users, reset_random_users, read_users_
 from ..util.config import CONFIG
 
 ALREADY_RANDOMIZED_USERS = []
+USER_CACHE_BY_TYPE = {}
 
 class MessagesSchema(Schema):
     parsed = fields.List(fields.Str(), dump_default=[])
@@ -34,7 +35,7 @@ class UserSchema(Schema):
     isFan = fields.Bool(dump_default=False)
     isFollower = fields.Bool(dump_default=False)
 
-    isRecent = fields.Bool(dump_default=False)
+    isFriend = fields.Bool(dump_default=False)
     isFavorite = fields.Bool(dump_default=False)
     isRenew = fields.Bool(dump_default=False)
     isRecent = fields.Bool(dump_default=False)
@@ -52,7 +53,7 @@ USER_CACHE = []
 class User:
     """OnlyFans users."""
 
-    def __init__(self, username, name="", user_id="", files=[], messages=[], isFan=False, isFollower=False, isFavorite=False, isRecent=False, isRenew=False, isTagged=False, isMuted=False, isRestricted=False, isBlocked=False):
+    def __init__(self, username, name="", user_id="", files=[], messages=[], isFan=False, isFollower=False, isFavorite=False, isFriend=False, isRecent=False, isRenew=False, isTagged=False, isMuted=False, isRestricted=False, isBlocked=False):
         """User object"""
 
         self.username = str(username).replace("@","")
@@ -65,6 +66,7 @@ class User:
         self.isFan = isFan
         self.isFollower = isFollower
         #
+        self.isFriend = isFriend
         self.isRecent = isRecent
         self.isFavorite = isFavorite
         self.isRenew = isRenew
@@ -174,26 +176,21 @@ class User:
         """
 
         logging.debug("getting all users...")
-
         global USER_CACHE
-        if len(USER_CACHE) > 0 and not refresh: return USER_CACHE
-
+        if len(USER_CACHE) > 0 and not refresh:
+            logging.debug(f"users: {len(USER_CACHE)}")
+            return USER_CACHE
         USER_CACHE = []
-
         if CONFIG["prefer_local"] and not refresh:
             user_objects, randomized_users = read_users_local()
             for user_object in user_objects:
                 USER_CACHE.append(User.create_user(user_object))
+            logging.debug(f"users: {len(USER_CACHE)}")
             return USER_CACHE
-
-        # if len(users) == 0:
         for user in WEBDRIVER_get_users(isFan=True, isFollower=True):
             USER_CACHE.append(User.create_user(user))
-
         User.save_users(USER_CACHE)
-
         logging.debug(f"users: {len(USER_CACHE)}")
-        # CONFIG["prefer_local"] = True
         return USER_CACHE
 
     # check each user in users
@@ -236,8 +233,8 @@ class User:
                 return User.get_random_user(isFollower=isFollower, reattempt=reattempt)
             else:
                 raise Exception("completely failed to find random user!")                
-        add_to_randomized_users(randomUser)
         logging.debug(f"random user: {randomUser.username}")
+        add_to_randomized_users(randomUser)
         return randomUser
 
     # TODO: use this function at all?
@@ -252,33 +249,61 @@ class User:
     # restricted
     # blocked
     @staticmethod
-    def get_users_by_type(typeOf="fan"):
+    def get_users_by_type(typeOf="fan", refresh=False):
         logging.debug(f"getting users: {typeOf}")
-        users = User.get_all_users()
-        foundUsers = []
-        for user in users:
-            if typeOf == "fan" and user.isFan:
-                foundUsers.append(user)
-            elif typeOf == "follower" and user.isFollower:
-                foundUsers.append(user)
-            elif typeOf == "friend" and user.isFriend:
-                foundUsers.append(user)
-            elif typeOf == "renew_on" and user.isRenew:
-                foundUsers.append(user)
-            elif typeOf == "renew_off" and not user.isRenew:
-                foundUsers.append(user)
-            elif typeOf == "recent" and user.isRecent:
-                foundUsers.append(user)
-            elif typeOf == "tagged" and user.isTagged:
-                foundUsers.append(user)
-            elif typeOf == "muted" and user.isMuted:
-                foundUsers.append(user)
-            elif typeOf == "restricted" and user.isRestricted:
-                foundUsers.append(user)
-            elif typeOf == "blocked" and user.isBlocked:
-                foundUsers.append(user)
-        logging.debug(f"found users: {len(foundUsers)}")
-        return foundUsers    
+
+        def return_type(typeOf, user_cache):
+            foundUsers = []
+            for user in user_cache:
+                if typeOf == "fan" and user.isFan:
+                    foundUsers.append(user)
+                elif typeOf == "follower" and user.isFollower:
+                    foundUsers.append(user)
+                elif typeOf == "friend" and user.isFriend:
+                    foundUsers.append(user)
+                elif typeOf == "renew_on" and user.isRenew:
+                    foundUsers.append(user)
+                elif typeOf == "renew_off" and not user.isRenew:
+                    foundUsers.append(user)
+                elif typeOf == "recent" and user.isRecent:
+                    foundUsers.append(user)
+                elif typeOf == "tagged" and user.isTagged:
+                    foundUsers.append(user)
+                elif typeOf == "muted" and user.isMuted:
+                    foundUsers.append(user)
+                elif typeOf == "restricted" and user.isRestricted:
+                    foundUsers.append(user)
+                elif typeOf == "blocked" and user.isBlocked:
+                    foundUsers.append(user)
+            global USER_CACHE_BY_TYPE
+            USER_CACHE_BY_TYPE[typeOf] = foundUsers
+            logging.debug(f"found users of type {typeOf}: {len(foundUsers)}")
+            return foundUsers
+
+        # copied format from get_all_users
+        global USER_CACHE_BY_TYPE
+        if not USER_CACHE_BY_TYPE.get(typeOf): USER_CACHE_BY_TYPE[typeOf] = []
+        if len(USER_CACHE_BY_TYPE[typeOf]) > 0 and not refresh:
+            return return_type(typeOf, USER_CACHE_BY_TYPE[typeOf])
+        USER_CACHE_BY_TYPE[typeOf] = []
+        if CONFIG["prefer_local"] and not refresh:
+            user_objects, randomized_users = read_users_local()
+            for user_object in user_objects:
+                USER_CACHE_BY_TYPE[typeOf].append(User.create_user(user_object))
+            return return_type(typeOf, USER_CACHE_BY_TYPE[typeOf])
+
+        # only return one or the other if they're specifically requested, otherwise all the other types could be either a fan or a follower
+        isFan = True
+        isFollower = True
+        if typeOf == "fan":
+            isFollower = False
+        elif typeOf == "follower":
+            isFan = False
+
+        for user in WEBDRIVER_get_users(isFan=isFan, isFollower=isFollower):
+            USER_CACHE_BY_TYPE[typeOf].append(User.create_user(user))
+
+        return return_type(typeOf, USER_CACHE_BY_TYPE[typeOf])
 
     # TODO: use this?
     # @staticmethod

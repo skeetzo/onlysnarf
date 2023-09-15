@@ -827,30 +827,36 @@
 **9/12/2023**
 - updated local user data structures
 - finished debugging message on_success
+**4.6.14 : 9/14/2023**
+- figured out why messaging a random user is replacing the users file with that random user
+- updates to data; updates to test_data
+- updated loading local users to save better internally
+- updates to other user types
+- user & message tests successful
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- figure out why messaging a random user is replacing the users file with that random user
-
+- finish test_message_class --> move webdriver tests so this can be renamed
 
 - RUN ALL TESTS AGAIN
 
-- update loading local users to save better internally
+- add specific tests for /class components separated from webdriver
 
-- possibly remove all return True statements in favor of returning nothing? raise exception moved to except clause?
 - refactor specific class names into shared variables like: new_post_text_input --> message_or_post_textarea
 
 - add message filters? maybe by request?
 
+- update 'snarf api' if necessary and test
+- update 'snarf config' if necessary and test
+- update 'snarf menu' if necessary and test
 
 (cleanup)
 - add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64
 
 (finish)
 - finish scan.py
-- finish updating image/video downloading
 - finish updating cli menu functionality
 - finish testing 'snarf config'
 

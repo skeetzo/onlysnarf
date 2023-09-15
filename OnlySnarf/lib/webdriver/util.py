@@ -27,32 +27,42 @@ def configure_logging():
         logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.ERROR)
 
 def read_session_data(browserType):
-    logging.debug("reading local session...")
-    path = os.path.join(DEFAULT.ROOT_PATH, f"session-{browserType}.json")
+    logging.debug(f"reading local session for {browserType}...")
+    path = os.path.join(DEFAULT.ROOT_PATH, f"session.json")
     logging.debug("local session path: "+str(path))
     try:
         with open(str(path)) as json_file:  
             data = json.load(json_file)
-            return data['id'], data['url']
-        logging.debug("loaded local users!")
+            browser_data = data.get(browserType, {'id':'','url':''})
+            return browser_data['id'], browser_data['url']
     except Exception as e:
-        logging.debug(e)
-    return None, None
+        logging.error(e)
+    return "", ""
 
 def write_session_data(browserType, session_id, session_url):
-    logging.debug("writing local session...")
+    logging.debug(f"writing local session for {browserType}...")
     logging.debug("saving session id: {}".format(session_id))        
     logging.debug("saving session url: {}".format(session_url))
-    path = os.path.join(DEFAULT.ROOT_PATH, f"session-{browserType}.json")
+    path = os.path.join(DEFAULT.ROOT_PATH, f"session.json")
     logging.debug("local session path: "+str(path))
-    data = {}
-    data['id'] = session_id
-    data['url'] = session_url
+    
     try:
+        browser_data = {}
+        with open(str(path)) as json_file:  
+            data = json.load(json_file)
+            browser_data = data.get(browserType, {'id':'','url':''})
+
+        browser_data['id'] = session_id
+        browser_data['url'] = session_url
+        data[browserType] = browser_data
+
         with open(str(path), 'w') as outfile:  
             json.dump(data, outfile, indent=4, sort_keys=True)
+
         logging.debug("saved session data!")
     except FileNotFoundError:
         logging.error("missing session file!")
     except OSError:
         logging.error("missing session path!")
+    except Exception as e:
+        logging.error(e)

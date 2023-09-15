@@ -25,7 +25,7 @@ class TestSeleniumBrave(unittest.TestCase):
     # def test_firefox_reconnect(self):
     #     CONFIG["keep"] = True
     #     self.browser = create_browser(CONFIG["browser"])
-    #     close_browser(self.browser)
+    #     close_browser()
 
     #     assert self.browser, "unable to keep browser open for reconnect test"
 

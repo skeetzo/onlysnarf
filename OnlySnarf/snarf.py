@@ -18,16 +18,16 @@ from .lib.config import Config
 from .lib import api as API
 
 
-def api(config={}):
-    API.main(config)
+def api():
+    API.main(CONFIG)
 
-def config(config={}):
-    Config.main(config)
+def config():
+    Config.main(CONFIG)
 
 # def menu(config={}):
-#     Menu.main(config)
+#     Menu.main(CONFIG)
 
-def discount(config={'user':None,'users':[]}):
+def discount():
 
     """
     Applies a discount to users as provided from args / prompts.
@@ -36,15 +36,15 @@ def discount(config={'user':None,'users':[]}):
     """
 
     logging.info("Beginning discount process...")
-    users = list(filter(None, config.get("users", [])))
-    if config.get("user"):
-        users.append(config.get("user"))
+    users = list(filter(None, CONFIG.get("users", [])))
+    if CONFIG.get("user"):
+        users.append(CONFIG.get("user"))
     successful = []
     for user in users:
-        successful.append(Discount.create_discount({'username':user,'amount':config["amount"],'months':config["months"]}).apply())
+        successful.append(Discount.create_discount({'username':user,'amount':CONFIG["amount"],'months':CONFIG["months"]}).apply())
     return all(successful)
 
-def message(config={'user':None,'users':[]}):
+def message():
 
     """
     Sends the configured message from args / prompts.
@@ -53,9 +53,9 @@ def message(config={'user':None,'users':[]}):
     """
 
     logging.info("Beginning message process...")
-    return Message.create_message(config).send()
+    return Message.create_message(CONFIG).send()
             
-def post(config={'text':"",'input':[]}):
+def post():
 
     """
     Posts the configured text from args / prompts.
@@ -64,7 +64,7 @@ def post(config={'text':"",'input':[]}):
     """
 
     logging.info("Beginning post process...")
-    return Post.create_post(config).send()
+    return Post.create_post(CONFIG).send()
 
 # TODO: update this
 # def profile():
@@ -120,7 +120,7 @@ def post(config={'text':"",'input':[]}):
     # except Exception as e: Settings.dev_print(e)
     # return False
 
-def users(config={'prefer_local':False}):
+def users():
 
     """
     Scan users.
@@ -129,7 +129,6 @@ def users(config={'prefer_local':False}):
     """
 
     try:
-        CONFIG["prefer_local"] = config["prefer_local"]
         User.get_all_users()
         return True
     except Exception as e: logging.debug(e)
@@ -137,32 +136,16 @@ def users(config={'prefer_local':False}):
 
 ################################################################################################################################################
 
-from .lib.driver import close_browser
-
-def exit_handler():
-    """Exit cleanly"""
-
-    try:
-        close_browser()
-    except Exception as e:
-        print(e)
-
-import atexit
-atexit.register(exit_handler)
-
-################################################################################################################################################
-
 def main():
     try:
         
         logging.info(f"Running - {CONFIG['action']}")
-        eval(f"{CONFIG['action']}(CONFIG)")
+        eval(f"{CONFIG['action']}()")
     except Exception as e:
         logging.error(e)
         logging.info("shnarf??")
     finally:
         logging.info("shnarrf!")
-        exit_handler()
 
 if __name__ == "__main__":
     main()

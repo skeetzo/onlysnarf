@@ -1,3 +1,4 @@
+import os
 import logging
 
 ##############
@@ -15,9 +16,10 @@ def error_checker(e):
 
     """
 
-    if "Unable to locate element" in str(e):
-        logging.error("Unable to locate element; OnlySnarf may require an update!")
-    elif "Message: " in str(e):
+    if os.environ.get('ENV') == "True": print(err)
+    if "unable to locate element" in str(e).lower():
+        logging.error("shnarf unable to locate an element! shnarf may require an update!")
+    elif "message: " in str(e).lower():
         logging.debug(e)
     else:
         logging.error(e)

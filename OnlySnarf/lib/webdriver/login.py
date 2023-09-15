@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
+from .cookies import cookies_load, cookies_save
 from .errors import error_checker
 from .goto import go_to_home
 from .. import CONFIG, DEFAULT
@@ -17,7 +18,7 @@ from .. import get_username_onlyfans, get_password, get_username_google, get_pas
 ###### Login #####
 ##################
 
-def login(browser):
+def login(browser, method="auto"):
     """
     Logs into OnlyFans account provided via args and chosen method.
 
@@ -30,24 +31,28 @@ def login(browser):
 
     """
 
+    cookies_load(browser)
     if check_if_already_logged_in(browser): return True
     logging.info(f"logging into OnlyFans for {CONFIG['username']}...")
     try:
-        if CONFIG["login"] == "auto":
+        successful = False
+        if method == "auto":
             successful = via_form(browser)
             if not successful: successful = via_google(browser)
             if not successful: successful = via_twitter(browser)
-            logging.debug("auto login successful!")
+        elif method == "onlyfans":
+            successful = via_form(browser)
+        elif method == "twitter":
+            successful = via_twitter(browser)
+        elif method == "google":
+            successful = via_google(browser)
+        if successful:
+            logging.debug(f"login successful! ({method})")
+            cookies_save(browser)
             return True
-        elif CONFIG["login"] == "onlyfans":
-            return via_form(browser)
-        elif CONFIG["login"] == "twitter":
-            return via_twitter(browser)
-        elif CONFIG["login"] == "google":
-            return via_google(browser)
     except Exception as e:
         error_checker(e)
-    return False
+    raise Exception("failed to login to OnlyFans!")
 
 ################################################################################################
 ################################################################################################
@@ -93,11 +98,11 @@ def check_if_logged_in(browser):
         # check for phone number page
         if "Verify your identity by entering the phone number associated with your Twitter account." in str(bodyText):
             verify_phone()
-            check_if_logged_in(browser)
+            return check_if_logged_in(browser)
         # check for email notification
         elif "Check your email" in str(bodyText):
             verify_email()
-            check_if_logged_in(browser)
+            return check_if_logged_in(browser)
         else:
             logging.error("Login Failure: Timed Out! Please check your credentials.")
             logging.error("If the problem persists, OnlySnarf may require an update.")

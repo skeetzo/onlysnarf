@@ -6,39 +6,41 @@ from OnlySnarf.util.config import set_config
 CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging
 configure_logging(True, True)
-from OnlySnarf.classes.user import User # TODO: i don't think this is in the correct import order with config variable
+
+from OnlySnarf.lib.driver import create_browser, login
+from OnlySnarf.lib.webdriver.users import get_users_by_type as WEBDRIVER_get_users_by_type
 
 class TestUsers(unittest.TestCase):
 
     def setUp(self):
-        CONFIG["prefer_local"] = False
-
+        self.browser = create_browser(CONFIG["browser"])
+        login()
         
     def tearDown(self):
-        CONFIG["prefer_local"] = True
+        pass
 
-    def test_get_users(self):
-        assert User.get_all_users(), "unable to read users"
+    def test_get_user_element(self):
+        pass
 
-    @unittest.skip("todo")
-    def test_read_users_locally(self):
-        assert User.read_users_local(), "unable to read in users locally"
+    # TODO: add tests for this and the rest in the webdriver class
+    # get_current_username
+    # get_userid_by_username
+    # get_user_element_at_page
+    # get_users_at_page
+    # get_user_by_username
+    # search_for_username
+    # get_user_from_elements
+    # click_user_button
 
-    @unittest.skip("todo")
-    def test_write_users_locally(self):
-        assert User.write_users_local(), "unable to write out users locally"
 
-    @unittest.skip("todo")
-    def test_get_following(self):
-        assert User.get_following(), "unable to read followers"
 
-    @unittest.skip("todo")
-    def test_read_following_local(self):
-        assert User.read_following_local(), "unable to read in followers locally"
+    def test_get_users_by_type_fans(self):
+        assert User.get_users_by_type(self.browser), "unable to get users by type: fans"
+        # which is by extension: get_users_at_page
 
-    @unittest.skip("todo")
-    def test_write_following_local(self):
-        assert User.write_following_local(), "unable to write out followers locally"
+    def test_get_users_by_type_followers(self):
+        assert User.get_users_by_type(self.browser, isFan=False, isFollower=True), "unable to get users by type: followers"
+
 
 ############################################################################################
 
