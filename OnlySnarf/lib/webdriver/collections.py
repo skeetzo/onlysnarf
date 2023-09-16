@@ -1,5 +1,6 @@
 import time
 import logging
+logger = logging.getLogger(__name__)
 
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -22,18 +23,18 @@ def check_clear_collections(browser, reattempt=False):
                 return True
     except Exception as e:
         if "stale element" in str(e) and not reattempt:
-            logging.debug('reattempting message_list...')
+            logger.debug('reattempting message_list...')
             if not reattempt: return check_clear_collections(browser, reattempt=True)
-    logging.debug("no collections to clear!")
+    logger.debug("no collections to clear!")
     return False
 
 # when clearing lists, just open the list menu for both and deselect every option available
 def clear_collections(browser, includes=[], excludes=[]):
     if not check_clear_collections(browser): return True
-    logging.debug("clearing collections...")
+    logger.debug("clearing collections...")
     try:
         click_collections(browser, includes=includes, excludes=excludes, unclick=True)
-        logging.debug("successfully cleared collections!")
+        logger.debug("successfully cleared collections!")
         return True
     except Exception as e:
         error_checker(e)
@@ -45,14 +46,14 @@ def click_view_all(browser, include=True):
         elements = browser.find_elements(By.CLASS_NAME, "b-content-filter__group-btns")
         element = None
         if include:
-            logging.debug("clicking view all 1...")
+            logger.debug("clicking view all 1...")
             element = elements[0]
         elif not include and len(elements) > 1:
-            logging.debug("clicking view all 2...")
+            logger.debug("clicking view all 2...")
             element = elements[1] 
         ActionChains(browser).move_to_element(element).click().perform()
         time.sleep(1)
-        logging.debug("clicked view all button")
+        logger.debug("clicked view all button")
         return True
     except Exception as e:
         error_checker(e)
@@ -60,7 +61,7 @@ def click_view_all(browser, include=True):
 
 # click existing list available
 def click_collection_button(browser, collection, unclick=False, reattempt=False):
-    logging.debug(f"{'unclicking' if unclick else 'clicking'} collection button: {collection}")
+    logger.debug(f"{'unclicking' if unclick else 'clicking'} collection button: {collection}")
     try:
         for element in browser.find_elements(By.CLASS_NAME, "b-rows-lists__item__label"):
             if str(collection).lower().strip() in str(element.get_attribute("innerHTML")).lower().strip():
@@ -68,7 +69,7 @@ def click_collection_button(browser, collection, unclick=False, reattempt=False)
                     try:
                         checkbox = element.find_element(By.CLASS_NAME, "b-input-radio")
                         if not checkbox.is_selected():
-                            logging.debug(f"not unclicking not clicked element: {collection}")
+                            logger.debug(f"not unclicking not clicked element: {collection}")
                             return True
                         # parent_element = element.find_element(By.XPATH, '..')
                         # icon_done = element.find_element(By.TAG_NAME, "use")
@@ -76,13 +77,13 @@ def click_collection_button(browser, collection, unclick=False, reattempt=False)
                     except Exception as e:
                         error_checker(e)
                         continue
-                logging.debug(f"{'unclicking' if unclick else 'clicking'} on collection element...")
+                logger.debug(f"{'unclicking' if unclick else 'clicking'} on collection element...")
                 ActionChains(browser).move_to_element(element).click(on_element=element).perform()
                 return True
     except Exception as e:
         # if "stale element" in str(e) and not reattempt:
         if not reattempt:
-            logging.debug("reattempting clicking collection button (stale element)...")
+            logger.debug("reattempting clicking collection button (stale element)...")
             return click_collection_button(browser, collection, unclick=unclick, reattempt=True)
         error_checker(e)
     raise Exception(f"failed to {'unclick' if unclick else 'click'} on collection: {collection}")
@@ -90,7 +91,7 @@ def click_collection_button(browser, collection, unclick=False, reattempt=False)
 # search for list
 def search_for_collection(browser, collection):
     try:
-        logging.debug(f"searching for collection: {collection}")
+        logger.debug(f"searching for collection: {collection}")
         elements = browser.find_elements(By.TAG_NAME, "use")
         element = [elem for elem in elements if '#icon-search' in str(elem.get_attribute('href'))][0]
         ActionChains(browser).move_to_element(element).click(on_element=element).click().send_keys(collection).perform()
@@ -112,7 +113,7 @@ def click_collections(browser, includes=[], excludes=[], unclick=False):
             elif collection.lower() == "recent" and include:
                 message_recent(browser)
                 continue
-            logging.debug(f"attempting to {'unclick' if unclick else 'click'}: {collection}")
+            logger.debug(f"attempting to {'unclick' if unclick else 'click'}: {collection}")
             try:
                 click_collection_button(browser, collection, unclick=unclick)
             except Exception as e:
@@ -135,7 +136,7 @@ def click_collections(browser, includes=[], excludes=[], unclick=False):
 # TODO: ADD SCHEDULE BEHAVIOR HERE
 def message_recent(browser, exclude=False, unclick=False):
     try:
-        logging.debug("clicking message recipients: recent")
+        logger.debug("clicking message recipients: recent")
         element = find_element_to_click(browser, "b-tabs__nav__text", text="Recent", fuzzyMatch=True)
 
         if unclick:
@@ -145,13 +146,13 @@ def message_recent(browser, exclude=False, unclick=False):
             except Exception as e:
                 print(e)
                 return False
-            logging.debug("unclicking on collection element...")
+            logger.debug("unclicking on collection element...")
             ActionChains(browser).move_to_element(element).click(on_element=element).perform()
 
             # find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Done").click()
         else:
             # TODO: add method for interacting with popup calendar for selecting date for recent subscribers
-            logging.error("TODO: FINISH ME")
+            logger.error("TODO: FINISH ME")
 
         return True
 

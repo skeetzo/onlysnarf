@@ -3,6 +3,7 @@
 # Profile Settings
 
 import logging
+logger = logging.getLogger(__name__)
 from ..util.config import CONFIG
 import json
 import inquirer
@@ -114,7 +115,7 @@ class Profile:
         failed = False
         for key, value in profile.items():
             for key_, value_ in desiredProfile.items():
-                # logging.debug("{}: {} = {}".format(key, value, value_))
+                # logger.debug("{}: {} = {}".format(key, value, value_))
                 if value and str(value_) != "avalue":
                     if value != value_:
                         print("Warning: Unrecommended setting - {}".format(key))
@@ -154,7 +155,7 @@ class Profile:
                     # do stuff
                     continue
 
-                logging.debug("{}: {} = {}".format(key, value, value_))
+                logger.debug("{}: {} = {}".format(key, value, value_))
                 setattr(profile, str(key), value_)
 
         # search for twitter banner
@@ -301,18 +302,18 @@ class Profile:
 
     @staticmethod
     def read_local():
-        logging.debug("Getting Local Profile")
+        logger.debug("Getting Local Profile")
         profile = None
         try:
             profile_ = {}
             with open(str(CONFIG["profile_path"])) as json_file:  
                 profile_ = json.load(json_file)['profile']
-            logging.debug("Loaded Local Profile")
+            logger.debug("Loaded Local Profile")
             profile = Profile()
             for key, value in profile_:
                 setattr(profile, str(key), value)
         except Exception as e:
-            logging.debug(e)
+            logger.debug(e)
         return profile
 
     @staticmethod
@@ -320,7 +321,7 @@ class Profile:
         if profile is None:
             profile = Profile.get_profile()
         print("Saving Profile Locally")
-        logging.debug("local profile path: "+str(CONFIG["profile_path"]))
+        logger.debug("local profile path: "+str(CONFIG["profile_path"]))
         try:
             with open(str(CONFIG["profile_path"]), 'w') as outfile:  
                 json.dump({"profile":profile.__dict__}, outfile, indent=4, sort_keys=True)

@@ -2,6 +2,7 @@ import json
 import os
 import random
 import logging
+logger = logging.getLogger(__name__)
 from datetime import datetime, timedelta
 from marshmallow import Schema, fields, validate, ValidationError, post_load, EXCLUDE
 
@@ -175,22 +176,22 @@ class User:
 
         """
 
-        logging.debug("getting all users...")
+        logger.debug("getting all users...")
         global USER_CACHE
         if len(USER_CACHE) > 0 and not refresh:
-            logging.debug(f"cached users: {len(USER_CACHE)}")
+            logger.debug(f"cached users: {len(USER_CACHE)}")
             return USER_CACHE
         USER_CACHE = []
         if CONFIG["prefer_local"] and not refresh:
             user_objects, randomized_users = read_users_local()
             for user_object in user_objects:
                 USER_CACHE.append(User.create_user(user_object))
-            logging.debug(f"local users: {len(USER_CACHE)}")
+            logger.debug(f"local users: {len(USER_CACHE)}")
             return USER_CACHE
         for user in WEBDRIVER_get_users(isFan=True, isFollower=True):
             USER_CACHE.append(User.create_user(user))
         User.save_users(USER_CACHE)
-        logging.debug(f"users: {len(USER_CACHE)}")
+        logger.debug(f"users: {len(USER_CACHE)}")
         return USER_CACHE
 
     # check each user in users
@@ -207,7 +208,7 @@ class User:
 
         """
 
-        logging.debug("getting random user...")
+        logger.debug("getting random user...")
         users = User.get_all_users()
         local_users, random_users = read_users_local()
         randomUser = None
@@ -228,12 +229,12 @@ class User:
                     randomUser = None
         if not randomUser:
             if not reattempt:
-                logging.warning("partially failed to find random user!")
+                logger.warning("partially failed to find random user!")
                 reset_random_users()
                 return User.get_random_user(isFollower=isFollower, reattempt=reattempt)
             else:
                 raise Exception("completely failed to find random user!")                
-        logging.debug(f"random user: {randomUser.username}")
+        logger.debug(f"random user: {randomUser.username}")
         add_to_randomized_users(randomUser)
         return randomUser
 
@@ -250,7 +251,7 @@ class User:
     # blocked
     @staticmethod
     def get_users_by_type(typeOf="fan", refresh=False):
-        logging.debug(f"getting users: {typeOf}")
+        logger.debug(f"getting users: {typeOf}")
 
         def return_type(typeOf, user_cache):
             foundUsers = []
@@ -277,7 +278,7 @@ class User:
                     foundUsers.append(user)
             global USER_CACHE_BY_TYPE
             USER_CACHE_BY_TYPE[typeOf] = foundUsers
-            logging.debug(f"found users of type {typeOf}: {len(foundUsers)}")
+            logger.debug(f"found users of type {typeOf}: {len(foundUsers)}")
             return foundUsers
 
         # copied format from get_all_users
@@ -318,11 +319,11 @@ class User:
 
     #     """
 
-    #     logging.debug("getting users that have never been messaged...")
+    #     logger.debug("getting users that have never been messaged...")
     #     users = []
     #     for user in User.get_all_users():
     #         if len(user.messages_received) == 0:
-    #             logging.debug("never messaged user: {}".format(user.username))
+    #             logger.debug("never messaged user: {}".format(user.username))
     #             users.append(user)
     #     return users
 
@@ -339,15 +340,15 @@ class User:
 
         """
 
-        logging.debug("getting new users...")
+        logger.debug("getting new users...")
         newUsers = []
         date_ = datetime.today() - timedelta(days=10)
         for user in User.get_all_users():
             if not user.start_date: continue
             started = datetime.strptime(str(user.start_date),"%b %d, %Y")
-            # logging.debug("date: "+str(date_)+" - "+str(started))
+            # logger.debug("date: "+str(date_)+" - "+str(started))
             if started < date_: continue
-            logging.debug("new user: {}".format(user.username))
+            logger.debug("new user: {}".format(user.username))
             newUsers.append(user)
         return newUsers
 
@@ -363,10 +364,10 @@ class User:
     #         The users on the list
 
     #     """
-    #     logging.debug("getting users by list: {} - {}".format(number, name))
+    #     logger.debug("getting users by list: {} - {}".format(number, name))
     #     listUsers = []
     #     for user in Driver.get_list(number=number, name=name):
-    #         logging.debug("user: {}".format(user.username))
+    #         logger.debug("user: {}".format(user.username))
     #         listUsers.append(user)
     #     return listUsers
 
@@ -382,13 +383,13 @@ class User:
 
         """
         if not userid or userid == None:
-            logging.error("missing user id")
+            logger.error("missing user id")
             return None
         for user in User.get_all_users():
             if str(user.user_id) == "@u"+str(userid) or str(user.user_id) == "@"+str(userid) or str(user.user_id) == str(userid):
-                logging.debug("found user id: {}".format(userid))
+                logger.debug("found user id: {}".format(userid))
                 return user
-        logging.error("missing user by user id - {}".format(userid))
+        logger.error("missing user by user id - {}".format(userid))
         return None
 
     @staticmethod
@@ -403,13 +404,13 @@ class User:
 
         """
         if not username or str(username) == "None":
-            logging.error("missing username!")
+            logger.error("missing username!")
             return None
         for user in User.get_all_users():
             if str(user.username) == "@u"+str(username) or str(user.username) == "@"+str(username) or str(user.username) == str(username):
-                logging.debug("found username: {}".format(username))
+                logger.debug("found username: {}".format(username))
                 return user
-        logging.error("missing user by username - {}".format(username))
+        logger.error("missing user by username - {}".format(username))
         return None
 
 
@@ -508,7 +509,7 @@ class User:
             The users that have recently sent messages
 
         """
-        logging.debug("getting recent users from messages...")
+        logger.debug("getting recent users from messages...")
         users = []
         for user in get_recent_chat_users():
             users.append(User.create_user({"id":user}))
@@ -545,7 +546,7 @@ class User:
         """
 
         if len(users) == 0: users = User.get_all_users()
-        logging.info("updating chat logs: {}".format(len(users)))
+        logger.info("updating chat logs: {}".format(len(users)))
         for user in users: user.messages_read()
         return users
 

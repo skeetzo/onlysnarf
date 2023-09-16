@@ -1,5 +1,6 @@
 import time
 import logging
+logger = logging.getLogger(__name__)
 
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -33,7 +34,7 @@ def login(browser, method="auto"):
 
     cookies_load(browser)
     if check_if_already_logged_in(browser): return True
-    logging.info(f"logging into OnlyFans for {CONFIG['username']}...")
+    logger.info(f"logging into OnlyFans for {CONFIG['username']}...")
     try:
         successful = False
         if method == "auto":
@@ -47,7 +48,7 @@ def login(browser, method="auto"):
         elif method == "google":
             successful = via_google(browser)
         if successful:
-            logging.debug(f"login successful! ({method})")
+            logger.debug(f"login successful! ({method})")
             cookies_save(browser)
             return True
     except Exception as e:
@@ -65,12 +66,12 @@ def check_if_already_logged_in(browser):
     go_to_home(browser, force=True)
     try:
         WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-make-post__streaming-link")))
-        logging.info("already logged into OnlyFans!")
+        logger.info("already logged into OnlyFans!")
         return True
     except TimeoutException as te:
-        logging.debug(str(te))
+        logger.debug(str(te))
     except Exception as e:
-        logging.debug(e)
+        logger.debug(e)
     return False
 
 def check_if_logged_in(browser):
@@ -85,16 +86,16 @@ def check_if_logged_in(browser):
     """
 
     try:
-        logging.debug("waiting for login check...")
+        logger.debug("waiting for login check...")
         WebDriverWait(browser, 30, poll_frequency=2).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-make-post__streaming-link")))
-        logging.info("OnlyFans login successful!")
+        logger.info("OnlyFans login successful!")
         return True
     except TimeoutException as te:
-        logging.warning("timeout during login check!")
-        logging.debug(str(te))
+        logger.warning("timeout during login check!")
+        logger.debug(str(te))
         bodyText = browser.find_element(By.TAG_NAME, "body").text
         # output page text for debugging
-        logging.debug(bodyText)
+        logger.debug(bodyText)
         # check for phone number page
         if "Verify your identity by entering the phone number associated with your Twitter account." in str(bodyText):
             verify_phone()
@@ -104,12 +105,12 @@ def check_if_logged_in(browser):
             verify_email()
             return check_if_logged_in(browser)
         else:
-            logging.error("Login Failure: Timed Out! Please check your credentials.")
-            logging.error("If the problem persists, OnlySnarf may require an update.")
+            logger.error("Login Failure: Timed Out! Please check your credentials.")
+            logger.error("If the problem persists, OnlySnarf may require an update.")
     except Exception as e:
         error_checker(e)
-        logging.error("Login Failure!")
-        logging.error("If the problem persists, OnlySnarf may require an update.")
+        logger.error("Login Failure!")
+        logger.error("If the problem persists, OnlySnarf may require an update.")
     return False
 
 def via_form(browser):
@@ -124,27 +125,27 @@ def via_form(browser):
     """
 
     try:
-        logging.debug("logging in via form...")
+        logger.debug("logging in via form...")
         if not str(get_username_onlyfans()) or not str(get_password()):
-            logging.warning("missing onlyfans login info!")
+            logger.warning("missing onlyfans login info!")
             return False
         go_to_home(browser)
         WAIT = WebDriverWait(browser, 10, poll_frequency=2)
-        logging.debug("entering username & password...")
+        logger.debug("entering username & password...")
         usernameField = WAIT.until(EC.presence_of_element_located((By.NAME, "email")))
         usernameField.click()
         usernameField.send_keys(str(get_username_onlyfans()))
-        logging.debug("username entered")
+        logger.debug("username entered")
         # passwordField = WAIT.until(EC.presence_of_element_located((By.NAME, "password")))
         passwordField = browser.find_element(By.NAME, "password")
         passwordField.click()
         passwordField.send_keys(str(get_password()))
         passwordField.send_keys(Keys.ENTER)
-        logging.debug("password entered")
+        logger.debug("password entered")
         check_captcha(browser)
         return check_if_logged_in(browser)
     except Exception as e:
-        logging.debug("form login failure!")
+        logger.debug("form login failure!")
         error_checker(e)
     return False
 
@@ -161,9 +162,9 @@ def via_google(browser):
     """
 
     try:
-        logging.debug("logging in via google...")
+        logger.debug("logging in via google...")
         if not str(get_username_google()) or not str(get_password_google()):
-            logging.error("missing google login info")
+            logger.error("missing google login info")
             return False
         # click google login
         elements = browser.find_elements(By.TAG_NAME, "a")
@@ -172,15 +173,15 @@ def via_google(browser):
         username = browser.switch_to.active_element
         username.send_keys(str(get_username_google()))
         username.send_keys(Keys.ENTER)
-        logging.debug("username entered")
+        logger.debug("username entered")
         time.sleep(2)
         password = browser.switch_to.active_element
         password.send_keys(str(get_password_google()))
         password.send_keys(Keys.ENTER)
-        logging.debug("password entered")
+        logger.debug("password entered")
         return check_if_logged_in(browser)
     except Exception as e:
-        logging.debug("google login failure!")
+        logger.debug("google login failure!")
         error_checker(e)
     return False
 
@@ -196,22 +197,22 @@ def via_twitter(browser):
     """
 
     try:
-        logging.debug("logging in via twitter...")
+        logger.debug("logging in via twitter...")
         if not str(get_username_twitter()) or not str(get_password_twitter()):
-            logging.error("missing twitter login info!")
+            logger.error("missing twitter login info!")
             return False
         # click twitter login
         elements = browser.find_elements(By.TAG_NAME, "a")
         [elem for elem in elements if '/twitter/auth' in str(elem.get_attribute('href'))][0].click()
         browser.find_element(By.NAME, "session[username_or_email]").send_keys(str(get_username_twitter()))
-        logging.debug("username entered")
+        logger.debug("username entered")
         password = browser.find_element(By.NAME, "session[password]")
         password.send_keys(str(get_password_twitter()))
         password.send_keys(Keys.ENTER)
-        logging.debug("password entered")
+        logger.debug("password entered")
         return check_if_logged_in(browser)
     except Exception as e:
-        logging.debug("twitter login failure!")
+        logger.debug("twitter login failure!")
         error_checker(e)
     return False
 
@@ -226,7 +227,7 @@ def check_captcha(browser):
         el = browser.find_element(By.NAME, "password")
         print(el.get_attribute("innerHTML"))
         if not el: return # likely logged in without captcha
-        logging.info("waiting for captcha completion by user...")
+        logger.info("waiting for captcha completion by user...")
         action = ActionChains(browser)
         action.move_to_element_with_offset(el, 40, 100)
         action.click()
@@ -237,32 +238,32 @@ def check_captcha(browser):
             if str(ele.get_attribute("innerHTML")) == "Login" and ele.is_enabled():
                 ele.click()
                 return
-        logging.error("unable to login via form - captcha")
+        logger.error("unable to login via form - captcha")
     except Exception as e:
         print(e)
         if "Unable to locate element: [name=\"password\"]" not in str(e):
-            logging.debug(e)
+            logger.debug(e)
 
 # Twitter second chance verification
 def verify_phone(browser):
     try:
-        logging.debug("verifying phone number...")
+        logger.debug("verifying phone number...")
         element = browser.switch_to.active_element
         element.send_keys(str(CONFIG["phone"]))
         element.send_keys(Keys.ENTER)
     except Exception as e:
-        logging.error("Unable to verify phone number!")
-        logging.debug(e)
+        logger.error("Unable to verify phone number!")
+        logger.debug(e)
 
 # TODO: requires testing, not successfuly receiving email w/ code to test further
 # Twitter second chance verification
 def verify_email(browser):
     try:
-        logging.info("email verification required - please enter the code sent to your email!")
+        logger.info("email verification required - please enter the code sent to your email!")
         element = browser.switch_to.active_element
         element.send_keys(str(input("Enter code: ")))
         element.send_keys(Keys.SHIFT + Keys.TAB)
         element.send_keys(Keys.ENTER)
     except Exception as e:
-        logging.error("Unable to verify email!")
-        logging.debug(e)
+        logger.error("Unable to verify email!")
+        logger.debug(e)

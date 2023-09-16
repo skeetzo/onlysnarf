@@ -1,4 +1,5 @@
 import logging
+logger = logging.getLogger(__name__)
 import os, shutil, random, sys
 from os import walk
 import wget

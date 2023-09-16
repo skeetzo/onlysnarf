@@ -6,10 +6,12 @@ import unittest
 
 from OnlySnarf.util.config import set_config
 CONFIG = set_config({"prefer_local":True})
-from OnlySnarf.util.logger import configure_logging
+from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
 from OnlySnarf.classes.user import User
+
+configure_logs_for_module_tests("OnlySnarf.classes.user")
 
 class TestUsers(unittest.TestCase):
 

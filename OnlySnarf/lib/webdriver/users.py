@@ -2,6 +2,7 @@ import os
 import re
 import time
 import logging
+logger = logging.getLogger(__name__)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
@@ -32,17 +33,17 @@ def get_current_username(browser):
     """
 
     try:
-        logging.debug("searching for active username...")
+        logger.debug("searching for active username...")
         go_to_home(browser)
         eles = [ele for ele in browser.find_elements(By.TAG_NAME, "a") if "@" in str(ele.get_attribute("innerHTML")) and "onlyfans" not in str(ele.get_attribute("innerHTML"))]
         if CONFIG["debug"]:
             for ele in eles:
-                logging.debug("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
+                logger.debug("{} - {}".format(ele.get_attribute("innerHTML"), ele.get_attribute("href")))
         if len(eles) == 0:
-            logging.error("failed to find username!")
+            logger.error("failed to find username!")
         else:
             username = str(eles[0].get_attribute("href")).replace(ONLYFANS_HOME_URL+"/", "")
-            logging.debug("successfully found active username: {}".format(username))
+            logger.debug("successfully found active username: {}".format(username))
             return username
     except Exception as e:
         error_checker(e)
@@ -69,17 +70,17 @@ def get_userid_by_username(browser, username):
         elements = browser.find_elements(By.TAG_NAME, "a")
         user_id = [ele.get_attribute("href") for ele in elements if "/my/chats/chat/" in str(ele.get_attribute("href"))]
         if len(user_id) == 0: 
-            logging.warning(f"failed to find user id for {username}!")
+            logger.warning(f"failed to find user id for {username}!")
             return None
         user_id = user_id[0]
         user_id = user_id.replace("https://onlyfans.com/my/chats/chat/", "")
-        logging.debug(f"successfully found user id: {user_id}")
+        logger.debug(f"successfully found user id: {user_id}")
         return user_id
     except Exception as e:
         error_checker(e)
     raise Exception(f"failed to find user id for username: {username}")
 
-def get_user_element_at_page(browser, username, page):
+def get_user_element_at_page(browser, username, page, reattempt=False):
     if page == ONLYFANS_FOLLOWING_URL:
         class_name = "subscriptions"
     elif page == ONLYFANS_FANS_URL:
@@ -96,11 +97,11 @@ def get_user_element_at_page(browser, username, page):
                 SLEEP_WAIT += 1
                 BREAK_COUNT += 1
             for ele in browser.find_elements(By.CLASS_NAME, "g-user-username"):
-                # logging.debug(f"{str(username).strip().replace('@','')} == {str(ele.get_attribute('innerHTML')).strip().replace('@','')}")
+                # logger.debug(f"{str(username).strip().replace('@','')} == {str(ele.get_attribute('innerHTML')).strip().replace('@','')}")
                 if str(username).strip().replace("@","") == str(ele.get_attribute("innerHTML")).strip().replace("@",""):
                     browser.execute_script("arguments[0].scrollIntoView();", ele)
-                    logging.info("")
-                    logging.debug("successfully found user: {}".format(username))
+                    logger.info("")
+                    logger.debug("successfully found user: {}".format(username))
                     # TODO: figure out how to combine xpath statements?
                     # return parent element housing user info
                     return ele.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
@@ -109,6 +110,8 @@ def get_user_element_at_page(browser, username, page):
             browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(SLEEP_WAIT)
     except Exception as e:
+        if "stale element reference" in str(e).lower() and not reattempt:
+            return get_user_element_at_page(browser, username, page, reattempt=True)
         error_checker(e)
     raise Exception(f"failed to find {username} at {page}!")
 
@@ -125,7 +128,7 @@ def get_users_at_page(browser, page, collection="Active"):
         BREAK_COUNT = 0
         count = 0
 
-        # logging.StreamHandler.terminator = ""
+        # logger.StreamHandler.terminator = ""
 
         while True:
             elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
@@ -136,15 +139,15 @@ def get_users_at_page(browser, page, collection="Active"):
                 BREAK_COUNT += 1
             count = len(elements)
             print_same_line(f"({count}) scrolling...")
-            # logging.info(f"({count}) scrolling...")
+            # logger.info(f"({count}) scrolling...")
             browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(SLEEP_WAIT)
-        logging.info("")
+        logger.info("")
 
-        # logging.StreamHandler.terminator = "\n"
+        # logger.StreamHandler.terminator = "\n"
 
         users = []
-        logging.debug(f"searching {class_name}...")
+        logger.debug(f"searching {class_name}...")
         for ele in browser.find_elements(By.CLASS_NAME, f"m-{class_name}"):
             username = ele.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()
             name = ele.find_element(By.CLASS_NAME, "g-user-name").get_attribute("innerHTML")
@@ -152,9 +155,9 @@ def get_users_at_page(browser, page, collection="Active"):
             name = re.sub("<.*\">", "", name)
             name = re.sub("</.*>", "", name).strip()
             users.append({"name":name, "username":username.replace("@",""), "isFan":True if class_name=="fans" else False, "isFollower":True if class_name=="subscriptions" else False})
-            logging.debug(users[-1])
-        logging.debug(f"found {len(users)} {class_name}")
-        logging.debug(f"successfully found {class_name}!")
+            logger.debug(users[-1])
+        logger.debug(f"found {len(users)} {class_name}")
+        logger.debug(f"successfully found {class_name}!")
         return users
     except Exception as e:
         error_checker(e)
@@ -171,7 +174,7 @@ def get_users_by_type(browser, isFan=True, isFollower=False):
 
 # TODO: change collection into enum stuff
 def get_user_by_username(browser, username, reattempt=False, collection="All"):
-    logging.debug(f"searching for user by username: {username}")
+    logger.debug(f"searching for user by username: {username}")
     if not username: return None
     try:
         search_for_username(browser, username, collection=collection)
@@ -184,7 +187,7 @@ def get_user_by_username(browser, username, reattempt=False, collection="All"):
 
 def search_for_username(browser, username, collection="All"):
     try:
-        logging.debug(f"searching for {username} by opening url...")
+        logger.debug(f"searching for {username} by opening url...")
         go_to_page(browser, os.path.join(ONLYFANS_FANS_URL, "" if collection == "All" else collection.lower(), f"?search={username}"))
         return True
     except Exception as e:
@@ -196,10 +199,10 @@ def get_user_from_elements(browser, username, reattempt=False):
         # WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.CLASS_NAME, "g-user-username")))
         elements = browser.find_elements(By.CLASS_NAME, "g-user-username")
         for ele in elements:
-            # logging.debug(f"{str(username).strip().replace('@','')} == {str(ele.get_attribute('innerHTML')).strip().replace('@','')}")
+            # logger.debug(f"{str(username).strip().replace('@','')} == {str(ele.get_attribute('innerHTML')).strip().replace('@','')}")
             if str(username).strip().replace("@","") == str(ele.get_attribute("innerHTML")).strip().replace("@",""):
                 browser.execute_script("arguments[0].scrollIntoView();", ele)
-                logging.debug("successfully found user: {}".format(username))
+                logger.debug("successfully found user: {}".format(username))
                 # TODO: figure out how to combine xpath statements?
                 # return parent element housing user info
                 return ele.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
@@ -214,13 +217,13 @@ def click_user_button(browser, user_element, text="Message", reattempt=False):
     if not user_element: raise Exception("missing user element!")
     button = None
     try:
-        logging.debug(f"clicking {text} btn...")
+        logger.debug(f"clicking {text} btn...")
         button = find_element_to_click(user_element, "b-tabs__nav__text", text=text)
         browser.execute_script("return arguments[0].scrollIntoView(0, document.documentElement.scrollHeight-10);", button)
         # scroll into view to prevent element from being obscured by menu at top of page
         # browser.execute_script("return arguments[0].scrollIntoView(true);", button)
         button.click()
-        logging.debug(f"clicked {text} btn")
+        logger.debug(f"clicked {text} btn")
         time.sleep(0.5)
         debug_delay_check()
         return True
@@ -252,14 +255,14 @@ def click_user_button(browser, user_element, text="Message", reattempt=False):
 
 # TODO: move these somewhere else?
 def scroll_to_bottom(browser):
-    logging.debug("scrolling to bottom...")
+    logger.debug("scrolling to bottom...")
     SCROLL_PAUSE_TIME = 1
 
     # Get scroll height
     last_height = browser.execute_script("return document.body.scrollHeight")
 
     while True:
-        logging.debug("scrolling...")
+        logger.debug("scrolling...")
         # Scroll down to bottom
         browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
@@ -274,7 +277,7 @@ def scroll_to_bottom(browser):
 
 # TODO: probably delete, or leave for reference
 def scroll_to_bottom_once(browser):
-    logging.debug("scrolling to bottom once...")
+    logger.debug("scrolling to bottom once...")
     # Scroll down to bottom
     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     # Wait to load page
@@ -303,7 +306,7 @@ def scroll_to_bottom_once(browser):
 #     if not username: return None
 #     go_to_page(browser, ONLYFANS_FANS_URL)
 #     count = 0
-#     logging.debug("searching for user: {} ...".format(username))
+#     logger.debug("searching for user: {} ...".format(username))
 #     # scroll through users on page until user is found
 #     attempts = 0
 #     attemptsLimit = 5
@@ -316,8 +319,8 @@ def scroll_to_bottom_once(browser):
 #                 found_username = ele.get_attribute("innerHTML").strip()
 #                 if str(username).strip().replace("@","") == str(found_username).strip().replace("@",""):
 #                     browser.execute_script("arguments[0].scrollIntoView();", ele)
-#                     logging.info("")
-#                     logging.debug("successfully found user: {}".format(username))
+#                     logger.info("")
+#                     logger.debug("successfully found user: {}".format(username))
 #                     # TODO: figure out how to combine xpath statements?
 #                     # return parent element housing user info
 #                     return ele.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
@@ -332,12 +335,12 @@ def scroll_to_bottom_once(browser):
 #             time.sleep(scrollDelay)
 #         except Exception as e:
 #             if "is stale" in str(e):
-#                 logging.debug("stale element found, resetting search!")
-#     logging.warning(f"failed to find user by username: {username}")
+#                 logger.debug("stale element found, resetting search!")
+#     logger.warning(f"failed to find user by username: {username}")
 #     if not reattempt:
 #         browser.refresh()
 #         return get_user_by_username(browser, username, reattempt=True)
-#     logging.info(f"Snarf isn't sure that '{username}' really exists...")
+#     logger.info(f"Snarf isn't sure that '{username}' really exists...")
 #     return None
 
 
@@ -345,7 +348,7 @@ def scroll_to_bottom_once(browser):
 # not needed, unnecessary once realizing that its simpler to just go to the url with the username in the search?= format
 def get_user_search_field(browser):
     try:
-        logging.debug(f"getting user search field...")
+        logger.debug(f"getting user search field...")
         WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-content-filter__group-btns")))
         search_elements = browser.find_elements(By.CLASS_NAME, "b-content-filter__group-btns")
         search_element = search_elements[1].find_element(By.CLASS_NAME, "b-content-filter__btn")
@@ -357,7 +360,7 @@ def get_user_search_field(browser):
 
 def search_username_in_search_element(browser, search_element, username):
     try:
-        logging.debug(f"entering username '{username}' into search field...")
+        logger.debug(f"entering username '{username}' into search field...")
         ActionChains(browser).move_to_element(search_element).click(on_element=search_element).send_keys(str(username)).send_keys(Keys.ENTER).perform()
         time.sleep(1) # required wait
         return True

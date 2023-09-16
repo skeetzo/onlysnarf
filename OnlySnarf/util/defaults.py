@@ -125,10 +125,9 @@ Path(CONFIGS_PATH).mkdir(parents=True, exist_ok=True)
 Path(USERS_PATH).mkdir(parents=True, exist_ok=True)
 
 if os.environ.get('ENV') == "test":
-    print("##############")
-    print("## DEFAULTS ##")
-    print("##############")
-    print("Paths:")
+    print("###########")
+    print("## PATHS ##")
+    print("###########")
     print("root: "+ROOT_PATH)
     print("configs: "+CONFIGS_PATH)
     print("config: "+CONFIG_PATH)

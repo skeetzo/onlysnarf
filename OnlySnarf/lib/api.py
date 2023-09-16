@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+logger = logging.getLogger(__name__)
 from flask import Flask, request
 
 from ..util import CONFIG

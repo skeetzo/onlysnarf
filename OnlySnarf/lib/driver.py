@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+logger = logging.getLogger(__name__)
 
 from .webdriver import create_browser, get_user_chat, cookies_save, go_to_home, login as WEBDRIVER_login, \
     discount_user as WEBDRIVER_discount_user, message as WEBDRIVER_message, post as WEBDRIVER_post, \
@@ -22,17 +23,17 @@ def close_browser():
     """Save and exit"""
 
     global BROWSER
-    logging.debug("closing web browser...")
+    logger.debug("closing web browser...")
     if not BROWSER:
-        logging.debug("no browser to close!")
+        logger.debug("no browser to close!")
         return
     cookies_save(BROWSER)
     if CONFIG["keep"]:
         go_to_home(BROWSER, force=True)
-        logging.debug("reset to home page")
+        logger.debug("reset to home page")
     else:
         BROWSER.quit()
-        logging.info("web browser closed!")
+        logger.info("web browser closed!")
 
 ###############
 ##### Get #####
@@ -44,7 +45,7 @@ def get_browser():
     try:
         BROWSER = create_browser(CONFIG["browser"])
     except Exception as e:
-        logging.error(e)
+        logger.critical(e)
         os._exit(1)
     return BROWSER
 
@@ -54,49 +55,50 @@ def get_browser():
 
 def login():
     global LOGGED_IN
-    if LOGGED_IN: return True
-    browser = get_browser()
+    global BROWSER
+    if LOGGED_IN: return BROWSER
+    BROWSER = get_browser()
     try:
-        WEBDRIVER_login(browser, CONFIG["login"])
+        WEBDRIVER_login(BROWSER, CONFIG["login"])
     except Exception as e:
-        logging.error(e)
+        logger.critical(e)
         os._exit(1)
     LOGGED_IN = True
-    return True
+    return BROWSER
 
 #####################################
 ### Basic Functionality Shortcuts ###
 #####################################
 
 def discount_user(discount_object):
-    return WEBDRIVER_discount_user(get_browser(), discount_object)
+    return WEBDRIVER_discount_user(login(), discount_object)
 
 def expiration(expires_amount):
-    return WEBDRIVER_expiration(get_browser(), expires_amount)
+    return WEBDRIVER_expiration(login(), expires_amount)
 
 def message(message_object):
-    return WEBDRIVER_message(get_browser(), message_object)
+    return WEBDRIVER_message(login(), message_object)
 
 def poll(poll_object):
-    return WEBDRIVER_poll(get_browser(), poll_object)
+    return WEBDRIVER_poll(login(), poll_object)
 
 def post(post_object):
-    return WEBDRIVER_post(get_browser(), post_object)
+    return WEBDRIVER_post(login(), post_object)
 
 def schedule(schedule_object):
-    return WEBDRIVER_schedule(get_browser(), schedule_object)
+    return WEBDRIVER_schedule(login(), schedule_object)
 
 def get_recent_chat_users():
-    return WEBDRIVER_get_recent_chat_users(get_browser())
+    return WEBDRIVER_get_recent_chat_users(login())
 
 def get_userid_by_username():
-    return WEBDRIVER_get_userid_by_username(get_browser())
+    return WEBDRIVER_get_userid_by_username(login())
 
 def get_users(isFan=False, isFollower=False):
-    return WEBDRIVER_get_users_by_type(get_browser(), isFan=isFan, isFollower=isFollower)
+    return WEBDRIVER_get_users_by_type(login(), isFan=isFan, isFollower=isFollower)
 
 def get_user_chat():
-    return WEBDRIVER_get_user_chat(get_browser())
+    return WEBDRIVER_get_user_chat(login())
 
 
 # TODO: add remaining functionality like lists, promotion, profile, etc
@@ -113,7 +115,7 @@ def exit_handler():
     try:
         close_browser()
     except Exception as e:
-        print(e)
+        logger.error(e)
 
 import atexit
 atexit.register(exit_handler)

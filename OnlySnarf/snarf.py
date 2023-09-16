@@ -1,12 +1,14 @@
 #!/usr/bin/python3
 
+import logging
+
 from .util.args import get_args
 from .util.config import set_config
 CONFIG = set_config(get_args())
 
-from .util.logger import configure_logging, logging
+from .util.logger import configure_logging
 configure_logging(CONFIG["debug"], True if int(CONFIG["verbose"]) > 0 else False)
-# log = logging.getLogger('onlysnarf')
+logger = logging.getLogger(__name__)
 
 from .classes.discount import Discount
 from .classes.message import Message, Post
@@ -35,7 +37,7 @@ def discount():
 
     """
 
-    logging.info("Beginning discount process...")
+    logging.snarf("Beginning discount process...")
     users = list(filter(None, CONFIG.get("users", [])))
     if CONFIG.get("user"):
         users.append(CONFIG.get("user"))
@@ -52,7 +54,7 @@ def message():
     
     """
 
-    logging.info("Beginning message process...")
+    logging.snarf("Beginning message process...")
     return Message.create_message(CONFIG).send()
             
 def post():
@@ -63,7 +65,7 @@ def post():
     
     """
 
-    logging.info("Beginning post process...")
+    logging.snarf("Beginning post process...")
     return Post.create_post(CONFIG).send()
 
 # TODO: update this
@@ -142,10 +144,10 @@ def main():
         logging.info(f"Running - {CONFIG['action']}")
         eval(f"{CONFIG['action']}()")
     except Exception as e:
-        logging.error(e)
-        logging.info("shnarf??")
+        logging.critical(e)
+        logging.snarf("shnarf??")
     finally:
-        logging.info("shnarrf!")
+        logging.snarf("shnarrf!")
 
 if __name__ == "__main__":
     main()

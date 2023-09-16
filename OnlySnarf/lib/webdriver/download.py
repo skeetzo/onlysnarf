@@ -2,6 +2,7 @@
 
 import time
 import logging
+logger = logging.getLogger(__name__)
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 
@@ -10,7 +11,7 @@ from .. import CONFIG, DEFAULT, print_same_line
 def download_content(self):
     """Downloads all content (images and video) from the user's profile page"""
 
-    logging.info("downloading content...")
+    logger.info("downloading content...")
     def scroll_to_bottom():
         try:
             # go to profile page and scroll to bottom
@@ -18,20 +19,20 @@ def download_content(self):
             # count number of content elements to scroll to bottom
             num = self.browser.find_element(By.CLASS_NAME, "b-profile__sections__count").get_attribute("innerHTML")
             num = num.replace("K","00").replace(".","")
-            logging.debug("content count: {}".format(num))
+            logger.debug("content count: {}".format(num))
             for n in range(int(int(int(num)/5)+1)):
                 print_same_line("({}/{}) scrolling...".format(n,int(int(int(num)/5)+1)))
                 self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(1)
-            logging.info("")
+            logger.info("")
         except Exception as e:
-            logging.info(e)
-            logging.error("failed to find content to scroll")
+            logger.info(e)
+            logger.error("failed to find content to scroll")
     scroll_to_bottom()
     imagesDownloaded = self.download_images()
     videosDownloaded = self.download_videos()
-    logging.info("downloaded content")
-    logging.info("count: {}".format(len(imagesDownloaded)+len(videosDownloaded)))
+    logger.info("downloaded content")
+    logger.info("count: {}".format(len(imagesDownloaded)+len(videosDownloaded)))
 
 def download_images(self, destination=None):
     """Downloads all images on the page"""
@@ -51,7 +52,7 @@ def download_images(self, destination=None):
 
         end = len(images)
         if len(images) == 0:
-            logging.warning("no images found!")
+            logger.warning("no images found!")
             return downloaded
         if not destination: destination = os.path.join(DEFAULT.DOWNLOAD_PATH, "images")
         Path(destination).mkdir(parents=True, exist_ok=True)
@@ -81,14 +82,14 @@ def download_images(self, destination=None):
                     downloadMe.append(image.get_attribute("src"))
                 # print(len(downloadMe))
             except Exception as err:
-                logging.info("")            
-                logging.warning(err)
+                logger.info("")            
+                logger.warning(err)
             finally:
                 ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
                 i+=1
-        logging.info("")
+        logger.info("")
     except Exception as err:
-        logging.error(err)
+        logger.error(err)
 
     # print(downloadMe)
     downloadMe = list(set(downloadMe)) # remove duplicates
@@ -103,8 +104,8 @@ def download_images(self, destination=None):
             # print(src)
             if not src or src == "" or src == "None" or "/thumbs/" in src or "_frame_" in src or "http" not in src: continue
             print_same_line("downloading image: {}/{}".format(i, len(images)))
-            # logging.info("Image: {}".format(src[:src.find(".jpg")+4]))
-            # logging.debug("image src: {}".format(src))
+            # logger.info("Image: {}".format(src[:src.find(".jpg")+4]))
+            # logger.debug("image src: {}".format(src))
                 # while os.path.isfile("{}/{}.jpg".format(destination, i)):
                     # i+=1
 
@@ -113,9 +114,9 @@ def download_images(self, destination=None):
             wget.download(src, "{}/{}.jpg".format(destination, i), False)
             downloaded.append(i)
         except Exception as err:
-            logging.info("")            
-            logging.error(err)
-            logging.warning("skipped image: "+src)
+            logger.info("")            
+            logger.error(err)
+            logger.warning("skipped image: "+src)
         finally:
             i+=1
 
@@ -132,7 +133,7 @@ def download_messages(self, user="all", destination=None):
 
     """
 
-    logging.info("downloading messages: {}".format(user))
+    logger.info("downloading messages: {}".format(user))
     try:
         if str(user) == "all":
             # from OnlySnarf.classes.user import User
@@ -150,7 +151,7 @@ def download_messages(self, user="all", destination=None):
             time.sleep(1)
             images = self.browser.find_elements(By.TAG_NAME, "img")
             videos = self.browser.find_elements(By.TAG_NAME, "video")
-            # logging.info((len(images)+len(videos)))
+            # logger.info((len(images)+len(videos)))
             if contentCount == len(images)+len(videos): break
             contentCount = len(images)+len(videos)
         # download all images and videos
@@ -159,10 +160,10 @@ def download_messages(self, user="all", destination=None):
         imagesDownloaded = self.download_images()
         videosDownloaded = self.download_videos()
 
-        logging.info("downloaded messages")
-        logging.info("count: {}".format(len(imagesDownloaded)+len(videosDownloaded)))
+        logger.info("downloaded messages")
+        logger.info("count: {}".format(len(imagesDownloaded)+len(videosDownloaded)))
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
 
 def download_videos(self, destination=None):
     """Downloads all videos on the page"""
@@ -177,7 +178,7 @@ def download_videos(self, destination=None):
         end = len(playButtons)
 
         if len(playButtons) == 0:
-            logging.warning("no videos found!")
+            logger.warning("no videos found!")
             return downloaded
         if not destination: destination = os.path.join(DEFAULT.DOWNLOAD_PATH, "videos")
         Path(destination).mkdir(parents=True, exist_ok=True)
@@ -209,7 +210,7 @@ def download_videos(self, destination=None):
                 if not src or src == "" or src == "None" or "http" not in src: continue
                 downloadMe.append(src)
             except Exception as e:
-                logging.warning(e)
+                logger.warning(e)
             finally:
                 # self.browser.switch_to.default_content()
                 ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
@@ -221,20 +222,20 @@ def download_videos(self, destination=None):
         for src in downloadMe:
             try:
                 print_same_line("downloading video: {}/{}".format(i, end))
-                # logging.info("Video: {}".format(src[:src.find(".mp4")+4]))
-                # logging.debug("video src: {}".format(src))
+                # logger.info("Video: {}".format(src[:src.find(".mp4")+4]))
+                # logger.debug("video src: {}".format(src))
                 # while os.path.isfile("{}/{}.mp4".format(destination, i)):
                     # i+=1
                 wget.download(src, "{}/{}.mp4".format(destination, i), False)
                 downloaded.append(i)
             except Exception as e:
-                logging.info("")            
-                logging.error(e)
-                logging.warning("skipped video: "+src)
+                logger.info("")            
+                logger.error(e)
+                logger.warning("skipped video: "+src)
             finally:
                 ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
                 i+=1
-        logging.info("")
+        logger.info("")
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
     return downloaded

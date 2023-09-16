@@ -1,5 +1,6 @@
 import time
 import logging
+logger = logging.getLogger(__name__)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
@@ -29,7 +30,7 @@ def promotional_campaign(self, promotion=None):
     """
 
     if not promotion:
-        logging.error("missing promotion!")
+        logger.error("missing promotion!")
         return False
     # go to onlyfans.com/my/subscribers/active
     try:
@@ -40,25 +41,25 @@ def promotional_campaign(self, promotion=None):
         # user = promotion["user"]
         amount = promotion["amount"]
         text = promotion["message"]
-        logging.debug("goto -> /my/promotions")
+        logger.debug("goto -> /my/promotions")
         self.go_to_page("my/promotions")
-        logging.debug("checking existing promotion")
+        logger.debug("checking existing promotion")
         copies = self.browser.find_elements(By.CLASS_NAME, "g-btn.m-rounded.m-uppercase")
         for copy in copies:
             if "copy link to profile" in str(copy.get_attribute("innerHTML")).lower():
-            # logging.info("{}".format(copy.get_attribute("innerHTML")))
+            # logger.info("{}".format(copy.get_attribute("innerHTML")))
                 copy.click()
-                logging.debug("successfully clicked early copy")
-                logging.warning("a promotion already exists")
-                logging.info("Copied existing promotion")
+                logger.debug("successfully clicked early copy")
+                logger.warning("a promotion already exists")
+                logger.info("Copied existing promotion")
                 return True
-        logging.debug("clicking promotion campaign")
+        logger.debug("clicking promotion campaign")
         self.find_element_to_click("promotionalCampaign").click()
-        logging.debug("successfully clicked promotion campaign")
+        logger.debug("successfully clicked promotion campaign")
         # debug_delay_check()
         time.sleep(10)
         # limit dropdown
-        logging.debug("setting campaign count")
+        logger.debug("setting campaign count")
         limitDropwdown = self.find_element_by_name("promotionalTrialCount")
         for n in range(11): # 11 max subscription limits
             limitDropwdown.send_keys(str(Keys.UP))
@@ -66,10 +67,10 @@ def promotional_campaign(self, promotion=None):
         if limit:
             for n in range(int(limit)):
                 limitDropwdown.send_keys(Keys.DOWN)
-        logging.debug("successfully set campaign count")
+        logger.debug("successfully set campaign count")
         debug_delay_check()
         # expiration dropdown
-        logging.debug("settings campaign expiration")
+        logger.debug("settings campaign expiration")
         expirationDropdown = self.find_element_by_name("promotionalTrialExpiration")
         for n in range(11): # 31 max days
             expirationDropdown.send_keys(str(Keys.UP))
@@ -77,63 +78,63 @@ def promotional_campaign(self, promotion=None):
         if expiration:
             for n in range(int(expiration)):
                 expirationDropdown.send_keys(Keys.DOWN)
-        logging.debug("successfully set campaign expiration")
+        logger.debug("successfully set campaign expiration")
         debug_delay_check()
         # duration dropdown
         # LIMIT_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
         durationDropdown = self.find_element_by_name("promotionalCampaignAmount")
-        logging.debug("entering discount amount")
+        logger.debug("entering discount amount")
         for n in range(11):
             durationDropdown.send_keys(str(Keys.UP))
         for n in range(round(int(amount)/5)-1):
             durationDropdown.send_keys(Keys.DOWN)
-        logging.debug("successfully entered discount amount")
+        logger.debug("successfully entered discount amount")
         # todo: add message to users
         message = self.find_element_by_name("promotionalTrialMessage")
-        logging.debug("found message text")
+        logger.debug("found message text")
         message.clear()
-        logging.debug("sending text")
+        logger.debug("sending text")
         message.send_keys(str(text))
         # todo: [] apply to expired subscribers checkbox
         debug_delay_check()
         # find and click promotionalTrialConfirm
         if str(CONFIG["debug"]) == "True":
-            logging.debug("finding campaign cancel")
+            logger.debug("finding campaign cancel")
             self.find_element_to_click("promotionalTrialCancel").click()
-            logging.debug("skipping promotion (debug)")
-            logging.debug("successfully cancelled promotion campaign")
+            logger.debug("skipping promotion (debug)")
+            logger.debug("successfully cancelled promotion campaign")
             return True
-        logging.debug("finding campaign save")
+        logger.debug("finding campaign save")
         # save_ = self.find_element_to_click("promotionalTrialConfirm")
         # save_ = self.find_element_to_click("promotionalCampaignConfirm")
         save_ = self.browser.find_elements(By.CLASS_NAME, "g-btn.m-rounded")
         for save__ in save_:
-            logging.info(save__.get_attribute("innerHTML"))
+            logger.info(save__.get_attribute("innerHTML"))
         if len(save_) == 0:
-            logging.debug("unable to find promotion 'Create'")
-            logging.error("unable to save promotion")
+            logger.debug("unable to find promotion 'Create'")
+            logger.error("unable to save promotion")
             return False
         for save__ in save_:
             if save__.get_attribute("innerHTML").lower().strip() == "create":
                 save_ = save__    
-        logging.info(save_.get_attribute("innerHTML"))
-        logging.debug("saving promotion")
+        logger.info(save_.get_attribute("innerHTML"))
+        logger.debug("saving promotion")
         save_.click()
-        logging.debug("successfully saved promotion")
-        logging.debug("successful promotion campaign")
+        logger.debug("successfully saved promotion")
+        logger.debug("successful promotion campaign")
         # todo: add copy link to profile
         debug_delay_check()
-        logging.debug("clicking copy")
+        logger.debug("clicking copy")
         copies = self.browser.find_elements(By.CLASS_NAME, "g-btn.m-rounded.m-uppercase")
         for copy in copies:
-            logging.info("{}".format(copy.get_attribute("innerHTML")))
+            logger.info("{}".format(copy.get_attribute("innerHTML")))
             if "copy link to profile" in str(copy.get_attribute("innerHTML")).lower():
                 copy.click()
-                logging.debug("successfully clicked copy")
+                logger.debug("successfully clicked copy")
         return True
     except Exception as e:
         Driver.error_checker(e)
-        logging.error("failed to apply promotion")
+        logger.error("failed to apply promotion")
         return None
 
 # or email
@@ -154,7 +155,7 @@ def promotional_trial_link(self, promotion=None):
     """
 
     if not promotion:
-        logging.error("missing promotion")
+        logger.error("missing promotion")
         return False
     # go to onlyfans.com/my/subscribers/active
     try:
@@ -163,16 +164,16 @@ def promotional_trial_link(self, promotion=None):
         expiration = promotion["expiration"]
         duration = promotion["duration"]
         user = promotion["user"]
-        logging.debug("goto -> /my/promotions")
+        logger.debug("goto -> /my/promotions")
         self.go_to_page("/my/promotions")
-        logging.debug("showing promotional trial link")
+        logger.debug("showing promotional trial link")
         self.find_element_to_click("promotionalTrialShow").click()
-        logging.debug("successfully showed promotional trial link")
-        logging.debug("creating promotional trial")
+        logger.debug("successfully showed promotional trial link")
+        logger.debug("creating promotional trial")
         self.find_element_to_click("promotionalTrial").click()
-        logging.debug("successfully clicked promotional trial")
+        logger.debug("successfully clicked promotional trial")
         # limit dropdown
-        logging.debug("setting trial count")
+        logger.debug("setting trial count")
         limitDropwdown = self.find_element_by_name("promotionalTrialCount")
         for n in range(11): # 11 max subscription limits
             limitDropwdown.send_keys(str(Keys.UP))
@@ -180,10 +181,10 @@ def promotional_trial_link(self, promotion=None):
         if limit:
             for n in range(int(limit)):
                 limitDropwdown.send_keys(Keys.DOWN)
-        logging.debug("successfully set trial count")
+        logger.debug("successfully set trial count")
         debug_delay_check()
         # expiration dropdown
-        logging.debug("settings trial expiration")
+        logger.debug("settings trial expiration")
         expirationDropdown = self.find_element_by_name("promotionalTrialExpiration")
         for n in range(11): # 31 max days
             expirationDropdown.send_keys(str(Keys.UP))
@@ -191,11 +192,11 @@ def promotional_trial_link(self, promotion=None):
         if expiration:
             for n in range(int(expiration)):
                 expirationDropdown.send_keys(Keys.DOWN)
-        logging.debug("successfully set trial expiration")
+        logger.debug("successfully set trial expiration")
         debug_delay_check()
         # duration dropdown
         # LIMIT_ALLOWED = ["1 day","3 days","7 days","14 days","1 month","3 months","6 months","12 months"]
-        logging.debug("settings trial duration")
+        logger.debug("settings trial duration")
         durationDropwdown = self.find_element_by_name("promotionalTrialDuration")
         for n in range(11):
             durationDropwdown.send_keys(str(Keys.UP))
@@ -211,39 +212,39 @@ def promotional_trial_link(self, promotion=None):
         if str(duration) == "12 months": num = 8
         for n in range(int(num)-1):
             durationDropwdown.send_keys(Keys.DOWN)
-        logging.debug("successfully set trial duration")
+        logger.debug("successfully set trial duration")
         debug_delay_check()
         # find and click promotionalTrialConfirm
         # if CONFIG["debug"]:
-        #     logging.debug("finding trial cancel")
+        #     logger.debug("finding trial cancel")
         #     self.find_element_to_click("promotionalTrialCancel").click()
-        #     logging.info("skipping: Promotion (debug)")
-        #     logging.debug("successfully cancelled promotion trial")
+        #     logger.info("skipping: Promotion (debug)")
+        #     logger.debug("successfully cancelled promotion trial")
         #     return True
-        logging.debug("finding trial save")
+        logger.debug("finding trial save")
         save_ = self.find_element_to_click("promotionalTrialConfirm")
         # "g-btn.m-rounded"
 
         save_ = self.browser.find_elements(By.CLASS_NAME, "g-btn.m-rounded")
         for save__ in save_:
-            logging.info(save__.get_attribute("innerHTML"))
+            logger.info(save__.get_attribute("innerHTML"))
         if len(save_) == 0:
-            logging.debug("unable to find promotion 'Create'")
-            logging.error("unable to save promotion")
+            logger.debug("unable to find promotion 'Create'")
+            logger.error("unable to save promotion")
             return False
         for save__ in save_:
             if save__.get_attribute("innerHTML").lower().strip() == "create":
                 save_ = save__    
-        logging.info(save_.get_attribute("innerHTML"))
-        logging.debug("saving promotion")
+        logger.info(save_.get_attribute("innerHTML"))
+        logger.debug("saving promotion")
         save_.click()
-        logging.debug("successfully saved promotion")
+        logger.debug("successfully saved promotion")
         ## TODO ##
         # finish this
         link = ""
-        # logging.debug("copying trial link")
+        # logger.debug("copying trial link")
         # self.find_element_by_name("promotionalTrialLink").click()
-        # logging.debug("successfully copied trial link")
+        # logger.debug("successfully copied trial link")
 
         # in order for this to work accurately i need to figure out the number of trial things already on the page
         # then find the new trial thing
@@ -256,12 +257,12 @@ def promotional_trial_link(self, promotion=None):
         # get text in new post
         # email link to user
 
-        logging.debug("successful promotion trial")
+        logger.debug("successful promotion trial")
         debug_delay_check()
         return link
     except Exception as e:
         Driver.error_checker(e)
-        logging.error("failed to apply promotion")
+        logger.error("failed to apply promotion")
         return None
 
 def promotion_user_directly(self, promotion=None):
@@ -281,7 +282,7 @@ def promotion_user_directly(self, promotion=None):
     """
 
     if not promotion:
-        logging.error("missing promotion")
+        logger.error("missing promotion")
         return False
     # go to onlyfans.com/my/subscribers/active
     promotion.get()
@@ -292,20 +293,20 @@ def promotion_user_directly(self, promotion=None):
 
     # TODO: replace with defaults
     # if int(expiration) > int(Settings.get_discount_max_amount()):
-    #     logging.warning("discount too high, max -> {}%".format(Settings.get_discount_max_amount()))
+    #     logger.warning("discount too high, max -> {}%".format(Settings.get_discount_max_amount()))
     #     discount = Settings.get_discount_max_amount()
     # elif int(expiration) > int(Settings.get_discount_min_amount()):
-    #     logging.warning("discount too low, min -> {}%".format(Settings.get_discount_min_amount()))
+    #     logger.warning("discount too low, min -> {}%".format(Settings.get_discount_min_amount()))
     #     discount = Settings.get_discount_min_amount()
     # if int(months) > int(Settings.get_discount_max_months()):
-    #     logging.warning("duration too high, max -> {} days".format(Settings.get_discount_max_months()))
+    #     logger.warning("duration too high, max -> {} days".format(Settings.get_discount_max_months()))
     #     months = Settings.get_discount_max_months()
     # elif int(months) < int(Settings.get_discount_min_months()):
-    #     logging.warning("duration too low, min -> {} days".format(Settings.get_discount_min_months()))
+    #     logger.warning("duration too low, min -> {} days".format(Settings.get_discount_min_months()))
     #     months = Settings.get_discount_min_months()
     
     try:
-        logging.debug("goto -> /{}".format(user))
+        logger.debug("goto -> /{}".format(user))
         self.go_to_page(user)
         # click discount button
         self.find_element_to_click("discountUserPromotion").click()
@@ -316,42 +317,42 @@ def promotion_user_directly(self, promotion=None):
         # enter message
         message = self.find_element_by_name("promotionalTrialMessageUser")
         # save
-        logging.debug("entering expiration")
+        logger.debug("entering expiration")
         for n in range(11):
             expirations.send_keys(str(Keys.UP))
         for n in range(round(int(expiration)/5)-1):
             expirations.send_keys(Keys.DOWN)
-        logging.debug("successfully entered expiration")
-        logging.debug("entering duration")
+        logger.debug("successfully entered expiration")
+        logger.debug("entering duration")
         for n in range(11):
             durations.send_keys(str(Keys.UP))
         for n in range(int(months)-1):
             durations.send_keys(Keys.DOWN)
-        logging.debug("successfully entered duration")
+        logger.debug("successfully entered duration")
         debug_delay_check()
-        logging.debug("entering message")
+        logger.debug("entering message")
         message.clear()
         message.send_keys(message)
-        logging.debug("successfully entered message")
-        logging.debug("applying discount")
+        logger.debug("successfully entered message")
+        logger.debug("applying discount")
         save = self.find_element_by_name("promotionalTrialApply")
         if str(CONFIG["debug"]) == "True":
             self.find_element_by_name("promotionalTrialCancel").click()
-            logging.debug("skipping save discount (debug)")
-            logging.debug("successfully canceled discount")
+            logger.debug("skipping save discount (debug)")
+            logger.debug("successfully canceled discount")
             cancel.click()
             return True
         save.click()
-        logging.info("discounted: {}".format(user.username))
-        logging.debug("### User Discount Successful ###")
+        logger.info("discounted: {}".format(user.username))
+        logger.debug("### User Discount Successful ###")
         return True
     except Exception as e:
         Driver.error_checker(e)
         try:
             self.find_element_by_name("promotionalTrialCancel").click()
-            logging.debug("### Discount Successful Failure ###")
+            logger.debug("### Discount Successful Failure ###")
             return False
         except Exception as e:
             Driver.error_checker(e)
-        logging.debug("### Discount Failure ###")
+        logger.debug("### Discount Failure ###")
         return False

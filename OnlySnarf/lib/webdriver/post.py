@@ -1,5 +1,6 @@
 import time
 import logging
+logger = logging.getLogger(__name__)
 
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -12,7 +13,6 @@ from .clear import click_clear_button, clear_text
 from .element import find_element_to_click
 from .expiration import expiration as EXPIRES
 from .errors import error_checker
-from .goto import go_to_home
 from .poll import poll as POLL
 from .schedule import schedule as SCHEDULE
 from .upload import upload_files
@@ -47,39 +47,39 @@ def post(browser, post_object):
     """
 
     if not post_object:
-        logging.debug("skipping empty post")
+        logger.debug("skipping empty post")
         return True
     click_clear_button(browser)
     #################### Formatted Text ####################
-    logging.info("====================")
-    logging.info("Posting:")
-    logging.info(f"- Files: {len(post_object['files'])}")
-    logging.info(f"- Performers: {post_object['performers']}")
-    logging.info(f"- Keywords: {post_object['keywords']}")
-    logging.info(f"- Text: {post_object['text']}")
-    logging.info(f"- Tweeting: {CONFIG['tweeting']}")
+    logger.info("====================")
+    logger.info("Posting:")
+    logger.info(f"- Files: {len(post_object['files'])}")
+    logger.info(f"- Performers: {post_object['performers']}")
+    logger.info(f"- Keywords: {post_object['keywords']}")
+    logger.info(f"- Text: {post_object['text']}")
+    logger.info(f"- Tweeting: {CONFIG['tweeting']}")
     ## Expires, Schedule, Poll ##
     if not EXPIRES(browser, post_object["expiration"]): return False
     if post_object["schedule"] and not SCHEDULE(browser, post_object["schedule"]): return False
     if post_object["poll"] and not POLL(browser, post_object["poll"]): return False
-    logging.info("====================")
+    logger.info("====================")
     ############################################################
     try:
         if CONFIG["tweeting"]: enable_tweeting(browser)
         if not enter_text(browser, post_object["text"]):
-            logging.error("failed to post!")
+            logger.error("failed to post!")
             return False
         successful, skipped = upload_files(browser, post_object["files"])
         if successful and not skipped:
             postButton = [ele for ele in browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
             WebDriverWait(browser, CONFIG["upload_max_duration"], poll_frequency=3).until(EC.element_to_be_clickable(postButton))
-            logging.debug("upload complete!")
+            logger.debug("upload complete!")
         send_post(browser)
     except TimeoutException:
-        logging.error("timed out waiting for post upload!")
+        logger.error("timed out waiting for post upload!")
     except Exception as e:
-        logging.debug(e)
-        logging.error("failed to send post!")
+        logger.debug(e)
+        logger.error("failed to send post!")
     click_clear_button(browser)
     return True
 
@@ -104,7 +104,7 @@ def enter_text(browser, text):
 
         try:
             clear_text(browser)
-            logging.debug("entering text: "+text)
+            logger.debug("entering text: "+text)
             element = browser.find_element(By.ID, "new_post_text_input")
             action = ActionChains(browser)
             action.move_to_element(element)
@@ -114,7 +114,7 @@ def enter_text(browser, text):
             action.send_keys(Keys.CLEAR)
             action.send_keys(str(text))
             action.perform()
-            logging.debug("successfully entered text!")
+            logger.debug("successfully entered text!")
             return True
         except Exception as e:
             error_checker(e)
@@ -122,23 +122,23 @@ def enter_text(browser, text):
 
 # TODO: test this
 def enable_tweeting(browser):
-    logging.debug("enabling tweeting...")
+    logger.debug("enabling tweeting...")
     ActionChains(browser).move_to_element(browser.find_element(By.CLASS_NAME, "b-btns-group").find_elements(By.XPATH, "./child::*")[0]).click().perform()
-    logging.debug("enabled tweeting")
+    logger.debug("enabled tweeting")
 
 def send_post(browser):
     if CONFIG["debug"] and str(CONFIG["debug"]) == "True":
-        logging.info('skipped post (debug)')
+        logger.info('skipped post (debug)')
         debug_delay_check()
         return True
-    logging.debug("sending post...")
+    logger.debug("sending post...")
 
     # button = [ele for ele in browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
     # ActionChains(browser).move_to_element(button).click().perform()
 
     find_element_to_click("button", by=By.TAG_NAME, text="Post").click()
 
-    logging.info('Posted to OnlyFans!')
+    logger.info('Posted to OnlyFans!')
     return True
 
 # no longer used?
@@ -157,20 +157,20 @@ def open_more_options(browser):
     def option_one():
         """Click on '...' element"""
 
-        logging.debug("opening options (1)")
+        logger.debug("opening options (1)")
         moreOptions = find_element_to_click(browser, "button.g-btn.m-flat.b-make-post__more-btn")
         if not moreOptions: return False    
         moreOptions.click()
-        logging.debug("successfully opened more options (1)")
+        logger.debug("successfully opened more options (1)")
         return True
     def option_two():
         """Click in empty space"""
 
-        logging.debug("opening options (2)")
+        logger.debug("opening options (2)")
         moreOptions = find_element_to_click(browser, "new_post_text_input", by=By.ID)
         if not moreOptions: return False    
         moreOptions.click()
-        logging.debug("successfully opened more options (2)")
+        logger.debug("successfully opened more options (2)")
         return True
 
     try:

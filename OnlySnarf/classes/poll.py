@@ -1,4 +1,5 @@
-
+# import logging
+# logger = logging.getLogger(__name__)
 from marshmallow import Schema, fields, validate, ValidationError, post_load, EXCLUDE
 
 class PollSchema(Schema):

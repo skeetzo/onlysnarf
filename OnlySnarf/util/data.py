@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+logger = logging.getLogger(__name__)
 
 from .config import CONFIG
 
@@ -10,7 +11,7 @@ def reset_userlist():
     try:
         os.remove(USERS_PATH)
     except Exception as e:
-        logging.debug(e)
+        logger.debug(e)
     with open(USERS_PATH, 'w') as f:
         json.dump({"users":[],"randomized_users":[]}, f)
 
@@ -19,7 +20,7 @@ def reset_userlist():
 def add_to_randomized_users(newUser):
     if CONFIG["debug"]: return
     if not newUser: return
-    logging.debug("saving random user...")
+    logger.debug("saving random user...")
     users, randomized_users = read_users_local()
     for user in randomized_users:
         if newUser.equals(user):
@@ -31,21 +32,21 @@ def add_to_randomized_users(newUser):
         data['randomized_users'] = randomized_users
         with open(USERS_PATH, 'w') as outfile:  
             json.dump(data, outfile, indent=4, sort_keys=True)
-        logging.debug("saved random user!")
+        logger.debug("saved random user!")
     except OSError:
         reset_userlist()
         return add_to_randomized_users(newUser)
     except OSError:
-        logging.error("missing local path!")
+        logger.error("missing local path!")
     except Exception as e:
         reset_userlist()
-        logging.debug(e)
+        logger.debug(e)
 
 def remove_from_randomized_users(removedUser):
     pass
 
 def reset_random_users():
-    logging.debug("resetting random users...")
+    logger.debug("resetting random users...")
     existing_users, randomized_users = read_users_local()
     try:
         data = {}
@@ -53,9 +54,9 @@ def reset_random_users():
         data['randomized_users'] = []
         with open(USERS_PATH, 'w') as outfile:  
             json.dump(data, outfile, indent=4, sort_keys=True)
-        logging.debug("successfully reset random users!")
+        logger.debug("successfully reset random users!")
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
 
 def read_users_local():
     """
@@ -67,7 +68,7 @@ def read_users_local():
         The locally saved users
 
     """
-    logging.debug("getting local users...")
+    logger.debug("getting local users...")
     users = []
     randomized_users = []
     from ..classes.user import User
@@ -78,13 +79,13 @@ def read_users_local():
                 users.append(User.create_user(user).dump())
             for user in loaded['randomized_users']:
                 randomized_users.append(User.create_user(user).dump())
-        # logging.debug(users)
-        # logging.debug(randomized_users)
-        logging.debug(f"successfully loaded local users: {len(users)}")
+        # logger.debug(users)
+        # logger.debug(randomized_users)
+        logger.debug(f"successfully loaded local users: {len(users)}")
     except OSError:
         reset_userlist()
     except Exception as e:
-        logging.debug(e)
+        logger.debug(e)
         # reset_userlist()
     return users, randomized_users
 
@@ -95,10 +96,10 @@ def write_users_local(added_users):
     """
 
     if not isinstance(added_users, list) and len(added_users) == 0:
-        logging.debug("skipping local users save - empty")
+        logger.debug("skipping local users save - empty")
         return
-    logging.debug("saving users...")
-    logging.debug(f"local users path: {USERS_PATH}")
+    logger.debug("saving users...")
+    logger.debug(f"local users path: {USERS_PATH}")
     # merge with existing user data
     existing_users, randomized_users = read_users_local()
 
@@ -113,7 +114,7 @@ def write_users_local(added_users):
                     # if added_user.equals(existing_user):
                     if added_user.equals(existing_user) and added_user.username not in usernames:
                         existing_user.update(added_user.dump())
-                        # logging.debug(f"updated: {added_user.username}")
+                        # logger.debug(f"updated: {added_user.username}")
                         new_users.append(existing_user)
                         usernames.append(added_user.username)
                         updated = True
@@ -122,21 +123,21 @@ def write_users_local(added_users):
                         break
                 # if found: continue
                 if not updated and existing_user["username"] not in usernames:
-                    # logging.debug(f"existing: {existing_user['username']}")
+                    # logger.debug(f"existing: {existing_user['username']}")
                     new_users.append(existing_user)
                     usernames.append(existing_user["username"])
             if not found and each_added_user.username not in usernames:
-                # logging.debug(f"adding: {each_added_user.username}")
+                # logger.debug(f"adding: {each_added_user.username}")
                 new_users.append(each_added_user.dump())
                 usernames.append(each_added_user.username)
     except Exception as e:
         print(e)
 
-    # logging.debug("usernames:")
-    # logging.debug(usernames)
+    # logger.debug("usernames:")
+    # logger.debug(usernames)
 
-    # logging.debug("new users:")
-    # logging.debug(new_users)
+    # logger.debug("new users:")
+    # logger.debug(new_users)
 
     data = {}
     data['users'] = new_users
@@ -144,10 +145,10 @@ def write_users_local(added_users):
     try:
         with open(USERS_PATH, 'w') as outfile:  
             json.dump(data, outfile, indent=4, sort_keys=True)
-        logging.debug("saved users!")
+        logger.debug("saved users!")
     except OSError:
-        logging.error("missing local users!")
+        logger.error("missing local users!")
         reset_userlist()
         write_users_local(added_users)
     except Exception as e:
-        logging.debug(e)
+        logger.debug(e)

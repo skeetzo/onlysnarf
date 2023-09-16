@@ -1,5 +1,6 @@
 import time
 import logging
+logger = logging.getLogger(__name__)
 
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -43,7 +44,7 @@ def message(browser, message_object):
     """
 
     try:
-        logging.info(f"Entering message to {', '.join(message_object['recipients'])}: (${message_object['price']}) {message_object['text']}\nIncludes: {','.join(message_object['includes'])}\nExcludes: {','.join(message_object['excludes'])}")
+        logger.info(f"Entering message to {', '.join(message_object['recipients'])}: (${message_object['price']}) {message_object['text']}\nIncludes: {','.join(message_object['includes'])}\nExcludes: {','.join(message_object['excludes'])}")
 
         # prepare the message
         if len(message_object["recipients"]) > 1 or message_object["includes"] or message_object["excludes"]:
@@ -81,7 +82,7 @@ def message(browser, message_object):
     except Exception as e:
         error_checker(e)
 
-    logging.error("failed to send message!")
+    logger.error("failed to send message!")
     return False
 
 ########################################################################
@@ -91,7 +92,7 @@ def message(browser, message_object):
 # add username to existing mass message being started
 def add_user_to_message(browser, username):
     try:
-        logging.debug(f"adding user to message: {username}")
+        logger.debug(f"adding user to message: {username}")
         element = browser.find_element(By.CLASS_NAME, "b-search-users-form__input")
         ActionChains(browser).move_to_element(element).click(on_element=element).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(username)).perform()
         WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-search-users-form__input")))
@@ -126,20 +127,20 @@ def message_confirm(browser):
     """
 
     try:
-        logging.debug("waiting for message confirm to be clickable...")
+        logger.debug("waiting for message confirm to be clickable...")
         confirm = WebDriverWait(browser, int(CONFIG["upload_max_duration"]), poll_frequency=3).until(EC.element_to_be_clickable((By.CLASS_NAME, "g-btn.m-rounded.b-chat__btn-submit")))
-        logging.debug("message confirm is clickable")
+        logger.debug("message confirm is clickable")
         debug_delay_check()
         if CONFIG["debug"] and str(CONFIG["debug"]) == "True":
-            logging.info('skipping message (debug)')
+            logger.info('skipping message (debug)')
             message_clear(browser)
         else:
-            logging.debug("clicking confirm...")
+            logger.debug("clicking confirm...")
             confirm.click()
-            logging.info('OnlyFans message sent!')
+            logger.info('OnlyFans message sent!')
         return True
     except TimeoutException:
-        logging.error("Timed out waiting for message confirm!")
+        logger.error("Timed out waiting for message confirm!")
     except Exception as e:
         error_checker(e)
     message_clear(browser)
@@ -163,13 +164,13 @@ def message_price(browser, price):
 
     try:
         if not price or str(price) == "None":
-            logging.debug("skipping empty price")
+            logger.debug("skipping empty price")
             return True
         message_price_clear(browser)
         message_price_open(browser)
         message_price_enter(browser, price)
         message_price_save(browser)
-        logging.debug("successfully entered message price!")
+        logger.debug("successfully entered message price!")
         return True
     except Exception as e:
         error_checker(e)
@@ -178,12 +179,12 @@ def message_price(browser, price):
 # clear any pre-existing message price
 def message_price_clear(browser):
     try:
-        logging.debug("clearing any preexisting price...")
+        logger.debug("clearing any preexisting price...")
         # this is not the same class as the x icons for close_icons
         element = browser.find_element(By.CLASS_NAME, "m-btn-remove")
         if element:
             element.click()
-            logging.debug("sucessfully cleared preexisting price!")
+            logger.debug("sucessfully cleared preexisting price!")
     except Exception as e:
         if "unable to locate element" not in str(e).lower():
             error_checker(e)
@@ -192,11 +193,11 @@ def message_price_clear(browser):
 
 def message_price_open(browser, reattempt=False):
     try:
-        logging.debug("clicking price button...")
+        logger.debug("clicking price button...")
         for element in browser.find_element(By.CLASS_NAME, "b-make-post__actions__btns").find_elements(By.XPATH, "./child::*"):
             if "icon-price" in str(element.get_attribute("innerHTML")):
                 browser.execute_script("arguments[0].click()", element)
-                logging.debug("sucessfully clicked price button!")
+                logger.debug("sucessfully clicked price button!")
                 return True
                 # BUG: normal methods not working :/
                 # ActionChains(browser).move_to_element(element).click().perform()
@@ -212,11 +213,11 @@ def message_price_open(browser, reattempt=False):
 
 def message_price_enter(browser, price, reattempt=False):
     try:
-        logging.debug("entering price...")
+        logger.debug("entering price...")
         element = WebDriverWait(browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(browser.find_element(By.ID, "priceInput_1")))
         element.click()
         element.send_keys(str(price))
-        logging.debug("entered price!")
+        logger.debug("entered price!")
         debug_delay_check()
         return True
     except Exception as e:
@@ -228,9 +229,9 @@ def message_price_enter(browser, price, reattempt=False):
 
 def message_price_save(browser):
     try:
-        logging.debug("saving price...")
+        logger.debug("saving price...")
         find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Save").click()
-        logging.debug("saved price!")
+        logger.debug("saved price!")
         debug_delay_check()
         return True
     except Exception as e:
@@ -255,11 +256,11 @@ def message_text(browser, text):
 
     try:
         clear_text(browser)
-        logging.debug("entering text...")
+        logger.debug("entering text...")
         # clear any preexisting text first
         element = WebDriverWait(browser, 3).until(EC.visibility_of_element_located((By.ID, 'new_post_text_input')))
         ActionChains(browser).move_to_element(element).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(text)).perform()
-        logging.debug("successfully entered text!")
+        logger.debug("successfully entered text!")
         time.sleep(0.5)
         return True
     except Exception as e:
@@ -290,7 +291,7 @@ def message_user_by_id(browser, user_id):
     user_id = str(user_id).replace("@u","").replace("@","")
     try:
         go_to_page(browser, "{}{}".format(ONLYFANS_CHAT_URL, user_id))
-        logging.debug("successfully messaging user id: {}".format(user_id))
+        logger.debug("successfully messaging user id: {}".format(user_id))
         return True
     except Exception as e:
         error_checker(e)
@@ -312,26 +313,26 @@ def message_user_by_username(browser, username):
 
     """
 
-    logging.debug(f"messaging username: {username}")
+    logger.debug(f"messaging username: {username}")
     try:
         user = get_user_by_username(browser, username, collection="Active", reattempt=True) # a True value for reattempt has the function skip "All" as a search option
         # backup method aka original method that needs updates / debugging
         if not user: return message_user_by_user_page(browser, username)
         click_user_button(browser, user, text="Message")
         time.sleep(0.5)
-        logging.debug(f"successfully messaging username: {username}")
+        logger.debug(f"successfully messaging username: {username}")
         return True
     except Exception as e:
         error_checker(e)
     raise Exception(f"failed to message user: {username}")    
 
 def message_user_by_user_page(browser, username):
-    logging.debug(f"messaging username via page: {username}")
+    logger.debug(f"messaging username via page: {username}")
     try:
-        logging.warning("TODO: DEBUG THIS")
-        logging.debug("BACKUP USER SEARCH")
-        logging.debug("BACKUP USER SEARCH")
-        logging.debug("BACKUP USER SEARCH")
+        logger.warning("TODO: DEBUG THIS")
+        logger.debug("BACKUP USER SEARCH")
+        logger.debug("BACKUP USER SEARCH")
+        logger.debug("BACKUP USER SEARCH")
 
         go_to_page(browser, username)
         time.sleep(3) # for whatever reason this constantly errors out from load times
@@ -343,9 +344,9 @@ def message_user_by_user_page(browser, username):
         ele = ele[0]
         ele = ele.get_attribute("href").replace("https://onlyfans.com", "")
         # clicking no longer works? just open href in self.browser
-        # logging.debug("clicking send message")
+        # logger.debug("clicking send message")
         # ele.click()
-        logging.debug(f"user id found: {ele.replace(ONLYFANS_HOME_URL+'/', '')}")
+        logger.debug(f"user id found: {ele.replace(ONLYFANS_HOME_URL+'/', '')}")
         go_to_page(browser, ele)
         return True
     except Exception as e:

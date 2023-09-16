@@ -1,5 +1,6 @@
 import os
 import logging
+logger = logging.getLogger(__name__)
 
 ##############
 ### Errors ###
@@ -18,8 +19,8 @@ def error_checker(e):
 
     if os.environ.get('ENV') == "True": print(err)
     if "unable to locate element" in str(e).lower():
-        logging.error("shnarf unable to locate an element! shnarf may require an update!")
+        logger.error("shnarf unable to locate an element! shnarf may require an update!")
     elif "message: " in str(e).lower():
-        logging.debug(e)
+        logger.debug(e)
     else:
-        logging.error(e)
+        logger.error(e)

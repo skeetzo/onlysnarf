@@ -1,4 +1,5 @@
 import logging
+logger = logging.getLogger(__name__)
 
 from .user import User
 from ..lib.driver import discount_user as WEBDRIVER_discount_user
@@ -52,26 +53,26 @@ class Discount:
 
         """
 
-        logging.debug(f"applying discount to: {self.username}")
+        logger.debug(f"applying discount to: {self.username}")
         return WEBDRIVER_discount_user(self.dump())
 
     @staticmethod
     def format_amount(amount):
         if int(amount) > int(DISCOUNT_MAX_AMOUNT):
-            logging.warning(f"discount amount too high, max -> {DISCOUNT_MAX_AMOUNT}%")
+            logger.warning(f"discount amount too high, max -> {DISCOUNT_MAX_AMOUNT}%")
             return int(DISCOUNT_MAX_AMOUNT)
         elif int(amount) < int(DISCOUNT_MIN_AMOUNT):
-            logging.warning(f"discount amount too low, min -> {DISCOUNT_MIN_AMOUNT}%")
+            logger.warning(f"discount amount too low, min -> {DISCOUNT_MIN_AMOUNT}%")
             return int(DISCOUNT_MIN_AMOUNT)
         return amount
 
     @staticmethod
     def format_months(months):
         if int(months) > int(DISCOUNT_MAX_MONTHS):
-            logging.warning(f"discount months too high, max -> {DISCOUNT_MAX_MONTHS} months")
+            logger.warning(f"discount months too high, max -> {DISCOUNT_MAX_MONTHS} months")
             return int(DISCOUNT_MAX_MONTHS)
         elif int(months) < int(DISCOUNT_MIN_MONTHS):
-            logging.warning(f"discount months too low, min -> {DISCOUNT_MIN_MONTHS} months")
+            logger.warning(f"discount months too low, min -> {DISCOUNT_MIN_MONTHS} months")
             return int(DISCOUNT_MIN_MONTHS)
         return months
 

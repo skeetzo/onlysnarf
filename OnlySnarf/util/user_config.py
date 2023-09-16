@@ -1,5 +1,6 @@
 import configparser
 import logging
+logger = logging.getLogger(__name__)
 import os
 
 from .config import CONFIG
@@ -10,16 +11,16 @@ def get_user_config(username="default"):
     # strip email
     if "@" in username: username = username[0 : username.index("@")]
     username = username.replace(".conf", "") # filename formatting
-    logging.debug("retrieving user config: {}".format(username))
-    logging.debug(os.path.join(DEFAULT.ROOT_PATH, "conf/users", username+".conf"))
+    logger.debug("retrieving user config: {}".format(username))
+    logger.debug(os.path.join(DEFAULT.ROOT_PATH, "conf/users", username+".conf"))
     config_file.read(os.path.join(DEFAULT.ROOT_PATH, "conf/users", username+".conf"))
     userConfig = {}
     for section in config_file.sections():
-        # logging.debug(section)
+        # logger.debug(section)
         for key in config_file[section]:
-            # logging.debug(section, key, config_file[section][key].strip("\""))
+            # logger.debug(section, key, config_file[section][key].strip("\""))
             userConfig[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
-    # logging.debug(userConfig)
+    # logger.debug(userConfig)
     return userConfig
 
 def get_user_config_path(username="default"):

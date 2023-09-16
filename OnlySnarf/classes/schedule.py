@@ -1,4 +1,5 @@
 import logging
+logger = logging.getLogger(__name__)
 from datetime import datetime
 from marshmallow import Schema, fields, validate, post_load, EXCLUDE
 
@@ -52,11 +53,11 @@ class Schedule:
         try:
             date = datetime.strptime(str(date_string), DATE_FORMAT)    
         except Exception as e:
-            logging.debug(f"unable to format date: {date_string}")
-            logging.error(e)
+            logger.debug(f"unable to format date: {date_string}")
+            logger.error(e)
             date = datetime.strptime(DATE, DATE_FORMAT)
         date = date.strftime(DATE_FORMAT)[:10]
-        logging.debug(f"formatted date: {date}")
+        logger.debug(f"formatted date: {date}")
         return str(date)
 
     @staticmethod
@@ -65,11 +66,11 @@ class Schedule:
         try:
             time = datetime.strptime(str(time_string), TIME_FORMAT)
         except Exception as e:
-            logging.debug(f"unable to format time: {time_string}")
-            logging.error(e)
+            logger.debug(f"unable to format time: {time_string}")
+            logger.error(e)
             time = datetime.strptime(TIME, TIME_FORMAT)
         time = time.strftime(TIME_FORMAT)[:9]
-        logging.debug(f"formatted time: {time}")
+        logger.debug(f"formatted time: {time}")
         return str(time)
 
     @staticmethod
@@ -79,11 +80,11 @@ class Schedule:
             schedule_string = f"{Schedule.format_date(date_string)} {Schedule.format_time(time_string)}"
             schedule = datetime.strptime(schedule_string, SCHEDULE_FORMAT)
         except Exception as e:
-            logging.debug(f"unable to format schedule: {date_string} {time_string}")
-            logging.error(e)
+            logger.debug(f"unable to format schedule: {date_string} {time_string}")
+            logger.error(e)
             schedule = datetime.strptime(SCHEDULE, SCHEDULE_FORMAT)
         schedule = schedule.strftime(SCHEDULE_FORMAT)
-        logging.debug(f"formatted schedule: {schedule}")
+        logger.debug(f"formatted schedule: {schedule}")
         return str(schedule)
 
     def validate(self):
@@ -97,15 +98,15 @@ class Schedule:
 
         """
 
-        logging.debug("validating schedule...")
+        logger.debug("validating schedule...")
         today = datetime.strptime(str(datetime.now().strftime(SCHEDULE_FORMAT)), SCHEDULE_FORMAT)
         if not self.schedule: return False
         # should invalidate if all default settings
         if self.date == DATE and (self.time == TIME or self.time == TIME_NONE):
-            logging.debug("invalid schedule! (default date and time)")
+            logger.debug("invalid schedule! (default date and time)")
             return False
         elif self.schedule <= today:
-            logging.debug("invalid schedule! (must be in future)")
+            logger.debug("invalid schedule! (must be in future)")
             return False
-        logging.debug("valid schedule!")
+        logger.debug("valid schedule!")
         return True

@@ -1,6 +1,7 @@
 # TODO: finish this later
 
 import logging
+logger = logging.getLogger(__name__)
 import re
 from datetime import datetime
 ##

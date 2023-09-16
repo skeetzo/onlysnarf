@@ -1,4 +1,5 @@
 import logging
+logger = logging.getLogger(__name__)
 
 from .errors import error_checker
 from .. import CONFIG
@@ -17,7 +18,7 @@ from .. import CONFIG
 # goes through the settings and get all the values
 # @staticmethod
 # def settings_get_all():
-#     logging.info("Getting All Settings")
+#     logger.info("Getting All Settings")
 #     profile = Profile()
 #     try:
 #         pages = Profile.get_pages()
@@ -25,8 +26,8 @@ from .. import CONFIG
 #             data = self.sync_from_settings_page(page)
 #             for key, value in data:
 #                 profile[key] = value
-#         logging.debug("successfully got settings")
-#         logging.info("Settings Retrieved")
+#         logger.debug("successfully got settings")
+#         logger.info("Settings Retrieved")
 #     except Exception as e:
 #         error_checker(e)
 #     return profile
@@ -49,13 +50,13 @@ def sync_from_settings_page(self, profile=None, page=None):
 
     """
 
-    logging.info("Getting Settings: {}".format(page))
+    logger.info("Getting Settings: {}".format(page))
     from ..classes.profile import Profile
     try:
         variables = Profile.get_variables_for_page(page)
-        logging.debug("going to settings page: {}".format(page))
+        logger.debug("going to settings page: {}".format(page))
         self.go_to_settings(page)
-        logging.debug("reached settings: {}".format(page))
+        logger.debug("reached settings: {}".format(page))
         if profile == None:
             profile = Profile()
         for var in variables:
@@ -63,10 +64,10 @@ def sync_from_settings_page(self, profile=None, page=None):
             page_ = var[1]
             type_ = var[2]
             status = None
-            logging.debug("searching: {} - {}".format(name, type_))
+            logger.debug("searching: {} - {}".format(name, type_))
             try:
                 element = self.find_element_by_name(name)
-                logging.debug("successful ele: {}".format(name))
+                logger.debug("successful ele: {}".format(name))
             except Exception as e:
                 error_checker(e)
                 continue
@@ -74,7 +75,7 @@ def sync_from_settings_page(self, profile=None, page=None):
                 # get attr text
                 status = element.get_attribute("innerHTML").strip() or None
                 status2 = element.get_attribute("value").strip() or None
-                logging.info("{} - {}".format(status, status2))
+                logger.info("{} - {}".format(status, status2))
                 if not status and status2: status = status2
             elif str(type_) == "toggle":
                 # get state true|false
@@ -86,18 +87,18 @@ def sync_from_settings_page(self, profile=None, page=None):
             elif str(type_) == "list":
                 status = element.get_attribute("innerHTML")
             elif str(type_) == "file":
-                logging.info("NEED TO UPDATE THIS")
+                logger.info("NEED TO UPDATE THIS")
                 # can get file from image above
                 # can set once found
                 # status = element.get_attribute("innerHTML")
                 # pass
             elif str(type_) == "checkbox":
                 status = element.is_selected()
-            if status is not None: logging.debug("successful value: {}".format(status))
-            logging.debug("{} : {}".format(name, status))
+            if status is not None: logger.debug("successful value: {}".format(status))
+            logger.debug("{} : {}".format(name, status))
             setattr(profile, str(name), status)
-        logging.debug("successfully got settings page: {}".format(page))
-        logging.info("Settings Page Retrieved: {}".format(page))
+        logger.debug("successfully got settings page: {}".format(page))
+        logger.info("Settings Page Retrieved: {}".format(page))
     except Exception as e:
         error_checker(e)
 
@@ -120,13 +121,13 @@ def sync_to_settings_page(self, profile=None, page=None):
 
     """
 
-    logging.info("Updating Page Settings: {}".format(page))
+    logger.info("Updating Page Settings: {}".format(page))
     from ..classes.profile import Profile
     try:
         variables = Profile.get_variables_for_page(page)
-        logging.debug("going to settings page: {}".format(page))
+        logger.debug("going to settings page: {}".format(page))
         self.go_to_settings(page)
-        logging.debug("reached settings: {}".format(page))
+        logger.debug("reached settings: {}".format(page))
         if profile == None:
             profile = Profile()
         for var in variables:
@@ -134,10 +135,10 @@ def sync_to_settings_page(self, profile=None, page=None):
             page_ = var[1]
             type_ = var[2]
             status = None
-            logging.debug("searching: {} - {}".format(name, type_))
+            logger.debug("searching: {} - {}".format(name, type_))
             try:
                 element = self.find_element_by_name(name)
-                logging.debug("successful ele: {}".format(name))
+                logger.debug("successful ele: {}".format(name))
             except Exception as e:
                 error_checker(e)
                 continue
@@ -160,23 +161,23 @@ def sync_to_settings_page(self, profile=None, page=None):
             elif str(type_) == "checkbox":
                 element.click()
         if str(CONFIG["debug"]) == "True":
-            logging.debug("successfully cancelled settings page: {}".format(page))
+            logger.debug("successfully cancelled settings page: {}".format(page))
         else:
             self.settings_save(page=page)
-            logging.debug("successfully set settings page: {}".format(page))
-        logging.info("Settings Page Updated: {}".format(page))
+            logger.debug("successfully set settings page: {}".format(page))
+        logger.info("Settings Page Updated: {}".format(page))
     except Exception as e:
         error_checker(e)
 
 # @staticmethod
 # def settings_set_all(Profile):
-#     logging.info("Updating All Settings")
+#     logger.info("Updating All Settings")
 #     try:
 #         pages = Profile.TABS
 #         for page in pages:
 #             self.sync_to_settings_page(Profile, page)
-#         logging.debug("successfully set settings")
-#         logging.info("Settings Updated")
+#         logger.debug("successfully set settings")
+#         logger.info("Settings Updated")
 #     except Exception as e:
 #         error_checker(e)
 
@@ -202,19 +203,19 @@ def settings_save(self, page=None):
     """
 
     if str(page) not in ["profile", "account", "security"]:
-        logging.debug("not saving: {}".format(page))
+        logger.debug("not saving: {}".format(page))
         return
     try:
-        logging.debug("saving: {}".format(page))
+        logger.debug("saving: {}".format(page))
         element = self.find_element_by_name("profileSave")
-        logging.debug("derp")
+        logger.debug("derp")
         element = self.find_element_to_click("profileSave")
-        logging.debug("found page save")
+        logger.debug("found page save")
         if str(CONFIG["debug"]) == "True":
-            logging.info("skipping settings save (debug)")
+            logger.info("skipping settings save (debug)")
         else:
-            logging.debug("saving page")
+            logger.debug("saving page")
             element.click()
-            logging.debug("page saved")
+            logger.debug("page saved")
     except Exception as e:
         error_checker(e)

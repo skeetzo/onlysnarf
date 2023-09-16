@@ -1,5 +1,6 @@
 import os
 import logging
+logger = logging.getLogger(__name__)
 
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -33,14 +34,14 @@ def expiration(browser, expires):
     """
 
     if str(expires) == str(DEFAULT.EXPIRATION_NONE):
-        logging.debug("skipping empty expiration")
+        logger.debug("skipping empty expiration")
         return True
     try:
-        logging.info(f"Expiration: {expires}")
+        logger.info(f"Expiration: {expires}")
         enter_expiration(browser, expires)
         # unnecessary due to clear_message
         if CONFIG["debug"]:
-            logging.debug("skipping expiration save (debug)")
+            logger.debug("skipping expiration save (debug)")
             click_close_icons(browser)
         return True
     except Exception as e:
@@ -50,7 +51,7 @@ def expiration(browser, expires):
 
 def enter_expiration(browser, expires):
     try:
-        logging.debug("entering expiration...")
+        logger.debug("entering expiration...")
         element = find_element_to_click(browser, "b-make-post__expire-period-btn")
         action = ActionChains(browser)
         action.click(on_element=element)
@@ -62,7 +63,7 @@ def enter_expiration(browser, expires):
         action.pause(int(1))
         action.send_keys(Keys.ENTER)
         action.perform()
-        logging.debug("successfully entered expiration!")
+        logger.debug("successfully entered expiration!")
         debug_delay_check()
         return True
     except Exception as e:

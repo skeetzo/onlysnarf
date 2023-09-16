@@ -11,13 +11,13 @@ CONFIG = {}
 
 def get_config_file():
   if os.environ.get('ENV') == "test":
-    print(f"using test config: {CONFIG_TEST}")
+    # print(f"using test config: {CONFIG_TEST}")
     return CONFIG_TEST
   elif os.path.isfile(CONFIG_USER):
-    print(f"using normal config: {CONFIG_USER}")
+    # print(f"using normal config: {CONFIG_USER}")
     return CONFIG_USER
   else:
-    print(f"using local config: {CONFIG_DEFAULT}")
+    # print(f"using local config: {CONFIG_DEFAULT}")
     return CONFIG_DEFAULT
 
 def parse_config(config_path, parsed_config=None):

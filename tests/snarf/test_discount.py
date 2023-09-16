@@ -4,11 +4,13 @@ import unittest
 
 from OnlySnarf.util.config import set_config
 CONFIG = set_config({})
-from OnlySnarf.util.logger import configure_logging
+from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
 from OnlySnarf.util import defaults as DEFAULT
 from OnlySnarf.classes.discount import Discount
+
+configure_logs_for_module_tests("OnlySnarf.lib.webdriver.discount")
 
 class TestSnarf(unittest.TestCase):
 
@@ -22,7 +24,7 @@ class TestSnarf(unittest.TestCase):
         pass
 
     def test_discount(self):
-        CONFIG["prefer_local"] = False
+        # CONFIG["prefer_local"] = False
         self.discount = Discount.create_discount({**CONFIG, 'username':CONFIG["user"]})
         assert self.discount.apply(), "unable to apply discount"
 

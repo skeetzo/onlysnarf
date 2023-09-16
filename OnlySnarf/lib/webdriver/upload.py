@@ -1,5 +1,6 @@
 import time
 import logging
+logger = logging.getLogger(__name__)
 import threading
 import concurrent.futures
 from selenium.webdriver.common.by import By
@@ -63,8 +64,8 @@ def drag_and_drop_file(drop_target, path):
         return input;
     """
     try:
-        logging.debug("dragging and dropping file...")
-        logging.debug("drop target: {}".format(drop_target.get_attribute("innerHTML")))
+        logger.debug("dragging and dropping file...")
+        logger.debug("drop target: {}".format(drop_target.get_attribute("innerHTML")))
         # BUG: requires double to register file upload
         file_input = drop_target.parent.execute_script(JS_DROP_FILE, drop_target, 0, 0)
         file_input.send_keys(path)
@@ -73,7 +74,7 @@ def drag_and_drop_file(drop_target, path):
         debug_delay_check()
         return True
     except Exception as e:
-        logging.error(e) 
+        logger.error(e) 
     return False
 
 ##################
@@ -99,28 +100,28 @@ def upload_files(browser, files):
     """
 
     if CONFIG["skip_download"]: 
-        logging.info("skipping upload (download)")
+        logger.info("skipping upload (download)")
         return True, True
     elif CONFIG["skip_upload"]: 
-        logging.info("skipping upload (upload)")
+        logger.info("skipping upload (upload)")
         return True, True
     if len(files) == 0:
-        logging.debug("skipping upload (empty file list)")
+        logger.debug("skipping upload (empty file list)")
         return True, True
     if CONFIG["skip_upload"]:
-        logging.info("skipping upload (disabled)")
+        logger.info("skipping upload (disabled)")
         return True, True
     files = files[:int(CONFIG["upload_max"])]
-    logging.info("uploading file(s): {}".format(len(files)))
+    logger.info("uploading file(s): {}".format(len(files)))
 
     prepared_files = []
 
     def prepare_file(file):
         if not isinstance(file, File):
-            logging.debug("preparing new file object...")
+            logger.debug("preparing new file object...")
             file = File(file)
         if not file.prepare():
-            logging.error("unable to upload - {}".format(file.get_title()))
+            logger.error("unable to upload - {}".format(file.get_title()))
         else:
             prepared_files.append(file)
 
@@ -129,24 +130,24 @@ def upload_files(browser, files):
         for result in executor.map(prepare_file, files):
             pass
         
-    logging.debug("files prepared: {}".format(len(prepared_files)))
+    logger.debug("files prepared: {}".format(len(prepared_files)))
     if len(prepared_files) == 0:
-        logging.error("skipping upload (unable to prepare files)")
+        logger.error("skipping upload (unable to prepare files)")
         return False, True
     enter_file = browser.find_element(By.ID, "attach_file_photo")
     successful = []
     i = 1
     for file in prepared_files:
-        logging.info('> {} - {}/{}'.format(file.get_title(), i, len(files)))
+        logger.info('> {} - {}/{}'.format(file.get_title(), i, len(files)))
         i += 1
         successful.append(drag_and_drop_file(enter_file , file.path))
         time.sleep(1)
     if all(successful):
-        if error_window_upload(browser): logging.debug("files uploaded successfully!")
-        else: logging.debug("files probably uploaded succesfully!")
+        if error_window_upload(browser): logger.debug("files uploaded successfully!")
+        else: logger.debug("files probably uploaded succesfully!")
         time.sleep(1) # bug prevention
         return True, False
-    logging.warning("a file failed to upload!")
+    logger.warning("a file failed to upload!")
     return False, False
 
 def error_window_upload(browser):
@@ -157,19 +158,19 @@ def error_window_upload(browser):
             element = find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Close")
             if not element: break
             element.click()
-            logging.debug("upload error message successfully closed!")
+            logger.debug("upload error message successfully closed!")
         return True
         ## other method
         # buttons = browser.find_elements(By.CLASS_NAME, "g-btn.m-flat.m-btn-gaps.m-reset-width")
-        # logging.debug("errors btns: {}".format(len(buttons)))
+        # logger.debug("errors btns: {}".format(len(buttons)))
         # if len(buttons) == 0: return True
         # # if not button: return True
         # for button in buttons:
         #     if button.get_attribute("innerHTML").strip() == "Close" and button.is_enabled():
-        #         logging.debug("upload error message, closing")
+        #         logger.debug("upload error message, closing")
         #         button.click()
         #         break
-        # logging.debug("success: upload error message closed")
+        # logger.debug("success: upload error message closed")
         # time.sleep(1)
         # return True
     except Exception as e:
@@ -182,10 +183,10 @@ def fix_filename(file):
     filename = os.path.basename(file.get_path())
     filename = os.path.splitext(filename)[0]
     if "_fixed" in str(filename): return
-    logging.debug("fixing filename...")
+    logger.debug("fixing filename...")
     filename += "_fixed"
     ext = os.path.splitext(filename)[1].lower()
-    logging.debug("{} -> {}.{}".format(os.path.dirname(file.get_path()), filename, ext))
+    logger.debug("{} -> {}.{}".format(os.path.dirname(file.get_path()), filename, ext))
     dst = "{}/{}.{}".format(os.path.dirname(file), filename, ext)
     shutil.move(file.get_path(), dst)
     file.path = dst

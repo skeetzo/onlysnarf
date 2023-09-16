@@ -1,5 +1,6 @@
 import time
 import logging
+logger = logging.getLogger(__name__)
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -9,8 +10,6 @@ from selenium.common.exceptions import WebDriverException
 
 from .. import ONLYFANS_HOME_URL, ONLYFANS_SETTINGS_URL
 from .. import CONFIG, DEFAULT
-
-# TABS = []
 
 ##############
 ### Go Tos ###
@@ -31,24 +30,24 @@ def go_to_home(browser, force=False):
     """
 
     def goto():
-        logging.debug("goto -> onlyfans.com")
+        logger.debug("goto -> onlyfans.com")
         try:
             browser.set_page_load_timeout(10)
             browser.get(ONLYFANS_HOME_URL)
         except TimeoutException:
-            logging.warning("timed out waiting for page load!")
+            logger.warning("timed out waiting for page load!")
         except WebDriverException as e:
-            logging.debug("error fetching home page!")
-            logging.error(e)
+            logger.debug("error fetching home page!")
+            logger.error(e)
         handle_alert(browser)
         get_page_load(browser)
     if force: return goto()
     if search_for_tab(browser, ONLYFANS_HOME_URL, force=force):
-        logging.debug("found -> /")
+        logger.debug("found -> /")
         return
-    logging.debug(f"current url: {browser.current_url}")
+    logger.debug(f"current url: {browser.current_url}")
     if str(browser.current_url) == str(ONLYFANS_HOME_URL):
-        logging.debug("already at -> onlyfans.com")
+        logger.debug("already at -> onlyfans.com")
         browser.execute_script("window.scrollTo(0, 0);")
     else: goto()        
     
@@ -66,13 +65,13 @@ def go_to_page(browser, page, force=False):
     """
 
     if search_for_tab(browser, page, force=force):
-        logging.debug(f"found -> {page}")
+        logger.debug(f"found -> {page}")
         browser.execute_script("window.scrollTo(0, 0);")
     elif str(browser.current_url) == str(page) or (str(page) in str(browser.current_url) and not force):
-        logging.debug(f"already at -> {page}")
+        logger.debug(f"already at -> {page}")
         browser.execute_script("window.scrollTo(0, 0);")
     else:
-        logging.debug(f"goto -> {page}")
+        logger.debug(f"goto -> {page}")
         open_tab(browser, page)
         handle_alert(browser)
         get_page_load(browser)
@@ -83,13 +82,13 @@ def go_to_profile(browser):
     username = CONFIG["username"]
     page = f"{ONLYFANS_HOME_URL}/{username}"
     if search_for_tab(browser, page):
-        logging.debug(f"found -> /{username}")
+        logger.debug(f"found -> /{username}")
         return
     if str(username) in str(browser.current_url):
-        logging.debug(f"already at -> {username}")
+        logger.debug(f"already at -> {username}")
         browser.execute_script("window.scrollTo(0, 0);")
     else:
-        logging.debug(f"goto -> {username}")
+        logger.debug(f"goto -> {username}")
         open_tab(browser, page)
         get_page_load(browser)
 
@@ -108,14 +107,14 @@ def go_to_settings(browser, settingsTab):
     """
 
     if search_for_tab(browser, f"{ONLYFANS_SETTINGS_URL}{settingsTab}"):  
-        logging.debug(f"found -> settings/{settingsTab}")
+        logger.debug(f"found -> settings/{settingsTab}")
         return
     if str(ONLYFANS_SETTINGS_URL) in str(browser.current_url) and str(settingsTab) == "profile":
-        logging.debug(f"at -> onlyfans.com/settings/{settingsTab}")
+        logger.debug(f"at -> onlyfans.com/settings/{settingsTab}")
         browser.execute_script("window.scrollTo(0, 0);")
     else:
         if str(settingsTab) == "profile": settingsTab = ""
-        logging.debug(f"goto -> onlyfans.com/settings/{settingsTab}")
+        logger.debug(f"goto -> onlyfans.com/settings/{settingsTab}")
         go_to_page(f"{ONLYFANS_SETTINGS_URL}{settingsTab}")
 
 ############
@@ -139,9 +138,9 @@ def open_tab(browser, url):
 
     """
 
-    logging.debug(f"opening tab -> {url}")
+    logger.debug(f"opening tab -> {url}")
     windows_before  = browser.current_window_handle
-    logging.debug(f"current window handle is : {windows_before}")
+    logger.debug(f"current window handle is : {windows_before}")
     windows = browser.window_handles
     browser.execute_script('''window.open("{}","_blank");'''.format(url))
     # handle_alert(browser)
@@ -150,8 +149,8 @@ def open_tab(browser, url):
     windows_after = browser.window_handles
     new_window = [x for x in windows_after if x not in windows][0]
     browser.switch_to.window(new_window)
-    logging.debug(f"page title after tab switching is : {browser.title}")
-    logging.debug(f"new window handle is : {new_window}")
+    logger.debug(f"page title after tab switching is : {browser.title}")
+    logger.debug(f"new window handle is : {new_window}")
     # global TABS
     # if len(TABS) >= DEFAULT.MAX_TABS:
     #     least = TABS[0]
@@ -179,27 +178,27 @@ def search_for_tab(browser, page, force=False):
     """
 
     original_handle = browser.current_window_handle
-    logging.debug(f"searching for page: {page}")
-    logging.debug(f"handles: {browser.window_handles}")
+    logger.debug(f"searching for page: {page}")
+    logger.debug(f"handles: {browser.window_handles}")
     try:
-        logging.debug("checking handles...")
+        logger.debug("checking handles...")
         for handle in browser.window_handles:
-            logging.debug(handle)
+            logger.debug(handle)
             browser.switch_to.window(handle)
             if force:
                 print(f"{page} == {browser.current_url}")
                 if str(page) == str(browser.current_url).replace(ONLYFANS_HOME_URL, ""):
-                    logging.debug(f"successfully located exact tab in handles: {page}")
+                    logger.debug(f"successfully located exact tab in handles: {page}")
                     return True
             else:
                 if str(page) in str(browser.current_url):
-                    logging.debug(f"successfully located tab in handles: {page}")
+                    logger.debug(f"successfully located tab in handles: {page}")
                     return True
-        logging.debug(f"failed to locate tab: {page}")
+        logger.debug(f"failed to locate tab: {page}")
         browser.switch_to.window(original_handle)
     except Exception as e:
         # if "Unable to locate window" not in str(e):
-        logging.debug(e)
+        logger.debug(e)
     return False
 
 # waits for page load
@@ -209,7 +208,7 @@ def get_page_load(browser):
     try:
         WebDriverWait(browser, 60*2, poll_frequency=1).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
 
 def handle_alert(browser):
     """Switch to alert pop up"""

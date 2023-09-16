@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import ffmpeg
 import datetime
 import os

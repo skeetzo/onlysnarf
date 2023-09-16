@@ -1,4 +1,5 @@
 import logging
+logger = logging.getLogger(__name__)
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -32,23 +33,23 @@ def find_element_to_click(browser, name, text="", by=By.CLASS_NAME, fuzzyMatch=F
 
     """
 
-    logging.debug(f"finding element: {name} - {text}")
+    logger.debug(f"finding element: {name} - {text}")
     foundElement = None
     try:
         elements = browser.find_elements(by, name)
-        logging.debug(f"elements found: {len(elements)}")
+        logger.debug(f"elements found: {len(elements)}")
         i = 0
         for element in elements:
-            # logging.debug(f"element: {element.get_attribute('innerHTML').strip()}")
+            # logger.debug(f"element: {element.get_attribute('innerHTML').strip()}")
             if element.is_displayed() and element.is_enabled() and ( (index >= 0 and i == index) or (index==-1) ):
                 if text and str(text).lower().strip() == element.get_attribute("innerHTML").lower().strip():
-                    logging.debug("found matching element!")
+                    logger.debug("found matching element!")
                     return element
                 elif text and fuzzyMatch and str(text).lower().strip() in element.get_attribute("innerHTML").lower().strip():
-                    logging.debug("found matching fuzzy element!")
+                    logger.debug("found matching fuzzy element!")
                     return element
                 elif not text:
-                    logging.debug("found matching element!")
+                    logger.debug("found matching element!")
                     return element
             i += 1
     except Exception as e:
@@ -83,18 +84,18 @@ def move_to_then_click_element(browser, element):
         ActionChains(browser).move_to_element(element).click().perform()
         return True
     except Exception as e:
-        # logging.debug(e)
+        # logger.debug(e)
         # if 'firefox' in browser.capabilities['browserName']:
         try:
             scroll_shim(browser, element)
             ActionChains(browser).move_to_element(element).click().perform()
         except Exception as e:
             pass
-            # logging.debug(e)
+            # logger.debug(e)
             browser.execute_script("arguments[0].scrollIntoView();", element)
             # try:
             #     browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.CONTROL + Keys.HOME)
             #     ActionChains(browser).move_to_element(element).click().perform()
             # except Exception as e:
-            #     logging.debug(e)
+            #     logger.debug(e)
     return False
