@@ -9,10 +9,11 @@ from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_t
 configure_logging(True, True)
 
 from OnlySnarf.util import defaults as DEFAULT
-from OnlySnarf.lib.driver import poll
+from OnlySnarf.lib.driver import close_browser, poll
 from OnlySnarf.classes.poll import Poll
 
 configure_logs_for_module_tests("OnlySnarf.lib.webdriver.poll")
+close_browser()
 
 class TestSnarf(unittest.TestCase):
 

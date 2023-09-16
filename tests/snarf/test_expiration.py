@@ -8,9 +8,10 @@ from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_t
 configure_logging(True, True)
 
 from OnlySnarf.util import defaults as DEFAULT
-from OnlySnarf.lib.driver import expiration
+from OnlySnarf.lib.driver import close_browser, expiration
 
 configure_logs_for_module_tests("OnlySnarf.lib.webdriver.expiration")
+close_browser()
 
 class TestSnarf(unittest.TestCase):
 

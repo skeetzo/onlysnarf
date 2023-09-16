@@ -7,10 +7,12 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
+from OnlySnarf.lib.driver import close_browser
 from OnlySnarf.util import defaults as DEFAULT
 from OnlySnarf.classes.message import Post
 
 configure_logs_for_module_tests("OnlySnarf.lib.webdriver.post")
+close_browser()
 
 class TestSnarf(unittest.TestCase):
 

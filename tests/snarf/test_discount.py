@@ -25,27 +25,23 @@ class TestSnarf(unittest.TestCase):
 
     def test_discount(self):
         # CONFIG["prefer_local"] = False
-        self.discount = Discount.create_discount({**CONFIG, 'username':CONFIG["user"]})
-        assert self.discount.apply(), "unable to apply discount"
+        assert Discount.create_discount({**CONFIG, 'username':CONFIG["user"]}).apply(), "unable to apply discount"
 
     def test_discount_max(self):
         CONFIG["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT # 55
         CONFIG["months"] = DEFAULT.DISCOUNT_MAX_MONTHS # 12
-        self.discount = Discount.create_discount({**CONFIG, 'username':CONFIG["user"]})
-        assert self.discount.apply(), "unable to apply discount maximum"
+        assert Discount.create_discount({**CONFIG, 'username':CONFIG["user"]}).apply(), "unable to apply discount maximum"
 
     def test_discount_min(self):
         CONFIG["amount"] = DEFAULT.DISCOUNT_MIN_AMOUNT # 1
         CONFIG["months"] = DEFAULT.DISCOUNT_MIN_MONTHS # 1
-        self.discount = Discount.create_discount({**CONFIG, 'username':CONFIG["user"]})
-        assert self.discount.apply(), "unable to apply discount minimum"
+        assert Discount.create_discount({**CONFIG, 'username':CONFIG["user"]}).apply(), "unable to apply discount minimum"
 
     def test_discount_inactive_user(self):
         CONFIG["user"] = "yeahzers"
         CONFIG["amount"] = DEFAULT.DISCOUNT_MIN_AMOUNT # 1
         CONFIG["months"] = DEFAULT.DISCOUNT_MIN_MONTHS # 1
-        self.discount = Discount.create_discount({**CONFIG, 'username':CONFIG["user"]})
-        assert self.discount.apply(), "unable to apply discount to inactive user"
+        assert Discount.create_discount({**CONFIG, 'username':CONFIG["user"]}).apply(), "unable to apply discount to inactive user"
 
     # TODO: add a test for applying the same discount to an existing discount
     def test_discount_repeat(self):
