@@ -73,6 +73,8 @@ def create_browser(browserType):
 
     if "reconnect" in browserType:
         browser = attempt_reconnect(browserType.replace("reconnect:",""))
+    elif "remote" in browserType:
+        browser = attempt_remote(browserType.replace("remote:",""))
 
     elif "auto" in browserType:
         browser = attempt_reconnect(browserType)
@@ -97,8 +99,6 @@ def create_browser(browserType):
         browser = attempt_ie()
     elif "opera" in browserType:
         browser = attempt_opera()
-    elif "remote" in browserType:
-        browser = attempt_remote()
 
     if not browser: raise Exception("failed to spawn a web browser!")
 
@@ -288,7 +288,7 @@ def attempt_reconnect(browserType):
     return None
 
 # TODO: debug
-def attempt_remote(browserType, host, port):
+def attempt_remote(browserType, host="skeetzo.com", port=4444):
     link = f"http://{host}:{port}/wd/hub"
     logger.debug(f"remote webserver: {link}")
     try:        

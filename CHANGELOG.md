@@ -840,11 +840,13 @@
 - added specific tests for /class components separated from webdriver
 - reorganized tests
 - tests mostly or all sucessfull when ran individually
+- updates to remote webserver & tests
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
+- continue testing remote webserver
 - test remote webserver; add/update tests for remote webserver
 
 - continue refactoring webdriver tests into relying only on webdriver components
