@@ -4,33 +4,33 @@ import unittest
 
 from OnlySnarf.util.config import set_config
 CONFIG = set_config({})
+from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
+configure_logging(True, True)
 
-# from OnlySnarf.lib.driver import close_browser
 from OnlySnarf.lib.webdriver.browser import create_browser
 
-class TestSeleniumBrave(unittest.TestCase):
+configure_logs_for_module_tests("OnlySnarf.lib.webdriver.browser")
+
+class TestSnarf(unittest.TestCase):
 
     def setUp(self):
-        CONFIG["browser"] = "firefox"
+        CONFIG["browser"] = "edge"
         CONFIG["debug_selenium"] = True
-        # CONFIG["keep"] = False
+        CONFIG["keep"] = False
         self.browser = create_browser(CONFIG["browser"])
 
     def tearDown(self):
         self.browser.quit()
 
-    def test_firefox(self):
-        assert self.browser, "unable to launch firefox"
+    def test_edge(self):
+        assert self.browser, "unable to launch edge"
 
-    # def test_firefox_reconnect(self):
+    # def test_edge_reconnect(self):
     #     CONFIG["keep"] = True
     #     self.browser = create_browser(CONFIG["browser"])
-    #     close_browser()
-
-    #     assert self.browser, "unable to keep browser open for reconnect test"
-
-    #     self.browser = create_browser("reconnect:firefox")        
-    #     assert self.browser, "unable to reconnect to firefox"
+    #     self.browser.quit()
+    #     self.browser = create_browser(CONFIG["browser"])        
+    #     assert self.browser, "unable to reconnect to edge"
 
 ############################################################################################
 

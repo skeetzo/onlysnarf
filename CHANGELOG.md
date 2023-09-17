@@ -835,16 +835,23 @@
 - user & message tests successful
 **9/15/2023**
 - moved debug_delay to utils.extras
+**9/16/2023**
+- finished test_message_class --> moved webdriver tests so this can be renamed
+- added specific tests for /class components separated from webdriver
+- reorganized tests
+- tests mostly or all sucessfull when ran individually
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- finish test_message_class --> move webdriver tests so this can be renamed
+- test remote webserver; add/update tests for remote webserver
 
-- RUN ALL TESTS AGAIN
+- continue refactoring webdriver tests into relying only on webdriver components
+- and continue refactoring class tests into relying only on class components
 
-- add specific tests for /class components separated from webdriver
+- RUN ALL TESTS AGAIN until successful
+
 
 - refactor specific class names into shared variables like: new_post_text_input --> message_or_post_textarea
 

@@ -372,8 +372,8 @@ def configure_firefox_options():
     options = FirefoxOptions()
     add_options(options)
     # BUG: required for cookies when using firefox
-    options.add_argument("-profile")
-    options.add_argument(os.path.expanduser("~/.mozilla/firefox/whatever.selenium"))
+    # options.add_argument("-profile")
+    # options.add_argument(os.path.expanduser("~/.mozilla/firefox/whatever.selenium"))
     options.add_argument("--enable-file-cookies") # probably not needed
     return options
 

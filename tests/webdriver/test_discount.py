@@ -24,7 +24,6 @@ class TestSnarf(unittest.TestCase):
         pass
 
     def test_discount(self):
-        # CONFIG["prefer_local"] = False
         assert Discount.create_discount({**CONFIG, 'username':CONFIG["user"]}).apply(), "unable to apply discount"
 
     def test_discount_max(self):

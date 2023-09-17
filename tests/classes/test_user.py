@@ -13,7 +13,7 @@ from OnlySnarf.classes.user import User
 
 configure_logs_for_module_tests("OnlySnarf.classes.user")
 
-class TestUsers(unittest.TestCase):
+class TestSnarf(unittest.TestCase):
 
     def setUp(self):
         pass

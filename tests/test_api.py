@@ -6,7 +6,7 @@ import flask.globals
 
 import json
 
-from OnlySnarf.api import create_app
+from OnlySnarf.lib.api import create_app
 
 class TestAPI(flask_unittest.ClientTestCase):
     # Assign the `Flask` app object

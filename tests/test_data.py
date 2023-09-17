@@ -6,10 +6,13 @@ USERS_PATH = os.getcwd()+"/tests/test-users.json"
 
 from OnlySnarf.util.config import set_config
 CONFIG = set_config({"path_users":USERS_PATH})
+from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
+configure_logging(True, True)
 
 from OnlySnarf.classes.user import User
 from OnlySnarf.util.data import add_to_randomized_users, read_users_local, write_users_local, reset_userlist
 
+configure_logs_for_module_tests("OnlySnarf.util.data")
 reset_userlist()
 
 class TestData(unittest.TestCase):

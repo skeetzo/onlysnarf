@@ -102,6 +102,7 @@ def configure_logging(debug=False, verbose=False):
     # logging.getLogger("OnlySnarf.util").addFilter(level_filter)
 
 
+# hide all irrrelevant logs when doing tests on the specific module
 def configure_logs_for_module_tests(module_name):
     for name in logging.root.manager.loggerDict:
         if module_name in name:

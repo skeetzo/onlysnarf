@@ -93,10 +93,13 @@ def get_user_element_at_page(browser, username, page, reattempt=False):
             elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
             if len(elements) == int(count) and BREAK_COUNT > 3:
                 break
+            elif len(elements) == 0 and count <= 2 and BREAK_COUNT > 0:
+                break
             elif len(elements) == int(count):
                 SLEEP_WAIT += 1
                 BREAK_COUNT += 1
-            for ele in browser.find_elements(By.CLASS_NAME, "g-user-username"):
+            elements = browser.find_elements(By.CLASS_NAME, "g-user-username")
+            for ele in elements:
                 # logger.debug(f"{str(username).strip().replace('@','')} == {str(ele.get_attribute('innerHTML')).strip().replace('@','')}")
                 if str(username).strip().replace("@","") == str(ele.get_attribute("innerHTML")).strip().replace("@",""):
                     browser.execute_script("arguments[0].scrollIntoView();", ele)
@@ -134,6 +137,8 @@ def get_users_at_page(browser, page, collection="Active"):
             elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
             if len(elements) == int(count) and BREAK_COUNT > 3:
                 break
+            elif len(elements) == 0 and count <= 2 and BREAK_COUNT > 0:
+                break
             elif len(elements) == int(count):
                 SLEEP_WAIT += 1
                 BREAK_COUNT += 1
@@ -148,7 +153,8 @@ def get_users_at_page(browser, page, collection="Active"):
 
         users = []
         logger.debug(f"searching {class_name}...")
-        for ele in browser.find_elements(By.CLASS_NAME, f"m-{class_name}"):
+        elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
+        for ele in elements:
             username = ele.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()
             name = ele.find_element(By.CLASS_NAME, "g-user-name").get_attribute("innerHTML")
             name = re.sub("<!-*>", "", name)
@@ -181,8 +187,10 @@ def get_user_by_username(browser, username, reattempt=False, collection="All"):
         user = get_user_element_at_page(browser, username, ONLYFANS_FANS_URL)
         if user: return user
     except Exception as e:
+        if not reattempt:
+            logger.warning(e)
+            return get_user_by_username(browser, username, reattempt=True)
         error_checker(e)
-    if not reattempt: return get_user_by_username(browser, username, reattempt=True)
     raise Exception("failed to get user by username!")
 
 def search_for_username(browser, username, collection="All"):

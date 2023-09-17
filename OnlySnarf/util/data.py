@@ -18,7 +18,7 @@ def reset_userlist():
 # TODO: this could be combined into write_users_local but for now i'm keeping it separate
 # add random user to json file
 def add_to_randomized_users(newUser):
-    if CONFIG["debug"]: return
+    if CONFIG["debug"] and not os.getenv("ENV") == "test": return
     if not newUser: return
     logger.debug("saving random user...")
     users, randomized_users = read_users_local()
