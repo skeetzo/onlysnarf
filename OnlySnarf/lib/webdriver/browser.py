@@ -274,9 +274,10 @@ def attempt_reconnect(browserType):
     logger.debug("reconnect id: {}".format(session_id))
     logger.debug("reconnect url: {}".format(session_url))
     try:
-        options = configure_options(browserType)
+        # options = configure_options(browserType)
         # TODO: finish debugging / wait for better documentation on 4.0 @ https://www.selenium.dev/documentation/webdriver/drivers/remote_webdriver/
-        browserAttempt = webdriver.Remote(command_executor=session_url, options=options)
+        # browserAttempt = webdriver.Remote(command_executor=session_url, options=options)
+        browserAttempt = webdriver.Remote(command_executor=session_url)
         browserAttempt.close()   # this closes the session's window - it is currently the only one, thus the session itself will be auto-killed, yet:
         # take the session that's already running
         browserAttempt.session_id = session_id
@@ -288,17 +289,26 @@ def attempt_reconnect(browserType):
     return None
 
 # TODO: debug
-def attempt_remote(browserType, host="skeetzo.com", port=4444):
-    link = f"http://{host}:{port}/wd/hub"
+def attempt_remote(browserType, host="skeetzo.com", port=8888):
+    # link = f"http://{host}:{port}/wd/hub"
+    link = f"http://{host}:{port}"
     logger.debug(f"remote webserver: {link}")
+    browserAttempt = None
     try:        
         options = configure_options(browserType)
+
         logger.debug(f"attempting remote browser: {browserType}")
+
+        # chrome_options = webdriver.ChromeOptions()
+        # chrome_options.set_capability("browserVersion", "67")
+        # chrome_options.set_capability("platformName", "Windows XP")
+
+        # TODO: finish debugging -> 'string indices must be integers'
         browserAttempt = webdriver.Remote(command_executor=link, options=options)
-        logger.info(f"remote browser created - {browserType}")
+        logger.info(f"remote browser created: {browserType}")
         return browserAttempt
     except Exception as e:
-        browser_error(e, f"reconnect:{browserType}")
+        browser_error(e, f"remote:{browserType}")
     return None
 
 ################################################################################################
