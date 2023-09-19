@@ -1,6 +1,7 @@
 import os
 import re
 import time
+import random
 import logging
 logger = logging.getLogger(__name__)
 from selenium.webdriver.common.by import By
@@ -168,6 +169,55 @@ def get_users_at_page(browser, page, collection="Active"):
     except Exception as e:
         error_checker(e)
     raise Exception(f"failed to find {class_name}!")
+
+# not accurate; only useful for tests
+def get_random_fan_username(browser, page=ONLYFANS_FANS_URL, collection="Active"):
+    if page == ONLYFANS_FOLLOWING_URL:
+        class_name = "subscriptions"
+    elif page == ONLYFANS_FANS_URL:
+        class_name = "fans"
+    try:
+        go_to_page(browser, os.path.join(ONLYFANS_FANS_URL, collection.lower()), force=True)
+        find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True).click()
+        # scroll until elements stop spawning
+        SLEEP_WAIT = 1
+        BREAK_COUNT = 0
+        count = 0
+        while True:
+            elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
+            if len(elements) == int(count) and BREAK_COUNT > 3:
+                break
+            elif len(elements) == 0 and count <= 2 and BREAK_COUNT > 0:
+                break
+            elif len(elements) == int(count):
+                SLEEP_WAIT += 1
+                BREAK_COUNT += 1
+            elif len(elements) > 2:
+                break
+            count = len(elements)
+            print_same_line(f"({count}) scrolling...")
+            # logger.info(f"({count}) scrolling...")
+            browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(SLEEP_WAIT)
+        logger.info("")
+        users = []
+        logger.debug(f"searching users...")
+        elements = browser.find_elements(By.CLASS_NAME, f"m-{class_name}")
+        for ele in elements:
+            random_element = random.choice(elements)
+            username = random_element.find_element(By.CLASS_NAME, "g-user-username").get_attribute("innerHTML").strip()
+            name = random_element.find_element(By.CLASS_NAME, "g-user-name").get_attribute("innerHTML")
+            name = re.sub("<!-*>", "", name)
+            name = re.sub("<.*\">", "", name)
+            name = re.sub("</.*>", "", name).strip()
+            logger.debug(f"found: {username}")
+            logger.debug(f"successfully found random user!")
+            return username.replace("@","")
+    except Exception as e:
+        error_checker(e)
+        print(e)
+    raise Exception(f"failed to find random user!")
+
 
 # TODO: update to interact with other fan/follower types ala recent, favorite, etc
 def get_users_by_type(browser, isFan=True, isFollower=False):

@@ -8,30 +8,29 @@ from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_t
 configure_logging(True, True)
 
 from OnlySnarf.util import defaults as DEFAULT
-from OnlySnarf.lib.driver import login as get_browser_and_login
-from OnlySnarf.lib.webdriver.expiration import expiration as WEBDRIVER_expiration
+from OnlySnarf.lib.driver import expiration
 
 configure_logs_for_module_tests("OnlySnarf.lib.webdriver.expiration")
 
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
-        self.browser = get_browser_and_login()
+        pass
 
     def tearDown(self):
         pass
 
     def test_expiration(self):
-        assert WEBDRIVER_expiration(self.browser, DEFAULT.EXPIRATION_MAX / 2), "unable to post with expiration"
+        assert expiration(DEFAULT.EXPIRATION_MAX / 2), "unable to post with expiration"
 
     def test_expiration_min(self):
-        assert WEBDRIVER_expiration(self.browser, DEFAULT.EXPIRATION_MIN), "unable to post with expiration: min"
+        assert expiration(DEFAULT.EXPIRATION_MIN), "unable to post with expiration: min"
 
     def test_expiration_max(self):
-        assert WEBDRIVER_expiration(self.browser, DEFAULT.EXPIRATION_MAX), "unable to post with expiration: max"
+        assert expiration(DEFAULT.EXPIRATION_MAX), "unable to post with expiration: max"
 
     def test_expiration_none(self):
-        assert WEBDRIVER_expiration(self.browser, DEFAULT.EXPIRATION_NONE), "unable to skip missing expiration"
+        assert expiration(DEFAULT.EXPIRATION_NONE), "unable to skip missing expiration"
 
 ############################################################################################
 

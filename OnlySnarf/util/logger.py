@@ -103,9 +103,14 @@ def configure_logging(debug=False, verbose=False):
 
 
 # hide all irrrelevant logs when doing tests on the specific module
+also_this = []
 def configure_logs_for_module_tests(module_name):
+    global also_this
+    if module_name not in also_this:
+        also_this.append(module_name)
     for name in logging.root.manager.loggerDict:
-        if module_name in name:
+        # if module_name in name:
+        if name in also_this:
             logging.getLogger(name).setLevel(logging.TRACE)
         else:
             logging.getLogger(name).setLevel(logging.ERROR)

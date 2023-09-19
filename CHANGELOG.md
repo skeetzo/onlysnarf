@@ -843,16 +843,18 @@
 - updates to remote webserver & tests
 **9/18/2023**
 - continued testing remote webserver
+- finished refactoring webdriver tests into relying only on webdriver components
 
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
+- test newly refactored webdriver test components
+
 - check / test reconnect webdriver functionality
 - finish debugging remote webdriver
 
-- continue refactoring webdriver tests into relying only on webdriver components
 - and continue refactoring class tests into relying only on class components
 
 - RUN ALL TESTS AGAIN until successful

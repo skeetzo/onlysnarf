@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .webdriver import create_browser, get_user_chat, cookies_save, go_to_home, login as WEBDRIVER_login, \
-    discount_user as WEBDRIVER_discount_user, message as WEBDRIVER_message, post as WEBDRIVER_post, \
+    discount as WEBDRIVER_discount, message as WEBDRIVER_message, post as WEBDRIVER_post, \
     get_userid_by_username as WEBDRIVER_get_userid_by_username, get_users_by_type as WEBDRIVER_get_users_by_type, \
     get_recent_chat_users as WEBDRIVER_get_recent_chat_users
 
@@ -71,7 +71,7 @@ def login():
 #####################################
 
 def discount_user(discount_object):
-    return WEBDRIVER_discount_user(login(), discount_object)
+    return WEBDRIVER_discount(login(), discount_object)
 
 def expiration(expires_amount):
     return WEBDRIVER_expiration(login(), expires_amount)

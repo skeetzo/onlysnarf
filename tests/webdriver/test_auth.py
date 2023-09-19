@@ -10,6 +10,7 @@ configure_logging(True, True)
 from OnlySnarf.lib.webdriver.browser import create_browser as WEBDRIVER_create_browser
 from OnlySnarf.lib.webdriver.login import login as WEBDRIVER_login, check_if_already_logged_in as WEBDRIVER_check_if_already_logged_in
 
+configure_logs_for_module_tests("OnlySnarf.lib.webdriver.browser")
 configure_logs_for_module_tests("OnlySnarf.lib.webdriver.login")
 
 class TestAuth(unittest.TestCase):

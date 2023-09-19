@@ -8,26 +8,28 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import login as get_browser_and_login
-from OnlySnarf.lib.webdriver.poll import poll as WEBDRIVER_poll
 from OnlySnarf.util import defaults as DEFAULT
+from OnlySnarf.lib.driver import close_browser, poll
+from OnlySnarf.classes.poll import Poll
 
 configure_logs_for_module_tests("OnlySnarf.lib.webdriver.poll")
+close_browser()
 
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
-        self.browser = get_browser_and_login()
-        self.poll_object = {
-            "duration": DEFAULT.DURATION_ALLOWED[0],
-            "questions": ["suck","my","dick","please?"]
-        }
+        pass
 
     def tearDown(self):
         pass
 
     def test_poll(self):
-        assert WEBDRIVER_poll(self.browser, self.poll_object), "unable to post poll"
+        poll_object = {
+            "duration": DEFAULT.DURATION_ALLOWED[0],
+            "questions": ["suck","my","dick","please?"]
+        }
+        poll_object = Poll.create_poll(poll_object).dump()
+        assert poll(poll_object), "unable to post poll"
 
 ############################################################################################
 

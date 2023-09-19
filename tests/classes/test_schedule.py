@@ -8,9 +8,9 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import login as get_browser_and_login
-from OnlySnarf.lib.webdriver.schedule import schedule as WEBDRIVER_schedule
 from OnlySnarf.util import defaults as DEFAULT
+from OnlySnarf.lib.driver import schedule
+from OnlySnarf.classes.schedule import Schedule
 
 configure_logs_for_module_tests("OnlySnarf.lib.webdriver.schedule")
 
@@ -20,17 +20,18 @@ tomorrow = today + datetime.timedelta(days=1, hours=13, minutes=10)
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
-        self.browser = get_browser_and_login()
-        self.schedule_object = {
-            "date" : tomorrow.strftime(DEFAULT.DATE_FORMAT),
-            "time" : (today + datetime.timedelta(hours=1, minutes=30)).strftime(DEFAULT.TIME_FORMAT)
-        }
+        pass
 
     def tearDown(self):
         pass
 
     def test_schedule(self):
-        assert WEBDRIVER_schedule(self.browser, schedule_object), "unable to post schedule"
+        schedule_object = {
+            "date" : tomorrow.strftime(DEFAULT.DATE_FORMAT),
+            "time" : (today + datetime.timedelta(hours=1, minutes=30)).strftime(DEFAULT.TIME_FORMAT)
+        }
+        schedule_object = Schedule.create_schedule(schedule_object).dump()
+        assert schedule(schedule_object), "unable to post schedule"
 
     # TODO: are these even necessary?
     @unittest.skip("todo")

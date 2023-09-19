@@ -7,30 +7,28 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import login as get_browser_and_login
-from OnlySnarf.lib.webdriver.post import post as WEBDRIVER_post
+from OnlySnarf.lib.driver import close_browser
 from OnlySnarf.util import defaults as DEFAULT
+from OnlySnarf.classes.message import Post
 
 configure_logs_for_module_tests("OnlySnarf.lib.webdriver.post")
+close_browser()
 
 class TestSnarf(unittest.TestCase):
 
     def setUp(self):
-        self.browser = get_browser_and_login()
-        self.post_object = {
-            "files" : ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"],
-            "price" : DEFAULT.PRICE_MINIMUM,
-            "text" : "test balls",
-            "keywords" : ["test","ticles"],
-            "performers" : ["yourmom","yourdad"],
-            "schedule" : {}
-        }
+        CONFIG["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]
+        CONFIG["price"] = DEFAULT.PRICE_MINIMUM
+        CONFIG["text"] = "test balls"
+        CONFIG["keywords"] = ["test","ticles"]
+        CONFIG["performers"] = ["yourmom","yourdad"]
+        CONFIG["schedule"] = {}
 
     def tearDown(self):
         pass
 
     def test_post(self):
-        assert WEBDRIVER_post(self.browser, self.post_object), "unable to post"
+        assert Post.create_post({**CONFIG}).send(), "unable to post"
 
     # @unittest.skip("todo")
     # def test_post_files(self):

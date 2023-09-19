@@ -10,7 +10,7 @@ from .errors import error_checker
 from .users import click_user_button, get_user_by_username
 from .. import CONFIG, debug_delay_check
 
-def discount_user(browser, discount_object):
+def discount(browser, discount_object):
     """
     Enter and apply discount to user
 
