@@ -844,27 +844,18 @@
 **9/18/2023**
 - continued testing remote webserver
 - finished refactoring webdriver tests into relying only on webdriver components
-
+**4.6.15: 9/19/2023**
+- tested newly refactored webdriver test components
+- updates to test_onlyfans and test_auth format to properly check cookies
+- checked / somewhat tested reconnect selenium functionality
+- RAN ALL TESTS AGAIN until successful
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- test newly refactored webdriver test components
-
-- check / test reconnect webdriver functionality
-- finish debugging remote webdriver
-
 - and continue refactoring class tests into relying only on class components
-
-- RUN ALL TESTS AGAIN until successful
-
-- finish testing remote webserver; add/update tests for remote webserver
-
-
 - refactor specific class names into shared variables like: new_post_text_input --> message_or_post_textarea
-
-- add message filters? maybe by request?
 
 - update 'snarf api' if necessary and test
 - update 'snarf config' if necessary and test
@@ -878,6 +869,9 @@
 - finish updating cli menu functionality
 - finish testing 'snarf config'
 
+- finish debugging reconnect
+- finish testing remote webserver; add/update tests for remote webserver
+
 - LIVE TESTING --> release new version on pypi
 
 ------------------------------------------------------------------------------------
@@ -889,6 +883,7 @@
 - add cli args for config to autoconfigure more easily
 - add smart idea for getting statement information
 - add functionality that follows profiles that are free for a month
+- add message filters? maybe by request?
 (quality of life)
 - update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
 - add min/max to missing args & validators

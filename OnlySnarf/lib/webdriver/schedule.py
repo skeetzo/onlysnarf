@@ -51,7 +51,11 @@ def schedule(browser, schedule_object={}):
     except Exception as e:
         error_checker(e)
     # attempt to cancel window if reached this far
-    return schedule_cancel(browser)
+    try:
+        schedule_cancel(browser)
+    except Exception as e:
+        logger.debug(e)
+    return False
 
 def schedule_open(browser):
     """Click schedule"""

@@ -7,28 +7,34 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import login as get_browser_and_login
+from OnlySnarf.lib.driver import close_browser, login as get_browser_and_login
 from OnlySnarf.lib.webdriver.discount import discount as WEBDRIVER_discount
 from OnlySnarf.lib.webdriver.users import get_random_fan_username as WEBDRIVER_get_random_fan_username
 from OnlySnarf.util import defaults as DEFAULT
 
-configure_logs_for_module_tests("OnlySnarf.lib.webdriver.discount")
-configure_logs_for_module_tests("OnlySnarf.lib.webdriver.users")
-
 random_username = None
 
-class TestSnarf(unittest.TestCase):
+class TestWebdriver_Discount(unittest.TestCase):
 
     def setUp(self):
-        self.browser = get_browser_and_login()
+        self.browser = get_browser_and_login(cookies=CONFIG["cookies"])
         global random_username
         if not random_username:
             random_username = WEBDRIVER_get_random_fan_username(self.browser)
         self.username = random_username
 
     def tearDown(self):
-        # self.browser.quit()
         pass
+
+    @classmethod
+    def setUpClass(cls):
+        configure_logs_for_module_tests("OnlySnarf.lib.webdriver.discount")
+        configure_logs_for_module_tests("OnlySnarf.lib.webdriver.users")
+
+    @classmethod
+    def tearDownClass(cls):
+        configure_logs_for_module_tests("###FLUSH###")
+        close_browser()
 
     def test_discount(self):
         assert WEBDRIVER_discount(self.browser, {

@@ -48,7 +48,7 @@ from webdriver_manager.microsoft import EdgeChromiumDriverManager
 #########
 from webdriver_manager.opera import OperaDriverManager
 
-def create_browser(browserType):
+def create_browser(browserType="auto"):
     """
     Spawns a browser according to args.
 

@@ -8,29 +8,40 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import login as get_browser_and_login
+from OnlySnarf.classes.schedule import Schedule
+from OnlySnarf.lib.driver import close_browser, login as get_browser_and_login
 from OnlySnarf.lib.webdriver.schedule import schedule as WEBDRIVER_schedule
 from OnlySnarf.util import defaults as DEFAULT
 
-configure_logs_for_module_tests("OnlySnarf.lib.webdriver.schedule")
 
 today = datetime.datetime.now()
 tomorrow = today + datetime.timedelta(days=1, hours=13, minutes=10)
 
-class TestSnarf(unittest.TestCase):
+class TestWebdriver_Schedule(unittest.TestCase):
 
     def setUp(self):
-        self.browser = get_browser_and_login()
+        self.browser = get_browser_and_login(cookies=CONFIG["cookies"])
         self.schedule_object = {
             "date" : tomorrow.strftime(DEFAULT.DATE_FORMAT),
             "time" : (today + datetime.timedelta(hours=1, minutes=30)).strftime(DEFAULT.TIME_FORMAT)
         }
+        # creating a schedule object is annoying without the class helpers
+        self.schedule_object = Schedule.create_schedule(self.schedule_object).dump()
 
     def tearDown(self):
         pass
 
+    @classmethod
+    def setUpClass(cls):
+        configure_logs_for_module_tests("OnlySnarf.lib.webdriver.schedule")
+
+    @classmethod
+    def tearDownClass(cls):
+        configure_logs_for_module_tests("###FLUSH###")
+        close_browser()
+
     def test_schedule(self):
-        assert WEBDRIVER_schedule(self.browser, schedule_object), "unable to post schedule"
+        assert WEBDRIVER_schedule(self.browser, self.schedule_object), "unable to post schedule"
 
     # TODO: are these even necessary?
     @unittest.skip("todo")

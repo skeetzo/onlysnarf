@@ -27,13 +27,11 @@ class Discount:
 
         self.amount = Discount.format_amount(amount)
         self.months = Discount.format_months(months)
-        self.username = str(username).replace("@","") # the recipient username
+        self.username = Discount.format_username(username) # the recipient username
 
     @staticmethod
     def create_discount(discount_data):
         schema = DiscountSchema(unknown=EXCLUDE)
-        if discount_data["username"] == "random":
-            discount_data["username"] = User.get_random_user().username
         return schema.load(discount_data)
 
     def dump(self):
@@ -75,6 +73,12 @@ class Discount:
             logger.warning(f"discount months too low, min -> {DISCOUNT_MIN_MONTHS} months")
             return int(DISCOUNT_MIN_MONTHS)
         return months
+
+    @staticmethod
+    def format_username(username):
+        if username == "random":
+            username = User.get_random_user().username
+        return str(username).replace("@","")
 
     # TODO: update or move
     def grandfatherer(self, users=[]):

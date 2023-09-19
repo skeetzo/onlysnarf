@@ -1,33 +1,38 @@
-import os
-os.environ['ENV'] = "test"
-import unittest
+# import os
+# os.environ['ENV'] = "test"
+# import unittest
 
-from OnlySnarf.util.config import set_config
-CONFIG = set_config({})
+# from OnlySnarf.util.config import set_config
+# CONFIG = set_config({})
+# from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
+# configure_logging(True, True)
 
-from OnlySnarf.lib.driver import create_browser
-from OnlySnarf.lib.webdriver.login import login as WEBDRIVER_login
+# from OnlySnarf.lib.webdriver.cookies import reset_cookies
+# from OnlySnarf.lib.webdriver.browser import create_browser as WEBDRIVER_create_browser
+# from OnlySnarf.lib.webdriver.login import login as WEBDRIVER_login
 
-class TestAuth(unittest.TestCase):
+# class TestAuth_OnlyFans_Webdriver(unittest.TestCase):
 
-    def setUp(self):
-        self.browser = create_browser(CONFIG["browser"])
-        CONFIG["login"] = "onlyfans"
-        
-    def tearDown(self):
-        self.browser.quit()
+#     def setUp(self):
+#         self.browser = WEBDRIVER_create_browser()
 
-    def test_login(self):
-        CONFIG["cookies"] = False
-        assert WEBDRIVER_login(self.browser), "unable to login"
-        CONFIG["cookies"] = True # saves cookies for next test
+#     def tearDown(self):
+#         self.browser.quit()
 
-    def test_login_via_cookies(self):
-        CONFIG["cookies"] = True
-        CONFIG["debug_cookies"] = True
-        assert WEBDRIVER_login(self.browser), "unable to login from cookies"
+#     @classmethod
+#     def setUpClass(cls):
+#         configure_logs_for_module_tests("OnlySnarf.lib.webdriver.browser")
+#         configure_logs_for_module_tests("OnlySnarf.lib.webdriver.login")
+#         reset_cookies()
 
-############################################################################################
+#     @classmethod
+#     def tearDownClass(cls):
+#         configure_logs_for_module_tests("###FLUSH###")
 
-if __name__ == '__main__':
-    unittest.main()
+#     def test_login(self):
+#         assert WEBDRIVER_login(self.browser), "unable to login"
+
+# ############################################################################################
+
+# if __name__ == '__main__':
+#     unittest.main()

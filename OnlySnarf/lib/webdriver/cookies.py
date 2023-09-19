@@ -3,7 +3,7 @@ import pickle
 import logging
 logger = logging.getLogger(__name__)
 
-from .. import CONFIG, DEFAULT
+from .. import DEFAULT
 from .errors import error_checker
 from .goto import go_to_home
 
@@ -14,9 +14,6 @@ from .goto import go_to_home
 def cookies_load(browser):
     """Loads existing web browser cookies from local source"""
 
-    if not CONFIG["cookies"]:
-        logger.debug("skipping cookies (load)")
-        return
     logger.debug("loading cookies...")
     try:
         if os.path.exists(get_cookies_path()):
@@ -40,9 +37,6 @@ def cookies_load(browser):
 def cookies_save(browser):
     """Saves existing web browser cookies to local source"""
 
-    if not CONFIG["cookies"]:
-        logger.debug("skipping cookies (save)")
-        return
     logger.debug("saving cookies...")
     try:
         # must be at onlyfans.com to save cookies of onlyfans.com
@@ -58,3 +52,10 @@ def cookies_save(browser):
 
 def get_cookies_path():
     return os.path.join(DEFAULT.ROOT_PATH, "cookies.pkl")
+
+def reset_cookies():
+    logging.debug("resetting cookies...")
+    try:
+        os.remove(get_cookies_path())
+    except Exception as e:
+        pass

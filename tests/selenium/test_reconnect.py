@@ -1,35 +1,50 @@
-# import os
-# os.environ['ENV'] = "test"
-# import unittest
+import os
+os.environ['ENV'] = "test"
+import unittest
 
-# from OnlySnarf.util.config import config
-# from OnlySnarf.lib.driver import Driver
-# from OnlySnarf.util.settings import Settings
+from OnlySnarf.util.config import set_config
+CONFIG = set_config({"debug_selenium":True,"keep":True})
+from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
+configure_logging(True, True)
 
-# class TestSeleniumReconnect(unittest.TestCase):
+from OnlySnarf.lib.driver import close_browser
+from OnlySnarf.lib.webdriver.browser import create_browser
 
-#     def setUp(self):
-#         config["debug_selenium"] = True
-#         config["keep"] = True
-#         # config["show"] = True
-#         Settings.set_debug("tests")
-#         self.driver = Driver()
+class TestSelenium_Reconnect(unittest.TestCase):
 
-#     def tearDown(self):
-#         config["debug_selenium"] = False
-#         config["keep"] = False
-#         config["show"] = False
-#         self.driver.exit()
+    def setUp(self):
+        # self.browser = create_browser(method="firefox")
+        pass
+
+    def tearDown(self):
+        close_browser()
+
+    def test_reconnect(self):
+        self.browser = create_browser(browserType="firefox")
+        close_browser()
+        assert create_browser(browserType="reconnect:firefox"), "unable to launch via reconnect"
+
+    @classmethod
+    def setUpClass(cls):
+        configure_logs_for_module_tests("OnlySnarf.lib.webdriver.browser")
+
+    @classmethod
+    def tearDownClass(cls):
+        configure_logs_for_module_tests("###FLUSH###")
     
-#     def test_reconnect(self):
-#         config["browser"] = "auto"
-#         self.driver.init()
-#         self.driver.exit()
-#         config["browser"] = "auto"
-#         self.driver.init()
-#         assert self.driver.browser, "unable to launch via reconnect auto"
+    # @unittest.skip("todo")
+    # def test_remote_chrome(self):
+    #     config["browser"] = "remote-chrome"
+    #     self.driver.init()
+    #     assert self.browser, "unable to launch via remote chrome"
 
-# ############################################################################################
+    # @unittest.skip("todo")
+    # def test_remote_firefox(self):
+    #     config["browser"] = "remote-firefox"
+    #     self.driver.init()
+    #     assert self.browser, "unable to launch via remote firefox"
 
-# if __name__ == '__main__':
-#     unittest.main()
+############################################################################################
+
+if __name__ == '__main__':
+    unittest.main()

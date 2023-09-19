@@ -7,27 +7,27 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import login as get_browser_and_login
+from OnlySnarf.lib.driver import close_browser, login as get_browser_and_login
 from OnlySnarf.lib.webdriver.message import message as WEBDRIVER_message
 from OnlySnarf.lib.webdriver.users import get_random_fan_username as WEBDRIVER_get_random_fan_username
 from OnlySnarf.util import defaults as DEFAULT
-
-configure_logs_for_module_tests("OnlySnarf.lib.webdriver.message")
-configure_logs_for_module_tests("OnlySnarf.lib.webdriver.users")
+from OnlySnarf.util.data import reset_random_users
 
 random_username_one = None
 random_username_two = None
 
-class TestSnarf(unittest.TestCase):
+class TestWebdriver_Message(unittest.TestCase):
 
     def setUp(self):
-        self.browser = get_browser_and_login()
+        self.browser = get_browser_and_login(cookies=CONFIG["cookies"])
         global random_username_one
         if not random_username_one:
             random_username_one = WEBDRIVER_get_random_fan_username(self.browser)
         global random_username_two
         if not random_username_two:
             random_username_two = WEBDRIVER_get_random_fan_username(self.browser)
+            while random_username_two == random_username_one:
+                random_username_two = WEBDRIVER_get_random_fan_username(self.browser)
         self.random_username_one = random_username_one
         self.random_username_two = random_username_two
         self.message_object = {
@@ -43,6 +43,17 @@ class TestSnarf(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @classmethod
+    def setUpClass(cls):
+        configure_logs_for_module_tests("OnlySnarf.lib.webdriver.message")
+        configure_logs_for_module_tests("OnlySnarf.lib.webdriver.users")
+        reset_random_users()
+
+    @classmethod
+    def tearDownClass(cls):
+        configure_logs_for_module_tests("###FLUSH###")
+        close_browser()
+
     def test_message(self):
         assert WEBDRIVER_message(self.browser, self.message_object), "unable to send basic message"
 
@@ -55,6 +66,7 @@ class TestSnarf(unittest.TestCase):
 
     def test_message_all_exclude(self):
         self.message_object["recipients"] = [random_username_one, random_username_two]
+        # self.message_object["price"] = DEFAULT.PRICE_MINIMUM
         self.message_object["excludes"] = ["all","following","favorites","friends","renew on","renew off"]
         assert WEBDRIVER_message(self.browser, self.message_object), "unable to send message to excluded lists"
 
@@ -73,7 +85,7 @@ class TestSnarf(unittest.TestCase):
 
     def test_message_failure(self):
         self.message_object["recipients"] = ["onlyfans"]
-        assert WEBDRIVER_message(self.browser, self.message_object), "unable to fail message properly"
+        assert not WEBDRIVER_message(self.browser, self.message_object), "unable to fail message properly"
 
     def test_message_inactive_user(self):
         import string

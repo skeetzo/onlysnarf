@@ -19,7 +19,7 @@ from .. import get_username_onlyfans, get_password, get_username_google, get_pas
 ###### Login #####
 ##################
 
-def login(browser, method="auto"):
+def login(browser, method="auto", cookies=False):
     """
     Logs into OnlyFans account provided via args and chosen method.
 
@@ -32,25 +32,28 @@ def login(browser, method="auto"):
 
     """
 
-    cookies_load(browser)
-    if check_if_already_logged_in(browser): return True
+    def logged_in():
+        if cookies: cookies_save(browser)
+        else: logger.debug("skipping cookies (save)")
+        logger.info(f"login successful! ({method})")
+        return True
+
+    if cookies: cookies_load(browser)
+    else: logger.debug("skipping cookies (load)")
+
+    if check_if_already_logged_in(browser): return logged_in()
+    
     logger.info(f"logging into OnlyFans for {CONFIG['username']}...")
     try:
         successful = False
         if method == "auto":
             successful = via_form(browser)
-            if not successful: successful = via_google(browser)
-            if not successful: successful = via_twitter(browser)
-        elif method == "onlyfans":
-            successful = via_form(browser)
-        elif method == "twitter":
-            successful = via_twitter(browser)
-        elif method == "google":
-            successful = via_google(browser)
-        if successful:
-            logger.debug(f"login successful! ({method})")
-            cookies_save(browser)
-            return True
+            if not successful:      successful = via_google(browser)
+            if not successful:      successful = via_twitter(browser)
+        elif method == "onlyfans":  successful = via_form(browser)
+        elif method == "twitter":   successful = via_twitter(browser)
+        elif method == "google":    successful = via_google(browser)
+        if successful: return logged_in()
     except Exception as e:
         error_checker(e)
     raise Exception("failed to login to OnlyFans!")
@@ -66,12 +69,12 @@ def check_if_already_logged_in(browser):
     go_to_home(browser, force=True)
     try:
         WebDriverWait(browser, 10, poll_frequency=1).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-make-post__streaming-link")))
-        logger.info("already logged into OnlyFans!")
+        logger.debug("already logged into OnlyFans!")
         return True
     except TimeoutException as te:
         logger.debug(str(te))
     except Exception as e:
-        logger.debug(e)
+        error_checker(e)
     return False
 
 def check_if_logged_in(browser):

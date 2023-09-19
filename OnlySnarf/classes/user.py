@@ -57,7 +57,7 @@ class User:
     def __init__(self, username, name="", user_id="", files=[], messages=[], isFan=False, isFollower=False, isFavorite=False, isFriend=False, isRecent=False, isRenew=False, isTagged=False, isMuted=False, isRestricted=False, isBlocked=False):
         """User object"""
 
-        self.username = str(username).replace("@","")
+        self.username = User.format_username(username)
         self.name = name
         self.user_id = user_id
         self.messages = messages
@@ -79,8 +79,6 @@ class User:
     @staticmethod
     def create_user(user_data):
         schema = UserSchema(unknown=EXCLUDE)
-        if user_data["username"].lower().strip() == "random":
-            user_data["username"] = User.get_random_user().username
         return schema.load(user_data)
 
     def dump(self):
@@ -154,6 +152,12 @@ class User:
     #############
     ## Statics ##
     #############
+
+    @staticmethod
+    def format_username(username):
+        if username == "random":
+            username = User.get_random_user().username
+        return str(username).replace("@","")
 
     @staticmethod
     def save_users(users):

@@ -53,13 +53,13 @@ def get_browser():
 ##### Login #####
 #################
 
-def login():
+def login(method="auto", cookies=False):
     global LOGGED_IN
     global BROWSER
     if LOGGED_IN: return BROWSER
     BROWSER = get_browser()
     try:
-        WEBDRIVER_login(BROWSER, CONFIG["login"])
+        WEBDRIVER_login(BROWSER, method=method, cookies=cookies)
     except Exception as e:
         logger.critical(e)
         os._exit(1)

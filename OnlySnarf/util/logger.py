@@ -72,7 +72,13 @@ class LevelFilter(logging.Filter):
         if record.levelno == self.level:
             return True
 
+once = False
+
 def configure_logging(debug=False, verbose=False):
+    global once
+    if once: return
+    once = True
+
     loglevel = logging.INFO
     if debug: loglevel = logging.DEBUG
     if verbose: loglevel = logging.SNARF
@@ -106,8 +112,16 @@ def configure_logging(debug=False, verbose=False):
 also_this = []
 def configure_logs_for_module_tests(module_name):
     global also_this
+
+    if module_name == "###FLUSH###":
+        for name in also_this:
+            logging.getLogger(name).setLevel(logging.root.level)
+        also_this = []
+        return
+
     if module_name not in also_this:
         also_this.append(module_name)
+        
     for name in logging.root.manager.loggerDict:
         # if module_name in name:
         if name in also_this:

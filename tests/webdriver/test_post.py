@@ -7,27 +7,37 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import login as get_browser_and_login
+from OnlySnarf.lib.driver import close_browser, login as get_browser_and_login
 from OnlySnarf.lib.webdriver.post import post as WEBDRIVER_post
 from OnlySnarf.util import defaults as DEFAULT
 
-configure_logs_for_module_tests("OnlySnarf.lib.webdriver.post")
 
-class TestSnarf(unittest.TestCase):
+class TestWebdriver_Post(unittest.TestCase):
 
     def setUp(self):
-        self.browser = get_browser_and_login()
+        self.browser = get_browser_and_login(cookies=CONFIG["cookies"])
         self.post_object = {
             "files" : ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"],
             "price" : DEFAULT.PRICE_MINIMUM,
             "text" : "test balls",
             "keywords" : ["test","ticles"],
             "performers" : ["yourmom","yourdad"],
+            "expiration": 0,
+            "poll": {},
             "schedule" : {}
         }
 
     def tearDown(self):
         pass
+
+    @classmethod
+    def setUpClass(cls):
+        configure_logs_for_module_tests("OnlySnarf.lib.webdriver.post")
+
+    @classmethod
+    def tearDownClass(cls):
+        configure_logs_for_module_tests("###FLUSH###")
+        close_browser()
 
     def test_post(self):
         assert WEBDRIVER_post(self.browser, self.post_object), "unable to post"

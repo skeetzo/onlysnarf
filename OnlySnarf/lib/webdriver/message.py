@@ -44,8 +44,9 @@ def message(browser, message_object):
     """
 
     try:
-        logger.info(f"Entering message to {', '.join(message_object['recipients'])}: (${message_object['price']}) {message_object['text']}\nIncludes: {','.join(message_object['includes'])}\nExcludes: {','.join(message_object['excludes'])}")
-
+        logger.info(f"Entering message to {', '.join(message_object['recipients'])}: (${message_object['price']}) {message_object['text']}")
+        logger.info(f"Includes: {','.join(message_object['includes'])}")
+        logger.info(f"Excludes: {','.join(message_object['excludes'])}")
         # prepare the message
         if len(message_object["recipients"]) > 1 or message_object["includes"] or message_object["excludes"]:
             go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
@@ -59,8 +60,6 @@ def message(browser, message_object):
             # if none of above or solo messaging, switch to normal user messaging (locates user_id on profile page and opens url link)
             # doesn't need to clear lists when opening a new tab to search for the username then send them a message
             message_user_by_username(browser, message_object["recipients"][0])
-
-        # time.sleep(0.5)
 
         message_text(browser, message_object['text'])
         message_price(browser, message_object['price'])
@@ -81,7 +80,6 @@ def message(browser, message_object):
         browser.refresh() # clears entered usernames
     except Exception as e:
         error_checker(e)
-
     logger.error("failed to send message!")
     return False
 

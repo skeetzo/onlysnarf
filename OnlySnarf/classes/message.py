@@ -33,7 +33,7 @@ class Message():
         self.keywords = list(set([k.strip() for k in keywords]))
         self.performers = list(set([p.strip() for p in performers]))
         self.price = Message.format_price(price)
-        self.recipients = list(set([username.replace("@","") for username in recipients])) # usernames
+        self.recipients = Message.format_recipients(recipients) # list of usernames
         self.includes = list(set([username.replace("@","") for username in includes]))
         self.excludes = list(set([username.replace("@","") for username in excludes]))
         self.schedule = Message.format_schedule(schedule)        
@@ -41,16 +41,8 @@ class Message():
 
     @staticmethod
     def create_message(message_data):
-        # TODO: possibly update these formatting / validation steps?
-        new_recipients = []
-        for recipient in message_data["recipients"]:
-            if recipient.lower().strip() == "random":
-                new_recipients.append(User.get_random_user().username)
-            else:
-                new_recipients.append(recipient)
-        message_data["recipients"] = new_recipients
-        if message_data["input"]:
-            message_data["files"] = message_data["input"]
+        # TODO: possibly outright change 'input' variable to 'files'
+        if message_data["input"]: message_data["files"] = message_data["input"]
         schema = MessageSchema(unknown=EXCLUDE)
         return schema.load(message_data)
 
@@ -115,6 +107,25 @@ class Message():
         if not text and len(files) > 0:
             text = Message.get_text_from_filename(files[0])
         return f"{text} {Message.format_performers(performers)} {Message.format_keywords(keywords)}".strip()
+
+    @staticmethod
+    def format_recipients(recipients):
+
+        # get random users
+        new_recipients = []
+        for recipient in recipients:
+            if recipient.lower().strip() == "random":
+                new_recipients.append(User.get_random_user().username)
+            else:
+                new_recipients.append(recipient.replace("@",""))
+
+        # no duplicates allowed
+        for username in new_recipients:
+            if new_recipients.count(username) > 1:
+                logger.warning(f"no duplicate usernames! {username}")
+        new_recipients = list(set(new_recipients))
+
+        return new_recipients
 
     @staticmethod
     def format_schedule(scheduleArgs):
