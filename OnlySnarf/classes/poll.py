@@ -1,5 +1,5 @@
-# import logging
-# logger = logging.getLogger(__name__)
+import logging
+logger = logging.getLogger(__name__)
 from marshmallow import Schema, fields, validate, ValidationError, post_load, EXCLUDE
 
 class PollSchema(Schema):
@@ -47,5 +47,9 @@ class Poll:
         return duration
 
     def validate(self):
-        if len(self.questions) > 0: return True
+        logger.debug("validating poll...")
+        if len(self.questions) > 0:
+            logger.debug("valid poll!")
+            return True
+        logger.debug("invalid poll!")
         return False

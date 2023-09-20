@@ -66,6 +66,8 @@ class Message():
             The generated keywords into a string
         """
 
+
+        logger.debug("formatting keywords...")
         return f"#{' #'.join(keywords)}" if len(keywords) > 0 else ""
 
     @staticmethod
@@ -85,6 +87,8 @@ class Message():
             The generated performers into a string
         """
 
+
+        logger.debug("formatting performers...")
         return f"@{' @'.join(performers)}" if len(performers) > 0 else ""
 
     @staticmethod
@@ -100,6 +104,8 @@ class Message():
 
         """
 
+
+        logger.debug("formatting text...")
         if "@" in text  or "#" in text: return text # BUG: return if text has already been formatted
         if not text and len(keywords) == 0 and len(performers) == 0 and len(files) == 0:
             logger.warning("formatting empty message!")
@@ -110,6 +116,7 @@ class Message():
 
     @staticmethod
     def format_recipients(recipients):
+        logger.debug("formatting recipients...")
 
         # get random users
         new_recipients = []
@@ -129,11 +136,13 @@ class Message():
 
     @staticmethod
     def format_schedule(scheduleArgs):
+        logger.debug("formatting schedule...")
         return Schedule.create_schedule(scheduleArgs).dump()
 
     # TODO: reintegrate upload max
     @staticmethod
     def format_files(file_paths):
+        logger.debug("formatting files...")
         files = []
         if len(file_paths) > 0:
             # for file in files[:int(CONFIG["upload_max"])]:
@@ -147,6 +156,7 @@ class Message():
 
     @staticmethod
     def format_price(price):
+        logger.debug("formatting price...")
         if not price or str(price) == "0" or str(price) == "0.0": return 0
         if str(price) == "max": return Decimal(PRICE_MAXIMUM)
         elif str(price) == "min": return Decimal(PRICE_MINIMUM)
@@ -172,7 +182,7 @@ class Message():
 
     # TODO: add updates to user object upon successful message?
     def on_success(self):
-
+        logger.debug("on message success...")
         # TODO: if was sent to 'all' or 'recent' then recipients might be empty
 
         # add files to list of files sent to help prevent duplicates

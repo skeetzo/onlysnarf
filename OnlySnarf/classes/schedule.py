@@ -101,18 +101,12 @@ class Schedule:
         """
 
         logger.debug("validating schedule...")
-
-        print("             schedule ")
-        print(self.schedule)
-        print(datetime.strptime(str(datetime.now().strftime(SCHEDULE_FORMAT)), SCHEDULE_FORMAT))
-        print("              ")
-
         if not self.schedule: return False
         # should invalidate if all default settings
         if self.date == DATE and (self.time == TIME or self.time == TIME_NONE):
             logger.debug("invalid schedule! (default date and time)")
             return False
-        elif self.schedule <= datetime.strptime(str(datetime.now().strftime(SCHEDULE_FORMAT)), SCHEDULE_FORMAT): # right now
+        elif self.schedule < datetime.strptime(str(datetime.now().strftime(SCHEDULE_FORMAT)), SCHEDULE_FORMAT): # right now
             logger.debug("invalid schedule! (must be in future)")
             return False
         logger.debug("valid schedule!")

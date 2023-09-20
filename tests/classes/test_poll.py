@@ -25,7 +25,7 @@ class TestClasses_Poll(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        configure_logs_for_module_tests("OnlySnarf.lib.webdriver.poll")
+        configure_logs_for_module_tests("OnlySnarf.classes.poll")
 
     @classmethod
     def tearDownClass(cls):

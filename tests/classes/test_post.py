@@ -28,7 +28,7 @@ class TestClasses_Post(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        configure_logs_for_module_tests("OnlySnarf.lib.webdriver.post")
+        configure_logs_for_module_tests("OnlySnarf.classes.post")
 
     @classmethod
     def tearDownClass(cls):

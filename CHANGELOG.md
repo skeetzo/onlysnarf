@@ -819,42 +819,42 @@
   - figured out why config settings arent loading proper variables
   - removed extra and unnecessary args from optional_args; cleaned up menu & help docs
   - finished message ability to add_user_to_message
-**4.6.13 : 9/11/2023**
-- more updates to messaging
-- finished updates to messaging includes & excludes
-- added webdriver/collections & /clear
-- finished adding and testing new messaging capacities: all, recent, etc
-**9/12/2023**
-- updated local user data structures
-- finished debugging message on_success
-**4.6.14 : 9/14/2023**
-- figured out why messaging a random user is replacing the users file with that random user
-- updates to data; updates to test_data
-- updated loading local users to save better internally
-- updates to other user types
-- user & message tests successful
-**9/15/2023**
-- moved debug_delay to utils.extras
-**9/16/2023**
-- finished test_message_class --> moved webdriver tests so this can be renamed
-- added specific tests for /class components separated from webdriver
-- reorganized tests
-- tests mostly or all sucessfull when ran individually
-- updates to remote webserver & tests
-**9/18/2023**
-- continued testing remote webserver
-- finished refactoring webdriver tests into relying only on webdriver components
+  **4.6.13 : 9/11/2023**
+  - more updates to messaging
+  - finished updates to messaging includes & excludes
+  - added webdriver/collections & /clear
+  - finished adding and testing new messaging capacities: all, recent, etc
+  **9/12/2023**
+  - updated local user data structures
+  - finished debugging message on_success
+  **4.6.14 : 9/14/2023**
+  - figured out why messaging a random user is replacing the users file with that random user
+  - updates to data; updates to test_data
+  - updated loading local users to save better internally
+  - updates to other user types
+  - user & message tests successful
+  **9/15/2023**
+  - moved debug_delay to utils.extras
+  **9/16/2023**
+  - finished test_message_class --> moved webdriver tests so this can be renamed
+  - added specific tests for /class components separated from webdriver
+  - reorganized tests
+  - tests mostly or all sucessfull when ran individually
+  - updates to remote webserver & tests
+  **9/18/2023**
+  - continued testing remote webserver
+  - finished refactoring webdriver tests into relying only on webdriver components
 **4.6.15: 9/19/2023**
 - tested newly refactored webdriver test components
 - updates to test_onlyfans and test_auth format to properly check cookies
 - checked / somewhat tested reconnect selenium functionality
 - RAN ALL TESTS AGAIN until successful
+- and continued refactoring class tests into relying only on class components (all tests successful)
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- and continue refactoring class tests into relying only on class components
 - refactor specific class names into shared variables like: new_post_text_input --> message_or_post_textarea
 
 - update 'snarf api' if necessary and test
@@ -872,6 +872,7 @@
 - finish debugging reconnect
 - finish testing remote webserver; add/update tests for remote webserver
 
+- update minor version w/ successful live testing
 - LIVE TESTING --> release new version on pypi
 
 ------------------------------------------------------------------------------------
