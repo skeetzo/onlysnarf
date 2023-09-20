@@ -864,6 +864,7 @@
 - skeleton test script for scan
 - add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64
 - updated readme with new commands
+- updates to readme in regards to webdriver changes
 
 ------------------------------------------------------------------------------------
 
