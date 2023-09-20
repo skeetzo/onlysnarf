@@ -45,8 +45,10 @@ def message(browser, message_object):
 
     try:
         logger.info(f"Entering message to {', '.join(message_object['recipients'])}: (${message_object['price']}) {message_object['text']}")
-        logger.info(f"Includes: {','.join(message_object['includes'])}")
-        logger.info(f"Excludes: {','.join(message_object['excludes'])}")
+        if len(message_object['includes']) > 0:
+            logger.info(f"Includes: {','.join(message_object['includes'])}")
+        if len(message_object['excludes']) > 0:
+            logger.info(f"Excludes: {','.join(message_object['excludes'])}")
         # prepare the message
         if len(message_object["recipients"]) > 1 or message_object["includes"] or message_object["excludes"]:
             go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)

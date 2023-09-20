@@ -13,13 +13,13 @@ def configure_logging():
     
     # logging.getLogger("urllib3.connectionpool").setLevel(logging.ERROR)
 
-    if int(CONFIG["verbose"]) >= 2:
+    if int(CONFIG.get("verbose", 0)) >= 2:
         # SeleniumLogger.setLevel(logging.WARNING)
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("requests").setLevel(logging.WARNING)
         logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.WARNING)
 
-    if not CONFIG["debug_selenium"]:
+    if not CONFIG.get("debug_selenium", False):
         # SeleniumLogger.setLevel(logging.ERROR)
         logging.getLogger("selenium.webdriver.common.service").setLevel(logging.ERROR)
         logging.getLogger("WDM").setLevel(logging.ERROR)

@@ -27,7 +27,7 @@ def get_user_config_path(username="default"):
     if ".conf" not in str(username): username = username+".conf"
     return os.path.join(DEFAULT.ROOT_PATH, "conf/users", username)
 
-def get_username_onlyfans(username=""):
+def get_username_onlyfans(username="default"):
     try:
         if not username: username = CONFIG["username"]
         username = get_user_config(username)["onlyfans_username"]
@@ -35,7 +35,7 @@ def get_username_onlyfans(username=""):
     except Exception as e: pass
     return username
 
-def get_username_google(username=""):
+def get_username_google(username="default"):
     try:
         if not username: username = CONFIG["username"]
         username = get_user_config(username)["google_username"]
@@ -43,7 +43,7 @@ def get_username_google(username=""):
     except Exception as e: pass
     return username           
 
-def get_username_twitter(username=""):
+def get_username_twitter(username="default"):
     try:
         if not username: username = CONFIG["username"]
         username = get_user_config(username)["twitter_username"]
@@ -51,7 +51,7 @@ def get_username_twitter(username=""):
     except Exception as e: pass
     return username
 
-def get_password(username=""):
+def get_password(username="default"):
     try:
         if not username: username = CONFIG["username"]
         username = get_user_config(username)["onlyfans_password"]
@@ -59,7 +59,7 @@ def get_password(username=""):
     except Exception as e: pass
     return username
 
-def get_password_google(username=""):
+def get_password_google(username="default"):
     try:
         if not username: username = CONFIG["username"]
         username = get_user_config(username)["google_password"]
@@ -67,7 +67,7 @@ def get_password_google(username=""):
     except Exception as e: pass
     return username
 
-def get_password_twitter(username=""):
+def get_password_twitter(username="default"):
     try:
         if not username: username = CONFIG["username"]
         username = get_user_config(username)["twitter_password"]

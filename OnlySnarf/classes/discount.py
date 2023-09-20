@@ -52,7 +52,11 @@ class Discount:
         """
 
         logger.debug(f"applying discount to: {self.username}")
-        return WEBDRIVER_discount_user(self.dump())
+        try:
+            return WEBDRIVER_discount_user(self.dump())
+        except Exception as e:
+            logger.error(e)
+        return False
 
     @staticmethod
     def format_amount(amount):

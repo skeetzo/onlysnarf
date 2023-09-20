@@ -22,7 +22,7 @@ def get_args():
   apply_args(parser)
 
   parser.version = str(pkg_resources.get_distribution("onlysnarf").version)
-  parser.add_argument('-version', action='version')
+  parser.add_argument('-version','--version', action='version')
 
   args: Dict[str, Any] = {}
   try:

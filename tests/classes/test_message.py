@@ -54,9 +54,15 @@ class TestClasses_Message(unittest.TestCase):
         self.assertEqual(Message.format_performers(self.message_object["performers"]), self.formatted_message_object["performers"], "unable to format message performers")
         
     def test_format_text(self):
-        self.assertEqual(Message.format_text(self.message_object["text"], self.message_object["keywords"], \
-                                                    self.message_object["performers"], self.message_object["files"]), \
-                                                    self.formatted_message_object["text"], "unable to format message text")
+        assert not Message.format_text("", [], []), "unable to skip formatting empty message"
+        self.assertEqual(Message.format_text(self.message_object["text"], [], []), self.message_object["text"], "unable to format message text")
+        self.assertEqual(Message.format_text(self.message_object["text"], self.message_object["keywords"], []), "test balls #balls #deep", "unable to format message text: keywords")
+        self.assertEqual(Message.format_text(self.message_object["text"], [], self.message_object["performers"]), "test balls w/ @yourmom @yourdad", "unable to format message text: performers")
+        self.assertEqual(Message.format_text(self.message_object["text"], self.message_object["keywords"], self.message_object["performers"]), \
+                                                    self.formatted_message_object["text"], "unable to format message text: full")
+
+    # TODO: add test for formatting missing text w/ filenames
+    # can this even happen if text is mandatory?
 
     def test_format_recipients(self):
         self.assertEqual(Message.format_recipients(self.message_object["recipients"]), self.formatted_message_object["recipients"], "unable to format message recipients")

@@ -27,7 +27,7 @@ class TestData(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        configure_logs_for_module_tests("###FLUSH###")
+        configure_logs_for_module_tests(flush=True)
 
     def test_a_read(self):
         users, random_users = read_users_local()

@@ -84,7 +84,7 @@ def configure_logging(debug=False, verbose=False):
     if verbose: loglevel = logging.SNARF
     if debug and verbose: loglevel = logging.TRACE
 
-    logPath = DEFAULT.LOG_PATH
+    logPath = DEFAULT.LOG_PATH_SNARF
     if str(os.environ.get('ENV')) == "test":
         logPath = os.path.join(os.getcwd(), "log", "snarf.log")
     Path(os.path.dirname(logPath)).mkdir(parents=True, exist_ok=True)

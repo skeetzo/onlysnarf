@@ -97,7 +97,7 @@ def apply_subcommand_args(parser):
   ## API ##
   #########
 
-  parser_config = subparsers.add_parser('api', help='> flask server')
+  parser_api = subparsers.add_parser('api', help='> flask server')
 
   ############
   ## Config ##
@@ -128,7 +128,7 @@ def apply_subcommand_args(parser):
   ##
   # -users
   # the users to discount
-  userAndUsers.add_argument('-users', dest='users', action='append', default=[], help='users to discount')
+  userAndUsers.add_argument('-users', dest='recipients', action='append', default=[], help='users to discount')
 
   ##########
   ## Menu ##
@@ -170,15 +170,23 @@ def apply_subcommand_args(parser):
   ##
   # -text
   # text for message or upload
-  parser_message.add_argument('-text', default=None, dest='text', help='text to send')
+  parser_message.add_argument('-text', default="", dest='text', help='text to send')
   ##
   # -user
   # the user to message
-  userAndUsers.add_argument('-user', type=str,  default=None, dest='user', help='user to message')
+  userAndUsers.add_argument('-user', type=str,  default="", dest='user', help='user to message')
   ##
   # -users
   # the users to message
-  userAndUsers.add_argument('-users', dest='users', action='append', default=[], help='users to message')
+  userAndUsers.add_argument('-users', dest='recipients', action='append', default=[], help='users to message')
+  ##
+  # -includes
+  # the user lists to includes
+  userAndUsers.add_argument('-includes', dest='includes', action='append', default=[], help='user lists to include in message')
+  ##
+  # -excludes
+  # the user lists to exclude
+  userAndUsers.add_argument('-excludes', dest='excludes', action='append', default=[], help='user lists to exclude from message')
   ##
   # input
   parser_message.add_argument('input', default=[], nargs=argparse.REMAINDER, type=valid_path, help='one or more paths to files (or folder) to include in the message')
@@ -208,6 +216,10 @@ def apply_subcommand_args(parser):
   # -performers
   # list of performers to tag
   parser_post.add_argument('-performers', dest='performers', action='append',  default=[], help='performers to reference. adds \"@[...performers]\"')
+  ##
+  # -keywords
+  # #keyword
+  parser_post.add_argument('-keywords', dest='keywords', action='append', default=[], help='the keywords to append')
   ##
   # -price
   # price to be set in a message
@@ -242,7 +254,7 @@ def apply_shim_args(parser):
   parser.add_argument('-amount', type=valid_amount, dest='amount', help='amount (%%) to discount by', default=DEFAULT.AMOUNT_NONE)
   parser.add_argument('-months', type=valid_month, default=None, dest='months', help='number of months to discount')
   parser.add_argument('-user', type=str,  default=None, dest='user', help='user to discount')
-  parser.add_argument('-users', dest='users', action='append', default=[], help='users to discount')
+  parser.add_argument('-users', dest='recipients', action='append', default=[], help='users to discount')
   parser.add_argument('-date', type=valid_date, default=DEFAULT.DATE, dest='date', help='schedule date (MM-DD-YYYY)')
   parser.add_argument('-price', type=valid_price, help='price to charge ($)', default=0, dest='price')
   parser.add_argument('-schedule', type=valid_schedule, default=DEFAULT.SCHEDULE, dest='schedule', help='schedule (MM-DD-YYYY:HH:MM:SS)')

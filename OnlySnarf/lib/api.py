@@ -4,7 +4,8 @@ import logging
 logger = logging.getLogger(__name__)
 from flask import Flask, request
 
-from ..util import CONFIG
+from .driver import close_browser
+from ..classes.message import Message, Post
 
 def create_app():
     app = Flask(__name__)
@@ -12,57 +13,63 @@ def create_app():
     @app.route('/message', methods=['POST'])
     def message():
         try:
+            logger.debug("received message request:")
             args = json.loads(request.data)
-            logging.debug(args)
-            CONFIG["text"] = args["text"]
-            CONFIG["user"] = args["user"]
-            try: CONFIG["input"] = args["input"].split(",")
-            except Exception as e: pass
-            try: CONFIG["price"] = args["price"] or 0
-            except Exception as e: pass
-            try: CONFIG["schedule"] = args["schedule"]
-            except Exception as e: pass
-            try: CONFIG["performers"] = args["performers"]
-            except Exception as e: pass
-            from ..snarf import Snarf
-            Snarf.message()
-            Snarf.close()
+            logger.debug(args)
+            message_object = {
+                "text" : args.get("text", ""),
+                "recipients" : args.get("recipients", []),
+                "files" : args.get("files", []),
+                "price" : args.get("price", 0),
+                "schedule" : args.get("schedule", {}),
+                "performers" : args.get("performers", []),
+                "keywords" : args.get("keywords", []),
+                "includes" : args.get("includes", []),
+                "excludes" : args.get("excludes", [])
+            }
+            if not app.debug:
+                Message.create_message(message_object).send()
+                # keep open when done: default false
+                if not args.get("keep", False):
+                    close_browser()
         except Exception as e:
-            logging.debug(e)
+            logger.debug(e)
         finally:
             return "", 200
 
     @app.route('/post', methods=['POST'])
     def post():
         try:
+            logger.debug("received post request:")
             args = json.loads(request.data)
-            logging.debug(args)
-            CONFIG["text"] = args["text"]
-            try: CONFIG["input"] = args["input"].split(",")
-            except Exception as e: pass
-            try: CONFIG["performers"] = args["performers"]
-            except Exception as e: pass
-            try: CONFIG["schedule"] = args["schedule"]
-            except Exception as e: pass
-            try: CONFIG["questions"] = args["questions"]
-            except Exception as e: pass
-            try: CONFIG["duration"] = args["duration"]
-            except Exception as e: pass
-            try: CONFIG["expires"] = args["expires"]
-            except Exception as e: pass
-            from ..snarf import Snarf
-            Snarf.post()
-            Snarf.close()
+            logger.debug(args)
+            post_object = {
+                "text" : args.get("text", ""),
+                "recipients" : args.get("recipients", []),
+                "files" : args.get("files", []),
+                "price" : args.get("price", 0),
+                "schedule" : args.get("schedule", {}),
+                "performers" : args.get("performers", []),
+                "keywords" : args.get("keywords", []),
+                "questions" : args.get("questions", []),
+                "duration" : args.get("duration", []),
+                "expires" : args.get("expires", 0)
+            }
+            if not app.debug:
+                Post.create_post(post_object).send()
+                # keep open when done: default false
+                if not args.get("keep", False):
+                    close_browser()
         except Exception as e:
-            logging.debug(e)
+            logger.debug(e)
         finally:
             return "", 200
 
     return app
 
-def main():
+def main(debug=False):
     app = create_app()
-    if str(CONFIG["debug"]) == "True":
+    if debug:
         app.debug = True
         app.testing = True
     app.run(host="0.0.0.0", port=5000)

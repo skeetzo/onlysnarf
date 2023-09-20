@@ -19,7 +19,7 @@ from marshmallow import Schema, fields, validate, post_load, EXCLUDE
 class Message():
     """OnlyFans message (and post) class"""
 
-    def __init__(self, files=[], keywords=[], performers=[], price=0, recipients=[], schedule={}, text="", includes=[], excludes=[]):
+    def __init__(self, text, recipients, files=[], keywords=[], performers=[], price=0, schedule={}, includes=[], excludes=[]):
         """
         OnlyFans message and post object
 
@@ -42,7 +42,8 @@ class Message():
     @staticmethod
     def create_message(message_data):
         # TODO: possibly outright change 'input' variable to 'files'
-        if message_data["input"]: message_data["files"] = message_data["input"]
+        if "input" in message_data:
+            message_data["files"] = message_data["input"]
         schema = MessageSchema(unknown=EXCLUDE)
         return schema.load(message_data)
 
@@ -92,7 +93,7 @@ class Message():
         return f"@{' @'.join(performers)}" if len(performers) > 0 else ""
 
     @staticmethod
-    def format_text(text, keywords, performers, files):
+    def format_text(text, keywords, performers, files=[]):
         """Formats self.text with the provided keywords and performers
 
         
@@ -106,13 +107,17 @@ class Message():
 
 
         logger.debug("formatting text...")
-        if "@" in text  or "#" in text: return text # BUG: return if text has already been formatted
+        if "@" in text or "#" in text: return text # BUG: return if text may have already been formatted
         if not text and len(keywords) == 0 and len(performers) == 0 and len(files) == 0:
             logger.warning("formatting empty message!")
             return ""
         if not text and len(files) > 0:
             text = Message.get_text_from_filename(files[0])
-        return f"{text} {Message.format_keywords(keywords)} w/ {Message.format_performers(performers)}".strip()
+        if len(keywords) > 0:
+            text += " "+Message.format_keywords(keywords)
+        if len(performers) > 0:
+            text += " w/ "+Message.format_performers(performers)
+        return text
 
     @staticmethod
     def format_recipients(recipients):
@@ -210,9 +215,12 @@ class Message():
 
         """
 
-        if WEBDRIVER_message(self.dump()):
-            self.on_success()        
-            return True
+        try:
+            if WEBDRIVER_message(self.dump()):
+                self.on_success()        
+                return True
+        except Exception as e:
+            logger.error(e)
         return False
             
 ########################################################################################################################            
@@ -256,7 +264,7 @@ class Message():
 class Post(Message):
     """OnlyFans message (and post) class"""
 
-    def __init__(self, expiration=0, poll={}, **kwargs):
+    def __init__(self, text, expiration=0, poll={}, **kwargs):
         """
         OnlyFans post object
 
@@ -265,7 +273,11 @@ class Post(Message):
 
         """
 
-        super().__init__(**kwargs)
+        # TODO: figure out why this is necessary / fails without
+        if "recipients" in kwargs:
+            super().__init__(text, **kwargs)            
+        else:
+            super().__init__(text, [], **kwargs)
         self.expiration = expiration
         self.poll = Post.format_poll(poll)
 
@@ -299,7 +311,11 @@ class Post(Message):
         if not self.files and not self.text:
             logger.error("Missing files and text!")
             return False
-        return WEBDRIVER_post(self.dump())
+        try:
+            return WEBDRIVER_post(self.dump())
+        except Exception as e:
+            logger.error(e)
+        return False
             
 
 # https://marshmallow.readthedocs.io/en/stable/
@@ -324,6 +340,7 @@ class MessageSchema(Schema):
 class PostSchema(MessageSchema):
     __model__ = Post
 
+    text = fields.Str(dump_default="")
     expiration = fields.Int(dump_default=0)
     poll = fields.Dict(dump_default={})
 

@@ -4,8 +4,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .config import CONFIG
+from . import defaults as DEFAULT
 
-USERS_PATH = os.path.expanduser(CONFIG["path_users"])
+USERS_PATH = CONFIG.get("path_users", DEFAULT.USERS_PATH)
 
 def reset_userlist():
     try:

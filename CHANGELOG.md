@@ -850,24 +850,31 @@
 - checked / somewhat tested reconnect selenium functionality
 - RAN ALL TESTS AGAIN until successful
 - and continued refactoring class tests into relying only on class components (all tests successful)
+**4.6.16 : 9/20/2023**
+- updated 'snarf api' if necessary and tested
+- updated 'snarf config' if necessary and tested
+- updated 'snarf menu' if necessary and tested (still requires updates)
+- finished testing 'snarf config'
+- tested user messaging processes: all fans, favorite, renew, bookmarks, random
+- fixed clear_text bug a while ago?
+- (probably) fixed how tabs open and scroll and then the process opens another tab to find the same elements and scroll again ala: find users then discount user
+- (probably) fixed driver.firefox: DeprecationWarning: service_log_path has been deprecated, please pass in a Service object
+- changelog cleanup
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
-- refactor specific class names into shared variables like: new_post_text_input --> message_or_post_textarea
+- write test scripts for scan & uploading to dropbox
 
-- update 'snarf api' if necessary and test
-- update 'snarf config' if necessary and test
-- update 'snarf menu' if necessary and test
+- refactor specific class names into shared variables like: new_post_text_input --> message_or_post_textarea
 
 (cleanup)
 - add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64
 
 (finish)
 - finish scan.py
-- finish updating cli menu functionality
-- finish testing 'snarf config'
+- finish implementing message recent calendar selection
 
 - finish debugging reconnect
 - finish testing remote webserver; add/update tests for remote webserver
@@ -916,7 +923,6 @@
 - test scan.py for final touches
 - test dropbox scripts on rpi
 - test upload script on android
-- test user messaging processes: all fans, recent, favorite, renew, bookmarks, random
 - re-add stuff for testing on multiple platforms ala mac ;) 
 --
 - add tests for newly separated driver files / functions
@@ -926,14 +932,12 @@
 
 -> CLI Menu
 (probably never)
+- finish updating menu functionality
+- finish updating menu settings
 - re-add menu system & re-enable menu command
 - fix any new cli menu errors made while updating major processes
 
 ## Fix / Debug
-
-- fix clear_text bug
-
-- fix how tabs open and scroll and then the process opens another tab to find the same elements and scroll again ala: find users then discount user
 
 (unlikely to be fixed soon, if ever)
 - google login: unsafe browser warning --> possibly end of usability --> should I just remove this? form login works, twitter login works (i think)
@@ -942,17 +946,16 @@
 - debug: discover the cause of the super slow web scraping
 -- probably not: debug_delay
 ---- possibly improved via recent updated coding? (4.3.10)
+----- much much improved by 4.6.16
 
 - figure out how to suppress the chrome stacktrace debugging messages
-- fix driver.firefox: DeprecationWarning: service_log_path has been deprecated, please pass in a Service object
 
 ### Browser Changes
 
-working: brave, chrome, chromium, firefox 
-not working: edge, ie, opera
+working: chrome, firefox 
+not working: brave, chromium, edge, ie, opera
 
-existing browsers: chrome, firefox
-added new browsers: brave, chromium, ie, edge, and opera
+existing browsers: chrome, firefox, brave, chromium, ie, edge, and opera
 other potential browsers: phantomjs (requires node), safari (requires python2.7)
 
 https://pypi.org/project/webdriver-manager/
@@ -983,32 +986,5 @@ what helps in general:
 >> specifying binary paths
 >> correct permissions on binary paths
 
-# API
-
-note: the 
-
 # Bugs
-
-**4.1.4**
-  - boolean checks from "Settings.is_" functions are failing: replaced with redundant string checks for if == "True"
-**4.3.12**
-  - message: drag&drop has decided to occasionally stop working; maybe a selenium version issue?
-**4.4.0**
-  - discount: amount&months still require 2 passes on average to update values correctly
-**4.4.6**
-  - followed instructions here for enabled firefox on ubuntu 22.04: https://www.reddit.com/r/learnpython/comments/umft75/selenium_your_firefox_profile_cannot_be_loaded_it/ -> https://support.mozilla.org/en-US/kb/install-firefox-linux#w_install-firefox-from-mozilla-builds-for-advanced-users
-**4.4.9**
-  - when running pytest, the final arg is mistakenly picked up as an input (and passes validation, because it's a file) and tests therefore have multiple repeat file uploads    
-**4.5.2**
-  - [fixed] message tests come up negative when they're all passing basic functionality
-
-
-
-# Web Browser Versions
-(no longer as relevant as of 4.4.7ish updates)
-
-Version Check:
-stable => Google Chrome 106.0.5249.40 beta
-beta => Google Chrome 106.0.5249.40 beta
-binary => Version: 106.0.5249.21.0
-geckodriver => geckodriver 0.31.0 (b617178ef491 2022-04-06 11:57 +0000)
+all bugs previous to 4.6.16 are relatively squashed

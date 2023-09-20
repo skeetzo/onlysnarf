@@ -1,33 +1,34 @@
 #!/usr/bin/python3
 
-import logging
-
+# Args
 from .util.args import get_args
 from .util.config import set_config
 CONFIG = set_config(get_args())
 
+# Logging
+import logging
 from .util.logger import configure_logging
 configure_logging(CONFIG["debug"], True if int(CONFIG["verbose"]) > 0 else False)
 logger = logging.getLogger(__name__)
 
+# Basic Behaviors
 from .classes.discount import Discount
 from .classes.message import Message, Post
-from .classes.profile import Profile
+# from .classes.profile import Profile
 # from .classes.promotion import Promotion
 from .classes.user import User
-from .lib.config import Config
-# from .lib.menu import Menu
-from .lib import api as API
-
+from .lib.config import main as CONFIG_main
+from .lib.menu import main as MENU_main
+from .lib.api import main as API_main
 
 def api():
-    API.main(CONFIG)
+    API_main(debug=CONFIG["debug"])
 
 def config():
-    Config.main(CONFIG)
+    CONFIG_main()
 
-# def menu(config={}):
-#     Menu.main(CONFIG)
+def menu(config={}):
+    MENU_main()
 
 def discount():
 
@@ -38,12 +39,12 @@ def discount():
     """
 
     logging.snarf("Beginning discount process...")
-    users = list(filter(None, CONFIG.get("users", [])))
-    if CONFIG.get("user"):
-        users.append(CONFIG.get("user"))
+    recipients = CONFIG.get("recipients", [])
+    recipients.append(CONFIG.get("user", ""))
+    recipients = list(set(filter(None, recipients)))
     successful = []
-    for user in users:
-        successful.append(Discount.create_discount({'username':user,'amount':CONFIG["amount"],'months':CONFIG["months"]}).apply())
+    for username in recipients:
+        successful.append(Discount.create_discount({'username':username,'amount':CONFIG["amount"],'months':CONFIG["months"]}).apply())
     return all(successful)
 
 def message():
@@ -55,7 +56,26 @@ def message():
     """
 
     logging.snarf("Beginning message process...")
-    return Message.create_message(CONFIG).send()
+    recipients = CONFIG.get("recipients", [])
+    recipients.append(CONFIG.get("user", ""))
+    recipients = list(filter(None, recipients))
+    message_object = {
+        "text"      : CONFIG["text"],
+        "files"     : CONFIG["input"],
+        "keywords"  : CONFIG["keywords"],
+        "performers": CONFIG["performers"],
+        "price"     : CONFIG["price"],
+        "schedule"  : {
+            "date" : str(CONFIG["date"]),
+            "time" : str(CONFIG["time"])
+        },
+        "recipients": recipients,
+        "includes"  : CONFIG["includes"],
+        "excludes"  : CONFIG["excludes"]
+    }
+    if not message_object["text"]: raise Exception("missing text!")
+    if not message_object["recipients"]: raise Exception("missing recipients!")
+    return Message.create_message(message_object).send()
             
 def post():
 
@@ -66,7 +86,19 @@ def post():
     """
 
     logging.snarf("Beginning post process...")
-    return Post.create_post(CONFIG).send()
+    post_object = {
+        "text"      : CONFIG["text"],
+        "files"     : CONFIG["input"],
+        "keywords"  : CONFIG["keywords"],
+        "performers": CONFIG["performers"],
+        "price"     : CONFIG["price"],
+        "schedule"  : {
+            "date" : str(CONFIG["date"]),
+            "time" : str(CONFIG["time"])
+        }
+    }
+    if not post_object["text"]: raise Exception("missing text!")
+    return Post.create_post(post_object).send()
 
 # TODO: update this
 # def profile():
@@ -130,17 +162,12 @@ def users():
     
     """
 
-    try:
-        User.get_all_users()
-        return True
-    except Exception as e: logging.debug(e)
-    return False
+    return User.get_all_users()
 
 ################################################################################################################################################
 
 def main():
     try:
-        
         logging.info(f"Running - {CONFIG['action']}")
         eval(f"{CONFIG['action']}()")
     except Exception as e:

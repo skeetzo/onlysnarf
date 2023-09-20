@@ -101,7 +101,6 @@ UPLOAD_PATH = os.path.join(ROOT_PATH, "uploads")
 
 CONFIGS_PATH = os.path.join(ROOT_PATH, "conf")
 CONFIG_PATH = os.path.join(CONFIGS_PATH, "config.conf")
-USERS_PATH = os.path.join(CONFIGS_PATH, "users.json")
 PROFILE_PATH = os.path.join(CONFIGS_PATH, "profile.json")
 USERS_PATH = os.path.join(CONFIGS_PATH, "users")
 
@@ -123,6 +122,8 @@ Path(DOWNLOAD_PATH).mkdir(parents=True, exist_ok=True)
 Path(UPLOAD_PATH).mkdir(parents=True, exist_ok=True)
 Path(CONFIGS_PATH).mkdir(parents=True, exist_ok=True)
 Path(USERS_PATH).mkdir(parents=True, exist_ok=True)
+
+USERS_PATH = os.path.join(CONFIGS_PATH, "users.json")
 
 if os.environ.get('ENV') == "test":
     print("###########")
