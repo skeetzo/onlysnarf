@@ -110,10 +110,10 @@ def configure_logging(debug=False, verbose=False):
 
 # hide all irrrelevant logs when doing tests on the specific module
 also_this = []
-def configure_logs_for_module_tests(module_name):
+def configure_logs_for_module_tests(module_name="", flush=False):
     global also_this
 
-    if module_name == "###FLUSH###":
+    if flush:
         for name in also_this:
             logging.getLogger(name).setLevel(logging.root.level)
         also_this = []

@@ -85,7 +85,7 @@ class Message():
             The generated performers into a string
         """
 
-        return f"@{' @'.join(performers)} " if len(performers) > 0 else ""
+        return f"@{' @'.join(performers)}" if len(performers) > 0 else ""
 
     @staticmethod
     def format_text(text, keywords, performers, files):
@@ -106,7 +106,7 @@ class Message():
             return ""
         if not text and len(files) > 0:
             text = Message.get_text_from_filename(files[0])
-        return f"{text} {Message.format_performers(performers)} {Message.format_keywords(keywords)}".strip()
+        return f"{text} {Message.format_keywords(keywords)} w/ {Message.format_performers(performers)}".strip()
 
     @staticmethod
     def format_recipients(recipients):
@@ -147,7 +147,7 @@ class Message():
 
     @staticmethod
     def format_price(price):
-        if not price or str(price) == "0": return 0
+        if not price or str(price) == "0" or str(price) == "0.0": return 0
         if str(price) == "max": return Decimal(PRICE_MAXIMUM)
         elif str(price) == "min": return Decimal(PRICE_MINIMUM)
         elif Decimal(sub(r'[^\d.]', '', str(price))) < Decimal(PRICE_MINIMUM):

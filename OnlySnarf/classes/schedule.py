@@ -62,6 +62,7 @@ class Schedule:
 
     @staticmethod
     def format_time(time_string):
+        if not time_string: return ""
         time = ""
         try:
             time = datetime.strptime(str(time_string), TIME_FORMAT)
@@ -75,6 +76,7 @@ class Schedule:
 
     @staticmethod
     def format_schedule(date_string, time_string):
+        if not date_string or not time_string: return ""
         schedule = ""
         try:
             schedule_string = f"{Schedule.format_date(date_string)} {Schedule.format_time(time_string)}"
@@ -99,13 +101,18 @@ class Schedule:
         """
 
         logger.debug("validating schedule...")
-        today = datetime.strptime(str(datetime.now().strftime(SCHEDULE_FORMAT)), SCHEDULE_FORMAT)
+
+        print("             schedule ")
+        print(self.schedule)
+        print(datetime.strptime(str(datetime.now().strftime(SCHEDULE_FORMAT)), SCHEDULE_FORMAT))
+        print("              ")
+
         if not self.schedule: return False
         # should invalidate if all default settings
         if self.date == DATE and (self.time == TIME or self.time == TIME_NONE):
             logger.debug("invalid schedule! (default date and time)")
             return False
-        elif self.schedule <= today:
+        elif self.schedule <= datetime.strptime(str(datetime.now().strftime(SCHEDULE_FORMAT)), SCHEDULE_FORMAT): # right now
             logger.debug("invalid schedule! (must be in future)")
             return False
         logger.debug("valid schedule!")

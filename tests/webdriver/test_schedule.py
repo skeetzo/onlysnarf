@@ -13,7 +13,6 @@ from OnlySnarf.lib.driver import close_browser, login as get_browser_and_login
 from OnlySnarf.lib.webdriver.schedule import schedule as WEBDRIVER_schedule
 from OnlySnarf.util import defaults as DEFAULT
 
-
 today = datetime.datetime.now()
 tomorrow = today + datetime.timedelta(days=1, hours=13, minutes=10)
 
@@ -37,7 +36,7 @@ class TestWebdriver_Schedule(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        configure_logs_for_module_tests("###FLUSH###")
+        configure_logs_for_module_tests(flush=True)
         close_browser()
 
     def test_schedule(self):

@@ -7,40 +7,39 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import close_browser
 from OnlySnarf.util import defaults as DEFAULT
 from OnlySnarf.classes.message import Post
 
-configure_logs_for_module_tests("OnlySnarf.lib.webdriver.post")
-close_browser()
-
-class TestSnarf(unittest.TestCase):
+class TestClasses_Post(unittest.TestCase):
 
     def setUp(self):
-        CONFIG["input"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"]
-        CONFIG["price"] = DEFAULT.PRICE_MINIMUM
-        CONFIG["text"] = "test balls"
-        CONFIG["keywords"] = ["test","ticles"]
-        CONFIG["performers"] = ["yourmom","yourdad"]
-        CONFIG["schedule"] = {}
+        self.post_object = {
+            "input" : ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg", "/home/skeetzo/Projects/onlysnarf/public/images/snarf.jpg"],
+            "price" : DEFAULT.PRICE_MINIMUM,
+            "text" : "test balls",
+            "keywords" : ["test","ticles"],
+            "performers" : ["yourmom","yourdad"],
+            "schedule" : {}
+        }
+        self.post = Post.create_post(self.post_object)
 
     def tearDown(self):
         pass
 
+    @classmethod
+    def setUpClass(cls):
+        configure_logs_for_module_tests("OnlySnarf.lib.webdriver.post")
+
+    @classmethod
+    def tearDownClass(cls):
+        configure_logs_for_module_tests(flush=True)
+
     def test_post(self):
-        assert Post.create_post({**CONFIG}).send(), "unable to post"
+        assert self.post, "unable to create post object"
 
-    # @unittest.skip("todo")
-    # def test_post_files(self):
-    #     assert Snarf.post(CONFIG), "unable to upload post files"
-
-    # @unittest.skip("todo")
-    # def test_post_price(self):
-    #     assert Snarf.post(CONFIG), "unable to set post price"
-
-    # @unittest.skip("todo")
-    # def test_post_text(self):
-    #     assert Snarf.post(CONFIG), "unable to set post text"
+    # def test_post_format_poll(self):
+        # pointless
+        # pass
 
 ############################################################################################
 

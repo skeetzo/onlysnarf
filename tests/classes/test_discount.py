@@ -3,55 +3,52 @@ os.environ['ENV'] = "test"
 import unittest
 
 from OnlySnarf.util.config import set_config
-CONFIG = set_config({})
+CONFIG = set_config({"prefer_local":True})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
 from OnlySnarf.util import defaults as DEFAULT
 from OnlySnarf.classes.discount import Discount
 
-configure_logs_for_module_tests("OnlySnarf.lib.webdriver.discount")
-
-class TestSnarf(unittest.TestCase):
+class TestClasses_Discount(unittest.TestCase):
 
     def setUp(self):
-        CONFIG["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT/2 # 55 / 2 = 27 or 28 -> 25
-        CONFIG["months"] = DEFAULT.DISCOUNT_MAX_MONTHS/2 # 12 / 2 = 6
-        CONFIG["user"] = "random"
-        CONFIG["prefer_local"] = True
+        pass
 
     def tearDown(self):
         pass
 
-    def test_discount(self):
-        assert Discount.create_discount({**CONFIG, 'username':CONFIG["user"]}).apply(), "unable to apply discount"
+    @classmethod
+    def setUpClass(cls):
+        configure_logs_for_module_tests("OnlySnarf.classes.discount")
 
-    def test_discount_max(self):
-        CONFIG["amount"] = DEFAULT.DISCOUNT_MAX_AMOUNT # 55
-        CONFIG["months"] = DEFAULT.DISCOUNT_MAX_MONTHS # 12
-        assert Discount.create_discount({**CONFIG, 'username':CONFIG["user"]}).apply(), "unable to apply discount maximum"
+    @classmethod
+    def tearDownClass(cls):
+        configure_logs_for_module_tests(flush=True)
 
-    def test_discount_min(self):
-        CONFIG["amount"] = DEFAULT.DISCOUNT_MIN_AMOUNT # 1
-        CONFIG["months"] = DEFAULT.DISCOUNT_MIN_MONTHS # 1
-        assert Discount.create_discount({**CONFIG, 'username':CONFIG["user"]}).apply(), "unable to apply discount minimum"
+    def test_create_discount(self):
+        assert Discount.create_discount({
+            "amount" : DEFAULT.DISCOUNT_MAX_AMOUNT,
+            "months" : DEFAULT.DISCOUNT_MAX_MONTHS,
+            "username" : "random",
+        }), "unable to create discount"
 
-    def test_discount_inactive_user(self):
-        CONFIG["user"] = "yeahzers"
-        CONFIG["amount"] = DEFAULT.DISCOUNT_MIN_AMOUNT # 1
-        CONFIG["months"] = DEFAULT.DISCOUNT_MIN_MONTHS # 1
-        assert Discount.create_discount({**CONFIG, 'username':CONFIG["user"]}).apply(), "unable to apply discount to inactive user"
+    def test_format_amount(self):
+        assert Discount.format_amount(DEFAULT.DISCOUNT_MAX_AMOUNT/2), "unable to format discount amount"
+        self.assertEqual(Discount.format_amount(DEFAULT.DISCOUNT_MAX_AMOUNT+1), DEFAULT.DISCOUNT_MAX_AMOUNT), "unable to format discount amount greater than maximum"
+        self.assertEqual(Discount.format_amount(DEFAULT.DISCOUNT_MIN_AMOUNT-1), DEFAULT.DISCOUNT_MIN_AMOUNT), "unable to format discount amount less than minimum"
 
-    # TODO: add a test for applying the same discount to an existing discount
-    def test_discount_repeat(self):
-        CONFIG["user"] = "yeahzers"
-        CONFIG["amount"] = DEFAULT.DISCOUNT_MIN_AMOUNT # 1
-        CONFIG["months"] = DEFAULT.DISCOUNT_MIN_MONTHS # 1
-        CONFIG["debug"] = False
-        self.discount = Discount.create_discount({**CONFIG, 'username':CONFIG["user"]})
-        self.discount.apply() # must actually apply discount or know existing discount values, if not applied already; easier than constantly fetching individual values i'll never need
-        assert self.discount.apply(), "unable to skip equal discount"
-        
+    def test_format_months(self):
+        assert Discount.format_months(DEFAULT.DISCOUNT_MAX_MONTHS/2), "unable to format discount months"
+        self.assertEqual(Discount.format_months(DEFAULT.DISCOUNT_MAX_MONTHS+1), DEFAULT.DISCOUNT_MAX_MONTHS), "unable to format discount months greater than maximum"
+        self.assertEqual(Discount.format_months(DEFAULT.DISCOUNT_MIN_MONTHS-1), DEFAULT.DISCOUNT_MIN_MONTHS), "unable to format discount months less than minimum"
+
+    def test_format_username(self):
+        # if user is random, return a user not "random"
+        self.assertEqual(Discount.format_username("@onlyfans"), "onlyfans", "unable to format discount username")
+        formatted_username = Discount.format_username("random")
+        self.assertNotEqual(formatted_username, "random", "unable to format random discount username")
+
 ############################################################################################
 
 if __name__ == '__main__':

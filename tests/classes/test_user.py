@@ -11,15 +11,21 @@ configure_logging(True, True)
 
 from OnlySnarf.classes.user import User
 
-configure_logs_for_module_tests("OnlySnarf.classes.user")
-
-class TestSnarf(unittest.TestCase):
+class TestClasses_Users(unittest.TestCase):
 
     def setUp(self):
         pass
 
     def tearDown(self):
         pass
+
+    @classmethod
+    def setUpClass(cls):
+        configure_logs_for_module_tests("OnlySnarf.classes.user")
+
+    @classmethod
+    def tearDownClass(cls):
+        configure_logs_for_module_tests(flush=True)
 
     def test_get_all_users(self):
         assert User.get_all_users(), "unable to get all users"

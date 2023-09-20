@@ -51,8 +51,9 @@ class TestWebdriver_Message(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        configure_logs_for_module_tests("###FLUSH###")
+        configure_logs_for_module_tests(flush=True)
         close_browser()
+        reset_random_users()
 
     def test_message(self):
         assert WEBDRIVER_message(self.browser, self.message_object), "unable to send basic message"

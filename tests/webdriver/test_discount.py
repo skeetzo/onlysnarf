@@ -33,7 +33,7 @@ class TestWebdriver_Discount(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        configure_logs_for_module_tests("###FLUSH###")
+        configure_logs_for_module_tests(flush=True)
         close_browser()
 
     def test_discount(self):
