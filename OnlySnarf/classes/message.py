@@ -306,15 +306,15 @@ class Post(Message):
 class MessageSchema(Schema):
     __model__ = Message
 
-    text = fields.Str(default="")
-    files = fields.List(fields.Str(), default=[])
-    keywords = fields.List(fields.Str(), default=[])
-    performers = fields.List(fields.Str(), default=[])
-    price = fields.Float(validate=validate.Range(min=0, max=PRICE_MAXIMUM))
-    schedule = fields.Dict()
-    recipients = fields.List(fields.Str(), default=[])
-    includes = fields.List(fields.Str(), default=[])
-    excludes = fields.List(fields.Str(), default=[])
+    text = fields.Str(dump_default="")
+    files = fields.List(fields.Str(), dump_default=[])
+    keywords = fields.List(fields.Str(), dump_default=[])
+    performers = fields.List(fields.Str(), dump_default=[])
+    price = fields.Float(validate=validate.Range(min=0, max=PRICE_MAXIMUM), dump_default=0)
+    schedule = fields.Dict(dump_default={})
+    recipients = fields.List(fields.Str(), dump_default=[])
+    includes = fields.List(fields.Str(), dump_default=[])
+    excludes = fields.List(fields.Str(), dump_default=[])
 
     @post_load
     def make_message(self, data, **kwargs):
@@ -324,8 +324,8 @@ class MessageSchema(Schema):
 class PostSchema(MessageSchema):
     __model__ = Post
 
-    expiration = fields.Int(default=0)
-    poll = fields.Dict()
+    expiration = fields.Int(dump_default=0)
+    poll = fields.Dict(dump_default={})
 
     @post_load
     def make_post(self, data, **kwargs):

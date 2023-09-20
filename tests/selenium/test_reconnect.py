@@ -19,31 +19,20 @@ class TestSelenium_Reconnect(unittest.TestCase):
     def tearDown(self):
         close_browser()
 
-    def test_reconnect(self):
-        self.browser = create_browser(browserType="firefox")
-        close_browser()
-        assert create_browser(browserType="reconnect:firefox"), "unable to launch via reconnect"
-
     @classmethod
     def setUpClass(cls):
+        configure_logs_for_module_tests("OnlySnarf.lib.driver")
         configure_logs_for_module_tests("OnlySnarf.lib.webdriver.browser")
 
     @classmethod
     def tearDownClass(cls):
-        configure_logs_for_module_tests("###FLUSH###")
+        configure_logs_for_module_tests(flush=True)
+
+    def test_reconnect(self):
+        self.browser = create_browser(browserType="firefox")
+        close_browser()
+        assert create_browser(browserType="reconnect:firefox"), "unable to launch via reconnect"
     
-    # @unittest.skip("todo")
-    # def test_remote_chrome(self):
-    #     config["browser"] = "remote-chrome"
-    #     self.driver.init()
-    #     assert self.browser, "unable to launch via remote chrome"
-
-    # @unittest.skip("todo")
-    # def test_remote_firefox(self):
-    #     config["browser"] = "remote-firefox"
-    #     self.driver.init()
-    #     assert self.browser, "unable to launch via remote firefox"
-
 ############################################################################################
 
 if __name__ == '__main__':
