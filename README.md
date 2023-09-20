@@ -21,6 +21,7 @@ There are two **different** installation options (that I know of):
 Here is an output of the command: [`snarf -h`](/public/docs/help.md/#-h)
   
 Command example: `snarf -text "suck my giant balls" /path/to/imageOfBalls.jpeg`
+Version: `snarf -version` or `snarf --version`
 
 ## Config
 The command `snarf config` is now available for help adding, listing, updating, and removing user config files. This command **does not** (yet) help with configuring the general config file which is described as follows.
@@ -66,6 +67,11 @@ Runs sucessfully with browsers:
 Runs successfully on devices:
 - Raspberry Pi 4 : aarch64
 
+## Dev
+If you are doing your own development or webscraping all of the related files are available at: [OnlySnarf/lib/webdriver](/OnlySnarf/lib/webdriver)  
+And the shortcut file for [webdriver](/OnlySnarf/lib/driver.py) behaviors that I'm not quire sure if I want to be a class or not but is used to funnel proper interactions through.  
+More in code commenting / documentation will come later.  
+
 ## Tests
 
 The test environment uses the config file found at:  [OnlySnarf/conf/test-config.conf](/OnlySnarf/conf/test-config.conf) 
@@ -89,7 +95,8 @@ Pytests available under /tests:
 
 ## Updates
 7/5/2023 : clarifications to readme and menu text...
-4/18/2023 : To further reduce repo size, preview gifs have been relocated to [IPFS](//ipfs.io/ipfs/QmVpjSy9NXy3VUM474hSDoPSsmsb5WVYkN9WN6N7nFxZuj).
+4/18/2023 : to further reduce repo size, preview gifs have been relocated to [IPFS](//ipfs.io/ipfs/QmVpjSy9NXy3VUM474hSDoPSsmsb5WVYkN9WN6N7nFxZuj).
+9/20/2023 : major cleanup of webdriver structure & overlap with classes; test scripts overhaul to match
 
 <hr>
 Feel free to make use of my <a href="//onlyfans.com/?ref=409408" target="_blank">referral code</a> ;)
