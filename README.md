@@ -94,9 +94,9 @@ Pytests available under /tests:
 - `pytest tests/webdriver`
 
 ## Updates
-7/5/2023 : clarifications to readme and menu text...
-4/18/2023 : to further reduce repo size, preview gifs have been relocated to [IPFS](//ipfs.io/ipfs/QmVpjSy9NXy3VUM474hSDoPSsmsb5WVYkN9WN6N7nFxZuj).
-9/20/2023 : major cleanup of webdriver structure & overlap with classes; test scripts overhaul to match
+7/5/2023 : clarifications to readme and menu text...  
+4/18/2023 : to further reduce repo size, preview gifs have been relocated to [IPFS](//ipfs.io/ipfs/QmVpjSy9NXy3VUM474hSDoPSsmsb5WVYkN9WN6N7nFxZuj).  
+9/20/2023 : major cleanup of webdriver structure & overlap with classes; test scripts overhaul to match  
 
 <hr>
 Feel free to make use of my <a href="//onlyfans.com/?ref=409408" target="_blank">referral code</a> ;)
