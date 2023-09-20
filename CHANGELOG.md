@@ -860,17 +860,19 @@
 - (probably) fixed how tabs open and scroll and then the process opens another tab to find the same elements and scroll again ala: find users then discount user
 - (probably) fixed driver.firefox: DeprecationWarning: service_log_path has been deprecated, please pass in a Service object
 - changelog cleanup
+- minor cleanup and updates to scan and dropbox scripts
+- skeleton test script for scan
+- add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64
+- updated readme with new commands
 
 ------------------------------------------------------------------------------------
 
 ## TODO
 
 - write test scripts for scan & uploading to dropbox
-
 - refactor specific class names into shared variables like: new_post_text_input --> message_or_post_textarea
 
 (cleanup)
-- add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64
 
 (finish)
 - finish scan.py

@@ -34,19 +34,12 @@ load_dotenv()  # take environment variables from .env.
 # TOKEN = str(os.getenv("DROPBOX_ACCESS_TOKEN"))
 
 parser = argparse.ArgumentParser(description='Sync ~/.onlysnarf/uploads from Dropbox')
-parser.add_argument('folder', nargs='?', default='Uploads',
-                    help='Folder name in your Dropbox')
-parser.add_argument('rootdir', nargs='?', default='~/.onlysnarf/uploads',
-                    help='Local directory to download to')
-# parser.add_argument('--token', default=TOKEN,
-#                     help='Access token '
-#                     '(see https://www.dropbox.com/developers/apps)')
-parser.add_argument('--yes', '-y', action='store_true',
-                    help='Answer yes to all questions')
-parser.add_argument('--no', '-n', action='store_true',
-                    help='Answer no to all questions')
-parser.add_argument('--default', '-d', action='store_true',
-                    help='Take default answer on all questions')
+parser.add_argument('folder', nargs='?', default='Uploads', help='Folder name in your Dropbox')
+parser.add_argument('rootdir', nargs='?', default='~/.onlysnarf/uploads', help='Local directory to download to')
+# parser.add_argument('--token', default=TOKEN, help='Access token (see https://www.dropbox.com/developers/apps)')
+parser.add_argument('--yes', '-y', action='store_true', help='Answer yes to all questions')
+parser.add_argument('--no', '-n', action='store_true', help='Answer no to all questions')
+parser.add_argument('--default', '-d', action='store_true', help='Take default answer on all questions')
 
 def main():
     """Main program.

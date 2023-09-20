@@ -9,15 +9,28 @@ CONFIG_USER = os.path.expanduser(os.path.join("~/.onlysnarf/conf", "config.conf"
 
 CONFIG = {}
 
+# copy/paste default config file to target folder
+def create_default_config(targetPath):
+  logger.debug(f"creating default config: {targetPath}")
+  if "config.conf" not in str(targetPath):
+    targetPath = os.path.join(targetPath, "config.conf")
+  shutil.copyfile(get_args_config_file(), targetPath)
+  logger.debug("created default config at: "+targetPath)
+  # TODO: update to return config file path at target path?
+  # return 
+
+def get_args_config_file():
+  return os.path.join(os.path.abspath(__file__), "../conf", "config-args.conf")
+
 def get_config_file():
   if os.environ.get('ENV') == "test":
-    # print(f"using test config: {CONFIG_TEST}")
+    # logger.debug(f"using test config: {CONFIG_TEST}")
     return CONFIG_TEST
   elif os.path.isfile(CONFIG_USER):
-    # print(f"using normal config: {CONFIG_USER}")
+    # logger.debug(f"using normal config: {CONFIG_USER}")
     return CONFIG_USER
   else:
-    # print(f"using local config: {CONFIG_DEFAULT}")
+    # logger.debug(f"using local config: {CONFIG_DEFAULT}")
     return CONFIG_DEFAULT
 
 def parse_config(config_path, parsed_config=None):
@@ -31,6 +44,19 @@ def parse_config(config_path, parsed_config=None):
       else:
         parsed_config[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
   return parsed_config  
+
+# search for a config file in or near the provided dir or filename
+def search_for_config(path):
+  onlyconfigs = []
+  if os.path.isdir(path):
+    onlyconfigs = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f == "config.conf"]
+  else:
+    path = Path(path)
+    path = path.parent.absolute()
+    onlyconfigs = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f == "config.conf"]
+  if len(onlyconfigs) > 0:
+    return onlyconfigs[0]
+  return None
 
 def set_config(args):
   try:
@@ -67,7 +93,15 @@ def set_config(args):
   # sys.exit(0)
   return parsed_config
 
-def get_args_config_file():
-  return os.path.join(os.path.abspath(__file__), "../conf", "config-args.conf")
-
-
+# update new default config file to appropriately match containing folder (somehow)
+def update_default_filepaths(filepaths, config):
+  files = []
+  for file in filepaths:
+    # logger.debug(file)
+    file = os.path.expanduser(file)
+    # logger.debug(file)
+    if not os.path.exists(file):
+      file = os.path.join(os.path.dirname(config), os.path.basename(file))
+      # logger.debug(file)
+      files.append(file)
+  return files
