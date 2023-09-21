@@ -10,14 +10,14 @@
 """
 
 from __future__ import print_function
-from pathlib import Path
+# from pathlib import Path
 
 import os
 import six
 import sys
 import json
 import time
-import shutil
+# import shutil
 import random
 import datetime
 import argparse
@@ -25,7 +25,7 @@ import contextlib
 import unicodedata
 import configparser
 
-from OnlySnarf.util.config import create_default_config, parse_config, search_for_config
+from OnlySnarf.util.config import get_config_file_at_path, parse_config, update_default_filepaths
 from OnlySnarf.classes.message import Message, Post
 
 rootdir = os.path.expanduser("~/.onlysnarf/uploads")
@@ -35,10 +35,11 @@ parser.add_argument('rootdir', nargs='?', default='~/.onlysnarf/uploads', help='
 parser.add_argument('--yes', '-y', action='store_true', help='Answer yes to all questions')
 parser.add_argument('--no', '-n', action='store_true', help='Answer no to all questions')
 parser.add_argument('--default', '-d', action='store_true', help='Take default answer on all questions')
+parser.add_argument('--config', '-c', action='store_true', help='Prefer available configuration files')
 parser.add_argument('--random', '-r', action='store_true', help='Upload at random')
 parser.add_argument('--oldest', '-o', action='store_true', help='Upload oldest file')
 parser.add_argument('--youngest', '-l', action='store_true', help='Upload youngest file')
-parser.add_argument('--name', action='store_true', help='Upload filename or folder by name')
+parser.add_argument('--name', help='Upload filename or folder by name')
 subparsers = parser.add_subparsers(help='Include a sub-command to run a corresponding action:', dest="action", required=True)
 parser_config = subparsers.add_parser('post', help='> scan for posts to upload')
 parser_config = subparsers.add_parser('message', help='> scan for a message to upload')
@@ -63,102 +64,87 @@ def main():
 	elif not os.path.isdir(rootdir):
 		print(rootdir, 'is not a folder on your filesystem')
 		sys.exit(1)
+	scan(args)
 
-	if args.action == "post":
-		scan_posts(args)
-	elif args.action == "message":
-		scan_messages(args)
+################################################################################################################################################
+################################################################################################################################################
+################################################################################################################################################
 
-# TODO: change to get_config_for_upload_path ?
-def get_config_for_upload(upload):
-	config = None
-	# check if config exists for dir / filename
-	# if the upload has a config file, use it
-	config = search_for_config(upload)
-	print(config)
-	if not config:
-		# else create a config file
-		create_default_config(upload)
-		config = search_for_config(upload)
-		print(config)
-	# load the config as args
-	parsed_config = parse_config(config)
-	print(parsed_config)
-
+def process_upload_config(upload_path, config_path):
+	parsed_config = {}
 	# ensure / replace file links in config file with absolute paths 
-	parsed_config.input = update_default_paths(parsed_config.input, config)
-	print(parsed_config)
-	
+	if config_path:
+		parsed_config = parse_config(config_path)
+	else:
+		parsed_config = get_config_file_at_path(upload_path)
+	parsed_config.input = update_default_filepaths(parsed_config.input, config_path if config_path else upload_path)
 	return parsed_config
 
-def get_file_or_folder_to_upload(uploads, options={'random': False,'oldest': False,'youngest': False,'name':False,'file':False,'folder':False}):
-	files = []
-	print(f"getting file or folder from upload options: {len(uploads)}")
+# scan /posts for anything
+def scan(args):
+	if args.config:
+		upload_options = scan_for_uploads(args.action, configs=True)
+		if len(upload_options) > 0:
+			config_path = get_file_or_folder_to_upload(upload_options, options=args)
+			return process_upload_config(None, config_path)
+		else:
+			print("Warning: unable to find any config files!")
+			return
+	upload_options = scan_for_uploads(args.action)
+	upload_path = get_file_or_folder_to_upload(upload_options, options=args)
+	if not upload_path: return
+	upload_config = process_upload_config(upload_path, None)
+	print("### FINAL CONFIG ###")
+	print(upload_config)
+	return print("### DEBUGGING STOP ###")
+	if args.action == "post":
+		Post.create_post(upload_config).send()
+	elif args.action == "message":
+		Message.create_message(upload_config).send()
+
+################################################################################################################################################
+################################################################################################################################################
+################################################################################################################################################
+
+
+
+def get_file_or_folder_to_upload(upload_options, options={'random': False,'oldest': False,'youngest': False,'name':False,'file':False,'folder':False}):
+	if len(upload_options) == 0:
+		print("Warning: no upload options to choose from!")
+		return None
+	print(f"getting file or folder from upload options: {len(upload_options)}")
 	if options.name:
-		for filepath in uploads:
+		for filepath in upload_options:
 			print(f"filepath: {filepath}")
 			if str(filepath) == str(options.name) or str(options.name) in str(filepath):
 				return filename
-
+		print("Warning: unable to find matching file or folder!")
+		return None
 	# don't bother trying to code the exclusivity much, just let younger override older
-	if options.oldest:
-		files.append(get_oldest_file_in_files(uploads))
-	if options.youngest:
-		files.append(get_youngest_file_in_files(uploads))
-
+	elif options.oldest:
+		return get_oldest_file_in_files(upload_options)
+	elif options.youngest:
+		return get_youngest_file_in_files(upload_options)
 	# return a random file from whichever files have been selected so far
-	if options.random:
-		return random.choice(files)
-
-	print("Warning: unable to find matching file or folder!")
-	return None
-
-
-
+	elif options.random:
+		return random.choice(upload_options)
+	for upload_option in upload_options:
+		if upload_option: return upload_option
+	# print("Warning: unable to find files for upload!")
+	# return None
 
 
-
-# what the fuck do i want the actual process to be again?
-
-# scan files / folders
-# if a config file is found, use that (contains file information in args)
-
-# if not, and getting random, return a random file or folder
-# if not random, get a file or folder (based on preference) and based on youngest or oldest
-
-
-
-
-
-# scan /posts for anything
-def scan_posts(args):
-
-
-	# TODO: i need to change this whole order of operations going on here
-	uploads = scan_for_uploads("posts")
-	upload = get_file_or_folder_to_upload(uploads, args)
-
-
-
-	config = get_config_for_upload(upload)
-	Post.create_post(config).send()
-
-# scan /messages for anything
-def scan_messages(args):
-	# copy from scan_posts
-	# Message.create_message(config).send()
-	pass
-
-# returns all "options" found which are either folders or files
-def scan_for_uploads(place="both"):
+# returns all "options" found which are either folders or files or specifically config files
+# configs = True to only return config files
+def scan_for_uploads(place="both", configs=False):
 	print(f"scanning for {place}...")
-	if place == "both":
-		upload_options = []
-		upload_options.extend(scan_for_uploads("posts"))
-		upload_options.extend(scan_for_uploads("messages"))
-		return upload_options
 	upload_options = []
+	if place == "both":
+		upload_options.extend(scan_for_uploads("post"))
+		upload_options.extend(scan_for_uploads("message"))
+		return upload_options
 	scanPath = os.path.join(rootdir, place)
+	print(scanPath)
 	for dn, dirs, files in os.walk(scanPath):
 		subfolder = dn[len(scanPath):].strip(os.path.sep)
 		upload_options.extend(dirs)
@@ -169,14 +155,15 @@ def scan_for_uploads(place="both"):
 			if not isinstance(name, six.text_type):
 				name = name.decode('utf-8')
 			nname = unicodedata.normalize('NFC', name)
+			if configs and name.endswith('.conf'):
+				upload_options.append(parse_config(fullname))
+				continue
 			if name.startswith('.'):
 				print('Skipping dot file:', name)
 			elif name.startswith('@') or name.endswith('~'):
 				print('Skipping temporary file:', name)
 			elif name.endswith('.pyc') or name.endswith('.pyo'):
 				print('Skipping generated file:', name)
-			elif name.endswith('.conf'):
-				print('Skipping config file:', name)
 			upload_options.append(fullname)
 
 		# Then choose which subdirectories to traverse.
@@ -211,6 +198,7 @@ def get_oldest_file_in_files(files):
 		if mtime_dt > oldest_date:
 			oldest_date = mtime_dt
 			oldest_file = file
+	print(f"oldest file: {datetime.datetime(*time.gmtime(os.path.getmtime(oldest_file))[:6])}")
 	return oldest_file	    
 
 def get_youngest_file_in_files(files):
@@ -224,6 +212,7 @@ def get_youngest_file_in_files(files):
 		if mtime_dt < youngest_date:
 			youngest_date = mtime_dt
 			youngest_file = file
+	print(f"youngest file: {datetime.datetime(*time.gmtime(os.path.getmtime(youngest_file))[:6])}")
 	return youngest_file
 
 ################################################################################################################################################
@@ -242,26 +231,6 @@ def scan_for_gallery():
 
 
 
-# # probably won't be used
-# def scan_for_configs():
-# 	configs = []
-# 	for dn, dirs, files in os.walk(rootdir):
-# 		subfolder = dn[len(rootdir):].strip(os.path.sep)
-# 		for file in files:
-# 			if file == "config.conf":
-# 				fullname = os.path.join(dn, file)
-# 				config_file = configparser.ConfigParser()
-# 				config_file.read(fullname)
-# 				config = {}
-# 				# relabels config for cleaner usage
-# 				for section in config_file.sections():
-# 				  for key in config_file[section]:
-# 					if section == "ARGS":
-# 					  config[key] = config_file[section][key]
-# 					  # print(key, config[key])
-# 					else:
-# 					  config[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
-# 					  # print(key, config[section.lower()+"_"+key.lower()])
-# 				print(config)
-# 				configs.append(config)
-# 	return configs
+
+if __name__ == '__main__':
+    main()

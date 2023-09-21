@@ -1,7 +1,11 @@
 
-import configparser
-import getpass
 import os
+import shutil
+import getpass
+import logging
+logger = logging.getLogger(__name__)
+import configparser
+from pathlib import Path
 
 CONFIG_DEFAULT = os.path.join(os.getcwd(), "OnlySnarf/conf", "config.conf")
 CONFIG_TEST = os.path.join(os.getcwd(), "OnlySnarf/conf", "test-config.conf")
@@ -11,28 +15,45 @@ CONFIG = {}
 
 # copy/paste default config file to target folder
 def create_default_config(targetPath):
-  logger.debug(f"creating default config: {targetPath}")
+  targetPath = Path(targetPath).parent.absolute()
+  print(targetPath)
+
+  print(f"creating default config: {targetPath}")
   if "config.conf" not in str(targetPath):
     targetPath = os.path.join(targetPath, "config.conf")
   shutil.copyfile(get_args_config_file(), targetPath)
-  logger.debug("created default config at: "+targetPath)
-  # TODO: update to return config file path at target path?
-  # return 
+  print("created default config at: "+targetPath)
 
 def get_args_config_file():
-  return os.path.join(os.path.abspath(__file__), "../conf", "config-args.conf")
+  return Path(os.path.abspath(__file__)).joinpath("../../conf/config-args.conf").resolve()
 
-def get_config_file():
+# TODO: change to get_config_for_upload_path ?
+# searched for a config file at the same path as provided
+def get_config_file_at_path(search_path):
+  # check if config exists for dir / filename
+  # if the upload has a config file, use it
+  config_path = search_for_config(search_path)
+  print(config_path)
+  if not config_path:
+    create_default_config(search_path)
+    config_path = search_path
+  # load the config as args
+  parsed_config = parse_config(config_path)
+  print(parsed_config)
+  return parsed_config
+
+def get_config_file_path():
   if os.environ.get('ENV') == "test":
-    # logger.debug(f"using test config: {CONFIG_TEST}")
+    # print(f"using test config: {CONFIG_TEST}")
     return CONFIG_TEST
   elif os.path.isfile(CONFIG_USER):
-    # logger.debug(f"using normal config: {CONFIG_USER}")
+    # print(f"using normal config: {CONFIG_USER}")
     return CONFIG_USER
   else:
-    # logger.debug(f"using local config: {CONFIG_DEFAULT}")
+    # print(f"using local config: {CONFIG_DEFAULT}")
     return CONFIG_DEFAULT
 
+# including a parsed_config object has that object overwritten by the newly parsed config
 def parse_config(config_path, parsed_config=None):
   if not parsed_config: parsed_config = {}
   config_file = configparser.ConfigParser()
@@ -43,6 +64,7 @@ def parse_config(config_path, parsed_config=None):
         parsed_config[key] = config_file[section][key]
       else:
         parsed_config[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
+  print(f"parsed config: {parse_config}")
   return parsed_config  
 
 # search for a config file in or near the provided dir or filename
@@ -63,7 +85,7 @@ def set_config(args):
     # load default values
     default_config = parse_config(CONFIG_DEFAULT)
     # load config from args or use user config, overwrite default values
-    parsed_config = parse_config(args.get("path_config", get_config_file()), parsed_config=default_config)
+    parsed_config = parse_config(args.get("path_config", get_config_file_path()), parsed_config=default_config)
     # overwrite with provided args
     for key, value in args.items():
       parsed_config[key] = value
@@ -94,14 +116,14 @@ def set_config(args):
   return parsed_config
 
 # update new default config file to appropriately match containing folder (somehow)
-def update_default_filepaths(filepaths, config):
+def update_default_filepaths(filepaths, config_path):
   files = []
   for file in filepaths:
-    # logger.debug(file)
+    # print(file)
     file = os.path.expanduser(file)
-    # logger.debug(file)
+    # print(file)
     if not os.path.exists(file):
-      file = os.path.join(os.path.dirname(config), os.path.basename(file))
-      # logger.debug(file)
+      file = os.path.join(os.path.dirname(config_path), os.path.basename(file))
+      # print(file)
       files.append(file)
   return files

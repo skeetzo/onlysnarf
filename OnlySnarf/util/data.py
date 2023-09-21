@@ -6,14 +6,14 @@ logger = logging.getLogger(__name__)
 from .config import CONFIG
 from . import defaults as DEFAULT
 
-USERS_PATH = CONFIG.get("path_users", DEFAULT.USERS_PATH)
+USERS_PATH = os.path.expanduser(CONFIG.get("path_users", DEFAULT.USERS_PATH))
 
 def reset_userlist():
     try:
         os.remove(USERS_PATH)
     except Exception as e:
         logger.debug(e)
-    with open(USERS_PATH, 'w') as f:
+    with open(USERS_PATH, 'w+') as f:
         json.dump({"users":[],"randomized_users":[]}, f)
 
 # TODO: this could be combined into write_users_local but for now i'm keeping it separate
