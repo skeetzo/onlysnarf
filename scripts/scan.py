@@ -10,7 +10,6 @@
 """
 
 from __future__ import print_function
-# from pathlib import Path
 
 import os
 import six
@@ -28,7 +27,6 @@ import configparser
 from OnlySnarf.util.config import get_config_file_at_path, parse_config, update_default_filepaths
 from OnlySnarf.classes.message import Message, Post
 
-rootdir = os.path.expanduser("~/.onlysnarf/uploads")
 parser = argparse.ArgumentParser(description='Scan ~/.onlysnarf/uploads for uploads')
 # parser.add_argument('folder', nargs='?', default='Uploads', help='Folder name in your Dropbox')
 parser.add_argument('rootdir', nargs='?', default='~/.onlysnarf/uploads', help='Local directory to upload from')
@@ -57,6 +55,7 @@ def main():
 		print('At most one of --yes, --no, --default is allowed')
 		sys.exit(2)
 	rootdir = os.path.expanduser(args.rootdir)
+	args["rootdir"] = rootdir
 	print('Local directory:', rootdir)
 	if not os.path.exists(rootdir):
 		print(rootdir, 'does not exist on your filesystem')
@@ -64,7 +63,7 @@ def main():
 	elif not os.path.isdir(rootdir):
 		print(rootdir, 'is not a folder on your filesystem')
 		sys.exit(1)
-	scan(args)
+	scan(vars(args))
 
 ################################################################################################################################################
 ################################################################################################################################################
@@ -77,33 +76,59 @@ def process_upload_config(upload_path, config_path):
 		parsed_config = parse_config(config_path)
 	else:
 		parsed_config = get_config_file_at_path(upload_path)
-	parsed_config.input = update_default_filepaths(parsed_config.input, config_path if config_path else upload_path)
+	parsed_config["input"] = update_default_filepaths(parsed_config.get("input", []), config_path if config_path else upload_path)
 	return parsed_config
 
 # scan /posts for anything
+
+# if configs is specified: only return config files
+# otherwise, searches for a file or folder AND then creates a config file at the target location
+
+# this works but doesn't really do what i probably want
+
+# i want it to prefer config files over everything else anyways, because a config file might contain info about the files that are in the same folder as it
+# so config files have highest priority no matter what
+
+# then, if no config files are found, i want to upload a random file in a folder or upload a random folder itself
+
+# the files that are in the main 'posts' or 'messages' folder are all meant to be uploaded by themselves (seemingly at random)
+# any folders that are in the main posts or messages folder are all meant to be uploaded as whole folders of content (galleries)
+
+# so scan everything from config files, if found one, great, if not, then either use a random file or folder
+
+
 def scan(args):
-	if args.config:
-		upload_options = scan_for_uploads(args.action, configs=True)
+	upload_config = {}
+	if args["config"]:
+		upload_options = scan_for_uploads(args["action"], configs=True, args=args)
 		if len(upload_options) > 0:
 			config_path = get_file_or_folder_to_upload(upload_options, options=args)
-			return process_upload_config(None, config_path)
+			upload_config = process_upload_config(None, config_path)
 		else:
 			print("Warning: unable to find any config files!")
 			return
-	upload_options = scan_for_uploads(args.action)
-	upload_path = get_file_or_folder_to_upload(upload_options, options=args)
-	if not upload_path: return
-	upload_config = process_upload_config(upload_path, None)
+	else:
+		upload_options = scan_for_uploads(args["action"], args=args)
+		upload_path = get_file_or_folder_to_upload(upload_options, options=args)
+		if not upload_path: return
+		upload_config = process_upload_config(upload_path, None)
 	print("### FINAL CONFIG ###")
 	print(upload_config)
+	return True
 	return print("### DEBUGGING STOP ###")
-	if args.action == "post":
+	if args["action"] == "post":
 		Post.create_post(upload_config).send()
-	elif args.action == "message":
+	elif args["action"] == "message":
 		Message.create_message(upload_config).send()
+	remove_uploaded(uploaded_files)
 
 ################################################################################################################################################
 ################################################################################################################################################
+
+def remove_uploaded(uploaded_files):
+	pass
+	# delete / remove uploaded files & config
+
 ################################################################################################################################################
 
 def get_file_or_folder_to_upload(upload_options, options={'random': False,'oldest': False,'youngest': False,'name':False,'file':False,'folder':False}):
@@ -111,20 +136,20 @@ def get_file_or_folder_to_upload(upload_options, options={'random': False,'oldes
 		print("Warning: no upload options to choose from!")
 		return None
 	print(f"getting file or folder from upload options: {len(upload_options)}")
-	if options.name:
+	if options["name"]:
 		for filepath in upload_options:
 			print(f"filepath: {filepath}")
-			if str(filepath) == str(options.name) or str(options.name) in str(filepath):
+			if str(filepath) == str(options["name"]) or str(options["name"]) in str(filepath):
 				return filename
 		print("Warning: unable to find matching file or folder!")
 		return None
 	# don't bother trying to code the exclusivity much, just let younger override older
-	elif options.oldest:
+	elif options["oldest"]:
 		return get_oldest_file_in_files(upload_options)
-	elif options.youngest:
+	elif options["youngest"]:
 		return get_youngest_file_in_files(upload_options)
 	# return a random file from whichever files have been selected so far
-	elif options.random:
+	elif options["random"]:
 		return random.choice(upload_options)
 	for upload_option in upload_options:
 		if upload_option: return upload_option
@@ -134,18 +159,18 @@ def get_file_or_folder_to_upload(upload_options, options={'random': False,'oldes
 
 # returns all "options" found which are either folders or files or specifically config files
 # configs = True to only return config files
-def scan_for_uploads(place="both", configs=False):
+def scan_for_uploads(place="both", configs=False, args={}):
 	print(f"scanning for {place}...")
 	upload_options = []
 	if place == "both":
-		upload_options.extend(scan_for_uploads("post"))
-		upload_options.extend(scan_for_uploads("message"))
+		upload_options.extend(scan_for_uploads("post"), args=args)
+		upload_options.extend(scan_for_uploads("message"), args=args)
 		return upload_options
-	scanPath = os.path.join(rootdir, place)
+	scanPath = os.path.join(args["rootdir"], place)
 	print(scanPath)
 	for dn, dirs, files in os.walk(scanPath):
 		subfolder = dn[len(scanPath):].strip(os.path.sep)
-		upload_options.extend(dirs)
+		# upload_options.extend(dirs)
 		print('Descending into', subfolder, '...')
 		# First do all the files.
 		for name in files:
@@ -153,15 +178,15 @@ def scan_for_uploads(place="both", configs=False):
 			if not isinstance(name, six.text_type):
 				name = name.decode('utf-8')
 			nname = unicodedata.normalize('NFC', name)
-			if configs and name.endswith('.conf'):
-				upload_options.append(parse_config(fullname))
-				continue
+			if name.endswith('.conf'):
+				upload_options.append(fullname)
 			if name.startswith('.'):
 				print('Skipping dot file:', name)
 			elif name.startswith('@') or name.endswith('~'):
 				print('Skipping temporary file:', name)
 			elif name.endswith('.pyc') or name.endswith('.pyo'):
 				print('Skipping generated file:', name)
+			if configs: continue
 			upload_options.append(fullname)
 
 		# Then choose which subdirectories to traverse.
@@ -214,6 +239,51 @@ def get_youngest_file_in_files(files):
 	return youngest_file
 
 ################################################################################################################################################
+
+def yesno(message, default, args):
+    """Handy helper function to ask a yes/no question.
+
+    Command line arguments --yes or --no force the answer;
+    --default to force the default answer.
+
+    Otherwise a blank line returns the default, and answering
+    y/yes or n/no returns True or False.
+
+    Retry on unrecognized answer.
+
+    Special answers:
+    - q or quit exits the program
+    - p or pdb invokes the debugger
+    """
+    if args["default"]:
+        print(message + '? [auto]', 'Y' if default else 'N')
+        return default
+    if args["yes"]:
+        print(message + '? [auto] YES')
+        return True
+    if args["no"]:
+        print(message + '? [auto] NO')
+        return False
+    if default:
+        message += '? [Y/n] '
+    else:
+        message += '? [N/y] '
+    while True:
+        answer = input(message).strip().lower()
+        if not answer:
+            return default
+        if answer in ('y', 'yes'):
+            return True
+        if answer in ('n', 'no'):
+            return False
+        if answer in ('q', 'quit'):
+            print('Exit')
+            raise SystemExit(0)
+        if answer in ('p', 'pdb'):
+            import pdb
+            pdb.set_trace()
+        print('Please answer YES or NO.')
+
 ################################################################################################################################################
 
 # TODO: determine usage potential / necessity

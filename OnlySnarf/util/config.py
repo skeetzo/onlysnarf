@@ -16,13 +16,11 @@ CONFIG = {}
 # copy/paste default config file to target folder
 def create_default_config(targetPath):
   targetPath = Path(targetPath).parent.absolute()
-  print(targetPath)
-
-  print(f"creating default config: {targetPath}")
+  logger.debug(f"creating default config: {targetPath}")
   if "config.conf" not in str(targetPath):
     targetPath = os.path.join(targetPath, "config.conf")
   shutil.copyfile(get_args_config_file(), targetPath)
-  print("created default config at: "+targetPath)
+  logger.debug("created default config at: "+targetPath)
 
 def get_args_config_file():
   return Path(os.path.abspath(__file__)).joinpath("../../conf/config-args.conf").resolve()
@@ -30,45 +28,52 @@ def get_args_config_file():
 # TODO: change to get_config_for_upload_path ?
 # searched for a config file at the same path as provided
 def get_config_file_at_path(search_path):
+  logger.debug(f"getting config file at path: {search_path}")
   # check if config exists for dir / filename
   # if the upload has a config file, use it
   config_path = search_for_config(search_path)
-  print(config_path)
   if not config_path:
     create_default_config(search_path)
     config_path = search_path
+    # logger.debug(config_path)
   # load the config as args
   parsed_config = parse_config(config_path)
-  print(parsed_config)
+  logger.debug(f"found config: {parsed_config}")
   return parsed_config
 
 def get_config_file_path():
   if os.environ.get('ENV') == "test":
-    # print(f"using test config: {CONFIG_TEST}")
+    # logger.debug(f"using test config: {CONFIG_TEST}")
     return CONFIG_TEST
   elif os.path.isfile(CONFIG_USER):
-    # print(f"using normal config: {CONFIG_USER}")
+    # logger.debug(f"using normal config: {CONFIG_USER}")
     return CONFIG_USER
   else:
-    # print(f"using local config: {CONFIG_DEFAULT}")
+    # logger.debug(f"using local config: {CONFIG_DEFAULT}")
     return CONFIG_DEFAULT
 
 # including a parsed_config object has that object overwritten by the newly parsed config
 def parse_config(config_path, parsed_config=None):
   if not parsed_config: parsed_config = {}
-  config_file = configparser.ConfigParser()
-  config_file.read(config_path)
-  for section in config_file.sections():
-    for key in config_file[section]:
-      if section == "ARGS":
-        parsed_config[key] = config_file[section][key]
-      else:
-        parsed_config[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
-  print(f"parsed config: {parse_config}")
+  # logger.debug(config_path)
+  try:
+    config_file = configparser.ConfigParser()
+    config_file.read(config_path)
+    for section in config_file.sections():
+      for key in config_file[section]:
+        if section == "ARGS":
+          parsed_config[key] = config_file[section][key]
+        else:
+          parsed_config[section.lower()+"_"+key.lower()] = config_file[section][key].strip("\"")
+    logger.debug(f"parsed config: {parsed_config}")
+  except Exception as e:
+    # don't know why this exception is caused by scripts/scan, doesn't seem to affect runtime
+    logger.debug(e)
   return parsed_config  
 
 # search for a config file in or near the provided dir or filename
 def search_for_config(path):
+  logger.debug(f"searching for config at path: {path}")
   onlyconfigs = []
   if os.path.isdir(path):
     onlyconfigs = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f == "config.conf"]
@@ -77,6 +82,7 @@ def search_for_config(path):
     path = path.parent.absolute()
     onlyconfigs = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f == "config.conf"]
   if len(onlyconfigs) > 0:
+    logger.debug(f"found config at path: {onlyconfigs[0]}")
     return onlyconfigs[0]
   return None
 
@@ -92,26 +98,26 @@ def set_config(args):
     # turn strings of booleans into actual booleans, fix lists
     for key, value in parsed_config.items():
       if "true" in str(value).lower():
-        # print("FIXING TRUE")
+        # logger.debug("FIXING TRUE")
         parsed_config[key] = True
       elif "false" in str(value).lower():
-        # print("FIXING FALSE")
+        # logger.debug("FIXING FALSE")
         parsed_config[key] = False
       elif value == '[]':
-        # print("FIXING EMPTY LIST")
+        # logger.debug("FIXING EMPTY LIST")
         parsed_config[key] = []
       elif value == 'None':
-        # print("FIXING NONE")
+        # logger.debug("FIXING NONE")
         parsed_config[key] = None
   except Exception as e:
-    print(e)
+    logger.debug(e)
   ###############
   global CONFIG
   CONFIG = parsed_config
   ###############
   ## Debugging ##
   # import sys
-  # print(parsed_config)
+  # logger.debug(parsed_config)
   # sys.exit(0)
   return parsed_config
 
@@ -119,11 +125,11 @@ def set_config(args):
 def update_default_filepaths(filepaths, config_path):
   files = []
   for file in filepaths:
-    # print(file)
+    # logger.debug(file)
     file = os.path.expanduser(file)
-    # print(file)
+    # logger.debug(file)
     if not os.path.exists(file):
       file = os.path.join(os.path.dirname(config_path), os.path.basename(file))
-      # print(file)
+      # logger.debug(file)
       files.append(file)
   return files

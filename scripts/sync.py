@@ -83,9 +83,9 @@ def main():
         )
 
     if args.action == "download":
-        sync_downloads(args, dbx)
+        sync_downloads(vars(args), dbx)
     elif args.action == "upload":
-        sync_uploads(args, dbx)
+        sync_uploads(vars(args), dbx)
 
 ########################################################################################################################
 ########################################################################################################################
