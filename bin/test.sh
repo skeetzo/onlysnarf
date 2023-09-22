@@ -7,6 +7,11 @@ python -m pip install -e .[dev]
 
 snarf -debug -vvv post -text "balls"
 
+# for live tests:
+snarf post -text ""
+snarf message -text ""
+
+
 # formats:
 python -m unittest $TEST_PATH
 pytest $TEST_PATH

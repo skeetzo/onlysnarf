@@ -106,8 +106,6 @@ def scan(args):
 ################################################################################################################################################
 ################################################################################################################################################
 
-
-
 def get_file_or_folder_to_upload(upload_options, options={'random': False,'oldest': False,'youngest': False,'name':False,'file':False,'folder':False}):
 	if len(upload_options) == 0:
 		print("Warning: no upload options to choose from!")
@@ -130,9 +128,9 @@ def get_file_or_folder_to_upload(upload_options, options={'random': False,'oldes
 		return random.choice(upload_options)
 	for upload_option in upload_options:
 		if upload_option: return upload_option
-	# print("Warning: unable to find files for upload!")
-	# return None
-
+	# this should never happen
+	print("Error: failed to find files for upload!")
+	return None
 
 # returns all "options" found which are either folders or files or specifically config files
 # configs = True to only return config files
@@ -218,6 +216,7 @@ def get_youngest_file_in_files(files):
 ################################################################################################################################################
 ################################################################################################################################################
 
+# TODO: determine usage potential / necessity
 
 # scan for an image file
 def scan_for_image():
@@ -228,9 +227,6 @@ def scan_for_video():
 # scan for a folder with multiple images in it
 def scan_for_gallery():
 	pass
-
-
-
 
 if __name__ == '__main__':
     main()

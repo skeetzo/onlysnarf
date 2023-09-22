@@ -3,7 +3,7 @@
 <p align="center">Please refer to the <a href="public/docs/menu.md">Menu</a> for help with the available arguments and config settings.</p> 
 
 ## Description
-OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans by interacting with the site via web scraping. It does not interact with the API whatsoever and barely contains one of its own due to its poor memory performance while on the battlefield with Allem Hoes. OnlySnarf carries no weapons, but it has been known to use its tail, teeth and claws when improperly configured.
+OnlySnarf is a python based automation tool to assist with uploading content to OnlyFans by interacting with the site purely via web scraping. OnlySnarf carries no weapons, but it has been known to use its tail, teeth and claws when improperly configured.
 
 Here are some fuzzy debugging previews of how it looks when everything works:
 - [Discount](//ipfs.io/ipfs/QmboqfpCeAAbbhqGhPQ8cCscqm7CNH4mxTPR42g8Cg7iLW?filename=discount.gif)
@@ -42,13 +42,13 @@ When no "--username" argument is passed at runtime or in the config file then th
 ## API
 The api server is super basic and as such runs with the Flask development server behind the standard port 5000. Be sure to remember to open this port when attempting to make requests and don't spam your own server. The api fulfills a niche role built by request and allows OnlySnarf to passively wait to receive requests from the internet with the necessary data to post or message appropriately.
 
-Make POST requests with the same basic message & post data to: /post   &   /message
+Make POST requests with the same basic discount, message, or post data to: /discount   or   /message   or   /post
 
 ## Menu
-The `snarf menu` command has been semi-restored and requires further updates to return to the same pointless iteration of glory.
+The `snarf menu` command has been semi-restored and still requires further updates to return to the same pointless iteration of glory.
 
 ## Dependencies
-Selenium's webdriver manager should install everything it needs automatically. If left unspecified the default browser argument is "auto" which will cylce throuch each web driver available and attempt to spawn a working browser. If you are using a Raspberry Pi 4, be sure to run `sudo apt-get install chromium-chromedriver` on your device to be able to launch chrome. The only working browsers for me have been chrome and firefox and so the others are unlikely to work without extra tinkering.
+Selenium's webdriver manager should install everything it needs automatically. If left unspecified the default browser argument is "auto" which will cylce throuch each web driver available and attempt to spawn a working browser. If you are using a Raspberry Pi 4, be sure to run `sudo apt-get install chromium-chromedriver` on your device to be able to launch chrome. The only working browsers for me have been chrome and firefox and so the others are unlikely to work without extra tinkering by yourself.
 
 ## Platforms
 Code versions:
@@ -74,7 +74,7 @@ More in code commenting / documentation will come later.
 
 ## Tests
 
-The test environment uses the config file found at:  [OnlySnarf/conf/test-config.conf](/OnlySnarf/conf/test-config.conf) 
+The test environment uses the config file found at: [OnlySnarf/conf/test-config.conf](/OnlySnarf/conf/test-config.conf) 
 
 Basic unittesting behavior organized by classes:
 - `python -m unittest tests/classes/test_discount.py`

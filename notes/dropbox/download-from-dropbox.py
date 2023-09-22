@@ -2,10 +2,14 @@
 
 # https://github.com/dropbox/dropbox-sdk-python/blob/main/example/updown.py
 
-"""Download the contents of your OnlySnarf Downloads folder to local uploads folders.
+"""Sync files with Dropbox.
 
 /OnlySnarf/post         -->     ~/.onlysnarf/uploads/post
 /OnlySnarf/message      -->     ~/.onlysnarf/uploads/message
+
+~/.onlysnarf/uploads/post       -->     /OnlySnarf/Uploads/post
+~/.onlysnarf/uploads/message    -->     /OnlySnarf/Uploads/message
+
 
 """
 

@@ -5,10 +5,32 @@ logger = logging.getLogger(__name__)
 from flask import Flask, request
 
 from .driver import close_browser
+from ..classes.discount import Discount
 from ..classes.message import Message, Post
 
 def create_app():
     app = Flask(__name__)
+
+    @app.route('/discount', methods=['POST'])
+    def discount():
+        try:
+            logger.debug("received discount request:")
+            args = json.loads(request.data)
+            logger.debug(args)
+            discount_object = {
+                "amount" : args.get("amount", 0),
+                "months" : args.get("months", 0),
+                "username" : args.get("username", "")
+            }
+            if not app.debug:
+                Discount.create_discount(discount_object).apply()
+                # keep open when done: default false
+                if not args.get("keep", False):
+                    close_browser()
+        except Exception as e:
+            logger.debug(e)
+        finally:
+            return "", 200
 
     @app.route('/message', methods=['POST'])
     def message():

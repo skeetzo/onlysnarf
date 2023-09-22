@@ -691,7 +691,7 @@
   **4.4.16 : 7/5/2023**
   - update readme and help&menu docs / added personal touchups
   - fixed get random user for discount test 
-**4.5.0 : 7/11/2023**
+  **4.5.0 : 7/11/2023**
   - added wget functionality to input for when a url is provided
   - cleaned up bin/test scripts
   - added basic api setup
@@ -727,7 +727,7 @@
   - moved api & menu to cli
   - updates to config script
   - tested new config script
-  **4.6.0,1 : 8/7/2023**
+**4.6.0,1 : 8/7/2023**
   - minor version bump for working api & cli changes
   **4.6.2 : 8/12/2023**
   - added watchdogger.py
@@ -844,67 +844,78 @@
   **9/18/2023**
   - continued testing remote webserver
   - finished refactoring webdriver tests into relying only on webdriver components
-**4.6.15: 9/19/2023**
-- tested newly refactored webdriver test components
-- updates to test_onlyfans and test_auth format to properly check cookies
-- checked / somewhat tested reconnect selenium functionality
-- RAN ALL TESTS AGAIN until successful
-- and continued refactoring class tests into relying only on class components (all tests successful)
-**4.6.16 : 9/20/2023**
-- updated 'snarf api' if necessary and tested
-- updated 'snarf config' if necessary and tested
-- updated 'snarf menu' if necessary and tested (still requires updates)
-- finished testing 'snarf config'
-- tested user messaging processes: all fans, favorite, renew, bookmarks, random
-- fixed clear_text bug a while ago?
-- (probably) fixed how tabs open and scroll and then the process opens another tab to find the same elements and scroll again ala: find users then discount user
-- (probably) fixed driver.firefox: DeprecationWarning: service_log_path has been deprecated, please pass in a Service object
-- changelog cleanup
-- minor cleanup and updates to scan and dropbox scripts
-- skeleton test script for scan
-- add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64
-- updated readme with new commands
-- updates to readme in regards to webdriver changes
+  **4.6.15: 9/19/2023**
+  - tested newly refactored webdriver test components
+  - updates to test_onlyfans and test_auth format to properly check cookies
+  - checked / somewhat tested reconnect selenium functionality
+  - RAN ALL TESTS AGAIN until successful
+  - and continued refactoring class tests into relying only on class components (all tests successful)
+  - added tests for newly separated driver files / functions
+  **4.6.16 : 9/20/2023**
+  - updated 'snarf api' if necessary and tested
+  - updated 'snarf config' if necessary and tested
+  - updated 'snarf menu' if necessary and tested (still requires updates)
+  - finished testing 'snarf config'
+  - tested user messaging processes: all fans, favorite, renew, bookmarks, random
+  - fixed clear_text bug a while ago?
+  - (probably) fixed how tabs open and scroll and then the process opens another tab to find the same elements and scroll again ala: find users then discount user
+  - (probably) fixed driver.firefox: DeprecationWarning: service_log_path has been deprecated, please pass in a Service object
+  - changelog cleanup
+  - minor cleanup and updates to scan and dropbox scripts
+  - skeleton test script for scan
+  - add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64
+  - updated readme with new commands
+  - updates to readme in regards to webdriver changes
+**4.6.17 : 9/22/2023**
+- added discount to api
+- preparing tests for scan & dropbox
+- added test for discount via api
+- combined dropbox scripts into one
+- finished writing test scripts for sync / dropbox
 
 ------------------------------------------------------------------------------------
 
-## TODO
-
-- write test scripts for scan & uploading to dropbox
-- refactor specific class names into shared variables like: new_post_text_input --> message_or_post_textarea
-
-(cleanup)
-
-(finish)
 - finish scan.py
-- finish implementing message recent calendar selection
 
+# TODO
+
+(prepare new minor version bump to 4.7.0)
+- LIVE TESTING --> release new version on pypi
+- update minor version w/ successful live testing
+
+(finish in patch versions)
 - finish debugging reconnect
 - finish testing remote webserver; add/update tests for remote webserver
-
-- update minor version w/ successful live testing
-- LIVE TESTING --> release new version on pypi
+- finish implementing message recent calendar selection
 
 ------------------------------------------------------------------------------------
 
--> OnlyFans
+## OnlyFans Behavior
+(major)
+- add smart idea for getting statement information
+
+(minor)
 - add quiz & price target interactions (missing onlyfans buttons)
 - update adding uploads to being able to set previews to messages
-- add process to clear upload/download space
+
+(patch)
 - add cli args for config to autoconfigure more easily
-- add smart idea for getting statement information
 - add functionality that follows profiles that are free for a month
 - add message filters? maybe by request?
+- (re)add process to clear upload/download space?
 (quality of life)
 - update schedule, date, and time args to accept strings aka "1 day" or "1 day 2 hours"
 - add min/max to missing args & validators
 - update time to accept strings that modify to add to current time aka "+2" or "2 hours" adds 2 hours to the current time
+- refactor specific class names into shared variables like: new_post_text_input --> message_or_post_textarea
 
--> OnlyFans: Promos (review usability and code first)
+## OnlyFans: Promos
+(minor)
 - clean up / fix & test
 - re-enable / add promo subcommands and config variables
 
--> OnlyFans: Profile (review usability and code first)
+## OnlyFans: Profile
+(major)
 - finish updating profile class & menu
 - new - setup - Twitter -> profile, banner; Price and Settings
 - new - advertise
@@ -915,30 +926,31 @@
 - re-enable / add profile subcommands and config variables
 
 (once everything else in app works again)
-- run new auth tests w/ appropriately connected accounts
--> Twitter
-- check auth via Twitter
+### Twitter
+(minor)
+- add checks for previously existing tweets
+- keep track of tweets (somehow)
+(patch)
+- run new auth tests w/ appropriately connected Twitter account
 - actually test if tweeting behavior works after being enabled
--- add checks for previously existing tweets
--- keep track of tweets (somehow)
 
--> Tests
-- test scan.py for final touches
-- test dropbox scripts on rpi
-- test upload script on android
-- re-add stuff for testing on multiple platforms ala mac ;) 
---
-- add tests for newly separated driver files / functions
-- add tests for additional config variables such as browser and image/video options, default limits
-- finish adding tests for individual message entry parts, individual post entry parts
-- add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi; readd references to remote in config files and such
-
--> CLI Menu
-(probably never)
+### CLI Menu
+(minor)
 - finish updating menu functionality
 - finish updating menu settings
 - re-add menu system & re-enable menu command
 - fix any new cli menu errors made while updating major processes
+
+## Tests
+- test scan.py for final touches
+- test dropbox scripts on rpi
+- test upload script on android
+- re-add stuff for testing on multiple platforms ala mac ;)
+- update how sync script checks dropbox for uploads
+--
+- add tests for additional config variables such as browser and image/video options, default limits
+- finish adding tests for individual message entry parts, individual post entry parts
+- add and finish tests for remote browser testing; requires remote server setup for testing? or test on same device or the rpi; readd references to remote in config files and such
 
 ## Fix / Debug
 
