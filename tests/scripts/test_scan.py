@@ -36,25 +36,26 @@ class TestSelenium_Reconnect(unittest.TestCase):
         pass
 
     def test_scan(self):
-        # use a mock directory
-        # create and use mock files in the mock directory
-
         assert scan(self.args), "unable to scan"
+
+    def test_scan_configs(self):
+        self.args["config"] = True
+        assert scan(self.args), "unable to scan configs"
 
     # @unittest.skip("todo")
     # def test_get_file_or_folder_to_upload(self):
-    #     # figure out how to mock each search setting: {'random': False,'oldest': False,'youngest': False,'name':False,'file':False,'folder':False}
-    #     pass
+        # figure out how to mock each search setting: {'random': False,'oldest': False,'youngest': False,'name':False,'file':False,'folder':False}
+        # pass
 
-    # @unittest.skip("todo")
-    # def test_get_oldest_file_in_files(self):
-    #     # use the mock directory
-    #     assert get_oldest_file_in_files(mock_files), "unable to get oldest file"
+    @unittest.skip("todo")
+    def test_get_oldest_file_in_files(self):
+        # use the mock directory
+        assert get_oldest_file_in_files(mock_files), "unable to get oldest file"
 
-    # @unittest.skip("todo")
-    # def test_get_youngest_file_in_files(self):
-    #     # use the mock directory
-    #     assert get_youngest_file_in_files(mock_files), "unable to get youngest file"
+    @unittest.skip("todo")
+    def test_get_youngest_file_in_files(self):
+        # use the mock directory
+        assert get_youngest_file_in_files(mock_files), "unable to get youngest file"
 
 ############################################################################################
 

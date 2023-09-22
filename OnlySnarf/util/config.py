@@ -27,16 +27,20 @@ def get_args_config_file():
 
 # TODO: change to get_config_for_upload_path ?
 # searched for a config file at the same path as provided
-def get_config_file_at_path(search_path):
-  logger.debug(f"getting config file at path: {search_path}")
+def get_config_file_for_path(search_path, create=False):
+  logger.debug(f"getting config file for path{' (creating if missing)' if create else ''}: {search_path}")
   # check if config exists for dir / filename
   # if the upload has a config file, use it
   config_path = search_for_config(search_path)
-  if not config_path:
+  if not config_path and create:
     create_default_config(search_path)
     config_path = search_path
-    # logger.debug(config_path)
+  elif not config_path:
+    logger.warning("no config found at path!")
+    return None
+  # logger.debug(config_path)
   # load the config as args
+
   parsed_config = parse_config(config_path)
   logger.debug(f"found config: {parsed_config}")
   return parsed_config
@@ -81,6 +85,8 @@ def search_for_config(path):
     path = Path(path)
     path = path.parent.absolute()
     onlyconfigs = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f == "config.conf"]
+  if len(onlyconfigs) > 1:
+    logger.warning("found multiple config files!")
   if len(onlyconfigs) > 0:
     logger.debug(f"found config at path: {onlyconfigs[0]}")
     return onlyconfigs[0]
