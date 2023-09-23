@@ -7,7 +7,7 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import close_browser, login as get_browser_and_login
+from OnlySnarf.lib.driver import login as get_browser_and_login
 from OnlySnarf.lib.webdriver.message import message as WEBDRIVER_message
 from OnlySnarf.lib.webdriver.users import get_random_fan_username as WEBDRIVER_get_random_fan_username
 from OnlySnarf.util import defaults as DEFAULT
@@ -52,7 +52,6 @@ class TestWebdriver_Message(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         configure_logs_for_module_tests(flush=True)
-        # close_browser()
         reset_random_users()
 
     def test_message(self):

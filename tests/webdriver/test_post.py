@@ -7,7 +7,7 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import close_browser, login as get_browser_and_login
+from OnlySnarf.lib.driver import login as get_browser_and_login
 from OnlySnarf.lib.webdriver.post import post as WEBDRIVER_post
 from OnlySnarf.util import defaults as DEFAULT
 
@@ -37,7 +37,6 @@ class TestWebdriver_Post(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         configure_logs_for_module_tests(flush=True)
-        # close_browser()
 
     def test_post(self):
         assert WEBDRIVER_post(self.browser, self.post_object), "unable to post"

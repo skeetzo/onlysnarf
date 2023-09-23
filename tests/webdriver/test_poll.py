@@ -8,7 +8,7 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import close_browser, login as get_browser_and_login
+from OnlySnarf.lib.driver import login as get_browser_and_login
 from OnlySnarf.lib.webdriver.poll import poll as WEBDRIVER_poll
 from OnlySnarf.util import defaults as DEFAULT
 
@@ -31,7 +31,6 @@ class TestWebdriver_Poll(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         configure_logs_for_module_tests(flush=True)
-        # close_browser()
 
     def test_poll(self):
         assert WEBDRIVER_poll(self.browser, self.poll_object), "unable to post poll"
