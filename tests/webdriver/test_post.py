@@ -37,7 +37,7 @@ class TestWebdriver_Post(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         configure_logs_for_module_tests(flush=True)
-        close_browser()
+        # close_browser()
 
     def test_post(self):
         assert WEBDRIVER_post(self.browser, self.post_object), "unable to post"

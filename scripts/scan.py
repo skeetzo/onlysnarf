@@ -26,6 +26,7 @@ import configparser
 
 from OnlySnarf.util.config import get_config_file_for_path, parse_config, update_default_filepaths
 from OnlySnarf.classes.message import Message, Post
+from OnlySnarf.classes.file import File
 
 parser = argparse.ArgumentParser(description='Scan ~/.onlysnarf/uploads for uploads')
 # parser.add_argument('folder', nargs='?', default='Uploads', help='Folder name in your Dropbox')
@@ -41,6 +42,7 @@ parser.add_argument('--name', help='Upload filename or folder by name')
 subparsers = parser.add_subparsers(help='Include a sub-command to run a corresponding action:', dest="action", required=True)
 parser_config = subparsers.add_parser('post', help='> scan for posts to upload')
 parser_config = subparsers.add_parser('message', help='> scan for a message to upload')
+parser_config = subparsers.add_parser('test', help='> test processes')
 
 def main():
 	"""Main program.
@@ -55,7 +57,7 @@ def main():
 		print('At most one of --yes, --no, --default is allowed')
 		sys.exit(2)
 	rootdir = os.path.expanduser(args.rootdir)
-	args["rootdir"] = rootdir
+	args.rootdir = rootdir
 	print('Local directory:', rootdir)
 	if not os.path.exists(rootdir):
 		print(rootdir, 'does not exist on your filesystem')
@@ -96,9 +98,7 @@ def main():
 
 # so scan everything from config files, if found one, great, if not, then either use a random file or folder
 
-
-def scan(args):
-
+def get_upload_options(args):
 	upload_path = None
 	upload_config = {}
 	if args["config"]:
@@ -106,47 +106,68 @@ def scan(args):
 		if len(upload_options) > 0:
 			upload_path = get_file_or_folder_to_upload(upload_options, options=args)
 			upload_config = parse_config(upload_path)
-			upload_config["input"] = update_default_filepaths(upload_config.get("input", []), upload_path)
 		else:
 			print("Warning: unable to find any config files!")
-			return
+			return None, None
 	else:
 		upload_options = scan_for_uploads(args["action"], args=args)
 		upload_path = get_file_or_folder_to_upload(upload_options, options=args)
 
-	if not upload_path and not upload_config: return
 
 	print(f"config: {upload_config}")
 	print(f"path: {upload_path}")
+	return upload_config, upload_path
 
+def scan(args):
+	upload_config, upload_path = get_upload_options(args)
+	if not upload_path and not upload_config:
+		print("### NO UPLOADS FOUND ###")
+		return
+	upload_object = process_upload_object(upload_config, upload_path)
 
-	# TODO: finish the switch stuff below
-
-	# if no config was found and a path was, check if theres a config in that same area
-	if not upload_config:
-		upload_config = get_config_file_for_path(upload_path)
-
-	if not upload_config:
-		upload_config = # process config from path of file
-
-	upload_object = {}
-
-	return print("### DEBUGGING STOP ###")
+	print("### DEBUGGING STOP ###")
+	# return True
 
 	if args["action"] == "post":
 		Post.create_post(upload_object).send()
 	elif args["action"] == "message":
 		Message.create_message(upload_object).send()
+	else:
+		print("Skipping upload while testing!")
 
-	remove_uploaded(uploaded_files)
+	remove_uploaded(upload_object, True if args["action"] == "test" else False)
+	return True
+
+def process_upload_object(upload_config, upload_path):
+	upload_object = upload_config or {}
+	# if no config was found and a path was, check if theres a config in that same area
+	if not upload_config and upload_path:
+		upload_object = get_config_file_for_path(upload_path)
+		if not upload_object: upload_object = {}
+	if not upload_object and upload_path:
+		print("using filename as text...")
+		file = File(upload_path)
+		upload_object["text"] = file.get_title(with_ext=False)
+		upload_object["input"] = [ upload_path ]
+	files = upload_object.get("input", [])
+	if not isinstance(files, list):
+		files = files.split(",")
+	upload_object["input"] = update_default_filepaths(files, upload_path)
+	print("Final upload object:")
+	print(upload_object)
+	return upload_object
 
 ################################################################################################################################################
 ################################################################################################################################################
 
 # delete / remove uploaded files & config
-def remove_uploaded(uploaded_files):
-	# TODO: finish me
-	print("TODO: FINISH ME")
+def remove_uploaded(upload_object, debug=False):
+	for file in upload_object["input"]:
+		if debug:
+			print(f"skipping file remove: {file}")
+		else:
+			print(f"removing uploaded file: {file}")
+			os.remove(file)
 
 ################################################################################################################################################
 
@@ -193,32 +214,22 @@ def scan_for_uploads(place="both", configs=False, args={}):
 		# upload_options.extend(dirs)
 		print('Descending into', subfolder, '...')
 
-		folder_options = []
-
 		# First do all the files.
 		for name in files:
 			fullname = os.path.join(dn, name)
 			if not isinstance(name, six.text_type):
 				name = name.decode('utf-8')
 			nname = unicodedata.normalize('NFC', name)
-			# if name.endswith('.conf'):
-				# upload_options.append(fullname)
+			if configs and name.endswith('.conf'):
+				upload_options.append(fullname)
 			if name.startswith('.'):
 				print('Skipping dot file:', name)
 			elif name.startswith('@') or name.endswith('~'):
 				print('Skipping temporary file:', name)
 			elif name.endswith('.pyc') or name.endswith('.pyo'):
 				print('Skipping generated file:', name)
-			# if configs: continue
+			if configs: continue
 			upload_options.append(fullname)
-
-			folder_options.append(fullname)
-
-		for name in folder_options:
-			if name.endswith('.conf'):
-				config_found = True
-
-
 
 		# Then choose which subdirectories to traverse.
 		keep = []
@@ -248,8 +259,7 @@ def get_oldest_file_in_files(files):
 	for file in files:
 		mtime = os.path.getmtime(file)
 		mtime_dt = datetime.datetime(*time.gmtime(mtime)[:6])
-		print(f"{file} : {mtime_dt}")
-		if mtime_dt > oldest_date:
+		if mtime > oldest_date:
 			oldest_date = mtime_dt
 			oldest_file = file
 	print(f"oldest file: {datetime.datetime(*time.gmtime(os.path.getmtime(oldest_file))[:6])}")
@@ -262,8 +272,7 @@ def get_youngest_file_in_files(files):
 	for file in files:
 		mtime = os.path.getmtime(file)
 		mtime_dt = datetime.datetime(*time.gmtime(mtime)[:6])
-		print(f"{file} : {mtime_dt}")
-		if mtime_dt < youngest_date:
+		if mtime < youngest_date:
 			youngest_date = mtime_dt
 			youngest_file = file
 	print(f"youngest file: {datetime.datetime(*time.gmtime(os.path.getmtime(youngest_file))[:6])}")

@@ -31,7 +31,7 @@ class TestWebdriver_Poll(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         configure_logs_for_module_tests(flush=True)
-        close_browser()
+        # close_browser()
 
     def test_poll(self):
         assert WEBDRIVER_poll(self.browser, self.poll_object), "unable to post poll"

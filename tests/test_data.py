@@ -11,6 +11,7 @@ configure_logging(True, True)
 
 from OnlySnarf.classes.user import User
 from OnlySnarf.util.data import add_to_randomized_users, read_users_local, write_users_local, reset_userlist
+from OnlySnarf.util import defaults as DEFAULT
 
 class TestData(unittest.TestCase):
 
@@ -28,6 +29,7 @@ class TestData(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         configure_logs_for_module_tests(flush=True)
+        # reset_userlist()
 
     def test_a_read(self):
         users, random_users = read_users_local()

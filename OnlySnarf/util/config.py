@@ -23,7 +23,7 @@ def create_default_config(targetPath):
   logger.debug("created default config at: "+targetPath)
 
 def get_args_config_file():
-  return Path(os.path.abspath(__file__)).joinpath("../../conf/config-args.conf").resolve()
+  return Path(os.path.abspath(__file__)).joinpath("../../conf/args-config.conf").resolve()
 
 # TODO: change to get_config_for_upload_path ?
 # searched for a config file at the same path as provided
@@ -80,11 +80,14 @@ def search_for_config(path):
   logger.debug(f"searching for config at path: {path}")
   onlyconfigs = []
   if os.path.isdir(path):
-    onlyconfigs = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f == "config.conf"]
+    # onlyconfigs = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f == "config.conf"]
+    onlyconfigs = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and "config.conf" in f]
   else:
     path = Path(path)
     path = path.parent.absolute()
-    onlyconfigs = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f == "config.conf"]
+    # onlyconfigs = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and f == "config.conf"]
+    onlyconfigs = [os.path.join(path, f) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) and "config.conf" in f]
+    
   if len(onlyconfigs) > 1:
     logger.warning("found multiple config files!")
   if len(onlyconfigs) > 0:
@@ -137,5 +140,7 @@ def update_default_filepaths(filepaths, config_path):
     if not os.path.exists(file):
       file = os.path.join(os.path.dirname(config_path), os.path.basename(file))
       # logger.debug(file)
+      files.append(file)
+    else:
       files.append(file)
   return files

@@ -26,7 +26,7 @@ class TestWebdriver_Expiration(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         configure_logs_for_module_tests(flush=True)
-        close_browser()
+        # close_browser()
 
     def test_expiration(self):
         assert WEBDRIVER_expiration(self.browser, DEFAULT.EXPIRATION_MAX / 2), "unable to post with expiration"

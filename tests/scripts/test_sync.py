@@ -16,7 +16,7 @@ dbx = dropbox.Dropbox(
 
 TESTS_PATH = os.path.expanduser("~/.onlysnarf/uploads")
 
-class TestDropbox(unittest.TestCase):
+class Test_Sync(unittest.TestCase):
 
     def setUp(self):
         self.args = {

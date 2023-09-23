@@ -872,10 +872,12 @@
 - added test for discount via api
 - combined dropbox scripts into one
 - finished writing test scripts for sync / dropbox
+**9/23/2023**
+- finished scan.py
+- added tests for scan
 
 ------------------------------------------------------------------------------------
 
-- finish scan.py
 
 # TODO
 
@@ -887,6 +889,9 @@
 - finish debugging reconnect
 - finish testing remote webserver; add/update tests for remote webserver
 - finish implementing message recent calendar selection
+
+(double check)
+- scan script actually gets youngest & oldest files
 
 ------------------------------------------------------------------------------------
 

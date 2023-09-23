@@ -66,7 +66,7 @@ def main():
     #     sys.exit(2)
 
     rootdir = os.path.expanduser(args["rootdir"])
-    args["rootdir"] = rootdir
+    args.rootdir = rootdir
     print('Dropbox folder name:', args.folder)
     print('Local directory:', rootdir)
     if not os.path.exists(rootdir):

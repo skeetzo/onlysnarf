@@ -37,7 +37,7 @@ class TestWebdriver_Schedule(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         configure_logs_for_module_tests(flush=True)
-        close_browser()
+        # close_browser()
 
     def test_schedule(self):
         assert WEBDRIVER_schedule(self.browser, self.schedule_object), "unable to post schedule"

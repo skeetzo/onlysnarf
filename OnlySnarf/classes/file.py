@@ -91,7 +91,7 @@ class File():
         self.get_title()
         return self.ext
 
-    def get_title(self):
+    def get_title(self, with_ext=True):
         """
         Get the file's title from it's filename
         
@@ -105,7 +105,10 @@ class File():
         if self.title: return self.title
         title, ext = os.path.splitext(self.path)
         self.ext = ext.replace(".","")
-        self.title = "{}{}".format(os.path.basename(title), ext)
+        if with_ext:
+            self.title = "{}{}".format(os.path.basename(title), ext)
+        else:
+            self.title = os.path.basename(title)            
         if self.title.find("?") >= 0:
             self.title = self.title[:self.title.find("?")]
         return self.title

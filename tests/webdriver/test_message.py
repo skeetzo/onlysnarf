@@ -52,7 +52,7 @@ class TestWebdriver_Message(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         configure_logs_for_module_tests(flush=True)
-        close_browser()
+        # close_browser()
         reset_random_users()
 
     def test_message(self):
