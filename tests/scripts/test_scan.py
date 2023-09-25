@@ -13,6 +13,8 @@ class Test_Scan(unittest.TestCase):
         self.args = {
             'action': "test",
             'name': "",
+            'file_count': 10,
+            'directory': False,
             "oldest": False,
             "youngest": False,
             "random": False,
@@ -38,6 +40,13 @@ class Test_Scan(unittest.TestCase):
     def test_scan(self):
         assert scan(self.args), "unable to scan"
 
+    def test_scan_for_folder(self):
+        assert scan({**self.args, "directory": True}), "unable to scan directories"
+
+    def test_scan_for_name(self):
+        assert scan({**self.args, "name": "test-image"}), "unable to scan for file by name"
+        assert scan({**self.args, "directory": True, "name": "testpost3"}), "unable to scan for directory by name"
+
     def test_scan_configs(self):
         self.args["config"] = True
         assert scan(self.args), "unable to scan configs"
@@ -59,10 +68,14 @@ class Test_Scan(unittest.TestCase):
     def test_get_oldest_file_in_files(self):
         mock_files = [ '/home/skeetzo/.onlysnarf/uploads/test/post/testpost/test-image-younger.jpg', '/home/skeetzo/.onlysnarf/uploads/test/post/testpost/test-image.jpg' ]
         self.assertEqual(get_oldest_file_in_files(mock_files), '/home/skeetzo/.onlysnarf/uploads/test/post/testpost/test-image.jpg', "unable to get oldest file")
+        mock_directory = [ '/home/skeetzo/.onlysnarf/uploads/test/post/testpost', '/home/skeetzo/.onlysnarf/uploads/test/post/testpost2' ]
+        self.assertEqual(get_oldest_file_in_files(mock_directory), '/home/skeetzo/.onlysnarf/uploads/test/post/testpost', "unable to get oldest folder")
 
     def test_get_youngest_file_in_files(self):
         mock_files = [ '/home/skeetzo/.onlysnarf/uploads/test/post/testpost/test-image-younger.jpg', '/home/skeetzo/.onlysnarf/uploads/test/post/testpost/test-image.jpg' ]
         self.assertEqual(get_youngest_file_in_files(mock_files), '/home/skeetzo/.onlysnarf/uploads/test/post/testpost/test-image-younger.jpg', "unable to get youngest file")
+        mock_directory = [ '/home/skeetzo/.onlysnarf/uploads/test/post/testpost', '/home/skeetzo/.onlysnarf/uploads/test/post/testpost2' ]
+        self.assertEqual(get_youngest_file_in_files(mock_directory), '/home/skeetzo/.onlysnarf/uploads/test/post/testpost2', "unable to get youngest folder")
 
 ############################################################################################
 

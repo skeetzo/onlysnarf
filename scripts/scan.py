@@ -39,6 +39,7 @@ parser.add_argument('--random', '-r', action='store_true', help='Upload at rando
 parser.add_argument('--oldest', '-o', action='store_true', help='Upload oldest file')
 parser.add_argument('--youngest', '-l', action='store_true', help='Upload youngest file')
 parser.add_argument('--name', help='Upload filename or folder by name')
+parser.add_argument('--file-count', dest="file_count", default=10, help='Number of files to upload')
 subparsers = parser.add_subparsers(help='Include a sub-command to run a corresponding action:', dest="action", required=True)
 parser_config = subparsers.add_parser('post', help='> scan for posts to upload')
 parser_config = subparsers.add_parser('message', help='> scan for a message to upload')
@@ -70,6 +71,22 @@ def main():
 ################################################################################################################################################
 ################################################################################################################################################
 ################################################################################################################################################
+
+
+
+
+# file_count --> change number of files to grab
+# directory --> True/False directories only
+# config --> True/False configs only
+# youngest/oldest/random --> True/False
+# name --> '' string match
+
+
+
+
+
+
+
 
 # def process_upload_config(upload_path, config_path):
 # 	parsed_config = {}
@@ -111,6 +128,7 @@ def get_upload_options(args):
 			return None, None
 	else:
 		upload_options = scan_for_uploads(args["action"], args=args)
+		print(upload_options)
 		upload_path = get_file_or_folder_to_upload(upload_options, options=args)
 
 
@@ -123,10 +141,11 @@ def scan(args):
 	if not upload_path and not upload_config:
 		print("### NO UPLOADS FOUND ###")
 		return
-	upload_object = process_upload_object(upload_config, upload_path)
+	upload_object = process_upload_object(upload_config, upload_path, args)
 
-	print("### DEBUGGING STOP ###")
-	# return True
+	if len(upload_object["input"]) == 0:
+		print("Skipping empty upload!")
+		return True
 
 	if args["action"] == "post":
 		Post.create_post(upload_object).send()
@@ -138,17 +157,24 @@ def scan(args):
 	remove_uploaded(upload_object, True if args["action"] == "test" else False)
 	return True
 
-def process_upload_object(upload_config, upload_path):
+def process_upload_object(upload_config, upload_path, args):
 	upload_object = upload_config or {}
 	# if no config was found and a path was, check if theres a config in that same area
 	if not upload_config and upload_path:
 		upload_object = get_config_file_for_path(upload_path)
 		if not upload_object: upload_object = {}
+
+
+
 	if not upload_object and upload_path:
 		print("using filename as text...")
 		file = File(upload_path)
 		upload_object["text"] = file.get_title(with_ext=False)
-		upload_object["input"] = [ upload_path ]
+		if args["directory"]:
+			upload_object["text"] = "random "+upload_object["text"]
+			upload_object["input"] = get_files_in_folder(upload_path, args)
+		else:
+			upload_object["input"] = [ upload_path ]
 	files = upload_object.get("input", [])
 	if not isinstance(files, list):
 		files = files.split(",")
@@ -158,6 +184,13 @@ def process_upload_object(upload_config, upload_path):
 	return upload_object
 
 ################################################################################################################################################
+
+def get_files_in_folder(folder_path, args):
+	print(folder_path)
+	from os import listdir
+	from os.path import isfile, join
+	return [f for f in listdir(folder_path) if isfile(join(folder_path, f))][:args["file_count"]]
+
 ################################################################################################################################################
 
 # delete / remove uploaded files & config
@@ -177,10 +210,15 @@ def get_file_or_folder_to_upload(upload_options, options={'random': False,'oldes
 		return None
 	print(f"getting file or folder from upload options: {len(upload_options)}")
 	if options["name"]:
+		print(f"searching for: {options['name']}")
 		for filepath in upload_options:
-			print(f"filepath: {filepath}")
-			if str(filepath) == str(options["name"]) or str(options["name"]) in str(filepath):
-				return filename
+			if str(File(filepath).get_title()) == str(options["name"]):
+				print("exact match!")
+				return filepath
+		for filepath in upload_options:
+			if str(options["name"]) in str(File(filepath).get_title()):
+				print("fuzzy match!")
+				return filepath
 		print("Warning: unable to find matching file or folder!")
 		return None
 	# don't bother trying to code the exclusivity much, just let younger override older
@@ -214,22 +252,23 @@ def scan_for_uploads(place="both", configs=False, args={}):
 		# upload_options.extend(dirs)
 		print('Descending into', subfolder, '...')
 
-		# First do all the files.
-		for name in files:
-			fullname = os.path.join(dn, name)
-			if not isinstance(name, six.text_type):
-				name = name.decode('utf-8')
-			nname = unicodedata.normalize('NFC', name)
-			if configs and name.endswith('.conf'):
+		if not args["directory"]:
+			# First do all the files.
+			for name in files:
+				fullname = os.path.join(dn, name)
+				if not isinstance(name, six.text_type):
+					name = name.decode('utf-8')
+				nname = unicodedata.normalize('NFC', name)
+				if configs and name.endswith('.conf'):
+					upload_options.append(fullname)
+				if name.startswith('.'):
+					print('Skipping dot file:', name)
+				elif name.startswith('@') or name.endswith('~'):
+					print('Skipping temporary file:', name)
+				elif name.endswith('.pyc') or name.endswith('.pyo'):
+					print('Skipping generated file:', name)
+				if configs: continue
 				upload_options.append(fullname)
-			if name.startswith('.'):
-				print('Skipping dot file:', name)
-			elif name.startswith('@') or name.endswith('~'):
-				print('Skipping temporary file:', name)
-			elif name.endswith('.pyc') or name.endswith('.pyo'):
-				print('Skipping generated file:', name)
-			if configs: continue
-			upload_options.append(fullname)
 
 		# Then choose which subdirectories to traverse.
 		keep = []
@@ -245,6 +284,10 @@ def scan_for_uploads(place="both", configs=False, args={}):
 				keep.append(name)
 			else:
 				print('OK, skipping directory:', name)
+
+			if args["directory"]:
+				upload_options.append(os.path.join(scanPath,subfolder,name))
+
 		dirs[:] = keep
 	upload_options = list(set(upload_options))
 	return upload_options

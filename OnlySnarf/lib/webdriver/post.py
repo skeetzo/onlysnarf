@@ -73,7 +73,7 @@ def post(browser, post_object):
         if successful and not skipped:
             postButton = [ele for ele in browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
             WebDriverWait(browser, CONFIG["upload_max_duration"], poll_frequency=3).until(EC.element_to_be_clickable(postButton))
-            logger.debug("upload complete!")
+            logger.info("upload complete!")
         send_post(browser)
     except TimeoutException:
         logger.error("timed out waiting for post upload!")
@@ -127,18 +127,14 @@ def enable_tweeting(browser):
     logger.debug("enabled tweeting")
 
 def send_post(browser):
+    logger.debug("sending post...")
     if CONFIG["debug"] and str(CONFIG["debug"]) == "True":
         logger.info('skipped post (debug)')
         debug_delay_check()
         return True
-    logger.debug("sending post...")
-
-    # button = [ele for ele in browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
-    # ActionChains(browser).move_to_element(button).click().perform()
-
-    find_element_to_click("button", by=By.TAG_NAME, text="Post").click()
-
-    logger.info('Posted to OnlyFans!')
+    find_element_to_click(browser, "button", by=By.TAG_NAME, text="Post").click()
+    logger.info('posted to OnlyFans!')
+    time.sleep(1)
     return True
 
 # no longer used?

@@ -66,15 +66,22 @@ def message():
         "performers": CONFIG["performers"],
         "price"     : CONFIG["price"],
         "schedule"  : {
-            "date" : str(CONFIG["date"]),
-            "time" : str(CONFIG["time"])
+            "date" : str(CONFIG["date"]).split(" ")[0],
+            "time" : str(CONFIG["time"]).split(" ")[1]
         },
         "recipients": recipients,
         "includes"  : CONFIG["includes"],
         "excludes"  : CONFIG["excludes"]
     }
     if not message_object["text"]: raise Exception("missing text!")
-    if not message_object["recipients"]: raise Exception("missing recipients!")
+    if not message_object["recipients"] and not message_object["includes"]:        
+        raise Exception("missing recipients!")
+
+    # print(message_object)
+
+    # return
+
+
     return Message.create_message(message_object).send()
             
 def post():
@@ -93,8 +100,8 @@ def post():
         "performers": CONFIG["performers"],
         "price"     : CONFIG["price"],
         "schedule"  : {
-            "date" : str(CONFIG["date"]),
-            "time" : str(CONFIG["time"])
+            "date" : str(CONFIG["date"]).split(" ")[0],
+            "time" : str(CONFIG["time"]).split(" ")[1]
         }
     }
     if not post_object["text"]: raise Exception("missing text!")

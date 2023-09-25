@@ -7,9 +7,8 @@ python -m pip install -e .[dev]
 
 snarf -debug -vvv post -text "balls"
 
-# for live tests:
-snarf post -text ""
-snarf message -text ""
+snarf post -text "testes" ~/Downloads/3.jpg
+snarf message -text "testes" -includes "all" ~/Downloads/3.jpg
 
 
 # formats:

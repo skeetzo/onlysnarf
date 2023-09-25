@@ -41,6 +41,9 @@ schedule: "mm/dd/YYYY:HH:MM"
 date: "mm/dd/YYYY"  
 time: "HH:MM"  
 
+includes: "all" | "favorites" | "recent" | ...  
+excludes: "all" | "favorites" | "recent" | ...  
+
 Message $USER the provided $TEXT with $TAGS and uploaded $IMAGE available for $PRICE.  
 
 If schedule: schedules the message for the provided date and time.  
@@ -137,6 +140,12 @@ The user by username to specify for messages.
 -users "user1,user2"  
 The users by username to specify for messages.  
 
+-includes "list1" -includes "list2"  
+The lists to include when sending a mass message. Examples: all, favorites, recent  
+
+-excludes "list1" -excludes "list2"  
+The lists to exclude when sending a mass message. Examples: all, favorites, recent  
+
 ### Post
 -date "01/01/2000"  
 The date required for a scheduled post.  
@@ -184,9 +193,6 @@ Browser to connect with.
 -keep, -K  
 Keep the browser open when finished (allows for reconnect).  
 
--save, -S  
-Enable saving users before exiting browser.  
-
 -upload-max-duration #  
 The number of 10 minute intervals to wait while uploading a file.  
 
@@ -228,9 +234,6 @@ The number of users to count as "recent".
 
 -skip-upload  
 Skip file uploads.  
-
--skip-users "user1,user2"  
-Skip specific users by username or id.  
 
 -users-read #  
 The number of users to count when reading messages.  

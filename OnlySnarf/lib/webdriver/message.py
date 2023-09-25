@@ -66,7 +66,7 @@ def message(browser, message_object):
         message_text(browser, message_object['text'])
         message_price(browser, message_object['price'])
         upload_files(browser, message_object['files'])
-        message_confirm(browser)
+        message_send(browser)
         if CONFIG["debug"]:
             clear_collections(browser, includes=message_object["includes"], excludes=message_object["excludes"])
             # message confirm function contains default clear text behavior
@@ -115,36 +115,48 @@ def message_clear(browser):
         error_checker(e)
     raise Exception("failed to clear message!")
 
-def message_confirm(browser):
+def message_send(browser):
     """
-    Wait for the message open on the page's Confirm button to be clickable and click it
+    Wait for the send button to be clickable and click it
 
     Returns
     -------
     bool
-        Whether or not the message confirmation was successful
+        Whether or not the button click was successful
 
     """
 
     try:
-        logger.debug("waiting for message confirm to be clickable...")
+        logger.debug("waiting for message send to be clickable...")
         confirm = WebDriverWait(browser, int(CONFIG["upload_max_duration"]), poll_frequency=3).until(EC.element_to_be_clickable((By.CLASS_NAME, "g-btn.m-rounded.b-chat__btn-submit")))
-        logger.debug("message confirm is clickable")
+        logger.debug("message send is clickable")
         debug_delay_check()
         if CONFIG["debug"] and str(CONFIG["debug"]) == "True":
             logger.info('skipping message (debug)')
             message_clear(browser)
+            return True
         else:
-            logger.debug("clicking confirm...")
+            logger.debug("clicking send...")
             confirm.click()
-            logger.info('OnlyFans message sent!')
-        return True
+            time.sleep(0.5) # allow final modal to appear 
+            return message_confirm(browser)
     except TimeoutException:
         logger.error("Timed out waiting for message confirm!")
     except Exception as e:
         error_checker(e)
     message_clear(browser)
     raise Exception("failed to confirm message!")
+
+def message_confirm(browser):
+    try:
+        logger.debug("clicking confirm...")
+        find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Yes").click()
+        logger.info('OnlyFans message sent!')
+        time.sleep(1)
+        return True
+    except Exception as e:
+        error_checker(e)
+    return False
 
 def message_price(browser, price):
     """

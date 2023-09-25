@@ -727,7 +727,7 @@
   - moved api & menu to cli
   - updates to config script
   - tested new config script
-**4.6.0,1 : 8/7/2023**
+  **4.6.0,1 : 8/7/2023**
   - minor version bump for working api & cli changes
   **4.6.2 : 8/12/2023**
   - added watchdogger.py
@@ -866,24 +866,27 @@
   - add better version notes to readme's list of "works on": mine is x86_64, rpi4 is aarch64
   - updated readme with new commands
   - updates to readme in regards to webdriver changes
-**4.6.17 : 9/22/2023**
-- added discount to api
-- preparing tests for scan & dropbox
-- added test for discount via api
-- combined dropbox scripts into one
-- finished writing test scripts for sync / dropbox
-**9/23/2023**
-- finished scan.py
-- added tests for scan
+  **4.6.17 : 9/22/2023**
+  - added discount to api
+  - preparing tests for scan & dropbox
+  - added test for discount via api
+  - combined dropbox scripts into one
+  - finished writing test scripts for sync / dropbox
+  **9/23/2023**
+  - finished scan.py
+  - added tests for scan
+**4.7.0 : 9/25/2023**
+- updates to script/scan
+- LIVE TESTS: post, message
+- updated minor version w/ successful live testing
+- release new version on pypi
 
 ------------------------------------------------------------------------------------
 
 
 # TODO
 
-(prepare new minor version bump to 4.7.0)
-- LIVE TESTING --> release new version on pypi
-- update minor version w/ successful live testing
+- update verbose & snarf logging
 
 (finish in patch versions)
 - finish debugging reconnect
