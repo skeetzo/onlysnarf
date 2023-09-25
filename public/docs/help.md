@@ -11,27 +11,27 @@ No mention of old Shnarf, I notice. Go ahead, just take all the glory, and leave
 
 positional arguments: {**api**,**config**,**discount**,**menu**,**message**,**post**,**users**}  
 
-Include a sub-command to run a corresponding action:
->   **api**                 > flask server
->   **config**              > configuration options
->   **discount**            > discount one or more users
->   **menu**                > access the cli menu
->   **message**             > send a message to one or more users
->   **post**                > upload a post
->   **users**               > scan & save users
+Include a sub-command to run a corresponding action:  
+>   **api**                 > flask server  
+>   **config**              > configuration options  
+>   **discount**            > discount one or more users  
+>   **menu**                > access the cli menu  
+>   **message**             > send a message to one or more users  
+>   **post**                > upload a post  
+>   **users**               > scan & save users  
 
 options:
-> -h, --help            show this help message and exit
-> -browser {auto,brave,chrome,chromium,firefox}, -B {auto,brave,chrome,chromium,firefox}	web browser to use
-> -login {auto,onlyfans,twitter}, -L {auto,onlyfans,twitter}	method of user login to prefer
-> -tweet                enable tweeting when posting
-> --username USERNAME, --u USERNAME		OnlyFans username to use
-> -config PATH_CONFIG, -C PATH_CONFIG	path to config.conf
-> -debug, -D            enable debugging
-> -keep, -K             keep browser window open after scripting ends
-> -show, -SW            enable displaying browser window
-> -v, -verbose          verbosity level (max 3)
-> -version, --version   show program's version number and exit
+> -h, --help            show this help message and exit  
+> -browser {auto,brave,chrome,chromium,firefox}, -B {auto,brave,chrome,chromium,firefox}	web browser to use  
+> -login {auto,onlyfans,twitter}, -L {auto,onlyfans,twitter}	method of user login to prefer  
+> -tweet                enable tweeting when posting  
+> --username USERNAME, --u USERNAME		OnlyFans username to use  
+> -config PATH_CONFIG, -C PATH_CONFIG	path to config.conf  
+> -debug, -D            enable debugging  
+> -keep, -K             keep browser window open after scripting ends  
+> -show, -SW            enable displaying browser window  
+> -v, -verbose          verbosity level (max 3)  
+> -version, --version   show program's version number and exit  
 
 Shnarrf!  
 
