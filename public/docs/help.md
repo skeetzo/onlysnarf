@@ -5,20 +5,20 @@
 
 `snarf [-h] [-browser {auto,brave,chrome,chromium,firefox}] [-login {auto,onlyfans,twitter}] [-tweet] [--username USERNAME]
              [-config PATH_CONFIG] [-debug] [-keep] [-show] [-v] [-version]
-             {api,config,discount,menu,message,post,users} ...`
+             {api,config,discount,menu,message,post,users} ...`  
 
 No mention of old Shnarf, I notice. Go ahead, just take all the glory, and leave it to Snarf to clean up after you. I don't mind!  
 
 positional arguments: {**api**,**config**,**discount**,**menu**,**message**,**post**,**users**}  
 
 Include a sub-command to run a corresponding action:  
-**api**                 > flask server  
-**config**              > configuration options  
-**discount**            > discount one or more users  
-**menu**                > access the cli menu  
-**message**             > send a message to one or more users  
-**post**                > upload a post  
-**users**               > scan & save users  
+>   **api**                 > flask server  
+>   **config**              > configuration options  
+>   **discount**            > discount one or more users  
+>   **menu**                > access the cli menu  
+>   **message**             > send a message to one or more users  
+>   **post**                > upload a post  
+>   **users**               > scan & save users  
 
 options:
 > -h, --help            show this help message and exit  
@@ -37,26 +37,32 @@ Shnarrf!
 
 # API
 
-`snarf api`
+Flask server API for receiving POST requests to /post and /message.  
 
-Flask server API for receiving POST requests to /post and /message. 
+`snarf api [-h]`  
+
+options:  
+> -h, --help  show this help message and exit  
 
 # Config
 
-`snarf config`
+Menu interface for interacting with user config files.  
 
-Menu interface for interacting with user config files.
+`snarf config [-h]`  
+
+options:
+> -h, --help  show this help message and exit  
 
 # Discount
 
 `snarf discount [-h] [-amount AMOUNT] [-months MONTHS] [-user USER | -users USERS]`  
 
 options:  
-> -h, --help      show this help message and exit  
-> -amount AMOUNT  amount (%) to discount by  
-> -months MONTHS  number of months to discount  
-> -user USER      user to discount  
-> -users USERS    users to discount  
+> -h, --help      	   show this help message and exit  
+> -amount AMOUNT  	   amount (%) to discount by  
+> -months MONTHS  	   number of months to discount  
+> -user USER      	   user to discount  
+> -users RECIPIENTS    users to discount  
 
 # Message
 
@@ -72,13 +78,16 @@ options:
 > -price PRICE          price to charge ($)  
 > -schedule SCHEDULE    schedule (MM-DD-YYYY:HH:MM:SS)  
 > -time TIME            time (HH:MM)  
+> -keywords KEYWORDS    the keywords to append  
 > -text TEXT            text to send  
 > -user USER            user to message  
-> -users USERS          users to message  
+> -users RECIPIENTS     users to message  
+> -includes INCLUDES    user lists to include in message  
+> -excludes EXCLUDES    user lists to exclude from message  
 
 # Post
 
-`snarf post [-h] [-date DATE] [-duration {1,3,7,30,99} | -expiration EXPIRATION] [-performers PERFORMERS] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-text TEXT] [-question QUESTIONS] ... `  
+`snarf post [-h] [-date DATE] [-duration {1,3,7,30} | -expiration EXPIRATION] [-performers PERFORMERS] [-keywords KEYWORDS] [-price PRICE] [-schedule SCHEDULE] [-time TIME] [-text TEXT] [-question QUESTIONS]`  
 
 positional arguments:  
 > input                 one or more paths to files (or folders) to include in the post  
