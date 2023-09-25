@@ -880,15 +880,16 @@
 - LIVE TESTS: post, message
 - updated minor version w/ successful live testing
 - release new version on pypi
+- updated readme and help texts
 
 ------------------------------------------------------------------------------------
 
 
 # TODO
 
-- update verbose & snarf logging
-
 (finish in patch versions)
+- update `config` to assist with setting up main config files
+- update verbose & snarf logging
 - finish debugging reconnect
 - finish testing remote webserver; add/update tests for remote webserver
 - finish implementing message recent calendar selection
