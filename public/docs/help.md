@@ -12,13 +12,13 @@ No mention of old Shnarf, I notice. Go ahead, just take all the glory, and leave
 positional arguments: {**api**,**config**,**discount**,**menu**,**message**,**post**,**users**}  
 
 Include a sub-command to run a corresponding action:  
->   **api**                 > flask server  
->   **config**              > configuration options  
->   **discount**            > discount one or more users  
->   **menu**                > access the cli menu  
->   **message**             > send a message to one or more users  
->   **post**                > upload a post  
->   **users**               > scan & save users  
+**api**                 > flask server  
+**config**              > configuration options  
+**discount**            > discount one or more users  
+**menu**                > access the cli menu  
+**message**             > send a message to one or more users  
+**post**                > upload a post  
+**users**               > scan & save users  
 
 options:
 > -h, --help            show this help message and exit  
