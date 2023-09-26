@@ -48,7 +48,7 @@ Make POST requests with the same basic discount, message, or post data to: /disc
 The `snarf menu` command has been semi-restored and still requires further updates to return to the same pointless iteration of glory.
 
 ## Dependencies
-Selenium's webdriver manager should install everything it needs automatically. If left unspecified the default browser argument is "auto" which will cylce throuch each web driver available and attempt to spawn a working browser. If you are using a Raspberry Pi 4, be sure to run `sudo apt-get install chromium-chromedriver` on your device to be able to launch chrome. The only working browsers for me have been chrome and firefox and so the others are unlikely to work without extra tinkering by yourself.
+Selenium's webdriver manager should install everything it needs automatically. If left unspecified the default browser argument is "auto" which will cylce throuch each web driver available and attempt to spawn a working browser. If you are using a Raspberry Pi 4, be sure to run `sudo apt-get install chromium-chromedriver` on your device to be able to launch chrome. Firefox should work via the firefox-snap. The only working browsers for me have been chrome and firefox and so the others are unlikely to work without extra tinkering by yourself.
 
 ## Platforms
 Code versions:

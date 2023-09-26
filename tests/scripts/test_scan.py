@@ -77,6 +77,12 @@ class Test_Scan(unittest.TestCase):
         mock_directory = [ '/home/skeetzo/.onlysnarf/uploads/test/post/testpost', '/home/skeetzo/.onlysnarf/uploads/test/post/testpost2' ]
         self.assertEqual(get_youngest_file_in_files(mock_directory), '/home/skeetzo/.onlysnarf/uploads/test/post/testpost2', "unable to get youngest folder")
 
+    def test_backup(self):
+        assert scan({**self.args, "backup": True, "directory":True}), "unable to backup scanned file"
+
+    def test_delete(self):
+        assert scan({**self.args, "delete": True}), "unable to delete scanned file"
+
 ############################################################################################
 
 if __name__ == '__main__':

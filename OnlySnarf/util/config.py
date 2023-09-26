@@ -41,9 +41,9 @@ def get_config_file_for_path(search_path, create=False):
   # logger.debug(config_path)
   # load the config as args
 
-  parsed_config = parse_config(config_path)
-  logger.debug(f"found config: {parsed_config}")
-  return parsed_config
+  # parsed_config = parse_config(config_path)
+  # logger.debug(f"found config: {config_path}")
+  return config_path
 
 def get_config_file_path():
   if os.environ.get('ENV') == "test":
@@ -138,7 +138,8 @@ def update_default_filepaths(filepaths, config_path):
     file = os.path.expanduser(file)
     # logger.debug(file)
     if not os.path.exists(file):
-      file = os.path.join(os.path.dirname(config_path), os.path.basename(file))
+      # file = os.path.join(os.path.dirname(config_path), os.path.basename(file))
+      file = os.path.join(config_path, os.path.basename(file))
       # logger.debug(file)
       files.append(file)
     else:

@@ -23,7 +23,7 @@ import argparse
 import contextlib
 import unicodedata
 import configparser
-
+from pathlib import Path
 from OnlySnarf.util.config import get_config_file_for_path, parse_config, update_default_filepaths
 from OnlySnarf.classes.message import Message, Post
 from OnlySnarf.classes.file import File
@@ -38,8 +38,12 @@ parser.add_argument('--config', '-c', action='store_true', help='Prefer availabl
 parser.add_argument('--random', '-r', action='store_true', help='Upload at random')
 parser.add_argument('--oldest', '-o', action='store_true', help='Upload oldest file')
 parser.add_argument('--youngest', '-l', action='store_true', help='Upload youngest file')
+parser.add_argument('--directory', action='store_true', help='Prefer folders of files')
 parser.add_argument('--name', help='Upload filename or folder by name')
 parser.add_argument('--file-count', dest="file_count", default=10, help='Number of files to upload')
+backupOrDelete = parser.add_mutually_exclusive_group()
+backupOrDelete.add_argument('--backup', '-b', action='store_true', help='backup after uploading')
+backupOrDelete.add_argument('--delete', action='store_true', help='delete after uploading')
 subparsers = parser.add_subparsers(help='Include a sub-command to run a corresponding action:', dest="action", required=True)
 parser_config = subparsers.add_parser('post', help='> scan for posts to upload')
 parser_config = subparsers.add_parser('message', help='> scan for a message to upload')
@@ -141,7 +145,10 @@ def scan(args):
 	if not upload_path and not upload_config:
 		print("### NO UPLOADS FOUND ###")
 		return
-	upload_object = process_upload_object(upload_config, upload_path, args)
+
+	upload_config_path, upload_object = process_upload_object(upload_config, upload_path, args)
+	if upload_config_path:
+		print(f"upload config path: {upload_config_path}")
 
 	if len(upload_object["input"]) == 0:
 		print("Skipping empty upload!")
@@ -151,56 +158,112 @@ def scan(args):
 		Post.create_post(upload_object).send()
 	elif args["action"] == "message":
 		Message.create_message(upload_object).send()
-	else:
+	elif args["action"] == "test":
 		print("Skipping upload while testing!")
+	else:
+		return print("Error scanning!")
 
-	remove_uploaded(upload_object, True if args["action"] == "test" else False)
+	if args["backup"]:
+		backup_uploaded(upload_object, upload_path, args["action"], config=upload_config_path, debug=True if args["action"] == "test" else False)
+	elif args["remove"]:
+		remove_uploaded(upload_object, config=upload_config_path, debug=True if args["action"] == "test" else False)
+
 	return True
 
 def process_upload_object(upload_config, upload_path, args):
 	upload_object = upload_config or {}
 	# if no config was found and a path was, check if theres a config in that same area
 	if not upload_config and upload_path:
-		upload_object = get_config_file_for_path(upload_path)
-		if not upload_object: upload_object = {}
-
-
+		upload_config = get_config_file_for_path(upload_path)
+		if not upload_config:
+			upload_object = {}
+		else:
+			upload_object = parse_config(upload_config)
 
 	if not upload_object and upload_path:
 		print("using filename as text...")
 		file = File(upload_path)
 		upload_object["text"] = file.get_title(with_ext=False)
+	
 		if args["directory"]:
 			upload_object["text"] = "random "+upload_object["text"]
 			upload_object["input"] = get_files_in_folder(upload_path, args)
 		else:
 			upload_object["input"] = [ upload_path ]
+
+
+	# formatting check
 	files = upload_object.get("input", [])
 	if not isinstance(files, list):
 		files = files.split(",")
+
+
 	upload_object["input"] = update_default_filepaths(files, upload_path)
 	print("Final upload object:")
 	print(upload_object)
-	return upload_object
+	return upload_config, upload_object
 
 ################################################################################################################################################
 
 def get_files_in_folder(folder_path, args):
-	print(folder_path)
+	print(f"folder path: {folder_path}")
 	from os import listdir
 	from os.path import isfile, join
-	return [f for f in listdir(folder_path) if isfile(join(folder_path, f))][:args["file_count"]]
+	return [os.path.join(folder_path, f) for f in listdir(folder_path) if isfile(join(folder_path, f))][:args["file_count"]]
 
 ################################################################################################################################################
 
 # delete / remove uploaded files & config
-def remove_uploaded(upload_object, debug=False):
+def remove_uploaded(upload_object, config=None, debug=False):
+	if config and debug:
+		print(f"skipping config remove: {config}")
+	elif config:
+		print(f"removing config file: {config}")
+		os.remove(config)
 	for file in upload_object["input"]:
 		if debug:
 			print(f"skipping file remove: {file}")
 		else:
 			print(f"removing uploaded file: {file}")
 			os.remove(file)
+
+def backup_uploaded(upload_object, upload_path, folder, config=None, debug=False):
+
+	parent = Path(upload_path).parent.absolute()
+	print(f"parent: {parent}")
+
+	# debug = False
+
+	if config:
+		backup_path = f"{parent}/{File(config).get_title()}".replace(f"uploads/{folder}", f"uploads/backup/{folder}")
+		if debug:
+			print(f"skipping config backup: {config} --> {backup_path}")
+		else:
+			print(f"backing up config file: {config} --> {backup_path}")
+			Path(Path(backup_path).parent.absolute()).mkdir(parents=True, exist_ok=True)
+			os.rename(config, backup_path)
+
+	####################################################
+	# does this part even happen with the above? no?
+	elif ".conf" in str(upload_path):
+		backup_path = f"{parent}/{File(upload_path).get_title()}".replace(f"uploads/{folder}", f"uploads/backup/{folder}")
+		if debug:
+			print(f"skipping config file backup: {upload_path} --> {backup_path}")
+		else:
+			print(f"backing up uploaded config: {upload_path} --> {backup_path}")
+			Path(Path(backup_path).parent.absolute()).mkdir(parents=True, exist_ok=True)
+			os.rename(upload_path, backup_path)
+	####################################################
+
+
+	for file in upload_object["input"]:
+		backup_path = f"{parent}/{File(file).get_title()}".replace(f"uploads/{folder}", f"uploads/backup/{folder}")
+		if debug:
+			print(f"skipping file backup: {file} --> {backup_path}")
+		else:
+			print(f"backing up uploaded file: {file} --> {backup_path}")
+			Path(Path(backup_path).parent.absolute()).mkdir(parents=True, exist_ok=True)
+			os.rename(file, backup_path)
 
 ################################################################################################################################################
 
