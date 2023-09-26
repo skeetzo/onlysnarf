@@ -881,6 +881,9 @@
 - updated minor version w/ successful live testing
 - release new version on pypi
 - updated readme and help texts
+**9/26/2023**
+- updates to scan: backup & delete
+- update to sync: tests & formatting
 
 ------------------------------------------------------------------------------------
 

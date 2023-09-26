@@ -16,7 +16,7 @@ import six
 import sys
 import json
 import time
-# import shutil
+import shutil
 import random
 import datetime
 import argparse
@@ -165,9 +165,9 @@ def scan(args):
 
 	if args["backup"]:
 		backup_uploaded(upload_object, upload_path, args["action"], config=upload_config_path, debug=True if args["action"] == "test" else False)
-	elif args["remove"]:
+	elif args["delete"]:
 		remove_uploaded(upload_object, config=upload_config_path, debug=True if args["action"] == "test" else False)
-
+	delete_folder_if_empty(upload_path, debug=True if args["action"] == "test" else False)
 	return True
 
 def process_upload_object(upload_config, upload_path, args):
@@ -207,9 +207,7 @@ def process_upload_object(upload_config, upload_path, args):
 
 def get_files_in_folder(folder_path, args):
 	print(f"folder path: {folder_path}")
-	from os import listdir
-	from os.path import isfile, join
-	return [os.path.join(folder_path, f) for f in listdir(folder_path) if isfile(join(folder_path, f))][:args["file_count"]]
+	return [os.path.join(folder_path, f) for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))][:args["file_count"]]
 
 ################################################################################################################################################
 
@@ -230,6 +228,7 @@ def remove_uploaded(upload_object, config=None, debug=False):
 def backup_uploaded(upload_object, upload_path, folder, config=None, debug=False):
 
 	parent = Path(upload_path).parent.absolute()
+	print(f"upload path: {upload_path}")
 	print(f"parent: {parent}")
 
 	# debug = False
@@ -237,7 +236,7 @@ def backup_uploaded(upload_object, upload_path, folder, config=None, debug=False
 	if config:
 		backup_path = f"{parent}/{File(config).get_title()}".replace(f"uploads/{folder}", f"uploads/backup/{folder}")
 		if debug:
-			print(f"skipping config backup: {config} --> {backup_path}")
+			print(f"skipping conf backup: {config} --> {backup_path}")
 		else:
 			print(f"backing up config file: {config} --> {backup_path}")
 			Path(Path(backup_path).parent.absolute()).mkdir(parents=True, exist_ok=True)
@@ -248,7 +247,7 @@ def backup_uploaded(upload_object, upload_path, folder, config=None, debug=False
 	elif ".conf" in str(upload_path):
 		backup_path = f"{parent}/{File(upload_path).get_title()}".replace(f"uploads/{folder}", f"uploads/backup/{folder}")
 		if debug:
-			print(f"skipping config file backup: {upload_path} --> {backup_path}")
+			print(f"skipping conf file backup: {upload_path} --> {backup_path}")
 		else:
 			print(f"backing up uploaded config: {upload_path} --> {backup_path}")
 			Path(Path(backup_path).parent.absolute()).mkdir(parents=True, exist_ok=True)
@@ -264,6 +263,29 @@ def backup_uploaded(upload_object, upload_path, folder, config=None, debug=False
 			print(f"backing up uploaded file: {file} --> {backup_path}")
 			Path(Path(backup_path).parent.absolute()).mkdir(parents=True, exist_ok=True)
 			os.rename(file, backup_path)
+
+def delete_folder_if_empty(upload_path, debug=False):
+	# if folder is now empty, remove it
+	# BUG: for whatever reason each method tried sometimes bugs out and does not fetch all files ???
+	# METHOD 1
+	files_remaining = [name for name in os.listdir(upload_path)]
+	# METHOD 2
+	# files_remaining = []
+	# input_dir = Path(upload_path)
+	# for file in input_dir.iterdir():
+	# 	files_remaining.append(file)
+	# METHOD 3
+	# for (dirpath, dirnames, filenames) in os.walk(upload_path, topdown=True):
+	#     files_remaining.extend(filenames)
+
+	if len(files_remaining) == 0:
+		if debug:
+			print("skipping empty directory deletion!")
+		else:
+			print("deleting empty directory!")
+			shutil.rmtree(upload_path)
+	else:
+		print(f"files remaining: {files_remaining}")
 
 ################################################################################################################################################
 

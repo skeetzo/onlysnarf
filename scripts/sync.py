@@ -106,6 +106,10 @@ def sync_downloads(args, dbx):
             if "has no attribute" not in str(e):
                 print(e)
 
+    # print(downloadMe)
+
+    # return
+
     for listing in downloadMe:
         path = os.path.join(args["rootdir"], args["folder"], listing.path_lower).replace("/uploads/Uploads", "/uploads") 
         path = (args["rootdir"] + path).replace("/uploads/uploads/", "/uploads/")
@@ -164,6 +168,7 @@ def sync_downloads(args, dbx):
 def sync_uploads(args, dbx):
     for dn, dirs, files in os.walk(args["rootdir"]):
         subfolder = dn[len(args["rootdir"]):].strip(os.path.sep)
+
         listing = list_folder(dbx, args["folder"], subfolder=subfolder)
         print('Descending into', subfolder, '...')
 

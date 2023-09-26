@@ -1,5 +1,6 @@
 import os
 os.environ['ENV'] = "test"
+import shutil
 import unittest
 
 from dotenv import load_dotenv
@@ -14,8 +15,6 @@ dbx = dropbox.Dropbox(
     oauth2_refresh_token = str(os.getenv("DROPBOX_REFRESH_TOKEN"))
 )
 
-TESTS_PATH = os.path.expanduser("~/.onlysnarf/uploads")
-
 class Test_Sync(unittest.TestCase):
 
     def setUp(self):
@@ -23,8 +22,8 @@ class Test_Sync(unittest.TestCase):
             'yes': True,
             'no' : False,
             'default': False,
-            'folder' : 'Tests',
-            'rootdir' : TESTS_PATH
+            'folder' : 'Test',
+            # 'rootdir' : TESTS_PATH
         }
 
     def tearDown(self):
@@ -39,21 +38,25 @@ class Test_Sync(unittest.TestCase):
         pass
 
     def test_sync_downloads(self):
+        TESTS_PATH = os.path.expanduser("~/.onlysnarf/dropbox")
+        self.args["rootdir"] = TESTS_PATH
         # clear Tests folder
         try:
-            os.remove(TESTS_PATH)
+            shutil.rmtree(TESTS_PATH)
         except Exception as e:
-            pass
+            print(e)
 
         # download test file from dropbox
         assert sync_downloads(self.args, dbx), "unable to sync downloads"
         size = 0
-        for path, dirs, files in os.walk(TESTS_PATH+"/post"):
+        for path, dirs, files in os.walk(os.path.join(TESTS_PATH)):
             for f in files:
                 size += os.path.getsize(os.path.join(path, f))
         assert size, "unable to download synced files"
 
     def test_sync_uploads(self):
+        TESTS_PATH = os.path.expanduser("~/.onlysnarf/dropbox/test")
+        self.args["rootdir"] = TESTS_PATH
         assert sync_uploads(self.args, dbx), "unable to sync uploads"
         # TODO: add tests for checking if file has been added to dropbox
 

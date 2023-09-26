@@ -14,6 +14,8 @@ class Test_Scan(unittest.TestCase):
             'action': "test",
             'name': "",
             'file_count': 10,
+            'backup': False,
+            'delete': False,
             'directory': False,
             "oldest": False,
             "youngest": False,
@@ -22,7 +24,7 @@ class Test_Scan(unittest.TestCase):
             'no' : False,
             'default': False,
             'config': False,
-            'folder' : 'Test',
+            # 'folder' : 'Test',
             'rootdir' : TESTS_PATH
         }
 
@@ -81,7 +83,7 @@ class Test_Scan(unittest.TestCase):
         assert scan({**self.args, "backup": True, "directory":True}), "unable to backup scanned file"
 
     def test_delete(self):
-        assert scan({**self.args, "delete": True}), "unable to delete scanned file"
+        assert scan({**self.args, "delete": True, "directory": True}), "unable to delete scanned file"
 
 ############################################################################################
 
