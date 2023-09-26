@@ -28,6 +28,15 @@ from OnlySnarf.util.config import get_config_file_for_path, parse_config, update
 from OnlySnarf.classes.message import Message, Post
 from OnlySnarf.classes.file import File
 
+
+
+# file_count --> change number of files to grab
+# directory --> True/False directories only
+# config --> True/False configs only
+# youngest/oldest/random --> True/False
+# name --> '' string match
+
+
 parser = argparse.ArgumentParser(description='Scan ~/.onlysnarf/uploads for uploads')
 # parser.add_argument('folder', nargs='?', default='Uploads', help='Folder name in your Dropbox')
 parser.add_argument('rootdir', nargs='?', default='~/.onlysnarf/uploads', help='Local directory to upload from')
@@ -77,32 +86,6 @@ def main():
 ################################################################################################################################################
 
 
-
-
-# file_count --> change number of files to grab
-# directory --> True/False directories only
-# config --> True/False configs only
-# youngest/oldest/random --> True/False
-# name --> '' string match
-
-
-
-
-
-
-
-
-# def process_upload_config(upload_path, config_path):
-# 	parsed_config = {}
-# 	# ensure / replace file links in config file with absolute paths 
-# 	if config_path:
-# 		parsed_config = parse_config(config_path)
-# 	else:
-# 		# parsed_config = get_config_file_for_path(upload_path)
-# 	parsed_config["input"] = update_default_filepaths(parsed_config.get("input", []), config_path if config_path else upload_path)
-# 	return parsed_config
-
-# scan /posts for anything
 
 # if configs is specified: only return config files
 # otherwise, searches for a file or folder AND then creates a config file at the target location which i actually don't want to do

@@ -884,11 +884,15 @@
 **9/26/2023**
 - updates to scan: backup & delete
 - update to sync: tests & formatting
+- added scan_dropbox and test_scan_dropbox
 
 ------------------------------------------------------------------------------------
 
 
 # TODO
+
+- finish (combining) scan & scan_dropbox\
+- finish testing scan_dropbox
 
 (finish in patch versions)
 - update `config` to assist with setting up main config files
@@ -896,9 +900,6 @@
 - finish debugging reconnect
 - finish testing remote webserver; add/update tests for remote webserver
 - finish implementing message recent calendar selection
-
-(double check)
-- scan script actually gets youngest & oldest files
 
 ------------------------------------------------------------------------------------
 

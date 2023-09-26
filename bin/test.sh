@@ -10,6 +10,8 @@ snarf -debug -vvv post -text "balls"
 snarf post -text "testes" ~/Downloads/3.jpg
 snarf message -text "testes" -includes "all" ~/Downloads/3.jpg
 
+snarf -debug post -text "balls" https://www.dropbox.com/scl/fi/5cy6unlhpkkfykha4h0ev/4.jpg?rlkey=pjkvbduknxklwssrz392j4vdw
+
 
 # formats:
 python -m unittest $TEST_PATH

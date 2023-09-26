@@ -106,10 +106,6 @@ def sync_downloads(args, dbx):
             if "has no attribute" not in str(e):
                 print(e)
 
-    # print(downloadMe)
-
-    # return
-
     for listing in downloadMe:
         path = os.path.join(args["rootdir"], args["folder"], listing.path_lower).replace("/uploads/Uploads", "/uploads") 
         path = (args["rootdir"] + path).replace("/uploads/uploads/", "/uploads/")
@@ -145,22 +141,6 @@ def sync_downloads(args, dbx):
                             upload_downloads(dbx, path, listing.path_display, overwrite=True)
         elif yesno('Download %s' % listing.name, True, args):
             download_downloads(dbx, args["rootdir"], listing)
-
-            # # Then choose which subdirectories to traverse.
-            # keep = []
-            # for name in dirs:
-            #     if name.startswith('.'):
-            #         print('Skipping dot directory:', name)
-            #     elif name.startswith('@') or name.endswith('~'):
-            #         print('Skipping temporary directory:', name)
-            #     elif name == '__pycache__':
-            #         print('Skipping generated directory:', name)
-            #     elif yesno('Descend into %s' % name, True, args):
-            #         print('Keeping directory:', name)
-            #         keep.append(name)
-            #     else:
-            #         print('OK, skipping directory:', name)
-            # dirs[:] = keep
 
     dbx.close()
     return True # for tests
