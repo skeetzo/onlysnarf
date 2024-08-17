@@ -28,7 +28,7 @@ def add_user():
     update_twitter_user(user=username)
     main()
 
-def check_config(user):
+def check_user_config(user):
     try:
         if not os.path.isfile(get_user_config_path(user)):
             reset_user_config(user)
@@ -237,9 +237,9 @@ def reset_user_config(user="default"):
 
 def reset_config():
     logger.info("resetting configuration...")
-    shutil.copyfile(BASE_CONFIG, os.path.join(Settings.get_base_directory(), "conf", "config.conf"))
-    shutil.rmtree(os.path.join(Settings.get_base_directory(), "conf/users"))
-    Path(os.path.join(Settings.get_base_directory(), "conf/users")).mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(BASE_CONFIG, os.path.join(DEFAULT.ROOT_PATH, "conf", "config.conf"))
+    shutil.rmtree(os.path.join(DEFAULT.ROOT_PATH, "conf/users"))
+    Path(os.path.join(DEFAULT.ROOT_PATH, "conf/users")).mkdir(parents=True, exist_ok=True)
     logger.info("OnlySnarf config reset!")
 
 def update_user_config(user="default"):
@@ -273,7 +273,7 @@ def update_user_config(user="default"):
     logger.info("successfully updated user config for {}!".format(user))
 
 def update_onlyfans_user(data=None, user="default"):
-    check_config(user)
+    check_user_config(user)
     if not data: data = prompt_onlyfans(user)
     with fileinput.FileInput(get_user_config_path(user), inplace = True) as f:
         for line in f: 
@@ -285,7 +285,7 @@ def update_onlyfans_user(data=None, user="default"):
     logger.info("OnlyFans user config updated!")
 
 def update_google_user(data=None, user="default"):
-    check_config(user)
+    check_user_config(user)
     if not data: data = prompt_google(user)
     with fileinput.FileInput(get_user_config_path(user), inplace = True) as f:
         for line in f: 
@@ -297,7 +297,7 @@ def update_google_user(data=None, user="default"):
     logger.info("Google user config updated!")
 
 def update_twitter_user(data=None, user="default"):
-    check_config(user)
+    check_user_config(user)
     if not data: data = prompt_twitter(user)
     with fileinput.FileInput(get_user_config_path(user), inplace = True) as f:
         for line in f: 

@@ -14,18 +14,20 @@ Here are some fuzzy debugging previews of how it looks when everything works:
 - [Users](//ipfs.io/ipfs/Qmc9zPytgSKx4EK6V1A8DABNeCpMxBybcRs4hNtAMSKDyi?filename=users.gif)
 
 ## Installation
-There are two **different** installation options (that I know of):
+There are two installation options:
 1) via pip for the latest official package: `python3 -m pip install onlysnarf`  
 2) or clone the repo & setup a virtual environment to install locally like in the bash script at [bin/virtualenv.sh](/bin/virtualenv.sh) 
 
+Once installed run the command: `snarf config`
+1) Select 'reset' to reset / copy the main configuration file to its default location
+2) Add an OnlyFans user profile to login with via 'Add'
+
 Here is an output of the command: [`snarf -h`](/public/docs/help.md/#-h)  
   
-Command example: `snarf -text "suck my giant balls" /path/to/imageOfBalls.jpeg`  
+Command example: `snarf --username $username -text "suck my giant balls" /path/to/imageOfBalls.jpeg`  
 Version: `snarf -version` or `snarf --version`  
 
 ## Config
-The command `snarf config` is now available for help adding, listing, updating, and removing user config files. This command **does not** (yet) help with configuring the general config file which is described as follows.
-
 Example config files are provided. There are two main types of config files that should be provided to affect runtime behavior as well as one optional method to help distinguish between user logins for multiple accounts.
 1) the config for the general app's behavior: `$HOME/.onlysnarf/config.conf`
 2) one config for each user containing their credentials: `$HOME/.onlysnarf/users/$username.conf`
@@ -34,6 +36,8 @@ Example config files are provided. There are two main types of config files that
 The user config to use at runtime can be specificed with the "--username" argument. 
 User config example: "--username alexdicksdown" --> `$HOME/.onlysnarf/users/alexdicksdown.conf`
 When no "--username" argument is passed at runtime or in the config file then the default config file containing the default user credentials is used.
+
+The command `snarf config` is available for help adding, listing, updating, and removing **user** config files.
 
 **Note for Windows**: the user's $HOME path works out to `C:\Users\YOUR_USERNAME` so the base directory for config files and such can instead be found at `C:\Users\YOUR_USERNAME\.onlysnarf`
 

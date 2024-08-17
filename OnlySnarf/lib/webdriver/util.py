@@ -37,7 +37,7 @@ def read_session_data(browserType):
             browser_data = data.get(browserType, {'id':'','url':''})
             return browser_data['id'], browser_data['url']
     except Exception as e:
-        logger.error(e)
+        logger.warning(e)
     return "", ""
 
 def write_session_data(browserType, session_id, session_url):

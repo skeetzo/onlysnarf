@@ -886,6 +886,7 @@
   - update to sync: tests & formatting
   - added scan_dropbox and test_scan_dropbox
 **4.7.1 : 8-17-2024**
+- checkin: mostly functional
 - adjusted manifest to include config files
 - updated config subcommand to reset base config file via 'Reset'
 
