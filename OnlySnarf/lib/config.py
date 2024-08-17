@@ -14,6 +14,7 @@ from ..util.colorize import colorize
 from ..util.user_config import get_user_config_path, get_username_onlyfans, get_password, get_username_google, get_password_google, get_username_twitter, get_password_twitter
 
 EMPTY_USER_CONFIG = Path(__file__).parent.joinpath("../conf/users/example-user.conf").resolve()
+BASE_CONFIG = Path(__file__).parent.joinpath("../conf/config.conf").resolve()
 
 def add_user():
     username = input("OnlyFans username: ")
@@ -165,7 +166,7 @@ def menu():
     questions = [
         inquirer.List('menu',
             message= "Please select an option:",
-            choices= ['Add', 'Display', 'List', 'Update', 'Remove', 'Exit']
+            choices= ['Add', 'Display', 'List', 'Update', 'Remove', 'Reset', 'Exit']
         )
     ]
     answers = inquirer.prompt(questions)
@@ -178,6 +179,7 @@ def main_menu():
     elif (action == 'List'): list_users()
     elif (action == 'Update'): update_menu()
     elif (action == 'Remove'): remove_menu()
+    elif (action == 'Reset'): reset_config()
     else: exit()
     main()
 
@@ -233,6 +235,12 @@ def reset_user_config(user="default"):
     shutil.copyfile(EMPTY_USER_CONFIG, get_user_config_path(user))
     logger.info("successfully reset config!")
 
+def reset_config():
+    logger.info("resetting configuration...")
+    shutil.copyfile(BASE_CONFIG, os.path.join(Settings.get_base_directory(), "conf", "config.conf"))
+    shutil.rmtree(os.path.join(Settings.get_base_directory(), "conf/users"))
+    Path(os.path.join(Settings.get_base_directory(), "conf/users")).mkdir(parents=True, exist_ok=True)
+    logger.info("OnlySnarf config reset!")
 
 def update_user_config(user="default"):
     # save user settings in variables

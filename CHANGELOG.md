@@ -876,18 +876,20 @@
   - finished scan.py
   - added tests for scan
 **4.7.0 : 9/25/2023**
-- updates to script/scan
-- LIVE TESTS: post, message
-- updated minor version w/ successful live testing
-- release new version on pypi
-- updated readme and help texts
-**9/26/2023**
-- updates to scan: backup & delete
-- update to sync: tests & formatting
-- added scan_dropbox and test_scan_dropbox
+  - updates to script/scan
+  - LIVE TESTS: post, message
+  - updated minor version w/ successful live testing
+  - release new version on pypi
+  - updated readme and help texts
+  **9/26/2023**
+  - updates to scan: backup & delete
+  - update to sync: tests & formatting
+  - added scan_dropbox and test_scan_dropbox
+**4.7.1 : 8-17-2024**
+- adjusted manifest to include config files
+- updated config subcommand to reset base config file via 'Reset'
 
 ------------------------------------------------------------------------------------
-
 
 # TODO
 
