@@ -691,7 +691,7 @@
   **4.4.16 : 7/5/2023**
   - update readme and help&menu docs / added personal touchups
   - fixed get random user for discount test 
-**4.5.0 : 7/11/2023**
+  **4.5.0 : 7/11/2023**
   - added wget functionality to input for when a url is provided
   - cleaned up bin/test scripts
   - added basic api setup
@@ -723,12 +723,15 @@
   **4.5.9 : 8/3/2023**
   - added update script meant to be run by systemd service script
   - added config script; requires testing
-**4.5.10 : 8/4/2023**
+  **4.5.10 : 8/4/2023**
   - moved api & menu to cli
   - updates to config script
   - tested new config script
 **4.6.0,1 : 8/7/2023**
   - minor version bump for working api & cli changes
+**4.6.2 : 8-17-2024**
+- adjusted manifest to include config files
+- updated config subcommand to reset base config file via 'Reset'
 
 ------------------------------------------------------------------------------------
 

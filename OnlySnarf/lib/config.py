@@ -12,6 +12,7 @@ from ..util.colorize import colorize
 from pathlib import Path
 
 EMPTY_USER_CONFIG = Path(__file__).parent.joinpath("../conf/users/example-user.conf").resolve()
+BASE_CONFIG = Path(__file__).parent.joinpath("../conf/config.conf").resolve()
 
 class Config:
 
@@ -184,7 +185,7 @@ class Config:
         questions = [
             inquirer.List('menu',
                 message= "Please select an option:",
-                choices= ['Add', 'Display', 'List', 'Update', 'Remove', 'Exit']
+                choices= ['Add', 'Display', 'List', 'Update', 'Remove', 'Reset', 'Exit']
             )
         ]
         answers = inquirer.prompt(questions)
@@ -197,6 +198,7 @@ class Config:
         elif (action == 'List'): Config.list_users()
         elif (action == 'Update'): Config.update_menu()
         elif (action == 'Remove'): Config.remove_menu()
+        elif (action == 'Reset'): Config.reset_config()
         else: exit()
         Config.main()
 
@@ -242,16 +244,22 @@ class Config:
         if data['password'] == "" or input("Update Twitter password? N/y ").lower() == "y":
             data['password'] = input('Twitter Password: ')
         return data
-    
+
+    def reset_config():
+        Settings.print("resetting configuration...")
+        shutil.copyfile(BASE_CONFIG, os.path.join(Settings.get_base_directory(), "conf", "config.conf"))
+        shutil.rmtree(os.path.join(Settings.get_base_directory(), "conf/users"))
+        Path(os.path.join(Settings.get_base_directory(), "conf/users")).mkdir(parents=True, exist_ok=True)
+        Settings.print("OnlySnarf config reset!")
+
     def reset_user_config(user="default"):
-        Settings.print("resetting user config files for {}...".format(user))
+        Settings.dev_print("resetting user config files for {}...".format(user))
         if os.path.exists(Settings.get_user_config_path(user)):
             os.remove(Settings.get_user_config_path(user))
         else:
-            Settings.warn_print("no config exists to reset!")
+            Settings.dev_print("no user config exists to reset!")
         shutil.copyfile(EMPTY_USER_CONFIG, Settings.get_user_config_path(user))
-        Settings.print("successfully reset config!")
-
+        Settings.dev_print("successfully reset user config!")
 
     def update_user_config(user="default"):
         # save user settings in variables
