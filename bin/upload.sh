@@ -6,4 +6,4 @@ python -m pip freeze
 bin/save.sh
 wait
 python -m build
-twine upload dist/*
+twine upload --repository onlysnarf dist/*
