@@ -12,7 +12,7 @@ from selenium.common.exceptions import TimeoutException
 
 from .clear import clear_text, click_close_icons
 from .collections import clear_collections, click_collections
-from .element import find_element_to_click
+from .element import find_element_to_click, move_to_then_click_element
 from .errors import error_checker
 from .goto import go_to_home, go_to_page
 # from .post import enter_text
@@ -52,19 +52,18 @@ def message(browser, message_object):
         # prepare the message
         if len(message_object["recipients"]) > 1 or message_object["includes"] or message_object["excludes"]:
             go_to_page(browser, ONLYFANS_NEW_MESSAGE_URL)
-            clear_collections(browser, includes=message_object["includes"], excludes=message_object["excludes"])
-            # if not messaging a single user directly, all these can be stacked in a single message
-            click_collections(browser, includes=message_object["includes"], excludes=message_object["excludes"])
             # use same page to add additional users to message 
             for username in message_object["recipients"]:
                 add_user_to_message(browser, username)
+            clear_collections(browser, includes=message_object["includes"], excludes=message_object["excludes"])
+            # if not messaging a single user directly, all these can be stacked in a single message
+            click_collections(browser, includes=message_object["includes"], excludes=message_object["excludes"])
         else:
             # if none of above or solo messaging, switch to normal user messaging (locates user_id on profile page and opens url link)
             # doesn't need to clear lists when opening a new tab to search for the username then send them a message
             message_user_by_username(browser, message_object["recipients"][0])
-
         message_text(browser, message_object['text'])
-        message_price(browser, message_object['price'])
+        message_price(browser, message_object['price'], skip_clear=True)
         upload_files(browser, message_object['files'])
         message_send(browser)
         if CONFIG["debug"]:
@@ -96,10 +95,12 @@ def add_user_to_message(browser, username):
         element = browser.find_element(By.CLASS_NAME, "b-search-users-form__input")
         ActionChains(browser).move_to_element(element).click(on_element=element).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(username)).perform()
         WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-search-users-form__input")))
+        # find_element_to_click(browser, "b-available-users__item")
         elements = browser.find_elements(By.CLASS_NAME, "b-available-users__item")
         if len(elements) > 0:
             for element in elements:
                 element.click()
+                break
             return True
     except Exception as e:
         error_checker(e)
@@ -158,7 +159,7 @@ def message_confirm(browser):
         error_checker(e)
     return False
 
-def message_price(browser, price):
+def message_price(browser, price, skip_clear=False):
     """
     Enter the provided price into the message on the page
 
@@ -178,7 +179,8 @@ def message_price(browser, price):
         if not price or str(price) == "None":
             logger.debug("skipping empty price")
             return True
-        message_price_clear(browser)
+        if not skip_clear:
+            message_price_clear(browser)
         message_price_open(browser)
         message_price_enter(browser, price)
         message_price_save(browser)
@@ -226,8 +228,10 @@ def message_price_open(browser, reattempt=False):
 def message_price_enter(browser, price, reattempt=False):
     try:
         logger.debug("entering price...")
-        element = WebDriverWait(browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(browser.find_element(By.ID, "priceInput_1")))
-        element.click()
+        element = WebDriverWait(browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(browser.find_element(By.XPATH, "//*[starts-with(@id, 'priceInput')]")))
+        # element = WebDriverWait(browser, 10, poll_frequency=2).until(EC.element_to_be_clickable(browser.find_element(By.CLASS_NAME, "v-text-field__slot")))
+        # move_to_then_click_element(browser, element)
+        # element.click()
         element.send_keys(str(price))
         logger.debug("entered price!")
         debug_delay_check()

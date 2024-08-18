@@ -889,6 +889,9 @@
 - checkin: mostly functional
 - adjusted manifest to include config files
 - updated config subcommand to reset base config file via 'Reset'
+- minor updates
+**4.7.2 : 8-18-2024**
+- tests complete
 
 ------------------------------------------------------------------------------------
 

@@ -62,7 +62,7 @@ def schedule_open(browser):
 
     try:
         logger.debug("opening schedule...")
-        find_element_to_click(browser, "g-btn.m-flat.b-make-post__datepicker-btn").click()
+        find_element_to_click(browser, "b-make-post__datepicker-btn").click()
         logger.debug("sucessfully opened schedule!")
         return True
     except Exception as e:

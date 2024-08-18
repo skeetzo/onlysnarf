@@ -11,7 +11,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 
 # from . import scroll_to_bottom
-from .element import find_element_to_click
+from .element import find_element_to_click, move_to_then_click_element
 from .errors import error_checker
 from .goto import go_to_home, go_to_page
 from .. import CONFIG, debug_delay_check, print_same_line
@@ -82,9 +82,9 @@ def get_userid_by_username(browser, username):
     raise Exception(f"failed to find user id for username: {username}")
 
 def get_user_element_at_page(browser, username, page, reattempt=False):
-    if page == ONLYFANS_FOLLOWING_URL:
+    if ONLYFANS_FOLLOWING_URL in page:
         class_name = "subscriptions"
-    elif page == ONLYFANS_FANS_URL:
+    elif ONLYFANS_FANS_URL in page:
         class_name = "fans"
     try:
         SLEEP_WAIT = 1
@@ -120,13 +120,14 @@ def get_user_element_at_page(browser, username, page, reattempt=False):
     raise Exception(f"failed to find {username} at {page}!")
 
 def get_users_at_page(browser, page, collection="Active"):
-    if page == ONLYFANS_FOLLOWING_URL:
+
+    if ONLYFANS_FOLLOWING_URL in str(page):
         class_name = "subscriptions"
-    elif page == ONLYFANS_FANS_URL:
+    elif ONLYFANS_FANS_URL in str(page):
         class_name = "fans"
     try:
         go_to_page(browser, os.path.join(page, collection.lower()), force=True)
-        find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True).click()
+        move_to_then_click_element(browser, find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True))
         # scroll until elements stop spawning
         SLEEP_WAIT = 1
         BREAK_COUNT = 0
@@ -178,7 +179,8 @@ def get_random_fan_username(browser, page=ONLYFANS_FANS_URL, collection="Active"
         class_name = "fans"
     try:
         go_to_page(browser, os.path.join(ONLYFANS_FANS_URL, collection.lower()), force=True)
-        find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True).click()
+        # find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True).click()
+        move_to_then_click_element(browser, find_element_to_click(browser, "b-tabs__nav__text", text=collection, fuzzyMatch=True))
         # scroll until elements stop spawning
         SLEEP_WAIT = 1
         BREAK_COUNT = 0

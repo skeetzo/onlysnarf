@@ -107,6 +107,7 @@ def open_poll_model(browser):
     try:
         logger.debug("adding poll..")
         for element in browser.find_element(By.CLASS_NAME, "b-make-post__actions__btns").find_elements(By.XPATH, "./child::*"):
+            logger.debug(str(element.get_attribute("innerHTML")))
             if "icon-poll" in str(element.get_attribute("innerHTML")):
                 logger.debug("clicking poll button...")
                 browser.execute_script("arguments[0].click()", element)

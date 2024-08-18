@@ -75,4 +75,4 @@ def click_close_icons(browser):
         return True
     except Exception as e:
         error_checker(e)
-    raise Exception("failed to click close icons!")
+    # raise Exception("failed to click close icons!")

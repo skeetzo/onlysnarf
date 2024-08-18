@@ -77,11 +77,10 @@ def post(browser, post_object):
         send_post(browser)
     except TimeoutException:
         logger.error("timed out waiting for post upload!")
-        click_clear_button(browser)
     except Exception as e:
         logger.debug(e)
         logger.error("failed to send post!")
-        click_clear_button(browser)
+    click_clear_button(browser)
     return True
 
 def enter_text(browser, text):

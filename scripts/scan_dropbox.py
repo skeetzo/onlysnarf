@@ -79,7 +79,7 @@ def scan(args, dbx):
         print(f"path: {path}")
 
     # check for a config near the located files or folder
-    upload_config = ?
+    # upload_config = {} # ?
 
     # create a config or use one that was found
     upload_config = {}

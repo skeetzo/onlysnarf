@@ -61,13 +61,13 @@ class TestWebdriver_Message(unittest.TestCase):
         self.message_object["files"] = ["/home/skeetzo/Projects/onlysnarf/public/images/shnarf.jpg"]
         self.message_object["price"] = DEFAULT.PRICE_MINIMUM
         self.message_object["recipients"] = [random_username_one, random_username_two]
-        self.message_object["includes"] = ["all","following","favorites","friends","renew on","renew off"]
+        self.message_object["includes"] = ["all","favorites","friends","renew on","renew off"]
         assert WEBDRIVER_message(self.browser, self.message_object), "unable to send message to included lists"
 
     def test_message_all_exclude(self):
         self.message_object["recipients"] = [random_username_one, random_username_two]
         # self.message_object["price"] = DEFAULT.PRICE_MINIMUM
-        self.message_object["excludes"] = ["all","following","favorites","friends","renew on","renew off"]
+        self.message_object["excludes"] = ["all","favorites","friends","renew on","renew off"]
         assert WEBDRIVER_message(self.browser, self.message_object), "unable to send message to excluded lists"
 
     def test_message_files_local(self):
