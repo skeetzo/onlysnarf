@@ -892,6 +892,8 @@
 - minor updates
 **4.7.2 : 8-18-2024**
 - tests complete
+**4.7.3 : 9-5-2024**
+- minor update to package entry from importing projects
 
 ------------------------------------------------------------------------------------
 

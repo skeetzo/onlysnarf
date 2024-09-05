@@ -47,7 +47,7 @@ def discount():
         successful.append(Discount.create_discount({'username':username,'amount':CONFIG["amount"],'months':CONFIG["months"]}).apply())
     return all(successful)
 
-def message():
+def message(message_object):
 
     """
     Sends the configured message from args / prompts.
@@ -59,32 +59,27 @@ def message():
     recipients = CONFIG.get("recipients", [])
     recipients.append(CONFIG.get("user", ""))
     recipients = list(filter(None, recipients))
-    message_object = {
-        "text"      : CONFIG["text"],
-        "files"     : CONFIG["input"],
-        "keywords"  : CONFIG["keywords"],
-        "performers": CONFIG["performers"],
-        "price"     : CONFIG["price"],
-        "schedule"  : {
-            "date" : str(CONFIG["date"]).split(" ")[0],
-            "time" : str(CONFIG["time"]).split(" ")[1]
-        },
-        "recipients": recipients,
-        "includes"  : CONFIG["includes"],
-        "excludes"  : CONFIG["excludes"]
-    }
+    if  not message_object:
+        message_object = {
+            "text"      : CONFIG["text"],
+            "files"     : CONFIG["input"],
+            "keywords"  : CONFIG["keywords"],
+            "performers": CONFIG["performers"],
+            "price"     : CONFIG["price"],
+            "schedule"  : {
+                "date" : str(CONFIG["date"]).split(" ")[0],
+                "time" : str(CONFIG["time"]).split(" ")[1]
+            },
+            "recipients": recipients,
+            "includes"  : CONFIG["includes"],
+            "excludes"  : CONFIG["excludes"]
+        }
     if not message_object["text"]: raise Exception("missing text!")
     if not message_object["recipients"] and not message_object["includes"]:        
         raise Exception("missing recipients!")
-
-    # print(message_object)
-
-    # return
-
-
     return Message.create_message(message_object).send()
             
-def post():
+def post(post_object):
 
     """
     Posts the configured text from args / prompts.
@@ -93,17 +88,18 @@ def post():
     """
 
     logging.snarf("Beginning post process...")
-    post_object = {
-        "text"      : CONFIG["text"],
-        "files"     : CONFIG["input"],
-        "keywords"  : CONFIG["keywords"],
-        "performers": CONFIG["performers"],
-        "price"     : CONFIG["price"],
-        "schedule"  : {
-            "date" : str(CONFIG["date"]).split(" ")[0],
-            "time" : str(CONFIG["time"]).split(" ")[1]
+    if not post_object:
+        post_object = {
+            "text"      : CONFIG["text"],
+            "files"     : CONFIG["input"],
+            "keywords"  : CONFIG["keywords"],
+            "performers": CONFIG["performers"],
+            "price"     : CONFIG["price"],
+            "schedule"  : {
+                "date" : str(CONFIG["date"]).split(" ")[0],
+                "time" : str(CONFIG["time"]).split(" ")[1]
+            }
         }
-    }
     if not post_object["text"]: raise Exception("missing text!")
     return Post.create_post(post_object).send()
 
