@@ -894,10 +894,14 @@
 - tests complete
 **4.7.3 : 9-5-2024**
 - minor update to package entry from importing projects
+**4.7.4 : 9-16-2024**
+- updated remote host address
 
 ------------------------------------------------------------------------------------
 
 # TODO
+
+- add X-api auth key to all of api
 
 - finish (combining) scan & scan_dropbox\
 - finish testing scan_dropbox

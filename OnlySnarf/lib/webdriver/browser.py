@@ -289,7 +289,7 @@ def attempt_reconnect(browserType):
     return None
 
 # TODO: debug
-def attempt_remote(browserType, host="skeetzo.com", port=8888):
+def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
     # link = f"http://{host}:{port}/wd/hub"
     link = f"http://{host}:{port}"
     logger.debug(f"remote webserver: {link}")
