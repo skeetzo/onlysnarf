@@ -90,7 +90,7 @@ def check_if_logged_in(browser):
 
     try:
         logger.debug("waiting for login check...")
-        WebDriverWait(browser, 30, poll_frequency=2).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-make-post__streaming-link")))
+        WebDriverWait(browser, 60*6, poll_frequency=3).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-make-post__streaming-link")))
         logger.info("OnlyFans login successful!")
         return True
     except TimeoutException as te:
@@ -148,7 +148,7 @@ def via_form(browser):
         check_captcha(browser)
         return check_if_logged_in(browser)
     except Exception as e:
-        logger.debug("form login failure!")
+        logger.debug("form login failure")
         error_checker(e)
     return False
 
@@ -184,7 +184,7 @@ def via_google(browser):
         logger.debug("password entered")
         return check_if_logged_in(browser)
     except Exception as e:
-        logger.debug("google login failure!")
+        logger.debug("google login failure")
         error_checker(e)
     return False
 
@@ -202,7 +202,7 @@ def via_twitter(browser):
     try:
         logger.debug("logging in via twitter...")
         if not str(get_username_twitter()) or not str(get_password_twitter()):
-            logger.error("missing twitter login info!")
+            logger.error("missing twitter login info")
             return False
         # click twitter login
         elements = browser.find_elements(By.TAG_NAME, "a")
@@ -215,7 +215,7 @@ def via_twitter(browser):
         logger.debug("password entered")
         return check_if_logged_in(browser)
     except Exception as e:
-        logger.debug("twitter login failure!")
+        logger.debug("twitter login failure")
         error_checker(e)
     return False
 

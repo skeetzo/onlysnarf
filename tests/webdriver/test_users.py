@@ -7,7 +7,7 @@ CONFIG = set_config({})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import login as get_browser_and_login
+from OnlySnarf.lib.driver import login as get_browser_and_login, close_browser
 from OnlySnarf.lib.webdriver.users import get_users_by_type as WEBDRIVER_get_users_by_type
 
 class TestWebdriver_Users(unittest.TestCase):
@@ -16,7 +16,7 @@ class TestWebdriver_Users(unittest.TestCase):
         self.browser = get_browser_and_login(cookies=CONFIG["cookies"])
         
     def tearDown(self):
-        pass
+        close_browser(self.browser)
 
     @classmethod
     def setUpClass(cls):

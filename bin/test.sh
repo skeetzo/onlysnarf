@@ -24,6 +24,8 @@ pytest $TEST_PATH
 # single test format:
 python -m unittest tests.webdriver.test_message.TestMessage_Webdriver.test_message_failure
 
+python -m unittest tests/webdriver/test_auth.py
+
 # Webdriver #
 python -m unittest tests/webdriver/test_discount.py
 python -m unittest tests/webdriver/test_expiration.py

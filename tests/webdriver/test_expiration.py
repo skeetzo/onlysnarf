@@ -8,7 +8,7 @@ from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_t
 configure_logging(True, True)
 
 from OnlySnarf.util import defaults as DEFAULT
-from OnlySnarf.lib.driver import login as get_browser_and_login
+from OnlySnarf.lib.driver import login as get_browser_and_login, close_browser
 from OnlySnarf.lib.webdriver.expiration import expiration as WEBDRIVER_expiration
 
 class TestWebdriver_Expiration(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestWebdriver_Expiration(unittest.TestCase):
         self.browser = get_browser_and_login(cookies=CONFIG["cookies"])
 
     def tearDown(self):
-        pass
+        close_browser(self.browser)
 
     @classmethod
     def setUpClass(cls):

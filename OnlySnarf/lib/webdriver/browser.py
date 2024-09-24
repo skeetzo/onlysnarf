@@ -129,10 +129,12 @@ def add_options(options):
     # if os.name == 'nt':
         # options.add_argument(r"--user-data-dir=C:\Users\brain\AppData\Local\Google\Chrome\User Data")
     # else:
-    # options.add_argument('--profile-directory=Default')
 
-    if str(platform.processor()) == "aarch64": # raspi
+    # TODO: modify this so that it does this for remote sessions as well
+    if str(platform.processor()) == "aarch64" or "remote" in CONFIG["browser"]: # raspi & remote sessions
+        options.add_argument("--profile-directory=Default")
         options.add_argument("--user-data-dir=/home/ubuntu/selenium") # do not disable, required for cookies to work 
+        # options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
     else:
         options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
 
@@ -296,6 +298,8 @@ def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
     browserAttempt = None
     try:        
         options = configure_options(browserType)
+
+        # options.enable_downloads = True
 
         logger.debug(f"attempting remote browser: {browserType}")
 

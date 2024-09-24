@@ -19,21 +19,25 @@ LOGGED_IN = False
 ##### Close #####
 #################
 
-def close_browser():
+def close_browser(browser=None):
     """Save and exit"""
 
     global BROWSER
     logger.debug("closing web browser...")
-    if not BROWSER:
+    if not browser: browser = BROWSER
+    if not browser:
         logger.debug("no browser to close!")
         return
-    cookies_save(BROWSER)
+    cookies_save(browser)
     if CONFIG.get("keep", False):
-        go_to_home(BROWSER, force=True)
+        go_to_home(browser, force=True)
         logger.debug("reset to home page")
     else:
-        BROWSER.quit()
+        browser.quit()
         logger.info("web browser closed!")
+    # is cleanup necessary?
+    browser = None
+    BROWSER = None
 
 ###############
 ##### Get #####

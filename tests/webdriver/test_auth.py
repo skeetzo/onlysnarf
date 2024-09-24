@@ -7,6 +7,7 @@ CONFIG = set_config({'keep':False})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
+from OnlySnarf.lib.driver import close_browser
 from OnlySnarf.lib.webdriver.cookies import reset_cookies
 from OnlySnarf.lib.webdriver.browser import create_browser as WEBDRIVER_create_browser
 from OnlySnarf.lib.webdriver.login import login as WEBDRIVER_login, check_if_already_logged_in as WEBDRIVER_check_if_already_logged_in
@@ -14,10 +15,14 @@ from OnlySnarf.lib.webdriver.login import login as WEBDRIVER_login, check_if_alr
 class TestWebdriver_Auth(unittest.TestCase):
 
     def setUp(self):
-        self.browser = WEBDRIVER_create_browser()
-        
+        try:
+            self.browser = WEBDRIVER_create_browser("remote:firefox")
+        except Exception as e:
+            print(e)
+            os._exit(1)
+
     def tearDown(self):
-        self.browser.quit()
+        close_browser(self.browser)
 
     @classmethod
     def setUpClass(cls):
