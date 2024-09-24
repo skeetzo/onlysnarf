@@ -35,7 +35,7 @@ class TestWebdriver_Auth(unittest.TestCase):
         assert WEBDRIVER_login(self.browser, cookies=True), "unable to login"
 
     def test_login_via_cookies(self):
-        assert WEBDRIVER_check_if_already_logged_in(self.browser), "unable to login from cookies"
+        assert WEBDRIVER_check_if_already_logged_in(self.browser, cookies=True), "unable to login from cookies"
 
 ############################################################################################
 

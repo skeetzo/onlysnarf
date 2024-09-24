@@ -38,10 +38,10 @@ def login(browser, method="auto", cookies=False):
         logger.info(f"login successful! ({method})")
         return True
 
-    if cookies: cookies_load(browser)
-    else: logger.debug("skipping cookies (load)")
+    # if cookies: cookies_load(browser)
+    # else: logger.debug("skipping cookies (load)")
 
-    if check_if_already_logged_in(browser): return logged_in()
+    if check_if_already_logged_in(browser, cookies=cookies): return logged_in()
     
     logger.info(f"logging into OnlyFans for {CONFIG['username']}...")
     try:
@@ -62,8 +62,11 @@ def login(browser, method="auto", cookies=False):
 ################################################################################################
 ################################################################################################
 
-def check_if_already_logged_in(browser):
+def check_if_already_logged_in(browser, cookies=False):
     """Check if already logged in before attempting to login again"""
+
+    if cookies: cookies_load(browser)
+    else: logger.debug("skipping cookies (load)")
 
     # go_to_home(browser)
     go_to_home(browser, force=True)
@@ -90,7 +93,7 @@ def check_if_logged_in(browser):
 
     try:
         logger.debug("waiting for login check...")
-        WebDriverWait(browser, 60*6, poll_frequency=3).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-make-post__streaming-link")))
+        WebDriverWait(browser, 60*2, poll_frequency=3).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-make-post__streaming-link")))
         logger.info("OnlyFans login successful!")
         return True
     except TimeoutException as te:

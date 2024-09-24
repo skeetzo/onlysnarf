@@ -115,47 +115,6 @@ def create_browser(browserType="auto"):
 ################################################################################################
 ################################################################################################
 
-def add_options(options):
-    options.add_argument("--no-sandbox") # Bypass OS security model
-    if not CONFIG["show"]:
-        options.add_argument('--headless')
-        options.add_argument("--window-size=1920,1080") # required for headless
-    options.add_argument("--disable-gpu")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("enable-automation")
-    # options.add_argument("--disable-infobars")
-
-    # if os.name == 'nt':
-        # options.add_argument(r"--user-data-dir=C:\Users\brain\AppData\Local\Google\Chrome\User Data")
-    # else:
-
-    options.add_argument("--profile-directory=Default")
-    if str(platform.processor()) == "aarch64" or "remote" in CONFIG["browser"]: # raspi & remote sessions
-        options.add_argument("--user-data-dir=/home/ubuntu/selenium") # do not disable, required for cookies to work 
-        # options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
-    else:
-        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
-
-    options.add_argument("--disable-browser-side-navigation") # https://stackoverflow.com/a/49123152/1689770
-
-    # options.add_argument("--allow-insecure-localhost")            
-    # possibly linux only
-    # options.add_argument('disable-notifications')
-    # https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
-    # options.add_argument("start-maximized")
-    # options.add_argument("--disable-crash-reporter")
-    # options.add_argument("--disable-infobars")
-    # options.add_argument("--disable-in-process-stack-traces")
-    # options.add_argument("--disable-logging")
-    # options.add_argument("--log-level=3")
-    # options.add_argument("--output=/dev/null")
-    # TODO: to be added to list of removed (if not truly needed by then)
-    # options.add_argument('--disable-software-rasterizer')
-    # options.add_argument('--ignore-certificate-errors')
-    # options.add_argument("--remote-debugging-address=localhost")    
-    # options.add_argument("--remote-debugging-port=9223") # required
-
 def browser_error(err, browserName):
     if os.environ.get('ENV') == "True": print(err)
     logger.debug(err)
@@ -189,6 +148,7 @@ def attempt_chrome():
             browserAttempt = ChromeWebDriver(service=ChromeService('/usr/bin/chromedriver', log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
         else:
             logger.debug("cpu process: standard")
+            # browserAttempt = ChromeWebDriver(service=ChromeService('/usr/bin/chromedriver', log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
             browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=ChromeDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
         logger.info("browser created - Chrome")        
     except Exception as e:
@@ -295,8 +255,6 @@ def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
     logger.debug(f"remote webserver: {link}")
     browserAttempt = None
     try:        
-        options = configure_options(browserType)
-
         # necessary?
         # options.enable_downloads = True
         # chrome_options = webdriver.ChromeOptions()
@@ -304,7 +262,7 @@ def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
         # chrome_options.set_capability("platformName", "Windows XP")
 
         logger.debug(f"attempting remote browser: {browserType}")
-        browserAttempt = webdriver.Remote(command_executor=link, options=options)
+        browserAttempt = webdriver.Remote(command_executor=link, options=configure_options(browserType))
         logger.info(f"remote browser created: {browserType}")
         return browserAttempt
     except Exception as e:
@@ -343,6 +301,47 @@ def configure_options(browserType):
 ################################################################################################
 ################################################################################################
 ################################################################################################
+
+def add_options(options):
+    options.add_argument("--no-sandbox") # Bypass OS security model
+    if not CONFIG["show"]:
+        options.add_argument('--headless')
+        options.add_argument("--window-size=1920,1080") # required for headless
+    options.add_argument("--disable-gpu")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("enable-automation")
+    # options.add_argument("--disable-infobars")
+
+    # if os.name == 'nt':
+        # options.add_argument(r"--user-data-dir=C:\Users\brain\AppData\Local\Google\Chrome\User Data")
+    # else:
+
+    if str(platform.processor()) == "aarch64" or "remote" in CONFIG["browser"]: # raspi & remote sessions
+        options.add_argument("--profile-directory=Default")
+        # options.add_argument("--user-data-dir=/home/ubuntu/selenium") # do not disable, required for cookies to work 
+        options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
+    else:
+        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
+
+    options.add_argument("--disable-browser-side-navigation") # https://stackoverflow.com/a/49123152/1689770
+
+    # options.add_argument("--allow-insecure-localhost")            
+    # possibly linux only
+    # options.add_argument('disable-notifications')
+    # https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
+    # options.add_argument("start-maximized")
+    # options.add_argument("--disable-crash-reporter")
+    # options.add_argument("--disable-infobars")
+    # options.add_argument("--disable-in-process-stack-traces")
+    # options.add_argument("--disable-logging")
+    # options.add_argument("--log-level=3")
+    # options.add_argument("--output=/dev/null")
+    # TODO: to be added to list of removed (if not truly needed by then)
+    # options.add_argument('--disable-software-rasterizer')
+    # options.add_argument('--ignore-certificate-errors')
+    # options.add_argument("--remote-debugging-address=localhost")    
+    # options.add_argument("--remote-debugging-port=9223") # required
 
 def configure_brave_options():
     options = webdriver.BraveOptions()

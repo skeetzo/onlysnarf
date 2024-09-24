@@ -36,7 +36,7 @@ def close_browser(browser=None):
         browser.quit()
         logger.info("web browser closed!")
     # is cleanup necessary?
-    browser = None
+    # browser = None
     BROWSER = None
 
 ###############
@@ -75,34 +75,34 @@ def login(method="auto", cookies=False):
 #####################################
 
 def discount_user(discount_object):
-    return WEBDRIVER_discount(login(cookies=CONFIG["cookies"]), discount_object)
+    return WEBDRIVER_discount(login(method=CONFIG["login"], cookies=CONFIG["cookies"]), discount_object)
 
 def expiration(expires_amount):
-    return WEBDRIVER_expiration(login(cookies=CONFIG["cookies"]), expires_amount)
+    return WEBDRIVER_expiration(login(method=CONFIG["login"], cookies=CONFIG["cookies"]), expires_amount)
 
 def message(message_object):
-    return WEBDRIVER_message(login(cookies=CONFIG["cookies"]), message_object)
+    return WEBDRIVER_message(login(method=CONFIG["login"], cookies=CONFIG["cookies"]), message_object)
 
 def poll(poll_object):
-    return WEBDRIVER_poll(login(cookies=CONFIG["cookies"]), poll_object)
+    return WEBDRIVER_poll(login(method=CONFIG["login"], cookies=CONFIG["cookies"]), poll_object)
 
 def post(post_object):
-    return WEBDRIVER_post(login(cookies=CONFIG["cookies"]), post_object)
+    return WEBDRIVER_post(login(method=CONFIG["login"], cookies=CONFIG["cookies"]), post_object)
 
 def schedule(schedule_object):
-    return WEBDRIVER_schedule(login(cookies=CONFIG["cookies"]), schedule_object)
+    return WEBDRIVER_schedule(login(method=CONFIG["login"], cookies=CONFIG["cookies"]), schedule_object)
 
 def get_recent_chat_users():
-    return WEBDRIVER_get_recent_chat_users(login(cookies=CONFIG["cookies"]))
+    return WEBDRIVER_get_recent_chat_users(login(method=CONFIG["login"], cookies=CONFIG["cookies"]))
 
 def get_userid_by_username():
-    return WEBDRIVER_get_userid_by_username(login(cookies=CONFIG["cookies"]))
+    return WEBDRIVER_get_userid_by_username(login(method=CONFIG["login"], cookies=CONFIG["cookies"]))
 
 def get_users(isFan=False, isFollower=False):
-    return WEBDRIVER_get_users_by_type(login(cookies=CONFIG["cookies"]), isFan=isFan, isFollower=isFollower)
+    return WEBDRIVER_get_users_by_type(login(method=CONFIG["login"], cookies=CONFIG["cookies"]), isFan=isFan, isFollower=isFollower)
 
 def get_user_chat():
-    return WEBDRIVER_get_user_chat(login(cookies=CONFIG["cookies"]))
+    return WEBDRIVER_get_user_chat(login(method=CONFIG["login"], cookies=CONFIG["cookies"]))
 
 
 # TODO: add remaining functionality like lists, promotion, profile, etc

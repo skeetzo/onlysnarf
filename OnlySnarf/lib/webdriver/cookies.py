@@ -29,7 +29,7 @@ def cookies_load(browser):
             browser.refresh()
             logger.debug("successfully loaded cookies!")
         else: 
-            logger.warning("missing cookies file!")
+            logger.debug("missing cookies file")
     except Exception as e:
         error_checker(e)
         logger.warning("failed to load cookies!")

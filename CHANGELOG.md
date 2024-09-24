@@ -899,12 +899,15 @@
 **4.7.5 : 9-24-2024**
 - updated class name for post text field
 - finished testing remote webserver; updated tests for remote webserver
+- checkin that cookies works on chrome
+- added script for installing chromedriver on ubuntu
 
 ------------------------------------------------------------------------------------
 
 # TODO
 
-- fix cookies again before running full webdriver tests
+- finish debugging cookies again for firefox
+- run full webdriver tests
 
 - finish (combining) scan & scan_dropbox\
 - finish testing scan_dropbox
@@ -1030,3 +1033,11 @@ what helps in general:
 
 # Bugs
 all bugs previous to 4.6.16 are relatively squashed
+
+Webdriver Manager bug:
+2024-09-24 16:53:12,234 - DEBUG - [Errno 8] Exec format error: '/home/skeetzo/.wdm/drivers/chromedriver/linux64/128.0.6613.84/chromedriver-linux64/THIRD_PARTY_NOTICES.chromedriver'
+solved by: https://stackoverflow.com/questions/78806812/third-party-notices-chromedriver-exec-format-error-undetected-chromedriver
+
+`rm -rf ~/.wdm
+pip uninstall webdriver-manager
+pip install webdriver-manager`
