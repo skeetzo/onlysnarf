@@ -172,7 +172,7 @@ def users():
 def main():
     try:
         logging.info(f"Running - {CONFIG['action']}")
-        eval(f"{CONFIG['action']}()")
+        eval(CONFIG['action']+"({})")
     except Exception as e:
         logging.critical(e)
         logging.snarf("shnarf??")

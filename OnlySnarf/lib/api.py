@@ -62,14 +62,6 @@ def create_app():
     @app.route('/post', methods=['POST'])
     def post():
         try:
-            # https://ruan.dev/blog/2018/06/01/add-a-authentication-header-to-your-python-flask-app
-            # headers = request.headers
-            # auth = headers.get("X-Api-Key")
-            # if auth == 'testballs':
-            #     return jsonify({"message": "OK: Authorized"}), 200
-            # else:
-            #     return jsonify({"message": "ERROR: Unauthorized"}), 401
-
             logger.debug("received post request:")
             args = json.loads(request.data)
             logger.debug(args)

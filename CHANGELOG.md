@@ -885,23 +885,26 @@
   - updates to scan: backup & delete
   - update to sync: tests & formatting
   - added scan_dropbox and test_scan_dropbox
-**4.7.1 : 8-17-2024**
-- checkin: mostly functional
-- adjusted manifest to include config files
-- updated config subcommand to reset base config file via 'Reset'
-- minor updates
-**4.7.2 : 8-18-2024**
-- tests complete
-**4.7.3 : 9-5-2024**
-- minor update to package entry from importing projects
-**4.7.4 : 9-16-2024**
-- updated remote host address
+  **4.7.1 : 8-17-2024**
+  - checkin: mostly functional
+  - adjusted manifest to include config files
+  - updated config subcommand to reset base config file via 'Reset'
+  - minor updates
+  **4.7.2 : 8-18-2024**
+  - tests complete
+  **4.7.3 : 9-5-2024**
+  - minor update to package entry from importing projects
+  **4.7.4 : 9-16-2024**
+  - updated remote host address
+**4.7.5 : 9-24-2024**
+- updated class name for post text field
+- finished testing remote webserver; updated tests for remote webserver
 
 ------------------------------------------------------------------------------------
 
 # TODO
 
-- add X-api auth key to all of api
+- fix cookies again before running full webdriver tests
 
 - finish (combining) scan & scan_dropbox\
 - finish testing scan_dropbox
@@ -910,7 +913,6 @@
 - update `config` to assist with setting up main config files
 - update verbose & snarf logging
 - finish debugging reconnect
-- finish testing remote webserver; add/update tests for remote webserver
 - finish implementing message recent calendar selection
 
 ------------------------------------------------------------------------------------

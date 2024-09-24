@@ -15,11 +15,7 @@ from OnlySnarf.lib.webdriver.login import login as WEBDRIVER_login, check_if_alr
 class TestWebdriver_Auth(unittest.TestCase):
 
     def setUp(self):
-        try:
-            self.browser = WEBDRIVER_create_browser("remote:firefox")
-        except Exception as e:
-            print(e)
-            os._exit(1)
+        self.browser = WEBDRIVER_create_browser(CONFIG["browser"])
 
     def tearDown(self):
         close_browser(self.browser)

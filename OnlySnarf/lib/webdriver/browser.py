@@ -130,9 +130,8 @@ def add_options(options):
         # options.add_argument(r"--user-data-dir=C:\Users\brain\AppData\Local\Google\Chrome\User Data")
     # else:
 
-    # TODO: modify this so that it does this for remote sessions as well
+    options.add_argument("--profile-directory=Default")
     if str(platform.processor()) == "aarch64" or "remote" in CONFIG["browser"]: # raspi & remote sessions
-        options.add_argument("--profile-directory=Default")
         options.add_argument("--user-data-dir=/home/ubuntu/selenium") # do not disable, required for cookies to work 
         # options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
     else:
@@ -290,7 +289,6 @@ def attempt_reconnect(browserType):
         browser_error(e, f"reconnect:{browserType}")
     return None
 
-# TODO: debug
 def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
     # link = f"http://{host}:{port}/wd/hub"
     link = f"http://{host}:{port}"
@@ -299,15 +297,13 @@ def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
     try:        
         options = configure_options(browserType)
 
+        # necessary?
         # options.enable_downloads = True
-
-        logger.debug(f"attempting remote browser: {browserType}")
-
         # chrome_options = webdriver.ChromeOptions()
         # chrome_options.set_capability("browserVersion", "67")
         # chrome_options.set_capability("platformName", "Windows XP")
 
-        # TODO: finish debugging -> 'string indices must be integers'
+        logger.debug(f"attempting remote browser: {browserType}")
         browserAttempt = webdriver.Remote(command_executor=link, options=options)
         logger.info(f"remote browser created: {browserType}")
         return browserAttempt

@@ -23,6 +23,8 @@ from .. import debug_delay_check
 from .. import CONFIG
 from .. import ONLYFANS_HOME_URL, ONLYFANS_CHAT_URL, ONLYFANS_NEW_MESSAGE_URL
 
+NEW_POST_CLASS = "b-text-editor"
+
 ####################
 ##### Messages #####
 ####################
@@ -274,7 +276,7 @@ def message_text(browser, text):
         clear_text(browser)
         logger.debug("entering text...")
         # clear any preexisting text first
-        element = WebDriverWait(browser, 3).until(EC.visibility_of_element_located((By.ID, 'new_post_text_input')))
+        element = WebDriverWait(browser, 3).until(EC.visibility_of_element_located((By.CLASS_NAME, NEW_POST_CLASS)))
         ActionChains(browser).move_to_element(element).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(text)).perform()
         logger.debug("successfully entered text!")
         time.sleep(0.5)

@@ -18,6 +18,8 @@ from .schedule import schedule as SCHEDULE
 from .upload import upload_files
 from .. import CONFIG, debug_delay_check
 
+NEW_POST_CLASS = "b-text-editor"
+
 ################
 ##### Post #####
 ################
@@ -105,7 +107,7 @@ def enter_text(browser, text):
         try:
             clear_text(browser)
             logger.debug("entering text: "+text)
-            element = browser.find_element(By.ID, "new_post_text_input")
+            element = browser.find_element(By.CLASS_NAME, NEW_POST_CLASS)
             action = ActionChains(browser)
             action.move_to_element(element)
             action.click(on_element=element)
@@ -163,7 +165,7 @@ def open_more_options(browser):
         """Click in empty space"""
 
         logger.debug("opening options (2)")
-        moreOptions = find_element_to_click(browser, "new_post_text_input", by=By.ID)
+        moreOptions = find_element_to_click(browser, NEW_POST_CLASS, by=By.CLASS_NAME)
         if not moreOptions: return False    
         moreOptions.click()
         logger.debug("successfully opened more options (2)")

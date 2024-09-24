@@ -15,15 +15,18 @@ from .element import find_element_to_click
 from .errors import error_checker
 from .goto import go_to_home
 
+NEW_POST_CLASS = "b-text-editor"
+
 def clear_text(browser):
     try:
         # BUGS: only backspace method is working
         # TODO: fix this horribly inefficient loop; maybe add a way that checks for text in field and deltes until gone?
         #       reimplement methods in a way that allows for continuous debugging
-        element = WebDriverWait(browser, 3).until(EC.visibility_of_element_located((By.ID, 'new_post_text_input')))
+        # element = WebDriverWait(browser, 3).until(EC.element_to_be_clickable((By.CLASS_NAME, NEW_POST_CLASS)))
+        element = WebDriverWait(browser, 3).until(EC.visibility_of_element_located((By.CLASS_NAME, NEW_POST_CLASS)))
+        # ActionChains(browser).move_to_element(element).click().clear().perform()
         for i in range(300):
             element.send_keys(Keys.BACK_SPACE)
-        logger.debug("successfully cleared text!")
     # broken method one:
         # print(element.get_attribute("innerHTML"))
         # element.click()
@@ -39,6 +42,7 @@ def clear_text(browser):
     # broken method 3:
         # # action.send_keys(Keys.CONTROL + "a")
         # action.send_keys(Keys.DELETE)
+        logger.debug("successfully cleared text!")
         return True
     except Exception as e:
         error_checker(e)
@@ -54,7 +58,7 @@ def click_clear_button(browser, reattempt=False):
         # if "obscures element" in str(e).lower() and not reattempt:
         if not reattempt:
             go_to_home(browser, force=True)
-            element = browser.find_element(By.ID, "new_post_text_input")
+            element = browser.find_element(By.CLASS_NAME, NEW_POST_CLASS)
             action = ActionChains(browser)
             action.move_to_element(element)
             action.click(on_element=element)
