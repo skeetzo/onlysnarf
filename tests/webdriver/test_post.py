@@ -28,7 +28,8 @@ class TestWebdriver_Post(unittest.TestCase):
         }
 
     def tearDown(self):
-        close_browser(self.browser)
+        # close_browser(self.browser)
+        pass
 
     @classmethod
     def setUpClass(cls):

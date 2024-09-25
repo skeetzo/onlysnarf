@@ -28,7 +28,8 @@ class TestWebdriver_Schedule(unittest.TestCase):
         self.schedule_object = Schedule.create_schedule(self.schedule_object).dump()
 
     def tearDown(self):
-        close_browser(self.browser)
+        # close_browser(self.browser)
+        pass
 
     @classmethod
     def setUpClass(cls):

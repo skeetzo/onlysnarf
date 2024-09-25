@@ -37,7 +37,7 @@ def close_browser(browser=None):
         logger.info("web browser closed!")
     # is cleanup necessary?
     # browser = None
-    BROWSER = None
+    # BROWSER = None
 
 ###############
 ##### Get #####
