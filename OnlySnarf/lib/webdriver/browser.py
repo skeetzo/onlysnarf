@@ -254,15 +254,18 @@ def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
     link = f"http://{host}:{port}"
     logger.debug(f"remote webserver: {link}")
     browserAttempt = None
-    try:        
-        # necessary?
-        # options.enable_downloads = True
-        # chrome_options = webdriver.ChromeOptions()
-        # chrome_options.set_capability("browserVersion", "67")
-        # chrome_options.set_capability("platformName", "Windows XP")
+    try:
+        options = configure_options(browserType)
+        # BUG: WHAT THE ACTUAL FUCK??? do not change the "==" to "--", it only works with "=="
+        # https://stackoverflow.com/questions/36434415/chromedriver-cannot-create-default-profile-directory 
+        options.add_argument("==profile-directory=Default")
+        options.add_argument("==user-data-dir=/home/ubuntu/selenium") # do not disable, required for cookies to work 
+
+        # options.binary_location = "/usr/bin/chromedriver"
+        # options.binary_location = "/usr/bin/chromium"
 
         logger.debug(f"attempting remote browser: {browserType}")
-        browserAttempt = webdriver.Remote(command_executor=link, options=configure_options(browserType))
+        browserAttempt = webdriver.Remote(command_executor=link, options=options)
         logger.info(f"remote browser created: {browserType}")
         return browserAttempt
     except Exception as e:
@@ -305,7 +308,7 @@ def configure_options(browserType):
 def add_options(options):
     options.add_argument("--no-sandbox") # Bypass OS security model
     if not CONFIG["show"]:
-        options.add_argument('--headless')
+        options.add_argument('--headless=new')
         options.add_argument("--window-size=1920,1080") # required for headless
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-extensions")
@@ -316,13 +319,10 @@ def add_options(options):
     # if os.name == 'nt':
         # options.add_argument(r"--user-data-dir=C:\Users\brain\AppData\Local\Google\Chrome\User Data")
     # else:
-
-    if str(platform.processor()) == "aarch64" or "remote" in CONFIG["browser"]: # raspi & remote sessions
-        options.add_argument("--profile-directory=Default")
-        # options.add_argument("--user-data-dir=/home/ubuntu/selenium") # do not disable, required for cookies to work 
+    if str(platform.processor()) == "aarch64": # raspi
         options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
-    else:
-        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
+    # else:
+        # options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
 
     options.add_argument("--disable-browser-side-navigation") # https://stackoverflow.com/a/49123152/1689770
 
@@ -342,6 +342,12 @@ def add_options(options):
     # options.add_argument('--ignore-certificate-errors')
     # options.add_argument("--remote-debugging-address=localhost")    
     # options.add_argument("--remote-debugging-port=9223") # required
+
+    # necessary?
+    # options.enable_downloads = True
+    # chrome_options = webdriver.ChromeOptions()
+    # chrome_options.set_capability("browserVersion", "67")
+    # chrome_options.set_capability("platformName", "Windows XP")
 
 def configure_brave_options():
     options = webdriver.BraveOptions()

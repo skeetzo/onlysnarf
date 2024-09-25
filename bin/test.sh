@@ -26,6 +26,10 @@ python -m unittest tests.webdriver.test_message.TestMessage_Webdriver.test_messa
 
 python -m unittest tests/webdriver/test_auth.py
 
+
+python -m unittest tests.webdriver.test_remote.TestSelenium_Remote.test_remote_chrome
+
+
 # Webdriver #
 python -m unittest tests/webdriver/test_discount.py
 python -m unittest tests/webdriver/test_expiration.py

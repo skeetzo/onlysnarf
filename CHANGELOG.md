@@ -902,10 +902,13 @@
 - checkin that cookies works on chrome
 - added script for installing chromedriver on ubuntu
 - ran full webdriver tests
+- finished chrome webdriver remote test
 
 ------------------------------------------------------------------------------------
 
 # TODO
+
+- fix remote chrome & geckodriver (again)
 
 - finish debugging cookies again for firefox
 

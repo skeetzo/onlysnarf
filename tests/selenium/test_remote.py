@@ -3,7 +3,7 @@ os.environ['ENV'] = "test"
 import unittest
 
 from OnlySnarf.util.config import set_config
-CONFIG = set_config({"debug_selenium":True,"keep":True,"show":False})
+CONFIG = set_config({"debug_selenium":True,"keep":False,"show":False})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
@@ -27,7 +27,6 @@ class TestSelenium_Remote(unittest.TestCase):
     def tearDownClass(cls):
         configure_logs_for_module_tests(flush=True)
 
-    @unittest.skip("todo")
     def test_remote_chrome(self):
         self.browser = create_browser(browserType="remote:chrome")
         assert self.browser, "unable to launch via chrome"
@@ -35,8 +34,6 @@ class TestSelenium_Remote(unittest.TestCase):
     def test_remote_firefox(self):
         self.browser = create_browser(browserType="remote:firefox")
         assert self.browser, "unable to launch via remote"
-
-    # TODO: add test for reconnecting to remote webdriver
 
 ############################################################################################
 
