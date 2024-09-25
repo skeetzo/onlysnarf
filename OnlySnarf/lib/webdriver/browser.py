@@ -263,6 +263,9 @@ def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
 
         # options.binary_location = "/usr/bin/chromedriver"
         # options.binary_location = "/usr/bin/chromium"
+        # options.binary_location = "/usr/bin/chromium-browser"
+        # options.binary_location = "/snap/chromium/2906/usr/lib/chromium-browser/chrome"
+        # options.driver_location = "/usr/lib/chromium-browser/chromedriver"
 
         logger.debug(f"attempting remote browser: {browserType}")
         browserAttempt = webdriver.Remote(command_executor=link, options=options)
@@ -308,8 +311,10 @@ def configure_options(browserType):
 def add_options(options):
     options.add_argument("--no-sandbox") # Bypass OS security model
     if not CONFIG["show"]:
-        options.add_argument('--headless=new')
-        options.add_argument("--window-size=1920,1080") # required for headless
+        # options.add_argument('--headless=new')
+        options.add_argument('--headless')
+        options.add_argument("--start-maximized") # required for headless
+        # options.add_argument("--window-size=1920,1080") # required for headless
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-extensions")
     options.add_argument("--disable-dev-shm-usage")
