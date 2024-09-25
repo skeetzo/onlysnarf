@@ -901,13 +901,13 @@
 - finished testing remote webserver; updated tests for remote webserver
 - checkin that cookies works on chrome
 - added script for installing chromedriver on ubuntu
+- ran full webdriver tests
 
 ------------------------------------------------------------------------------------
 
 # TODO
 
 - finish debugging cookies again for firefox
-- run full webdriver tests
 
 - finish (combining) scan & scan_dropbox\
 - finish testing scan_dropbox
