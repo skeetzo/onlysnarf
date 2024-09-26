@@ -331,6 +331,9 @@ def add_options(options):
         options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
     else:
         options.add_argument("--profile-directory=Default")
+        logger.debug(os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["remote_username"]),"tmp","selenium"))
+        logger.debug(os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["remote_username"]),"tmp","selenium"))
+        logger.debug(os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["remote_username"]),"tmp","selenium"))
         options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["remote_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
 
 
