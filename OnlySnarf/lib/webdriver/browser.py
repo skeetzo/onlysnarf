@@ -150,7 +150,7 @@ def attempt_chrome():
             logger.debug("cpu process: standard")
             # browserAttempt = ChromeWebDriver(service=ChromeService('/usr/bin/chromedriver', log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
             # browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=ChromeDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
-            browserAttempt = ChromeWebDriver(service=ChromeService(executable_path="/usr/bin/google-chrome", log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
+            browserAttempt = ChromeWebDriver(service=ChromeService("/usr/bin/chromedriver", executable_path="/usr/bin/google-chrome", log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
         logger.info("browser created - Chrome")        
     except Exception as e:
         browser_error(e, "chrome")
