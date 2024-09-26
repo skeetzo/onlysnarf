@@ -27,10 +27,10 @@ def api():
 def config():
     CONFIG_main()
 
-def menu(config={}):
+def menu():
     MENU_main()
 
-def discount():
+def discount(discount_object):
 
     """
     Applies a discount to users as provided from args / prompts.
@@ -39,12 +39,28 @@ def discount():
     """
 
     logging.snarf("Beginning discount process...")
-    recipients = CONFIG.get("recipients", [])
-    recipients.append(CONFIG.get("user", ""))
+    if discount_object["recipients"]:
+        recipients = discount_object["recipients"]
+    else:
+        recipients = CONFIG.get("recipients", [])
+    if discount_object["user"]:
+        recipients.append(discount_object["user"])
+    else:
+        recipients.append(CONFIG.get("user", ""))
     recipients = list(set(filter(None, recipients)))
     successful = []
+    if discount_object["amount"]:
+        amount = discount_object["amount"]
+    else:
+        amount = CONFIG["amount"]
+
+    if discount_object["months"]:
+        months = discount_object["months"]
+    else:
+        months = CONFIG["months"]
+
     for username in recipients:
-        successful.append(Discount.create_discount({'username':username,'amount':CONFIG["amount"],'months':CONFIG["months"]}).apply())
+        successful.append(Discount.create_discount({'username':username,'amount':amount,'months':months}).apply())
     return all(successful)
 
 def message(message_object):
@@ -172,7 +188,10 @@ def users():
 def main():
     try:
         logging.info(f"Running - {CONFIG['action']}")
-        eval(CONFIG['action']+"({})")
+        if CONFIG['action'] == "api" or CONFIG['action'] == "config" or CONFIG['action'] == "menu":
+            eval(CONFIG['action']+"()")
+        else:
+            eval(CONFIG['action']+"({})")
     except Exception as e:
         logging.critical(e)
         logging.snarf("shnarf??")
