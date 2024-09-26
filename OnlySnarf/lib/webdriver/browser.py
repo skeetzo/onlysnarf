@@ -329,9 +329,9 @@ def add_options(options):
     # else:
     # if str(platform.processor()) == "aarch64": # raspi
         # options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
-    if "remote" not in str(CONFIG["browser"]):
-        options.add_argument("--profile-directory=Default")
-        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
+    # if "remote" not in str(CONFIG["browser"]):
+        # options.add_argument("--profile-directory=Default")
+        # options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
 
 
     options.add_argument("--disable-browser-side-navigation") # https://stackoverflow.com/a/49123152/1689770
