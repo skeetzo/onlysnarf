@@ -396,14 +396,17 @@ def configure_firefox_options():
     options = FirefoxOptions()
     add_options(options)
 
+    print(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
+    print(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
+    print(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
+    print(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
+    print(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
+    print(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
 
 
-    try:
     # BUG: required for cookies when using firefox
-        options.add_argument("-profile="+os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
-    except Exception as e:
-        print(e)
-    # options.add_argument(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
+    options.add_argument("-profile")
+    options.add_argument(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
     # options.add_argument("==profile-directory=Default")
     # options.add_argument("==user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["host_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
 
