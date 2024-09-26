@@ -1,5 +1,5 @@
 # Config
-include OnlySnarf/conf/*
+include OnlySnarf/conf/*/**
 
 exclude OnlySnarf/bin
 exclude OnlySnarf/build
