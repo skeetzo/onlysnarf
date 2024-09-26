@@ -206,8 +206,8 @@ def prompt_google(user):
     data = {}
     data['username'] = get_username_google(user)
     data['password'] = get_password_google(user)
-    logger.info("Username: "+data['username'])
-    logger.info("Password: "+data['password'])
+    logger.info("Google Username: "+data['username'])
+    logger.info("Google Password: "+data['password'])
     if data['username'] == "" or input("Update Google email? N/y ").lower() == "y":
         data['username'] = input('Google Email: ')
     if data['password'] == "" or input("Update Google password? N/y ").lower() == "y":
@@ -218,8 +218,8 @@ def prompt_onlyfans(user):
     data = {}
     data['username'] = get_username_onlyfans(user)
     data['password'] = get_password(user)
-    logger.info("Username: "+data['username'])
-    logger.info("Password: "+data['password'])
+    logger.info("OnlyFans Username: "+data['username'])
+    logger.info("OnlyFans Password: "+data['password'])
     if data['username'] == "" or input("Update OnlyFans email? N/y ").lower() == "y":
         data['username'] = input('OnlyFans Email: ')
     if data['password'] == "" or input("Update OnlyFans password? N/y ").lower() == "y":
@@ -230,8 +230,8 @@ def prompt_twitter(user):
     data = {}
     data['username'] = get_username_twitter(user)
     data['password'] = get_password_twitter(user)
-    logger.info("Username: "+data['username'])
-    logger.info("Password: "+data['password'])
+    logger.info("Twitter Username: "+data['username'])
+    logger.info("Twitter Password: "+data['password'])
     if data['username'] == "" or input("Update Twitter username? N/y ").lower() == "y":
         data['username'] = input('Twitter Username: ')
     if data['password'] == "" or input("Update Twitter password? N/y ").lower() == "y":

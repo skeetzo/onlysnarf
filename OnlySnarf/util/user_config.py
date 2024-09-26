@@ -32,7 +32,7 @@ def get_username_onlyfans(username="default"):
         if not username: username = CONFIG["username"]
         username = get_user_config(username)["onlyfans_username"]
         if username == DEFAULT.USERNAME: return ""
-    except Exception as e: pass
+    except Exception as e: logger.warning(e)
     return username
 
 def get_username_google(username="default"):
@@ -40,7 +40,7 @@ def get_username_google(username="default"):
         if not username: username = CONFIG["username"]
         username = get_user_config(username)["google_username"]
         if username == DEFAULT.GOOGLE_USERNAME: return ""
-    except Exception as e: pass
+    except Exception as e: logger.warning(e)
     return username           
 
 def get_username_twitter(username="default"):
@@ -48,29 +48,29 @@ def get_username_twitter(username="default"):
         if not username: username = CONFIG["username"]
         username = get_user_config(username)["twitter_username"]
         if username == DEFAULT.TWITTER_USERNAME: return ""
-    except Exception as e: pass
+    except Exception as e: logger.warning(e)
     return username
 
 def get_password(username="default"):
     try:
         if not username: username = CONFIG["username"]
-        username = get_user_config(username)["onlyfans_password"]
-        if username == DEFAULT.PASSWORD: return ""
-    except Exception as e: pass
-    return username
+        password = get_user_config(username)["onlyfans_password"]
+        if password == DEFAULT.PASSWORD: return ""
+    except Exception as e: logger.warning(e)
+    return password
 
 def get_password_google(username="default"):
     try:
         if not username: username = CONFIG["username"]
-        username = get_user_config(username)["google_password"]
-        if username == DEFAULT.GOOGLE_PASSWORD: return ""
-    except Exception as e: pass
-    return username
+        password = get_user_config(username)["google_password"]
+        if password == DEFAULT.GOOGLE_PASSWORD: return ""
+    except Exception as e: logger.warning(e)
+    return password
 
 def get_password_twitter(username="default"):
     try:
         if not username: username = CONFIG["username"]
-        username = get_user_config(username)["twitter_password"]
-        if username == DEFAULT.TWITTER_PASSWORD: return ""
-    except Exception as e: pass
-    return username
+        password = get_user_config(username)["twitter_password"]
+        if password == DEFAULT.TWITTER_PASSWORD: return ""
+    except Exception as e: logger.warning(e)
+    return password
