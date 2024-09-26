@@ -259,7 +259,7 @@ def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
         # BUG: WHAT THE ACTUAL FUCK??? do not change the "==" to "--", it only works with "=="
         # https://stackoverflow.com/questions/36434415/chromedriver-cannot-create-default-profile-directory 
         options.add_argument("==profile-directory=Default")
-        options.add_argument("==user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["remote_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
+        options.add_argument("==user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["host_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
 
         # options.binary_location = "/usr/bin/chromedriver"
         # options.binary_location = "/usr/bin/chromium"
@@ -327,14 +327,11 @@ def add_options(options):
     # if os.name == 'nt':
         # options.add_argument(r"--user-data-dir=C:\Users\brain\AppData\Local\Google\Chrome\User Data")
     # else:
-    if str(platform.processor()) == "aarch64": # raspi
-        options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
-    else:
+    # if str(platform.processor()) == "aarch64": # raspi
+        # options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
+    if "remote" not in str(CONFIG["browser"]):
         options.add_argument("--profile-directory=Default")
-        logger.debug(os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["remote_username"]),"tmp","selenium"))
-        logger.debug(os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["remote_username"]),"tmp","selenium"))
-        logger.debug(os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["remote_username"]),"tmp","selenium"))
-        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["remote_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
+        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
 
 
     options.add_argument("--disable-browser-side-navigation") # https://stackoverflow.com/a/49123152/1689770

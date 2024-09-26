@@ -29,11 +29,13 @@ class TestSelenium_Remote(unittest.TestCase):
         configure_logs_for_module_tests(flush=True)
 
     def test_remote_chrome(self):
-        self.browser = create_browser(browserType="remote:chrome")
+        CONFIG["browser"] = "remote:chrome"
+        self.browser = create_browser(browserType=CONFIG["browser"])
         assert self.browser, "unable to launch via chrome"
 
     def test_remote_firefox(self):
-        self.browser = create_browser(browserType="remote:firefox")
+        CONFIG["browser"] = "remote:firefox"        
+        self.browser = create_browser(browserType=CONFIG["browser"])
         assert self.browser, "unable to launch via remote"
 
 ############################################################################################

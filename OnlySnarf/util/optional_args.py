@@ -33,14 +33,10 @@ def apply_args(parser):
   # OnlyFans phone number to use for additional login steps; never really required
   # parser.add_argument('-phone', type=str, default="", dest='phone', help='OnlyFans phone number to use')
 
-  ############
-  ## Remote ##
-  ############
-
   ##
-  # --remote-username
-  # Username to use at remote host
-  parser.add_argument('--remote-username', type=str, default="default", dest='remote_username', help='Username to use at a remote host')
+  # --host-username
+  # Username to use as a local or remote host
+  parser.add_argument('--host-username', type=str, default="ubuntu", dest='host_username', help='Username to use as a local or remote host')
 
   ###############
   ## DEBUGGING ##
