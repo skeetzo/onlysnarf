@@ -23,7 +23,7 @@ setuptools.setup(
         'marshmallow',
         'wget',
         'selenium==4.8.3',
-        'webdriver_manager==4.0.0',
+        'webdriver_manager>=4.0.0',
         'validators',
         'flask'
     ],
