@@ -16,18 +16,21 @@ class TestWebdriver_Auth(unittest.TestCase):
 
     def setUp(self):
         # self.browser = WEBDRIVER_create_browser(CONFIG["browser"])
-        self.browser = WEBDRIVER_create_browser("remote:chrome")
+        self.browser = WEBDRIVER_create_browser("firefox")
+        # self.browser = WEBDRIVER_create_browser("remote:chrome")
         # self.browser = WEBDRIVER_create_browser("remote:firefox")
 
     def tearDown(self):
-        close_browser(self.browser)
+        # close_browser(self.browser)
+        if self.browser:
+            self.browser.quit()
 
     @classmethod
     def setUpClass(cls):
         configure_logs_for_module_tests("OnlySnarf.lib.webdriver.browser")
         configure_logs_for_module_tests("OnlySnarf.lib.webdriver.cookies")
         configure_logs_for_module_tests("OnlySnarf.lib.webdriver.login")
-        reset_cookies()
+        # reset_cookies()
 
     @classmethod
     def tearDownClass(cls):

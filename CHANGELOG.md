@@ -907,9 +907,9 @@
 
 # TODO
 
-- finish chrome webdriver auth test
+- finish chrome & firefox webdriver auth test
 
-- finish debugging cookies again for firefox
+- finish debugging cookies for firefox
 
 - finish (combining) scan & scan_dropbox\
 - finish testing scan_dropbox

@@ -93,7 +93,7 @@ def check_if_logged_in(browser):
 
     try:
         logger.debug("waiting for login check...")
-        WebDriverWait(browser, 60*2, poll_frequency=3).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-make-post__streaming-link")))
+        WebDriverWait(browser, 600, poll_frequency=3).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-make-post__streaming-link")))
         logger.info("OnlyFans login successful!")
         return True
     except TimeoutException as te:

@@ -32,7 +32,7 @@ def go_to_home(browser, force=False):
     def goto():
         logger.debug("goto -> onlyfans.com")
         try:
-            browser.set_page_load_timeout(10)
+            browser.set_page_load_timeout(60)
             browser.get(ONLYFANS_HOME_URL)
         except TimeoutException:
             logger.warning("timed out waiting for page load!")
@@ -206,7 +206,7 @@ def get_page_load(browser):
     """Attempt to generic page load"""
 
     try:
-        WebDriverWait(browser, 60*2, poll_frequency=1).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
+        WebDriverWait(browser, 60*5, poll_frequency=1).until(EC.visibility_of_element_located((By.CLASS_NAME, "main-wrapper")))
     except Exception as e:
         logger.error(e)
 

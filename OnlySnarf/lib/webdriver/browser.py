@@ -267,6 +267,9 @@ def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
         # options.binary_location = "/snap/chromium/2906/usr/lib/chromium-browser/chrome"
         # options.driver_location = "/usr/lib/chromium-browser/chromedriver"
 
+        options.binary_location = "/usr/bin/firefox"
+        options.driver_location = "/usr/local/bin/geckodriver"
+
         logger.debug(f"attempting remote browser: {browserType}")
         browserAttempt = webdriver.Remote(command_executor=link, options=options)
         logger.info(f"remote browser created: {browserType}")
@@ -318,7 +321,7 @@ def add_options(options):
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-extensions")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("enable-automation")
+    options.add_argument("--enable-automation")
     # options.add_argument("--disable-infobars")
 
     # if os.name == 'nt':
@@ -326,8 +329,10 @@ def add_options(options):
     # else:
     if str(platform.processor()) == "aarch64": # raspi
         options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
-    # else:
-        # options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
+    else:
+        options.add_argument("--profile-directory=Default")
+        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
+
 
     options.add_argument("--disable-browser-side-navigation") # https://stackoverflow.com/a/49123152/1689770
 
@@ -335,7 +340,6 @@ def add_options(options):
     # possibly linux only
     # options.add_argument('disable-notifications')
     # https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
-    # options.add_argument("start-maximized")
     # options.add_argument("--disable-crash-reporter")
     # options.add_argument("--disable-infobars")
     # options.add_argument("--disable-in-process-stack-traces")
