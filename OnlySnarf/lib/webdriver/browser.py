@@ -395,9 +395,16 @@ def configure_edge_options():
 def configure_firefox_options():
     options = FirefoxOptions()
     add_options(options)
+
+
+
+
     # BUG: required for cookies when using firefox
     options.add_argument("-profile")
     options.add_argument(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
+    # options.add_argument("==profile-directory=Default")
+    # options.add_argument("==user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["host_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
+
     options.add_argument("--enable-file-cookies") # probably not needed
     return options
 
