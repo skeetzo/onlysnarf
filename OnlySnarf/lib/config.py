@@ -16,7 +16,17 @@ from ..util.user_config import get_user_config_path, get_username_onlyfans, get_
 EMPTY_USER_CONFIG = Path(__file__).parent.joinpath("../conf/users/example-user.conf").resolve()
 BASE_CONFIG = Path(__file__).parent.joinpath("../conf/config.conf").resolve()
 
-def add_user():
+ROOT_CONFIG = os.path.join(DEFAULT.ROOT_PATH, "conf/config.conf")
+ROOT_USERS_CONFIG_DIRECTORY = os.path.join(DEFAULT.ROOT_PATH, "conf/users")
+ROOT_USER_DEFAULT_CONFIG = os.path.join(ROOT_USERS_CONFIG_DIRECTORY, "default.conf")
+
+def add_user(default=False):
+    if default and "default.conf" in get_users():
+        answer = input("Default user already exists, overwrite? (y/N)")
+        if answer == "y":
+            pass
+        else:
+            return main()
     username = input("OnlyFans username: ")
     # check if user already exists
     if str(username)+".conf" in get_users():
@@ -26,6 +36,7 @@ def add_user():
     update_onlyfans_user(user=username)
     update_google_user(user=username)
     update_twitter_user(user=username)
+    if default: shutil.copyfile(get_user_config_path(username), ROOT_USER_DEFAULT_CONFIG)
     main()
 
 def check_user_config(user):
@@ -44,7 +55,7 @@ def display_user():
 
 def list_users():
     # list all user configs in conf/users
-    for (dirpath, dirnames, filenames) in os.walk(os.path.join(DEFAULT.ROOT_PATH, "conf/users")):
+    for (dirpath, dirnames, filenames) in os.walk(ROOT_USERS_CONFIG_DIRECTORY):
         for filename in filenames:
             logger.info("> "+filename)
         break
@@ -104,7 +115,7 @@ def list_user_menu():
 
 def get_users():
     users = []
-    for (dirpath, dirnames, filenames) in os.walk(os.path.join(DEFAULT.ROOT_PATH, "conf/users")):
+    for (dirpath, dirnames, filenames) in os.walk(ROOT_USERS_CONFIG_DIRECTORY):
         users.extend(filenames)
         break
     return users
@@ -166,7 +177,7 @@ def menu():
     questions = [
         inquirer.List('menu',
             message= "Please select an option:",
-            choices= ['Add', 'Display', 'List', 'Update', 'Remove', 'Reset', 'Exit']
+            choices= ['Add', 'Add: default', 'Display', 'List', 'Update', 'Remove', 'Reset', 'Exit']
         )
     ]
     answers = inquirer.prompt(questions)
@@ -175,6 +186,7 @@ def menu():
 def main_menu():
     action = menu()
     if (action == 'Add'): add_user()
+    elif (action == 'Add: default'): add_user(default=True)
     elif (action == 'Display'): display_user()
     elif (action == 'List'): list_users()
     elif (action == 'Update'): update_menu()
@@ -230,16 +242,14 @@ def reset_user_config(user="default"):
     logger.info("resetting user config files for {}...".format(user))
     if os.path.exists(get_user_config_path(user)):
         os.remove(get_user_config_path(user))
-    else:
-        logger.warning("no config exists to reset!")
     shutil.copyfile(EMPTY_USER_CONFIG, get_user_config_path(user))
     logger.info("successfully reset config!")
 
 def reset_config():
     logger.info("resetting configuration...")
-    shutil.copyfile(BASE_CONFIG, os.path.join(DEFAULT.ROOT_PATH, "conf", "config.conf"))
-    shutil.rmtree(os.path.join(DEFAULT.ROOT_PATH, "conf/users"))
-    Path(os.path.join(DEFAULT.ROOT_PATH, "conf/users")).mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(BASE_CONFIG, ROOT_CONFIG)
+    shutil.rmtree(ROOT_USERS_CONFIG_DIRECTORY)
+    Path(ROOT_USERS_CONFIG_DIRECTORY).mkdir(parents=True, exist_ok=True)
     logger.info("OnlySnarf config reset!")
 
 def update_user_config(user="default"):
