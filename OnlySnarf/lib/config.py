@@ -239,10 +239,13 @@ def prompt_twitter(user):
     return data
 
 def reset_user_config(user="default"):
-    logger.info("resetting user config files for {}...".format(user))
-    if os.path.exists(get_user_config_path(user)):
-        os.remove(get_user_config_path(user))
-    shutil.copyfile(EMPTY_USER_CONFIG, get_user_config_path(user))
+    logger.info("resetting the user config file for {}...".format(user))
+    try:
+        if os.path.exists(get_user_config_path(user)):
+            os.remove(get_user_config_path(user))
+        shutil.copyfile(EMPTY_USER_CONFIG, get_user_config_path(user))
+    except Exception as e:
+        print(e)
     logger.info("successfully reset config!")
 
 def reset_config():
