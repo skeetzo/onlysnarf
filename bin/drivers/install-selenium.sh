@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-echo "\n" | sudo add-apt-repository ppa:linuxuprising/java
+# not necessary?
+# echo "\n" | sudo add-apt-repository ppa:linuxuprising/java
+
 sudo apt-get update
 sudo apt-get install -y software-properties-common default-jre
 
@@ -12,7 +14,7 @@ sudo mv "selenium-server-$selenium_version.jar" "/opt/selenium-server-$selenium_
 
 # start server:
 echo "to start selenium server:"
-echo "java -jar /opt/selenium-server$selenium_version.jar"
+echo "java -jar /opt/selenium-server-$selenium_version.jar"
 # -role hub
 
 # copy updated service file

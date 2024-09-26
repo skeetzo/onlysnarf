@@ -7,16 +7,17 @@ CONFIG = set_config({"debug_selenium":True,"keep":False,"show":False})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import close_browser
 from OnlySnarf.lib.webdriver.browser import create_browser
 
 class TestSelenium_Remote(unittest.TestCase):
 
     def setUp(self):
-        pass
+        self.browser = None
+        CONFIG["remote_username"] = "skeetzo"
 
     def tearDown(self):
-        close_browser(self.browser)
+        if self.browser:
+            self.browser.quit()
 
     @classmethod
     def setUpClass(cls):

@@ -259,7 +259,7 @@ def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
         # BUG: WHAT THE ACTUAL FUCK??? do not change the "==" to "--", it only works with "=="
         # https://stackoverflow.com/questions/36434415/chromedriver-cannot-create-default-profile-directory 
         options.add_argument("==profile-directory=Default")
-        options.add_argument("==user-data-dir=/home/ubuntu/selenium") # do not disable, required for cookies to work 
+        options.add_argument("==user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["remote_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
 
         # options.binary_location = "/usr/bin/chromedriver"
         # options.binary_location = "/usr/bin/chromium"
@@ -267,8 +267,8 @@ def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
         # options.binary_location = "/snap/chromium/2906/usr/lib/chromium-browser/chrome"
         # options.driver_location = "/usr/lib/chromium-browser/chromedriver"
 
-        options.binary_location = "/usr/bin/firefox"
-        options.driver_location = "/usr/local/bin/geckodriver"
+        # options.binary_location = "/usr/bin/firefox"
+        # options.driver_location = "/usr/local/bin/geckodriver"
 
         logger.debug(f"attempting remote browser: {browserType}")
         browserAttempt = webdriver.Remote(command_executor=link, options=options)
@@ -331,7 +331,7 @@ def add_options(options):
         options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
     else:
         options.add_argument("--profile-directory=Default")
-        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
+        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["remote_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
 
 
     options.add_argument("--disable-browser-side-navigation") # https://stackoverflow.com/a/49123152/1689770
