@@ -33,6 +33,15 @@ def apply_args(parser):
   # OnlyFans phone number to use for additional login steps; never really required
   # parser.add_argument('-phone', type=str, default="", dest='phone', help='OnlyFans phone number to use')
 
+  ############
+  ## Remote ##
+  ############
+
+  ##
+  # --remote-username
+  # Username to use at remote host
+  parser.add_argument('--remote-username', type=str, default="default", dest='remote_username', help='Username to use at a remote host')
+
   ###############
   ## DEBUGGING ##
   ###############
@@ -249,15 +258,6 @@ def apply_subcommand_args(parser):
   ##########
 
   parser_user = subparsers.add_parser('users', help='> scan & save users')
-
-  ############
-  ## Remote ##
-  ############
-
-  ##
-  # --remote-username
-  # Username to use at remote host
-  parser.add_argument('--remote-username', type=str, default="default", dest='remote_username', help='Username to use at a remote host')
 
 def apply_shim_args(parser):
   parser.add_argument('-amount', type=valid_amount, dest='amount', help='amount (%%) to discount by', default=DEFAULT.AMOUNT_NONE)
