@@ -74,7 +74,7 @@ def post(browser, post_object):
         successful, skipped = upload_files(browser, post_object["files"])
         if successful and not skipped:
             postButton = [ele for ele in browser.find_elements(By.TAG_NAME, "button") if "Post" in ele.get_attribute("innerHTML")][0]
-            WebDriverWait(browser, CONFIG["upload_max_duration"], poll_frequency=3).until(EC.element_to_be_clickable(postButton))
+            WebDriverWait(browser, int(CONFIG["upload_max_duration"]), poll_frequency=3).until(EC.element_to_be_clickable(postButton))
             logger.info("upload complete!")
         send_post(browser)
     except TimeoutException:

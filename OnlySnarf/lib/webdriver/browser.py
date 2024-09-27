@@ -148,7 +148,7 @@ def attempt_chrome():
             browserAttempt = ChromeWebDriver(service=ChromeService('/usr/bin/chromedriver', log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
         else:
             logger.debug("cpu process: standard")
-            # browserAttempt = ChromeWebDriver(service=ChromeService('/usr/bin/chromedriver', log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
+            # browserAttempt = ChromeWebDriver(service=ChromeService('/usr/bin/google-chrome', log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
             browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=ChromeDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
         logger.info("browser created - Chrome")        
     except Exception as e:
@@ -329,9 +329,9 @@ def add_options(options):
     # else:
     # if str(platform.processor()) == "aarch64": # raspi
         # options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
-    # if "remote" not in str(CONFIG["browser"]):
-        # options.add_argument("--profile-directory=Default")
-        # options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
+    if "remote" not in str(CONFIG["browser"]):
+        options.add_argument("--profile-directory=Default")
+        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
 
 
     options.add_argument("--disable-browser-side-navigation") # https://stackoverflow.com/a/49123152/1689770
@@ -395,22 +395,11 @@ def configure_edge_options():
 def configure_firefox_options():
     options = FirefoxOptions()
     add_options(options)
-
-    print(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
-    print(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
-    print(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
-    print(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
-    print(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
-    print(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
-
-
-    # BUG: required for cookies when using firefox
-    options.add_argument("-profile")
-    options.add_argument(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
-    # options.add_argument("==profile-directory=Default")
-    # options.add_argument("==user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["host_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
-
     options.add_argument("--enable-file-cookies") # probably not needed
+
+    # BUG: required for cookies when using firefox but only breaks it?
+    # options.add_argument("-profile")
+    # options.add_argument(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
     return options
 
 def configure_ie_options():

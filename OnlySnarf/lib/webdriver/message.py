@@ -24,6 +24,12 @@ from .. import CONFIG
 from .. import ONLYFANS_HOME_URL, ONLYFANS_CHAT_URL, ONLYFANS_NEW_MESSAGE_URL
 
 NEW_POST_CLASS = "b-text-editor"
+PRICE_BUTTON_CLASS = "b-make-post__actions__btns"
+PRICE_CLEAR_CLASS = "m-btn-remove"
+PRICE_SAVE_CLASS = "g-btn.m-flat.m-btn-gaps.m-reset-width"
+SEND_BUTTON_CLASS = "g-btn.m-rounded.b-chat__btn-submit"
+USER_CLASS = "b-search-users-form__input"
+USERS_CLASS = "b-available-users__item"
 
 ####################
 ##### Messages #####
@@ -94,11 +100,11 @@ def message(browser, message_object):
 def add_user_to_message(browser, username):
     try:
         logger.debug(f"adding user to message: {username}")
-        element = browser.find_element(By.CLASS_NAME, "b-search-users-form__input")
+        element = browser.find_element(By.CLASS_NAME, USER_CLASS)
         ActionChains(browser).move_to_element(element).click(on_element=element).double_click().click_and_hold().send_keys(Keys.CLEAR).send_keys(str(username)).perform()
-        WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "b-search-users-form__input")))
-        # find_element_to_click(browser, "b-available-users__item")
-        elements = browser.find_elements(By.CLASS_NAME, "b-available-users__item")
+        WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, USER_CLASS)))
+        # find_element_to_click(browser, USERS_CLASS)
+        elements = browser.find_elements(By.CLASS_NAME, USERS_CLASS)
         if len(elements) > 0:
             for element in elements:
                 element.click()
@@ -131,7 +137,7 @@ def message_send(browser):
 
     try:
         logger.debug("waiting for message send to be clickable...")
-        confirm = WebDriverWait(browser, int(CONFIG["upload_max_duration"]), poll_frequency=3).until(EC.element_to_be_clickable((By.CLASS_NAME, "g-btn.m-rounded.b-chat__btn-submit")))
+        confirm = WebDriverWait(browser, int(CONFIG["upload_max_duration"]), poll_frequency=3).until(EC.element_to_be_clickable((By.CLASS_NAME, SEND_BUTTON_CLASS)))
         logger.debug("message send is clickable")
         debug_delay_check()
         if CONFIG["debug"] and str(CONFIG["debug"]) == "True":
@@ -153,7 +159,7 @@ def message_send(browser):
 def message_confirm(browser):
     try:
         logger.debug("clicking confirm...")
-        find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Yes").click()
+        find_element_to_click(browser, SEND_BUTTON_CLASS, text="Send").click()
         logger.info('OnlyFans message sent!')
         time.sleep(1)
         return True
@@ -197,7 +203,7 @@ def message_price_clear(browser):
     try:
         logger.debug("clearing any preexisting price...")
         # this is not the same class as the x icons for close_icons
-        element = browser.find_element(By.CLASS_NAME, "m-btn-remove")
+        element = browser.find_element(By.CLASS_NAME, PRICE_CLEAR_CLASS)
         if element:
             element.click()
             logger.debug("sucessfully cleared preexisting price!")
@@ -210,7 +216,7 @@ def message_price_clear(browser):
 def message_price_open(browser, reattempt=False):
     try:
         logger.debug("clicking price button...")
-        for element in browser.find_element(By.CLASS_NAME, "b-make-post__actions__btns").find_elements(By.XPATH, "./child::*"):
+        for element in browser.find_element(By.CLASS_NAME, PRICE_BUTTON_CLASS).find_elements(By.XPATH, "./child::*"):
             if "icon-price" in str(element.get_attribute("innerHTML")):
                 browser.execute_script("arguments[0].click()", element)
                 logger.debug("sucessfully clicked price button!")
@@ -248,7 +254,7 @@ def message_price_enter(browser, price, reattempt=False):
 def message_price_save(browser):
     try:
         logger.debug("saving price...")
-        find_element_to_click(browser, "g-btn.m-flat.m-btn-gaps.m-reset-width", text="Save").click()
+        find_element_to_click(browser, PRICE_SAVE_CLASS, text="Save").click()
         logger.debug("saved price!")
         debug_delay_check()
         return True

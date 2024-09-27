@@ -902,6 +902,8 @@
 - checkin that cookies works on chrome
 - added script for installing chromedriver on ubuntu
 - ran full webdriver tests
+**4.7.6 : 9-26-2024**
+- updated config script
 
 ------------------------------------------------------------------------------------
 
