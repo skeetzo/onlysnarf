@@ -104,6 +104,25 @@ CONFIG_PATH = os.path.join(CONFIGS_PATH, "config.conf")
 PROFILE_PATH = os.path.join(CONFIGS_PATH, "profile.json")
 USERS_PATH = os.path.join(CONFIGS_PATH, "users")
 
+# these are typically managed automatically by Selenium Webdriver
+# CHROME_BINARY = "/usr/bin/google-chrome"
+# CHROME_DRIVER "/usr/bin/chromedriver"
+# FIREFOX_BINARY = "/usr/bin/firefox"
+# FIREFOX_BINARY_SNAP = "/snap/bin/firefox"
+# FIREFOX_DRIVER = "/usr/bin/geckodriver"
+# FIREFOX_DRIVER_SNAP = "/snap/bin/geckodriver"
+WEBDRIVER_BINARY = "/usr/bin/google-chrome"
+WEBDRIVER_DRIVER = "/usr/bin/chromedriver"
+
+        # options.binary_location = "/usr/bin/chromedriver"
+        # options.binary_location = "/usr/bin/chromium"
+        # options.binary_location = "/usr/bin/chromium-browser"
+        # options.binary_location = "/snap/chromium/2906/usr/lib/chromium-browser/chrome"
+        # options.driver_location = "/usr/lib/chromium-browser/chromedriver"
+
+        # options.binary_location = "/usr/bin/firefox"
+        # options.driver_location = "/usr/local/bin/geckodriver"
+
 if str(os.environ.get('ENV')).lower() == "test":
     CONFIG_PATH = os.path.join(os.getcwd(), "OnlySnarf", "conf", "test-config.conf")
     # LOG_PATH = os.path.join(os.getcwd(), "log")

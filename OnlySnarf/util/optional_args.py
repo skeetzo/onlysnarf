@@ -38,6 +38,16 @@ def apply_args(parser):
   # Username to use as a local or remote host
   parser.add_argument('--host-username', type=str, default="ubuntu", dest='host_username', help='Username to use as a local or remote host')
 
+  ##
+  # --webdriver-binary
+  # Path to use to specify a binary
+  parser.add_argument('--webdriver-binary', type=str, dest='webdriver_binary', help='Path to the local webdriver browser binary')
+
+  ##
+  # --webdriver-driver
+  # Path to use to specify a driver
+  parser.add_argument('--webdriver-driver', type=str, dest='webdriver_driver', help='Path to the local webdriver browser driver')
+
   ###############
   ## DEBUGGING ##
   ###############

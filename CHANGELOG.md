@@ -904,6 +904,8 @@
 - ran full webdriver tests
 **4.7.6 : 9-26-2024**
 - updated config script
+**4.7.7 : 9-28-2024**
+- added chrome & firefox binary/drivers to args
 
 ------------------------------------------------------------------------------------
 

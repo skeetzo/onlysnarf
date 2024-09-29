@@ -125,7 +125,11 @@ def attempt_brave():
     browserAttempt = None
     try:
         logger.debug("attempting Brave web browser...")
-        browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=ChromeDriverManager(chrome_type=ChromeType.BRAVE).install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_BRAVE, service_args=configure_service_args()), options=configure_brave_options())
+        if CONFIG["webdriver_binary"]:
+            logger.debug("using provided binary path")
+            browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=CONFIG["webdriver_binary"], log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_BRAVE, service_args=configure_service_args()), options=configure_brave_options())
+        else:
+            browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=ChromeDriverManager(chrome_type=ChromeType.BRAVE).install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_BRAVE, service_args=configure_service_args()), options=configure_brave_options())
         logger.info("browser created - Brave")
     except Exception as e:
         browser_error(e, "brave")
@@ -135,20 +139,10 @@ def attempt_chrome():
     browserAttempt = None
     try:
         logger.debug("attempting Chrome web browser...")
-        # TODO: is this still necessary?
-        # raspberrypi arm processors don't work with webdriver manager
-        # linux = x86_64
-        # rpi = aarch64
-        logger.debug("checking processor for use with RPi4s...")
-        processor = platform.processor()
-        logger.debug("cpu processor: {}".format(processor))
-        if str(processor) == "aarch64":
-            logger.debug("cpu process: RPi4")
-            # TODO: add file check for chromedriver w/ reminder warning for rpi install requirement
-            browserAttempt = ChromeWebDriver(service=ChromeService('/usr/bin/chromedriver', log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
+        if CONFIG["webdriver_binary"]:
+            logger.debug("using provided binary path")
+            browserAttempt = ChromeWebDriver(service=ChromeService(CONFIG["webdriver_driver"], log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
         else:
-            logger.debug("cpu process: standard")
-            # browserAttempt = ChromeWebDriver(service=ChromeService('/usr/bin/google-chrome', log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
             browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=ChromeDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
         logger.info("browser created - Chrome")        
     except Exception as e:
@@ -160,7 +154,11 @@ def attempt_chromium():
     browserAttempt = None
     try:
         logger.debug("attempting Chromium web browser...")
-        browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_CHROMIUM, service_args=configure_service_args()), options=configure_chromium_options())
+        if CONFIG["webdriver_binary"]:
+            logger.debug("using provided binary path")
+            browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=CONFIG["webdriver_binary"], log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_CHROMIUM, service_args=configure_service_args()), options=configure_chromium_options())
+        else:
+            browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_CHROMIUM, service_args=configure_service_args()), options=configure_chromium_options())
         logger.info("browser created - Chromium")        
     except Exception as e:
         browser_error(e, "chromium")
@@ -171,7 +169,11 @@ def attempt_edge():
     browserAttempt = None
     try:
         logger.debug("attempting Edge web browser...")
-        browserAttempt = webdriver.Edge(service=EdgeService(executable_path=EdgeChromiumDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_EDGE, service_args=configure_service_args()), options=configure_edge_options())
+        if CONFIG["webdriver_binary"]:
+            logger.debug("using provided binary path")
+            browserAttempt = webdriver.Edge(service=EdgeService(executable_path=CONFIG["webdriver_binary"], log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_EDGE, service_args=configure_service_args()), options=configure_edge_options())
+        else:
+            browserAttempt = webdriver.Edge(service=EdgeService(executable_path=EdgeChromiumDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_EDGE, service_args=configure_service_args()), options=configure_edge_options())
         logger.info("browser created - Edge")
     except Exception as e:
         browser_error(e, "edge")
@@ -185,7 +187,11 @@ def attempt_firefox():
         return None
     try:
         logger.debug("attempting Firefox web browser...")
-        browserAttempt = FirefoxWebDriver(service=FirefoxService(log_path=DEFAULT.LOG_PATH_GECKODRIVER), options=configure_firefox_options())
+        if CONFIG["webdriver_binary"]:
+            logger.debug("using provided binary path")
+            browserAttempt = FirefoxWebDriver(CONFIG["webdriver_driver"], service=FirefoxService(log_path=DEFAULT.LOG_PATH_GECKODRIVER), options=configure_firefox_options())
+        else:
+            browserAttempt = FirefoxWebDriver(service=FirefoxService(log_path=DEFAULT.LOG_PATH_GECKODRIVER), options=configure_firefox_options())
         logger.info("browser created - Firefox")
     except Exception as e:
         browser_error(e, "firefox")
@@ -199,7 +205,11 @@ def attempt_ie():
         # driver_path = IEDriverManager().install()
         # os.chmod(driver_path, 0o755)
         # browserAttempt = webdriver.Ie(executable_path=IEService(driver_path))
-        browserAttempt = webdriver.Ie(service=IEService(executable_path=IEDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_IE, service_args=configure_service_args()), options=configure_ie_options())
+        if CONFIG["webdriver_binary"]:
+            logger.debug("using provided binary path")
+            browserAttempt = webdriver.Ie(service=IEService(executable_path=CONFIG["webdriver_binary"], log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_IE, service_args=configure_service_args()), options=configure_ie_options())
+        else:
+            browserAttempt = webdriver.Ie(service=IEService(executable_path=IEDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_IE, service_args=configure_service_args()), options=configure_ie_options())
         logger.info("browser created - IE")
     except Exception as e:
         browser_error(e, "ie")
@@ -211,16 +221,20 @@ def attempt_opera():
     try:
         logger.debug("attempting Opera web browser...")
 
-        from selenium.webdriver.chrome import service
-        webdriver_service = service.Service(executable_path=OperaDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_OPERA, service_args=configure_service_args())
-        webdriver_service.start()
+        # from selenium.webdriver.chrome import service
+        # webdriver_service = service.Service(executable_path=OperaDriverManager().install(), log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_OPERA, service_args=configure_service_args())
+        # webdriver_service.start()
 
-        options = webdriver.ChromeOptions()
-        options.add_experimental_option('w3c', True)
+        # options = webdriver.ChromeOptions()
+        # options.add_experimental_option('w3c', True)
 
-        browserAttempt = webdriver.Remote(webdriver_service.service_url, options=options)
+        # browserAttempt = webdriver.Remote(webdriver_service.service_url, options=options)
 
-        # browserAttempt = webdriver.Opera(executable_path=OperaDriverManager().install())
+        if CONFIG["webdriver_binary"]:
+            logger.debug("using provided binary path")
+            browserAttempt = webdriver.Opera(executable_path=CONFIG["webdriver_binary"])
+        else:
+            browserAttempt = webdriver.Opera(executable_path=OperaDriverManager().install())
         logger.info("browser created - Opera")
     except Exception as e:
         browser_error(e, "opera")
@@ -261,15 +275,9 @@ def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
         options.add_argument("==profile-directory=Default")
         options.add_argument("==user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["host_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
 
-        # options.binary_location = "/usr/bin/chromedriver"
-        # options.binary_location = "/usr/bin/chromium"
-        # options.binary_location = "/usr/bin/chromium-browser"
-        # options.binary_location = "/snap/chromium/2906/usr/lib/chromium-browser/chrome"
-        # options.driver_location = "/usr/lib/chromium-browser/chromedriver"
-
-        # options.binary_location = "/usr/bin/firefox"
-        # options.driver_location = "/usr/local/bin/geckodriver"
-
+        if CONFIG["webdriver_binary"] and CONFIG["webdriver_driver"]:
+            options.binary_location = CONFIG["webdriver_binary"]
+            options.driver_location = CONFIG["webdriver_driver"]
         logger.debug(f"attempting remote browser: {browserType}")
         browserAttempt = webdriver.Remote(command_executor=link, options=options)
         logger.info(f"remote browser created: {browserType}")
