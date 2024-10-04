@@ -41,12 +41,12 @@ def apply_args(parser):
   ##
   # --webdriver-binary
   # Path to use to specify a binary
-  parser.add_argument('--webdriver-binary', type=str, dest='webdriver_binary', help='Path to the local webdriver browser binary')
+  parser.add_argument('--webdriver-binary', type=str, default="", dest='webdriver_binary', help='Path to the local webdriver browser binary')
 
   ##
   # --webdriver-driver
   # Path to use to specify a driver
-  parser.add_argument('--webdriver-driver', type=str, dest='webdriver_driver', help='Path to the local webdriver browser driver')
+  parser.add_argument('--webdriver-driver', type=str, default="", dest='webdriver_driver', help='Path to the local webdriver browser driver')
 
   ###############
   ## DEBUGGING ##

@@ -27,8 +27,10 @@ from webdriver_manager.core.os_manager import ChromeType
 ########################
 # Firefox: Geckodriver #
 ########################
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.firefox import GeckoDriverManager
+
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxWebDriver
 
 ######
@@ -125,7 +127,7 @@ def attempt_brave():
     browserAttempt = None
     try:
         logger.debug("attempting Brave web browser...")
-        if CONFIG["webdriver_binary"]:
+        if CONFIG["webdriver_binary"] != "":
             logger.debug("using provided binary path")
             browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=CONFIG["webdriver_binary"], log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_BRAVE, service_args=configure_service_args()), options=configure_brave_options())
         else:
@@ -139,7 +141,7 @@ def attempt_chrome():
     browserAttempt = None
     try:
         logger.debug("attempting Chrome web browser...")
-        if CONFIG["webdriver_binary"]:
+        if CONFIG["webdriver_binary"] != "":
             logger.debug("using provided binary path")
             browserAttempt = ChromeWebDriver(service=ChromeService(CONFIG["webdriver_driver"], log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
         else:
@@ -154,7 +156,7 @@ def attempt_chromium():
     browserAttempt = None
     try:
         logger.debug("attempting Chromium web browser...")
-        if CONFIG["webdriver_binary"]:
+        if CONFIG["webdriver_binary"] != "":
             logger.debug("using provided binary path")
             browserAttempt = ChromeWebDriver(service=ChromeService(executable_path=CONFIG["webdriver_binary"], log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_CHROMIUM, service_args=configure_service_args()), options=configure_chromium_options())
         else:
@@ -169,7 +171,7 @@ def attempt_edge():
     browserAttempt = None
     try:
         logger.debug("attempting Edge web browser...")
-        if CONFIG["webdriver_binary"]:
+        if CONFIG["webdriver_binary"] != "":
             logger.debug("using provided binary path")
             browserAttempt = webdriver.Edge(service=EdgeService(executable_path=CONFIG["webdriver_binary"], log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_EDGE, service_args=configure_service_args()), options=configure_edge_options())
         else:
@@ -187,11 +189,22 @@ def attempt_firefox():
         return None
     try:
         logger.debug("attempting Firefox web browser...")
-        if CONFIG["webdriver_binary"]:
+        if CONFIG["webdriver_binary"] != "":
             logger.debug("using provided binary path")
             browserAttempt = FirefoxWebDriver(CONFIG["webdriver_driver"], service=FirefoxService(log_path=DEFAULT.LOG_PATH_GECKODRIVER), options=configure_firefox_options())
         else:
-            browserAttempt = FirefoxWebDriver(service=FirefoxService(log_path=DEFAULT.LOG_PATH_GECKODRIVER), options=configure_firefox_options())
+            service = FirefoxService(GeckoDriverManager().install(), log_path=DEFAULT.LOG_PATH_GECKODRIVER)
+            # service = FirefoxService("/usr/local/bin/geckodriver", log_path=DEFAULT.LOG_PATH_GECKODRIVER)
+            # service = FirefoxService("/snap/bin/firefox.geckodriver", log_path=DEFAULT.LOG_PATH_GECKODRIVER)
+            # service.path = "/usr/local/bin/geckodriver"
+            # service.path = "/snap/bin/firefox.geckodriver"
+
+            # browserAttempt = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install(), log_path=DEFAULT.LOG_PATH_GECKODRIVER), options=configure_firefox_options())
+            # browserAttempt = FirefoxWebDriver(service=FirefoxService(log_path=DEFAULT.LOG_PATH_GECKODRIVER), options=configure_firefox_options())
+
+            browserAttempt = FirefoxWebDriver(service=service, options=configure_firefox_options())
+            # browserAttempt = webdriver.Firefox(service=service, options=configure_firefox_options())
+
         logger.info("browser created - Firefox")
     except Exception as e:
         browser_error(e, "firefox")
@@ -205,7 +218,7 @@ def attempt_ie():
         # driver_path = IEDriverManager().install()
         # os.chmod(driver_path, 0o755)
         # browserAttempt = webdriver.Ie(executable_path=IEService(driver_path))
-        if CONFIG["webdriver_binary"]:
+        if CONFIG["webdriver_binary"] != "":
             logger.debug("using provided binary path")
             browserAttempt = webdriver.Ie(service=IEService(executable_path=CONFIG["webdriver_binary"], log_path=DEFAULT.LOG_PATH_CHROMEDRIVER_IE, service_args=configure_service_args()), options=configure_ie_options())
         else:
@@ -230,7 +243,7 @@ def attempt_opera():
 
         # browserAttempt = webdriver.Remote(webdriver_service.service_url, options=options)
 
-        if CONFIG["webdriver_binary"]:
+        if CONFIG["webdriver_binary"] != "":
             logger.debug("using provided binary path")
             browserAttempt = webdriver.Opera(executable_path=CONFIG["webdriver_binary"])
         else:
@@ -275,9 +288,6 @@ def attempt_remote(browserType, host="selenium.skeetzo.com", port=80):
         options.add_argument("==profile-directory=Default")
         options.add_argument("==user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["host_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
 
-        if CONFIG["webdriver_binary"] and CONFIG["webdriver_driver"]:
-            options.binary_location = CONFIG["webdriver_binary"]
-            options.driver_location = CONFIG["webdriver_driver"]
         logger.debug(f"attempting remote browser: {browserType}")
         browserAttempt = webdriver.Remote(command_executor=link, options=options)
         logger.info(f"remote browser created: {browserType}")
@@ -337,10 +347,20 @@ def add_options(options):
     # else:
     # if str(platform.processor()) == "aarch64": # raspi
         # options.add_argument("--user-data-dir=selenium") # do not disable, required for cookies to work 
-    if "remote" not in str(CONFIG["browser"]):
-        options.add_argument("--profile-directory=Default")
-        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
+    # if "remote" not in str(CONFIG["browser"]):
+        # options.add_argument("--profile-directory=Default")
+        # options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium")) # do not disable, required for cookies to work 
+        # options.add_argument("--user-data-dir=/home/skeetzo/snap/firefox/common/.mozilla/firefox/balls.default") # do not disable, required for cookies to work 
 
+    # options.add_argument("==profile-directory=Default")
+    # options.add_argument("==user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["host_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
+
+    if CONFIG["webdriver_binary"] != "" and CONFIG.get("webdriver_driver", "") != "":
+        options.binary_location = CONFIG["webdriver_binary"]
+        options.driver_location = CONFIG["webdriver_driver"]
+
+    # options.binary_location = "/usr/bin/firefox"
+    # options.binary_location = "/snap/bin/firefox"
 
     options.add_argument("--disable-browser-side-navigation") # https://stackoverflow.com/a/49123152/1689770
 
@@ -404,10 +424,10 @@ def configure_firefox_options():
     options = FirefoxOptions()
     add_options(options)
     options.add_argument("--enable-file-cookies") # probably not needed
-
-    # BUG: required for cookies when using firefox but only breaks it?
-    # options.add_argument("-profile")
-    # options.add_argument(os.path.expanduser("~/.mozilla/firefox/snarf.selenium"))
+    options.add_argument("--profile-root")
+    options.add_argument(os.path.join(DEFAULT.ROOT_PATH,"tmp"))
+    options.add_argument("--profile")
+    options.add_argument(os.path.join(DEFAULT.ROOT_PATH,"tmp","selenium-firefox"))
     return options
 
 def configure_ie_options():

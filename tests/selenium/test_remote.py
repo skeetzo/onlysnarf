@@ -13,7 +13,7 @@ class TestSelenium_Remote(unittest.TestCase):
 
     def setUp(self):
         self.browser = None
-        CONFIG["remote_username"] = "skeetzo"
+        CONFIG["host_username"] = "skeetzo"
 
     def tearDown(self):
         if self.browser:
