@@ -7,7 +7,6 @@ CONFIG = set_config({'keep':False,'host_username':'skeetzo'})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
-from OnlySnarf.lib.driver import close_browser
 from OnlySnarf.lib.webdriver.cookies import reset_cookies
 from OnlySnarf.lib.webdriver.browser import create_browser as WEBDRIVER_create_browser
 from OnlySnarf.lib.webdriver.login import login as WEBDRIVER_login, check_if_already_logged_in as WEBDRIVER_check_if_already_logged_in
@@ -16,12 +15,12 @@ class TestWebdriver_Auth(unittest.TestCase):
 
     def setUp(self):
         # self.browser = WEBDRIVER_create_browser(CONFIG["browser"])
+        # self.browser = WEBDRIVER_create_browser("chrome")
         self.browser = WEBDRIVER_create_browser("firefox")
         # self.browser = WEBDRIVER_create_browser("remote:chrome")
         # self.browser = WEBDRIVER_create_browser("remote:firefox")
 
     def tearDown(self):
-        # close_browser(self.browser)
         if self.browser:
             self.browser.quit()
 
@@ -30,7 +29,7 @@ class TestWebdriver_Auth(unittest.TestCase):
         configure_logs_for_module_tests("OnlySnarf.lib.webdriver.browser")
         configure_logs_for_module_tests("OnlySnarf.lib.webdriver.cookies")
         configure_logs_for_module_tests("OnlySnarf.lib.webdriver.login")
-        # reset_cookies()
+        # reset_cookies() # doesn't necessarily have anything to do with the login process due to browser profiles
 
     @classmethod
     def tearDownClass(cls):

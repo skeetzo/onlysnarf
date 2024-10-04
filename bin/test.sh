@@ -25,6 +25,7 @@ pytest $TEST_PATH
 python -m unittest tests.webdriver.test_message.TestMessage_Webdriver.test_message_failure
 
 python -m unittest tests/webdriver/test_auth.py
+python -m unittest tests.webdriver.test_auth.TestWebdriver_Auth.test_login_via_cookies
 
 
 python -m unittest tests.webdriver.test_remote.TestSelenium_Remote.test_remote_chrome

@@ -906,12 +906,20 @@
 - updated config script
 **4.7.7 : 9-28-2024**
 - added chrome & firefox binary/drivers to args
+**4.7.8 : 10-4-2024**
+- debugging cookies for firefox & chrome
+- finished debugging cookies for chrome
+- updated firefox & chrome webdriver / selenium browser process
+
 
 ------------------------------------------------------------------------------------
 
+
+
+
 # TODO
 
-- finish chrome & firefox webdriver auth test
+- finish chrome & firefox webdriver remote auth test
 
 - finish debugging cookies for firefox
 
