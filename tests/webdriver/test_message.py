@@ -41,7 +41,6 @@ class TestWebdriver_Message(unittest.TestCase):
         }
 
     def tearDown(self):
-        # close_browser(self.browser)
         pass
 
     @classmethod

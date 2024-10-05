@@ -142,7 +142,7 @@ def attempt_chrome():
     browserAttempt = None
     try:
         logger.debug("attempting Chrome web browser...")
-        if CONFIG["webdriver_driver"] != "":
+        if CONFIG.get("webdriver_driver", "") != "":
             logger.debug("using provided driver path: "+CONFIG["webdriver_driver"])
             browserAttempt = ChromeWebDriver(service=ChromeService(CONFIG["webdriver_driver"], log_path=DEFAULT.LOG_PATH_CHROMEDRIVER, service_args=configure_service_args()), options=configure_chrome_options())
         else:
@@ -334,7 +334,7 @@ def add_options(options):
     options.add_argument("--disable-dev-shm-usage")
     # options.add_argument("--enable-automation")
 
-    if CONFIG["webdriver_binary"] != "":
+    if CONFIG.get("webdriver_binary","") != "":
         options.binary_location = CONFIG["webdriver_binary"]
     if CONFIG.get("webdriver_driver", "") != "":
         options.driver_location = CONFIG["webdriver_driver"]
@@ -396,12 +396,12 @@ def configure_chrome_options():
     options.add_argument("--remote-debugging-port=9223") # required
     if "remote" not in CONFIG["browser"]:
         options.add_argument("--profile-directory=Default")
-        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["host_username"]), "tmp", "selenium-chrome")) # do not disable, required for cookies to work 
+        options.add_argument("--user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG.get("host_username","")), "tmp", "selenium-chrome")) # do not disable, required for cookies to work 
     else:
         # BUG: WHAT THE ACTUAL FUCK??? do not change the "==" to "--", it only works with "=="
         # https://stackoverflow.com/questions/36434415/chromedriver-cannot-create-default-profile-directory 
         options.add_argument("==profile-directory=Default")
-        options.add_argument("==user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG["host_username"]),"tmp","selenium")) # do not disable, required for cookies to work 
+        options.add_argument("==user-data-dir="+os.path.join(DEFAULT.ROOT_PATH.replace(DEFAULT.USER, CONFIG.get("host_username","")),"tmp","selenium")) # do not disable, required for cookies to work 
     return options
 
 def configure_chromium_options():

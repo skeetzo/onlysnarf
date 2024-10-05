@@ -24,17 +24,18 @@ class TestWebdriver_Discount(unittest.TestCase):
         self.username = random_username
 
     def tearDown(self):
-        # close_browser(self.browser)
         pass
 
     @classmethod
     def setUpClass(cls):
+        configure_logs_for_module_tests("OnlySnarf.lib.webdriver.browser")
         configure_logs_for_module_tests("OnlySnarf.lib.webdriver.discount")
         configure_logs_for_module_tests("OnlySnarf.lib.webdriver.users")
 
     @classmethod
     def tearDownClass(cls):
         configure_logs_for_module_tests(flush=True)
+        if self.browser: self.browser.quit()
 
     def test_discount(self):
         assert WEBDRIVER_discount(self.browser, {

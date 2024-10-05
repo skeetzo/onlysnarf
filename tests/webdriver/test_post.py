@@ -11,7 +11,6 @@ from OnlySnarf.lib.driver import login as get_browser_and_login, close_browser
 from OnlySnarf.lib.webdriver.post import post as WEBDRIVER_post
 from OnlySnarf.util import defaults as DEFAULT
 
-
 class TestWebdriver_Post(unittest.TestCase):
 
     def setUp(self):
@@ -28,7 +27,6 @@ class TestWebdriver_Post(unittest.TestCase):
         }
 
     def tearDown(self):
-        # close_browser(self.browser)
         pass
 
     @classmethod

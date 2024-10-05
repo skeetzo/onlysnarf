@@ -3,7 +3,7 @@ os.environ['ENV'] = "test"
 import unittest
 
 from OnlySnarf.util.config import set_config
-CONFIG = set_config({'keep':False,'host_username':'skeetzo'})
+CONFIG = set_config({'keep':False})
 from OnlySnarf.util.logger import configure_logging, configure_logs_for_module_tests
 configure_logging(True, True)
 
@@ -15,8 +15,8 @@ class TestWebdriver_Auth(unittest.TestCase):
 
     def setUp(self):
         # self.browser = WEBDRIVER_create_browser(CONFIG["browser"])
-        # self.browser = WEBDRIVER_create_browser("chrome")
-        self.browser = WEBDRIVER_create_browser("firefox")
+        self.browser = WEBDRIVER_create_browser("chrome")
+        # self.browser = WEBDRIVER_create_browser("firefox")
         # self.browser = WEBDRIVER_create_browser("remote:chrome")
         # self.browser = WEBDRIVER_create_browser("remote:firefox")
 

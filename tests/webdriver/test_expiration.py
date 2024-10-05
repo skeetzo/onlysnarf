@@ -17,7 +17,6 @@ class TestWebdriver_Expiration(unittest.TestCase):
         self.browser = get_browser_and_login(cookies=CONFIG["cookies"])
 
     def tearDown(self):
-        # close_browser(self.browser)
         pass
 
     @classmethod

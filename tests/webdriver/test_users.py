@@ -13,10 +13,9 @@ from OnlySnarf.lib.webdriver.users import get_users_by_type as WEBDRIVER_get_use
 class TestWebdriver_Users(unittest.TestCase):
 
     def setUp(self):
-        self.browser = get_browser_and_login(cookies=CONFIG["cookies"])
+        browser = get_browser_and_login(cookies=CONFIG["cookies"])
         
     def tearDown(self):
-        # close_browser(self.browser)
         pass
 
     @classmethod
