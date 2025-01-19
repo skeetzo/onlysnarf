@@ -910,11 +910,13 @@
 - debugging cookies for firefox & chrome
 - finished debugging cookies for chrome
 - updated firefox & chrome webdriver / selenium browser process
-
+**4.7.9 : 1-18-2025**
+- minor bugfixes
 
 ------------------------------------------------------------------------------------
 
 
+- add pkg_resources? -> pip install setuptools
 
 
 # TODO

@@ -223,6 +223,7 @@ def get_random_fan_username(browser, page=ONLYFANS_FANS_URL, collection="Active"
 
 # TODO: update to interact with other fan/follower types ala recent, favorite, etc
 def get_users_by_type(browser, isFan=True, isFollower=False):
+    logger.debug(f"getting users by types: fan:{isFan}, follower:{isFollower}")
     users = []
     if isFan:
         users.extend(get_users_at_page(browser, ONLYFANS_FANS_URL))

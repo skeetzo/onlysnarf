@@ -22,6 +22,7 @@ ASCII = "\n     ________         .__          _________                     ____
 \\_______  /___|  /____/ ____/_______  /___|  (____  \\\\__|  |_|   \n \
         \\/     \\/     \\/            \\/     \\/     \\/              \n"
 
+VERSION = pkg_resources.get_distribution("onlysnarf").version
 
 def ask_action():
     """
@@ -71,7 +72,7 @@ def header():
 
     if not CONFIG["debug"]: os.system('clear')
     print(colorize(ASCII, 'header'))
-    print(colorize('version {}\n'.format(pkg_resources.get_distribution("onlysnarf").version), 'green'))
+    print(colorize('version {}\n'.format(VERSION), 'green'))
     user_header()
     settings_header()
 
@@ -84,7 +85,8 @@ def settings_header():
 
     # Settings.header()
     # TODO: update how settings can be reflected in menu (again)
-    pass
+    logger.info("TODO: update how settings can be reflected in menu (again)")
+    # pass
 
 def user_header():
     """
@@ -147,7 +149,7 @@ def main_menu():
 
     action = menu()
     if (action == 'Action'): action_menu()
-    # elif (action == 'Settings'): Settings.menu()
+    elif (action == 'Settings'): settings_header() # TODO: update me
     else: sys.exit(0)
     main()
 
@@ -160,7 +162,6 @@ def main():
 
     try:
         header()
-        settings_header()
         main_menu()
     except Exception as e:
         logger.error(e)

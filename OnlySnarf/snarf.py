@@ -188,7 +188,7 @@ def users():
 def main():
     try:
         logging.info(f"Running - {CONFIG['action']}")
-        if CONFIG['action'] == "api" or CONFIG['action'] == "config" or CONFIG['action'] == "menu":
+        if CONFIG['action'] in ["api","config","menu","users"]:
             eval(CONFIG['action']+"()")
         else:
             eval(CONFIG['action']+"({})")

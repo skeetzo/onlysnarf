@@ -25,7 +25,8 @@ setuptools.setup(
         'selenium==4.8.3',
         'webdriver_manager>=4.0.0',
         'validators',
-        'flask'
+        'flask',
+        'pkg_resources'
     ],
     extras_require={
         'dev': [
